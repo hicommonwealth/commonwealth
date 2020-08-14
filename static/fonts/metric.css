@@ -1,0 +1,112 @@
+@font-face {
+    font-family: Metric;
+    font-weight: 900;
+    font-style: normal;
+    src: url("./MetricWeb-Black.eot") format("embedded-opentype"),
+        url("./MetricWeb-Black.woff") format("woff"),
+        url("./MetricWeb-Black.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 900;
+    font-style: italic;
+    src: url("./MetricWeb-BlackItalic.eot") format("embedded-opentype"),
+        url("./MetricWeb-BlackItalic.woff") format("woff"),
+        url("./MetricWeb-BlackItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 700;
+    font-style: normal;
+    src: url("./MetricWeb-Bold.eot") format("embedded-opentype"),
+        url("./MetricWeb-Bold.woff") format("woff"),
+        url("./MetricWeb-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 700;
+    font-style: italic;
+    src: url("./MetricWeb-BoldItalic.eot") format("embedded-opentype"),
+        url("./MetricWeb-BoldItalic.woff") format("woff"),
+        url("./MetricWeb-BoldItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 300;
+    font-style: normal;
+    src: url("./MetricWeb-Light.eot") format("embedded-opentype"),
+        url("./MetricWeb-Light.woff") format("woff"),
+        url("./MetricWeb-Light.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 300;
+    font-style: italic;
+    src: url("./MetricWeb-LightItalic.eot") format("embedded-opentype"),
+        url("./MetricWeb-LightItalic.woff") format("woff"),
+        url("./MetricWeb-LightItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 500;
+    font-style: normal;
+    src: url("./MetricWeb-Medium.eot") format("embedded-opentype"),
+        url("./MetricWeb-Medium.woff") format("woff"),
+        url("./MetricWeb-Medium.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 500;
+    font-style: italic;
+    src: url("./MetricWeb-MediumItalic.eot") format("embedded-opentype"),
+        url("./MetricWeb-MediumItalic.woff") format("woff"),
+        url("./MetricWeb-MediumItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 400;
+    font-style: normal;
+    src: url("./MetricWeb-Regular.eot") format("embedded-opentype"),
+        url("./MetricWeb-Regular.woff") format("woff"),
+        url("./MetricWeb-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 400;
+    font-style: italic;
+    src: url("./MetricWeb-RegularItalic.eot") format("embedded-opentype"),
+        url("./MetricWeb-RegularItalic.woff") format("woff"),
+        url("./MetricWeb-RegularItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 600;
+    font-style: normal;
+    src: url("./MetricWeb-Semibold.eot") format("embedded-opentype"),
+        url("./MetricWeb-Semibold.woff") format("woff"),
+        url("./MetricWeb-Semibold.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 600;
+    font-style: italic;
+    src: url("./MetricWeb-SemiboldItalic.eot") format("embedded-opentype"),
+        url("./MetricWeb-SemiboldItalic.woff") format("woff"),
+        url("./MetricWeb-SemiboldItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 200;
+    font-style: normal;
+    src: url("./MetricWeb-Thin.eot") format("embedded-opentype"),
+        url("./MetricWeb-Thin.woff") format("woff"),
+        url("./MetricWeb-Thin.ttf") format("truetype");
+}
+@font-face {
+    font-family: Metric;
+    font-weight: 200;
+    font-style: italic;
+    src: url("./MetricWeb-ThinItalic.eot") format("embedded-opentype"),
+        url("./MetricWeb-ThinItalic.woff") format("woff"),
+        url("./MetricWeb-ThinItalic.ttf") format("truetype");
+}

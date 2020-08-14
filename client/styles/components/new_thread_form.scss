@@ -1,0 +1,137 @@
+@import 'client/styles/shared';
+
+.NewThreadForm {
+    display: flex;
+    max-width: 600px;
+    &.has-drafts {
+        max-width: 810px;
+    }
+
+    .cui-form-group {
+        margin-bottom: 15px;
+    }
+    .ql-editor {
+        min-height: 160px;
+    }
+    &.link-post .ql-editor {
+        min-height: 105px;
+    }
+
+    .new-thread-form-body {
+        padding-bottom: 24px;
+        flex: 9;
+        .cui-tabs {
+            margin-top: 4px;
+            margin-bottom: 16px;
+            padding-right: 28px;
+            border-bottom: 1px solid #eee;
+            .cui-tabs-item {
+                padding: 12px 0;
+                margin-left: 1px;
+                margin-right: 24px;
+            }
+            .cui-tabs-item.tab-right {
+                margin-right: 1px;
+                margin-left: 24px;
+            }
+        }
+        .cui-form {
+            margin: 0;
+            margin-right: 28px;
+            // space between title and topic
+            .topic-selection-drop-menu {
+                margin-left: 12px;
+                width: calc(100% - 12px);
+            }
+        }
+        button[name="submit"], button[name="submission"] {
+            margin-right: 12px;
+        }
+        .error-message {
+            @include error-text;
+            margin: 10px 0 20px;
+        }
+    }
+    &.is-modal .new-thread-form-body {
+        .cui-tabs {
+            padding-left: 28px;
+        }
+        .cui-form {
+            margin-left: 28px;
+        }
+    }
+    .new-thread-form-sidebar {
+        display: flex;
+        flex-direction: column;
+        flex: 3;
+        border-left: 1px solid #eee;
+        padding-bottom: 10px;
+        .cui-list {
+            max-height: none;
+            .cui-list-item {
+                display: block;
+                padding: 16px 20px;
+                border-bottom-color: #eee;
+                max-height: 140px;
+                overflow: hidden;
+                .discussion-draft-title-wrap {
+                    display: flex;
+                    .cui-icon-edit {
+                        color: $negative-text-color;
+                        margin: 0 8px 8px 0;
+                    }
+                }
+                .discussion-draft-title {
+                    font-weight: 400;
+                    line-height: 1.25;
+                    margin-bottom: 8px;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 2;
+                    overflow: hidden;
+                }
+                .discussion-draft-body {
+                    font-weight: 400 !important;
+                    .QuillFormattedText {
+                        line-height: 1.25;
+                        opacity: 0.4;
+                    }
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 2;
+                    overflow: hidden;
+                }
+                .discussion-draft-actions {
+                    margin-top: 7px;
+                    a {
+                        font-size: 12px;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        opacity: 0.4;
+                        text-decoration: none;
+                        &:hover {
+                            opacity: 1;
+                            color: $negative-text-color;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .draft-badge-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .draft-badge {
+            display: inline-block;
+            margin-right: 12px;
+            width: calc(100% - 6px);
+            padding: 3px 8px 2px;
+            line-height: 1.2;
+            color: $negative-text-color;
+            border: 1px solid $negative-text-color;
+            border-radius: 9999px;
+            text-align: center;
+        }
+    }
+}

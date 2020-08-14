@@ -1,8 +1,10 @@
+@import 'client/styles/shared';
+
 @mixin dropzone-button {
     $color: #444;
     $color-hover: #333;
     $background: #f2f2f2;
-    $background-hover: #eeeeee;
+    $background-hover: $background-color-light;
 
     cursor: pointer;
     margin: 2px 0;
@@ -12,7 +14,7 @@
     border-radius: 99px;
     color: $color;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 500;
     > svg {
         margin: -3px 0;
         margin-right: 6px;

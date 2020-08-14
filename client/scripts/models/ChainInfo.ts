@@ -2,7 +2,7 @@ import $ from 'jquery';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork } from './types';
-import OffchainTag from './OffchainTag';
+import OffchainTopic from './OffchainTopic';
 
 class ChainInfo {
   public readonly id: string;
@@ -11,23 +11,34 @@ class ChainInfo {
   public readonly network: ChainNetwork;
   public readonly iconUrl: string;
   public description: string;
-  public readonly featuredTags: string[];
-  public readonly tags: OffchainTag[];
+  public website: string;
+  public chat: string;
+  public telegram: string;
+  public github: string;
+  public readonly featuredTopics: string[];
+  public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
 
-  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, chainObjectVersion?, adminsAndMods?) {
+  constructor(
+    id, network, symbol, name, iconUrl, description, website, chat, telegram,
+    github, featuredTopics, topics, adminsAndMods?
+  ) {
     this.id = id;
     this.network = network;
     this.symbol = symbol;
     this.name = name;
     this.iconUrl = iconUrl;
     this.description = description;
-    this.featuredTags = featuredTags || [];
-    this.tags = tags || [];
-    this.chainObjectId = chainObjectVersion && chainObjectVersion.id;
+    this.website = website;
+    this.chat = chat;
+    this.telegram = telegram;
+    this.github = github;
+    this.featuredTopics = featuredTopics || [];
+    this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
   }
+
   public static fromJSON(json) {
     return new ChainInfo(
       json.id,
@@ -36,9 +47,12 @@ class ChainInfo {
       json.name,
       json.icon_url,
       json.description,
-      json.featured_tags,
-      json.tags,
-      json.ChainObjectVersion,
+      json.website,
+      json.chat,
+      json.telegram,
+      json.github,
+      json.featured_topics,
+      json.topics,
       json.adminsAndMods,
     );
   }
@@ -71,42 +85,52 @@ class ChainInfo {
     });
   }
 
-  public async updateChainData(name: string, description: string,) {
+  public async updateChainData(
+    name: string, description: string, website: string, chat: string, telegram: string, github: string
+  ) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
       'id': app.activeChainId(),
       'name': name,
       'description': description,
+      'website': website,
+      'chat': chat,
+      'telegram': telegram,
+      'github': github,
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
+    this.website = updatedChain.website;
+    this.chat = updatedChain.chat;
+    this.telegram = telegram;
+    this.github = github;
   }
 
-  public addFeaturedTag(tag: string) {
-    this.featuredTags.push(tag);
+  public addFeaturedTopic(topic: string) {
+    this.featuredTopics.push(topic);
   }
 
-  public removeFeaturedTag(tag: string) {
-    if (this.featuredTags.includes(tag)) {
-      this.featuredTags.splice(this.featuredTags.indexOf(tag), 1);
+  public removeFeaturedTopic(topic: string) {
+    if (this.featuredTopics.includes(topic)) {
+      this.featuredTopics.splice(this.featuredTopics.indexOf(topic), 1);
     }
   }
 
-  public async updateFeaturedTags(tags: string[]) {
+  public async updateFeaturedTopics(topics: string[]) {
     try {
       // TODO: Change to PUT /chain
       await $.post(`${app.serverUrl()}/updateChain`, {
         'id': app.activeChainId(),
-        'featured_tags[]': tags,
+        'featured_topics[]': topics,
         'jwt': app.user.jwt
       });
     } catch (err) {
-      console.log('Failed to update featured tags');
+      console.log('Failed to update featured topics');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to update featured tags');
+        : 'Failed to update featured topics');
     }
   }
 }

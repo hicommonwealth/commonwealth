@@ -1,13 +1,11 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
+import { isSameAccount } from 'helpers';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
-import SelectAddressModal from 'views/modals/select_address_modal';
 import {
   ChainInfo,
   SocialAccount,
@@ -23,23 +21,23 @@ function createAccount(account: Account<any>) {
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
     keytype: account.chainBase === ChainBase.Substrate
-      && (account as SubstrateAccount).isEd25519 ? 'ed25519' : undefined,
+      && (account as any).isEd25519 ? 'ed25519' : undefined,
     chain: account.chain.id,
     jwt: app.user.jwt,
   });
 }
 
-export async function setActiveAccount(account: Account<any>, suppressNotification?) {
+export async function setActiveAccount(account: Account<any>) {
   return new Promise((resolve, reject) => {
     const chain = app.activeChainId();
     const community = app.activeCommunityId();
-    const role = app.user.getRoleInCommunity({ chain, community });
+    const role = app.user.getRoleInCommunity({ account, chain, community });
 
-    if (!role) {
-      if (!suppressNotification && app.user.activeAccount !== account) {
-        notifySuccess('Switched account');
+    if (!role || role.is_user_default) {
+      app.user.ephemerallySetActiveAccount(account);
+      if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+        app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
       }
-      app.user.setActiveAccount(account);
       resolve();
     } else {
       $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
@@ -60,10 +58,10 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
           .forEach((r) => { r.is_user_default = false; });
         role.is_user_default = true;
 
-        if (!suppressNotification && app.user.activeAccount !== account) {
-          notifySuccess('Switched account');
+        app.user.ephemerallySetActiveAccount(account);
+        if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+          app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
         }
-        app.user.setActiveAccount(account);
         resolve();
       }).catch((err) => reject());
     }
@@ -90,12 +88,7 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
   }
 }
 
-export function clearActiveAddresses() {
-  app.user.setActiveAccounts([]);
-  app.user.setActiveAccount(null);
-}
-
-export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectionModal = false) {
+export function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
@@ -119,9 +112,6 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
     setActiveAccount(memberAddresses[0]);
-  } else if (app.user.activeAccounts.length === 1) {
-    // one non-member address - start the community with that address
-    setActiveAccount(app.user.activeAccounts[0]);
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
@@ -134,8 +124,6 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
         return a.chain.id === existingAddress.chain && a.address === existingAddress.address;
       });
       if (account) setActiveAccount(account);
-    } else if (!suppressAddressSelectionModal) {
-      app.modals.create({ modal: SelectAddressModal });
     }
   }
 }
@@ -152,7 +140,7 @@ export function updateActiveUser(data) {
     app.user.setLastVisited({});
     app.user.setUnseenPosts({});
     app.user.setActiveAccounts([]);
-    app.user.setActiveAccount(null);
+    app.user.ephemerallySetActiveAccount(null);
   } else {
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
@@ -178,7 +166,7 @@ export async function createUserWithSeed(seed: string): Promise<Account<any>> {
     throw new Error('User with this seed already exists');
   }
 
-  const account = (app.chain.accounts as SubstrateAccounts).fromSeed(seed);
+  const account = (app.chain.accounts as any).fromSeed(seed);
   // Look for account with the same public key
   const existingUser = app.user.activeAccounts.find((user) => user.address === account.address);
   if (existingUser) {
@@ -187,14 +175,16 @@ export async function createUserWithSeed(seed: string): Promise<Account<any>> {
   }
   const response = await createAccount(account);
   account.setValidationToken(response.result.verification_token);
+  account.setAddressId(response.result.id);
   await account.validate();
   return account;
 }
 
 export async function createUserWithMnemonic(mnemonic: string): Promise<Account<any>> {
-  const account = (app.chain.accounts as SubstrateAccounts).fromMnemonic(mnemonic);
+  const account = (app.chain.accounts as any).fromMnemonic(mnemonic);
   const response = await createAccount(account);
   account.setValidationToken(response.result.verification_token);
+  account.setAddressId(response.result.id);
   await account.validate();
   return account;
 }
@@ -204,10 +194,12 @@ export async function createUserWithAddress(address: string, keytype?: string): 
   const response = await createAccount(account);
   const token = response.result.verification_token;
   account.setValidationToken(token);
+  account.setAddressId(response.result.id);
   return account;
 }
 
 export function unlinkLogin(account) {
+  // TODO: make this an async function, and properly wait for ajax request, setActiveAccount, etc
   const unlinkingCurrentlyActiveAccount = app.user.activeAccount === account;
   // TODO: Change to DELETE /address
   return $.post(`${app.serverUrl()}/deleteAddress`, {
@@ -224,6 +216,10 @@ export function unlinkLogin(account) {
     app.user.addresses.splice(index, 1);
 
     if (!unlinkingCurrentlyActiveAccount) return;
-    app.user.setActiveAccount(app.user.activeAccounts.length > 0 ? app.user.activeAccounts[0] : null);
+    if (app.user.activeAccounts.length > 0) {
+      setActiveAccount(app.user.activeAccounts[0]);
+    } else {
+      app.user.ephemerallySetActiveAccount(null);
+    }
   });
 }

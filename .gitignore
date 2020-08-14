@@ -2,6 +2,7 @@
 *.pyc
 /venv
 /build
+/eth/build
 node_modules/
 jsconfig.json
 .vscode
@@ -27,3 +28,6 @@ stats.json
 
 # Test account artefacts
 test_accounts.txt
+
+.idea/
+report.*

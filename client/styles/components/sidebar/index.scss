@@ -1,77 +1,141 @@
 @import 'client/styles/shared';
 
-$sidebar-padding: 16px;
-$active-color: #ececec;
-
 .Sidebar {
-    > .cui-list {
-        // reset list styles
-        overflow-x: hidden;
-        max-height: 100%;
-        user-select: none;
-        // set up visual styles
-        background: #fff;
-        box-shadow: 0 0 6px rgba(0,0,0,0.07);
-        border-radius: 3px;
-        padding: 10px 0;
-        margin-bottom: 20px;
-        > h4 {
-            color: #555;
-            opacity: 0.6;
-            margin: 0;
-            padding: 6px $sidebar-padding;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.15px;
-            border: none;
-        }
-        .cui-list-item {
-            color: #111;
-            font-size: 15px;
-            border: none;
-            padding: 4px $sidebar-padding;
-            > .cui-list-item-content-left > .cui-icon svg {
-                height: 14px;
-                width: 14px;
-                min-height: 14px;
-                min-width: 14px;
-                margin-right: -2px;
-                color: #444;
-            }
-            &:hover {
-                background: lighten($active-color, 3%);
-            }
-            &.cui-selected,
-            &.cui-active {
-                font-weight: 400;
-                background: $theme-base-color;
-                color: #fff;
-                .cui-icon svg {
-                    color: #fff !important;
+    .SidebarHeader {
+        border-bottom: 1px solid $background-color-border;
+        margin-bottom: 18px;
+        .cui-button {
+            padding: 0;
+            width: 100%;
+            height: initial;
+            background: none !important;
+            > .cui-button-label {
+                padding: 0 19px;
+                width: 100%;
+                display: flex;
+                > .CommunityLabel {
+                    padding: 14px 0 15px;
+                    max-width: calc(100% - 18px);
+                }
+                > .CommunityLabel.CommunityLabelPlaceholder {
+                    padding: 22px 0;
+                    padding-left: 5px;
+                    font-weight: 500;
+                }
+                .cui-icon {
+                    margin-top: 26px;
+                    margin-left: 2px;
                 }
             }
-            .cui-tag {
-                margin: -3px 0;
-                position: relative;
-                top: -2px;
-            }
-        }
-        .cui-list.more-tags-list {
-            border-top: 1px solid #eee;
-            margin-top: 10px;
-            padding: 10px 0;
-            max-height: 230px;
-            margin-bottom: -10px;
-        }
-        .cui-list-item.more-tags-toggle {
-            display: block;
-            color: #888;
-            border-top: 1px solid #eee;
-            width: 100%;
-            padding: 10px 15px;
-            margin-top: 10px;
-            margin-bottom: -10px;
         }
     }
+    .SidebarModule {
+        margin: 0 15px 20px;
+        > .cui-list {
+            // reset list styles
+            overflow-x: hidden;
+            max-height: 100%;
+            user-select: none;
+            background: transparent;
+            .cui-list-item {
+                // small adjustments to .cui-lg list
+                font-size: 18px;
+                font-weight: 500;
+                padding: 3px 12px 4px;
+                border-radius: 4px;
+                border: none;
+                white-space: nowrap;
+                &.section-header, &.section-callout {
+                    background: initial !important;
+                    cursor: initial;
+                }
+                &.section-header {
+                    font-size: 15px;
+                    color: $text-color-lighter;
+                }
+                &.section-callout {
+                    margin-top: 8px;
+                    white-space: initial;
+                }
+                .proposal-topic-icon {
+                    position: relative;
+                    top: -1px;
+                }
+                .cui-list-item-content-left .cui-icon svg {
+                    stroke: $text-color-lighter;
+                }
+                &:hover {
+                    background: $background-color-light-hover;
+                }
+                &.cui-active, &.cui-active:hover {
+                    background: $primary-bg-color !important;
+                    color: #fff;
+                    .cui-icon svg {
+                        stroke: #fff;
+                    }
+                    .proposal-topic-icon {
+                        border-color: #fff;
+                    }
+                }
+                .cui-icon-action {
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    bottom: 0;
+                    width: 36px;
+                    // center the icon
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .cui-icon svg {
+                        opacity: 0.6;
+                    }
+                }
+                .cui-callout {
+                    font-weight: initial;
+                }
+            }
+        }
+        > .cui-list.cui-interactive {
+            .cui-list-item:hover {
+                background: $background-color-light-hover;
+            }
+            .cui-icon-action:hover {
+                .cui-icon svg {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+
+    .TopicsModule {
+        > .cui-list {
+            .cui-list.more-topics-list {
+                border-top: 1px solid $background-color-light-hover;
+                margin-top: 10px;
+                padding: 10px 0;
+                max-height: 230px;
+                margin-bottom: -10px;
+            }
+        }
+
+        // tag icons
+        .cui-list-item {
+            @include proposal-topic-inline;
+        }
+        .cui-list .cui-list-item-content-left {
+            padding-left: 4px !important;
+            padding-right: 12px !important;
+        }
+        .proposal-topic-icon {
+            margin-right: 0;
+            border-color: $background-color-placeholder;
+        }
+    }
+}
+
+.cui-popover.sidebar-edit-topic .cui-menu,
+.cui-popover.sidebar-add-topic .cui-menu {
+    padding: 4px 0;
 }

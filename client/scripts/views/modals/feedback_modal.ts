@@ -8,7 +8,9 @@ import app from 'state';
 const FeedbackModal = {
   view: (vnode) => {
     return m('.FeedbackModal', [
-      m('.header', 'Send feedback'),
+      m('.compact-modal-title', [
+        m('h3', 'Send feedback'),
+      ]),
       m('.compact-modal-body', [
         m(Form, { fluid: true }, [
           m(FormGroup, [

@@ -1,18 +1,8 @@
-@import 'client/styles/shared';
-
 .NewThreadModal {
-    max-width: 640px;
-    min-height: 410px;
-    padding: 4px 24px 10px;
-
-    .ql-editor {
-        min-height: 160px;
-    }
-}
-
-.NewThreadForm {
-    .error-message {
-        @include error-text;
-        margin: 10px 0 20px;
+    .modal-header {
+        padding: 0 24px;
+        h3 {
+            margin: 16px 0 6px;
+        }
     }
 }

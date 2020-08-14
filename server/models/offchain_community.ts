@@ -3,7 +3,7 @@ import * as Sequelize from 'sequelize';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { StarredCommunityAttributes } from './starred_community';
-import { OffchainTagAttributes } from './offchain_tag';
+import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainThreadAttributes } from './offchain_thread';
 
 export interface OffchainCommunityAttributes {
@@ -12,7 +12,12 @@ export interface OffchainCommunityAttributes {
   creator_id: number;
   default_chain: string;
   description?: string;
-  featured_tags?: string[];
+  website?: string;
+  chat?: string;
+  telegram?: string;
+  github?: string;
+  featured_topics?: string[];
+  visible: boolean;
   privacyEnabled?: boolean;
   invitesEnabled?: boolean;
   created_at?: Date;
@@ -22,7 +27,7 @@ export interface OffchainCommunityAttributes {
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  tags?: OffchainTagAttributes[] | OffchainTagAttributes['id'][];
+  topics?: OffchainTopicAttributes[] | OffchainTopicAttributes['id'][];
   OffchainThreads?: OffchainThreadAttributes[] | OffchainThreadAttributes['id'][];
   StarredCommunities?: StarredCommunityAttributes[] | StarredCommunityAttributes['id'][];
 }
@@ -46,8 +51,13 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       creator_id: { type: dataTypes.INTEGER, allowNull: false },
       default_chain: { type: dataTypes.STRING, allowNull: false },
+      visible: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       description: { type: dataTypes.TEXT, allowNull: true },
-      featured_tags: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
+      website: { type: dataTypes.STRING, allowNull: true },
+      chat: { type: dataTypes.STRING, allowNull: true },
+      telegram: { type: dataTypes.STRING, allowNull: true },
+      github: { type: dataTypes.STRING, allowNull: true },
+      featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
       // auth_forum: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       // auth_condition: { type: DataTypes.STRING, allowNull: true, defaultValue: null }, // For Auth Forum Checking
       // ^^^ other names: community_config, OffchainCommunityConfiguration, CommunityConditions
@@ -68,7 +78,7 @@ export default (
   OffchainCommunity.associate = (models) => {
     models.OffchainCommunity.belongsTo(models.Chain, { foreignKey: 'default_chain', targetKey: 'id' });
     models.OffchainCommunity.belongsTo(models.Address, { foreignKey: 'creator_id', targetKey: 'id' });
-    models.OffchainCommunity.hasMany(models.OffchainTag, { as: 'tags', foreignKey: 'community_id' });
+    models.OffchainCommunity.hasMany(models.OffchainTopic, { as: 'topics', foreignKey: 'community_id' });
     models.OffchainCommunity.hasMany(models.OffchainThread, { foreignKey: 'community' });
     models.OffchainCommunity.hasMany(models.StarredCommunity, { foreignKey: 'community' });
   };

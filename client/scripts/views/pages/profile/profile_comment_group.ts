@@ -2,28 +2,33 @@ import m from 'mithril';
 import _ from 'lodash';
 
 import app from 'state';
-import { OffchainThread, OffchainComment, AddressInfo } from 'models';
+import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
 import User from '../../components/widgets/user';
 import { link, slugify } from '../../../helpers';
 import QuillFormattedText from '../../components/quill_formatted_text';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 
-const ProfileCommentGroup : m.Component< { proposal: OffchainThread, comments: Array<OffchainComment<any>> } > = {
+interface IProfileCommentGroupAttrs {
+  proposal: OffchainThread;
+  comments: Array<OffchainComment<any>>;
+  account: Account<any>;
+}
+
+const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
   view: (vnode) => {
-    const { proposal, comments } = vnode.attrs;
-    const { author, createdAt, body, slug, identifier, title } = proposal;
+    const { proposal, comments, account } = vnode.attrs;
+    if (!proposal) return;
+    const { slug, identifier, title, } = proposal;
 
     return m('.ProfileCommentGroup', [
       m('.summary', [
         m(User, {
-          user: new AddressInfo(null, comments[0].author, comments[0].chain, null),
+          user: new AddressInfo(null, account.address, account.chain, null),
           linkify: true,
           hideAvatar: true,
           tooltip: true
         }),
-        ' commented on ',
-        link('a', `/${app.activeChainId()}/proposal/${slug}/${identifier}-${slugify(title)}`, title),
-        createdAt ? ` ${createdAt.fromNow()}` : '',
+        ' commented',
       ]),
       m('.activity', [
         comments.map((comment) => m('.proposal-comment', [

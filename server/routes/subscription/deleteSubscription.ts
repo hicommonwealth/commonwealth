@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import Errors from './errors';
+import { NotificationCategories } from '../../../shared/types';
 import { factory, formatFilename } from '../../../shared/logging';
 
 const Op = Sequelize.Op;
@@ -23,6 +24,9 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   }
   if (req.user.id !== subscription.subscriber_id) {
     return next(new Error(Errors.NotUsersSubscription));
+  }
+  if (subscription.category_id === NotificationCategories.NewMention) {
+    return next(new Error(Errors.NoMentionDelete));
   }
 
   // we don't delete all associated notifications -- since Subscriptions is set to paranoid mode,

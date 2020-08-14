@@ -102,7 +102,9 @@ const TXSigningCLIOption = {
         if (txData.status === TransactionStatus.Ready) {
           vnode.attrs.next('WaitingToConfirmTransaction', { obs });
         } else {
-          vnode.attrs.next('SentTransactionRejected', { error: new Error('Transaction Failed'), hash: null });
+          vnode.attrs.next('SentTransactionRejected', {
+            error: new Error('Transaction Failed'), hash: null, err: txData.err
+          });
         }
       });
     };
@@ -205,7 +207,7 @@ const TXSigningWebWalletOption = {
           if (txData.status === TransactionStatus.Ready) {
             vnode.attrs.next('WaitingToConfirmTransaction', { obs });
           } else {
-            vnode.attrs.next('SentTransactionRejected', { error: new Error('Transaction Failed'), hash: null });
+            vnode.attrs.next('SentTransactionRejected', { hash: null, error: txData.err });
           }
         });
       } catch (e) { console.log(e); }
@@ -245,7 +247,7 @@ const TXSigningSeedOrMnemonicOption = {
         if (txData.status === TransactionStatus.Ready) {
           vnode.attrs.next('WaitingToConfirmTransaction', { obs });
         } else {
-          vnode.attrs.next('SentTransactionRejected', { error: new Error('Transaction Failed'), hash: null });
+          vnode.attrs.next('SentTransactionRejected', { error: txData.err, hash: null });
         }
       });
     };
@@ -365,7 +367,7 @@ const TXSigningModalStates = {
         }
         if (data.status === TransactionStatus.Failed || data.status === TransactionStatus.Error) {
           vnode.attrs.next('SentTransactionRejected', {
-            error: new Error('Transaction Failed'),
+            error: data.err,
             hash: data.hash,
             blocknum: data.blocknum,
             timestamp: data.timestamp
@@ -425,7 +427,7 @@ const TXSigningModalStates = {
         m('.compact-modal-body', [
           m(TXSigningTransactionBox, {
             success: false,
-            status: 'Fail',
+            status: vnode.attrs.stateData.error,
             blockHash: vnode.attrs.stateData.hash ? `${vnode.attrs.stateData.hash}` : '--',
             blockNum: vnode.attrs.stateData.blocknum ? `${vnode.attrs.stateData.blocknum}` : '--',
             timestamp: vnode.attrs.stateData.timestamp ? `${vnode.attrs.stateData.timestamp.format()}` : '--',

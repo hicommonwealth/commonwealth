@@ -11,7 +11,6 @@ import {
   Moment,
   Balance,
   EventRecord,
-  Event,
   BlockNumber,
   Index,
   Hash,
@@ -26,38 +25,28 @@ import {
 import { Vec, Compact } from '@polkadot/types/codec';
 import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 
-import { formatCoin, Coin } from 'adapters/currency';
+import { formatCoin } from 'adapters/currency';
 import { formatAddressShort, BlocktimeHelper } from 'helpers';
 import {
-  Proposal,
   NodeInfo,
-  StorageModule,
   ITXModalData,
   ITransactionResult,
   TransactionStatus,
   IChainModule,
   ITXData,
-  ChainBase,
   ChainClass,
   ChainEntity,
   ChainEvent,
-  ChainEventType,
 } from 'models';
 
-import { CWEvent } from 'events/interfaces';
-import fetchSubstrateEvents from 'events/edgeware/storageFetcher';
-import EdgewareEventSubscriber from 'events/edgeware/subscriber';
-import EdgewareEventProcessor from 'events/edgeware/processor';
-import {
-  SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents,
-  eventToEntity, entityToFieldName
-} from 'events/edgeware/types';
+import { SubstrateEvents, SubstrateTypes } from '@commonwealth/chain-events';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
+import { constructSubstrateUrl } from 'substrate';
 import { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
@@ -69,15 +58,10 @@ export type HandlerId = number;
 
 // creates a substrate API provider and waits for it to emit a connected event
 async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
-  let nodeUrl = node.url;
-  const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
-  nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
-  const isInsecureProtocol = nodeUrl.indexOf('edgewa.re') === -1 && nodeUrl.indexOf('kusama-rpc.polkadot.io') === -1;
-  const protocol = isInsecureProtocol ? 'ws://' : 'wss://';
-  if (nodeUrl.indexOf(':9944') !== -1) {
-    nodeUrl = isInsecureProtocol ? nodeUrl : nodeUrl.split(':9944')[0];
-  }
-  const provider = new WsProvider(protocol + nodeUrl);
+  const nodeUrl = constructSubstrateUrl(node.url, [
+    'edgewa.re', 'kusama-rpc.polkadot.io', 'rpc.polkadot.io',
+  ]);
+  const provider = new WsProvider(nodeUrl, 10 * 1000);
   let unsubscribe: () => void;
   await new Promise((resolve) => {
     unsubscribe = provider.on('connected', () => resolve());
@@ -90,20 +74,20 @@ async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
 // dispatches an entity update to the appropriate module
 export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: ChainEvent): void {
   switch (entity.type) {
-    case SubstrateEntityKind.DemocracyProposal: {
+    case SubstrateTypes.EntityKind.DemocracyProposal: {
       const constructorFunc = (e) => new SubstrateDemocracyProposal(
         chain.chain, chain.accounts, chain.democracyProposals, e
       );
       return chain.democracyProposals.updateProposal(constructorFunc, entity, event);
     }
-    case SubstrateEntityKind.DemocracyReferendum: {
+    case SubstrateTypes.EntityKind.DemocracyReferendum: {
       const constructorFunc = (e) => new SubstrateDemocracyReferendum(
         chain.chain, chain.accounts, chain.democracy, e
       );
       return chain.democracy.updateProposal(constructorFunc, entity, event);
     }
-    case SubstrateEntityKind.DemocracyPreimage: {
-      if (event.data.kind === SubstrateEventKind.PreimageNoted) {
+    case SubstrateTypes.EntityKind.DemocracyPreimage: {
+      if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
         console.log('dispatching preimage noted, from entity', entity);
         const proposal = chain.democracyProposals.getByHash(entity.typeId);
         if (proposal) {
@@ -116,15 +100,16 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
       }
       break;
     }
-    case SubstrateEntityKind.TreasuryProposal: {
+    case SubstrateTypes.EntityKind.TreasuryProposal: {
       const constructorFunc = (e) => new SubstrateTreasuryProposal(
         chain.chain, chain.accounts, chain.treasury, e
       );
       return chain.treasury.updateProposal(constructorFunc, entity, event);
     }
-    case SubstrateEntityKind.CollectiveProposal: {
-      const collectiveName = (event.data as ISubstrateCollectiveProposalEvents).collectiveName;
-      if (collectiveName && collectiveName === 'technicalCommittee' && chain.class === ChainClass.Kusama) {
+    case SubstrateTypes.EntityKind.CollectiveProposal: {
+      const collectiveName = (event.data as SubstrateTypes.ICollectiveProposalEvents).collectiveName;
+      if (collectiveName && collectiveName === 'technicalCommittee'
+        && (chain.class === ChainClass.Kusama || chain.class === ChainClass.Polkadot)) {
         const constructorFunc = (e) => new SubstrateCollectiveProposal(
           chain.chain, chain.accounts, chain.technicalCommittee, e
         );
@@ -136,7 +121,7 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
         return chain.council.updateProposal(constructorFunc, entity, event);
       }
     }
-    case SubstrateEntityKind.SignalingProposal: {
+    case SubstrateTypes.EntityKind.SignalingProposal: {
       if (chain.class === ChainClass.Edgeware) {
         const constructorFunc = (e) => new EdgewareSignalingProposal(
           chain.chain, chain.accounts, chain.signaling, e
@@ -148,6 +133,7 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
       }
     }
     default:
+      console.error('Received invalid substrate chain entity!');
       break;
   }
   // force titles to update?
@@ -279,10 +265,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       ...additionalOptions,
     };
     const apiRx = new ApiRx(options);
-    const apiPromise = new ApiPromise(options);
     this._api = apiRx;
+    await this._api.isReady.toPromise();
+
+    // clone API as promise
+    const apiPromise = new ApiPromise({ source: apiRx, ...options });
     this._apiPromise = apiPromise;
-    return this._api.isReady.toPromise();
+    return this._api;
   }
 
   private _removeConnectedCb: () => void;
@@ -314,52 +303,17 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return !!this._api;
   }
 
-  // handle a single incoming chain event emitted from client connection with node
-  private _handleCWEvent(chain: string, cwEvent: CWEvent): void {
-    // immediately return if no entity involved, event unrelated to proposals/etc
-    const entityKind = eventToEntity(cwEvent.data.kind);
-    if (!entityKind) return;
-
-    // create event type
-    const eventType = new ChainEventType(
-      `${chain}-${cwEvent.data.kind.toString()}`,
-      chain,
-      cwEvent.data.kind.toString()
-    );
-
-    // create event
-    const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
-
-    // create entity
-    const fieldName = entityToFieldName(entityKind);
-    if (!fieldName) return;
-    const fieldValue = event.data[fieldName];
-    const entity = new ChainEntity(chain, entityKind, fieldValue.toString(), []);
-    this._app.chainEntities.update(entity, event);
-    this._app.chain.handleEntityUpdate(entity, event);
-  }
-
   // load existing events and subscribe to future via client node connection
-  public async initChainEntities(chain: string) {
-    // get existing events
-    const existingEvents = await fetchSubstrateEvents(this._apiPromise);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const cwEvent of existingEvents) {
-      this._handleCWEvent(chain, cwEvent);
-    }
-
-    // kick off subscription to future events
-    const subscriber = new EdgewareEventSubscriber(this._apiPromise);
-    const processor = new EdgewareEventProcessor(this._apiPromise);
-    // TODO: handle unsubscribing
-    console.log('Subscribing to chain events.');
-    subscriber.subscribe(async (block) => {
-      const incomingEvents = await processor.process(block);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const cwEvent of incomingEvents) {
-        this._handleCWEvent(chain, cwEvent);
-      }
-    });
+  public initChainEntities(): Promise<void> {
+    const fetcher = new SubstrateEvents.StorageFetcher(this._apiPromise);
+    const subscriber = new SubstrateEvents.Subscriber(this._apiPromise);
+    const processor = new SubstrateEvents.Processor(this._apiPromise);
+    return this._app.chain.chainEntities.subscribeEntities(
+      this._app.chain,
+      fetcher,
+      subscriber,
+      processor,
+    );
   }
 
   public query<T>(fn: (api: ApiRx) => Observable<T>): Observable<T> {
@@ -685,16 +639,25 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                       };
                     } else if (method === 'ExtrinsicFailed') {
                       const errorData = data[0] as DispatchError;
+                      let errorInfo;
                       if (errorData.isModule) {
-                        const errorInfo = this.registry.findMetaError(errorData.asModule.toU8a());
-                        console.error(`${errorInfo.section}::${errorInfo.name}: ${errorInfo.documentation[0]}`);
+                        const details = this.registry.findMetaError(errorData.asModule.toU8a());
+                        errorInfo = `${details.section}::${details.name}: ${details.documentation[0]}`;
+                      } else if (errorData.isBadOrigin) {
+                        errorInfo = 'TX Error: invalid sender origin';
+                      } else if (errorData.isCannotLookup) {
+                        errorInfo = 'TX Error: cannot lookup call';
+                      } else {
+                        errorInfo = 'TX Error: unknown';
                       }
+                      console.error(errorInfo);
                       notifyError(`Failed ${txName}: "${objName}"`);
                       return {
                         status: TransactionStatus.Failed,
                         hash: status.asFinalized.toHex(),
                         blocknum: this.app.chain.block.height,
                         timestamp: this.app.chain.block.lastTime,
+                        err: errorInfo,
                       };
                     }
                   }
@@ -741,7 +704,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   public get currentEra(): Observable<EraIndex> {
-    return this.query((api: ApiRx) => api.query.staking.currentEra())
+    return this.query((api: ApiRx) => api.query.staking.currentEra<EraIndex>())
       .pipe(map((era: EraIndex) => {
         if (era) {
           return era;

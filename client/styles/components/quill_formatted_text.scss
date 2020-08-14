@@ -13,7 +13,7 @@
     }
     h1, h2, h3, h4, h5, h6 {
         font-family: $fonts;
-        font-weight: 600;
+        font-weight: 500;
         margin: 1.5em 0 0.47em;
     }
     > :first-child > h1,
@@ -133,16 +133,17 @@
         background-color: transparent;
     }
     b, strong {
-        font-weight: 600;
+        font-weight: 500;
     }
     code,
     kbd,
     samp {
         font-family: $monospace-fonts;
-        font-size: 0.833em;
-        padding: 2px 4px;
-        background: #eee;
-        border-radius: 4px;
+        font-size: 0.75em;
+        padding: 2px 5px;
+        margin: 0 1px;
+        background: $background-color-light;
+        border-radius: 3px;
     }
     small {
         font-size: 80%;
@@ -161,6 +162,10 @@
         top: -0.5em;
     }
 
+    // miscellaneous
+    .twitter-tweet {
+        margin: 25px 0 28px !important;
+    }
 }
 
 // mixin for collapsing large text blocks to <200px in height
@@ -184,7 +189,7 @@
 
 .QuillFormattedText {
     position: relative;
-    line-height: 1.5;
+    line-height: 1.3;
     @include formatted-text();
     @include collapsible();
     @include hidden-formatting();

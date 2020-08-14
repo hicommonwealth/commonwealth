@@ -24,7 +24,7 @@ const ProfileContent: m.Component<{ account: Account<any>, type: UserContent, co
         ]),
         allContent.slice(0, vnode.state.count).map((obj) => {
           if (obj instanceof OffchainThread) return m(ProfileProposal, { proposal: obj });
-          else return m(ProfileCommentGroup, { proposal: obj.proposal, comments: [obj] });
+          else return m(ProfileCommentGroup, { proposal: obj.proposal, comments: [obj], account, });
         })
       ]),
       (type === UserContent.Threads) && m('.user-threads', [
@@ -40,7 +40,7 @@ const ProfileContent: m.Component<{ account: Account<any>, type: UserContent, co
           ' hasn\'t posted any comments'
         ]),
         comments.slice(0, vnode.state.count).map((comment) => {
-          return m(ProfileCommentGroup, { proposal: comment.proposal, comments: [comment] });
+          return m(ProfileCommentGroup, { proposal: comment.proposal, comments: [comment], account, });
         }),
       ]),
       ((type === UserContent.All && allContent.length > 10 && vnode.state.count < allContent.length)

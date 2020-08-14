@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import app from 'state';
 import { get } from 'lib/util';
-import { AccountId } from '@polkadot/types/interfaces';
 
 class ChainEventsController {
   public constructor() {

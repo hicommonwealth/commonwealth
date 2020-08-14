@@ -1,0 +1,21 @@
+@mixin xxs-max {
+    @media only screen and (max-width: 42em) { @content; }
+}
+@mixin xs-max {
+    @media only screen and (max-width: 48em) { @content; }
+}
+@mixin sm-max {
+    @media only screen and (max-width: 62em) { @content; }
+}
+@mixin md-max {
+    @media only screen and (max-width: 75em) { @content; }
+}
+@mixin sm-min {
+    @media only screen and (min-width: 48em) { @content; }
+}
+@mixin md-min {
+    @media only screen and (min-width: 62em) { @content; }
+}
+@mixin lg-min {
+    @media only screen and (min-width: 75em) { @content; }
+}

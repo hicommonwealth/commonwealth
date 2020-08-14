@@ -2,28 +2,53 @@ import $ from 'jquery';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import ChainInfo from './ChainInfo';
-import OffchainTag from './OffchainTag';
+import OffchainTopic from './OffchainTopic';
+
+interface CommunityData {
+  name: string,
+  description: string,
+  website: string,
+  chat: string,
+  telegram: string,
+  github: string,
+  visible: boolean;
+  invitesEnabled: boolean,
+  privacyEnabled: boolean,
+}
 
 class CommunityInfo {
   public readonly id: string;
   public name: string;
   public description: string;
+  public chat: string;
+  public website: string;
+  public telegram: string;
+  public github: string;
   public readonly defaultChain: ChainInfo;
+  public readonly visible: boolean;
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
-  public readonly featuredTags: string[];
-  public readonly tags: OffchainTag[];
+  public readonly featuredTopics: string[];
+  public readonly topics: OffchainTopic[];
   public adminsAndMods: RoleInfo[];
 
-  constructor(id, name, description, defaultChain, invitesEnabled, privacyEnabled, featuredTags, tags, adminsAndMods?) {
+  constructor(
+    id, name, description, website, chat, telegram, github, defaultChain,
+    visible, invitesEnabled, privacyEnabled, featuredTopics, topics, adminsAndMods?
+  ) {
     this.id = id;
     this.name = name;
     this.description = description;
+    this.website = website;
+    this.chat = chat;
+    this.telegram = telegram;
+    this.github = github;
     this.defaultChain = defaultChain;
+    this.visible = visible;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
-    this.featuredTags = featuredTags || [];
-    this.tags = tags || [];
+    this.featuredTopics = featuredTopics || [];
+    this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
   }
 
@@ -32,11 +57,16 @@ class CommunityInfo {
       json.id,
       json.name,
       json.description,
+      json.website,
+      json.chat,
+      json.telegram,
+      json.github,
       json.default_chain,
+      json.visible,
       json.invitesEnabled,
       json.privacyEnabled,
-      json.featuredTags,
-      json.tags,
+      json.featuredTopics,
+      json.topics,
       json.adminsAndMods,
     );
   }
@@ -69,17 +99,25 @@ class CommunityInfo {
     });
   }
 
-  public async updateCommunityData(
-    name: string,
-    description: string,
-    privacyEnabled: boolean,
-    invitesEnabled: boolean
-  ) {
+  public async updateCommunityData({
+    description,
+    invitesEnabled,
+    name,
+    privacyEnabled,
+    website,
+    chat,
+    telegram,
+    github,
+  }) {
     // TODO: Change to PUT /community
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
       'id': app.activeCommunityId(),
       'name': name,
       'description': description,
+      'website': website,
+      'chat': chat,
+      'telegram': telegram,
+      'github': github,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
       'jwt': app.user.jwt,
@@ -87,33 +125,37 @@ class CommunityInfo {
     const updatedCommunity: CommunityInfo = r.result;
     this.name = updatedCommunity.name;
     this.description = updatedCommunity.description;
+    this.website = updatedCommunity.website;
+    this.chat = updatedCommunity.chat;
+    this.telegram = updatedCommunity.telegram;
+    this.github = updatedCommunity.github;
     this.privacyEnabled = updatedCommunity.privacyEnabled;
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }
 
-  public addFeaturedTag(tag: string) {
-    this.featuredTags.push(tag);
+  public addFeaturedTopic(topic: string) {
+    this.featuredTopics.push(topic);
   }
 
-  public removeFeaturedTag(tag: string) {
-    if (this.featuredTags.includes(tag)) {
-      this.featuredTags.splice(this.featuredTags.indexOf(tag), 1);
+  public removeFeaturedTopic(topic: string) {
+    if (this.featuredTopics.includes(topic)) {
+      this.featuredTopics.splice(this.featuredTopics.indexOf(topic), 1);
     }
   }
 
-  public async updateFeaturedTags(tags: string[]) {
+  public async updateFeaturedTopics(topics: string[]) {
     try {
       // TODO: Change to PUT /community
       await $.post(`${app.serverUrl()}/updateCommunity`, {
         'id': app.activeCommunityId(),
-        'featured_tags[]': tags,
+        'featured_topics[]': topics,
         'jwt': app.user.jwt
       });
     } catch (err) {
-      console.log('Failed to update featured tags');
+      console.log('Failed to update featured topics');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to update featured tags');
+        : 'Failed to update featured topics');
     }
   }
 }

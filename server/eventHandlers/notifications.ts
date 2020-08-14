@@ -2,7 +2,7 @@
  * Generic handler that transforms events into notifications.
  */
 import WebSocket from 'ws';
-import { IEventHandler, CWEvent } from '../../shared/events/interfaces';
+import { IEventHandler, CWEvent } from '@commonwealth/chain-events';
 import { NotificationCategories } from '../../shared/types';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -20,7 +20,7 @@ export default class extends IEventHandler {
    * Handles an event by emitting notifications as needed.
    */
   public async handle(event: CWEvent, dbEvent) {
-    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
+    // log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     if (!dbEvent) {
       log.error('No db event received! Ignoring.');
       return;
@@ -42,7 +42,7 @@ export default class extends IEventHandler {
       event.excludeAddresses,
       event.includeAddresses,
     );
-    log.info(`Emitted ${dbNotifications.length} notifications.`);
+    log.trace(`Emitted ${dbNotifications.length} notifications.`);
     return dbEvent;
   }
 }

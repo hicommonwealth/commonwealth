@@ -6,7 +6,7 @@ import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
 import { CommentsStore } from 'stores';
-import { OffchainComment, OffchainAttachment, IUniqueId, AnyProposal, OffchainThread } from 'models';
+import { OffchainComment, OffchainAttachment, IUniqueId, AnyProposal, OffchainThread, AddressInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 // tslint:disable: object-literal-key-quotes
 
@@ -64,12 +64,17 @@ class CommentsController {
     return this._store.nComments(proposal);
   }
 
-  public uniqueCommenters<T extends IUniqueId>(proposal: T) {
+  public uniqueCommenters<T extends IUniqueId>(proposal: T, proposalAuthor?, proposalAuthorChain?) {
     // Returns an array of [chain, address] arrays
     // TODO: Use a better comparator to determine uniqueness
-    const comments = this._store.getByProposal(proposal);
-    return _.uniq(comments.map((c) => `${c.authorChain}#${c.author}`))
-      .map((slug) => slug.split(/#/));
+    const comments = (proposalAuthor && proposalAuthorChain)
+      ? [`${proposalAuthorChain}#${proposalAuthor}`]
+        .concat(this._store.getByProposal(proposal).map((c) => `${c.authorChain}#${c.author}`))
+      : (this._store.getByProposal(proposal)).map((c) => `${c.authorChain}#${c.author}`);
+
+    return _.uniq((comments as string[]))
+      .map((slug) => slug.split(/#/))
+      .map(([chain, address]) => new AddressInfo(null, address, chain, null));
   }
 
   public lastCommented<T extends IUniqueId>(proposal: T) {

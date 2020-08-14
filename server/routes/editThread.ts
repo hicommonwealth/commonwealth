@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories, ProposalType } from '../../shared/types';
@@ -13,7 +14,7 @@ export const Errors = {
 };
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, kind, thread_id, version_history, read_only, privacy } = req.body;
+  const { body, kind, thread_id, version_history, } = req.body;
 
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
@@ -43,26 +44,23 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   };
 
   try {
-    const userOwnedAddresses = await req.user.getAddresses();
+    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const thread = await models.OffchainThread.findOne({
-      where: { id: thread_id },
+      where: {
+        id: thread_id,
+        address_id: { [Op.in]: userOwnedAddressIds },
+      },
     });
     if (!thread) return next(new Error('No thread with that id found'));
-    if (userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
-      return next(new Error(Errors.IncorrectOwner));
-    }
     const arr = thread.version_history;
     arr.unshift(version_history);
     thread.version_history = arr;
     thread.body = body;
-    thread.read_only = read_only;
-    // threads can be changed from private to public, but not the other way around
-    if (thread.private) thread.private = privacy;
     await thread.save();
-    attachFiles();
+    await attachFiles();
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
-      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTag, as: 'tag' } ],
+      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTopic, as: 'topic' } ],
     });
 
     // dispatch notifications to subscribers of the given chain/community

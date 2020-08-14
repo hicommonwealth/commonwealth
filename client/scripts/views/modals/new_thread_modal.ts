@@ -1,13 +1,20 @@
 import 'modals/new_thread_modal.scss';
 
+import $ from 'jquery';
 import m from 'mithril';
-import { NewThreadForm } from 'views/pages/new_thread';
+import { CompactModalExitButton } from 'views/modal';
+import { NewThreadForm } from 'views/components/new_thread_form';
 
 const NewThreadModal = {
   view: (vnode) => {
     return m('.NewThreadModal', [
-      m('h3', 'New Post'),
-      m(NewThreadForm),
+      m('.compact-modal-title', [
+        m('h3', 'New thread'),
+        m(CompactModalExitButton),
+      ]),
+      m('.compact-modal-body-max', [
+        m(NewThreadForm, { isModal: true }),
+      ]),
     ]);
   }
 };

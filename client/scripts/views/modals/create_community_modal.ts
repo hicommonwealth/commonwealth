@@ -124,11 +124,16 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 result.result.id,
                 result.result.name,
                 result.result.description,
+                null,
+                null,
+                null,
+                null,
                 result.result.default_chain,
+                false,
                 result.result.invitesEnabled,
                 result.result.privacyEnabled,
-                result.featured_tags,
-                result.tags,
+                result.featured_topics,
+                result.topics,
               );
               app.config.communities.add(newCommunityInfo);
               vnode.state.success = 'Sucessfully added';

@@ -2,12 +2,12 @@ import 'pages/validators.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { formatAddressShort } from 'helpers';
+
+import app, { ApiStatus } from 'state';
+import { formatAddressShort } from 'helpers/index';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
-import _ from 'lodash';
 import { u32 } from '@polkadot/types';
-import app, { ApiStatus } from 'state';
 import { HeaderExtended } from '@polkadot/api-derive';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
@@ -125,6 +125,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
         ];
         break;
       case ChainClass.Kusama:
+      case ChainClass.Polkadot: {
         vComponents = [
           m(SubstratePreHeader, {
             sender: app.user.activeAccount as SubstrateAccount,
@@ -133,6 +134,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;
+      }
       case ChainClass.CosmosHub:
         vComponents = [
           CosmosValidationViews.ValidationPreHeader(app.chain as Cosmos),

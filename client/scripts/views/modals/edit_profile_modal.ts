@@ -9,6 +9,8 @@ import {
   PROFILE_NAME_MAX_CHARS,
   PROFILE_NAME_MIN_CHARS
 } from 'types';
+import { Button } from 'construct-ui';
+
 import CharacterLimitedTextInput from '../components/widgets/character_limited_text_input';
 import ResizableTextarea from '../components/widgets/resizable_textarea';
 import AvatarUpload from '../components/avatar_upload';
@@ -104,21 +106,24 @@ const EditProfileModal = {
         ]),
         m('.form-bottom', [
           m('.buttons', [
-            m('button.btn.formular-button-primary', {
-              class: vnode.state.saving || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+            m(Button, {
+              intent: 'primary',
+              disabled: vnode.state.saving || vnode.state.uploadsInProgress > 0,
               onclick: (e) => {
                 e.preventDefault();
                 updateProfile();
                 if (!vnode.state.error) $(vnode.dom).trigger('modalexit');
                 vnode.state.saving = false;
-              }
-            }, 'Save Changes'),
-            m('button', {
+              },
+              label: 'Save Changes'
+            }),
+            m(Button, {
               onclick: (e) => {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');
-              }
-            }, 'Cancel'),
+              },
+              label: 'Cancel'
+            }),
           ]),
           vnode.state.error && m('.error-message', vnode.state.error),
         ])
