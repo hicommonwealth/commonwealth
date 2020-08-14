@@ -182,14 +182,12 @@ const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs, { op
                     return app.user.notifications.subscribe(NotificationCategories.ChainEvent, obj);
                   })
                 ).then(async () => {
-                  console.log('inside this thing.');
                   const newSubscriptions = app.user.notifications.subscriptions.filter((s) => {
                     return (
                       s.category === NotificationCategories.ChainEvent
                       && notificationTypeArray.includes(s.objectId)
                     );
                   });
-                  console.log('new subscriptions', newSubscriptions);
                   await app.user.notifications.enableImmediateEmails(newSubscriptions);
                   m.redraw();
                 });
