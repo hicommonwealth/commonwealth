@@ -3,6 +3,9 @@
 .Sublayout {
     display: block;
     padding: 0 32px;
+    @include xs-max {
+        padding: 0 26px;
+    }
 
     .sublayout-grid {
         position: relative;

@@ -312,46 +312,44 @@ const SettingsModule: m.Component<{}> = {
 const MobileSidebarHeader: m.Component<{ parentVnode }> = {
   view: (vnode) => {
     const { parentVnode } = vnode.attrs;
-
-    // TODO: clean up menu opening/closing logic
-    return m('.MobileSidebarHeader', {
-      tabindex: '0',
-      onfocus: (e) => { parentVnode.state.open = true; },
-      onblur: (e) => {
-        // because of lag, defer closing this menu so the click can be handled
-        // should find a better way to handle blur, using CSS or another method that doesn't block on the event loop
-        setTimeout(() => { parentVnode.state.open = false; m.redraw(); }, 100);
-      },
-      onmousedown: (e) => {
-        // use onmousedown handler to handle clicking to close, since it runs before onfocus()
-        const $el = $(e.target).closest('.MobileSidebarHeader');
-        if ($el.is(':focus')) setTimeout(() => $el.blur(), 0);
-        // TODO: handle flash when 1) clicking to focus 2) clicking into inspector, which blurs the menu 3) clicking back on the menu
-      }
-    }, [
-      m('.mobile-sidebar-left', [
-        m(Icon, { name: Icons.MENU }),
-      ]),
-      m('.mobile-sidebar-center', [
-        // m('.community-label', app.chain
-        //   ? m(CommunityLabel, { chain: app.chain.meta.chain })
-        //   : app.community ? m(CommunityLabel, { community: app.community.meta }) : null),
-        m('.community-label', m(CommunitySelector)),
-      ]),
-      m('.mobile-sidebar-right', [
-        app.isLoggedIn() && m(NotificationsMenu, { small: true }),
-        m(LoginSelector, { small: true }),
-      ]),
-    ]);
   }
 };
 
 const Sidebar: m.Component<{}, { open: boolean }> = {
   view: (vnode) => {
     return [
-      m(MobileSidebarHeader, { parentVnode: vnode }),
+      m('.MobileSidebarHeader', {
+        onclick: (e) => {
+          // clicking anywhere outside the trigger should close the sidebar
+          const onTrigger = $(e.target).hasClass('mobile-sidebar-trigger')
+            || $(e.target).closest('.mobile-sidebar-trigger').length > 0;
+          if (!onTrigger && vnode.state.open) vnode.state.open = false;
+        },
+      }, [
+        m('.mobile-sidebar-left', [
+          m(Button, {
+            class: 'mobile-sidebar-trigger',
+            size: 'sm',
+            onclick: (e) => {
+              vnode.state.open = !vnode.state.open;
+            },
+            label: m(Icon, { name: Icons.MENU }),
+          }),
+        ]),
+        m('.mobile-sidebar-center', [
+          m('.community-label', m(CommunitySelector)),
+        ]),
+        m('.mobile-sidebar-right', [
+          app.isLoggedIn() && m(NotificationsMenu, { small: true }),
+          m(LoginSelector, { small: true }),
+        ]),
+      ]),
       m('.Sidebar', {
         class: vnode.state.open ? 'open' : '',
+        onclick: (e) => {
+          // clicking inside the sidebar should close the sidebar
+          vnode.state.open = false;
+        },
       }, [
         m('.SidebarHeader', m(CommunitySelector)),
         (app.chain || app.community) && m(NavigationModule),

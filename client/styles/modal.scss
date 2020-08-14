@@ -32,7 +32,9 @@
     }
     @include xs-max {
         .popup {
-            min-width: 310px;
+            margin-top: 50px;
+            min-width: calc(100vw - 40px);
+            max-height: calc(100vh - 100px);
         }
     }
 
@@ -63,10 +65,7 @@
     }
     @include xs-max {
         .compact-modal-title {
-            padding: 14px 20px 12px;
-            h1, h2, h3 {
-                font-size: 16px;
-            }
+            padding: 14px 20px 13px;
         }
         .compact-modal-body,
         .compact-modal-actions {

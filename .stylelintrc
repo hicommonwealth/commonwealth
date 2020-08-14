@@ -9,6 +9,6 @@
     "declaration-colon-space-after": "always",
     "indentation": 4,
     "max-empty-lines": 2,
-    "unit-whitelist": ["px", "em", "rem", "%", "s", "vh", "deg", "ms"]
+    "unit-whitelist": ["px", "em", "rem", "%", "s", "vh", "vw", "deg", "ms"]
   }
 }

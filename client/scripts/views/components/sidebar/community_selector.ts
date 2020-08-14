@@ -22,7 +22,7 @@ export const CommunityLabel: m.Component<{
     if (chain) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(ChainIcon, {
-          size: 24,
+          size: 18,
           chain,
           onclick: link ? (() => m.route.set(`/${chain.id}`)) : null
         }),
@@ -32,14 +32,13 @@ export const CommunityLabel: m.Component<{
           m('span.community-name', chain.name),
           showStatus === true && m(ChainStatusIndicator, { hideLabel: true }),
         ]),
-        m('.community-id', `/${chain.id}`),
       ]),
     ]);
 
     if (community) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(CommunityIcon, {
-          size: 24,
+          size: 18,
           community,
           onclick: link ? (() => m.route.set(`/${community.id}`)) : null
         }),
@@ -52,7 +51,6 @@ export const CommunityLabel: m.Component<{
             !community.privacyEnabled && m('span.icon-globe'),
           ],
         ]),
-        m('.community-id', `/${community.id}`),
       ]),
     ]);
 
@@ -106,8 +104,13 @@ const CommunitySelector = {
     });
 
     const isInCommunity = (item) => {
-      return item instanceof ChainInfo ? app.user.getRoleInCommunity({ chain: item.id })
-        : item instanceof CommunityInfo ? app.user.getRoleInCommunity({ community: item.id }) : false;
+      if (item instanceof ChainInfo) {
+        return app.user.getAllRolesInCommunity({ chain: item.id }).length > 0;
+      } else if (item instanceof CommunityInfo) {
+        return app.user.getAllRolesInCommunity({ community: item.id }).length > 0;
+      } else {
+        return false;
+      }
     };
     const joinedCommunities = allCommunities.filter((c) => isInCommunity(c));
     const unjoinedCommunities = allCommunities.filter((c) => !isInCommunity(c));
@@ -118,7 +121,9 @@ const CommunitySelector = {
           class: app.communities.isStarred(item.id, null) ? 'starred' : '',
           label: m(CommunityLabel, { chain: item }),
           selected: app.activeChainId() === item.id,
-          onclick: () => {
+          onclick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             m.route.set(item.id ? `/${item.id}` : '/');
           },
           contentRight: app.isLoggedIn() && app.user.isMember({
@@ -126,6 +131,8 @@ const CommunitySelector = {
             chain: item.id
           }) && m('.community-star-toggle', {
             onclick: (e) => {
+              e.preventDefault();
+              e.stopPropagation();
               app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
             }
           }, [
@@ -145,16 +152,18 @@ const CommunitySelector = {
               community: item.id
             }) && m('.community-star-toggle', {
               onclick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
               },
             }, [
               m(Icon, { name: Icons.STAR }),
             ]),
           })
-            : m.route.get() !== '/'
+          : m.route.get() !== '/'
             ? m(ListItem, {
               class: 'select-list-back-home',
-              label: 'Back to home',
+              label: '« Back home',
               onclick: () => {
                 m.route.set(item.id ? `/${item.id}` : '/');
               },
@@ -164,6 +173,7 @@ const CommunitySelector = {
     return m('.CommunitySelector', [
       m('.title-selector', [
         m(PopoverMenu, {
+          transitionDuration: 0,
           hasArrow: false,
           inline: true,
           trigger: m(Button, {
@@ -178,9 +188,12 @@ const CommunitySelector = {
           }),
           class: 'CommunitySelectList',
           content: [
-            app.isLoggedIn() && m('h4', 'Joined'),
-            app.isLoggedIn() && joinedCommunities.map(renderCommunity),
-            app.isLoggedIn() && m('h4', 'More communities'),
+            app.isLoggedIn() && [
+              m('h4', 'Your communities'),
+              joinedCommunities.map(renderCommunity),
+              joinedCommunities.length === 0 && m('.community-placeholder', 'None'),
+              m('h4', 'More communities'),
+            ],
             unjoinedCommunities.map(renderCommunity),
             renderCommunity('home'),
           ],
