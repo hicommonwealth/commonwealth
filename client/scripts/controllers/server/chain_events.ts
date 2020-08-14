@@ -51,6 +51,16 @@ class ChainEventsController {
       }, resolve);
     });
   }
+
+  public getNominatorsOverTime(stash?: string) {
+    return new Promise((resolve) => {
+      return get('/getNominatorsOverTime', {
+        chain: app.chain.id,
+        stash
+      }, resolve);
+    });
+  }
+
 }
 
 export default ChainEventsController;
