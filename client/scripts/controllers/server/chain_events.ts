@@ -8,42 +8,47 @@ class ChainEventsController {
     // do nothing
   }
 
-  public offences() {
+  public offences(stash?: string) {
     return new Promise((resolve) => {
-      return get('/getOffences/:stash_id?', {
-        chain: app.chain.id
+      return get('/getOffences', {
+        chain: app.chain.id,
+        stash
       }, resolve);
     });
   }
 
-  public rewards() {
+  public rewards(stash?: string) {
     return new Promise((resolve) => {
-      return get('/getRewards/:stash_id?', {
+      return get('/getRewards', {
         chain: app.chain.id,
+        stash
       }, resolve);
     });
   }
 
-  public getOwnStakeOverTime() {
+  public getOwnStakeOverTime(stash?: string) {
     return new Promise((resolve) => {
-      return get('/getOwnStakeOverTime/:stash_id?', {
+      return get('/getOwnStakeOverTime', {
         chain: app.chain.id,
+        stash
       }, resolve);
     });
   }
 
-  public getTotalStakeOverTime() {
+  public getTotalStakeOverTime(stash?: string) {
     return new Promise((resolve) => {
-      return get('/getTotalStakeOverTime/:stash_id?', {
+      return get('/getTotalStakeOverTime', {
         chain: app.chain.id,
+        stash
       }, resolve);
     });
   }
 
-  public getOtherStakeOverTime() {
+  public getOtherStakeOverTime(stash?: string) {
     return new Promise((resolve) => {
-      return get('/getOtherStakeOverTime/:stash_id?', {
+      return get('/getOtherStakeOverTime', {
         chain: app.chain.id,
+        stash
       }, resolve);
     });
   }

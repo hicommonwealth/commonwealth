@@ -11,7 +11,7 @@ export const Errors = {
 };
 
 const getOffences = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { chain, startDate, endDate } = req.query;
+  const { chain, startDate, endDate, stash } = req.query;
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
 

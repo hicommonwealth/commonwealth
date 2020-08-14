@@ -5,13 +5,13 @@ import { Errors } from './getOffences';
 const Op = Sequelize.Op;
 
 interface IEventData {
-    stash_id: AccountId;
+    stash: AccountId;
     exposure: Exposure;
     block_number: BlockNumber;
 }
 
 const getOwnStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { chain, stash_id } = req.query;
+  const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
   const chainInfo = await models.Chain.findOne({
     where: { id: chain }
@@ -33,12 +33,12 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
     // To get all exposure of validator between a time period
     where: {
       '$ChainEventType.chain$': chain,
-      '$HistoricalValidatorStatistic.stash_id': stash_id,
+      '$HistoricalValidatorStatistic.stash': stash,
       created_at: {
         [Op.between]: [startDate, endDate]
       }
     },
-    attributes: ['stash_id', 'exposure', 'block'],
+    attributes: ['stash', 'exposure', 'block'],
     order: [
       ['created_at', 'ASC']
     ],
@@ -50,8 +50,8 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
 
   const othersStake = [];
   const block = [];
-  OwnStakeOverTime.forEach((stake) => {
-    const event_data: IEventData = stake.dataValues.event_data;
+  OwnStakeOverTime.forEach((value) => {
+    const event_data: IEventData = value.dataValues.event_data;
     othersStake.push(event_data.exposure.others);
     block.push(event_data.block_number);
   });
