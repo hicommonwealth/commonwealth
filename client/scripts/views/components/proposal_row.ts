@@ -65,7 +65,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
           : proposal.isPassing === ProposalStatus.Passed ? 'Passed'
             : proposal.isPassing === ProposalStatus.Failed ? 'Did not pass'
               : proposal.isPassing === ProposalStatus.Passing ? 'Passing'
-                : proposal.isPassing === ProposalStatus.Failing ? 'Insufficient votes' : '';
+                : proposal.isPassing === ProposalStatus.Failing ? 'Needs more votes' : '';
   if (proposal.isPassing === ProposalStatus.Passing
       || proposal.isPassing === ProposalStatus.Failing
       || (proposal instanceof MolochProposal
