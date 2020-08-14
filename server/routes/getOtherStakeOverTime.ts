@@ -49,7 +49,7 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
     });
 
     if (!OtherStakeOverTime.length)
-      return next(new Error(Errors.NoRecordsFound));
+      return [];
 
     const otherStake : { [key:string]:any } = {};
     OtherStakeOverTime.forEach((value) => {
@@ -70,6 +70,12 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
       attributes: [ 'stash' ]
     });
 
+    if (!validators.length) return ['Validator Table Empty'];
+
+    validators.map((value) => {
+      return value.stash;
+    });
+
     OtherStakeOverTime = await models.HistoricalValidatorStatistic.findAll({
       where:{
         '$ChainEventType.chain$': chain,
@@ -85,7 +91,7 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
     });
 
     if (!OtherStakeOverTime.length)
-      return next(new Error(Errors.NoRecordsFound));
+      return [];
 
     const allValidatorsHistoricalStats : {
       [stash:string]: {

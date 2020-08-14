@@ -38,7 +38,7 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     ]
   });
   // No Offences
-  if (!offences) return next(new Error(Errors.NoRecordsFound));
+  if (!offences.length) return [];
 
   return res.json({ status: 'Success', result: offences });
 };

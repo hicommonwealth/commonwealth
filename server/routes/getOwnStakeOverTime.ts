@@ -52,7 +52,8 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
     });
     // No Records found
     if (!OwnStakeOverTime.length)
-      return next(new Error(Errors.NoRecordsFound));
+      return [];
+
     OwnStakeOverTime.forEach((stake) => {
       const event_data: IEventData = stake.dataValues.event_data;
       ownStake.push(event_data.exposure.own);
@@ -73,11 +74,10 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
       attributes: [ 'stash' ]
     });
 
-    if (!validators.length)
-      return next(new Error(Errors.NoRecordsFound));
+    if (!validators.length) return ['Validator Table Empty'];
 
-    validators.map((validator_stash) => {
-      return validator_stash.stash;
+    validators.map((value) => {
+      return value.stash;
     });
 
     OwnStakeOverTime = await models.HistoricalValidatorStatistic.findAll({
@@ -93,6 +93,9 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
       attributes: ['stash', 'exposure', 'block'],
       include: [ { model: models.ChainEventType } ]
     });
+
+    if (!OwnStakeOverTime.length)
+      return [];
 
     const allValidatorsHistoricalStats : { [key:string]: any } = {};
 

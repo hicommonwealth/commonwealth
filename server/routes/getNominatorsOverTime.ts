@@ -49,7 +49,7 @@ const getNominatorsOverTime = async (models, req: Request, res: Response, next: 
     });
 
     if (!NominatorsOverTime.length)
-      return next(new Error(Errors.NoRecordsFound));
+      return [];
 
     const nominators : { [key:string]:any } = {};
 
@@ -70,6 +70,12 @@ const getNominatorsOverTime = async (models, req: Request, res: Response, next: 
       attributes: [ 'stash' ]
     });
 
+    if (!validators.length) return ['Validator Table Empty'];
+
+    validators.map((value) => {
+      return value.stash;
+    });
+
     NominatorsOverTime = await models.HistoricalValidatorStatistic.findAll({
       where:{
         '$ChainEventType.chain$': chain,
@@ -85,7 +91,7 @@ const getNominatorsOverTime = async (models, req: Request, res: Response, next: 
     });
 
     if (!NominatorsOverTime.length)
-      return next(new Error(Errors.NoRecordsFound));
+      return [];
 
     const allValidatorsHistoricalStats : {
       [stash:string]: {
@@ -97,7 +103,7 @@ const getNominatorsOverTime = async (models, req: Request, res: Response, next: 
       const event_data :IEventData = value.dataValues.event_data;
       const key = event_data.stash.toString();
       if (key in validators) {
-        allValidatorsHistoricalStats[key].other_exposure.push(event_data.exposure.others.map((individualExposure)=>{
+        allValidatorsHistoricalStats[key].other_exposure.push(event_data.exposure.others.map((individualExposure) => {
           return individualExposure.who;
         }));
         allValidatorsHistoricalStats[key].blk_number.push(event_data.block_number);

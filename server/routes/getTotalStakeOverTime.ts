@@ -48,7 +48,7 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
     });
 
     if (!TotalStakeOverTime.length)
-      return next(new Error(Errors.NoRecordsFound));
+      return [];
 
     const totalStake = [];
     const block = [];
@@ -68,6 +68,13 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
       */
       attributes: [ 'stash' ]
     });
+
+    if (!validators.length) return ['Validator Table Empty'];
+
+    validators.map((value) => {
+      return value.stash;
+    });
+
     const TotalStakeOverTime = await models.HistoricalValidatorStatistic.findAll({
       // To get all exposure of validator between a time period
       where: {
@@ -85,7 +92,7 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
     });
 
     if (!TotalStakeOverTime.length)
-      return next(new Error(Errors.NoRecordsFound));
+      return [];
 
     const allValidatorsHistoricalStats : {
         [stash:string]: {
