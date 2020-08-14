@@ -21,6 +21,7 @@ import DiscussionRow from 'views/pages/discussions/discussion_row';
 
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import Listing from '../listing';
+import PinnedListing from './pinned_listing';
 
 interface IDiscussionPageState {
   lookback?: number;
@@ -186,6 +187,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const getRecentPostsSortedByWeek = () => {
         const arr = [];
         let count = 0;
+        const pinnedThreads = allProposals.filter((t) => t.pinned);
+        arr.push(m(PinnedListing, { proposals: pinnedThreads }));
         weekIndexes.sort((a, b) => Number(a) - Number(b)).forEach((msecAgo) => {
           let proposals;
           if (allProposals.length < vnode.state.lookback) {
