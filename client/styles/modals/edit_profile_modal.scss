@@ -2,39 +2,23 @@
 
 .EditProfileModal {
     width: 620px;
-    .header {
-        background-color: black;
-        color: white;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        padding-left: 32px;
-        font-size: 19px;
-        font-weight: 500;
-    }
-    .cover {
-        height: 96px;
-        width: 100%;
-        background: linear-gradient(180deg, #404040 0%, #111 100%);
+    @include xs-max {
+        width: initial;
     }
     .form {
         .avatar {
-            height: 45px;
             .AvatarUpload {
-                position: relative;
-                bottom: 60px;
                 width: 92px;
                 height: 92px;
             }
         }
         display: flex;
         flex-direction: column;
-        padding: 32px;
+        padding: 26px;
         .text-input-wrapper {
             margin: 6px 0 4px 0;
             input, textarea {
-                padding: 11px 16px;
-                margin: 8px 0;
+                margin: 6px 0;
             }
             textarea {
                 height: 96px !important;
@@ -45,8 +29,8 @@
     .form-bottom {
         display: flex;
         justify-content: space-between;
-        margin-top: 11px;
         .buttons {
+            margin-top: 10px;
             display: flex;
             justify-content: left;
         }

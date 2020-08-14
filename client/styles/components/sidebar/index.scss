@@ -16,7 +16,10 @@
         }
         .CommunitySelector .cui-button {
             background: #fff;
-            padding: 20px 14px 22px;
+            padding: 10px 14px;
+            height: 24px;
+            max-height: 24px;
+            overflow: hidden;
             .cui-icon-menu {
                 display: none;
             }

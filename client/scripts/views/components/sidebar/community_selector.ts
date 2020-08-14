@@ -22,7 +22,7 @@ export const CommunityLabel: m.Component<{
     if (chain) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(ChainIcon, {
-          size: 24,
+          size: 18,
           chain,
           onclick: link ? (() => m.route.set(`/${chain.id}`)) : null
         }),
@@ -32,14 +32,13 @@ export const CommunityLabel: m.Component<{
           m('span.community-name', chain.name),
           showStatus === true && m(ChainStatusIndicator, { hideLabel: true }),
         ]),
-        m('.community-id', `/${chain.id}`),
       ]),
     ]);
 
     if (community) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(CommunityIcon, {
-          size: 24,
+          size: 18,
           community,
           onclick: link ? (() => m.route.set(`/${community.id}`)) : null
         }),
@@ -52,7 +51,6 @@ export const CommunityLabel: m.Component<{
             !community.privacyEnabled && m('span.icon-globe'),
           ],
         ]),
-        m('.community-id', `/${community.id}`),
       ]),
     ]);
 
@@ -165,7 +163,7 @@ const CommunitySelector = {
           : m.route.get() !== '/'
             ? m(ListItem, {
               class: 'select-list-back-home',
-              label: 'Back to home',
+              label: '« Back home',
               onclick: () => {
                 m.route.set(item.id ? `/${item.id}` : '/');
               },
@@ -175,6 +173,7 @@ const CommunitySelector = {
     return m('.CommunitySelector', [
       m('.title-selector', [
         m(PopoverMenu, {
+          transitionDuration: 0,
           hasArrow: false,
           inline: true,
           trigger: m(Button, {

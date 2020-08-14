@@ -148,6 +148,7 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
 
     return m('.LoginSelector', [
       wrapHint(m(Popover, {
+        hasArrow: false,
         class: 'login-selector-popover',
         closeOnContentClick: true,
         transitionDuration: 0,
@@ -196,7 +197,6 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
               }
             }),
             !isPrivateCommunity && m(MenuItem, {
-              style: 'margin-top: 4px',
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
               }),

@@ -3,17 +3,9 @@ import 'modals/edit_profile_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
-import {
-  PROFILE_BIO_MAX_CHARS,
-  PROFILE_HEADLINE_MAX_CHARS,
-  PROFILE_NAME_MAX_CHARS,
-  PROFILE_NAME_MIN_CHARS
-} from 'types';
-import { Button } from 'construct-ui';
+import { Button, Input, TextArea } from 'construct-ui';
 
-import CharacterLimitedTextInput from '../components/widgets/character_limited_text_input';
-import ResizableTextarea from '../components/widgets/resizable_textarea';
-import AvatarUpload from '../components/avatar_upload';
+import AvatarUpload from 'views/components/avatar_upload';
 
 const EditProfileModal = {
   view: (vnode) => {
@@ -37,10 +29,9 @@ const EditProfileModal = {
     };
 
     return m('.EditProfileModal', [
-      m('.header', [
-        m('span', 'Edit profile')
+      m('.compact-modal-title', [
+        m('h3', 'Edit profile')
       ]),
-      m('.cover'),
       m('.form', [
         m('.avatar', [
           m(AvatarUpload, {
@@ -66,26 +57,28 @@ const EditProfileModal = {
           oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.avatarUrl)
         }),
         m('.text-input-wrapper', [
-          m(CharacterLimitedTextInput, {
+          m(Input, {
             name: 'name',
             placeholder: 'Display name',
+            fluid: true,
+            autocomplete: 'off',
             oncreate: (vvnode) => {
               if (account.profile) $(vvnode.dom).val(account.profile.name);
               $(vvnode.dom).focus();
             },
-            limit: 40,
           }),
-          m(CharacterLimitedTextInput, {
+          m(Input, {
             name: 'headline',
             placeholder: 'Headline',
+            fluid: true,
+            autocomplete: 'off',
             oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.headline),
-            limit: 80,
           }),
-          m(ResizableTextarea, {
+          m(TextArea, {
             name: 'bio',
             placeholder: 'Enter bio...',
+            fluid: true,
             oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.bio)
-            // TODO: character limit
           }),
         ]),
         m('.form-bottom', [

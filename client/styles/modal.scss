@@ -32,9 +32,9 @@
     }
     @include xs-max {
         .popup {
-            min-width: 310px;
             margin-top: 50px;
-            max-height: calc(100vh - 120px);
+            min-width: calc(100vw - 40px);
+            max-height: calc(100vh - 100px);
         }
     }
 

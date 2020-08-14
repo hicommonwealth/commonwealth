@@ -30,12 +30,20 @@
         }
     }
     .cui-list-item {
-        padding: 6px 20px 6px 24px;
+        padding: 4px 20px 4px 24px;
         border: none;
         user-select: none;
         &.cui-selected {
             color: #111;
         }
+        .CommunityLabel .community-name-row {
+            position: relative;
+            top: -2px;
+        }
+    }
+    .cui-list-item.select-list-back-home {
+        margin: 15px 0;
+        font-size: 16px;
     }
 
     // stars
