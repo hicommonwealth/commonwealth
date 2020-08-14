@@ -10,7 +10,7 @@ interface IEventData {
     block_number: BlockNumber;
 }
 
-const getOwnStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
+const getOtherStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
   const chainInfo = await models.Chain.findOne({
@@ -59,4 +59,4 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
   return res.json({ status: 'Success', result: { othersStake, block } });
 };
 
-export default getOwnStakeOverTime;
+export default getOtherStakeOverTime;

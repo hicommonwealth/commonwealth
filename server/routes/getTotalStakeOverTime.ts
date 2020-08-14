@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import { Exposure, BlockNumber, AccountId, ValidatorPrefs} from '@polkadot/types/interfaces';
+import { Exposure, BlockNumber, AccountId, ValidatorPrefs } from '@polkadot/types/interfaces';
 import { Request, Response, NextFunction } from 'express';
 import { Errors } from './getOffences';
 const Op = Sequelize.Op;
@@ -10,7 +10,7 @@ interface IEventData {
     block_number: BlockNumber;
 }
 
-const getOwnStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
+const getTotalStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
   const chainInfo = await models.Chain.findOne({
@@ -59,4 +59,4 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
   return res.json({ status: 'Success', result: { totalStake, block } });
 };
 
-export default getOwnStakeOverTime;
+export default getTotalStakeOverTime;
