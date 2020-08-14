@@ -88,6 +88,13 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       return tsB - tsA;
     };
 
+    const orderByDateReverseChronological = (a, b) => {
+      // tslint:disable-next-line
+      const tsB = Math.max(+b.createdAt);
+      const tsA = Math.max(+a.createdAt);
+      return tsA - tsB;
+    };
+
     const getSingleTopicListing = (topic_) => {
       if (!activeEntity || !activeEntity.serverLoaded) {
         return m('.discussions-main', [
@@ -103,8 +110,13 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       let list = [];
       const divider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last Visited'), m('hr') ]);
       const sortedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.topic && thread.topic.name === topic_)
+        .filter((thread) => thread.topic && thread.topic.name === topic_ && !thread.pinned)
         .sort(orderDiscussionsbyLastComment);
+
+      const pinnedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
+        .filter((thread) => thread.topic && thread.topic.name === topic_ && thread.pinned)
+        .sort(orderByDateReverseChronological);
+      list.push(m(PinnedListing, { proposals: pinnedThreads }));
 
       if (sortedThreads.length > 0) {
         const firstThread = sortedThreads[0];
