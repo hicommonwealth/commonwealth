@@ -1,4 +1,4 @@
-import 'pages/subscriptions.scss';
+import 'pages/notification_subscriptions.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -303,13 +303,13 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
     return m('.CommunityNotifications', [
       m('.header', [
         m(SelectList, {
-          class: 'CommunitySelectList',
+          class: 'CommunityNotificationSelectList',
           filterable: false,
           checkmark: false,
           emptyContent: null,
-          inputAttrs: {
-            class: 'CommunitySelectRow',
-          },
+          // inputAttrs: {
+          //   class: 'CommunitySelectRow',
+          // },
           itemRender: (community: string) => {
             return m(ListItem, {
               label: community,
@@ -390,7 +390,7 @@ const NotificationSettingsPage: m.Component<{}, {
     if (subscriptions.length < 1) return m(PageLoading);
 
     return m(Sublayout, {
-      class: 'SubscriptionsPage',
+      class: 'NotificationSettingsPage',
       title: 'Notifications',
     }, [
       m('.forum-container', [

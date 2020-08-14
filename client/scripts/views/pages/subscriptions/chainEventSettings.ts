@@ -276,7 +276,7 @@ const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { se
     const filteredChains = chains.filter((c) => validChains.includes(c.id)).sort((a, b) => (a.id > b.id) ? 1 : -1);
     return m('ChainNotificationManagementPage', [
       m(SelectList, {
-        class: 'CommunitySelectList',
+        class: 'ChainNotificationSelectList',
         filterable: false,
         checkmark: false,
         emptyContent: null,
