@@ -1,0 +1,25 @@
+@import 'client/styles/shared';
+
+.ListingHeader {
+    display: flex;
+    border-bottom: 1px solid $background-color-light;
+    margin-bottom: 2px;
+    color: $text-color-light;
+    .listing-header-right {
+        flex: $listing-right-flex;
+    }
+    .listing-header-col {
+        font-size: 0.94rem;
+        text-align: right;
+        width: 84px;
+        padding: 10px 6px 10px 0;
+        &.listing-header-col-1 {
+            flex: $listing-left-flex;
+            width: initial;
+            text-align: left;
+        }
+        &:last-child {
+            padding-right: 0px;
+        }
+    }
+}

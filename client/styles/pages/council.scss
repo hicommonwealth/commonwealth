@@ -22,10 +22,55 @@
     }
 }
 
-.CollectiveMember, .CouncilCandidate, .CouncilElectionVoter {
+.CouncilPage {
+    padding-bottom: 36px;
+    .stats-container {
+        display: flex;
+        align-items: flex-start;
+        margin-top: 25px;
+        padding: 10px 20px;
+        background-color: $background-color-light;
+        border-radius: 5px;
+        .stats-tile {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+        }
+    }
+    .council-section-header {
+        font-size: 0.94rem;
+        font-weight: 400;
+        color: $text-color-light;
+        padding: 10px 0;
+        margin: 22px 0 0;
+        border-bottom: 1px solid #ededed;
+    }
+    h4.proposals-subheader {
+        text-transform: uppercase;
+        color: #999;
+        letter-spacing: 0.4px;
+        margin-top: 26px;
+        font-weight: 500;
+    }
+    a.proposals-action {
+        float: right;
+        margin-left: 10px;
+        color: #999;
+        cursor: pointer;
+        &:hover {
+            color: #555;
+        }
+        @include xs-max {
+            float: none;
+        }
+    }
+    .Listing {
+        margin-top: 20px;
+    }
+}
+
+.CouncilCandidate, .CouncilElectionVoter {
     display: flex;
-    border: 1px solid $background-color-light;
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
     background: $background-color-white;
     border-radius: 3px;
     margin: 10px 0;
@@ -83,7 +128,7 @@
     // left
     .proposal-row-left {
         .proposal-display-id {
-            font-weight: 500;
+            font-weight: 400;
             font-size: 16px;
             line-height: 1.2;
         }
@@ -197,29 +242,6 @@
         }
         .proposal-row-right {
             padding: 0;
-        }
-    }
-}
-
-.CouncilPage {
-    // TODO: duplicated
-    h4.proposals-subheader {
-        text-transform: uppercase;
-        color: #999;
-        letter-spacing: 0.4px;
-        margin-top: 26px;
-        font-weight: 500;
-    }
-    a.proposals-action {
-        float: right;
-        margin-left: 10px;
-        color: #999;
-        cursor: pointer;
-        &:hover {
-            color: #555;
-        }
-        @include xs-max {
-            float: none;
         }
     }
 }

@@ -16,7 +16,10 @@
         }
         .CommunitySelector .cui-button {
             background: #fff;
-            padding: 20px 14px 22px;
+            padding: 10px 14px;
+            height: 24px;
+            max-height: 24px;
+            overflow: hidden;
             .cui-icon-menu {
                 display: none;
             }
@@ -47,6 +50,7 @@
 }
 
 .Sidebar {
+    z-index: 1;
     @include sm-max {
         .SidebarHeader {
             display: none;
@@ -65,7 +69,7 @@
                 width: 100%;
                 display: flex;
                 > .CommunityLabel {
-                    padding: 14px 0 15px;
+                    padding: 20px 0 18px;
                     max-width: calc(100% - 18px);
                 }
                 > .CommunityLabel.CommunityLabelPlaceholder {
@@ -74,8 +78,8 @@
                     font-weight: 500;
                 }
                 .cui-icon {
-                    margin-top: 26px;
-                    margin-left: 2px;
+                    margin-top: 25px;
+                    margin-left: 6px;
                 }
             }
         }

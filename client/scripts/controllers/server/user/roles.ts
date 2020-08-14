@@ -63,6 +63,8 @@ export default class extends Base {
     });
   }
 
+  // TODO: clarify differences between getRoleInCommunity, getRoleOfCommunity, isRoleOfCommunity, getAllRolesInCommunity
+
   /**
    * Retrieves the role of a specific account in the active roles set
    * @param account An arbitrary Commonwealth account
