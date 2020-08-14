@@ -20,9 +20,12 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIdentity) => {
-  const chainName = capitalizeFirstLetter(app.chain.class);
-  return (account.chainBase === ChainBase.Substrate) && m(Button, {
+const editIdentityAction = (account, currentIdentity: SubstrateIdentity) => {
+  const chainObj = app.config.chains.getById(account.chain);
+  if (!chainObj) return;
+
+  // TODO: look up the chainObj's chain base
+  return (account.chain.indexOf('edgeware') !== -1 || account.chain.indexOf('kusama') !== -1) && m(Button, {
     intent: 'primary',
     // wait for info to load before making it clickable
     class: currentIdentity ? '' : 'disabled',
@@ -32,7 +35,7 @@ const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIde
         data: { account, currentIdentity },
       });
     },
-    label: currentIdentity?.exists ? `Edit ${chainName} identity` : `Set ${chainName} identity`
+    label: currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
   });
 };
 
@@ -86,7 +89,6 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             vnode.state.copied && m('span.copy-done', 'Copied'),
           ]),
         ]),
-        // Add in identity actions here
         m('.bio-actions', [
           onOwnProfile ? [
             editIdentityAction(account, vnode.state.identity),
