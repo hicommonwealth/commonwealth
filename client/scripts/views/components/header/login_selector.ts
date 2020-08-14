@@ -91,14 +91,18 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
+const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint: boolean }> = {
   view: (vnode) => {
+    const { small } = vnode.attrs;
+
     if (!app.isLoggedIn()) return m('.LoginSelector', [
       m('.login-selector-user', [
         m(Button, {
           iconLeft: Icons.USER,
           fluid: true,
           label: 'Log in',
+          compact: true,
+          size: small ? 'sm' : 'default',
           onclick: () => app.modals.create({ modal: LoginModal }),
         }),
       ]),
@@ -144,6 +148,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
 
     return m('.LoginSelector', [
       wrapHint(m(Popover, {
+        hasArrow: false,
         class: 'login-selector-popover',
         closeOnContentClick: true,
         transitionDuration: 0,
@@ -154,6 +159,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
           intent: 'none',
           fluid: true,
           compact: true,
+          size: small ? 'sm' : 'default',
           disabled: !(app.chain || app.community),
           onclick: (e) => {
             vnode.state.showAddressSelectionHint = false;
@@ -182,8 +188,15 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
                 compact: true
               }),
             })),
+            app.user.activeAccount && app.activeId() && m(MenuItem, {
+              label: 'Edit profile',
+              onclick: (e) => {
+                return m.route.set(
+                  `/${app.activeId()}/account/${app.user.activeAccount.address}?base=${app.user.activeAccount.chain.id}`
+                );
+              }
+            }),
             !isPrivateCommunity && m(MenuItem, {
-              style: 'margin-top: 4px',
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
               }),

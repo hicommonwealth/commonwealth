@@ -20,6 +20,7 @@ import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pa
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
+import moment from 'moment';
 
 interface IThreadForm {
   topicName?: string;
@@ -116,6 +117,9 @@ export const loadDraft = async (dom, state, draft) => {
   state.activeTopic = draft.tag;
   state.form.topicName = draft.tag;
   state.fromDraft = draft.id;
+  if (state.quillEditorState?.alteredText) {
+    state.quillEditorState.alteredText = false;
+  }
   m.redraw();
 };
 
@@ -231,7 +235,7 @@ export const NewThreadForm: m.Component<{
     };
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    const { fromDraft,newType, saving } = vnode.state;
+    const { fromDraft, newType, saving } = vnode.state;
 
     return m('.NewThreadForm', {
       class: `${newType === PostType.Link ? 'link-post' : ''} `
@@ -287,7 +291,7 @@ export const NewThreadForm: m.Component<{
           m(FormGroup, { span: 8 }, [
             m(Input, {
               placeholder: 'https://',
-              onchange: (e) => {
+              oninput: (e) => {
                 const { value } = e.target as any;
                 vnode.state.form.url = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
@@ -312,7 +316,7 @@ export const NewThreadForm: m.Component<{
               class: 'new-thread-title',
               placeholder: 'Title',
               name: 'new-link-title',
-              onchange: (e) => {
+              oninput: (e) => {
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
                 vnode.state.form.linkTitle = value;
@@ -384,10 +388,13 @@ export const NewThreadForm: m.Component<{
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
-              onchange: (e) => {
+              oninput: (e) => {
                 const { value } = (e as any).target;
+                if (!vnode.state.quillEditorState?.alteredText) {
+                  vnode.state.quillEditorState.alteredText = true;
+                  m.redraw();
+                }
                 vnode.state.form.threadTitle = value;
-
                 localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
               },
               defaultValue: vnode.state.form.threadTitle,
@@ -432,8 +439,7 @@ export const NewThreadForm: m.Component<{
                 try {
                   await newThread(form, quillEditorState, author);
                   vnode.state.saving = false;
-                  const { fromDraft } = vnode.state;
-                  if (fromDraft && !vnode.state.recentlyDeletedDrafts.includes(fromDraft)) {
+                  if (vnode.state.fromDraft && !vnode.state.recentlyDeletedDrafts.includes(fromDraft)) {
                     await app.user.discussionDrafts.delete(fromDraft);
                   }
                   if (isModal) {
@@ -455,8 +461,12 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
             m(Button, {
-              class: !author || saving || vnode.state.uploadsInProgress > 0
-                ? 'disabled' : '',
+              class: !author
+                || saving
+                || vnode.state.uploadsInProgress > 0
+                || (fromDraft && !vnode.state.quillEditorState?.alteredText)
+                ? 'disabled'
+                : '',
               intent: 'none',
               onclick: async (e) => {
                 const { form, quillEditorState } = vnode.state;
@@ -486,7 +496,9 @@ export const NewThreadForm: m.Component<{
                   notifyError(err.message);
                 }
               },
-              label: 'Save as draft',
+              label: fromDraft
+                ? 'Update saved draft'
+                : 'Save draft',
               name: 'save',
               tabindex: 5
             }),
@@ -496,7 +508,9 @@ export const NewThreadForm: m.Component<{
       !!discussionDrafts.length
       && newType === PostType.Discussion
       && m('.new-thread-form-sidebar', [
-        m(List, { interactive: true }, discussionDrafts.map((draft) => {
+        m(List, {
+          interactive: true
+        }, discussionDrafts.sort((a, b) => a.createdAt - b.createdAt).map((draft) => {
           const { body } = draft;
           let bodyComponent;
           if (body) {

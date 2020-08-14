@@ -2,8 +2,9 @@ import 'components/sidebar/index.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
+import $ from 'jquery';
 import dragula from 'dragula';
-import { Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner } from 'construct-ui';
+import { Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
@@ -11,7 +12,9 @@ import { ChainClass, ChainBase, AddressInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
-import CommunitySelector from './community_selector';
+import NotificationsMenu from 'views/components/header/notifications_menu';
+import LoginSelector from 'views/components/header/login_selector';
+import CommunitySelector, { CommunityLabel } from './community_selector';
 import CommunityInfoModule from './community_info_module';
 
 const NavigationModule: m.Component<{}, {}> = {
@@ -305,15 +308,56 @@ const SettingsModule: m.Component<{}> = {
   }
 };
 
-const Sidebar: m.Component<{}> = {
+
+const MobileSidebarHeader: m.Component<{ parentVnode }> = {
   view: (vnode) => {
-    return m('.Sidebar', [
-      m('.SidebarHeader', m(CommunitySelector)),
-      (app.chain || app.community) && m(NavigationModule),
-      (app.chain || app.community) && m(TopicsModule),
-      app.isLoggedIn() && m(SettingsModule),
-      (app.chain || app.community) && m(CommunityInfoModule),
-    ]);
+    const { parentVnode } = vnode.attrs;
+  }
+};
+
+const Sidebar: m.Component<{}, { open: boolean }> = {
+  view: (vnode) => {
+    return [
+      m('.MobileSidebarHeader', {
+        onclick: (e) => {
+          // clicking anywhere outside the trigger should close the sidebar
+          const onTrigger = $(e.target).hasClass('mobile-sidebar-trigger')
+            || $(e.target).closest('.mobile-sidebar-trigger').length > 0;
+          if (!onTrigger && vnode.state.open) vnode.state.open = false;
+        },
+      }, [
+        m('.mobile-sidebar-left', [
+          m(Button, {
+            class: 'mobile-sidebar-trigger',
+            size: 'sm',
+            onclick: (e) => {
+              vnode.state.open = !vnode.state.open;
+            },
+            label: m(Icon, { name: Icons.MENU }),
+          }),
+        ]),
+        m('.mobile-sidebar-center', [
+          m('.community-label', m(CommunitySelector)),
+        ]),
+        m('.mobile-sidebar-right', [
+          app.isLoggedIn() && m(NotificationsMenu, { small: true }),
+          m(LoginSelector, { small: true }),
+        ]),
+      ]),
+      m('.Sidebar', {
+        class: vnode.state.open ? 'open' : '',
+        onclick: (e) => {
+          // clicking inside the sidebar should close the sidebar
+          vnode.state.open = false;
+        },
+      }, [
+        m('.SidebarHeader', m(CommunitySelector)),
+        (app.chain || app.community) && m(NavigationModule),
+        (app.chain || app.community) && m(TopicsModule),
+        app.isLoggedIn() && m(SettingsModule),
+        (app.chain || app.community) && m(CommunityInfoModule),
+      ])
+    ];
   },
 };
 

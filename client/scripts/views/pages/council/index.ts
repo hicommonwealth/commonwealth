@@ -112,7 +112,8 @@ export const CandidacyButton: m.Component<{ candidates, buttonStyle?: boolean }>
     return buttonStyle
       ? m(Button, {
         class: '.CandidacyButton',
-        disabled: (!app.user.activeAccount || activeAccountIsCandidate || app.chain.networkStatus !== ApiStatus.Connected),
+        disabled: (!app.user.activeAccount || activeAccountIsCandidate
+                   || app.chain.networkStatus !== ApiStatus.Connected),
         intent: 'primary',
         label: activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy',
         onclick: (e) => {
@@ -145,14 +146,13 @@ const CouncilPage: m.Component<{}> = {
 
     const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
 
-    if (!initialized) return m(PageLoading, { message: 'Loading council data from chain...', title: 'Council' });
+    if (!initialized) return m(PageLoading, { message: 'Connecting to chain...', title: 'Council' });
 
     const councillors: SubstrateAccount[] = app.chain
       && ((app.chain as Substrate).phragmenElections.members || []).map((a) => app.chain.accounts.get(a));
-    const candidates: Array<[SubstrateAccount, number]> = app.chain &&
-     ((app.chain as Substrate).phragmenElections.activeElection &&
-       (app.chain as Substrate).phragmenElections.activeElection.candidates || [])
-       .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]);
+    const candidates: Array<[SubstrateAccount, number]> = app.chain
+      && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || [])
+        .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]);
 
     const nSeats = app.chain && (app.chain as Substrate).phragmenElections.desiredMembers;
     const termDuration = app.chain && (app.chain as Substrate).phragmenElections.termDuration;

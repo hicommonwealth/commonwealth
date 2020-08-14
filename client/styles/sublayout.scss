@@ -3,6 +3,9 @@
 .Sublayout {
     display: block;
     padding: 0 32px;
+    @include xs-max {
+        padding: 0 26px;
+    }
 
     .sublayout-grid {
         position: relative;
@@ -20,6 +23,9 @@
 
     .sublayout-header {
         display: flex;
+        @include sm-max {
+            display: none;
+        }
         margin-top: 28px;
         margin-bottom: 8px;
         .sublayout-header-left {
