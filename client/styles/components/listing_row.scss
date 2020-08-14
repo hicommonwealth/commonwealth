@@ -2,6 +2,10 @@
 
 .ListingRow {
     @include listing-row-base;
+
+    .pinned {
+        margin: 13px 13px 0 0;
+    }
     .row-left {
         line-height: 1.1;
         flex: $listing-left-flex;
