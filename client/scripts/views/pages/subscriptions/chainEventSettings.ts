@@ -6,13 +6,10 @@ import { Checkbox, Table, SelectList, Icons, Button, ListItem } from 'construct-
 import {
   SubstrateEvents, SubstrateTypes, IChainEventKind, EventSupportingChains, TitlerFilter
 } from '@commonwealth/chain-events';
-
 import { ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
-
 import { ChainNetwork } from 'models/types.ts';
-
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import PageError from 'views/pages/error';
