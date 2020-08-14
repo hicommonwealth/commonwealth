@@ -173,6 +173,7 @@ class ThreadsController {
         return result;
       },
       error: (err) => {
+        notifyError('Could not update thread privacy');
         console.error(err);
       },
     });
@@ -195,6 +196,7 @@ class ThreadsController {
         return result;
       },
       error: (err) => {
+        notifyError('Could not update pinned state');
         console.error(err);
       }
     });

@@ -109,7 +109,6 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
             class: 'pin-thread-toggle',
             onclick: (e) => {
               e.preventDefault();
-              console.log('hi zak');
               app.threads.pin({ proposal }).then(() => m.redraw());
             },
             label: proposal.pinned ? 'Unpin thread' : 'Pin thread',
