@@ -14,7 +14,7 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
   const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
   // TODO: Implement better data types
-  let where: any, attributes: any, OwnStakeOverTime: any, ownStake: Array<any>, block: Array<any>, validators: any;
+  let OwnStakeOverTime: any, ownStake: Array<any>, block: Array<any>, validators: any;
   const chainInfo = await models.Chain.findOne({
     where: { id: chain }
   });
