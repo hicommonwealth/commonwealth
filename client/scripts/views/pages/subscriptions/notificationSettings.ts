@@ -338,7 +338,7 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
       }, [
         m('tr', [
           m('th', null),
-          m('th', 'Setting'),
+          m('th', 'Settings'),
         ]),
         (selectedCommunityId === 'All communities') && [
           m(GeneralCommunityNotifications, { communities, subscriptions }),
