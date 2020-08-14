@@ -22,6 +22,7 @@ class DiscussionDraft {
     title: string,
     body: string,
     topic: string,
+    createdAt: moment.Moment,
     attachments: OffchainAttachment[],
     authorChain?: string,
   ) {
@@ -33,6 +34,7 @@ class DiscussionDraft {
     this.topic = topic;
     this.community = community;
     this.chain = chain;
+    this.createdAt = createdAt;
     this.authorChain = authorChain;
   }
 }
