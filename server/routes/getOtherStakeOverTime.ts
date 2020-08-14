@@ -29,7 +29,7 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
     endDate = new Date();
   }
   // Querying from DB
-  const OwnStakeOverTime = await models.HistoricalValidatorStatistic.findAll({
+  const OtherStakeOverTime = await models.HistoricalValidatorStatistic.findAll({
     // To get all exposure of validator between a time period
     where: {
       '$ChainEventType.chain$': chain,
@@ -45,12 +45,12 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
     include: [ { model: models.ChainEventType } ]
   });
 
-  if (!OwnStakeOverTime.length)
+  if (!OtherStakeOverTime.length)
     return next(new Error(Errors.NoRecordsFound));
 
   const othersStake = [];
   const block = [];
-  OwnStakeOverTime.forEach((value) => {
+  OtherStakeOverTime.forEach((value) => {
     const event_data: IEventData = value.dataValues.event_data;
     othersStake.push(event_data.exposure.others);
     block.push(event_data.block_number);
