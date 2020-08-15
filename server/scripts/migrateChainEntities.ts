@@ -1,6 +1,6 @@
 /**
- * This script "migrates" identities from the chain into the database, by first
- * querying all addresses, and then attempting to fetch corresponding identities
+ * This script "migrates" chain entities (proposals) from the chain into the database, by first
+ * querying events, and then attempting to fetch corresponding entities
  * from the chain, writing the results back into the database.
  */
 

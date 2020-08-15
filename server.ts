@@ -190,12 +190,14 @@ async function main() {
       if (ENTITY_MIGRATION) {
         // "all" means run for all supported chains, otherwise we pass in the name of
         // the specific chain to migrate
+        log.info('Started migrating chain entities into the DB');
         await migrateChainEntities(models, ENTITY_MIGRATION === 'all' ? undefined : ENTITY_MIGRATION);
         log.info('Finished migrating chain entities into the DB');
         process.exit(0);
       }
 
       if (IDENTITY_MIGRATION) {
+        log.info('Started migrating chain identities into the DB');
         await migrateIdentities(models);
         log.info('Finished migrating chain identities into the DB');
         process.exit(0);

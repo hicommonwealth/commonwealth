@@ -1,7 +1,8 @@
 /**
- * This script "migrates" identities from the chain into the database, by first
- * querying all addresses, and then attempting to fetch corresponding identities
- * from the chain, writing the results back into the database.
+ * This script "migrates" identities from the chain into the database,
+ * by first querying all offchain addresses we have records for, and
+ * then attempting to fetch corresponding identities from the chain,
+ * and writing the results back into the database.
  */
 
 import _ from 'underscore';
