@@ -41,7 +41,7 @@ const ListingRow: m.Component<{
         m(Grid, contentRight.map((ele, idx) => {
           return m(Col, {
             span: rightColSpacing[idx],
-            offset: initialOffset > 0 && idx === 0
+            offset: (initialOffset > 0 && idx === 0)
               ? initialOffset
               : 0
           }, ele);
