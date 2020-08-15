@@ -40,8 +40,10 @@ export default async function (models, chain?: string): Promise<void> {
     );
 
     // fetch all events and run through handlers in sequence then exit
+    log.info('Fetching chain events...');
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     const events = await fetcher.fetch();
+    log.info(`Writing chain events to db... (count: ${events.length})`);
     await Promise.all(events.map(async (event) => {
       try {
         // eslint-disable-next-line no-await-in-loop

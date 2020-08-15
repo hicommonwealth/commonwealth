@@ -62,7 +62,7 @@ export default async function (models, chain?: string): Promise<void> {
     }));
 
     // 2d. write the found identities back to db using the event handler
-    log.info(`Writing identities for chain ${node.chain} back to db...`);
+    log.info(`Writing identities for chain ${node.chain} back to db... (count: ${identityEvents.length})`);
     const handler = new IdentityEventHandler(models, node.chain);
     await Promise.all(identityEvents.map((e) => handler.handle(e, null)));
   }
