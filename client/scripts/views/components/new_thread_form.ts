@@ -384,7 +384,7 @@ export const NewThreadForm: m.Component<{
               label: 'Draft',
             })
           ]),
-          m(FormGroup, { span: fromDraft ? 7 : 8 }, [
+          m(FormGroup, { span: fromDraft ? 6 : 8 }, [
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
@@ -401,7 +401,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 1,
             }),
           ]),
-          m(FormGroup, { span: fromDraft ? 3 : 4 }, [
+          m(FormGroup, { span: 4 }, [
             m(TopicSelector, {
               activeTopic:(vnode.state.activeTopic === false || vnode.state.activeTopic)
                 ? vnode.state.activeTopic

@@ -5,11 +5,12 @@ import Chart from 'chart.js';
 import moment from 'moment-twitter';
 
 import app from 'state';
-import { Grid, Col } from 'construct-ui';
+import { Grid, Col, Icon, Icons } from 'construct-ui';
 
 interface IContentLeft {
   header: Vnode | Vnode[];
   subheader: Vnode | Vnode[];
+  pinned?: boolean;
 }
 
 const ListingRow: m.Component<{
@@ -28,6 +29,10 @@ const ListingRow: m.Component<{
     if (vnode.attrs.class) attrs['class'] = vnode.attrs.class;
     const initialOffset = 12 - rightColSpacing.reduce((t, n) => t + n);
     return m('.ListingRow', attrs, [
+      contentLeft.pinned && m(Icon, {
+        name: Icons.PAPERCLIP,
+        class: 'pinned',
+      }),
       m('.row-left', [
         m('.row-header', contentLeft.header),
         m('.row-subheader', contentLeft.subheader),

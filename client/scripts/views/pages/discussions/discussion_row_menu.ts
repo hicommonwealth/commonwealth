@@ -6,7 +6,7 @@ import app from 'state';
 import { NotificationCategories } from 'types';
 import { OffchainThread, OffchainTopic } from 'models';
 import TopicEditor from 'views/components/topic_editor';
-import { MenuItem, PopoverMenu, Icon, Icons } from 'construct-ui';
+import { MenuItem, PopoverMenu, Icon, Icons, MenuDivider } from 'construct-ui';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }> = {
@@ -77,18 +77,20 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;
 
-    const canEditThread = app.user.activeAccount
-      && (app.user.isRoleOfCommunity({
-        role: 'admin',
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      })
-      || app.user.isRoleOfCommunity({
-        role: 'moderator',
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      })
-      || proposal.author === app.user.activeAccount.address);
+    const hasAdminPermissions = app.user.activeAccount
+    && (app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    })
+    || app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    }));
+
+    const isAuthor = app.user.activeAccount
+      && (proposal.author === app.user.activeAccount.address);
 
     return m('.DiscussionRowMenu', {
       onclick: (e) => {
@@ -103,9 +105,15 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
         closeOnContentClick: true,
         menuAttrs: {},
         content: [
-          canEditThread && m(TopicEditorButton, { openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; } }),
-          canEditThread && m(ThreadDeletionButton, { proposal }),
-          canEditThread && m(MenuItem, {
+          hasAdminPermissions && m(MenuItem, {
+            class: 'pin-thread-toggle',
+            onclick: (e) => {
+              e.preventDefault();
+              app.threads.pin({ proposal }).then(() => m.redraw());
+            },
+            label: proposal.pinned ? 'Unpin thread' : 'Pin thread',
+          }),
+          hasAdminPermissions && m(MenuItem, {
             class: 'read-only-toggle',
             onclick: (e) => {
               e.preventDefault();
@@ -117,6 +125,9 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
             },
             label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
           }),
+          isAuthor && m(TopicEditorButton, { openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; } }),
+          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
+          (isAuthor || hasAdminPermissions) && m(MenuDivider),
           m(ThreadSubscriptionButton, { proposal }),
         ],
         inline: true,
