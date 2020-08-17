@@ -2,8 +2,7 @@
 
 .NotificationsMenuButton {
     .cui-icon {
-        margin-right: -2px !important;
-        margin-left: -2px !important;
+        margin-right: 0 !important;
         position: relative;
         top: -2px;
         @include xs-max {
@@ -27,6 +26,11 @@
 }
 
 .NotificationsMenu {
+    .cui-popover-content {
+        @include xs-max {
+            margin: 0 9px;
+        }
+    }
     .notification-list {
         height: 480px;
         background: #fff;
