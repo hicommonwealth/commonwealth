@@ -7,7 +7,7 @@ import 'nprogress.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import NProgress from 'nprogress';
+import NProgress from 'lib/nprogress';
 import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';

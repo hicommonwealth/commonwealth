@@ -141,7 +141,6 @@
     "node-releases": "^1.1.39",
     "node-sass": "^4.11.0",
     "nodemon": "^1.18.10",
-    "nprogress": "^0.2.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "parchment": "^1.1.4",
     "passport": "^0.4.0",
