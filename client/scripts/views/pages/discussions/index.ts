@@ -118,7 +118,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         .sort(orderByDateReverseChronological);
       list.push(m(PinnedListing, { proposals: pinnedThreads }));
 
-      if (sortedThreads.length > 0) {
+      if (sortedThreads.length > 0 || pinnedThreads.length > 0) {
         const firstThread = sortedThreads[0];
         const lastThread = sortedThreads[sortedThreads.length - 1];
         const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
