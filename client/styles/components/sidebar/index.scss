@@ -7,33 +7,11 @@
     .mobile-sidebar-left {
         padding: 11px 0;
         flex: 1;
-        @include xs-max {
-            .cui-button.mobile-sidebar-trigger {
-                padding-left: 12px;
-                padding-right: 12px;
-                .cui-icon {
-                    margin-left: -2px;
-                    margin-right: -2px;
-                }
-            }
-            .LoginSelector {
-                > button.cui-button {
-                    padding-left: 0;
-                    padding-right: 0;
-                    > .cui-icon {
-                        margin-left: -4px;
-                        margin-right: 8px;
-                    }
-                }
-            }
-            .hidden-xs {
-                display: none;
-            }
-        }
         > .community-label {
             display: inline-block;
         }
         .CommunitySelector .cui-button {
+            padding: 0 14px;
             background: #fff;
             overflow: hidden;
             .cui-icon-menu {
@@ -45,19 +23,44 @@
         > .LoginSelector {
             display: inline-block;
         }
+        > .LoginSelector > .cui-button > .cui-button-label > * {
+            display: inline-block;
+        }
         > .cui-button,
         > .community-label,
         > .LoginSelector {
             margin-left: 7px;
         }
-        > .cui-button .cui-icon.cui-icon-bell {
-            position: relative;
-            top: -3px;
-        }
         > .cui-button .cui-button-label {
             display: inline-block;
             position: relative;
             top: 2px;
+        }
+        @include xs-max {
+            .cui-button.mobile-sidebar-trigger {
+                padding-left: 12px;
+                padding-right: 12px;
+                .cui-icon {
+                    margin-left: -2px;
+                    margin-right: -2px;
+                }
+            }
+            .CommunityLabel .community-label-left {
+                padding-right: 8px;
+            }
+            .LoginSelector > button.cui-button {
+                padding-left: 12px;
+                padding-right: 12px;
+                .cui-icon {
+                    margin-left: -3px;
+                    margin-right: -3px;
+                    position: relative;
+                    top: -1px;
+                }
+            }
+            .hidden-xs {
+                display: none !important;
+            }
         }
     }
 }

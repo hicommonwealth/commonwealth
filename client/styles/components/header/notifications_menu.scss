@@ -1,3 +1,31 @@
+@import 'client/styles/shared';
+
+.NotificationsMenuButton {
+    .cui-icon {
+        margin-right: -2px !important;
+        margin-left: -2px !important;
+        position: relative;
+        top: -2px;
+        @include xs-max {
+            top: 0;
+        }
+    }
+    .notification-count {
+        position: relative;
+        top: 1px;
+    }
+    &.has-notifications {
+        .cui-icon {
+            display: none;
+        }
+    }
+    &.no-notifications {
+        .notification-count {
+            display: none;
+        }
+    }
+}
+
 .NotificationsMenu {
     .notification-list {
         height: 480px;

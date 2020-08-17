@@ -164,12 +164,14 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
           onclick: (e) => {
             vnode.state.showAddressSelectionHint = false;
           },
-          label: m('.hidden-xs', [
-            (!app.chain && !app.community) ? 'Select a community'
-              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
+          label: [
+            m('span.hidden-xs', [
+              (!app.chain && !app.community) ? 'Select a community'
+                : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
                 : 'Select an address',
-          ]),
-          iconRight: !(app.chain || app.community) ? null : Icons.CHEVRON_DOWN,
+            ]),
+            m(Icon, { name: Icons.CHEVRON_DOWN }),
+          ],
         }),
         content: m(Menu, { class: 'LoginSelectorMenu' }, [
           // address list
