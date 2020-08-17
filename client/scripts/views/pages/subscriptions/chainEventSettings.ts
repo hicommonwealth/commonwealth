@@ -71,7 +71,7 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
 };
 
 const IndividualEventSubscriptions: m.Component<{
-  chain: string;
+  chain: ChainNetwork;
 }, {
   eventKinds: IChainEventKind[];
   titler;
@@ -80,7 +80,7 @@ const IndividualEventSubscriptions: m.Component<{
   isEmailAll: boolean;
 }> = {
   oninit: (vnode) => {
-    if (vnode.attrs.chain === ChainNetwork.Edgeware || vnode.attrs.chain === 'edgeware-local') {
+    if (vnode.attrs.chain === ChainNetwork.Edgeware) {
       vnode.state.titler = SubstrateEvents.Title;
       vnode.state.eventKinds = SubstrateTypes.EventKinds;
     } else {
@@ -256,9 +256,9 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
           m('th', null),
           m('th', 'Settings'),
         ]),
-        (chain.id === ChainNetwork.Edgeware) && m(EdgewareChainEvents),
-        (chain.id === ChainNetwork.Kusama) && m(KusamaChainEvents),
-        (chain.id === ChainNetwork.Polkadot) && m(PolkadotChainEvents),
+        (chain.network === ChainNetwork.Edgeware) && m(EdgewareChainEvents),
+        (chain.network === ChainNetwork.Kusama) && m(KusamaChainEvents),
+        (chain.network === ChainNetwork.Polkadot) && m(PolkadotChainEvents),
       ]),
     ]);
   }
@@ -269,14 +269,13 @@ const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { se
     const { chains } = vnode.attrs;
     const scope = m.route.param('scope');
     vnode.state.selectedChain = chains.find((c) => c.id === scope)
-      || chains.find((c) => c.id === ChainNetwork.Edgeware);
+      || chains.find((c) => c.id === 'edgeware');
   },
   view: (vnode) => {
     const { chains } = vnode.attrs;
-    const chainIds = chains.map((c) => c.id);
     if (chains.length < 1) return;
-    const validChains = ['edgeware', 'polkadot', 'kusama'];
-    const filteredChains = chains.filter((c) => validChains.includes(c.id)).sort((a, b) => (a.id > b.id) ? 1 : -1);
+    const validChains = [ChainNetwork.Edgeware, ChainNetwork.Polkadot, ChainNetwork.Kusama];
+    const filteredChains = chains.filter((c) => validChains.includes(c.network)).sort((a, b) => (a.id > b.id) ? 1 : -1);
     return m('ChainNotificationManagementPage', [
       m(SelectList, {
         class: 'ChainNotificationSelectList',
