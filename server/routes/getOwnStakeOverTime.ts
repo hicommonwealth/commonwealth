@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 import { Exposure, BlockNumber, AccountId } from '@polkadot/types/interfaces';
 import { Request, Response, NextFunction } from 'express';
+import { elementAt } from 'rxjs/operators';
 import { Errors } from './getOffences';
 const Op = Sequelize.Op;
 
@@ -14,13 +15,22 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
   const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
   // TODO: Implement better data types
-  let OwnStakeOverTime: any, ownStake: Array<any>, block: Array<any>, validators: any;
-  const chainInfo = await models.Chain.findOne({
-    where: { id: chain }
-  });
+  let OwnStakeOverTime: any, validators: any;
+
+  let singleValidatorHistoricalStats: {
+    stash:string,
+      historicalData:
+        [{
+          block_number:any,
+          own_exposure:any
+        }]
+  };
+
+  if (!chain) return next(new Error(Errors.ChainIdNotFound));
+
+  const chainInfo = await models.Chain.findOne({ where: { id: chain } });
 
   // Handling Errors
-  if (!chain) return next(new Error(Errors.ChainIdNotFound));
   if (!chainInfo) {
     return next(new Error(Errors.InvalidChain));
   }
@@ -56,10 +66,12 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
 
     OwnStakeOverTime.forEach((stake) => {
       const event_data: IEventData = stake.dataValues.event_data;
-      ownStake.push(event_data.exposure.own);
-      block.push(event_data.block_number);
+      singleValidatorHistoricalStats.stash = event_data.stash.toString();
+      singleValidatorHistoricalStats.historicalData.push({
+        block_number: event_data.block_number,
+        own_exposure: event_data.exposure.own });
     });
-    return res.json({ status: 'Success', result: { ownStake, block, stash } });
+    return res.json({ status: 'Success', result: { singleValidatorHistoricalStats } });
   } else {
     // GET UNIQUE STASH IDS FROM THE VALIDATORS TABLE AND GET ALL DATA FROM THE HistoricalValidatorStatistic TABLE
     // NEXT MAKE A JSON OBJECT OF THE DATA FROM IT, PUT A MAPPING TO MATCH THE KEY (STASH) FROM VALIDATORS TABLE TO
@@ -76,7 +88,7 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
 
     if (!validators.length) return ['Validator Table Empty'];
 
-    validators.map((value) => {
+    validators = validators.map((value) => {
       return value.stash;
     });
 
@@ -97,13 +109,27 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
     if (!OwnStakeOverTime.length)
       return [];
 
-    const allValidatorsHistoricalStats : { [key:string]: any } = {};
+    const allValidatorsHistoricalStats: [typeof singleValidatorHistoricalStats] = [singleValidatorHistoricalStats];
 
     OwnStakeOverTime.forEach((value) => {
       const event_data: IEventData = value.dataValues.event_data;
       const key = event_data.stash.toString();
+      const index = allValidatorsHistoricalStats.findIndex((element) => element.stash.toString() === key);
       if (key in validators) {
-        allValidatorsHistoricalStats[key].push(event_data);
+        if (index === -1) { // index == -1 means that stash isn't present in allValidatorsHistoricalStats
+        // so we'll need to add one
+          let thisValidator : typeof singleValidatorHistoricalStats;
+          thisValidator.stash = key;
+          thisValidator.historicalData.push({
+            block_number: event_data.block_number,
+            own_exposure:event_data.exposure.own });
+          allValidatorsHistoricalStats.push(thisValidator);
+        } else { // if index is already there then we just need to push one more entry in historical data array
+          allValidatorsHistoricalStats[index].historicalData.push({
+            block_number:event_data.block_number,
+            own_exposure:event_data.exposure.own
+          });
+        }
       }
     });
     return res.json({ status: 'Success', result: { allValidatorsHistoricalStats } });

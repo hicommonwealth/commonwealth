@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
-import { Exposure, BlockNumber, AccountId, IndividualExposure } from '@polkadot/types/interfaces';
+import { Exposure, BlockNumber, AccountId } from '@polkadot/types/interfaces';
 import { Request, Response, NextFunction } from 'express';
+import { elementAt } from 'rxjs/operators';
 import { Errors } from './getOffences';
 const Op = Sequelize.Op;
 
@@ -13,16 +14,23 @@ interface IEventData {
 const getNominatorsOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
-  const chainInfo = await models.Chain.findOne({
-    where: { id: chain }
-  });
   let validators: any, NominatorsOverTime: any;
 
-  // Handling Errors
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
-  if (!chainInfo) {
-    return next(new Error(Errors.InvalidChain));
-  }
+
+  const chainInfo = await models.Chain.findOne({ where: { id: chain } });
+
+  let singleValidatorHistoricalData : {
+    stash:string,
+    historicalData: [{
+      block_number:any,
+      nominators:any
+    }]
+  };
+
+  // Handling Errors
+  if (!chainInfo) return next(new Error(Errors.InvalidChain));
+
   // Handling undefined Dates
   if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
     startDate = new Date();
@@ -51,14 +59,16 @@ const getNominatorsOverTime = async (models, req: Request, res: Response, next: 
     if (!NominatorsOverTime.length)
       return [];
 
-    const nominators : { [key:string]:any } = {};
-
+    let singleValidator : typeof singleValidatorHistoricalData;
     NominatorsOverTime.forEach((value) => {
       const event_data: IEventData = value.dataValues.event_data;
-      const key = event_data.block_number.toString();
-      nominators[key].push(event_data.exposure.others);
+      singleValidator.stash = event_data.stash.toString();
+      singleValidator.historicalData.push({ block_number:event_data.block_number,
+        nominators: event_data.exposure.others.map((IndividualExposure) => {
+          return IndividualExposure.who;
+        }) });
     });
-    return res.json({ status: 'Success', result: { stash, nominators } });
+    return res.json({ status: 'Success', result: { singleValidator } });
   } else { // If stash isn't given
   // Getting all stashes from Validators Table (Unique)
     validators = await models.Validators.findAll({
@@ -72,7 +82,7 @@ const getNominatorsOverTime = async (models, req: Request, res: Response, next: 
 
     if (!validators.length) return ['Validator Table Empty'];
 
-    validators.map((value) => {
+    validators = validators.map((value) => {
       return value.stash;
     });
 
@@ -93,20 +103,27 @@ const getNominatorsOverTime = async (models, req: Request, res: Response, next: 
     if (!NominatorsOverTime.length)
       return [];
 
-    const allValidatorsHistoricalStats : {
-      [stash:string]: {
-        other_exposure:any,
-      blk_number:any
-    }} = {};
+    let allValidatorsHistoricalStats : [typeof singleValidatorHistoricalData];
 
     NominatorsOverTime.forEach((value) => {
-      const event_data :IEventData = value.dataValues.event_data;
+      const event_data: IEventData = value.dataValues.event_data;
       const key = event_data.stash.toString();
+      const index = allValidatorsHistoricalStats.findIndex((element) => element.stash.toString() === key);
       if (key in validators) {
-        allValidatorsHistoricalStats[key].other_exposure.push(event_data.exposure.others.map((individualExposure) => {
-          return individualExposure.who;
-        }));
-        allValidatorsHistoricalStats[key].blk_number.push(event_data.block_number);
+        if (index === -1) {
+          let thisValidator: typeof singleValidatorHistoricalData;
+          thisValidator.stash = key;
+          thisValidator.historicalData.push({
+            block_number:event_data.block_number,
+            nominators: event_data.exposure.others.map((element) => { return element.who; })
+          });
+          allValidatorsHistoricalStats.push(thisValidator);
+        }
+      } else {
+        allValidatorsHistoricalStats[index].historicalData.push({
+          block_number:event_data.block_number,
+          nominators:event_data.exposure.others.map((element) => { return element.who; })
+        });
       }
     });
 

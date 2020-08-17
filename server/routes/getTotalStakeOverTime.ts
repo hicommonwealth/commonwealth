@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 import { Exposure, BlockNumber, AccountId, ValidatorPrefs } from '@polkadot/types/interfaces';
 import { Request, Response, NextFunction } from 'express';
+import { elementAt } from 'rxjs/operators';
 import { Errors } from './getOffences';
 const Op = Sequelize.Op;
 
@@ -14,11 +15,11 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
   const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
   let validators: any;
-  const chainInfo = await models.Chain.findOne({
-    where: { id: chain }
-  });
-  // Handling Errors
+
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
+
+  const chainInfo = await models.Chain.findOne({ where: { id: chain } });
+
   if (!chainInfo) {
     return next(new Error(Errors.InvalidChain));
   }
@@ -29,6 +30,14 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
     startDate = new Date(startDate);
     endDate = new Date();
   }
+
+  let singleValidatorHistoricalData : {
+    stash:string,
+    historicalData:[{
+      block_number:any,
+      total_exposure:any
+    }]
+  };
 
   if (req.query.stash) {
     const TotalStakeOverTime = await models.HistoricalValidatorStatistic.findAll({
@@ -50,15 +59,16 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
     if (!TotalStakeOverTime.length)
       return [];
 
-    const totalStake = [];
-    const block = [];
+    let singleValidator : typeof singleValidatorHistoricalData;
     TotalStakeOverTime.forEach((value) => {
       const event_data: IEventData = value.dataValues.event_data;
-      totalStake.push(event_data.exposure.total);
-      block.push(event_data.block_number);
+      singleValidator.stash = event_data.stash.toString();
+      singleValidator.historicalData.push({
+        block_number:event_data.block_number,
+        total_exposure:event_data.exposure.total });
     });
     // Please check the result return statement
-    return res.json({ status: 'Success', result: { totalStake, block } });
+    return res.json({ status: 'Success', result: { singleValidator } });
   } else {
     validators = await models.Validators.findAll({
       /* For validators that are active only
@@ -71,7 +81,7 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
 
     if (!validators.length) return ['Validator Table Empty'];
 
-    validators.map((value) => {
+    validators = validators.map((value) => {
       return value.stash;
     });
 
@@ -94,20 +104,31 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
     if (!TotalStakeOverTime.length)
       return [];
 
-    const allValidatorsHistoricalStats : {
-        [stash:string]: {
-        total_exposure:any,
-        blk_number:any
-      }} = {};
+    let allValidatorsHistoricalStats : [typeof singleValidatorHistoricalData];
 
     TotalStakeOverTime.forEach((value) => {
       const event_data :IEventData = value.dataValues.event_data;
       const key = event_data.stash.toString();
+      const index = allValidatorsHistoricalStats.findIndex((element) => element.stash.toString() === key);
       if (key in validators) {
-        allValidatorsHistoricalStats[key].total_exposure.push(event_data.exposure.total);
-        allValidatorsHistoricalStats[key].blk_number.push(event_data.block_number);
+        if (index === -1) { // Means that this validator isn't present in allValidatorsHistoricalStats
+        // so we need to add one
+          let thisValidator: typeof singleValidatorHistoricalData;
+          thisValidator.stash = key;
+          thisValidator.historicalData.push({
+            block_number: event_data.block_number,
+            total_exposure:event_data.exposure.total
+          });
+          allValidatorsHistoricalStats.push(thisValidator);
+        } else {
+          allValidatorsHistoricalStats[index].historicalData.push({
+            block_number: event_data.block_number,
+            total_exposure: event_data.exposure.total
+          });
+        }
       }
     });
+    return res.json({ status: 'Success', result: { allValidatorsHistoricalStats } });
   }
 };
 

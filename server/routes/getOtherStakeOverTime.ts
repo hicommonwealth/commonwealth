@@ -13,16 +13,23 @@ interface IEventData {
 const getOtherStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
-  const chainInfo = await models.Chain.findOne({
-    where: { id: chain }
-  });
   let validators: any, OtherStakeOverTime: any;
 
-  // Handling Errors
+  let singleValidatorHistoricalStats: {
+    stash:string,
+      historicalData:
+        [{
+          block_number:any,
+          other_exposure:any
+        }]
+  };
+
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
-  if (!chainInfo) {
-    return next(new Error(Errors.InvalidChain));
-  }
+
+  const chainInfo = await models.Chain.findOne({ where: { id: chain } });
+
+  if (!chainInfo) return next(new Error(Errors.InvalidChain));
+
   // Handling undefined Dates
   if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
     startDate = new Date();
@@ -51,14 +58,16 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
     if (!OtherStakeOverTime.length)
       return [];
 
-    const otherStake : { [key:string]:any } = {};
+    let singleValidator : typeof singleValidatorHistoricalStats;
     OtherStakeOverTime.forEach((value) => {
       const event_data: IEventData = value.dataValues.event_data;
-      const key = event_data.block_number.toString();
-      otherStake[key].push(event_data.exposure.others);
+      singleValidator.stash = event_data.stash.toString();
+      singleValidator.historicalData.push({
+        block_number: event_data.block_number,
+        other_exposure: event_data.exposure.others });
     });
-    // Please check the result return statement
-    return res.json({ status: 'Success', result: { stash, otherStake } });
+
+    return res.json({ status: 'Success', result: { singleValidator } });
   } else { // If stash isn't given
   // Getting all stashes from Validators Table (Unique)
     validators = await models.Validators.findAll({
@@ -72,7 +81,7 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
 
     if (!validators.length) return ['Validator Table Empty'];
 
-    validators.map((value) => {
+    validators = validators.map((value) => {
       return value.stash;
     });
 
@@ -93,18 +102,29 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
     if (!OtherStakeOverTime.length)
       return [];
 
-    const allValidatorsHistoricalStats : {
-      [stash:string]: {
-      other_exposure:any,
-      blk_number:any
-    }} = {};
+    let allValidatorsHistoricalStats: [typeof singleValidatorHistoricalStats];
 
     OtherStakeOverTime.forEach((value) => {
       const event_data :IEventData = value.dataValues.event_data;
       const key = event_data.stash.toString();
       if (key in validators) {
-        allValidatorsHistoricalStats[key].other_exposure.push(event_data.exposure.others);
-        allValidatorsHistoricalStats[key].blk_number.push(event_data.block_number);
+        const index = allValidatorsHistoricalStats.findIndex((element) => element.stash.toString() === key);
+        // Checking if current key already exisit
+        if (index === -1) { // if not, then make a new key, with that stash, and then push historical data onto it.
+          let thisValidator : typeof singleValidatorHistoricalStats;
+          thisValidator.stash = key;
+          thisValidator.historicalData.push({
+            other_exposure:event_data.exposure.others,
+            block_number: event_data.block_number
+          });
+          allValidatorsHistoricalStats.push(thisValidator);
+        } else {
+          allValidatorsHistoricalStats[index].historicalData.push({ // If stash already exisits then push new element
+            // in the array of json objects containing historical data
+            other_exposure:event_data.exposure.others,
+            block_number: event_data.block_number
+          });
+        }
       }
     });
 
