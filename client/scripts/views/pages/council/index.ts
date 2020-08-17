@@ -220,8 +220,6 @@ const CouncilPage: m.Component<{}> = {
         rightColSpacing: [4, 6],
         columnHeaders: [
           'Candidates',
-          m(CollectiveVotingButton, { candidates }),
-          m(CandidacyButton, { candidates }),
         ]
       })
     ]);
