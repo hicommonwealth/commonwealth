@@ -65,4 +65,10 @@
             }
         }
     }
+    @include xs-max {
+        display: block;
+        .row-right {
+            display: none;
+        }
+    }
 }
