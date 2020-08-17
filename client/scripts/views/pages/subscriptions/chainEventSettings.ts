@@ -70,22 +70,26 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
   }
 };
 
-const IndividualEventSubscriptions: m.Component<{}, {
+const IndividualEventSubscriptions: m.Component<{
   chain: string;
+}, {
   eventKinds: IChainEventKind[];
+  titler;
   allSupportedChains: string[];
   isSubscribedAll: boolean;
   isEmailAll: boolean;
 }> = {
-  view: (vnode) => {
-    let titler;
-    if (vnode.state.chain === ChainNetwork.Edgeware || vnode.state.chain === 'edgeware-local') {
-      titler = SubstrateEvents.Title;
+  oninit: (vnode) => {
+    if (vnode.attrs.chain === ChainNetwork.Edgeware || vnode.attrs.chain === 'edgeware-local') {
+      vnode.state.titler = SubstrateEvents.Title;
       vnode.state.eventKinds = SubstrateTypes.EventKinds;
     } else {
-      titler = null;
+      vnode.state.titler = null;
       vnode.state.eventKinds = [];
     }
+  },
+  view: (vnode) => {
+    const { eventKinds, titler } = vnode.state;
 
     const supportedChains = app.loginStatusLoaded
       ? app.config.chains.getAll()
@@ -94,9 +98,9 @@ const IndividualEventSubscriptions: m.Component<{}, {
       : [];
 
     return [
-      supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
-        ? vnode.state.eventKinds.map((kind) => m(EventSubscriptionRow, {
-          chain: vnode.state.chain,
+      supportedChains.length > 0 && eventKinds.length > 0 && titler
+        ? eventKinds.map((kind) => m(EventSubscriptionRow, {
+          chain: vnode.attrs.chain,
           kind,
           titler,
           key: kind
