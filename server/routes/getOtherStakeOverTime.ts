@@ -64,7 +64,7 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
       singleValidator.stash = event_data.stash.toString();
       singleValidator.historicalData.push({
         block_number: event_data.block_number,
-        other_exposure: event_data.exposure.others });
+        other_exposure: event_data.exposure.others.map((element) => { return element.value; }) });
     });
 
     return res.json({ status: 'Success', result: { singleValidator } });
@@ -114,14 +114,14 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
           let thisValidator : typeof singleValidatorHistoricalStats;
           thisValidator.stash = key;
           thisValidator.historicalData.push({
-            other_exposure:event_data.exposure.others,
+            other_exposure:event_data.exposure.others.map((element) => { return element.value; }),
             block_number: event_data.block_number
           });
           allValidatorsHistoricalStats.push(thisValidator);
         } else {
           allValidatorsHistoricalStats[index].historicalData.push({ // If stash already exisits then push new element
             // in the array of json objects containing historical data
-            other_exposure:event_data.exposure.others,
+            other_exposure:event_data.exposure.others.map((element) => { return element.value; }),
             block_number: event_data.block_number
           });
         }
