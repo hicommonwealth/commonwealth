@@ -4,9 +4,9 @@
 }
 
 .CommunitySelectList {
-    max-height: 100vh;
-    overflow-y: auto;
     .cui-popover-content {
+        max-height: 100vh;
+        overflow-y: auto;
         padding: 20px 0;
         text-align: left;
     }

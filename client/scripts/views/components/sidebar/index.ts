@@ -329,19 +329,15 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
         m('.mobile-sidebar-left', [
           m(Button, {
             class: 'mobile-sidebar-trigger',
-            size: 'sm',
+            compact: true,
             onclick: (e) => {
               vnode.state.open = !vnode.state.open;
             },
             label: m(Icon, { name: Icons.MENU }),
           }),
-        ]),
-        m('.mobile-sidebar-center', [
           m('.community-label', m(CommunitySelector)),
-        ]),
-        m('.mobile-sidebar-right', [
-          app.isLoggedIn() && m(NotificationsMenu, { small: true }),
-          m(LoginSelector, { small: true }),
+          app.isLoggedIn() && m(NotificationsMenu, { small: false }),
+          m(LoginSelector, { small: false }),
         ]),
       ]),
       m('.Sidebar', {
