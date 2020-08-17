@@ -116,9 +116,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const pinnedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
         .filter((thread) => thread.topic && thread.topic.name === topic_ && thread.pinned)
         .sort(orderByDateReverseChronological);
-      list.push(m(PinnedListing, { proposals: pinnedThreads }));
+      if (pinnedThreads.length > 0) {
+        list.push(m(PinnedListing, { proposals: pinnedThreads }));
+      }
 
-      if (sortedThreads.length > 0 || pinnedThreads.length > 0) {
+      if (sortedThreads.length > 0) {
         const firstThread = sortedThreads[0];
         const lastThread = sortedThreads[sortedThreads.length - 1];
         const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
@@ -138,19 +140,20 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             }
           });
         }
-        if (list.length > 0) {
-          return m(Listing, {
-            content: list,
-            rightColSpacing: [4, 4, 4],
-            columnHeaders: [
-              'Title',
-              'Replies',
-              'Likes',
-              'Last updated'
-            ],
-            menuCarat: true,
-          });
-        }
+      }
+
+      if (list.length > 0) {
+        return m(Listing, {
+          content: list,
+          rightColSpacing: [4, 4, 4],
+          columnHeaders: [
+            'Title',
+            'Replies',
+            'Likes',
+            'Last updated'
+          ],
+          menuCarat: true,
+        });
       }
 
       return m('.discussions-main', [
@@ -200,7 +203,9 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         const arr = [];
         let count = 0;
         const pinnedThreads = allProposals.filter((t) => t.pinned);
-        arr.push(m(PinnedListing, { proposals: pinnedThreads }));
+        if (pinnedThreads.length > 0) {
+          arr.push(m(PinnedListing, { proposals: pinnedThreads }));
+        }
         weekIndexes.sort((a, b) => Number(a) - Number(b)).forEach((msecAgo) => {
           let proposals;
           if (allProposals.length < vnode.state.lookback) {
