@@ -70,6 +70,10 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
   }
 };
 
+/*  This currently is not in production. It is used for testing specific
+    chain events and their related subscriptions. The EventSubscriptionRow
+    above is also only used by IndividualEventSubscriptions.
+*/
 const IndividualEventSubscriptions: m.Component<{
   chain: ChainNetwork;
 }, {
