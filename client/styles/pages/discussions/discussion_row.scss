@@ -23,6 +23,10 @@ $discussion-meta-padding: 18px;
                     margin-right: 6px;
                 }
             }
+            .discussion-link {
+                color: $text-color-light;
+                margin-right: 12px;
+            }
             .User a {
                 display: inline-block;
                 text-decoration: none;
