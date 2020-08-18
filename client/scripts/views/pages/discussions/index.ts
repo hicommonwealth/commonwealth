@@ -201,12 +201,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const lastVisited = moment(allLastVisited[id]).utc();
       const lastVisitedAgo = now - lastVisited;
 
-      // TODO
-      // locate the appropriate week in which to display a 'last visited' divider
-      // const targetIdx = Math.max(...weekIndexes
-      //   .filter((idx) => Number(idx) < lastVisitedAgo)
-      //   .map((str) => Number(str)));
-
       const listing = [];
       let count = 0;
       let visitMarkerPlaced = false;
@@ -217,19 +211,25 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       if (pinnedThreads.length > 0) {
         listing.push(m(PinnedListing, { proposals: pinnedThreads }));
       }
-      discussionRows = allThreads.filter((t) => !t.pinned).map(discussionRow);
-      if (discussionRows.length < vnode.state.lookback) {
+      // TODO: Ensure proper counting with and without pins
+      const otherThreads = allThreads.filter((t) => !t.pinned);
+      if (otherThreads.length < vnode.state.lookback) {
         vnode.state.postsDepleted = true;
-        vnode.state.lookback = discussionRows.length;
+        vnode.state.lookback = otherThreads.length;
       }
       while (count < vnode.state.lookback) {
-        listing.push(discussionRows[count]);
+        const thread = otherThreads[count];
+        if (lastVisited < getLastUpdate(thread) && !visitMarkerPlaced) {
+          listing.push(LastSeenDivider);
+          visitMarkerPlaced = true;
+        }
+        listing.push(otherThreads[count]);
         count += 1;
       }
 
       return m('.discussions-main', [
         // m(InlineThreadComposer),
-        discussionRows.length === 0
+        listing.length === 0
           ? m(EmptyTopicPlaceholder, { communityName })
           : m(Listing, {
             content: listing,
@@ -245,7 +245,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         // TODO: Incorporate infinite scroll into generic Listing component
         listing.length && vnode.state.postsDepleted
           ? m('.infinite-scroll-reached-end', [
-            `Showing all ${discussionRows.length} of ${pluralize(discussionRows.length, 'posts')}`
+            `Showing all ${listing.length} of ${pluralize(listing.length, 'posts')}`
           ])
           : listing.length
             ? m('.infinite-scroll-spinner-wrap', [
