@@ -268,15 +268,31 @@ export function initCommunity(communityId: string): Promise<void> {
   }
 }
 
-// set up mithril
+// set up route navigation
 m.route.prefix = '';
 export const updateRoute = m.route.set;
 m.route.set = (...args) => {
+  // set app params that maintain global state for:
+  // - whether the user last clicked the back button
+  // - the last page the user was on
+  app._lastNavigatedBack = false;
+  app._lastNavigatedFrom = m.route.get();
+  // show nprogress bar if moving between pages, or otherwise changing url
+  if ((!args[2] || (args[2] && args[2].replace !== true)) && args[0] !== m.route.get()) NProgress.start();
+  // update route
   if (args[0] !== m.route.get()) updateRoute.apply(this, args);
+  // reset scroll position
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
   const body = document.getElementsByTagName('body')[0];
   if (body) body.scrollTo(0, 0);
+};
+
+const _onpopstate = window.onpopstate;
+window.onpopstate = (...args) => {
+  app._lastNavigatedBack = true;
+  app._lastNavigatedFrom = m.route.get();
+  if (_onpopstate) _onpopstate.apply(this, args);
 };
 
 // set up ontouchmove blocker
@@ -325,7 +341,6 @@ $(() => {
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
       console.log('onmatch called, for:', path);
-      NProgress.start();
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */

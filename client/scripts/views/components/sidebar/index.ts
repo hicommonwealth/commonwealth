@@ -12,6 +12,7 @@ import { ChainClass, ChainBase, AddressInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
+import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import CommunitySelector, { CommunityLabel } from './community_selector';
@@ -329,19 +330,16 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
         m('.mobile-sidebar-left', [
           m(Button, {
             class: 'mobile-sidebar-trigger',
-            size: 'sm',
+            compact: true,
             onclick: (e) => {
               vnode.state.open = !vnode.state.open;
             },
             label: m(Icon, { name: Icons.MENU }),
           }),
-        ]),
-        m('.mobile-sidebar-center', [
+          app.isLoggedIn() && m(MobileNewProposalButton),
           m('.community-label', m(CommunitySelector)),
-        ]),
-        m('.mobile-sidebar-right', [
-          app.isLoggedIn() && m(NotificationsMenu, { small: true }),
-          m(LoginSelector, { small: true }),
+          app.isLoggedIn() && m(NotificationsMenu, { small: false }),
+          m(LoginSelector, { small: false }),
         ]),
       ]),
       m('.Sidebar', {

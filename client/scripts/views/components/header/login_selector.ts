@@ -160,16 +160,17 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
           fluid: true,
           compact: true,
           size: small ? 'sm' : 'default',
-          disabled: !(app.chain || app.community),
           onclick: (e) => {
             vnode.state.showAddressSelectionHint = false;
           },
           label: [
-            (!app.chain && !app.community) ? 'Select a community'
-              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
+            m('span.hidden-xs', [
+              (!app.chain && !app.community) ? 'Select a community'
+                : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
                 : 'Select an address',
+            ]),
+            m(Icon, { name: Icons.CHEVRON_DOWN }),
           ],
-          iconRight: !(app.chain || app.community) ? null : Icons.CHEVRON_DOWN,
         }),
         content: m(Menu, { class: 'LoginSelectorMenu' }, [
           // address list

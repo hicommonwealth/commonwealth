@@ -4,7 +4,7 @@
     @include listing-row-base;
 
     .pinned {
-        margin: 13px 13px 0 0;
+        margin: 8px 15px 0 0;
     }
     .row-left {
         line-height: 1.1;
@@ -23,7 +23,6 @@
         .row-subheader a, span {
             color: $text-color-light;
             font-size: $text-size-item-meta;
-            line-height: 1.2;
         }
     }
     .row-right {
@@ -64,6 +63,12 @@
                     }
                 }
             }
+        }
+    }
+    @include xs-max {
+        display: block;
+        .row-right {
+            display: none;
         }
     }
 }

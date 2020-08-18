@@ -6,8 +6,15 @@ import moment from 'moment-twitter';
 
 import app from 'state';
 import { Coin } from 'adapters/currency';
-import { pluralize, slugify, formatPercentShort, blocknumToDuration, byAscendingCreationDate, link } from 'helpers';
-import { ProposalStatus, VotingType, AnyProposal, ChainBase, AddressInfo } from 'models';
+import {
+  formatLastUpdated,
+  slugify,
+  formatPercentShort,
+  blocknumToDuration,
+  byAscendingCreationDate,
+  link
+} from 'helpers';
+import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
 
 import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
@@ -273,9 +280,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
       !proposal.completed
         ? m('.last-updated', 'Active')
         : createdAt && createdAt instanceof moment
-          ? m('.last-updated', moment().diff(proposal.createdAt, 'days') > 30
-            ? proposal.createdAt.format('MMM  D')
-            : proposal.createdAt.fromNow())
+          ? m('.last-updated', formatLastUpdated(proposal.createdAt))
           : null
     ];
 

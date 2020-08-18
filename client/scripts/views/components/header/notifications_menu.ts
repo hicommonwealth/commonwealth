@@ -4,7 +4,7 @@ import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import app from 'state';
 
-import { PopoverMenu, Button, Icons, ButtonGroup } from 'construct-ui';
+import { PopoverMenu, Button, Icon, Icons, ButtonGroup } from 'construct-ui';
 import NotificationRow from 'views/components/notification_row';
 import { Notification } from 'models';
 import { sortNotifications } from 'helpers/notifications';
@@ -47,8 +47,11 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
       transitionDuration: 0,
       hoverCloseDelay: 0,
       trigger: m(Button, {
-        iconLeft: Icons.BELL,
-        label: m('.notification-badge', unreadNotifications),
+        class: `NotificationsMenuButton ${unreadNotifications > 0 ? 'has-notifications' : 'no-notifications'}`,
+        label: [
+          m(Icon, { name: Icons.BELL }),
+          m('.notification-count', unreadNotifications),
+        ],
         size: small ? 'sm' : 'default',
         compact: true,
       }),
