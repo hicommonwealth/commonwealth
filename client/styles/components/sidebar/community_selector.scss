@@ -11,12 +11,17 @@
         text-align: left;
         @include xs-max {
             margin: 1px 10px;
+            width: calc(100vw - 20px);
         }
     }
     .cui-menu {
         border: none;
         max-width: 300px;
         width: 300px;
+        @include xs-max {
+            max-width: 100%;
+            width: 100%;
+        }
         h4 {
             margin: 20px 24px 10px;
             color: #999;

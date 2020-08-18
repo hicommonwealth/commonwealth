@@ -31,6 +31,7 @@
 .NotificationsMenu {
     .cui-popover-content {
         @include xs-max {
+            position: relative;
             margin: 0 9px;
         }
     }
@@ -38,6 +39,9 @@
         height: 480px;
         background: #fff;
         width: 340px;
+        @include xs-max {
+            width: calc(100vw - 20px);
+        }
     }
     .cui-menu {
         max-width: 342px;
@@ -45,6 +49,9 @@
         padding: 0;
         background: none;
         overflow: hidden;
+        @include xs-max {
+            max-width: calc(100vw - 20px);
+        }
     }
     .cui-popover-arrow {
         background: white;
