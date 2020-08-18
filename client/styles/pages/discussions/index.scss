@@ -9,11 +9,13 @@
         &.empty-list {
             height: calc(100vh - 200px);
         }
-        @include xs-max {
+    }
+    @include xs-max {
+        .discussions-main {
             padding: 12px 0;
-            .ListingHeader {
-                display: none;
-            }
+        }
+        .ListingHeader {
+            display: none;
         }
     }
 

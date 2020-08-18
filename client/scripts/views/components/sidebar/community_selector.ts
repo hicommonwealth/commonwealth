@@ -182,7 +182,6 @@ const CommunitySelector = {
               currentCommunity instanceof CommunityInfo
                 ? m(CommunityLabel, { community: currentCommunity })
                 : m(CommunityLabel, { chain: currentCommunity }),
-              m(Icon, { name: Icons.MENU, size: 'sm' }),
             ],
           }),
           class: 'CommunitySelectList',

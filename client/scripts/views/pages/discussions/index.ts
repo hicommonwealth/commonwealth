@@ -142,18 +142,21 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         }
       }
 
-      if (list.length > 0) {
-        return m(Listing, {
-          content: list,
-          rightColSpacing: [4, 4, 4],
-          columnHeaders: [
-            'Title',
-            'Replies',
-            'Likes',
-            'Last updated'
-          ],
-          menuCarat: true,
-        });
+        if (list.length > 0) {
+          return m('.discussions-main', [
+            m(Listing, {
+              content: list,
+              rightColSpacing: [4, 4, 4],
+              columnHeaders: [
+                'Title',
+                'Replies',
+                'Likes',
+                'Last updated'
+              ],
+              menuCarat: true,
+            })
+          ]);
+        }
       }
 
       return m('.discussions-main', [

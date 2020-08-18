@@ -285,24 +285,24 @@ const SettingsModule: m.Component<{}> = {
           label: 'Notifications',
           onclick: (e) => m.route.set(
             app.activeId()
-              ? `/${app.activeId()}/notification-settings`
-              : '/notification-settings'
+              ? `/${app.activeId()}/notificationSettings`
+              : '/notificationSettings'
           ),
           active: app.activeId()
-            ? m.route.get() === `/${app.activeId()}/notification-settings`
-            : m.route.get() === '/notification-settings',
+            ? m.route.get() === `/${app.activeId()}/notificationSettings`
+            : m.route.get() === '/notificationSettings',
         }),
         app.activeId() && m(ListItem, {
           contentLeft: m(Icon, { name: Icons.BELL }),
           label: 'Chain Notifications',
           onclick: (e) => m.route.set(
             app.activeId()
-              ? `/${app.activeId()}/chain-event-settings`
-              : '/chain-event-settings'
+              ? `/${app.activeId()}/chainEventSettings`
+              : '/chainEventSettings'
           ),
           active: app.activeId()
-            ? m.route.get() === `/${app.activeId()}/chain-event-settings`
-            : m.route.get() === '/chain-event-settings',
+            ? m.route.get() === `/${app.activeId()}/chainEventSettings`
+            : m.route.get() === '/chainEventSettings',
         }),
       ]),
     ]);
