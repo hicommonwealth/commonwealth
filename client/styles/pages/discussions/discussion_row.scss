@@ -4,6 +4,16 @@ $discussion-meta-padding: 18px;
 
 .DiscussionRow {
     .row-left {
+        .row-header {
+            a.external-discussion-link {
+                .cui-icon {
+                    position: relative;
+                    top: -2px;
+                    color: #111;
+                    margin-left: 2px;
+                }
+            }
+        }
         .row-subheader {
             // Styling specific to DiscussionRow subheader content
             .discussion-locked {
@@ -38,11 +48,6 @@ $discussion-meta-padding: 18px;
                 a.user-display-name {
                     color: $theme-base-color;
                 }
-            }
-            .external-discussion-link {
-                display: inline;
-                // TODO: Investigate $discussion-meta-padding
-                margin-right: $discussion-meta-padding;
             }
         }
     }
