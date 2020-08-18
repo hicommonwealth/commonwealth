@@ -4,6 +4,7 @@ import 'components/new_thread_form.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
+import moment from 'moment';
 import Quill from 'quill-2.0-dev/quill';
 import {
   Tabs, TabItem, Form, FormGroup, Input, Button,
@@ -20,7 +21,6 @@ import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pa
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
-import moment from 'moment';
 
 interface IThreadForm {
   topicName?: string;
@@ -288,7 +288,7 @@ export const NewThreadForm: m.Component<{
           ]),
         ]),
         newType === PostType.Link && m(Form, [
-          m(FormGroup, { span: 8 }, [
+          m(FormGroup, { span: { xs: 12, sm: 8 }, order: { xs: 2, sm: 1 } }, [
             m(Input, {
               placeholder: 'https://',
               oninput: (e) => {
@@ -301,7 +301,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 1,
             }),
           ]),
-          m(FormGroup, { span: 4 }, [
+          m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 1, sm: 2 } }, [
             m(TopicSelector, {
               activeTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
               topics: app.topics.getByCommunity(app.activeId()),
@@ -311,7 +311,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 2,
             }),
           ]),
-          m(FormGroup, [
+          m(FormGroup, { order: 3 },  [
             m(Input, {
               class: 'new-thread-title',
               placeholder: 'Title',
@@ -326,7 +326,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 3,
             }),
           ]),
-          m(FormGroup, [
+          m(FormGroup, { order: 4 }, [
             m(QuillEditor, {
               contentsDoc: '', // Prevent the editor from being filled in with previous content
               oncreateBind: (state) => {
@@ -337,7 +337,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 4,
             })
           ]),
-          m(FormGroup, [
+          m(FormGroup, { order: 5 }, [
             m(Button, {
               class: !author ? 'disabled' : '',
               intent: 'primary',
@@ -376,7 +376,7 @@ export const NewThreadForm: m.Component<{
         ]),
         //
         newType === PostType.Discussion && m(Form, [
-          fromDraft && m(FormGroup, { span: 2, class: 'draft-badge-wrap' }, [
+          fromDraft && m(FormGroup, { span: 2, order: { xs: 3, sm: 1 }, class: 'hidden-xs draft-badge-wrap' }, [
             m(Tag, {
               class: 'draft-badge',
               size: 'xs',
@@ -384,7 +384,7 @@ export const NewThreadForm: m.Component<{
               label: 'Draft',
             })
           ]),
-          m(FormGroup, { span: fromDraft ? 6 : 8 }, [
+          m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 2 }, [
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
@@ -401,7 +401,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 1,
             }),
           ]),
-          m(FormGroup, { span: 4 }, [
+          m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 1, sm: 3 } }, [
             m(TopicSelector, {
               activeTopic:(vnode.state.activeTopic === false || vnode.state.activeTopic)
                 ? vnode.state.activeTopic
@@ -413,7 +413,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 2,
             }),
           ]),
-          m(FormGroup, [
+          m(FormGroup, { order: 4 }, [
             m(QuillEditor, {
               contentsDoc: '',
               oncreateBind: (state) => {
@@ -423,7 +423,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 3,
             }),
           ]),
-          m(FormGroup, [
+          m(FormGroup, { order: 5 }, [
             m(Button, {
               class: !author || saving || vnode.state.uploadsInProgress > 0
                 ? 'disabled' : '',

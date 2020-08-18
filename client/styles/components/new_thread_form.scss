@@ -20,6 +20,9 @@
         .ql-editor {
             max-height: calc(100vh - 310px) !important;
         }
+        .hidden-xs {
+            display: none;
+        }
     }
 
     .new-thread-form-body {
@@ -47,6 +50,10 @@
             .topic-selection-drop-menu {
                 margin-left: 12px;
                 width: calc(100% - 12px);
+                @include xs-max {
+                    margin-left: 0;
+                    width: 100%;
+                }
             }
         }
         button[name="submit"], button[name="submission"] {
