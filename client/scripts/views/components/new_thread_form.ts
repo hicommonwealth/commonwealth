@@ -316,6 +316,7 @@ export const NewThreadForm: m.Component<{
               class: 'new-thread-title',
               placeholder: 'Title',
               name: 'new-link-title',
+              autocomplete: 'off',
               oninput: (e) => {
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
@@ -388,6 +389,7 @@ export const NewThreadForm: m.Component<{
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
+              autocomplete: 'off',
               oninput: (e) => {
                 const { value } = (e as any).target;
                 if (!vnode.state.quillEditorState?.alteredText) {
