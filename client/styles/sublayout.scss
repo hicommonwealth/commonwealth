@@ -16,6 +16,9 @@
     .sublayout-grid-col {
         &.sublayout-grid-col-narrow {
             padding-right: 30px;
+            @include xs-max {
+                padding-right: 0;
+            }
         }
         &.sublayout-grid-col-wide {
         }

@@ -4,16 +4,23 @@
 }
 
 .CommunitySelectList {
-    max-height: 100vh;
-    overflow-y: auto;
     .cui-popover-content {
-        padding: 20px 0;
+        max-height: 100vh;
+        overflow-y: auto;
         text-align: left;
+        @include xs-max {
+            margin: 0 10px;
+            width: calc(100vw - 20px);
+        }
     }
     .cui-menu {
-        border: none;
         max-width: 300px;
         width: 300px;
+        padding: 20px 0;
+        @include xs-max {
+            max-width: 100%;
+            width: 100%;
+        }
         h4 {
             margin: 20px 24px 10px;
             color: #999;

@@ -177,7 +177,6 @@ const CommunitySelector = {
           hasArrow: false,
           inline: true,
           trigger: m(Button, {
-            basic: true,
             class: 'CommunitySelectList',
             label: [
               currentCommunity instanceof CommunityInfo

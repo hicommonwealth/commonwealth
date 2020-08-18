@@ -1,6 +1,5 @@
 @import 'client/styles/shared';
 
-$discussion-inner-padding: 37px;
 $discussion-outer-padding: 60px;
 $discussion-separator-padding: 30px; // padding around horizontal rule between header and body
 $discussion-meta-padding: 12px; // padding between comment meta & comment content
@@ -35,7 +34,10 @@ $discussion-title-font-size: 1.45rem;
     .ProposalHeader,
     .ProposalComment,
     .CreateComment {
-        padding-top: $discussion-inner-padding;
+        padding-top: 36px;
+        @include xs-max {
+            padding-top: 30px;
+        }
     }
     .ProposalComments.no-active-account,
     .CreateComment {
@@ -82,7 +84,6 @@ $discussion-title-font-size: 1.45rem;
             }
         }
         .proposal-title {
-            margin: 4px 0 0;
             .ProposalHeaderTitle {
                 display: inline;
                 font-size: $discussion-title-font-size;
