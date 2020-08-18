@@ -160,7 +160,6 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
           fluid: true,
           compact: true,
           size: small ? 'sm' : 'default',
-          disabled: !(app.chain || app.community),
           onclick: (e) => {
             vnode.state.showAddressSelectionHint = false;
           },

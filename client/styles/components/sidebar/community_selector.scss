@@ -1,6 +1,10 @@
 @import 'client/styles/shared';
 
 .CommunitySelector {
+    button.cui-button {
+        border: none !important;
+        border-radius: 0 !important;
+    }
 }
 
 .CommunitySelectList {
