@@ -44,7 +44,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       if (scrollPos > (scrollHeight - 400)) {
         if (vnode.state.hasOlderPosts && !vnode.state.postsDepleted) {
           vnode.state.lookback += vnode.state.defaultLookback;
-          localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
           m.redraw();
         }
       }
@@ -52,6 +51,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     $(window).on('scroll', onscroll);
   },
   view: (vnode) => {
+    if (!app.activeId()) return;
+
     // determine lookback length
     vnode.state.defaultLookback = 20;
 
@@ -61,6 +62,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       : Number.isInteger(vnode.state.lookback)
         ? vnode.state.lookback
         : vnode.state.defaultLookback;
+
+    localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
 
     if (returningFromThread && localStorage[`${app.activeId()}-scrollY`]) {
       setTimeout(() => {
