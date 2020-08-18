@@ -7,9 +7,6 @@ import createGist from './routes/createGist';
 
 import edgewareLockdropEvents from './routes/edgeware_lockdrop_events';
 import edgewareLockdropBalances from './routes/edgeware_lockdrop_balances';
-import supernovaLockdropATOMLocks from './routes/supernova_lockdrop_atom_locks';
-import supernovaLockdropBTCLocks from './routes/supernova_lockdrop_btc_locks';
-import supernovaLockdropETHLocks from './routes/supernova_lockdrop_eth_locks';
 
 import createHedgehogAuthentication from './routes/createHedgehogAuthentication';
 import getHedgehogAuthentication from './routes/getHedgehogAuthentication';
@@ -303,10 +300,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // edgeware
   router.get('/stats/edgeware/lockdrop/events', edgewareLockdropEvents.bind(this, models));
   router.get('/stats/edgeware/lockdrop/balances', edgewareLockdropBalances.bind(this, models));
-  // supernova
-  router.get('/stats/supernova/lockdrop/atom', supernovaLockdropATOMLocks.bind(this, models));
-  router.get('/stats/supernova/lockdrop/btc', supernovaLockdropBTCLocks.bind(this, models));
-  router.get('/stats/supernova/lockdrop/eth', supernovaLockdropETHLocks.bind(this, models));
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
