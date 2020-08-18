@@ -44,7 +44,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       if (scrollPos > (scrollHeight - 400)) {
         if (vnode.state.hasOlderPosts && !vnode.state.postsDepleted) {
           vnode.state.lookback += vnode.state.defaultLookback;
-          localStorage.discussionsLookback = vnode.state.lookback;
+          localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
           m.redraw();
         }
       }
@@ -56,15 +56,15 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     vnode.state.defaultLookback = 20;
 
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
-    vnode.state.lookback = (returningFromThread && localStorage.discussionsLookback)
-      ? Number(localStorage.discussionsLookback)
+    vnode.state.lookback = (returningFromThread && localStorage[`${app.activeId()}-lookback`])
+      ? Number(localStorage[`${app.activeId()}-lookback`])
       : Number.isInteger(vnode.state.lookback)
         ? vnode.state.lookback
         : vnode.state.defaultLookback;
 
-    if (returningFromThread && localStorage.discussionsListingScrollY) {
+    if (returningFromThread && localStorage[`${app.activeId()}-scrollY`]) {
       setTimeout(() => {
-        window.scrollTo(0, Number(localStorage.discussionsListingScrollY));
+        window.scrollTo(0, Number(localStorage[`${app.activeId()}-scrollY`]));
       }, 1);
     }
 

@@ -96,7 +96,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       rightColSpacing: app.isLoggedIn() ?  [4, 4, 3, 1] : [4, 4, 4],
       onclick: (e) => {
         e.preventDefault();
-        localStorage.discussionsListingScrollY = window.scrollY;
+        localStorage[`${app.activeId()}-scrollY`] = window.scrollY;
         m.route.set(discussionLink);
       },
     });
