@@ -92,6 +92,14 @@
         .cui-form {
             margin-left: 28px;
         }
+        @include xs-max {
+            .cui-tabs {
+                padding: 0;
+            }
+            .cui-form {
+                margin: 0 20px;
+            }
+        }
     }
     .new-thread-form-sidebar {
         display: flex;
