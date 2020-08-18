@@ -44,6 +44,14 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       if (scrollPos > (scrollHeight - 400)) {
         if (vnode.state.hasOlderPosts && !vnode.state.postsDepleted) {
           vnode.state.lookback += vnode.state.defaultLookback;
+          // const x = m.route.get();
+          // const y = m.route.param('topic');
+          // // debugger
+          // const params = m.route.param('topic')
+          //   ? { topic: m.route.param('topic'), lookback: vnode.state.lookback }
+          //   : { lookback: vnode.state.lookback };
+          localStorage.discussionsLookback = vnode.state.lookback;
+          // m.route.set(`${m.route.get()}`,  { replace: true, state: params });
           m.redraw();
         }
       }
@@ -51,6 +59,9 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     $(window).on('scroll', onscroll);
   },
   view: (vnode) => {
+    // if (localStorage.discussionsLookback) {
+    //   window.scrollTo(0, localStorage.scrollY);
+    // }
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
@@ -194,10 +205,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       // determine lookback length
       vnode.state.defaultLookback = 20;
       const { defaultLookback } = vnode.state;
-      vnode.state.lookback = (!vnode.state.lookback || isNaN(vnode.state.lookback))
-        ? defaultLookback
-        : vnode.state.lookback;
-
+      vnode.state.lookback = localStorage.discussionsLookback
+        ? Number(localStorage.discussionsLookback)
+        : Number.isInteger(vnode.state.lookback)
+          ? vnode.state.lookback
+          : defaultLookback;
+      console.log(vnode.state.lookback);
       let isFirstWeek = true;
 
       // render proposals by week

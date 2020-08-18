@@ -95,6 +95,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       contentRight: rowMetadata,
       rightColSpacing: app.isLoggedIn() ?  [4, 4, 3, 1] : [4, 4, 4],
       onclick: (e) => {
+        debugger
         e.preventDefault();
         m.route.set(discussionLink);
       },
