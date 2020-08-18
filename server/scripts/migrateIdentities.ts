@@ -1,7 +1,8 @@
 /**
- * This script "migrates" identities from the chain into the database, by first
- * querying all addresses, and then attempting to fetch corresponding identities
- * from the chain, writing the results back into the database.
+ * This script "migrates" identities from the chain into the database,
+ * by first querying all offchain addresses we have records for, and
+ * then attempting to fetch corresponding identities from the chain,
+ * and writing the results back into the database.
  */
 
 import _ from 'underscore';
@@ -61,7 +62,7 @@ export default async function (models, chain?: string): Promise<void> {
     }));
 
     // 2d. write the found identities back to db using the event handler
-    log.info(`Writing identities for chain ${node.chain} back to db...`);
+    log.info(`Writing identities for chain ${node.chain} back to db... (count: ${identityEvents.length})`);
     const handler = new IdentityEventHandler(models, node.chain);
     await Promise.all(identityEvents.map((e) => handler.handle(e, null)));
   }

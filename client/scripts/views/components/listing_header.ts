@@ -23,16 +23,16 @@ const ListingHeader: m.Component<{
           return m(Col, {
             class: `listing-header-col listing-header-col-${idx + 2}`,
             span: rightColSpacing[idx],
-            offset: initialOffset > 0 && idx === 0
+            offset: (initialOffset > 0 && idx === 0)
               ? initialOffset
               : 0
           }, column);
         }),
-        app.isLoggedIn()
-        && showMenu
-        && m(Col, { span: 1 }, [
-          m('.proposal-row-menu')
-        ])
+        (app.isLoggedIn() && showMenu)
+          ? m(Col, { span: 1 }, [
+            m('.proposal-row-menu')
+          ])
+          : null, // return null since Grid throws an exception when rendering false
       ]),
     ]);
   }

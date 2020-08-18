@@ -91,6 +91,7 @@ import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import setPrivacy from './routes/setPrivacy';
+import pinThread from './routes/pinThread';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -151,7 +152,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/profile', getProfile.bind(this, models));
 
   router.post('/setPrivacy', passport.authenticate('jwt', { session: false }), setPrivacy.bind(this, models));
-
+  router.post('/pinThread', passport.authenticate('jwt', { session: false }), pinThread.bind(this, models));
 
   // offchain discussion drafts
   router.post('/drafts', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));

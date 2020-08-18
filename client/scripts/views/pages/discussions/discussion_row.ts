@@ -6,7 +6,7 @@ import moment from 'moment-twitter';
 import { Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
-import { pluralize, slugify, link, externalLink, extractDomain } from 'helpers';
+import { formatLastUpdated, slugify, link, externalLink, extractDomain } from 'helpers';
 
 import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
@@ -15,21 +15,6 @@ import User from 'views/components/widgets/user';
 import DiscussionRowMenu from './discussion_row_menu';
 import UserGallery from '../../components/widgets/user_gallery';
 import ListingRow from '../../components/listing_row';
-
-const formatLastUpdated = (timestamp) => {
-  if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
-  if (timestamp.isBefore(moment().subtract(30, 'days'))) return timestamp.format('MMM D');
-  const formatted = timestamp.fromNow(true);
-  if (formatted.indexOf(' month') !== -1) {
-    return timestamp.format('MMM D');
-  } else {
-    return formatted
-      .replace(' days', 'd')
-      .replace(' day', 'd')
-      .replace(' hours', 'h')
-      .replace(' hour', 'h');
-  }
-};
 
 const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boolean }> = {
   view: (vnode) => {
@@ -46,6 +31,8 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
         proposal.title, m.trust('&nbsp;'), m(Icon, { name: Icons.EXTERNAL_LINK })
       ])
       : link('a', discussionLink, proposal.title);
+
+    const pinned = proposal.pinned;
 
     const rowSubheader = [
       proposal.readOnly && m('.discussion-locked', [
@@ -102,10 +89,11 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       contentLeft: {
         header: rowHeader,
         subheader: rowSubheader,
+        pinned,
       },
       key: proposal.id,
       contentRight: rowMetadata,
-      rightColSpacing: [4, 4, 3, 1],
+      rightColSpacing: app.isLoggedIn() ?  [4, 4, 3, 1] : [4, 4, 4],
       onclick: (e) => {
         e.preventDefault();
         m.route.set(discussionLink);

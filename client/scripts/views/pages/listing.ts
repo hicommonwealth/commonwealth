@@ -1,8 +1,7 @@
 import 'components/listing.scss';
 
-import m, { VnodeDOM, Vnode } from 'mithril';
-import ListingHeader from '../components/listing_header';
-
+import m from 'mithril';
+import ListingHeader from 'views/components/listing_header';
 
 const Listing: m.Component<{
   columnHeaders: any[];
