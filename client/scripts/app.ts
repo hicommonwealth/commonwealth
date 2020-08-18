@@ -278,7 +278,7 @@ m.route.set = (...args) => {
   app._lastNavigatedBack = false;
   app._lastNavigatedFrom = m.route.get();
   // show nprogress bar if moving between pages, or otherwise changing url
-  if (!args[2] || (args[2] && args[2].replace !== true)) NProgress.start();
+  if ((!args[2] || (args[2] && args[2].replace !== true)) && args[0] !== m.route.get()) NProgress.start();
   // update route
   if (args[0] !== m.route.get()) updateRoute.apply(this, args);
   // reset scroll position
