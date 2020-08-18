@@ -19,6 +19,7 @@ import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 
+import { updateRoute } from 'app';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import Listing from '../listing';
 import PinnedListing from './pinned_listing';
@@ -37,6 +38,14 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       'Page Name': 'DiscussionsPage',
       Scope: app.activeId(),
     });
+
+    const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
+    if (returningFromThread && localStorage[`${app.activeId()}-scrollY`]) {
+      setTimeout(() => {
+        window.scrollTo(0, Number(localStorage[`${app.activeId()}-scrollY`]));
+      }, 1);
+    }
+
     // Infinite Scroll
     const onscroll = _.debounce(() => {
       const scrollHeight = $(document).height();
@@ -64,12 +73,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         : vnode.state.defaultLookback;
 
     localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
-
-    if (returningFromThread && localStorage[`${app.activeId()}-scrollY`]) {
-      setTimeout(() => {
-        window.scrollTo(0, Number(localStorage[`${app.activeId()}-scrollY`]));
-      }, 1);
-    }
 
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
@@ -185,83 +188,82 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     const getHomepageListing = () => {
       // get proposals, grouped by week
-      const allProposals = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
+      let allThreads = app.threads
+        .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
         .sort(orderDiscussionsbyLastComment);
-      const now = +moment().utc();
-      const week = moment.duration(1, 'week');
-
-      // group proposals into an object with msecAgo as key and arr of OffchainThreads as val
-      const proposalsByWeek = _.groupBy(allProposals, (proposal) => {
-        const ago = now - +(app.comments.lastCommented(proposal) || proposal.createdAt).utc();
-        return ago - (ago % week);
-      });
-      const weekIndexes = Object.keys(proposalsByWeek);
-      vnode.state.hasOlderPosts = weekIndexes.findIndex((msecAgo) => +msecAgo > vnode.state.lookback) !== -1;
 
       // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
       // for easy comparison with weekly indexes' msecAgo
+      const now = +moment().utc();
       const id = (activeEntity.meta as NodeInfo).chain
         ? (activeEntity.meta as NodeInfo).chain.id
         : (activeEntity.meta as CommunityInfo).id;
       const lastVisited = moment(allLastVisited[id]).utc();
       const lastVisitedAgo = now - lastVisited;
 
+      // TODO
       // locate the appropriate week in which to display a 'last visited' divider
-      const targetIdx = Math.max(...weekIndexes
-        .filter((idx) => Number(idx) < lastVisitedAgo)
-        .map((str) => Number(str)));
+      // const targetIdx = Math.max(...weekIndexes
+      //   .filter((idx) => Number(idx) < lastVisitedAgo)
+      //   .map((str) => Number(str)));
 
-      let isFirstWeek = true;
-
-      // render proposals by week
-      const getRecentPostsSortedByWeek = () => {
-        const arr = [];
-        let count = 0;
-        const pinnedThreads = allProposals.filter((t) => t.pinned);
-        if (pinnedThreads.length > 0) {
-          arr.push(m(PinnedListing, { proposals: pinnedThreads }));
-        }
-        weekIndexes.sort((a, b) => Number(a) - Number(b)).forEach((msecAgo) => {
-          let proposals;
-          if (allProposals.length < vnode.state.lookback) {
-            vnode.state.postsDepleted = true;
-            vnode.state.lookback = allProposals.length;
-          }
-          if (count < vnode.state.lookback) {
-            if (count + proposalsByWeek[msecAgo].length > vnode.state.lookback) {
-              proposals = proposalsByWeek[msecAgo].slice(0, vnode.state.lookback - count);
-            } else {
-              proposals = proposalsByWeek[msecAgo];
-            }
-            count += proposals.length;
-            const isCurrentWeek = +msecAgo === 0;
-            const isLastWeek = +msecAgo === +week * 2;
-            const attrs = {
-              isCurrentWeek,
-              isFirstWeek,
-              heading: isCurrentWeek
-                ? 'This week'
-                : (isLastWeek
-                  ? 'Last week'
-                  : `Week ending ${moment(now - +msecAgo).format('MMM D, YYYY')}`),
-              proposals
-            };
-            if (Number(msecAgo) === targetIdx) attrs['lastVisited'] = Number(lastVisited);
-            arr.push(m(WeeklyDiscussionListing, attrs));
-            isFirstWeek = false;
-          } else {
-            // Already showing up to vnode.state.lookback posts; don't need to load any more
-            return null;
-          }
-        });
-        return arr;
-      };
+      const listing = [];
+      let count = 0;
+      const pinnedThreads = allThreads.filter((t) => t.pinned);
+      allThreads = allThreads.filter((t) => !t.pinned);
+      if (pinnedThreads.length > 0) {
+        listing.push(m(PinnedListing, { proposals: pinnedThreads }));
+      }
+      if (allThreads.length < vnode.state.lookback) {
+        vnode.state.postsDepleted = true;
+        vnode.state.lookback = allThreads.length;
+      }
+      while (count < vnode.state.lookback) {
+        listing.push(allThreads[count]);
+        count += 1;
+      }
+      //   weekIndexes.sort((a, b) => Number(a) - Number(b)).forEach((msecAgo) => {
+      //     let proposals;
+      //     if (allThreads.length < vnode.state.lookback) {
+      //       vnode.state.postsDepleted = true;
+      //       vnode.state.lookback = allThreads.length;
+      //     }
+      //     if (count < vnode.state.lookback) {
+      //       if (count + proposalsByWeek[msecAgo].length > vnode.state.lookback) {
+      //         proposals = proposalsByWeek[msecAgo].slice(0, vnode.state.lookback - count);
+      //       } else {
+      //         proposals = proposalsByWeek[msecAgo];
+      //       }
+      //       count += proposals.length;
+      //       const isCurrentWeek = +msecAgo === 0;
+      //       const isLastWeek = +msecAgo === +week * 2;
+      //       const attrs = {
+      //         isCurrentWeek,
+      //         isFirstWeek,
+      //         heading: isCurrentWeek
+      //           ? 'This week'
+      //           : (isLastWeek
+      //             ? 'Last week'
+      //             : `Week ending ${moment(now - +msecAgo).format('MMM D, YYYY')}`),
+      //         proposals
+      //       };
+      //       if (Number(msecAgo) === targetIdx) attrs['lastVisited'] = Number(lastVisited);
+      //       arr.push(m(WeeklyDiscussionListing, attrs));
+      //       isFirstWeek = false;
+      //     } else {
+      //       // Already showing up to vnode.state.lookback posts; don't need to load any more
+      //       return null;
+      //     }
+      //   });
+      //   return arr;
+      // };
+      // console.log({getRecentPosts: getRecentPostsSortedByWeek()})
       return m('.discussions-main', [
         // m(InlineThreadComposer),
-        allProposals.length === 0
+        allThreads.length === 0
           ? m(EmptyTopicPlaceholder, { communityName })
           : m(Listing, {
-            content: getRecentPostsSortedByWeek(),
+            content: listing,
             rightColSpacing: [4, 4, 4],
             columnHeaders: [
               'Title',
@@ -272,11 +274,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             menuCarat: true,
           }),
         // TODO: Incorporate infinite scroll into generic Listing component
-        getRecentPostsSortedByWeek().length && vnode.state.postsDepleted
+        listing.length && vnode.state.postsDepleted
           ? m('.infinite-scroll-reached-end', [
-            `Showing all ${allProposals.length} of ${pluralize(allProposals.length, 'posts')}`
+            `Showing all ${allThreads.length} of ${pluralize(allThreads.length, 'posts')}`
           ])
-          : getRecentPostsSortedByWeek().length
+          : listing.length
             ? m('.infinite-scroll-spinner-wrap', [
               m(Spinner, { active: !vnode.state.postsDepleted })
             ])
@@ -291,6 +293,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       topicDescription = topicObject?.description;
     }
 
+    console.log({ postsDepleted: vnode.state.postsDepleted, hasOlderPosts: vnode.state.hasOlderPosts });
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',

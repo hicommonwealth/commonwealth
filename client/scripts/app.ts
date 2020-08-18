@@ -283,9 +283,9 @@ m.route.set = (...args) => {
   if (args[0] !== m.route.get()) updateRoute.apply(this, args);
   // reset scroll position
   const html = document.getElementsByTagName('html')[0];
-  if (html) html.scrollTo(0, 0);
+  // if (html) html.scrollTo(0, 0);
   const body = document.getElementsByTagName('body')[0];
-  if (body) body.scrollTo(0, 0);
+  // if (body) body.scrollTo(0, 0);
 };
 
 const _onpopstate = window.onpopstate;
