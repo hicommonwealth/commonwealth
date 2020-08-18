@@ -29,10 +29,9 @@ const ListingRow: m.Component<{
     if (vnode.attrs.class) attrs['class'] = vnode.attrs.class;
     const initialOffset = 12 - rightColSpacing.reduce((t, n) => t + n);
     return m('.ListingRow', attrs, [
-      contentLeft.pinned && m(Icon, {
-        name: Icons.PAPERCLIP,
-        class: 'pinned',
-      }),
+      contentLeft.pinned && m('.pinned', [
+        m('span.icon-pin-outline'),
+      ]),
       m('.row-left', [
         m('.row-header', contentLeft.header),
         m('.row-subheader', contentLeft.subheader),
