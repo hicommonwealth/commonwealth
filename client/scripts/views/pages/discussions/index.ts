@@ -140,7 +140,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             }
           });
         }
-      }
 
         if (list.length > 0) {
           return m('.discussions-main', [
