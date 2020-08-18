@@ -16,29 +16,31 @@ const getNewProposalMenu = () => {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
       label: 'New thread',
     }),
-    (app.chain.base === ChainBase.CosmosSDK || app.chain.base === ChainBase.Substrate)
+    (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
       && m(MenuDivider),
-    app.chain.base === ChainBase.CosmosSDK && m(MenuItem, {
-      onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, { type: ProposalType.CosmosProposal }),
+    app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
+      onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, {
+        type: ProposalType.CosmosProposal
+      }),
       label: 'New proposal'
     }),
-    app.chain.base === ChainBase.Substrate && activeAccount?.chainClass === ChainClass.Edgeware && m(MenuItem, {
+    app.chain?.base === ChainBase.Substrate && activeAccount?.chainClass === ChainClass.Edgeware && m(MenuItem, {
       onclick: () => { m.route.set(`/${activeAccount.chain.id}/new/signaling`); },
       label: 'New signaling proposal'
     }),
-    app.chain.base === ChainBase.Substrate && m(MenuItem, {
+    app.chain?.base === ChainBase.Substrate && m(MenuItem, {
       onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, {
         type: ProposalType.SubstrateTreasuryProposal
       }),
       label: 'New treasury proposal'
     }),
-    app.chain.base === ChainBase.Substrate && m(MenuItem, {
+    app.chain?.base === ChainBase.Substrate && m(MenuItem, {
       onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, {
         type: ProposalType.SubstrateDemocracyProposal
       }),
       label: 'New democracy proposal'
     }),
-    app.chain.base === ChainBase.Substrate && m(MenuItem, {
+    app.chain?.base === ChainBase.Substrate && m(MenuItem, {
       class: activeAccount && (activeAccount as any).isCouncillor ? '' : 'disabled',
       onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, {
         type: ProposalType.SubstrateCollectiveProposal
