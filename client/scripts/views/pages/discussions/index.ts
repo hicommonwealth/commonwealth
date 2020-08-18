@@ -52,6 +52,22 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     $(window).on('scroll', onscroll);
   },
   view: (vnode) => {
+    // determine lookback length
+    vnode.state.defaultLookback = 20;
+
+    const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
+    vnode.state.lookback = (returningFromThread && localStorage.discussionsLookback)
+      ? Number(localStorage.discussionsLookback)
+      : Number.isInteger(vnode.state.lookback)
+        ? vnode.state.lookback
+        : vnode.state.defaultLookback;
+
+    if (returningFromThread && localStorage.discussionsListingScrollY) {
+      setTimeout(() => {
+        window.scrollTo(0, Number(localStorage.discussionsListingScrollY));
+      }, 1);
+    }
+
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
@@ -192,19 +208,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         .filter((idx) => Number(idx) < lastVisitedAgo)
         .map((str) => Number(str)));
 
-      // determine lookback length
-      vnode.state.defaultLookback = 20;
-
-      // TODO: add check app.lastNavigatedBack module checks
-      // vnode.state.lookback = (backButton
-      //  && lastPage.includes('/proposal/discussion/'
-      //  && localStorage.discussionsLookback)
-      vnode.state.lookback = localStorage.discussionsLookback
-        ? Number(localStorage.discussionsLookback)
-        : Number.isInteger(vnode.state.lookback)
-          ? vnode.state.lookback
-          : vnode.state.defaultLookback;
-      console.log(vnode.state.lookback);
       let isFirstWeek = true;
 
       // render proposals by week
