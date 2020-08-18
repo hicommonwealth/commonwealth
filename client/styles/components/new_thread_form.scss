@@ -16,6 +16,11 @@
     &.link-post .ql-editor {
         min-height: 105px;
     }
+    @include xs-max {
+        .ql-editor {
+            max-height: calc(100vh - 310px) !important;
+        }
+    }
 
     .new-thread-form-body {
         padding-bottom: 24px;
