@@ -32,7 +32,6 @@ $text-color-medium: #777;               // medium text on any background
 $text-color-dark: #222;                 // black text on any background
 
 $form-border-color: #c5cdd1;
-$form-active-color: #08c;
 
 $positive-text-color: $positive-bg-color;
 $negative-text-color: $negative-bg-color;
@@ -63,7 +62,7 @@ $listing-right-flex: 3;
     outline: none;
     box-shadow: none;
     &:focus {
-        border-color: $form-active-color;
+        border-color: $theme-focus-border;
     }
 }
 
