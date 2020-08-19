@@ -653,6 +653,10 @@ const ViewProposalPage: m.Component<{
         getSetGlobalEditingStatus,
         getSetGlobalReplyStatus
       }),
+      m('.proposal-mobile-sidebar', [
+        m(ProposalVotingActions, { proposal }),
+        m(ProposalVotingResults, { proposal }),
+      ]),
       m(ProposalComments, {
         proposal,
         comments,
