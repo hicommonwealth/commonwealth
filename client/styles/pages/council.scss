@@ -65,6 +65,14 @@
     .Listing {
         margin-top: 20px;
     }
+    @include sm-max {
+        .stats-container {
+            padding-bottom: 0;
+        }
+        .cui-col-xs-6 {
+            margin-bottom: 18px;
+        }
+    }
 }
 
 .CouncilCandidate, .CouncilElectionVoter {
