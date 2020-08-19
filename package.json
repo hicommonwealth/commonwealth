@@ -10,7 +10,7 @@
     "lint": "./scripts/lint-new-work.sh",
     "lint-all": "eslint client/\\**/*.ts server/\\**/*.ts",
     "test-client": "webpack-dev-server --config webpack/webpack.config.test.js",
-    "test-events": "nyc ts-mocha --project test/tsconfig.node.json ./test/unit/events/*.spec.ts ./test/unit/events/**/*.spec.ts",
+    "test-events": "nyc ts-mocha --project test/tsconfig.node.json ./test/unit/events/*.spec.ts",
     "integration-test": "nyc ts-mocha --project test/tsconfig.node.json ./test/integration/**/*.spec.ts",
     "test": "nyc ts-mocha --project test/tsconfig.node.json ./test/**/*.spec.ts",
     "test-select": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json",
