@@ -31,6 +31,7 @@ const ListingRow: m.Component<{
     return m('.ListingRow', attrs, [
       contentLeft.pinned && m('.pinned', [
         m('span.icon-pin-outline'),
+        m('.visible-xs', 'Pinned'),
       ]),
       m('.row-left', [
         m('.row-header', contentLeft.header),

@@ -32,7 +32,7 @@ const CouncilRow: m.Component<ICollectiveMemberAttrs> = {
     });
 
     const rowSubheader = m('span.council-row-subheader', election.isMember(account)
-      ? `${account.address.slice(0, 5)}... ${election.backing(account).format(true)} from ${pluralize(votes.length, 'account')}`
+      ? `${election.backing(account).format(true)} from ${pluralize(votes.length, 'account')}`
       : `${votes.length} votes`);
 
     return m(ListingRow, {
@@ -44,6 +44,7 @@ const CouncilRow: m.Component<ICollectiveMemberAttrs> = {
       rightColSpacing: [0],
       onclick: (e) => {
         e.preventDefault();
+        e.stopPropagation();
         app.modals.create({ modal: ViewVotersModal, data: { account, votes } });
       }
     });

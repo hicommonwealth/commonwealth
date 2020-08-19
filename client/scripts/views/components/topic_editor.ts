@@ -25,27 +25,24 @@ const TopicWindow: m.Component<{
 }, {
   activeTopic: OffchainTopic | string
 }> = {
+  oninit: (vnode) => {
+    if (!vnode.state.activeTopic) {
+      vnode.state.activeTopic = vnode.attrs.thread.topic;
+    }
+  },
   view: (vnode) => {
     const activeMeta = app.chain ? app.chain.meta.chain : app.community.meta;
     const featuredTopics = activeMeta.featuredTopics.map((t) => {
       return app.topics.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
     });
-    if (!vnode.state.activeTopic) {
-      vnode.state.activeTopic = vnode.attrs.thread.topic;
-    }
-
-    const onChangeHandler = (topicName, topicId?) => {
-      vnode.attrs.onChangeHandler(topicName, topicId);
-      vnode.state.activeTopic = topicName;
-    };
-
-    const { activeTopic } = vnode.state;
-
     return m(TopicSelector, {
       featuredTopics,
-      activeTopic,
+      defaultTopic: vnode.state.activeTopic,
       topics: app.topics.getByCommunity(app.activeId()),
-      updateFormData: onChangeHandler,
+      updateFormData: (topicName, topicId?) => {
+        vnode.attrs.onChangeHandler(topicName, topicId);
+        vnode.state.activeTopic = topicName;
+      },
     });
   }
 };

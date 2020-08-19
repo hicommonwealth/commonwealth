@@ -123,17 +123,6 @@ export const CompactModalExitButton = {
   }
 };
 
-export const ModalExitButton = {
-  view: (vnode) => {
-    return m('.ModalExitButton', {
-      onclick: (e) => {
-        e.preventDefault();
-        $(vnode.dom).trigger('modalexit');
-      }
-    }, symbols.times);
-  }
-};
-
 export const AppModals = {
   oncreate: (vnode) => {
     vnode.state.escapeHandler = (e) => {

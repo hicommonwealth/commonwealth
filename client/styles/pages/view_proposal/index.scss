@@ -222,4 +222,17 @@ $discussion-title-font-size: 1.45rem;
         width: 2px;
         z-index: -1;
     }
+
+    // responsive styles
+    .proposal-mobile-sidebar {
+        display: none;
+    }
+    @include sm-max {
+        .ProposalSidebar {
+            display: none;
+        }
+        .proposal-mobile-sidebar {
+            display: block;
+        }
+    }
 }
