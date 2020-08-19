@@ -125,7 +125,9 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
             },
             label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
           }),
-          isAuthor && m(TopicEditorButton, { openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; } }),
+          hasAdminPermissions && m(TopicEditorButton, {
+            openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; }
+          }),
           (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
           (isAuthor || hasAdminPermissions) && m(MenuDivider),
           m(ThreadSubscriptionButton, { proposal }),
