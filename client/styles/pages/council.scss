@@ -31,10 +31,8 @@
         padding: 10px 20px;
         background-color: $background-color-light;
         border-radius: 5px;
-        .stats-tile {
-            display: inline-block;
-            margin: 0;
-            padding: 0;
+        .stats-heading {
+            font-weight: 500;
         }
     }
     .council-section-header {

@@ -154,13 +154,14 @@ const CouncilPage: m.Component<{}> = {
       && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || [])
         .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]);
 
-    const nSeats = app.chain && (app.chain as Substrate).phragmenElections.desiredMembers;
-    const termDuration = app.chain && (app.chain as Substrate).phragmenElections.termDuration;
-    const votingBond = app.chain && formatCoin((app.chain as Substrate).phragmenElections.votingBond);
-    const nextRoundStartBlock = app.chain && (app.chain as Substrate).phragmenElections.activeElection.endTime.blocknum;
-    const candidacyBond = app.chain && formatCoin((app.chain as Substrate).phragmenElections.candidacyBond);
-    const voters = app.chain && (app.chain as Substrate).phragmenElections.activeElection.getVoters();
-    const electionIndex = app.chain && (app.chain as Substrate).phragmenElections.round;
+    const nSeats = (app.chain as Substrate).phragmenElections.desiredMembers;
+    const nRunnersUpSeats = (app.chain as Substrate).phragmenElections.desiredRunnersUp;
+    const termDuration = (app.chain as Substrate).phragmenElections.termDuration;
+    const votingBond = formatCoin((app.chain as Substrate).phragmenElections.votingBond);
+    const nextRoundStartBlock = (app.chain as Substrate).phragmenElections.activeElection.endTime.blocknum;
+    const candidacyBond = formatCoin((app.chain as Substrate).phragmenElections.candidacyBond);
+    const voters = (app.chain as Substrate).phragmenElections.activeElection.getVoters();
+    const electionIndex = (app.chain as Substrate).phragmenElections.round;
 
     return m(Sublayout, {
       class: 'CouncilPage',
@@ -176,21 +177,21 @@ const CouncilPage: m.Component<{}> = {
         gutter: 5,
         justify: 'space-between'
       }, [
-        m(Col, [
-          `${app.chain ? councillors.length : '--'} councillors`
-          // m('.stats-tile', app.chain && `${candidacyBond || '--'}`)
+        m(Col, { span: 3 }, [
+          m('.stats-heading', 'Councillors'),
+          m('.stats-tile', `${councillors?.length} / ${nSeats}`),
         ]),
-        m(Col, [
-          m('.stats-tile', [
-            m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false }),
-            ' till next council'
-          ])
+        m(Col, { span: 3 }, [
+          m('.stats-heading', 'Runners-up'),
+          m('.stats-tile', `${candidates?.length - councillors?.length} / ${nRunnersUpSeats}`),
         ]),
-        m(Col, [
-          m('.stats-tile', app.chain && `${candidacyBond || '--'} candidacy bond`)
+        m(Col, { span: 3 }, [
+          m('.stats-heading', 'Next council'),
+          m('.stats-tile', m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false })),
         ]),
-        m(Col, [
-          m('.stats-tile', app.chain && `${votingBond || '--'} voting bond`),
+        m(Col, { span: 3 }, [
+          m('.stats-heading', 'Candidacy bond'),
+          m('.stats-tile', candidacyBond),
         ]),
       ]),
       // councillors
@@ -205,7 +206,7 @@ const CouncilPage: m.Component<{}> = {
           ])],
         rightColSpacing: [0],
         columnHeaders: [
-          'Title',
+          'Councillors',
         ],
       }),
       // candidates
@@ -219,7 +220,7 @@ const CouncilPage: m.Component<{}> = {
           ],
         rightColSpacing: [4, 6],
         columnHeaders: [
-          'Candidates',
+          'Runners-up',
         ]
       })
     ]);

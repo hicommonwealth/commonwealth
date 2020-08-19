@@ -44,6 +44,7 @@ const CouncilRow: m.Component<ICollectiveMemberAttrs> = {
       rightColSpacing: [0],
       onclick: (e) => {
         e.preventDefault();
+        e.stopPropagation();
         app.modals.create({ modal: ViewVotersModal, data: { account, votes } });
       }
     });

@@ -26,60 +26,52 @@ import { Grid, Col, List } from 'construct-ui';
 import moment from 'moment';
 import Listing from './listing';
 
-const ProposalsStats: m.Component<{ onMoloch: boolean, onSubstrate: boolean }, {}> = {
+const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
-    const { onMoloch, onSubstrate } = vnode.attrs;
+    if (!app.chain) return;
+
     return m(Grid, {
       align: 'middle',
       class: 'stats-container',
       gutter: 5,
       justify: 'space-between'
     }, [
-      m(Col, { span: 4 }, [
-        onSubstrate && m('.stats-tile', [
-          onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
-            ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock, includeSeconds: false })
+      m(Col, { span: 3 }, [
+        m('.stats-tile', [
+          m('.stats-heading', 'Next referendum'),
+          (app.chain as Substrate).democracyProposals.nextLaunchBlock
+            ? m(CountdownUntilBlock, {
+              block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
+              includeSeconds: false
+            })
             : '--',
-          ' till next referendum',
-        ]),
-        onSubstrate && m('.stats-tile', [
-          app.chain && (app.chain as Substrate).treasury.nextSpendBlock
-            ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock, includeSeconds: false })
-            : '--',
-          ' till next treasury spend',
         ]),
       ]),
-      m(Col, { span: 4 }, [
-        onSubstrate && m('.stats-tile', [
-          app.chain
-          && (app.chain as Substrate).treasury.bondMinimum
-            ? (app.chain as Substrate).treasury.bondMinimum.format()
-            : '--',
-          ' proposal bond'
-        ]),
-        onSubstrate && m('.stats-tile', [
-          app.chain
-          && (app.chain as Substrate).democracyProposals.minimumDeposit
-          && (app.chain as Substrate).treasury.computeBond
-            ? (app.chain as Substrate).treasury.computeBond(
-              (app.chain as Substrate).democracyProposals.minimumDeposit
-            ).format()
-            : '--',
-          ' treasury proposal bond'
-        ])
-      ]),
-      m(Col, { span: 4 }, [
-        onSubstrate && m('.stats-tile', [
-          app.chain
-          && (app.chain as Substrate).democracy.enactmentPeriod
+      m(Col, { span: 3 }, [
+        m('.stats-tile', [
+          m('.stats-heading', 'Enactment delay'),
+          (app.chain as Substrate).democracy.enactmentPeriod
             ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
             : '--',
-          'd enactment delay after approval'
+          ' days'
         ]),
+      ]),
+      m(Col, { span: 3 }, [
+        m('.stats-tile', [
+          m('.stats-heading', 'Next treasury spend'),
+          (app.chain as Substrate).treasury.nextSpendBlock
+            ? m(CountdownUntilBlock, {
+              block: (app.chain as Substrate).treasury.nextSpendBlock,
+              includeSeconds: false
+            })
+            : '--',
+        ]),
+      ]),
+      m(Col, { span: 3 }, [
         // TODO: Pot is under construction
-        onSubstrate && m('.stats-tile', [
+        m('.stats-tile', [
+          m('.stats-heading', 'Treasury balance'),
           app.chain && formatCoin((app.chain as Substrate).treasury.pot),
-          ' in the treasury',
         ]),
       ]),
     ]);
@@ -216,7 +208,7 @@ const ProposalsPage: m.Component<{}> = {
       title: 'Proposals',
       showNewProposalButton: true,
     }, [
-      m(ProposalsStats, { onMoloch, onSubstrate }),
+      onSubstrate && m(SubstrateProposalStats),
       m(Listing, {
         content: activeProposalContent,
         columnHeaders: ['Active Proposals', 'Replies', 'Likes', 'Updated'],
