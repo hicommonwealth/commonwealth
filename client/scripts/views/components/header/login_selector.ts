@@ -201,7 +201,7 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
               }),
-              label: activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'New address',
+              label: activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
             }),
             m(MenuDivider),
           ],
