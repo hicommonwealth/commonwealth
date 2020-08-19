@@ -36,7 +36,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
       gutter: 5,
       justify: 'space-between'
     }, [
-      m(Col, { span: 3 }, [
+      m(Col, { span: { xs: 6, md: 3 } }, [
         m('.stats-tile', [
           m('.stats-heading', 'Next referendum'),
           (app.chain as Substrate).democracyProposals.nextLaunchBlock
@@ -47,7 +47,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
             : '--',
         ]),
       ]),
-      m(Col, { span: 3 }, [
+      m(Col, { span: { xs: 6, md: 3 } }, [
         m('.stats-tile', [
           m('.stats-heading', 'Enactment delay'),
           (app.chain as Substrate).democracy.enactmentPeriod
@@ -56,7 +56,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
           ' days'
         ]),
       ]),
-      m(Col, { span: 3 }, [
+      m(Col, { span: { xs: 6, md: 3 } }, [
         m('.stats-tile', [
           m('.stats-heading', 'Next treasury spend'),
           (app.chain as Substrate).treasury.nextSpendBlock
@@ -67,7 +67,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
             : '--',
         ]),
       ]),
-      m(Col, { span: 3 }, [
+      m(Col, { span: { xs: 6, md: 3 } }, [
         // TODO: Pot is under construction
         m('.stats-tile', [
           m('.stats-heading', 'Treasury balance'),

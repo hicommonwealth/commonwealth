@@ -190,19 +190,19 @@ const CouncilPage: m.Component<{}> = {
         gutter: 5,
         justify: 'space-between'
       }, [
-        m(Col, { span: 3 }, [
+        m(Col, { span: { xs: 6, md: 3 } }, [
           m('.stats-heading', 'Councillors'),
           m('.stats-tile', `${councillors?.length} / ${nSeats}`),
         ]),
-        m(Col, { span: 3 }, [
+        m(Col, { span: { xs: 6, md: 3 } }, [
           m('.stats-heading', 'Runners-up'),
           m('.stats-tile', `${candidates?.length - councillors?.length} / ${nRunnersUpSeats}`),
         ]),
-        m(Col, { span: 3 }, [
+        m(Col, { span: { xs: 6, md: 3 } }, [
           m('.stats-heading', 'Next council'),
           m('.stats-tile', m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false })),
         ]),
-        m(Col, { span: 3 }, [
+        m(Col, { span: { xs: 6, md: 3 } }, [
           m('.stats-heading', 'Candidacy bond'),
           m('.stats-tile', candidacyBond),
         ]),
