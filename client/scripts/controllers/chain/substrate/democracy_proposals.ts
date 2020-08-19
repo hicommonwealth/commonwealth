@@ -1,12 +1,12 @@
-import { Unsubscribable, Observable } from 'rxjs';
-import { map, first } from 'rxjs/operators';
+import { Unsubscribable } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { Codec } from '@polkadot/types/types';
-import { BlockNumber, Call, Balance, VoteThreshold, Hash, Proposal, PreimageStatus } from '@polkadot/types/interfaces';
+import { BlockNumber, Call, Balance, VoteThreshold, Hash } from '@polkadot/types/interfaces';
 import { bool, Option } from '@polkadot/types';
 import { ApiRx } from '@polkadot/api';
 import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from 'events/edgeware/types';
-import { ProposalModule, ChainEntity } from 'models';
+import { SubstrateTypes } from '@commonwealth/chain-events';
+import { ProposalModule } from 'models';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';
@@ -61,7 +61,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     return new Promise((resolve, reject) => {
-      const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.DemocracyProposal);
+      const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyProposal);
       const constructorFunc = (e) => new SubstrateDemocracyProposal(this._Chain, this._Accounts, this, e);
       const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 
@@ -100,15 +100,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
   }
 
   public async createTx(author: SubstrateAccount, action: Call, proposalHash: Hash, deposit: SubstrateCoin) {
-    if (deposit.lt(this.minimumDeposit)) {
-      throw new Error(`deposit must be greater than ${+this.minimumDeposit}`);
-    }
-
     const txFunc = (api: ApiRx) => api.tx.democracy.propose(proposalHash, deposit.asBN);
-    if (!(await this._Chain.canPayFee(author, txFunc, deposit))) {
-      throw new Error('insufficient funds');
-    }
-
     const title = this._Chain.methodToTitle(action);
     return this._Chain.createTXModalData(author, txFunc, 'createDemocracyProposal', title);
   }

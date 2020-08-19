@@ -5,15 +5,16 @@ import mixpanel from 'mixpanel-browser';
 import { EmptyState, Icon, Icons } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 
-const PageNotFound: m.Component<{ message?: string }> = {
+const PageNotFound: m.Component<{ title?: string, message?: string }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': '404Page' });
   },
   view: (vnode) => {
-    const { message } = vnode.attrs;
+    const { message, title } = vnode.attrs;
+
     return m(Sublayout, {
       class: 'PageNotFound',
-      leftSidebar: null,
+      title,
     }, [
       m(EmptyState, {
         class: 'PageNotFound',

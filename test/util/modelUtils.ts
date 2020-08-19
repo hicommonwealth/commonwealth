@@ -3,6 +3,8 @@ import chai from 'chai';
 import 'chai/register-should';
 import moment from 'moment';
 import wallet from 'ethereumjs-wallet';
+import { Keyring } from '@polkadot/api';
+import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { NotificationCategory } from 'models';
 import { factory, formatFilename } from '../../shared/logging';
 import app from '../../server-test';
@@ -16,24 +18,57 @@ export const generateEthAddress = () => {
   return { keypair, address };
 };
 
-export const createAndVerifyAddress = async ({ chain }) => {
-  const { keypair, address } = generateEthAddress();
-  let res = await chai.request.agent(app)
-    .post('/api/createAddress')
+export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
+  if (chain === 'ethereum') {
+    const { keypair, address } = generateEthAddress();
+    let res = await chai.request.agent(app)
+      .post('/api/createAddress')
+      .set('Accept', 'application/json')
+      .send({ address, chain });
+    const address_id = res.body.result.id;
+    const token = res.body.result.verification_token;
+    const msgHash = ethUtil.hashPersonalMessage(Buffer.from(token));
+    const sig = ethUtil.ecsign(msgHash, Buffer.from(keypair.getPrivateKey(), 'hex'));
+    const signature = ethUtil.toRpcSig(sig.v, sig.r, sig.s);
+    res = await chai.request.agent(app)
+      .post('/api/verifyAddress')
+      .set('Accept', 'application/json')
+      .send({ address, chain, signature });
+    const user_id = res.body.result.user.id;
+    const email = res.body.result.user.email;
+    return { address_id, address, user_id, email };
+  }
+  if (chain === 'edgeware') {
+    const keyPair = new Keyring({
+      type: 'sr25519',
+      ss58Format: 42,
+    }).addFromMnemonic(mnemonic);
+    const address = keyPair.address;
+    let res = await chai.request.agent(app)
+      .post('/api/createAddress')
+      .set('Accept', 'application/json')
+      .send({ address: keyPair.address, chain });
+    const address_id = res.body.result.id;
+    const token = res.body.result.verification_token;
+    const u8aSignature = keyPair.sign(stringToU8a(token));
+    const signature = u8aToHex(u8aSignature).slice(2);
+    res = await chai.request.agent(app)
+      .post('/api/verifyAddress')
+      .set('Accept', 'application/json')
+      .send({ address, chain, signature });
+    const user_id = res.body.result.user.id;
+    const email = res.body.result.user.email;
+    return { address_id, address, user_id, email };
+  }
+  throw new Error('invalid chain');
+};
+
+export const updateProfile = async ({ chain, address, data, jwt, skipChainFetch }) => {
+  const res = await chai.request.agent(app)
+    .post('/api/updateProfile')
     .set('Accept', 'application/json')
-    .send({ address, chain });
-  const address_id = res.body.result.id;
-  const token = res.body.result.verification_token;
-  const msgHash = ethUtil.hashPersonalMessage(Buffer.from(token));
-  const sig = ethUtil.ecsign(msgHash, Buffer.from(keypair.getPrivateKey(), 'hex'));
-  const signature = ethUtil.toRpcSig(sig.v, sig.r, sig.s);
-  res = await chai.request.agent(app)
-    .post('/api/verifyAddress')
-    .set('Accept', 'application/json')
-    .send({ address, chain, signature });
-  const user_id = res.body.result.user.id;
-  const email = res.body.result.user.email;
-  return { address_id, address, user_id, email };
+    .send({ address, chain, data, jwt, skipChainFetch });
+  return res.body;
 };
 
 export interface ThreadArgs {
@@ -43,8 +78,8 @@ export interface ThreadArgs {
   chainId: string,
   communityId: string,
   title: string,
-  tagName: string,
-  tagId: number,
+  topicName: string,
+  topicId: number,
   body?: string,
   url?: string,
   attachments?: string[],
@@ -53,7 +88,7 @@ export interface ThreadArgs {
   readOnly?: boolean
 }
 export const createThread = async (args: ThreadArgs) => {
-  const { chainId, communityId, address, jwt, title, body, tagName, tagId,
+  const { chainId, communityId, address, jwt, title, body, topicName, topicId,
     privacy, readOnly, kind, url, mentions, attachments } = args;
   const timestamp = moment();
   const firstVersion : any = { timestamp, body };
@@ -71,8 +106,8 @@ export const createThread = async (args: ThreadArgs) => {
       'kind': kind,
       'versionHistory': versionHistory,
       'attachments[]': undefined,
-      'tag_name': tagName,
-      'tag_id': tagId,
+      'topic_name': topicName,
+      'topic_id': topicId,
       'mentions[]': mentions,
       'url': url,
       'privacy': privacy || false,
@@ -102,7 +137,7 @@ export const createComment = async (args: CommentArgs) => {
     .set('Accept', 'application/json')
     .send({
       'author_chain': chain,
-      'chain': chain,
+      'chain': community ? undefined : chain,
       'community': community,
       'address': address,
       'parent_id': parentCommentId,
@@ -146,7 +181,7 @@ export const editComment = async (args: EditCommentArgs) => {
   return res.body;
 };
 
-export interface EditTagArgs {
+export interface EditTopicArgs {
   jwt: any;
   address: string;
   id: number;
@@ -157,10 +192,10 @@ export interface EditTagArgs {
   community?: string;
 }
 
-export const editTag = async (args: EditTagArgs) => {
+export const editTopic = async (args: EditTopicArgs) => {
   const { jwt, address, id, name, description, featured_order, chain, community } = args;
   const res = await chai.request.agent(app)
-    .post('/api/editTag')
+    .post('/api/editTopic')
     .set('Accept', 'application/json')
     .send({
       'id': id,

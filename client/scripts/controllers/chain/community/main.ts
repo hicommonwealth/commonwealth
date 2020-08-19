@@ -19,7 +19,7 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     await this.app.threads.refreshAll(null, this.id, true);
     await this.app.comments.refreshAll(null, this.id, CommentRefreshOption.ResetAndLoadOffchainComments);
     await this.app.reactions.refreshAll(null, this.id, true);
-    await this.app.tags.refreshAll(null, this.id, true);
+    await this.app.topics.refreshAll(null, this.id, true);
     await this.meta.getAdminsAndMods(this.id);
     this._serverLoaded = true;
     this._loaded = true;

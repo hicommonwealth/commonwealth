@@ -1,9 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import 'components/quill_formatted_text.scss';
 
-import $ from 'jquery';
 import m from 'mithril';
-import { stringUpperFirst } from '@polkadot/util';
 import { Icon, Icons } from 'construct-ui';
 import { loadScript } from 'helpers';
 
@@ -252,7 +250,7 @@ const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapse? }> = {
     const { doc, hideFormatting, collapse } = vnode.attrs;
 
     return m('.QuillFormattedText', {
-      oncreate: (vnode2) => {
+      oncreate: (vvnode) => {
         if (!(<any>window).twttr) loadScript('//platform.twitter.com/widgets.js')
           .then(() => { console.log('Twitter Widgets loaded'); });
       }

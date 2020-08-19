@@ -7,7 +7,7 @@
     }
     .proposal-status {
         color: #999;
-        font-weight: 700;
+        font-weight: 500;
         &.pass {
             color: #06983a;
         }
@@ -17,16 +17,16 @@
     }
     .proposal-comments {
         display: inline-block;
-        font-weight: 700;
+        font-weight: 500;
         color: #999;
     }
 }
 
 .CollectiveMember, .CouncilCandidate, .CouncilElectionVoter {
     display: flex;
-    border: 1px solid #eee;
+    border: 1px solid $background-color-light;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
-    background: #fff;
+    background: $background-color-white;
     border-radius: 3px;
     margin: 10px 0;
     padding: 17px 20px 13px;
@@ -83,7 +83,7 @@
     // left
     .proposal-row-left {
         .proposal-display-id {
-            font-weight: 700;
+            font-weight: 500;
             font-size: 16px;
             line-height: 1.2;
         }
@@ -116,7 +116,7 @@
         }
 
         .proposal-row-metadata {
-            font-weight: 600;
+            font-weight: 500;
             min-width: 90px;
 
             @include xs-max {

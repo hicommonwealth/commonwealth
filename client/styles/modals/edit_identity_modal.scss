@@ -10,7 +10,7 @@
         align-items: center;
         padding-left: 32px;
         font-size: 19px;
-        font-weight: 700;
+        font-weight: 500;
     }
     .form {
         padding: 20px 32px 32px;
@@ -28,19 +28,12 @@
     .form-bottom {
         margin-top: 20px;
         button {
-            @include clean-button;
-            border: 0px solid transparent !important;
             margin-right: 12px;
-            color: white !important;
-            &.formular-button-primary {
-                background-color: $electricblue !important;
-            }
-            background-color: darkgray !important;
         }
     }
     .error-message {
-        color: $error-red;
-        font-weight: bold;
+        color: $negative-text-color;
+        font-weight: 500;
         margin-top: 16px;
     }
 }

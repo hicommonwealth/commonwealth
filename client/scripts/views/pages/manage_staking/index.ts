@@ -11,6 +11,7 @@ import { ChainClass, ChainBase } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Sublayout from 'views/sublayout';
+import { Spinner } from 'construct-ui';
 import * as CosmosValidationViews from '../validators/cosmos';
 import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
 
@@ -30,7 +31,12 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   view: (vnode) => {
     const { ownStashInfos } = vnode.state.dynamic;
     if (!ownStashInfos)
-      return m(PageLoading);
+      return m(Spinner, {
+        fill: true,
+        message: '',
+        size: 'xl',
+        style: 'visibility: visible; opacity: 1;'
+      });
 
     const { bondedTotal } = extractBondedTotal(ownStashInfos);
 

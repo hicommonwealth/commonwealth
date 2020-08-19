@@ -8,9 +8,9 @@
     "outDir": "./build",
     "baseUrl": ".",
     "paths": {
-      "@polkadot/api/augment": ["./node_modules/edgeware-node-types/dist/augment-api.d.ts"],
-      "@polkadot/types/augment": ["./node_modules/edgeware-node-types/dist/augment-types.d.ts"],
-      "*": ["./*", "shared/*", "client/scripts/*"]
+      "@polkadot/api/augment": ["./node_modules/@edgeware/node-types/dist/interfaces/augment-api.d.ts"],
+      "@polkadot/types/augment": ["./node_modules/@edgeware/node-types/dist/interfaces/augment-types.d.ts"],
+      "*": ["./*", "shared/*", "client/scripts/*", "eth/types/*"]
     },
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -21,10 +21,10 @@
     "./client",
     "./client/scripts",
     "./shared/adapters",
-    "./test"
+    "./test",
+    "./eth/types",
   ],
   "exclude": [
     "./node_modules",
-    "client/scripts/controllers/chain/ethereum/contracts/*"
   ]
 }

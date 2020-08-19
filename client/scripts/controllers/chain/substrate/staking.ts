@@ -9,11 +9,11 @@ import { Option, StorageKey, Vec } from '@polkadot/types';
 import { formatNumber, u8aConcat, u8aToHex, BN_ZERO } from '@polkadot/util';
 import { Observable, combineLatest, of, from } from 'rxjs';
 import { HeaderExtended } from '@polkadot/api-derive';
-import { map, flatMap, auditTime, switchMap } from 'rxjs/operators';
+import { map, flatMap, auditTime, switchMap, catchError } from 'rxjs/operators';
 import { EraIndex, AccountId, Exposure, StakingLedger,
   SessionIndex, EraRewardPoints, Nominations, ValidatorPrefs } from '@polkadot/types/interfaces';
 import { InterfaceTypes, Codec, ITuple } from '@polkadot/types/types';
-import { DeriveStakingValidators, DeriveStakingQuery,
+import { DeriveStakingValidators, DeriveStakingQuery, DeriveSessionInfo,
   DeriveSessionProgress, DeriveAccountInfo, DeriveAccountRegistration,
   DeriveHeartbeatAuthor, DeriveStakingElected,
   DeriveStakingAccount, DeriveBalancesAll, DeriveSessionIndexes } from '@polkadot/api-derive/types';
@@ -244,8 +244,20 @@ class SubstrateStaking implements StorageModule {
       return validators.map((validator) => validator.toString());
     }));
   }
-  public get sessionInfo(): Observable<DeriveSessionProgress> {
-    return this._Chain.query((api: ApiRx) => api.derive.session.progress());
+  public get sessionInfo(): Observable<DeriveSessionProgress | DeriveSessionInfo> {
+    return this._Chain.api.pipe(
+      switchMap((api: ApiRx) => {
+        return combineLatest(
+          api.derive.session.progress()
+        );
+      }),
+      map(([info]: [DeriveSessionProgress]) => {
+        return info;
+      }),
+      catchError(() => {
+        return this._Chain.query((api: ApiRx) => api.derive.session.info());
+      })
+    );
   }
   public identity(addresses: string[]): Observable<any> {
     return this._Chain.query((api: ApiRx) => api.query.identity.identityOf.multi(addresses));
@@ -410,7 +422,7 @@ class SubstrateStaking implements StorageModule {
       )),
       flatMap((
         [api, { validators: currentSet }, era, electedInfo]:
-        [ApiRx, DeriveStakingValidators, EraIndex, DeriveStakingElected]
+        [ApiRx, DeriveStakingValidators, Option<EraIndex>, DeriveStakingElected]
       ) => {
         const commission: ICommissionInfo = {};
 
@@ -445,7 +457,6 @@ class SubstrateStaking implements StorageModule {
           const exposure = exposures[index];
           const totalStake = exposure.total.toBn();
           const comm = commissions[key] || 0;
-
           if (Object.keys(rewards.validators).length === 1) {
             key = this._app.chain.id;
           }
@@ -456,7 +467,7 @@ class SubstrateStaking implements StorageModule {
             const firstReward = new BN(amount.toString()).muln(Number(comm)).divn(100);
             const secondReward = exposure.own.toBn()
               .mul((new BN(amount.toString())).sub(firstReward))
-              .div(totalStake);
+              .div(totalStake || new BN(1));
             const totalReward = firstReward.add(secondReward);
             const length = rewards.validators[key].length;
             if (valRewards.length > 1) {
@@ -471,7 +482,7 @@ class SubstrateStaking implements StorageModule {
               const periodsInYear = (60 * 60 * 24 * 7 * 52) / eventDiff;
               const percentage = (new BN(totalReward))
                 .mul(new BN(n))
-                .div(new BN(totalStake))
+                .div(totalStake || new BN(1))
                 .toNumber() / n;
               const apr = percentage * periodsInYear;
               validatorRewards[account.toString()] = apr;

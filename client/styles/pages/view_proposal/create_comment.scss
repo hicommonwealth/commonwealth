@@ -2,19 +2,22 @@
 @import './index';
 
 .CreateComment {
-    padding: $padding $gutter ($padding + 6px);
-    border-top: 1px solid #e7e7e7;
-
-    .User {
-        font-size: 14px;
+    display: flex;
+    .create-comment-body {
+        flex: 1;
+        padding-left: 26px;
     }
-    .User .user-display-name {
+    .User {
+        font-size: $discussion-meta-font-size;
+        &, a.user-display-name {
+            color: $discussion-meta-color;
+        }
     }
 
     .QuillEditor {
         margin: 14px 0 18px;
         .ql-toolbar, .ql-editor {
-            background: #fff;
+            background: $background-color-white;
         }
         .ql-editor {
             min-height: 100px;
@@ -22,7 +25,10 @@
         }
     }
     .new-comment-error {
-        color: $error-red;
-        font-weight: 700;
+        @include error-text;
+        margin: 20px 0 10px;
+    }
+    .cui-callout {
+        margin-top: 20px;
     }
 }

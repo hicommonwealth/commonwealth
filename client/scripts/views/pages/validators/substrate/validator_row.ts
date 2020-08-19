@@ -72,6 +72,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
 
     const nominatorsList = vnode.attrs.nominators;
     const commission = vnode.attrs.commission || 0;
+    const apr = vnode.attrs?.apr || 0;
 
     return m('tr.ValidatorRow', [
       m('td.val-stash', m(Popover, {
@@ -99,7 +100,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       ]),
       m('td.val-commission', `${commission.toFixed(2)}%`),
       m('td.val-points', vnode.attrs.eraPoints || '0'),
-      m('td.val-apr', `${vnode.attrs?.apr.toFixed(2)}%`),
+      m('td.val-apr', `${apr.toFixed(2)}%`),
       m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
       m(ImOnline, {
         toBeElected: vnode.attrs.toBeElected,
@@ -107,17 +108,6 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
         hasMessage: vnode.attrs.hasMessage,
         blockCount: vnode.attrs.blockCount
       })
-      // m('td.val-age', '--'),
-      // m('td.val-action', [
-      //   m('button.nominate-validator.formular-button-primary', {
-      //     class: app.user.activeAccount ? '' : 'disabled',
-      //     onclick: (e) => {
-      //       e.preventDefault();
-      //       vnode.state.isNominating = !vnode.state.isNominating;
-      //       vnode.attrs.onChangeHandler(vnode.attrs.stash);
-      //     }
-      //   }, vnode.state.isNominating ? 'Un-Nominate' : 'Nominate'),
-      // ]),
     ]);
   }
 });

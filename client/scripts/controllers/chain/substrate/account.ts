@@ -123,7 +123,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       switchMap((api: ApiRx) => combineLatest(
         of(api),
         api.derive.staking.validators(),
-        api.query.staking.currentEra(),
+        api.query.staking.currentEra<EraIndex>(),
         api.derive.staking.electedInfo()
       )),
 
@@ -200,10 +200,9 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
     this.store.clear();
   }
 
-  public init(ChainInfo: SubstrateChain): Promise<void> {
+  public async init(ChainInfo: SubstrateChain): Promise<void> {
     this._Chain = ChainInfo;
     this._initialized = true;
-    return Promise.resolve();
   }
 }
 
@@ -271,7 +270,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     return this._Chain.api.pipe(
       switchMap((api: ApiRx) => combineLatest(
         of(api),
-        api.query.staking.currentEra(),
+        api.query.staking.currentEra<EraIndex>(),
       )),
       flatMap(([api, era]: [ApiRx, EraIndex]) => {
         // Different runtimes call for different access to stakers: old vs. new
@@ -309,6 +308,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       }));
   }
 
+  /*
   // Accounts may set a proxy that can take council and democracy actions on behalf of their account
   public get proxyFor(): Observable<SubstrateAccount> {
     if (!this._Chain?.apiInitialized) return;
@@ -321,6 +321,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
         }
       }));
   }
+  */
 
   // Accounts may delegate their voting power for democracy referenda. This always incurs the maximum locktime
   public get delegation(): Observable<[ SubstrateAccount, number ]> {
@@ -355,7 +356,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
 
   // CONSTRUCTORS
   constructor(app: IApp, ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, address: string, isEd25519: boolean = false) {
-    if (!ChainInfo) {
+    if (!ChainInfo?.metadataInitialized) {
       // defer chain initialization
       super(app, app.chain.meta.chain, address, null);
       app.chainModuleReady.pipe(first()).subscribe(() => {
@@ -439,13 +440,9 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   public async sendBalanceTx(recipient: SubstrateAccount, amount: SubstrateCoin) {
-    const txFunc = (api: ApiRx) => api.tx.balances.transfer(recipient.address, amount);
-    if (!(await this._Chain.canPayFee(this, txFunc, amount))) {
-      throw new Error('insufficient funds');
-    }
     return this._Chain.createTXModalData(
       this,
-      txFunc,
+      (api: ApiRx) => api.tx.balances.transfer(recipient.address, amount),
       'balanceTransfer',
       `${formatCoin(amount)} to ${recipient.address}`
     );
@@ -553,9 +550,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   public unlockTx() {
-    if (this.chainClass !== ChainClass.Kusama) {
-      throw new Error('unlock only supported on Kusama');
-    }
     return this._Chain.createTXModalData(
       this,
       (api: ApiRx) => api.tx.democracy.unlock(this.address),

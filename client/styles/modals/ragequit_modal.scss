@@ -9,7 +9,13 @@
         align-items: center;
         padding-left: 32px;
         font-size: 19px;
-        font-weight: 700;
+        font-weight: 500;
+    }
+    .data-label {
+        margin: 10px 0 10px;
+        width: 100%;
+        border-radius: 5px;
+        color: #888;
     }
     button {
         margin-bottom: 5px;

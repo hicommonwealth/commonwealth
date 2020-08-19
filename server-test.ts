@@ -10,25 +10,24 @@ import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
-import { SESSION_SECRET, QUERY_URL_OVERRIDE } from './server/config';
+import { SubstrateTypes } from '@commonwealth/chain-events';
+
+import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import models from './server/database';
 import setupWebsocketServer from './server/socket';
 import { NotificationCategories } from './shared/types';
-import ChainObjectFetcher from './server/util/chainObjectFetcher';
 import ViewCountCache from './server/util/viewCountCache';
-import { SubstrateEventKinds } from './shared/events/edgeware/types';
+import IdentityFetchCache from './server/util/identityFetchCache';
 
 require('express-async-errors');
 
-const FETCH_INTERVAL_MS = +process.env.FETCH_INTERVAL_MS || 600000; // default fetch interval is 10min
-
 const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
-const fetcher = new ChainObjectFetcher(models, FETCH_INTERVAL_MS, QUERY_URL_OVERRIDE);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
+const identityFetchCache = new IdentityFetchCache(0);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -107,7 +106,7 @@ const resetServer = (debug=false): Promise<void> => {
         id: 'edgeware',
         network: 'edgeware',
         symbol: 'EDG',
-        name: 'Edgeware Mainnet',
+        name: 'Edgeware',
         icon_url: '/static/img/protocols/edg.png',
         active: true,
         type: 'chain',
@@ -184,7 +183,7 @@ const resetServer = (debug=false): Promise<void> => {
       // initialize chain event types
       const initChainEventTypes = (chain) => {
         return Promise.all(
-          SubstrateEventKinds.map((event_name) => {
+          SubstrateTypes.EventKinds.map((event_name) => {
             return models['ChainEventType'].create({
               id: `${chain}-${event_name}`,
               chain,
@@ -241,10 +240,11 @@ const setupServer = () => {
 };
 
 setupPassport(models);
-setupAPI(app, models, fetcher, viewCountCache);
+setupAPI(app, models, viewCountCache, identityFetchCache);
 setupErrorHandlers();
 setupServer();
 
 export const resetDatabase = () => resetServer();
+export const getIdentityFetchCache = () => identityFetchCache;
 
 export default app;

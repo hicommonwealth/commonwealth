@@ -1,4 +1,3 @@
-import 'pages/_listing_page.scss';
 import 'pages/subscriptions.scss';
 
 import m from 'mithril';
@@ -6,9 +5,9 @@ import $ from 'jquery';
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
-import { SubstrateEventKinds } from 'events/edgeware/types';
-import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
-import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
+import {
+  SubstrateEvents, SubstrateTypes, MolochEvents, MolochTypes, IChainEventKind, EventSupportingChains, TitlerFilter
+} from '@commonwealth/chain-events';
 import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';
 import Sublayout from 'views/sublayout';
@@ -351,16 +350,18 @@ interface IEventSubscriptionState {
 const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
   oninit: (vnode) => {
     vnode.state.chain = EventSupportingChains.sort()[0];
-    vnode.state.eventKinds = SubstrateEventKinds;
+    vnode.state.eventKinds = SubstrateTypes.EventKinds;
     vnode.state.allSupportedChains = EventSupportingChains.sort();
     vnode.state.isSubscribedAll = false;
   },
   view: (vnode) => {
     let titler;
-    // TODO: swap this to use EventSupportingChains somehow
-    if (vnode.state.chain.startsWith('edgeware') || vnode.state.chain.startsWith('kusama')) {
-      titler = EdgewareTitlerFunc;
-      vnode.state.eventKinds = SubstrateEventKinds;
+    if (SubstrateTypes.EventChains.includes(vnode.state.chain)) {
+      titler = SubstrateEvents.Title;
+      vnode.state.eventKinds = SubstrateTypes.EventKinds;
+    } else if (MolochTypes.EventChains.includes(vnode.state.chain)) {
+      titler = MolochEvents.Title;
+      vnode.state.eventKinds = MolochTypes.EventKinds;
     } else {
       titler = null;
       vnode.state.eventKinds = [];

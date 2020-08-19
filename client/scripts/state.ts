@@ -1,30 +1,22 @@
 import { ChainStore, OffchainCommunitiesStore, NodeStore } from 'stores';
 import {
-  NodeInfo,
-  AddressInfo,
-  RoleInfo,
-  SocialAccount,
-  OffchainTag,
   ContractCategory,
-  Account,
   IChainAdapter,
   ICommunityAdapter,
   NotificationCategory,
-  StarredCommunity,
 } from 'models';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
-import { Subject, ReplaySubject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
 import ReactionsController from './controllers/server/reactions';
-import NotificationsController from './controllers/server/notifications';
 import WebsocketController from './controllers/server/socket';
-import TagsController from './controllers/server/tags';
-import ChainEntityController from './controllers/server/chain_entities';
+import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import ChainEventsController from './controllers/server/chain_events';
+import ChainEntityController from './controllers/server/chain_entities';
 import UserController from './controllers/server/user/index';
 
 export enum ApiStatus {
@@ -51,9 +43,9 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   reactions: ReactionsController;
-  tags: TagsController;
   chainEntities: ChainEntityController;
   chainEvents: ChainEventsController;
+  topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
   // XXX: replace this with some app.chain helper
@@ -94,9 +86,9 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
-  tags: new TagsController(),
   chainEntities: new ChainEntityController(),
   chainEvents: new ChainEventsController(),
+  topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
 
