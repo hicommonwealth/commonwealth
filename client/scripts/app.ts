@@ -136,7 +136,6 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
 // called by the user, when clicking on the chain/node switcher menu
 export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> {
   // Select the default node, if one wasn't provided
-  console.log(n);
   if (!n) {
     if (app.user.selectedNode) {
       n = app.user.selectedNode;
