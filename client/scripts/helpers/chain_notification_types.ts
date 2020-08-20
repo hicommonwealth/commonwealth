@@ -159,3 +159,58 @@ export const KusamaChainNotificationTypes = {
     'kusama-vote-delegated',
   ],
 };
+
+export const KulupuChainNotificationTypes = {
+  Council: [
+    'kusama-collective-approved',
+    'kusama-collective-disapproved',
+    'kusama-collective-executed',
+    'kusama-collective-member-executed',
+    'kusama-collective-proposed',
+    'kusama-collective-voted',
+    'kusama-election-candidacy-submitted',
+    'kusama-election-empty-term',
+    'kusama-election-member-kicked',
+    'kusama-election-member-renounced',
+    'kusama-election-new-term',
+  ],
+  Democracy: [
+    'kusama-democracy-cancelled',
+    'kusama-democracy-executed',
+    'kusama-democracy-not-passed',
+    'kusama-democracy-passed',
+    'kusama-democracy-proposed',
+    'kusama-democracy-started',
+    'kusama-democracy-tabled',
+  ],
+  Preimage: [
+    'kusama-preimage-invalid',
+    'kusama-preimage-missing',
+    'kusama-preimage-noted',
+    'kusama-preimage-reaped',
+    'kusama-preimage-used',
+  ],
+  // Signaling: [
+  //     'kusama-signaling-commit-started',
+  //     'kusama-signaling-new-proposal',
+  //     'kusama-signaling-voting-completed',
+  //     'kusama-signaling-voting-started',
+  // ],
+  // Treasury: [
+  //     'kusama-treasury-awarded',
+  //     'kusama-treasury-proposed',
+  //     'kusama-treasury-rejected',
+  //     'kusama-treasury-reward-minting',
+  //     'kusama-treasury-reward-minting-v2'
+  // ],
+  Validator: [
+    'kusama-bonded',
+    'kusama-reward',
+    'kusama-slash',
+    'kusama-unbonded',
+  ],
+  Vote: [
+    'kusama-vote-delegated',
+  ],
+};
+
