@@ -28,7 +28,6 @@ interface IDiscussionPageState {
   lookback?: number;
   postsDepleted?: boolean;
   lastVisitedUpdated?: boolean;
-  hasOlderPosts?: boolean;
   defaultLookback: number;
 }
 
@@ -50,18 +49,18 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const onscroll = _.debounce(() => {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
+      console.log({scrollHeight, scrollPos})
       if (scrollPos > (scrollHeight - 400)) {
-        if (vnode.state.hasOlderPosts && !vnode.state.postsDepleted) {
+        if (!vnode.state.postsDepleted) {
           vnode.state.lookback += vnode.state.defaultLookback;
+          console.log({ lookback: vnode.state.lookback, addition: vnode.state.defaultLookback });
           m.redraw();
         }
       }
     }, 400);
     $(window).on('scroll', onscroll);
   },
-  view: (vnode) => {
-    if (!app.activeId()) return;
-
+  oninit: (vnode) => {
     // determine lookback length
     vnode.state.defaultLookback = 20;
 
@@ -71,6 +70,9 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       : Number.isInteger(vnode.state.lookback)
         ? vnode.state.lookback
         : vnode.state.defaultLookback;
+  },
+  view: (vnode) => {
+    if (!app.activeId()) return;
 
     localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
 
@@ -259,7 +261,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const topicObject = topics.find((t) => t.name === topic);
       topicDescription = topicObject?.description;
     }
-
+    console.log(vnode.state)
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',
