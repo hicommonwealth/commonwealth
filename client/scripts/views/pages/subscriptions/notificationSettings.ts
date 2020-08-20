@@ -28,14 +28,14 @@ const singleLabel = (subscription: NotificationSubscription) => {
           ? decodeURIComponent(subscription.OffchainComment.id)
           : subscription.objectId;
       return subscription.OffchainThread
-        ? m('a', {
+        ? [ 'New comments on ', m('a', {
           href: '#',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
           }
-        }, `New Comments on '${String(threadOrComment)}'`)
-        : `New Comments on '${String(threadOrComment)}'`;
+        }, threadOrComment.toString()) ]
+        : `New comments on '${String(threadOrComment)}'`;
     }
     case (NotificationCategories.NewReaction): {
       const threadOrComment = subscription.OffchainThread
@@ -44,14 +44,14 @@ const singleLabel = (subscription: NotificationSubscription) => {
           ? decodeURIComponent(subscription.OffchainComment.id)
           : subscription.objectId;
       return subscription.OffchainThread
-        ? m('a', {
+        ? [ 'New reactions on ', m('a', {
           href: '#',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
           }
-        }, `New Reactions on '${String(threadOrComment)}'`)
-        : `New Reactions on '${String(threadOrComment)}'`;
+        }, threadOrComment.toString()) ]
+        : `New reactions on '${String(threadOrComment)}'`;
     }
     default:
       break;
@@ -72,14 +72,14 @@ const batchLabel = (subscriptions: NotificationSubscription[]) => {
       : subscriptions[0].objectId;
 
   return subscriptions[0].OffchainThread
-    ? m('a', {
+    ? [ 'New comments and reactions on ', m('a', {
       href: '#',
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscriptions[0].OffchainThread.id}`);
       }
-    }, `New Comments & Reactions on '${String(threadOrComment)}'`)
-    : `New Comments & Reactions on 'Comment ${String(threadOrComment)}'`;
+    }, threadOrComment.toString()) ]
+    : `New comments and reactions on 'Comment ${String(threadOrComment)}'`;
 };
 
 interface IBatchedSubscriptionRowAttrs {
@@ -170,7 +170,7 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
     );
     return subscription && m(BatchedSubscriptionRow, {
       subscriptions: [subscription],
-      label: 'New Threads',
+      label: 'New threads',
       bold: true
     });
   },
@@ -239,7 +239,7 @@ const GeneralNewThreadsAndComments:
       const threadSubs = subscriptions.filter((s) => communityIds.includes(s.objectId));
       return m(BatchedSubscriptionRow, {
         subscriptions: threadSubs,
-        label: 'New Threads (All Communities)',
+        label: 'New threads (all communities)',
       });
     },
   };
@@ -262,7 +262,10 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
         && !s.OffchainComment;
     }), 'objectId');
     return [
-      mentionsSubscription && m(BatchedSubscriptionRow, { subscriptions: [mentionsSubscription], label: 'Mentions' }),
+      mentionsSubscription && m(BatchedSubscriptionRow, {
+        subscriptions: [mentionsSubscription],
+        label: 'New mentions'
+      }),
       m(GeneralNewThreadsAndComments, { communities, subscriptions }),
       batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, { subscriptions: subscriptions2 });
