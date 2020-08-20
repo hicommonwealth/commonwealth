@@ -3,11 +3,9 @@ import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
-import 'nprogress.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import NProgress from 'lib/nprogress';
 import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
@@ -277,8 +275,6 @@ m.route.set = (...args) => {
   // - the last page the user was on
   app._lastNavigatedBack = false;
   app._lastNavigatedFrom = m.route.get();
-  // show nprogress bar if moving between pages, or otherwise changing url
-  if ((!args[2] || (args[2] && args[2].replace !== true)) && args[0] !== m.route.get()) NProgress.start();
   // update route
   if (args[0] !== m.route.get()) updateRoute.apply(this, args);
   // reset scroll position
@@ -351,7 +347,6 @@ $(() => {
       const { scoped } = attrs;
       let deferChain = attrs.deferChain;
       console.log('render called, for:', path);
-      NProgress.done();
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
