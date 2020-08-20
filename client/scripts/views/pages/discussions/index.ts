@@ -129,6 +129,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       return tsA - tsB;
     };
 
+    let listing = [];
     const allThreads = topic
       ? app.threads
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
@@ -136,45 +137,46 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         .sort(orderDiscussionsbyLastComment)
       : app.threads
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .sort(orderDiscussionsbyLastComment)
+        .sort(orderDiscussionsbyLastComment);
 
-    let listing = [];
-    let visitMarkerPlaced = false;
-    // pinned threads are inserted at the top of the listing
-    const pinnedThreads = allThreads.filter((t) => t.pinned);
-    if (pinnedThreads.length > 0) {
-      listing.push(m(PinnedListing, { proposals: pinnedThreads }));
-    }
+    if (allThreads.length) {
+      let visitMarkerPlaced = false;
+      // pinned threads are inserted at the top of the listing
+      const pinnedThreads = allThreads.filter((t) => t.pinned);
+      if (pinnedThreads.length > 0) {
+        listing.push(m(PinnedListing, { proposals: pinnedThreads }));
+      }
 
-    const sortedThreads = allThreads.filter((t) => !t.pinned);
+      const sortedThreads = allThreads.filter((t) => !t.pinned);
 
-    const firstThread = sortedThreads[0];
-    const lastThread = sortedThreads[sortedThreads.length - 1];
-    console.log({ firstThread, lastThread });
-    const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
-    const noThreadsSeen = () => getLastUpdate(lastThread) > lastVisited;
+      const firstThread = sortedThreads[0];
+      const lastThread = sortedThreads[sortedThreads.length - 1];
+      
+      const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
+      const noThreadsSeen = () => getLastUpdate(lastThread) > lastVisited;
 
-    const visibleThreads = sortedThreads.slice(0, vnode.state.lookback);
-    vnode.state.postsDepleted = (visibleThreads.length < vnode.state.lookback);
+      const visibleThreads = sortedThreads.slice(0, vnode.state.lookback);
+      vnode.state.postsDepleted = (visibleThreads.length < vnode.state.lookback);
 
-    if (noThreadsSeen() || allThreadsSeen()) {
-      listing.push(m('.discussion-group-wrap', sortedThreads
-        .slice(0, vnode.state.lookback)
-        .map((proposal) => m(DiscussionRow, { proposal }))));
-    } else {
-      let count = 0;
-      sortedThreads.slice(0, vnode.state.lookback).forEach((proposal) => {
-        const row = m(DiscussionRow, { proposal });
-        console.log(proposal);
-        if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
-          listing = [m('.discussion-group-wrap', listing), LastSeenDivider, m('.discussion-group-wrap', [row])];
-          visitMarkerPlaced = true;
-          count += 1;
-        } else {
-          visitMarkerPlaced ? listing[2].children.push(row) : listing.push(row);
-          count += 1;
-        }
-      });
+      if (noThreadsSeen() || allThreadsSeen()) {
+        listing.push(m('.discussion-group-wrap', sortedThreads
+          .slice(0, vnode.state.lookback)
+          .map((proposal) => m(DiscussionRow, { proposal }))));
+      } else {
+        let count = 0;
+        sortedThreads.slice(0, vnode.state.lookback).forEach((proposal) => {
+          const row = m(DiscussionRow, { proposal });
+          console.log(proposal);
+          if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
+            listing = [m('.discussion-group-wrap', listing), LastSeenDivider, m('.discussion-group-wrap', [row])];
+            visitMarkerPlaced = true;
+            count += 1;
+          } else {
+            visitMarkerPlaced ? listing[2].children.push(row) : listing.push(row);
+            count += 1;
+          }
+        });
+      }
     }
 
     let topicDescription;
@@ -198,7 +200,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           ? m('.discussions-main', [
               m(ProposalsLoadingRow),
             ])
-          : visibleThreads.length === 0
+          : allThreads.length === 0
               ? m(EmptyTopicPlaceholder, { communityName })
               : m(Listing, {
                 content: listing,
@@ -212,11 +214,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
                 menuCarat: true,
             }),
           // TODO: Incorporate infinite scroll into generic Listing component
-          (!topic && listing.length && vnode.state.postsDepleted)
+          (allThreads.length && vnode.state.postsDepleted)
             ? m('.infinite-scroll-reached-end', [
-              `Showing all ${visibleThreads.length} of ${pluralize(visibleThreads.length, 'posts')}`
+              `Showing all ${allThreads.length} of ${pluralize(allThreads.length, 'posts')}`,
+              (topic ? ` under the topic '${topic}'` : '')
             ])
-            : (!topic && visibleThreads.length)
+            : (allThreads.length)
               ? m('.infinite-scroll-spinner-wrap', [
                 m(Spinner, { active: !vnode.state.postsDepleted })
               ])
