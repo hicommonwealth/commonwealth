@@ -150,7 +150,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
                 'Title',
                 'Replies',
                 'Likes',
-                'Last updated'
+                'Updated'
               ],
               menuCarat: true,
             })
@@ -254,7 +254,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               'Title',
               'Replies',
               'Likes',
-              'Last updated'
+              'Updated'
             ],
             menuCarat: true,
           }),
