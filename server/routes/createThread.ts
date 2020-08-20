@@ -252,6 +252,14 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.chain,
       },
+      {
+        user: finalThread.Address.address,
+        url: getProposalUrl('discussion', finalThread),
+        title: req.body.title,
+        bodyUrl: req.body.url,
+        chain: finalThread.chain,
+        community: finalThread.community,
+      },
       req.wss,
       [ finalThread.Address.address ],
     );

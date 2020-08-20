@@ -241,7 +241,8 @@
             margin: 0;
             display: flex;
             align-items: center;
-            div {
+            > div {
+                font-size: 17px;
                 display: flex;
                 align-items: center;
                 width: 100%;
