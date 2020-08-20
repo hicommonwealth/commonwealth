@@ -39,9 +39,6 @@
         }
     }
     .new-thread-center, .new-link-center {
-        .FormField .form-group {
-            margin-bottom: 12px;
-        }
         .actions {
             .preview-button {
                 margin: 0 0 0 12px;
@@ -123,14 +120,5 @@
             margin-bottom: 10px;
         }
         margin-bottom: 20px;
-    }
-    .ButtonSelectorFormField {
-        padding-bottom: 0;
-        margin-top: 18px;
-        .form-group .form-field.buttons button {
-            font-size: 14px;
-            padding: 3px 10px;
-            margin: 0 3px 4px 0;
-        }
     }
 }

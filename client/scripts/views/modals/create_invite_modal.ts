@@ -8,7 +8,6 @@ import { Button, Input, Form, FormGroup, FormLabel, Select, CustomSelect } from 
 import app from 'state';
 import { CommunityInfo } from 'models';
 import { CompactModalExitButton } from 'views/modal';
-import { DropdownFormField } from 'views/components/forms';
 
 const CreateInviteLink: m.Component<{ onChangeHandler?: Function }, {
   link: string,

@@ -40,7 +40,7 @@ export const Layout: m.Component<{ scope: string, deferChain?: boolean }, { load
         m('.layout-container', [
           m(EmptyState, {
             fill: true,
-            icon: Icons.X,
+            icon: Icons.ALERT_TRIANGLE,
             content: [
               m('p', `Application error: ${app.loadingError}`),
               m('p', 'Please try again at another time'),

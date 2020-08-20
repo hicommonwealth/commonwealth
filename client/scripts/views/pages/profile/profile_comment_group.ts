@@ -28,7 +28,7 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           hideAvatar: true,
           tooltip: true
         }),
-        ' commented',
+        ' commented in a thread',
       ]),
       m('.activity', [
         comments.map((comment) => m('.proposal-comment', [
