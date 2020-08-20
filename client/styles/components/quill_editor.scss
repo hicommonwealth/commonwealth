@@ -255,7 +255,7 @@
             }
         }
         > .selected {
-            background: lighten(#08c, 48%);
+            background: $background-color-light-hover;
             cursor: pointer;
         }
         .ql-mention-text-wrap {
