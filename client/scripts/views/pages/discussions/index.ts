@@ -129,68 +129,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       return tsA - tsB;
     };
 
-    const getSingleTopicListing = (topic) => {
-      if (!activeEntity || !activeEntity.serverLoaded) {
-        return m('.discussions-main', [
-          m(ProposalsLoadingRow),
-        ]);
-      }
-      let visitMarkerPlaced = false;
-      let listing = [];
-      const sortedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.topic && thread.topic.name === topic && !thread.pinned)
-        .sort(orderDiscussionsbyLastComment);
-
-      const pinnedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.topic && thread.topic.name === topic && thread.pinned)
-        .sort(orderByDateReverseChronological);
-      if (pinnedThreads.length > 0) {
-        listing.push(m(PinnedListing, { proposals: pinnedThreads }));
-      }
-
-      if (sortedThreads.length > 0) {
-        const firstThread = sortedThreads[0];
-        const lastThread = sortedThreads[sortedThreads.length - 1];
-        const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
-        const noThreadsSeen = () => getLastUpdate(lastThread) > lastVisited;
-
-        if (noThreadsSeen() || allThreadsSeen()) {
-          listing.push(m('.discussion-group-wrap', sortedThreads.map((proposal) => m(DiscussionRow, { proposal }))));
-        } else {
-          sortedThreads.forEach((proposal) => {
-            const row = m(DiscussionRow, { proposal });
-            if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
-              listing = [m('.discussion-group-wrap', listing), LastSeenDivider, m('.discussion-group-wrap', [row])];
-              visitMarkerPlaced = true;
-            } else {
-              // eslint-disable-next-line no-unused-expressions
-              visitMarkerPlaced ? listing[2].children.push(row) : listing.push(row);
-            }
-          });
-        }
-
-        if (listing.length > 0) {
-          return m('.discussions-main', [
-            m(Listing, {
-              content: listing,
-              rightColSpacing: [4, 4, 4],
-              columnHeaders: [
-                'Title',
-                'Replies',
-                'Likes',
-                'Last updated'
-              ],
-              menuCarat: true,
-            })
-          ]);
-        }
-      } else {
-        return m('.discussions-main', [
-          m(EmptyTopicPlaceholder, { topicName: topic }),
-        ]);
-      }
-    };
-
     const allThreads = topic
       ? app.threads
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
@@ -200,7 +138,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
         .sort(orderDiscussionsbyLastComment)
 
-    const listing = [];
+    let listing = [];
     let count = 0;
     let visitMarkerPlaced = false;
     // pinned threads are inserted at the top of the listing
@@ -208,22 +146,27 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     if (pinnedThreads.length > 0) {
       listing.push(m(PinnedListing, { proposals: pinnedThreads }));
     }
-    // TODO: Ensure proper counting with and without pins
-    const otherThreads = allThreads.filter((t) => !t.pinned);
-    if (otherThreads.length < vnode.state.lookback) {
-      vnode.state.postsDepleted = true;
-      vnode.state.lookback = otherThreads.length;
-    }
-    while (count < vnode.state.lookback) {
-      const thread = otherThreads[count];
-      if (lastVisited < getLastUpdate(thread) && !visitMarkerPlaced) {
-        listing.push(LastSeenDivider);
-        visitMarkerPlaced = true;
-      }
-      listing.push(m(DiscussionRow, { proposal: thread }));
-      count += 1;
-    }
 
+    const sortedThreads = allThreads.filter((t) => !t.pinned);
+
+    const firstThread = sortedThreads[0];
+    const lastThread = sortedThreads[sortedThreads.length - 1];
+    const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
+    const noThreadsSeen = () => getLastUpdate(lastThread) > lastVisited;
+
+    if (noThreadsSeen() || allThreadsSeen()) {
+      listing.push(m('.discussion-group-wrap', sortedThreads.map((proposal) => m(DiscussionRow, { proposal }))));
+    } else {
+      sortedThreads.forEach((proposal) => {
+        const row = m(DiscussionRow, { proposal });
+        if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
+          listing = [m('.discussion-group-wrap', listing), LastSeenDivider, m('.discussion-group-wrap', [row])];
+          visitMarkerPlaced = true;
+        } else {
+          visitMarkerPlaced ? listing[2].children.push(row) : listing.push(row);
+        }
+      });
+    }
 
     let topicDescription;
     if (topic && app.activeId()) {
@@ -241,32 +184,36 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       (app.chain || app.community) && [
         m('.discussions-main', [
           // m(InlineThreadComposer),
-          listing.length === 0
-            ? m(EmptyTopicPlaceholder, { communityName })
-            : m(Listing, {
-              content: listing,
-              rightColSpacing: [4, 4, 4],
-              columnHeaders: [
-                'Title',
-                'Replies',
-                'Likes',
-                'Last updated'
-              ],
-              menuCarat: true,
-            }),
-          // TODO: Incorporate infinite scroll into generic Listing component
-          !topic
-          && listing.length
-          && vnode.state.postsDepleted
-            ? m('.infinite-scroll-reached-end', [
-              `Showing all ${listing.length} of ${pluralize(listing.length, 'posts')}`
+          (!activeEntity || !activeEntity.serverLoaded) 
+          ? m('.discussions-main', [
+              m(ProposalsLoadingRow),
             ])
-            : !topic && listing.length
-              ? m('.infinite-scroll-spinner-wrap', [
-                m(Spinner, { active: !vnode.state.postsDepleted })
+          : listing.length === 0
+              ? m(EmptyTopicPlaceholder, { communityName })
+              : m(Listing, {
+                content: listing,
+                rightColSpacing: [4, 4, 4],
+                columnHeaders: [
+                  'Title',
+                  'Replies',
+                  'Likes',
+                  'Last updated'
+                ],
+                menuCarat: true,
+              }),
+            // TODO: Incorporate infinite scroll into generic Listing component
+            !topic
+            && listing.length
+            && vnode.state.postsDepleted
+              ? m('.infinite-scroll-reached-end', [
+                `Showing all ${listing.length} of ${pluralize(listing.length, 'posts')}`
               ])
-              : null
-        ])
+              : !topic && listing.length
+                ? m('.infinite-scroll-spinner-wrap', [
+                  m(Spinner, { active: !vnode.state.postsDepleted })
+                ])
+                : null
+          ])
       ]
     ]);
   },
