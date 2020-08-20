@@ -136,6 +136,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
 // called by the user, when clicking on the chain/node switcher menu
 export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> {
   // Select the default node, if one wasn't provided
+  console.log(n);
   if (!n) {
     if (app.user.selectedNode) {
       n = app.user.selectedNode;
@@ -181,6 +182,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
       './controllers/chain/polkadot/main'
     )).default;
     app.chain = new Polkadot(n, app);
+  } else if (n.chain.network === ChainNetwork.Kulupu) {
+    const Kulupu = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "kusama-main" */
+      './controllers/chain/polkadot/main'
+    )).default;
+    app.chain = new Kulupu(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */
