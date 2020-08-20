@@ -28,13 +28,11 @@
         display: flex;
         align-items: flex-start;
         margin-top: 25px;
-        padding: 10px 20px;
+        padding: 12px 20px 13px;
         background-color: $background-color-light;
         border-radius: 5px;
-        .stats-tile {
-            display: inline-block;
-            margin: 0;
-            padding: 0;
+        .stats-heading {
+            font-weight: 500;
         }
     }
     .council-section-header {
@@ -66,6 +64,14 @@
     }
     .Listing {
         margin-top: 20px;
+    }
+    @include sm-max {
+        .stats-container {
+            padding-bottom: 0;
+        }
+        .cui-col-xs-6 {
+            margin-bottom: 18px;
+        }
     }
 }
 

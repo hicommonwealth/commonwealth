@@ -5,6 +5,22 @@
 
     .pinned {
         margin: 8px 15px 0 0;
+        .visible-xs {
+            display: none;
+        }
+        @include xs-max {
+            margin: 0 0 2px 0;
+            .visible-xs {
+                display: inline-block;
+                margin-left: 4px;
+                font-size: 15px;
+                color: #999;
+            }
+            .icon-pin-outline {
+                font-size: 12px;
+                color: #999;
+            }
+        }
     }
     .row-left {
         line-height: 1.1;

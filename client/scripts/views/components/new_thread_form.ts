@@ -303,7 +303,7 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 1, sm: 2 } }, [
             m(TopicSelector, {
-              activeTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
+              defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
               topics: app.topics.getByCommunity(app.activeId()),
               featuredTopics: app.topics.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
@@ -405,7 +405,7 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 1, sm: 3 } }, [
             m(TopicSelector, {
-              activeTopic:(vnode.state.activeTopic === false || vnode.state.activeTopic)
+              defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
                 ? vnode.state.activeTopic
                 : localStorage.getItem(`${app.activeId()}-active-tag`),
               topics: app.topics.getByCommunity(app.activeId()),
