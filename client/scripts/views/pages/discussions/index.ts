@@ -139,7 +139,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         .sort(orderDiscussionsbyLastComment)
 
     let listing = [];
-    let count = 0;
     let visitMarkerPlaced = false;
     // pinned threads are inserted at the top of the listing
     const pinnedThreads = allThreads.filter((t) => t.pinned);
@@ -151,19 +150,29 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     const firstThread = sortedThreads[0];
     const lastThread = sortedThreads[sortedThreads.length - 1];
+    console.log({ firstThread, lastThread });
     const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
     const noThreadsSeen = () => getLastUpdate(lastThread) > lastVisited;
 
+    const visibleThreads = sortedThreads.slice(0, vnode.state.lookback);
+    vnode.state.postsDepleted = (visibleThreads.length < vnode.state.lookback);
+
     if (noThreadsSeen() || allThreadsSeen()) {
-      listing.push(m('.discussion-group-wrap', sortedThreads.map((proposal) => m(DiscussionRow, { proposal }))));
+      listing.push(m('.discussion-group-wrap', sortedThreads
+        .slice(0, vnode.state.lookback)
+        .map((proposal) => m(DiscussionRow, { proposal }))));
     } else {
-      sortedThreads.forEach((proposal) => {
+      let count = 0;
+      sortedThreads.slice(0, vnode.state.lookback).forEach((proposal) => {
         const row = m(DiscussionRow, { proposal });
+        console.log(proposal);
         if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
           listing = [m('.discussion-group-wrap', listing), LastSeenDivider, m('.discussion-group-wrap', [row])];
           visitMarkerPlaced = true;
+          count += 1;
         } else {
           visitMarkerPlaced ? listing[2].children.push(row) : listing.push(row);
+          count += 1;
         }
       });
     }
@@ -174,7 +183,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const topicObject = topics.find((t) => t.name === topic);
       topicDescription = topicObject?.description;
     }
-  
+    console.log(vnode.state);
+    console.log(vnode.attrs);
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',
@@ -188,7 +198,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           ? m('.discussions-main', [
               m(ProposalsLoadingRow),
             ])
-          : listing.length === 0
+          : visibleThreads.length === 0
               ? m(EmptyTopicPlaceholder, { communityName })
               : m(Listing, {
                 content: listing,
@@ -200,19 +210,17 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
                   'Last updated'
                 ],
                 menuCarat: true,
-              }),
-            // TODO: Incorporate infinite scroll into generic Listing component
-            !topic
-            && listing.length
-            && vnode.state.postsDepleted
-              ? m('.infinite-scroll-reached-end', [
-                `Showing all ${listing.length} of ${pluralize(listing.length, 'posts')}`
+            }),
+          // TODO: Incorporate infinite scroll into generic Listing component
+          (!topic && listing.length && vnode.state.postsDepleted)
+            ? m('.infinite-scroll-reached-end', [
+              `Showing all ${visibleThreads.length} of ${pluralize(visibleThreads.length, 'posts')}`
+            ])
+            : (!topic && visibleThreads.length)
+              ? m('.infinite-scroll-spinner-wrap', [
+                m(Spinner, { active: !vnode.state.postsDepleted })
               ])
-              : !topic && listing.length
-                ? m('.infinite-scroll-spinner-wrap', [
-                  m(Spinner, { active: !vnode.state.postsDepleted })
-                ])
-                : null
+              : null
           ])
       ]
     ]);

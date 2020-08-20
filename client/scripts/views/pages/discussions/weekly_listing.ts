@@ -20,6 +20,7 @@ interface IWeeklyDiscussionListingState {
 }
 
 export const getLastUpdate = (proposal) => {
+  debugger
   const lastComment = Number(app.comments.lastCommented(proposal));
   const createdAt = Number(proposal.createdAt.utc());
   const lastUpdate = Math.max(createdAt, lastComment);
