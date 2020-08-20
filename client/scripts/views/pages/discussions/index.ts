@@ -262,7 +262,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       topicDescription = topicObject?.description;
     }
 
-    console.log({ postsDepleted: vnode.state.postsDepleted, hasOlderPosts: vnode.state.hasOlderPosts });
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',
