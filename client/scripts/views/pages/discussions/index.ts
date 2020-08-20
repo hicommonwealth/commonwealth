@@ -187,7 +187,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     };
 
     const getHomepageListing = () => {
-      // get proposals, grouped by week
       const allThreads = app.threads
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
         .sort(orderDiscussionsbyLastComment);
@@ -204,7 +203,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const listing = [];
       let count = 0;
       let visitMarkerPlaced = false;
-      const discussionRow = (proposal) => m(DiscussionRow, { proposal });
       const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'New posts'), m('hr') ]);
       // pinned threads are inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
@@ -223,7 +221,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           listing.push(LastSeenDivider);
           visitMarkerPlaced = true;
         }
-        listing.push(otherThreads[count]);
+        listing.push(m(DiscussionRow, { proposal: thread }));
         count += 1;
       }
 
@@ -272,9 +270,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         topic
           ? getSingleTopicListing(topic)
           : getHomepageListing(),
+          // : null
       ]
     ]);
   },
-};
+}
 
 export default DiscussionsPage;
