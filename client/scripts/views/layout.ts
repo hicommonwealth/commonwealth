@@ -15,9 +15,12 @@ import { featherIcon } from 'helpers';
 
 const CHAIN_LOADING_TIMEOUT = 3000;
 
-export const LoadingLayout: m.Component<{}> = {
+export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
   view: (vnode) => {
-    return m('.Layout.LoadingLayout.mithril-app', [
+    const { hideSidebar } = vnode.attrs;
+    return m('.Layout.LoadingLayout.mithril-app', {
+      class: hideSidebar ? 'hidden-sidebar' : ''
+    }, [
       m(Sidebar),
       m('.layout-container', [
         m('.LoadingLayout'),
@@ -28,14 +31,23 @@ export const LoadingLayout: m.Component<{}> = {
   }
 };
 
-export const Layout: m.Component<{ scope: string, deferChain?: boolean }, { loadingScope, deferred }> = {
+export const Layout: m.Component<{
+  scope: string,
+  hideSidebar?: boolean,
+  deferChain?: boolean,
+}, {
+  loadingScope,
+  deferred
+}> = {
   view: (vnode) => {
-    const { scope, deferChain } = vnode.attrs;
+    const { scope, deferChain, hideSidebar } = vnode.attrs;
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
     const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
     if (app.loadingError) {
-      return m('.Layout.mithril-app', [
+      return m('.Layout.mithril-app', {
+        class: hideSidebar ? 'hidden-sidebar' : ''
+      }, [
         m(Sidebar),
         m('.layout-container', [
           m(EmptyState, {
@@ -57,7 +69,9 @@ export const Layout: m.Component<{ scope: string, deferChain?: boolean }, { load
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
-      return m('.Layout.mithril-app', [
+      return m('.Layout.mithril-app', {
+        class: hideSidebar ? 'hidden-sidebar' : ''
+      }, [
         m(Sidebar),
         m('.layout-container', [
           m(PageNotFound)
@@ -95,7 +109,9 @@ export const Layout: m.Component<{ scope: string, deferChain?: boolean }, { load
       return m(LoadingLayout);
     }
 
-    return m('.Layout.mithril-app', [
+    return m('.Layout.mithril-app', {
+      class: hideSidebar ? 'hidden-sidebar' : ''
+    }, [
       m(Sidebar),
       m('.layout-container', [
         vnode.children

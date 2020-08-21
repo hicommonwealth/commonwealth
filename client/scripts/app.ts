@@ -331,6 +331,7 @@ $(() => {
 
   interface RouteAttrs {
     scoped: string | boolean;
+    hideSidebar?: boolean;
     deferChain?: boolean;
   }
 
@@ -344,9 +345,8 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      const { scoped } = attrs;
+      const { scoped, hideSidebar } = attrs;
       let deferChain = attrs.deferChain;
-      console.log('render called, for:', path);
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -362,7 +362,7 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      return m(Layout, { scope, deferChain }, [ vnode ]);
+      return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });
 
@@ -374,7 +374,7 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false }),
+    '/':                         importRoute('views/pages/home', { scoped: false, hideSidebar: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
