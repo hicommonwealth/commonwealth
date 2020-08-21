@@ -46,21 +46,12 @@
 
 .LoginSelector {
     > button.cui-button .cui-icon {
-        display: none;
+        position: relative;
+        top: -1px;
     }
     @include xs-max {
-        .hidden-xs {
-            display: none !important;
-        }
         > button.cui-button {
-            padding: 0 13px;
-            .cui-icon {
-                display: block;
-                margin-left: -3px;
-                margin-right: -3px;
-                position: relative;
-                top: -1px;
-            }
+            padding: 0 11px;
         }
     }
 }

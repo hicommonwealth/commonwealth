@@ -3,14 +3,13 @@ import 'modals/edit_identity_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
-import { Button } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel, Icon, Icons } from 'construct-ui';
 
 import { IdentityInfo } from '@polkadot/types/interfaces';
 import { Data } from '@polkadot/types/primitive';
 import { u8aToString } from '@polkadot/util';
 
 import { Account } from 'models';
-import CharacterLimitedTextInput from '../components/widgets/character_limited_text_input';
 import { createTXModal } from './tx_signing_modal';
 import { SubstrateAccount } from '../../controllers/chain/substrate/account';
 import AvatarUpload from '../components/avatar_upload';
@@ -101,32 +100,33 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
       m.redraw();
     };
 
-    const getInput = (inputLabel, inputName, description, limit = 32) => {
-      return m('.text-input-wrapper', [
-        m('label', {
+    const getInput = (inputLabel, inputName, description, prefixAt = false) => {
+      return m(FormGroup, [
+        m(FormLabel, {
           for: inputName,
         }, inputLabel),
-        m(CharacterLimitedTextInput, {
+        m(Input, {
           name: inputName,
           id: inputName,
           placeholder: description,
-          limit,
+          autocomplete: 'off',
+          contentLeft: prefixAt ? m(Icon, { name: Icons.AT_SIGN }) : null,
         }),
       ]);
     };
 
     return m('.EditIdentityModal', [
-      m('.header', [
-        m('span', 'Set on-chain identity')
+      m('.compact-modal-title', [
+        m('h3', 'Set on-chain identity')
       ]),
-      m('.form', [
+      m(Form, { class: 'form' }, [
         getInput('Display Name', 'display', 'A reasonable display name for the controller of the account'),
         getInput('Legal Name', 'legal', 'Full legal name in the local jurisdiction of the entity'),
         getInput('Website', 'web', 'Website for the controller of the account, https:// automatically prepended'),
         getInput('Riot/Matrix', 'riot', 'Riot/Matrix handle held by the controller of the account'),
         getInput('Email', 'email', 'Email address of the controller of the account'),
         // getInput('PGP', 'pgp', 'PGP/GPG public key of the controller of the account'),
-        getInput('Twitter', 'twitter', 'Twitter identity of the controller of the account, without leading @'),
+        getInput('Twitter', 'twitter', 'Twitter identity of the controller of the account', true),
         m('.form-bottom', [
           m('.buttons', [
             m(Button, {

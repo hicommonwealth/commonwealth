@@ -9,7 +9,7 @@
         position: relative;
         top: -1px;
         @include xs-max {
-            top: 0;
+            top: 1px;
         }
     }
     .notification-count {
@@ -76,8 +76,12 @@
                 text-align: center;
                 color: #333;
             }
+            &:after {
+                // suppress button group styling
+                display: none !important;
+            }
         }
-        .cui-button:nth-child(1) {
+        > .cui-button:nth-child(1) {
             border-right: 1px #d8dee0 solid;
         }
     }

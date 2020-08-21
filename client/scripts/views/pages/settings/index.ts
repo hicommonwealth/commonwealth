@@ -21,7 +21,7 @@ const SettingsPage: m.Component<{}> = {
   view: (vnode) => {
     if (app.loginStatusLoaded() && !app.isLoggedIn()) {
       m.route.set('/', {}, { replace: true });
-      return;
+      return m(PageLoading);
     }
     if (!app.loginStatusLoaded()) return m(PageLoading);
 

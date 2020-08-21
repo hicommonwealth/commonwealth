@@ -3,11 +3,10 @@ import 'modals/new_topic_modal.scss';
 import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
-import { Button } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel } from 'construct-ui';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
-import { TextInputFormField, CheckboxFormField, TextareaFormField } from 'views/components/forms';
 
 interface INewTopicModalForm {
   description: string,
@@ -37,42 +36,41 @@ const NewTopicModal: m.Component<{
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
-        m('.metadata', [
-          m(TextInputFormField, {
-            title: 'Name',
-            options: {
+        m(Form, [
+          m(FormGroup, [
+            m(FormLabel, { for: 'name' }, 'Name'),
+            m(Input, {
+              title: 'Name',
+              name: 'name',
               class: 'topic-form-name',
               tabindex: 1,
-              value: vnode.state?.form?.name,
+              defaultValue: vnode.state?.form?.name,
               autofocus: true,
-            },
-            callback: (value) => {
-              vnode.state.form.name = value;
-            },
-          }),
-          m(TextareaFormField, {
-            title: 'Description',
-            options: {
+              autocomplete: 'off',
+              onchange: (e) => {
+                vnode.state.form.name = (e.target as any).value;
+              },
+            }),
+          ]),
+          m(FormGroup, [
+            m(FormLabel, { for: 'description' }, 'Description'),
+            m(Input, {
+              title: 'Description',
               class: 'topic-form-description',
               tabindex: 2,
-              value: vnode.state.form.description,
-            },
-            callback: (value) => {
-              vnode.state.form.description = value;
-            }
-          }),
-        ]),
-      ]),
-      m('.compact-modal-actions', [
-        m('.buttons', [
+              defaultValue: vnode.state.form.description,
+              onchange: (e) => {
+                vnode.state.form.description = (e.target as any).value;
+              }
+            }),
+          ]),
           m(Button, {
             intent: 'primary',
             class: vnode.state.saving ? 'disabled' : '',
             onclick: async (e) => {
               e.preventDefault();
-              const { name, description } = vnode.state.form;
-              if (!name.trim()) return;
-              app.topics.add(name, description).then(() => {
+              if (!vnode.state.form.name.trim()) return;
+              app.topics.add(vnode.state.form.name, vnode.state.form.description).then(() => {
                 vnode.state.saving = false;
                 m.redraw();
                 $(e.target).trigger('modalexit');
@@ -84,8 +82,8 @@ const NewTopicModal: m.Component<{
             },
             label: 'Create topic',
           }),
+          vnode.state.error && m('.error-message', vnode.state.error),
         ]),
-        vnode.state.error && m('.error-message', vnode.state.error),
       ])
     ]);
   }

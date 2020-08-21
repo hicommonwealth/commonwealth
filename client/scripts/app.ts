@@ -3,11 +3,9 @@ import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
-import 'nprogress.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import NProgress from 'lib/nprogress';
 import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
@@ -277,8 +275,6 @@ m.route.set = (...args) => {
   // - the last page the user was on
   app._lastNavigatedBack = false;
   app._lastNavigatedFrom = m.route.get();
-  // show nprogress bar if moving between pages, or otherwise changing url
-  if ((!args[2] || (args[2] && args[2].replace !== true)) && args[0] !== m.route.get()) NProgress.start();
   // update route
   if (args[0] !== m.route.get()) updateRoute.apply(this, args);
   // reset scroll position
@@ -335,6 +331,7 @@ $(() => {
 
   interface RouteAttrs {
     scoped: string | boolean;
+    hideSidebar?: boolean;
     deferChain?: boolean;
   }
 
@@ -348,10 +345,8 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      const { scoped } = attrs;
+      const { scoped, hideSidebar } = attrs;
       let deferChain = attrs.deferChain;
-      console.log('render called, for:', path);
-      NProgress.done();
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -367,7 +362,7 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      return m(Layout, { scope, deferChain }, [ vnode ]);
+      return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });
 
@@ -379,7 +374,7 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false }),
+    '/':                         importRoute('views/pages/home', { scoped: false, hideSidebar: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),

@@ -11,9 +11,9 @@ const Homepage: m.Component<{}, {}> = {
       class: 'Homepage',
     }, [
       m('.container', [
-        m('h1', 'On-chain communities'),
+        m('h1', 'Commonwealth'),
         m('p.lead-copy', [
-          'Forums, profiles, and voting for decentralized organizations'
+          'Discussions and governance for decentralized communities'
         ]),
         m(CommunityCards),
       ]),

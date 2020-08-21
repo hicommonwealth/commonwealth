@@ -5,7 +5,6 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 
-import { DropdownFormField, RadioSelectorFormField } from 'views/components/forms';
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
 import { SocialAccount } from 'models';

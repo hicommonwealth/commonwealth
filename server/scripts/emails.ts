@@ -29,7 +29,7 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
   const subjectLine = (category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
     : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
       : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
-        : (category_id === NotificationCategories.NewThread) ? `New Thread in '${decodedTitle}'`
+        : (category_id === NotificationCategories.NewThread) ? `New thread called '${decodedTitle}'`
           : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
             : 'New notification on Commonwealth';
 

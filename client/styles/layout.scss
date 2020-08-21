@@ -86,8 +86,17 @@ pre {
     height: 100%;
     background: $background-color-light;
 }
+
 .layout-container {
     padding-left: $sidebar-width;
+}
+.hidden-sidebar {
+    .layout-container {
+        padding-left: 0;
+    }
+    .Sidebar {
+        display: none;
+    }
 }
 @include sm-max {
     $mobile-sidebar-height: 60px;

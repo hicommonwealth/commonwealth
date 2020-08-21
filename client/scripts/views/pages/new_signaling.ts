@@ -17,7 +17,6 @@ import { notifyInfo } from 'controllers/app/notifications';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import { TextInputFormField, TextareaFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import SendingFrom from 'views/components/sending_from';

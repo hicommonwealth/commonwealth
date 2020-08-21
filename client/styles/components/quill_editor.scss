@@ -241,7 +241,8 @@
             margin: 0;
             display: flex;
             align-items: center;
-            div {
+            > div {
+                font-size: 17px;
                 display: flex;
                 align-items: center;
                 width: 100%;
@@ -254,7 +255,7 @@
             }
         }
         > .selected {
-            background: lighten(#08c, 48%);
+            background: $background-color-light-hover;
             cursor: pointer;
         }
         .ql-mention-text-wrap {
