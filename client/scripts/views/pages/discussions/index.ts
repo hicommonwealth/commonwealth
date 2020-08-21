@@ -151,7 +151,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
       const firstThread = sortedThreads[0];
       const lastThread = sortedThreads[sortedThreads.length - 1];
-      
+
       const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
       const noThreadsSeen = () => getLastUpdate(lastThread) > lastVisited;
 
@@ -185,6 +185,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const topicObject = topics.find((t) => t.name === topic);
       topicDescription = topicObject?.description;
     }
+    console.log(app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link));
     console.log(vnode.state);
     console.log(vnode.attrs);
     return m(Sublayout, {
@@ -196,12 +197,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       (app.chain || app.community) && [
         m('.discussions-main', [
           // m(InlineThreadComposer),
-          (!activeEntity || !activeEntity.serverLoaded) 
-          ? m('.discussions-main', [
+          (!activeEntity || !activeEntity.serverLoaded)
+            ? m('.discussions-main', [
               m(ProposalsLoadingRow),
             ])
-          : allThreads.length === 0
-              ? m(EmptyTopicPlaceholder, { communityName })
+            : allThreads.length === 0
+              ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
               : m(Listing, {
                 content: listing,
                 rightColSpacing: [4, 4, 4],
@@ -212,7 +213,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
                   'Last updated'
                 ],
                 menuCarat: true,
-            }),
+              }),
           // TODO: Incorporate infinite scroll into generic Listing component
           (allThreads.length && vnode.state.postsDepleted)
             ? m('.infinite-scroll-reached-end', [
@@ -224,7 +225,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
                 m(Spinner, { active: !vnode.state.postsDepleted })
               ])
               : null
-          ])
+        ])
       ]
     ]);
   },
