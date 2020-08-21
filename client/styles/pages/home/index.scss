@@ -1,6 +1,11 @@
+@import 'client/styles/shared';
+
 .Homepage {
     max-width: 900px;
     margin: 0 auto 60px;
+    @include sm-max {
+        margin-top: 30px;
+    }
     h1 {
         font-size: 28px;
         margin: 0;
@@ -10,5 +15,6 @@
         text-align: center;
         font-size: 19px;
         margin: 0 0 34px;
+        line-height: 1.25;
     }
 }
