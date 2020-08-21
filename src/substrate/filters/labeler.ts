@@ -55,9 +55,9 @@ const edgBalanceFormatter = (chain, balance: BalanceString): string => {
     dollar = (new BN(10)).pow(new BN(EDG_DECIMAL));
   } else if (chain.startsWith('kusama') || chain.startsWith('polkadot')) {
     dollar = (new BN(10)).pow(new BN(KUSAMA_DECIMAL));
-  } else if (chain.startsWith('kulupu') {
+  } else if (chain.startsWith('kulupu')) {
     dollar = (new BN(10)).pow(new BN(KLP_DECIMAL));
-  }else {
+  } else {
     throw new Error('unexpected chain');
   }
   const balanceDollars = (new BN(balance, 10)).div(dollar);
