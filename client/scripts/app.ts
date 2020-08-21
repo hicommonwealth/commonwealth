@@ -268,7 +268,12 @@ export function initCommunity(communityId: string): Promise<void> {
 
 // set up route navigation
 m.route.prefix = '';
-export const updateRoute = m.route.set;
+const _updateRoute = m.route.set;
+export const updateRoute = (...args) => {
+  app._lastNavigatedBack = false;
+  app._lastNavigatedFrom = m.route.get();
+  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
+};
 m.route.set = (...args) => {
   // set app params that maintain global state for:
   // - whether the user last clicked the back button
@@ -276,7 +281,7 @@ m.route.set = (...args) => {
   app._lastNavigatedBack = false;
   app._lastNavigatedFrom = m.route.get();
   // update route
-  if (args[0] !== m.route.get()) updateRoute.apply(this, args);
+  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
   // reset scroll position
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
