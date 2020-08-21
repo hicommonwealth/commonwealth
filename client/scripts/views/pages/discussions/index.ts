@@ -6,9 +6,9 @@ import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
-import { Spinner } from 'construct-ui';
-
 import app from 'state';
+
+import { Spinner } from 'construct-ui';
 import { pluralize } from 'helpers';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
 
@@ -19,8 +19,7 @@ import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 
-import { updateRoute } from 'app';
-import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
+import { getLastUpdate } from './weekly_listing';
 import Listing from '../listing';
 import PinnedListing from './pinned_listing';
 
@@ -72,17 +71,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         : vnode.state.defaultLookback;
   },
   view: (vnode) => {
-    if (!app.activeId()) return;
-
-    localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
-
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading, { title: topic || 'Discussions' });
 
-    const activeAddressInfo = app.user.activeAccount && app.user.addresses
-      .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
+    localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
 
     const activeNode = app.chain?.meta;
     const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
@@ -107,12 +101,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
     // for easy comparison with weekly indexes' msecAgo
-    const now = +moment().utc();
     const id = (activeEntity.meta as NodeInfo).chain
       ? (activeEntity.meta as NodeInfo).chain.id
       : (activeEntity.meta as CommunityInfo).id;
     const lastVisited = moment(allLastVisited[id]).utc();
-    const lastVisitedAgo = now - lastVisited;
 
     // comparator
     const orderDiscussionsbyLastComment = (a, b) => {
