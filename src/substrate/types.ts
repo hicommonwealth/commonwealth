@@ -4,11 +4,11 @@ import {
 
 export const EventChains = [
   'edgeware',
-  // 'edgeware-local',
+  'edgeware-local',
   'kusama',
-  // 'kusama-local',
+  'kusama-local',
   'polkadot',
-  // 'polkadot-local',
+  'polkadot-local',
 ];
 
 /**
