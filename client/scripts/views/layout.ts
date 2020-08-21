@@ -21,6 +21,7 @@ export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
     return m('.Layout.LoadingLayout.mithril-app', {
       class: hideSidebar ? 'hidden-sidebar' : ''
     }, [
+      hideSidebar && m('.home-gradient'),
       m(Sidebar),
       m('.layout-container', [
         m('.LoadingLayout'),
@@ -48,6 +49,7 @@ export const Layout: m.Component<{
       return m('.Layout.mithril-app', {
         class: hideSidebar ? 'hidden-sidebar' : ''
       }, [
+        hideSidebar && m('.home-gradient'),
         m(Sidebar),
         m('.layout-container', [
           m(EmptyState, {
@@ -72,6 +74,7 @@ export const Layout: m.Component<{
       return m('.Layout.mithril-app', {
         class: hideSidebar ? 'hidden-sidebar' : ''
       }, [
+        hideSidebar && m('.home-gradient'),
         m(Sidebar),
         m('.layout-container', [
           m(PageNotFound)
@@ -112,6 +115,7 @@ export const Layout: m.Component<{
     return m('.Layout.mithril-app', {
       class: hideSidebar ? 'hidden-sidebar' : ''
     }, [
+      hideSidebar && m('.home-gradient'),
       m(Sidebar),
       m('.layout-container', [
         vnode.children

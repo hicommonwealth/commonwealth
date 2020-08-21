@@ -14,6 +14,11 @@
         font-size: 16px;
         color: #999;
     }
+    .other-list {
+        .home-card {
+            text-align: center;
+        }
+    }
     .home-card {
         box-sizing: border-box;
         float: left;
@@ -48,7 +53,7 @@
             overflow: hidden;
         }
         .card-description {
-            margin: 0 0 16px;
+            margin: 0;
             line-height: 1.25;
             height: 64px;
             overflow: hidden;
@@ -58,10 +63,9 @@
         }
         p.action {
             margin: 10px 0;
-            button {
-                position: relative;
-                top: 6px;
-            }
+        }
+        .cui-button {
+            margin: 8px 0 1px;
         }
     }
     .new-threads {

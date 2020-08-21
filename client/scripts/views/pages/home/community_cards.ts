@@ -85,32 +85,30 @@ const LockdropToolsCard: m.Component<{}> = {
     }, [
       m('.card-right', [
         m('h3', 'Edgeware Lockdrop Tools'),
-        m('p.action', [
-          m(Button, {
-            interactive: true,
-            compact: true,
-            fluid: true,
-            intent: 'primary',
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set('/edgeware/stats');
-            },
-            label: [ 'Lockdrop stats ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
-          }),
-        ]),
-        m('p.action', [
-          m(Button, {
-            interactive: true,
-            compact: true,
-            fluid: true,
-            intent: 'primary',
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set('/edgeware/unlock');
-            },
-            label: [ 'Unlock ETH ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
-          }),
-        ]),
+        m(Button, {
+          interactive: true,
+          compact: true,
+          fluid: true,
+          intent: 'primary',
+          size: 'sm',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set('/edgeware/stats');
+          },
+          label: [ 'Lockdrop stats ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
+        }),
+        m(Button, {
+          interactive: true,
+          compact: true,
+          fluid: true,
+          intent: 'primary',
+          size: 'sm',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set('/edgeware/unlock');
+          },
+          label: [ 'Unlock ETH ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
+        }),
       ]),
     ]);
   }
@@ -124,13 +122,13 @@ const NewCommunityCard: m.Component<{}> = {
       class: 'home-card NewCommunityCard',
       onclick: (e) => {
         e.preventDefault();
-        document.location = 'https://typeform.com/' as any;
+        document.location = 'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
       }
     }, [
       m('.card-right', [
         m('h3', 'Create a new community'),
         m('p.action', 'Launch and grow your decentralized community on Commonwealth'),
-        link('a.learn-more', 'https://typeform.com', m.trust('Learn more &raquo;')),
+        link('a.learn-more', 'https://hicommonwealth.typeform.com/to/cRP27Rp5', m.trust('Learn more &raquo;')),
       ]),
     ]);
   }
@@ -187,12 +185,13 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
         myCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
         otherChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
         otherCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
+        m('.clear'),
       ]),
-      // other
-      m(NewCommunityCard),
-      m('.clear'),
-      m(LockdropToolsCard),
-      m('.clear'),
+      m('.other-list', [
+        m(NewCommunityCard),
+        m(LockdropToolsCard),
+        m('.clear'),
+      ]),
     ]);
   }
 };
