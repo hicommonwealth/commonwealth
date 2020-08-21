@@ -92,7 +92,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
             m(UserBlock, { user: account, showRole: true }),
             m('.role-remove', [
-              m('span.already-connected', 'Already joined'),
+              m('span.already-connected', 'Member'),
               m('span.icon', {
                 onclick: deleteRole.bind(this, index)
               }, m(Icon, { name: Icons.X })),
