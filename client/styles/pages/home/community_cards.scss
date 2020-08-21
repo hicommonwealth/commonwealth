@@ -51,20 +51,20 @@
             flex: 1;
             .card-right-top {
                 display: flex;
-                h3 {
-                    flex: 1;
-                    font-size: 19px;
-                    font-weight: 500;
-                    margin: 0 0 6px;
-                    line-height: 1.1;
-                    white-space: nowrap;
-                    text-overflow: ellipse;
-                    overflow: hidden;
-                }
-                .chain-new {
-                    margin: -4px 0;
-                    margin-right: -8px;
-                }
+            }
+            h3 {
+                flex: 1;
+                font-size: 19px;
+                font-weight: 500;
+                margin: 0 0 6px;
+                line-height: 1.1;
+                white-space: nowrap;
+                text-overflow: ellipse;
+                overflow: hidden;
+            }
+            .chain-new {
+                margin: -4px 0;
+                margin-right: -8px;
             }
             .card-description {
                 margin: 0;
