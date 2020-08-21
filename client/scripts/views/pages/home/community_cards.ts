@@ -124,13 +124,13 @@ const NewCommunityCard: m.Component<{}> = {
       class: 'home-card NewCommunityCard',
       onclick: (e) => {
         e.preventDefault();
-        document.location = 'https://typeform.com/' as any;
+        document.location = 'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
       }
     }, [
       m('.card-right', [
         m('h3', 'Create a new community'),
         m('p.action', 'Launch and grow your decentralized community on Commonwealth'),
-        link('a.learn-more', 'https://typeform.com', m.trust('Learn more &raquo;')),
+        link('a.learn-more', 'https://hicommonwealth.typeform.com/to/cRP27Rp5', m.trust('Learn more &raquo;')),
       ]),
     ]);
   }
