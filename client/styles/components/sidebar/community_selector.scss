@@ -1,5 +1,14 @@
 @import 'client/styles/shared';
 
+.CommunityLabel {
+    .visible-sm {
+        display: none;
+        @include sm-max {
+            display: block;
+        }
+    }
+}
+
 .CommunitySelector {
     button.cui-button {
         border: none !important;

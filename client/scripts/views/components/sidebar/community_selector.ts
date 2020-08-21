@@ -54,7 +54,9 @@ export const CommunityLabel: m.Component<{
       ]),
     ]);
 
-    return m('.CommunityLabel.CommunityLabelPlaceholder');
+    return m('.CommunityLabel.CommunityLabelPlaceholder', [
+      m('.visible-sm', 'Commonwealth')
+    ]);
   }
 };
 
