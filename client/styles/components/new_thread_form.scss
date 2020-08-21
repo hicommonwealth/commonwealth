@@ -2,7 +2,7 @@
 
 .NewThreadForm {
     display: flex;
-    max-width: 600px;
+    max-width: 680px;
     &.has-drafts {
         max-width: 810px;
     }
@@ -11,10 +11,24 @@
         margin-bottom: 15px;
     }
     .ql-editor {
-        min-height: 160px;
+        min-height: 170px;
     }
     &.link-post .ql-editor {
-        min-height: 105px;
+        min-height: 119px;
+    }
+    @include xs-max {
+        .ql-editor {
+            max-height: calc(100vh - 310px) !important;
+        }
+        .hidden-xs {
+            display: none;
+        }
+        .cui-form-group > button {
+            width: 100%;
+        }
+        .cui-form-group > button + button {
+            margin-top: 10px;
+        }
     }
 
     .new-thread-form-body {
@@ -34,14 +48,33 @@
                 margin-right: 1px;
                 margin-left: 24px;
             }
+            // center tabs on mobile
+            @include xs-max {
+                justify-content: center;
+                padding-right: 0;
+                .cui-tabs-item {
+                    margin-right: 10px;
+                    margin-left: 10px;
+                }
+                .tab-spacer {
+                    display: none;
+                }
+            }
         }
         .cui-form {
             margin: 0;
             margin-right: 28px;
+            @include xs-max {
+                margin-right: 0;
+            }
             // space between title and topic
             .topic-selection-drop-menu {
                 margin-left: 12px;
                 width: calc(100% - 12px);
+                @include xs-max {
+                    margin-left: 0;
+                    width: 100%;
+                }
             }
         }
         button[name="submit"], button[name="submission"] {
@@ -58,6 +91,14 @@
         }
         .cui-form {
             margin-left: 28px;
+        }
+        @include xs-max {
+            .cui-tabs {
+                padding: 0;
+            }
+            .cui-form {
+                margin: 0 20px;
+            }
         }
     }
     .new-thread-form-sidebar {

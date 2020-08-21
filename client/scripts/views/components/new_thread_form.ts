@@ -4,6 +4,7 @@ import 'components/new_thread_form.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
+import moment from 'moment';
 import Quill from 'quill-2.0-dev/quill';
 import {
   Tabs, TabItem, Form, FormGroup, Input, Button,
@@ -116,6 +117,9 @@ export const loadDraft = async (dom, state, draft) => {
   state.activeTopic = draft.tag;
   state.form.topicName = draft.tag;
   state.fromDraft = draft.id;
+  if (state.quillEditorState?.alteredText) {
+    state.quillEditorState.alteredText = false;
+  }
   m.redraw();
 };
 
@@ -231,7 +235,7 @@ export const NewThreadForm: m.Component<{
     };
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    const { fromDraft,newType, saving } = vnode.state;
+    const { fromDraft, newType, saving } = vnode.state;
 
     return m('.NewThreadForm', {
       class: `${newType === PostType.Link ? 'link-post' : ''} `
@@ -284,10 +288,10 @@ export const NewThreadForm: m.Component<{
           ]),
         ]),
         newType === PostType.Link && m(Form, [
-          m(FormGroup, { span: 8 }, [
+          m(FormGroup, { span: { xs: 12, sm: 8 }, order: { xs: 2, sm: 1 } }, [
             m(Input, {
               placeholder: 'https://',
-              onchange: (e) => {
+              oninput: (e) => {
                 const { value } = e.target as any;
                 vnode.state.form.url = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
@@ -297,9 +301,9 @@ export const NewThreadForm: m.Component<{
               tabindex: 1,
             }),
           ]),
-          m(FormGroup, { span: 4 }, [
+          m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 1, sm: 2 } }, [
             m(TopicSelector, {
-              activeTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
+              defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
               topics: app.topics.getByCommunity(app.activeId()),
               featuredTopics: app.topics.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
@@ -307,12 +311,13 @@ export const NewThreadForm: m.Component<{
               tabindex: 2,
             }),
           ]),
-          m(FormGroup, [
+          m(FormGroup, { order: 3 },  [
             m(Input, {
               class: 'new-thread-title',
               placeholder: 'Title',
               name: 'new-link-title',
-              onchange: (e) => {
+              autocomplete: 'off',
+              oninput: (e) => {
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
                 vnode.state.form.linkTitle = value;
@@ -322,7 +327,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 3,
             }),
           ]),
-          m(FormGroup, [
+          m(FormGroup, { order: 4 }, [
             m(QuillEditor, {
               contentsDoc: '', // Prevent the editor from being filled in with previous content
               oncreateBind: (state) => {
@@ -333,7 +338,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 4,
             })
           ]),
-          m(FormGroup, [
+          m(FormGroup, { order: 5 }, [
             m(Button, {
               class: !author ? 'disabled' : '',
               intent: 'primary',
@@ -372,7 +377,7 @@ export const NewThreadForm: m.Component<{
         ]),
         //
         newType === PostType.Discussion && m(Form, [
-          fromDraft && m(FormGroup, { span: 2, class: 'draft-badge-wrap' }, [
+          fromDraft && m(FormGroup, { span: 2, order: { xs: 3, sm: 1 }, class: 'hidden-xs draft-badge-wrap' }, [
             m(Tag, {
               class: 'draft-badge',
               size: 'xs',
@@ -380,23 +385,27 @@ export const NewThreadForm: m.Component<{
               label: 'Draft',
             })
           ]),
-          m(FormGroup, { span: fromDraft ? 7 : 8 }, [
+          m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 2 }, [
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
-              onchange: (e) => {
+              autocomplete: 'off',
+              oninput: (e) => {
                 const { value } = (e as any).target;
+                if (!vnode.state.quillEditorState?.alteredText) {
+                  vnode.state.quillEditorState.alteredText = true;
+                  m.redraw();
+                }
                 vnode.state.form.threadTitle = value;
-
                 localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
               },
               defaultValue: vnode.state.form.threadTitle,
               tabindex: 1,
             }),
           ]),
-          m(FormGroup, { span: fromDraft ? 3 : 4 }, [
+          m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 1, sm: 3 } }, [
             m(TopicSelector, {
-              activeTopic:(vnode.state.activeTopic === false || vnode.state.activeTopic)
+              defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
                 ? vnode.state.activeTopic
                 : localStorage.getItem(`${app.activeId()}-active-tag`),
               topics: app.topics.getByCommunity(app.activeId()),
@@ -406,7 +415,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 2,
             }),
           ]),
-          m(FormGroup, [
+          m(FormGroup, { order: 4 }, [
             m(QuillEditor, {
               contentsDoc: '',
               oncreateBind: (state) => {
@@ -416,7 +425,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 3,
             }),
           ]),
-          m(FormGroup, [
+          m(FormGroup, { order: 5 }, [
             m(Button, {
               class: !author || saving || vnode.state.uploadsInProgress > 0
                 ? 'disabled' : '',
@@ -432,8 +441,7 @@ export const NewThreadForm: m.Component<{
                 try {
                   await newThread(form, quillEditorState, author);
                   vnode.state.saving = false;
-                  const { fromDraft } = vnode.state;
-                  if (fromDraft && !vnode.state.recentlyDeletedDrafts.includes(fromDraft)) {
+                  if (vnode.state.fromDraft && !vnode.state.recentlyDeletedDrafts.includes(fromDraft)) {
                     await app.user.discussionDrafts.delete(fromDraft);
                   }
                   if (isModal) {
@@ -455,8 +463,12 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
             m(Button, {
-              class: !author || saving || vnode.state.uploadsInProgress > 0
-                ? 'disabled' : '',
+              class: !author
+                || saving
+                || vnode.state.uploadsInProgress > 0
+                || (fromDraft && !vnode.state.quillEditorState?.alteredText)
+                ? 'disabled'
+                : '',
               intent: 'none',
               onclick: async (e) => {
                 const { form, quillEditorState } = vnode.state;
@@ -486,7 +498,9 @@ export const NewThreadForm: m.Component<{
                   notifyError(err.message);
                 }
               },
-              label: 'Save as draft',
+              label: fromDraft
+                ? 'Update saved draft'
+                : 'Save draft',
               name: 'save',
               tabindex: 5
             }),
@@ -496,7 +510,9 @@ export const NewThreadForm: m.Component<{
       !!discussionDrafts.length
       && newType === PostType.Discussion
       && m('.new-thread-form-sidebar', [
-        m(List, { interactive: true }, discussionDrafts.map((draft) => {
+        m(List, {
+          interactive: true
+        }, discussionDrafts.sort((a, b) => a.createdAt - b.createdAt).map((draft) => {
           const { body } = draft;
           let bodyComponent;
           if (body) {

@@ -604,7 +604,7 @@ const NewProposalForm = {
               intent: 'primary',
               label: proposalTypeEnum === ProposalType.OffchainThread
                 ? 'Create thread'
-                : 'Go to send transaction',
+                : 'Send transaction',
               onclick: (e) => {
                 e.preventDefault();
                 createNewProposal();

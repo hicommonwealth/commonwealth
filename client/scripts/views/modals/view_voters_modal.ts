@@ -69,7 +69,6 @@ const VoterRow: m.Component<IVoterRowAttrs> = {
           m('.proposal-row-metadata', stake.format(true)),
         ]),
       ]),
-      m('.proposal-row-xs-clear'),
     ]);
   }
 };

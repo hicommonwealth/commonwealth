@@ -7,7 +7,7 @@ import 'nprogress.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import NProgress from 'nprogress';
+import NProgress from 'lib/nprogress';
 import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
@@ -268,15 +268,31 @@ export function initCommunity(communityId: string): Promise<void> {
   }
 }
 
-// set up mithril
+// set up route navigation
 m.route.prefix = '';
 export const updateRoute = m.route.set;
 m.route.set = (...args) => {
+  // set app params that maintain global state for:
+  // - whether the user last clicked the back button
+  // - the last page the user was on
+  app._lastNavigatedBack = false;
+  app._lastNavigatedFrom = m.route.get();
+  // show nprogress bar if moving between pages, or otherwise changing url
+  if ((!args[2] || (args[2] && args[2].replace !== true)) && args[0] !== m.route.get()) NProgress.start();
+  // update route
   if (args[0] !== m.route.get()) updateRoute.apply(this, args);
+  // reset scroll position
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
   const body = document.getElementsByTagName('body')[0];
   if (body) body.scrollTo(0, 0);
+};
+
+const _onpopstate = window.onpopstate;
+window.onpopstate = (...args) => {
+  app._lastNavigatedBack = true;
+  app._lastNavigatedFrom = m.route.get();
+  if (_onpopstate) _onpopstate.apply(this, args);
 };
 
 // set up ontouchmove blocker
@@ -325,7 +341,6 @@ $(() => {
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
       console.log('onmatch called, for:', path);
-      NProgress.start();
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -373,10 +388,10 @@ $(() => {
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
     '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/notification-settings':    redirectRoute(() => '/edgeware/notification-settings'),
-    '/:scope/notification-settings': importRoute('views/pages/notification-settings/notification-settings', { scoped: true }),
-    '/chain-event-settings':    redirectRoute(() => '/edgeware/notification-settings/chain-event-settings'),
-    '/:scope/chain-event-settings': importRoute('views/pages/notification-settings/chain-event-settings', { scoped: true }),
+    '/notificationSettings':    redirectRoute(() => '/edgeware/notificationSettings'),
+    '/:scope/notificationSettings': importRoute('views/pages/subscriptions/notificationSettings', { scoped: true }),
+    '/chainEventSettings':    redirectRoute(() => '/edgeware/chainEventSettings'),
+    '/:scope/chainEventSettings': importRoute('views/pages/subscriptions/chainEventSettings', { scoped: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
@@ -391,7 +406,7 @@ $(() => {
     // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-    '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
+    '/:scope/council':           importRoute('views/pages/council/index', { scoped: true }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
     '/:scope/new/signaling':     importRoute('views/pages/new_signaling', { scoped: true }),

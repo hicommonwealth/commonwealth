@@ -2,9 +2,6 @@
 
 .NewProposalPage {
     height: 100%;
-    .new-proposal-title h2 {
-        font-size: 22.5px;
-    }
     .error {
         @include error-text();
         margin-bottom: 15px;
@@ -18,9 +15,6 @@
     max-width: 85%;
     textarea {
         min-height: 200px;
-    }
-    button[type="submit"] {
-        font-size: 15px;
     }
     .council-motion-description {
         margin-top: -12px;
