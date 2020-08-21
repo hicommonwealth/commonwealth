@@ -1,8 +1,12 @@
 @import 'client/styles/shared';
 
 .NotificationsMenuButton {
+    padding: 0 11px !important;
     @include xs-max {
-        padding: 0 11px !important;
+        .notification-count {
+            position: relative;
+            top: 1px;
+        }
     }
     .cui-icon {
         margin-right: 0 !important;
@@ -11,10 +15,6 @@
         @include xs-max {
             top: 1px;
         }
-    }
-    .notification-count {
-        position: relative;
-        top: 1px;
     }
     &.has-notifications {
         .cui-icon {

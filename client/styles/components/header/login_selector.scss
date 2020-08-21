@@ -49,10 +49,8 @@
         position: relative;
         top: -1px;
     }
-    @include xs-max {
-        > button.cui-button {
-            padding: 0 11px;
-        }
+    > button.cui-button {
+        padding: 0 11px;
     }
 }
 
