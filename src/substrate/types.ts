@@ -9,6 +9,7 @@ export const EventChains = [
   // 'kusama-local',
   'polkadot',
   // 'polkadot-local',
+  'kulupu',
 ];
 
 /**
