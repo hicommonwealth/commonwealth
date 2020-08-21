@@ -166,7 +166,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         let count = 0;
         sortedThreads.slice(0, vnode.state.lookback).forEach((proposal) => {
           const row = m(DiscussionRow, { proposal });
-          console.log(proposal);
           if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
             listing = [m('.discussion-group-wrap', listing), LastSeenDivider, m('.discussion-group-wrap', [row])];
             visitMarkerPlaced = true;
@@ -185,9 +184,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const topicObject = topics.find((t) => t.name === topic);
       topicDescription = topicObject?.description;
     }
-    console.log(app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link));
-    console.log(vnode.state);
-    console.log(vnode.attrs);
+
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',
