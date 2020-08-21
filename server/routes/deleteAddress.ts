@@ -8,7 +8,6 @@ export const Errors = {
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
   AddressNotFound: 'Address not found',
-  LastAddress: 'Cannot delete last address',
 };
 
 const deleteAddress = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -28,14 +27,6 @@ const deleteAddress = async (models, req: Request, res: Response, next: NextFunc
   if (!addressObj || addressObj.user_id !== req.user.id) {
     return next(new Error(Errors.AddressNotFound));
   }
-
-  // TODO: Membership Membership removed
-  // if (req.body.chain) {
-  //   const existingMemberships = await models.Membership.findAll({
-  //     where: { chain: req.body.chain, user_id: req.user.id, active: true }
-  //   });
-  //   if (existingMemberships.length > 0) return next(new Error(Errors.LastAddress));
-  // }
 
   try {
     addressObj.user_id = null;

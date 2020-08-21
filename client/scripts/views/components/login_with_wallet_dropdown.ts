@@ -38,6 +38,7 @@ const LoginWithWalletDropdown: m.Component<{
             joiningCommunity,
             successCallback: () => {
               m.route.set(next);
+              m.redraw();
             },
           });
         }
@@ -71,6 +72,7 @@ const LoginWithWalletDropdown: m.Component<{
                 joiningCommunity,
                 successCallback: () => {
                   m.route.set(next);
+                  m.redraw();
                 }
               });
             }

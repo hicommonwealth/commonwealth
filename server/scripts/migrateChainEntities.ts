@@ -1,6 +1,6 @@
 /**
- * This script "migrates" identities from the chain into the database, by first
- * querying all addresses, and then attempting to fetch corresponding identities
+ * This script "migrates" chain entities (proposals) from the chain into the database, by first
+ * querying events, and then attempting to fetch corresponding entities
  * from the chain, writing the results back into the database.
  */
 
@@ -40,8 +40,10 @@ export default async function (models, chain?: string): Promise<void> {
     );
 
     // fetch all events and run through handlers in sequence then exit
+    log.info('Fetching chain events...');
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     const events = await fetcher.fetch();
+    log.info(`Writing chain events to db... (count: ${events.length})`);
     await Promise.all(events.map(async (event) => {
       try {
         // eslint-disable-next-line no-await-in-loop

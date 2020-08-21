@@ -1,5 +1,6 @@
 @import 'client/styles/shared';
 
+// page layout
 * {
     box-sizing: border-box;
 }
@@ -46,10 +47,7 @@ html {
     padding-left: $sidebar-width;
 }
 
-//
-// typography
-//
-
+// global css
 h1, h2, h3, h4, h5, h6 {
     font-weight: 500;
 }
@@ -65,18 +63,6 @@ a {
 }
 a:visited {
     color: lighten($theme-accent-dark, 4%);
-}
-ul,
-ol {
-    padding-left: 1.25em;
-    margin-top: 16px;
-    margin-bottom: 16px;
-}
-ul + ul {
-    margin-top: -8px;
-}
-li {
-    margin: 2px 0;
 }
 code, pre {
     font-family: SF Mono, Menlo, Monaco, monospace;
@@ -102,150 +88,66 @@ pre {
     background: #444;
 }
 
-//
-// basic components
-//
-
-input[type="submit"],
-input[type="button"],
-button,
-a.btn {
-    font-size: 14.75px;
-    font-weight: 500;
-    line-height: 1.5;
-    padding: 6px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    outline: none;
-    border: none;
-    box-shadow: none;
-    background: $background-color-light;
-    color: #111;
-    transition: 0.07s background ease-in-out;
-    text-align: center;
-    text-decoration: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    &:hover {
-        background: $background-color-light-hover;
-    }
-    &:disabled,
-    &.disabled, {
-        opacity: 0.4;
-        pointer-events: none;
-    }
-    &.btn-block {
-        display: block;
-        margin-bottom: 6px;
-    }
-    &.formular-button-primary,
-    &.formular-button-positive {
-        background-color: #41a360;
-        background-image: linear-gradient(-180deg, #61cc82 -25%, #41a360 100%);
-        color: #fff;
-        &:hover {
-            background-color: lighten(#41a360, 2%);
-            background-image: linear-gradient(-180deg, lighten(#61cc82, 2%) -25%, lighten(#41a360, 2%) 100%);
-        }
-        &:focus {
-            box-shadow: 0 0 3px 1px #41a360;
-        }
-    }
-    &.formular-button-negative {
-        background-color: #971B1B;
-        background-image: linear-gradient(-180deg, #CD556D 0%, #971B1B 100%);
-        color: #fff;
-        &:hover {
-            background-color: lighten(#971B1B, 2%);
-            background-image: linear-gradient(-180deg, lighten(#CD556D, 2%) -25%, lighten(#971B1B, 2%) 100%);
-        }
-        &:focus {
-            box-shadow: 0 0 3px 1px #971B1B;
-        }
-    }
-    &.formular-button-secondary {
-        background-color: #0d83be;
-        background-image: linear-gradient(-180deg, #1a90cb -25%, #0d83be 100%);
-        color: #fff;
-        &:hover {
-            background-color: lighten(#0d83be, 2%);
-            background-image: linear-gradient(-180deg, lighten(#1a90cb, 2%) -25%, lighten(#0d83be, 2%) 100%);
-        }
-        &:focus {
-            box-shadow: 0 0 3px 1px #0d83be;
-        }
-    }
-    &.formular-button-tertiary {
-        background-color: #C76D2B;
-        background-image: linear-gradient(-180deg, #eb8d48 -25%, #C76D2B 100%);
-        color: #fff;
-        &:hover {
-            background-color: lighten(#C76D2B, 2%);
-            background-image: linear-gradient(-180deg, lighten(#eb8d48, 2%) -25%, lighten(#C76D2B, 2%) 100%);
-        }
-        &:focus {
-            box-shadow: 0 0 3px 1px #C76D2B;
-        }
-    }
-    &.formular-button-black {
-        background-color: #414247;
-        background-image: linear-gradient(-180deg, #606167 -25%, #414247 100%);
-        color: #fff;
-        &:hover {
-            background-color: lighten(#414247, 2%);
-            background-image: linear-gradient(-180deg, lighten(#606167, 2%) -25%, lighten(#414247, 2%) 100%);
-        }
-        &:focus {
-            box-shadow: 0 0 3px 1px #08c;
-        }
-    }
+// shared styles
+.clear {
+    clear: both;
 }
-
-input[type="submit"],
-button[type="submit"] {
-    background-color: #41a360;
-    background-image: linear-gradient(-180deg, #61cc82 -25%, #41a360 100%);
-    color: #fff;
-}
-
-input[type="radio"],
-input[type="checkbox"] {
-    margin-right: 10px;
-}
-label {
-    margin-right: 20px;
+.container {
     position: relative;
-    top: 1px;
-}
-input[type="text"],
-input[type="email"],
-input[type="search"],
-input[type="password"],
-textarea {
-    @include formfield-base;
-    @include formfield-text;
-    &.disabled, &:disabled {
-        pointer-events: none;
-        color: #999;
-        background: rgba(153, 153, 153, 0.07);
+    max-width: $layout-max-width;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    @include xs-max {
+        padding: 0 1rem;
     }
 }
-textarea {
-    min-height: 40px;
-    resize: vertical;
-    line-height: 1.4;
+.forum-container {
+    padding: 20px 0;
 }
-select {
-    @include formfield-base;
-    height: 35px;
+.MobileSidebarHeader {
+    display: none;
 }
-table {
-    width: 100%;
-    table-layout: fixed;
+.Sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: $sidebar-width;
+    height: 100%;
+    background: $background-color-light;
 }
-td, th {
-    padding: 8px 0;
-    border-bottom: 1px solid #e5e5e5;
+.layout-container {
+    padding-left: $sidebar-width;
+}
+@include sm-max {
+    $mobile-sidebar-height: 60px;
+    .MobileSidebarHeader {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 99;
+        height: $mobile-sidebar-height;
+        user-select: none;
+    }
+    .Sidebar {
+        display: none;
+        position: fixed;
+        top: $mobile-sidebar-height;
+        left: 0;
+        width: 100%;
+        padding: 20px 0;
+        z-index: 99;
+        &.open {
+            display: block;
+        }
+    }
+    .layout-container {
+        padding-top: $mobile-sidebar-height;
+        width: 100%;
+        padding-left: 0;
+    }
 }
 
 //
