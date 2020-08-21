@@ -9,7 +9,7 @@
         position: relative;
         top: -1px;
         @include xs-max {
-            top: 0;
+            top: 1px;
         }
     }
     .notification-count {
