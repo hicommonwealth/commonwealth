@@ -5,6 +5,7 @@ import _ from 'lodash';
 import moment from 'moment-twitter';
 import { Icon, Icons, Tag } from 'construct-ui';
 
+import { updateRoute } from 'app';
 import app from 'state';
 import { formatLastUpdated, slugify, link, externalLink, extractDomain } from 'helpers';
 
@@ -97,7 +98,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       onclick: (e) => {
         e.preventDefault();
         localStorage[`${app.activeId()}-scrollY`] = window.scrollY;
-        m.route.set(discussionLink);
+        updateRoute(discussionLink);
       },
     });
   }
