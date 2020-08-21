@@ -49,40 +49,39 @@
         }
         .card-right {
             flex: 1;
+            .card-right-top {
+                display: flex;
+                h3 {
+                    flex: 1;
+                    font-size: 19px;
+                    font-weight: 500;
+                    margin: 0 0 6px;
+                    line-height: 1.1;
+                    white-space: nowrap;
+                    text-overflow: ellipse;
+                    overflow: hidden;
+                }
+                .chain-new {
+                    margin: -4px 0;
+                    margin-right: -8px;
+                }
+            }
+            .card-description {
+                margin: 0;
+                line-height: 1.25;
+                height: 64px;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+            }
         }
 
-        h3 {
-            flex: 1;
-            font-size: 19px;
-            font-weight: 500;
-            margin: 0 0 6px;
-            line-height: 1.1;
-            white-space: nowrap;
-            text-overflow: ellipse;
-            overflow: hidden;
-        }
-        .card-description {
-            margin: 0;
-            line-height: 1.25;
-            height: 64px;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-        }
         p.action {
             margin: 10px 0;
         }
         .cui-button {
             margin: 8px 0 1px;
         }
-    }
-    .new-threads {
-        display: inline-block;
-        line-height: 1.2;
-        padding: 3px 8px 2px;
-        color: $positive-bg-color;
-        border: 1px solid $positive-bg-color;
-        border-radius: 9999px;
     }
 }

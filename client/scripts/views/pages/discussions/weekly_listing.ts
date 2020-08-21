@@ -46,7 +46,7 @@ const WeeklyDiscussionListing: m.Component<IWeeklyDiscussionListingAttrs, IWeekl
     const isEntireWeekUnseen = () => getLastUpdate(lastProposal) > lastVisited;
 
     const discussionRow = (proposal) => m(DiscussionRow, { proposal });
-    const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'New posts'), m('hr') ]);
+    const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last visit'), m('hr') ]);
     const threadGroup = '.discussion-group-wrap';
 
     const proposalsByLastViewed = () => {

@@ -1,12 +1,27 @@
 import 'pages/home/community_cards.scss';
 
 import m from 'mithril';
-import { Button, Icon, Icons, Card } from 'construct-ui';
+import { Button, Icon, Icons, Card, Tag } from 'construct-ui';
 
 import app from 'state';
-import { link } from 'helpers';
+import { link, pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+
+const getNewTag = (labelCount = null) => {
+  const label = labelCount === null
+    ? 'New'
+    : pluralize(labelCount, 'new thread');
+  return m('.chain-new', [
+    m(Tag, {
+      label,
+      size: 'sm',
+      compact: true,
+      rounded: true,
+      intent: 'primary',
+    })
+  ]);
+};
 
 const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedChains: string[] }> = {
   view: (vnode) => {
@@ -28,14 +43,16 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
         m(ChainIcon, { chain: nodeList[0].chain }),
       ]),
       m('.card-right', [
-        m('h3', chainInfo.name),
-        app.user.isMember({
-          account: app.user.activeAccount,
-          chain,
-        }) && justJoinedChains.indexOf(chain) === -1 && [
-          app.isLoggedIn() && !visitedChain && m('.chain-new', m('.new-threads', 'New')),
-          updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
-        ],
+        m('.card-right-top', [
+          m('h3', chainInfo.name),
+          app.user.isMember({
+            account: app.user.activeAccount,
+            chain,
+          }) && justJoinedChains.indexOf(chain) === -1 && [
+            app.isLoggedIn() && !visitedChain && getNewTag(),
+            updatedThreads > 0 && getNewTag(updatedThreads),
+          ],
+        ]),
         m('p.card-description', chainInfo.description),
       ]),
     ]);
@@ -61,16 +78,18 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
         m(CommunityIcon, { community }),
       ]),
       m('.card-right', [
-        m('h3', [
-          community.name,
-          community.privacyEnabled && m('span.icon-lock'),
+        m('.card-right-top', [
+          m('h3', [
+            community.name,
+            community.privacyEnabled && m('span.icon-lock'),
+          ]),
+          app.user.isMember({ account: app.user.activeAccount, community: community.id })
+            && justJoinedCommunities.indexOf(community.id) === -1
+            && [
+              app.isLoggedIn() && !visitedCommunity && getNewTag(),
+              updatedThreads > 0 && getNewTag(updatedThreads),
+            ],
         ]),
-        app.user.isMember({ account: app.user.activeAccount, community: community.id })
-          && justJoinedCommunities.indexOf(community.id) === -1
-          && [
-            app.isLoggedIn() && !visitedCommunity && m('.chain-new', m('.new-threads', 'New')),
-            updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
-          ],
         m('p.card-description', community.description),
       ]),
     ]);

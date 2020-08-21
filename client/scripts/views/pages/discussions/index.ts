@@ -30,7 +30,7 @@ interface IDiscussionPageState {
   defaultLookback: number;
 }
 
-const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'New posts'), m('hr') ]);
+const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last visit'), m('hr') ]);
 
 const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   oncreate: (vnode) => {
