@@ -1,18 +1,16 @@
 import { Mainnet } from '@edgeware/node-types';
 import { IEventHandler, CWEvent, SubstrateEvents, MolochEvents } from '../dist/index';
 
-import { factory, formatFilename } from '../src/logging';
-const log = factory.getLogger(formatFilename(__filename));
-
 const args = process.argv.slice(2);
 const chain = args[0] || 'edgeware';
-log.info(`Listening to events on ${chain}.`);
+console.log(`Listening to events on ${chain}.`);
 
 const networks = {
   'edgeware': 'ws://mainnet1.edgewa.re:9944',
   'edgeware-local': 'ws://localhost:9944',
   'kusama': 'wss://kusama-rpc.polkadot.io',
   'polkadot': 'wss://rpc.polkadot.io',
+  'kulupu': 'ws://rpc.kulupu.corepaper.org/ws',
 
   'moloch': 'wss://mainnet.infura.io/ws',
   'moloch-local': 'ws://127.0.0.1:9545',
@@ -25,7 +23,7 @@ const contracts = {
 
 class StandaloneEventHandler extends IEventHandler {
   public async handle(event: CWEvent): Promise<any> {
-    log.info(`Received event: ${JSON.stringify(event, null, 2)}`);
+    console.log(`Received event: ${JSON.stringify(event, null, 2)}`);
   }
 }
 

@@ -12,6 +12,7 @@ function fmtAddr(addr : string) {
 // ideally we shouldn't hard-code this stuff, but we need the header to appear before the chain loads
 const EDG_DECIMAL = 18;
 const KUSAMA_DECIMAL = 15;
+const KLP_DECIMAL = 12;
 
 function formatNumberShort(num: number) {
   const round = (n, digits?) => {
@@ -43,7 +44,9 @@ const edgBalanceFormatter = (chain, balance: BalanceString): string => {
       : chain === 'kusama'
         ? 'KSM'
         : chain === 'kusama-local'
-          ? 'tKSM' : null;
+          ? 'tKSM' 
+          : chain === 'kulupu' 
+            ? 'KLP' : null;
   if (!denom) {
     throw new Error('unexpected chain');
   }
@@ -52,6 +55,8 @@ const edgBalanceFormatter = (chain, balance: BalanceString): string => {
     dollar = (new BN(10)).pow(new BN(EDG_DECIMAL));
   } else if (chain.startsWith('kusama') || chain.startsWith('polkadot')) {
     dollar = (new BN(10)).pow(new BN(KUSAMA_DECIMAL));
+  } else if (chain.startsWith('kulupu')) {
+    dollar = (new BN(10)).pow(new BN(KLP_DECIMAL));
   } else {
     throw new Error('unexpected chain');
   }
