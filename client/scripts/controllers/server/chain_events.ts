@@ -16,14 +16,14 @@ class ChainEventsController {
     });
   }
 
-  public rewards(stash?: string) {
-    return new Promise((resolve) => {
-      return get('/getRewards', {
-        chain: app.chain.id,
-        stash
-      }, resolve);
-    });
-  }
+  // public rewards(stash?: string) {
+  //   return new Promise((resolve) => {
+  //     return get('/getRewards', {
+  //       chain: app.chain.id,
+  //       stash
+  //     }, resolve);
+  //   });
+  // }
 
   public getOwnStakeOverTime(stash?: string) {
     return new Promise((resolve) => {
@@ -60,7 +60,6 @@ class ChainEventsController {
       }, resolve);
     });
   }
-
 }
 
 export default ChainEventsController;

@@ -86,11 +86,11 @@ const PresentationComponent = (state, chain: Substrate) => {
     .sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
     .slice(model.perPage * (model.currentPage - 1), model.perPage * model.currentPage);
 
-  const filtered = Object.keys(annualPercentRate)
-    .map((elt) => annualPercentRate[elt])
-    .filter((elt) => elt > -1.0 && elt < 1000.0);
-  const aprSum = filtered.reduce((prev, curr) => prev + curr, 0.0);
-  const aprAvg = (aprSum * 1.0) / filtered.length;
+  // const filtered = Object.keys(annualPercentRate)
+  //   .map((elt) => annualPercentRate[elt])
+  //   .filter((elt) => elt > -1.0 && elt < 1000.0);
+  // const aprSum = filtered.reduce((prev, curr) => prev + curr, 0.0);
+  // const aprAvg = (aprSum * 1.0) / filtered.length;
   return m('div',
     m(Tabs, [{
       callback: model.reset,
@@ -138,8 +138,9 @@ const PresentationComponent = (state, chain: Substrate) => {
           const isOnline = validators[validator]?.isOnline;
           const otherTotal = validators[validator]?.otherTotal;
           const commission = validators[validator]?.commissionPer;
-          let apr = annualPercentRate[validator];
-          apr = (apr === -1.0 || typeof apr === 'undefined') ? aprAvg : apr;
+          const  apr = 12;
+          // let apr = annualPercentRate[validator];
+          // apr = (apr === -1.0 || typeof apr === 'undefined') ? aprAvg : apr;
           return m(ValidatorRow, {
             stash: validator,
             total,
@@ -152,7 +153,7 @@ const PresentationComponent = (state, chain: Substrate) => {
             blockCount,
             hasMessage,
             isOnline,
-            apr: (apr === -1.0) ? aprAvg : apr,
+            apr
           });
         }),
       ])

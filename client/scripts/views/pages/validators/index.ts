@@ -109,7 +109,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
       ? (app.chain as Substrate).staking.nominatedBy
       : null,
     annualPercentRate: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.annualPercentRate
+      ? null
       : null
   }),
   view: (vnode) => {
