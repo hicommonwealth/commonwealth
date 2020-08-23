@@ -30,8 +30,8 @@ const AccountActions = makeDynamicComponent<AccountActionsAttrs, IAccountActions
   }),
   view: () => {
     return m('div.account_actions',
-      m('table.mange-staking-table', [
-        m('tr.mange-staking-heading', [
+      m('table.validators-table', [
+        m('tr.validators-heading', [
           m('th.val-stashes', 'Stashes'),
           m('th.val-controller', 'Controller'),
           m('th.val-rewards', 'Rewards'),

@@ -1,5 +1,6 @@
 import m from 'mithril';
 import { DeriveStakingAccount } from '@polkadot/api-derive/types';
+import { Tooltip } from 'construct-ui';
 
 interface IAddressInfoAttrs {
   address: string;
@@ -14,16 +15,22 @@ const AddressInfo: m.Component<IAddressInfoAttrs, {}> = {
 
     return m('div.address-info',
       withHexSessionId && withHexSessionId[0] && m('div.session-keys', [
-        m('label.gray-txt', 'session keys'),
-        m('span.val', withHexSessionId[0])
+        m('.pointer', m(Tooltip, {
+          content: 'session keys',
+          trigger: m('span.val', withHexSessionId[0])
+        }))
       ]),
       withHexSessionId && withHexSessionId[0] !== withHexSessionId[1] && m('div.session-next', [
-        m('label.gray-txt', 'session next'),
-        m('span.val', withHexSessionId[1])
+        m('.pointer', m(Tooltip, {
+          content: 'session next',
+          trigger: m('span.val', withHexSessionId[1])
+        }))
       ]),
       commission && m('div.session-next', [
-        m('label.gray-txt', 'commission'),
-        m('span.val', `${(commission.unwrap().toNumber() / 10_000_000).toFixed(2)}%`)
+        m('.pointer', m(Tooltip, {
+          content: 'commission',
+          trigger: m('span.val', `${(commission.unwrap().toNumber() / 10_000_000).toFixed(2)}%`)
+        }))
       ]));
   },
 };

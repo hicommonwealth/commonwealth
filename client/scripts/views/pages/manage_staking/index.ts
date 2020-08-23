@@ -70,7 +70,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
         break;
     }
 
-    return m('.ManageStaking', vComponents);
+    return m('.Validators', vComponents);
   }
 });
 

@@ -19,14 +19,17 @@ export interface ListNomineesAttrs {
 }
 
 export interface NomineesListAttrs {
-  nominees?: string[]
+  nominees?: string[],
+  title: string
 }
 
 const NomineesList: m.Component<NomineesListAttrs, {}> = {
   view: (vnode) => {
-    const { nominees } = vnode.attrs;
+    const { nominees, title } = vnode.attrs;
 
     return m('div.nominees',
+      m('p', title),
+      m('hr'),
       m('div.padding-b-15', [
         app.chain.loaded
         && nominees.map((nominee) => m(User, { user: app.chain.accounts.get(nominee), linkify: true }))
@@ -58,22 +61,22 @@ const ListNominees = makeDynamicComponent<ListNomineesAttrs, IListNomineesState>
       && nomsActive.length !== 0
       && m('div.active-noms', m(Popover, {
         interactionType: 'click',
-        trigger: m('div.active-noms.pointer', `Active nominations (${nomsActive.length})`),
-        content: m('div', m(NomineesList, { nominees: nomsActive }))
+        trigger: m('div.active-noms.pointer', `Nominations (${nomsActive.length})`),
+        content: m('div', m(NomineesList, { nominees: nomsActive, title: 'Active' }))
       })),
       nomsInactive
       && nomsInactive.length !== 0
       && m('div.inactive-noms', m(Popover, {
         interactionType: 'click',
-        trigger: m('div.inactive-noms.pointer', `Inactive nominations (${nomsInactive.length})`),
-        content: m('div', m(NomineesList, { nominees: nomsInactive }))
+        trigger: m('div.inactive-noms.pointer', `Nominations (${nomsInactive.length})`),
+        content: m('div', m(NomineesList, { nominees: nomsInactive, title: 'Inactive' }))
       })),
       nomsWaiting
       && nomsWaiting.length !== 0
       && m('div.wait-noms', m(Popover, {
         interactionType: 'click',
-        trigger: m('div.wait-noms.pointer', `Waiting nominations (${nomsWaiting.length})`),
-        content: m('div', m(NomineesList, { nominees: nomsWaiting }))
+        trigger: m('div.wait-noms.pointer', `Nominations (${nomsWaiting.length})`),
+        content: m('div', m(NomineesList, { nominees: nomsWaiting, title: 'Waiting' }))
       })));
   }
 });
