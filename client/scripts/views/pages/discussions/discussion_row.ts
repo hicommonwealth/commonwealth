@@ -35,41 +35,29 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
 
     const pinned = proposal.pinned;
 
-    // const rowSubheader = [
-    //   proposal.readOnly && m('.discussion-locked', [
-    //     m(Tag, {
-    //       size: 'xs',
-    //       label: [
-    //         m(Icon, { name: Icons.LOCK, size: 'xs' }),
-    //       ],
-    //     }),
-    //   ]),
-    //   proposal.topic && link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
-    //     m('span.proposal-topic-icon'),
-    //     m('span.proposal-topic-name', `${proposal.topic.name}`),
-    //   ]),
-    //   (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
-    //     `Link: ${extractDomain(proposal.url)}`
-    //   ]),
-    //   m(User, {
-    //     user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
-    //     linkify: true,
-    //     tooltip: true,
-    //     hideAvatar: true,
-    //   }),
-    // ];
-
-    const rowSubheader = m('.proposal-topic-name', {
-      style: 'color: #999'
-    }, [
-      (() => {
-        try {
-          return JSON.parse(proposal.body).ops[0].insert.split('\n')[0];
-        } catch (e) {
-          return proposal?.body?.split('\n')[0];
-        }
-      })(),
-    ]);
+    const rowSubheader = [
+      proposal.readOnly && m('.discussion-locked', [
+        m(Tag, {
+          size: 'xs',
+          label: [
+            m(Icon, { name: Icons.LOCK, size: 'xs' }),
+          ],
+        }),
+      ]),
+      proposal.topic && link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
+        m('span.proposal-topic-icon'),
+        m('span.proposal-topic-name', `${proposal.topic.name}`),
+      ]),
+      (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
+        `Link: ${extractDomain(proposal.url)}`
+      ]),
+      m(User, {
+        user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
+        linkify: true,
+        tooltip: true,
+        hideAvatar: true,
+      }),
+    ];
 
     const rowMetadata = [
       m(UserGallery, {
