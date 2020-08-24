@@ -160,6 +160,7 @@ export const NewThreadForm: m.Component<{
     vnode.state.form = {};
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
+    vnode.state.overwriteConfirmationModal = false;
     if (vnode.state.postType === undefined) {
       vnode.state.postType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
     }
@@ -304,7 +305,6 @@ export const NewThreadForm: m.Component<{
                 vnode.state.overwriteConfirmationModal = true;
                 m.route.set(`/${app.activeId()}/new/thread`);
                 $(e.target).trigger('modalexit');
-                setTimeout(() => { vnode.state.overwriteConfirmationModal = false; }, 1);
                 // TODO: transfer any discussion or link into the page editor
               },
             }),
