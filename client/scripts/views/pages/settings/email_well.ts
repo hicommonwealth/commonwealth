@@ -47,7 +47,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
             vnode.state.email = (e.target as any).value;
           },
         }),
-        m(Button, {
+        (!app.user.email || emailInputUpdated || !emailVerified) && m(Button, {
           intent: 'primary',
           label: (app.user.email && !emailInputUpdated && !emailVerified) ? 'Retry verification' : 'Update email',
           class: 'update-email-button',
