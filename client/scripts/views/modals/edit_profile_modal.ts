@@ -10,6 +10,7 @@ import AvatarUpload from 'views/components/avatar_upload';
 const EditProfileModal = {
   view: (vnode) => {
     const { account } = vnode.attrs;
+    console.dir(account);
 
     return m('.EditProfileModal', [
       m('.compact-modal-title', [
@@ -42,6 +43,7 @@ const EditProfileModal = {
         m('.text-input-wrapper', [
           m(Input, {
             name: 'name',
+            defaultValue: account.name,
             placeholder: 'Display name',
             fluid: true,
             autocomplete: 'off',
@@ -52,6 +54,7 @@ const EditProfileModal = {
           }),
           m(Input, {
             name: 'headline',
+            defaultValue: account.profile.headline,
             placeholder: 'Headline',
             fluid: true,
             autocomplete: 'off',
@@ -59,6 +62,7 @@ const EditProfileModal = {
           }),
           m(TextArea, {
             name: 'bio',
+            defaultValue: account.profile.bio,
             placeholder: 'Enter bio...',
             fluid: true,
             oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.bio)
