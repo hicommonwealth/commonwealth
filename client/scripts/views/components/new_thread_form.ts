@@ -151,6 +151,7 @@ export const NewThreadForm: m.Component<{
   fromDraft?: number,
   postType: string,
   quillEditorState,
+  overwriteConfirmationModal: boolean,
   recentlyDeletedDrafts: number[],
   saving: boolean,
   uploadsInProgress: number,
@@ -300,8 +301,10 @@ export const NewThreadForm: m.Component<{
                 m(Icon, { name: Icons.ARROW_UP_RIGHT, style: 'margin-left: 5px;' }),
               ],
               onclick: (e) => {
+                vnode.state.overwriteConfirmationModal = true;
                 m.route.set(`/${app.activeId()}/new/thread`);
                 $(e.target).trigger('modalexit');
+                setTimeout(() => { vnode.state.overwriteConfirmationModal = false; }, 1);
                 // TODO: transfer any discussion or link into the page editor
               },
             }),
