@@ -10,7 +10,6 @@ import AvatarUpload from 'views/components/avatar_upload';
 const EditProfileModal = {
   view: (vnode) => {
     const { account } = vnode.attrs;
-    console.dir(account);
 
     return m('.EditProfileModal', [
       m('.compact-modal-title', [
