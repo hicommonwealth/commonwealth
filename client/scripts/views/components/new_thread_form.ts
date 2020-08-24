@@ -171,10 +171,10 @@ export const NewThreadForm: m.Component<{
     }
   },
   onremove: async (vnode) => {
-    if (vnode.state.postType === PostType.Discussion) {
-      if (vnode.state.quillEditorState?.alteredText) {
+    const { fromDraft, form, quillEditorState, postType, overwriteConfirmationModal } = vnode.state;
+    if (postType === PostType.Discussion && !overwriteConfirmationModal) {
+      if (quillEditorState?.alteredText) {
         let confirmed = false;
-        const { fromDraft, form, quillEditorState } = vnode.state;
         const modalMsg = fromDraft
           ? 'Update saved draft?'
           : 'Save as draft?';
