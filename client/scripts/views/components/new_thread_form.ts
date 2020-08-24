@@ -170,22 +170,22 @@ export const NewThreadForm: m.Component<{
     }
   },
   onremove: async (vnode) => {
-    // if localStorage.getItem(`${app.activeeId()}-post-type`) === PostType.Discussion {
-    let confirmed = false;
-    const { fromDraft, form, quillEditorState } = vnode.state;
-    const modalMsg = fromDraft
-      ? 'Update saved draft?'
-      : 'Save as draft?';
-    confirmed = await confirmationModalWithText(modalMsg)();
-    if (confirmed) {
-      await saveDraft(form, quillEditorState, null, fromDraft);
-    } else {
+    if (localStorage.getItem(`${app.activeId()}-post-type`) === PostType.Discussion) {
+      let confirmed = false;
+      const { fromDraft, form, quillEditorState } = vnode.state;
+      const modalMsg = fromDraft
+        ? 'Update saved draft?'
+        : 'Save as draft?';
+      confirmed = await confirmationModalWithText(modalMsg)();
+      if (confirmed) {
+        await saveDraft(form, quillEditorState, null, fromDraft);
+        notifySuccess('Draft saved');
+      }
       localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
       localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
       localStorage.removeItem(`${app.activeId()}-active-tag`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
     }
-    // }
   },
   view: (vnode) => {
     if (!app.community && !app.chain) return;
