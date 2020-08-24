@@ -187,7 +187,6 @@ export const NewThreadForm: m.Component<{
       localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
       localStorage.removeItem(`${app.activeId()}-active-tag`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
-      console.log(localStorage);
     }
   },
   view: (vnode) => {
@@ -504,6 +503,7 @@ export const NewThreadForm: m.Component<{
                 try {
                   await saveDraft(form, quillEditorState, author, fromDraft_);
                   vnode.state.saving = false;
+                  vnode.state.quillEditorState.alteredText = false;
                   if (isModal) {
                     notifySuccess('Draft saved');
                   }
