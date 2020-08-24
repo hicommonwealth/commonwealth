@@ -149,7 +149,7 @@ export const NewThreadForm: m.Component<{
   autoTitleOverride,
   form: IThreadForm,
   fromDraft?: number,
-  newType: string,
+  postType: string,
   quillEditorState,
   recentlyDeletedDrafts: number[],
   saving: boolean,
@@ -159,10 +159,10 @@ export const NewThreadForm: m.Component<{
     vnode.state.form = {};
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
-    if (vnode.state.newType === undefined) {
-      vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
+    if (vnode.state.postType === undefined) {
+      vnode.state.postType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
     }
-    if (vnode.state.newType === PostType.Discussion) {
+    if (vnode.state.postType === PostType.Discussion) {
       vnode.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
     } else {
       vnode.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
@@ -253,11 +253,11 @@ export const NewThreadForm: m.Component<{
     };
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    const { fromDraft, newType, saving } = vnode.state;
+    const { fromDraft, postType, saving } = vnode.state;
 
     return m('.NewThreadForm', {
-      class: `${newType === PostType.Link ? 'link-post' : ''} `
-        + `${newType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `
+      class: `${postType === PostType.Link ? 'link-post' : ''} `
+        + `${postType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `
         + `${isModal ? 'is-modal' : ''}`,
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
@@ -274,21 +274,21 @@ export const NewThreadForm: m.Component<{
               label: PostType.Discussion,
               onclick: (e) => {
                 saveToLocalStorage(PostType.Link);
-                vnode.state.newType = PostType.Discussion;
+                vnode.state.postType = PostType.Discussion;
                 localStorage.setItem(`${app.activeId()}-post-type`, PostType.Discussion);
                 populateFromLocalStorage(PostType.Discussion);
               },
-              active: newType === PostType.Discussion,
+              active: postType === PostType.Discussion,
             }),
             m(TabItem, {
               label: PostType.Link,
               onclick: (e) => {
                 saveToLocalStorage(PostType.Discussion);
-                vnode.state.newType = PostType.Link;
+                vnode.state.postType = PostType.Link;
                 localStorage.setItem(`${app.activeId()}-post-type`, PostType.Link);
                 populateFromLocalStorage(PostType.Link);
               },
-              active: newType === PostType.Link,
+              active: postType === PostType.Link,
             }),
             m('.tab-spacer', { style: 'flex: 1' }),
             isModal && m.route.get() !== `${app.activeId()}/new/thread` && m(TabItem, {
@@ -305,7 +305,7 @@ export const NewThreadForm: m.Component<{
             }),
           ]),
         ]),
-        newType === PostType.Link && m(Form, [
+        postType === PostType.Link && m(Form, [
           m(FormGroup, { span: { xs: 12, sm: 8 }, order: { xs: 2, sm: 1 } }, [
             m(Input, {
               placeholder: 'https://',
@@ -394,7 +394,7 @@ export const NewThreadForm: m.Component<{
           ]),
         ]),
         //
-        newType === PostType.Discussion && m(Form, [
+        postType === PostType.Discussion && m(Form, [
           fromDraft && m(FormGroup, { span: 2, order: { xs: 3, sm: 1 }, class: 'hidden-xs draft-badge-wrap' }, [
             m(Tag, {
               class: 'draft-badge',
@@ -526,7 +526,7 @@ export const NewThreadForm: m.Component<{
         ]),
       ]),
       !!discussionDrafts.length
-      && newType === PostType.Discussion
+      && postType === PostType.Discussion
       && m('.new-thread-form-sidebar', [
         m(List, {
           interactive: true
