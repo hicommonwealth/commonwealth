@@ -144,8 +144,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const firstThread = sortedThreads[0];
       const lastThread = sortedThreads[sortedThreads.length - 1];
 
-      const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
-      const noThreadsSeen = () => getLastUpdate(lastThread) > lastVisited;
+      const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited;
+      const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited;
 
       const visibleThreads = sortedThreads.slice(0, vnode.state.lookback);
       vnode.state.postsDepleted = (visibleThreads.length < vnode.state.lookback);
@@ -206,7 +206,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           // TODO: Incorporate infinite scroll into generic Listing component
           (allThreads.length && vnode.state.postsDepleted)
             ? m('.infinite-scroll-reached-end', [
-              `Showing all ${allThreads.length} of ${pluralize(allThreads.length, 'posts')}`,
+              `Showing ${allThreads.length} of ${pluralize(allThreads.length, 'posts')}`,
               (topic ? ` under the topic '${topic}'` : '')
             ])
             : (allThreads.length)
@@ -218,6 +218,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       ]
     ]);
   },
-}
+};
 
 export default DiscussionsPage;
