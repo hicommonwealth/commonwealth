@@ -125,7 +125,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const allThreads = topic
       ? app.threads
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.topic && thread.topic.name === topic && !thread.pinned)
+        .filter((thread) => thread.topic && thread.topic.name === topic)
         .sort(orderDiscussionsbyLastComment)
       : app.threads
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
