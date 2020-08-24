@@ -155,10 +155,8 @@ export default (
     let msg;
     if (isChainEventData(notification_data)) {
       const chainId = (notification_data as IChainEventNotificationData).chainEvent.type.chain;
-      const chain = models.Chain.findOne({
-        where: { id: chainId }
-      });
-      msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id, chain);
+      const chain = await models.Chain.findOne({ where: { id: chainId }, });
+      msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id, chain.name);
     } else {
       msg = createNotificationEmailObject((notification_data as IPostNotificationData), category_id);
     }
