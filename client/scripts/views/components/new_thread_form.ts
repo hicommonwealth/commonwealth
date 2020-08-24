@@ -169,6 +169,17 @@ export const NewThreadForm: m.Component<{
       vnode.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
     }
   },
+  onremove: async (vnode) => {
+    let confirmed = false;
+    const { fromDraft, form, quillEditorState } = vnode.state;
+    const modalMsg = fromDraft
+      ? 'Update saved draft?'
+      : 'Save as draft?';
+    confirmed = await confirmationModalWithText(modalMsg)();
+    if (confirmed) {
+      await saveDraft(form, quillEditorState, null, fromDraft);
+    }
+  },
   view: (vnode) => {
     if (!app.community && !app.chain) return;
     const author = app.user.activeAccount;
