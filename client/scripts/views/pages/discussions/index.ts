@@ -206,7 +206,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           // TODO: Incorporate infinite scroll into generic Listing component
           (allThreads.length && vnode.state.postsDepleted)
             ? m('.infinite-scroll-reached-end', [
-              `Showing ${allThreads.length} of ${pluralize(allThreads.length, 'posts')}`,
+              `Showing ${allThreads.length} of ${pluralize(allThreads.length, 'post')}`,
               (topic ? ` under the topic '${topic}'` : '')
             ])
             : (allThreads.length)
