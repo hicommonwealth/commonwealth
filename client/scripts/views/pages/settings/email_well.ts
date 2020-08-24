@@ -36,7 +36,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
     const { email, githubAccount, emailInputUpdated, emailVerified, verificationSent, errorMessage } = vnode.state;
     return [
       m('.EmailWell', [
-        m('h4', 'Email'),
+        m('h4', 'Login'),
         m(Input, {
           placeholder: 'name@example.com',
           contentLeft: m(Icon, { name: Icons.MAIL }),
