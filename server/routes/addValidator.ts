@@ -7,12 +7,12 @@ export const Errors = {
     alreadyPresent: 'Validator already exist',
     message: 'Validator Insertion failed :   ',
 };
-
 const addValidator = async (models, req: Request, res: Response, next: NextFunction) => {
+
     let { stash = '', controller = '', lastUpdate = 0, state = '', sessionKeys = [] } = req.body;
     if (stash && stash.trim() && controller && controller.trim()) {
         try {
-            const validator = await models.Validator.findOne({
+            const validator = await models.Validators.findOne({
                 where: {
                     stash,
                 },
@@ -21,7 +21,7 @@ const addValidator = async (models, req: Request, res: Response, next: NextFunct
             if (validator)
                 return next(new Error(Errors.alreadyPresent));
 
-            const added_validator = await models.Validator.create({
+            const added_validator = await models.Validators.create({
                 stash,
                 controller,
                 sessionKeys,
@@ -33,6 +33,6 @@ const addValidator = async (models, req: Request, res: Response, next: NextFunct
             log.error('Error  ', err);
             return next(new Error(Errors.message + err));
         }
-    } else return next(new Error('Stash ID and COntroller ID are required'));
+    } else return next(new Error('Stash ID and Controller ID are required'));
 };
 export default addValidator;

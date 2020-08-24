@@ -17,7 +17,7 @@ export interface ChainEventAttributes {
 }
 
 export interface ChainEventInstance
-extends Sequelize.Instance<ChainEventAttributes>, ChainEventAttributes {
+  extends Sequelize.Instance<ChainEventAttributes>, ChainEventAttributes {
 
 }
 

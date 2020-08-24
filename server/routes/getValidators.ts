@@ -2,11 +2,9 @@
 import { Request, Response, NextFunction } from 'express';
 
 
-// in real we will store validators acc to currentSessionIndex
-// and will fetch with currentIndex in where clause
 const getValidators = async (models, req: Request, res: Response, next: NextFunction) => {
 
-    const validators = await models.Validator.findAll({
+    let validators = await models.Validators.findAll({
         where: {
             // state: "Active"
         }

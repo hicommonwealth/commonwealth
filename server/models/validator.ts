@@ -1,11 +1,13 @@
+import { getCurrentTimestamp } from './../../client/scripts/views/stats/stats_helpers';
 import * as Sequelize from 'sequelize';
 
 export interface ValidatorAttributes {
-    stash?: string;
+    stash: string;
     controller: string;
     sessionKeys: string[];
-    state?: string;
+    state: string;
     lastUpdate?: string;
+    createdAt: number
 }
 
 export interface ValidatorInstance extends Sequelize.Instance<ValidatorAttributes>, ValidatorAttributes {
@@ -20,12 +22,14 @@ export default (
     sequelize: Sequelize.Sequelize,
     dataTypes: Sequelize.DataTypes,
 ): ValidatorModel => {
-    const Validator = sequelize.define<ValidatorInstance, ValidatorAttributes>('Validator', {
-        stash: { type: dataTypes.STRING, allowNull: false }, //AccountID
+    const Validators = sequelize.define<ValidatorInstance, ValidatorAttributes>('Validators', {
+
+        stash: { type: dataTypes.STRING, allowNull: false, primaryKey: true },//AccountID
         controller: { type: dataTypes.STRING, allowNull: false }, // AccountId
         sessionKeys: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false }, //AccountID[]
         state: { type: dataTypes.STRING, allowNull: false }, //Active/waiting/inactive
-        lastUpdate: { type: dataTypes.INTEGER, allowNull: false } //blocknumber
-    })
-    return Validator;
+        lastUpdate: { type: dataTypes.INTEGER, allowNull: false },//blocknumber,
+        createdAt: { type: dataTypes.NOW, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP'), }
+    }, { timestamps: false })
+    return Validators;
 };

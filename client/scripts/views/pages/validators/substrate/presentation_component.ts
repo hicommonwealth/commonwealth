@@ -62,6 +62,18 @@ const PresentationComponent = (state, chain: Substrate) => {
       style: 'visibility: visible; opacity: 1;'
     });
 
+
+  // let vals = JSON.stringify(validators);
+  // for (let i = 0; i < 3; i++) {
+  console.log("validators == ", JSON.stringify(Object.keys(validators)));
+  // }
+  let lh = (app.chain as Substrate).staking.lastHeaders
+  for (let i = 0; i < 3; i++) {
+    console.log("lh == ", JSON.stringify(lh[i]));
+  }
+  // let lh = JSON.stringify((app.chain as Substrate).staking.lastHeaders)
+  // console.log("valdiators === ", vals);
+  // console.log("lastheaders === ", lh);
   const lastHeaders = (app.chain.base === ChainBase.Substrate)
     ? (app.chain as Substrate).staking.lastHeaders
     : [];
@@ -86,11 +98,11 @@ const PresentationComponent = (state, chain: Substrate) => {
     .sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
     .slice(model.perPage * (model.currentPage - 1), model.perPage * model.currentPage);
 
-  const filtered = Object.keys(annualPercentRate)
-    .map((elt) => annualPercentRate[elt])
-    .filter((elt) => elt > -1.0 && elt < 1000.0);
-  const aprSum = filtered.reduce((prev, curr) => prev + curr, 0.0);
-  const aprAvg = (aprSum * 1.0) / filtered.length;
+  // const filtered = Object.keys(annualPercentRate)
+  //   .map((elt) => annualPercentRate[elt])
+  //   .filter((elt) => elt > -1.0 && elt < 1000.0);
+  // const aprSum = filtered.reduce((prev, curr) => prev + curr, 0.0);
+  // const aprAvg = (aprSum * 1.0) / filtered.length;
   return m('div',
     m(Tabs, [{
       callback: model.reset,
@@ -99,25 +111,35 @@ const PresentationComponent = (state, chain: Substrate) => {
         m('tr.validators-heading', [
           m('th.val-stash', 'Stash'),
           m('th.val-total', 'Total Stake',
-            m(Icon, { name: model.sortIcon('exposure.total'),
+            m(Icon, {
+              name: model.sortIcon('exposure.total'),
               size: 'lg',
-              onclick: () => model.changeSort('exposure.total') })),
+              onclick: () => model.changeSort('exposure.total')
+            })),
           m('th.val-own', 'Own Stake',
-            m(Icon, { name: model.sortIcon('exposure.own'),
+            m(Icon, {
+              name: model.sortIcon('exposure.own'),
               size: 'lg',
-              onclick: () => model.changeSort('exposure.own') })),
+              onclick: () => model.changeSort('exposure.own')
+            })),
           m('th.val-other', 'Other Stake',
-            m(Icon, { name: model.sortIcon('otherTotal'),
+            m(Icon, {
+              name: model.sortIcon('otherTotal'),
               size: 'lg',
-              onclick: () => model.changeSort('otherTotal') })),
+              onclick: () => model.changeSort('otherTotal')
+            })),
           m('th.val-commission', 'Commission',
-            m(Icon, { name: model.sortIcon('commissionPer'),
+            m(Icon, {
+              name: model.sortIcon('commissionPer'),
               size: 'lg',
-              onclick: () => model.changeSort('commissionPer') })),
+              onclick: () => model.changeSort('commissionPer')
+            })),
           m('th.val-points', 'Points',
-            m(Icon, { name: model.sortIcon('eraPoints'),
+            m(Icon, {
+              name: model.sortIcon('eraPoints'),
               size: 'lg',
-              onclick: () => model.changeSort('eraPoints') })),
+              onclick: () => model.changeSort('eraPoints')
+            })),
           m('th.val-apr', 'Est. APR'),
           m('th.val-last-hash', 'last #'),
           m('th.val-action', ''),
@@ -138,8 +160,9 @@ const PresentationComponent = (state, chain: Substrate) => {
           const isOnline = validators[validator]?.isOnline;
           const otherTotal = validators[validator]?.otherTotal;
           const commission = validators[validator]?.commissionPer;
-          let apr = annualPercentRate[validator];
-          apr = (apr === -1.0 || typeof apr === 'undefined') ? aprAvg : apr;
+          const apr = 12;
+          // let apr = annualPercentRate[validator];
+          // apr = (apr === -1.0 || typeof apr === 'undefined') ? aprAvg : apr;
           return m(ValidatorRow, {
             stash: validator,
             total,
@@ -152,7 +175,7 @@ const PresentationComponent = (state, chain: Substrate) => {
             blockCount,
             hasMessage,
             isOnline,
-            apr: (apr === -1.0) ? aprAvg : apr,
+            apr
           });
         }),
       ])

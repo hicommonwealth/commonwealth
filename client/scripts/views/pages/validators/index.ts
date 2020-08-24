@@ -53,7 +53,7 @@ export interface IValidatorPageState {
   };
 }
 
-export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
+export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
   view: (vnode) => {
     return m('.ViewNominatorsModal', [
       m('.compact-modal-title', [
@@ -109,7 +109,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
       ? (app.chain as Substrate).staking.nominatedBy
       : null,
     annualPercentRate: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.annualPercentRate
+      ? null
       : null
   }),
   view: (vnode) => {

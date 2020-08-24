@@ -10,12 +10,16 @@ import { formatNumber } from '@polkadot/util';
 import { Observable, combineLatest, of, from } from 'rxjs';
 import { HeaderExtended } from '@polkadot/api-derive';
 import { map, flatMap, auditTime, switchMap, catchError } from 'rxjs/operators';
-import { EraIndex, AccountId, Exposure,
-  SessionIndex, EraRewardPoints, Nominations } from '@polkadot/types/interfaces';
+import {
+  EraIndex, AccountId, Exposure,
+  SessionIndex, EraRewardPoints, Nominations
+} from '@polkadot/types/interfaces';
 import { InterfaceTypes } from '@polkadot/types/types';
-import { DeriveStakingValidators, DeriveStakingQuery, DeriveSessionInfo,
+import {
+  DeriveStakingValidators, DeriveStakingQuery, DeriveSessionInfo,
   DeriveSessionProgress, DeriveAccountInfo, DeriveAccountRegistration,
-  DeriveHeartbeatAuthor, DeriveStakingElected } from '@polkadot/api-derive/types';
+  DeriveHeartbeatAuthor, DeriveStakingElected
+} from '@polkadot/api-derive/types';
 import { IValidators } from './account';
 import SubstrateChain from './shared';
 
@@ -39,7 +43,7 @@ export interface ICommissionInfo {
   [key: string]: number | string
 }
 
-export interface IAccountInfo extends DeriveAccountRegistration{
+export interface IAccountInfo extends DeriveAccountRegistration {
   name: string;
   isBad: boolean;
   isErroneous: boolean;
@@ -58,7 +62,7 @@ function extractNominators(nominations: [StorageKey, Option<Nominations>][]): Re
 
       optNoms.unwrap().targets.forEach((_validatorId, index): void => {
         const validatorId = _validatorId.toString();
-        const info = { stash : nominatorId, balance:  index + 1 };
+        const info = { stash: nominatorId, balance: index + 1 };
 
         if (!mapped[validatorId]) {
           mapped[validatorId] = [info];
@@ -168,8 +172,8 @@ class SubstrateStaking implements StorageModule {
       flatMap((
         [api, { nextElected, validators: currentSet }, era, allStashes,
           queryPoints, imOnline, electedInfo]:
-        [ApiRx, DeriveStakingValidators, EraIndex, AccountId[],
-        EraRewardPoints, Record<string, DeriveHeartbeatAuthor>, DeriveStakingElected]
+          [ApiRx, DeriveStakingValidators, EraIndex, AccountId[],
+            EraRewardPoints, Record<string, DeriveHeartbeatAuthor>, DeriveStakingElected]
       ) => {
         const eraPoints: Record<string, string> = {};
         const entries = [...queryPoints.individual.entries()]
@@ -211,11 +215,11 @@ class SubstrateStaking implements StorageModule {
         currentSet, toBeElected, controllers, exposures,
         nextUpControllers, nextUpExposures, waiting, eraPoints,
         imOnline, commissionInfo
-      ] : [
-        AccountId[], AccountId[], Vec<AccountId>, Exposure[],
-        Vec<AccountId>, Exposure[], Uint32Array[], Record<string, string>,
-        Record<string, DeriveHeartbeatAuthor>, ICommissionInfo
-      ]) => {
+      ]: [
+          AccountId[], AccountId[], Vec<AccountId>, Exposure[],
+          Vec<AccountId>, Exposure[], Uint32Array[], Record<string, string>,
+          Record<string, DeriveHeartbeatAuthor>, ICommissionInfo
+        ]) => {
         const result: IValidators = {};
         for (let i = 0; i < currentSet.length; ++i) {
           const key = currentSet[i].toString();
@@ -270,90 +274,90 @@ class SubstrateStaking implements StorageModule {
   public query(address: string): Observable<DeriveStakingQuery> {
     return this._Chain.query((api: ApiRx) => api.derive.staking.query(address));
   }
-  public get annualPercentRate(): Observable<ICommissionInfo> {
-    return this._Chain.api.pipe(
-      switchMap((api: ApiRx) => combineLatest(
-        of(api),
-        api.derive.staking.validators(),
-        api.query.staking.currentEra(),
-        api.derive.staking.electedInfo()
-      )),
-      flatMap((
-        [api, { validators: currentSet }, era, electedInfo]:
-        [ApiRx, DeriveStakingValidators, Option<EraIndex>, DeriveStakingElected]
-      ) => {
-        const commission: ICommissionInfo = {};
+  // public get annualPercentRate(): Observable<ICommissionInfo> {
+  //   return this._Chain.api.pipe(
+  //     switchMap((api: ApiRx) => combineLatest(
+  //       of(api),
+  //       api.derive.staking.validators(),
+  //       api.query.staking.currentEra(),
+  //       api.derive.staking.electedInfo()
+  //     )),
+  //     flatMap((
+  //       [api, { validators: currentSet }, era, electedInfo]:
+  //       [ApiRx, DeriveStakingValidators, Option<EraIndex>, DeriveStakingElected]
+  //     ) => {
+  //       const commission: ICommissionInfo = {};
 
-        electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
-          const key = accountId.toString();
-          commission[key] = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
-          return commission[key];
-        });
-        // Different runtimes call for different access to stakers: old vs. new
-        const stakersCall = (api.query.staking.stakers)
-          ? api.query.staking.stakers
-          : api.query.staking.erasStakers;
-        // Different staking functions call for different function arguments: old vs. new
-        const stakersCallArgs = (account) => (api.query.staking.stakers)
-          ? account
-          : [era.toString(), account];
-        return combineLatest(
-          stakersCall.multi(currentSet.map((elt) => stakersCallArgs(elt.toString()))),
-          of(currentSet),
-          from(this._app.chainEvents.rewards()),
-          of(commission)
-        );
-      }),
-      auditTime(100),
-      map(([exposures, accounts, rewards, commissions ] :
-        [Exposure[], AccountId[], IReward, ICommissionInfo ]) => {
-        const data = {};
-        const n = 1000000000;
-        const validatorRewards: ICommissionInfo = {};
-        accounts.forEach((account, index) => {
-          let key = account.toString();
-          const exposure = exposures[index];
-          const totalStake = exposure.total.toBn();
-          const comm = commissions[key] || 0;
-          if (Object.keys(rewards.validators).length === 1) {
-            key = this._app.chain.id;
-          }
+  //       electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
+  //         const key = accountId.toString();
+  //         commission[key] = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
+  //         return commission[key];
+  //       });
+  //       // Different runtimes call for different access to stakers: old vs. new
+  //       const stakersCall = (api.query.staking.stakers)
+  //         ? api.query.staking.stakers
+  //         : api.query.staking.erasStakers;
+  //       // Different staking functions call for different function arguments: old vs. new
+  //       const stakersCallArgs = (account) => (api.query.staking.stakers)
+  //         ? account
+  //         : [era.toString(), account];
+  //       return combineLatest(
+  //         stakersCall.multi(currentSet.map((elt) => stakersCallArgs(elt.toString()))),
+  //         of(currentSet),
+  //         from(this._app.chainEvents.rewards()),
+  //         of(commission)
+  //       );
+  //     }),
+  //     auditTime(100),
+  //     map(([exposures, accounts, rewards, commissions ] :
+  //       [Exposure[], AccountId[], IReward, ICommissionInfo ]) => {
+  //       const data = {};
+  //       const n = 1000000000;
+  //       const validatorRewards: ICommissionInfo = {};
+  //       accounts.forEach((account, index) => {
+  //         let key = account.toString();
+  //         const exposure = exposures[index];
+  //         const totalStake = exposure.total.toBn();
+  //         const comm = commissions[key] || 0;
+  //         if (Object.keys(rewards.validators).length === 1) {
+  //           key = this._app.chain.id;
+  //         }
 
-          const valRewards = rewards.validators[key];
-          if (valRewards) {
-            const amount = valRewards[valRewards.length - 1].event_data.amount;
-            const firstReward = new BN(amount.toString()).muln(Number(comm)).divn(100);
-            const secondReward = exposure.own.toBn()
-              .mul((new BN(amount.toString())).sub(firstReward))
-              .div(totalStake || new BN(1));
-            const totalReward = firstReward.add(secondReward);
-            const length = rewards.validators[key].length;
-            if (valRewards.length > 1) {
-              const last = rewards.validators[key][length - 1];
-              const secondLast = rewards.validators[key][length - 2];
-              const start = moment(secondLast.created_at);
-              const end = moment(last.created_at);
-              const startBlock = secondLast.block_number;
-              const endBlock = last.block_number;
-              const eventDiff = end.diff(start, 'seconds');
+  //         const valRewards = rewards.validators[key];
+  //         if (valRewards) {
+  //           const amount = valRewards[valRewards.length - 1].event_data.amount;
+  //           const firstReward = new BN(amount.toString()).muln(Number(comm)).divn(100);
+  //           const secondReward = exposure.own.toBn()
+  //             .mul((new BN(amount.toString())).sub(firstReward))
+  //             .div(totalStake || new BN(1));
+  //           const totalReward = firstReward.add(secondReward);
+  //           const length = rewards.validators[key].length;
+  //           if (valRewards.length > 1) {
+  //             const last = rewards.validators[key][length - 1];
+  //             const secondLast = rewards.validators[key][length - 2];
+  //             const start = moment(secondLast.created_at);
+  //             const end = moment(last.created_at);
+  //             const startBlock = secondLast.block_number;
+  //             const endBlock = last.block_number;
+  //             const eventDiff = end.diff(start, 'seconds');
 
-              const periodsInYear = (60 * 60 * 24 * 7 * 52) / eventDiff;
-              const percentage = (new BN(totalReward))
-                .mul(new BN(n))
-                .div(totalStake || new BN(1))
-                .toNumber() / n;
-              const apr = percentage * periodsInYear;
-              validatorRewards[account.toString()] = apr;
-            }
-          } else {
-            validatorRewards[account.toString()] = -1.0;
-          }
-        });
+  //             const periodsInYear = (60 * 60 * 24 * 7 * 52) / eventDiff;
+  //             const percentage = (new BN(totalReward))
+  //               .mul(new BN(n))
+  //               .div(totalStake || new BN(1))
+  //               .toNumber() / n;
+  //             const apr = percentage * periodsInYear;
+  //             validatorRewards[account.toString()] = apr;
+  //           }
+  //         } else {
+  //           validatorRewards[account.toString()] = -1.0;
+  //         }
+  //       });
 
-        return validatorRewards;
-      }),
-    );
-  }
+  //       return validatorRewards;
+  //     }),
+  //   );
+  // }
   public get lastHeader(): Observable<HeaderExtended> {
     return this._Chain.query(
       (api: ApiRx) => api.derive.chain.subscribeNewHeads()

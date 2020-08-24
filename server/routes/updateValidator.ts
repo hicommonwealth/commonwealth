@@ -13,7 +13,7 @@ const updateValidator = async (models, req: Request, res: Response, next: NextFu
 
     if (stash && stash.trim()) {
         try {
-            const validator = await models.Validator.findOne({
+            const validator = await models.Validators.findOne({
                 where: {
                     stash,
                 },

@@ -53,7 +53,7 @@ import bulkAddresses from './routes/bulkAddresses';
 import createInvite from './routes/createInvite';
 import getInvites from './routes/getInvites';
 import getOffences from './routes/getOffences';
-import getRewards from './routes/getRewards';
+// import getRewards from './routes/getRewards';
 import getOwnStakeOverTime from './routes/getOwnStakeOverTime';
 import getOtherStakeOverTime from './routes/getOtherStakeOverTime';
 import getTotalStakeOverTime from './routes/getTotalStakeOverTime';
@@ -107,15 +107,13 @@ import IdentityFetchCache from './util/identityFetchCache';
 
 import bulkEntities from './routes/bulkEntities';
 
-//validator routes
 import addValidator from './routes/addValidator';
-import udpateValidator from './routes/updateValidator';
-import getValidators from './routes/getValidators';
-import getHistoricalValidatorStats from './routes/getHistoricalValidatorStats';
-
-//upsertHistoricalValidatorStats
-
 import upsertHistoricalValidatorStats from './routes/upsertHistoricalValidatorStats';
+
+import getValidators from './routes/getValidators';
+import getGlobalStatistics from './routes/getGlobalStatistics';
+import getValidatorDetails from './routes/getValidatorDetails';
+
 function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
@@ -223,7 +221,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to GET /invites
   router.get('/getInvites', passport.authenticate('jwt', { session: false }), getInvites.bind(this, models));
   router.get('/getOffences', getOffences.bind(this, models));
-  router.get('/getRewards', getRewards.bind(this, models));
+  // router.get('/getRewards', getRewards.bind(this, models));
   router.get('/getOwnStakeOverTime', getOwnStakeOverTime.bind(this, models));
   router.get('/getTotalStakeOverTime', getTotalStakeOverTime.bind(this, models));
   router.get('/getOtherStakeOverTime', getOtherStakeOverTime.bind(this, models));
@@ -318,7 +316,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // send feedback button
   // TODO: Change to POST /feedback
   router.post('/sendFeedback', sendFeedback.bind(this, models));
-
   // stats
   // edgeware
   router.get('/stats/edgeware/lockdrop/events', edgewareLockdropEvents.bind(this, models));
@@ -341,13 +338,14 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
 
-  // Create/Update validator
-  router.post('/addValidator', addValidator.bind(this, models));
-  router.post('/updateValidator', udpateValidator.bind(this, models));
-  router.post('/getValidators', getValidators.bind(this, models));
-  router.post('/getHistoricalValidatorStats', getHistoricalValidatorStats.bind(this, models));
+  //get validator 
 
-  //upsertHistoricalValidatorStats
+  router.get('/getValidators', getValidators.bind(this, models));
+  router.get('/getGlobalStatistics', getGlobalStatistics.bind(this, models));
+  router.get('/getValidatorDetails', getValidatorDetails.bind(this, models));
+
+  // post validator
+  router.post('/addValidator', addValidator.bind(this, models));
   router.post('/upsertHistoricalValidatorStats', upsertHistoricalValidatorStats.bind(this, models));
   app.use('/api', router);
 }
