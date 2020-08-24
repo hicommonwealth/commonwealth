@@ -175,7 +175,6 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
 
-
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
     // TODO: search for signaling proposals ->
     // Commented-out lines from previous version which included signaling proposals in proposals var:
