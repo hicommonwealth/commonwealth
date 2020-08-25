@@ -147,7 +147,7 @@ const NewCommunityCard: m.Component<{}> = {
       m('.card-right', [
         m('h3', 'Create a new community'),
         m('p.action', 'Launch and grow your decentralized community on Commonwealth'),
-        link('a.learn-more', 'https://hicommonwealth.typeform.com/to/cRP27Rp5', m.trust('Learn more &raquo;')),
+        m('a.learn-more', { href: '#' }, m.trust('Learn more &raquo;')),
       ]),
     ]);
   }

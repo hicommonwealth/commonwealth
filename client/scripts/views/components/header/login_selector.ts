@@ -166,7 +166,7 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
           label: [
             (!app.chain && !app.community) ? m(Icon, { name: Icons.USER })
               : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
-              : 'Select an address',
+                : app.user.activeAccounts.length === 0 ? 'Connect an address' : 'Select an address',
           ],
         }),
         content: m(Menu, { class: 'LoginSelectorMenu' }, [

@@ -12,9 +12,7 @@ const Homepage: m.Component<{}, {}> = {
     }, [
       m('.container', [
         m('h1', 'Commonwealth'),
-        m('p.lead-copy', [
-          'Discussions and governance for decentralized communities'
-        ]),
+        m('p.lead-copy', 'On-chain communities'),
         m(CommunityCards),
       ]),
     ]);
