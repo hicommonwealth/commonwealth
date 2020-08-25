@@ -20,6 +20,7 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const sendImmediateNotificationEmail = async (subscription, emailObject) => {
   const user = await subscription.getUser();
+  if (!emailObject) return;
   emailObject.to = (process.env.NODE_ENV === 'development') ? 'zak@commonwealth.im' : user.email;
 
   try {
@@ -37,7 +38,7 @@ export const createNotificationEmailObject = (
   if ((notification_data as IChainEventNotificationData).chainEvent !== undefined) {
     const { blockNumber } = (notification_data as IChainEventNotificationData).chainEvent;
     if (SubstrateTypes.EventChains.includes(chainId)) {
-      if (chainId === 'polkadot') { console.log('polkadot event lol'); return; }
+      if (chainId === 'polkadot') return;
       label = SubstrateEvents.Label(
         blockNumber,
         chainId,
@@ -54,7 +55,6 @@ export const createNotificationEmailObject = (
     //     (notification_data as IChainEventNotificationData).chainEvent.data,
     //   );
     }
-    console.log('label', label);
   }
 
   const { created_at, root_id, root_title, root_type, comment_id, comment_text,
@@ -87,7 +87,8 @@ export const createNotificationEmailObject = (
     dynamic_template_data: {
       notification: {
         subject: subjectLine,
-        title: label.label || decodedTitle,
+        title: label.heading || decodedTitle,
+        body: label.label,
         path,
       }
     },
