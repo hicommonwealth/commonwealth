@@ -3,11 +3,9 @@ import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
-import 'nprogress.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import NProgress from 'lib/nprogress';
 import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
@@ -111,6 +109,18 @@ export function handleInviteLinkRedirect() {
       app.modals.create({ modal: ConfirmInviteModal });
     } else {
       notifyError('Hmmmm... URL not constructed properly');
+    }
+  }
+}
+
+export function handleUpdateEmailConfirmation() {
+  if (m.route.param('confirmation')) {
+    mixpanel.track('Update Email Verification Redirect', {
+      'Step No': 1,
+      'Step': m.route.param('confirmation'),
+    });
+    if (m.route.param('confirmation') === 'success') {
+      notifySuccess('Success! Email confirmed');
     }
   }
 }
@@ -270,17 +280,20 @@ export function initCommunity(communityId: string): Promise<void> {
 
 // set up route navigation
 m.route.prefix = '';
-export const updateRoute = m.route.set;
+const _updateRoute = m.route.set;
+export const updateRoute = (...args) => {
+  app._lastNavigatedBack = false;
+  app._lastNavigatedFrom = m.route.get();
+  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
+};
 m.route.set = (...args) => {
   // set app params that maintain global state for:
   // - whether the user last clicked the back button
   // - the last page the user was on
   app._lastNavigatedBack = false;
   app._lastNavigatedFrom = m.route.get();
-  // show nprogress bar if moving between pages, or otherwise changing url
-  if ((!args[2] || (args[2] && args[2].replace !== true)) && args[0] !== m.route.get()) NProgress.start();
   // update route
-  if (args[0] !== m.route.get()) updateRoute.apply(this, args);
+  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
   // reset scroll position
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
@@ -335,6 +348,7 @@ $(() => {
 
   interface RouteAttrs {
     scoped: string | boolean;
+    hideSidebar?: boolean;
     deferChain?: boolean;
   }
 
@@ -348,10 +362,8 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      const { scoped } = attrs;
+      const { scoped, hideSidebar } = attrs;
       let deferChain = attrs.deferChain;
-      console.log('render called, for:', path);
-      NProgress.done();
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -367,7 +379,7 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      return m(Layout, { scope, deferChain }, [ vnode ]);
+      return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });
 
@@ -379,7 +391,7 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false }),
+    '/':                         importRoute('views/pages/home', { scoped: false, hideSidebar: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
@@ -526,6 +538,9 @@ $(() => {
       }
 
       handleInviteLinkRedirect();
+
+      // If the user updates their email
+      handleUpdateEmailConfirmation();
 
       app.socket = new WebsocketController(wsUrl, jwt, null);
       if (app.loginState === LoginState.LoggedIn) {

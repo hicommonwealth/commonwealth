@@ -12,6 +12,7 @@
 // 6. image upload spinner
 // 7. preview button
 // 8. mentions container
+// 9. progress bar
 //
 
 .QuillEditor {
@@ -127,6 +128,11 @@
     .ql-tooltip {
         z-index: 9999;
     }
+    @include xs-max {
+        .ql-toolbar .ql-formats:last-child {
+            padding-right: 80px;
+        }
+    }
 
     // 5. toolbar markdown mode
     &.markdown-mode {
@@ -235,7 +241,8 @@
             margin: 0;
             display: flex;
             align-items: center;
-            div {
+            > div {
+                font-size: 17px;
                 display: flex;
                 align-items: center;
                 width: 100%;
@@ -248,7 +255,7 @@
             }
         }
         > .selected {
-            background: lighten(#08c, 48%);
+            background: $background-color-light-hover;
             cursor: pointer;
         }
         .ql-mention-text-wrap {

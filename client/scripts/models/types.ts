@@ -31,7 +31,6 @@ export enum ChainClass {
   Edgeware = 'edgeware',
   Kusama = 'kusama',
   Polkadot = 'polkadot',
-  Supernova = 'supernova',
   CosmosHub = 'cosmos-hub',
   Gaia13k = 'gaia-13k',
   Ethereum = 'ethereum',

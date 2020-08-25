@@ -5,7 +5,6 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 
-import { DropdownFormField, RadioSelectorFormField } from 'views/components/forms';
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
 import { SocialAccount } from 'models';
@@ -37,7 +36,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
     const { email, githubAccount, emailInputUpdated, emailVerified, verificationSent, errorMessage } = vnode.state;
     return [
       m('.EmailWell', [
-        m('h4', 'Email'),
+        m('h4', 'Login'),
         m(Input, {
           placeholder: 'name@example.com',
           contentLeft: m(Icon, { name: Icons.MAIL }),
@@ -48,12 +47,13 @@ const EmailWell: m.Component<IAttrs, IState> = {
             vnode.state.email = (e.target as any).value;
           },
         }),
-        m(Button, {
+        (!app.user.email || emailInputUpdated || !emailVerified) && m(Button, {
           intent: 'primary',
-          label: (!emailInputUpdated && !emailVerified) ? 'Retry verification' : 'Update email',
+          label: (app.user.email && !emailInputUpdated && !emailVerified) ? 'Retry verification' : 'Update email',
           class: 'update-email-button',
           disabled: (!emailInputUpdated && emailVerified) || verificationSent,
           onclick: async () => {
+            vnode.state.errorMessage = null;
             try {
               const response = await $.post(`${app.serverUrl()}/updateEmail`, {
                 'email': vnode.state.email,
@@ -74,7 +74,13 @@ const EmailWell: m.Component<IAttrs, IState> = {
           }
         }),
         verificationSent
-          ? m('label', 'Check your email for a confirmation link')
+          ? m('label', {
+            style: {
+              color: Colors.GREEN500,
+              position: 'relative',
+              top: '2px',
+            }
+          }, 'Check your email for a confirmation link')
           : [
             m(Icon, {
               size: 'lg',
@@ -82,8 +88,12 @@ const EmailWell: m.Component<IAttrs, IState> = {
               name: emailVerified ? Icons.CHECK_CIRCLE : Icons.ALERT_CIRCLE,
             }),
             m('label', {
-              style: { color: emailVerified ? Colors.GREEN500 : Colors.ORANGE900 }
-            }, emailVerified ? 'Verified' : 'Not verified'),
+              style: {
+                color: emailVerified ? Colors.GREEN500 : '#f57c01',
+                position: 'relative',
+                top: '2px',
+              }
+            }, emailVerified ? 'Verified' : app.user.email ? 'Not verified' : 'No email provided'),
           ],
         errorMessage && m('p.error', errorMessage),
       ]),

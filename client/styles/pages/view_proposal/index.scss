@@ -77,7 +77,9 @@ $discussion-title-font-size: 1.45rem;
         .proposal-content-right {
             flex: 1;
             margin-left: $discussion-comment-padding;
-            margin-right: $discussion-outer-padding;
+            @include xs-max {
+                margin-right: 10px;
+            }
             .proposal-content-meta {
                 padding-bottom: $discussion-meta-padding;
                 font-size: $discussion-meta-font-size;
@@ -131,6 +133,11 @@ $discussion-title-font-size: 1.45rem;
         }
         .comment-body-bottom {
             padding: 4px 0 2px;
+        }
+        .comment-body-content {
+            @include xs-max {
+                margin-right: 10px;
+            }
         }
     }
 
@@ -221,5 +228,18 @@ $discussion-title-font-size: 1.45rem;
         left: 19px;
         width: 2px;
         z-index: -1;
+    }
+
+    // responsive styles
+    .proposal-mobile-sidebar {
+        display: none;
+    }
+    @include sm-max {
+        .ProposalSidebar {
+            display: none;
+        }
+        .proposal-mobile-sidebar {
+            display: block;
+        }
     }
 }

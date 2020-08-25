@@ -1,13 +1,29 @@
 import 'pages/home/community_cards.scss';
 
 import m from 'mithril';
-import { Button, Icon, Icons, Card } from 'construct-ui';
+import { Button, Icon, Icons, Card, Tag } from 'construct-ui';
 
 import app from 'state';
+import { link, pluralize } from 'helpers';
+import { NodeInfo, CommunityInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
-import MembershipButton from 'views/components/membership_button';
 
-const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
+const getNewTag = (labelCount = null) => {
+  const label = labelCount === null
+    ? 'New'
+    : pluralize(labelCount, 'new thread');
+  return m('.chain-new', [
+    m(Tag, {
+      label,
+      size: 'sm',
+      compact: true,
+      rounded: true,
+      intent: 'primary',
+    })
+  ]);
+};
+
+const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedChains: string[] }> = {
   view: (vnode) => {
     const { chain, nodeList, justJoinedChains } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
@@ -16,36 +32,34 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
 
     return m(Card, {
       elevation: 1,
+      interactive: true,
       class: 'home-card',
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${chain}`);
+      },
     }, [
-      m(ChainIcon, { chain: nodeList[0].chain }),
-      m('h3', chainInfo.name),
-      app.user.isMember({ account: app.user.activeAccount, chain: chain as string, }) && justJoinedChains.indexOf(chain) === -1 && [
-        app.isLoggedIn() && !visitedChain && m('.chain-new', m('.new-threads', 'New')),
-        updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
-      ],
-      m('p.card-description', chainInfo.description),
-      m(Button, {
-        interactive: true,
-        compact: true,
-        fluid: true,
-        intent: 'primary',
-        onclick: (e) => m.route.set(`/${chain}`),
-        label: [ 'Go to community ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
-      }),
-      // app.isLoggedIn() && m('.chain-membership', [
-      //   m(MembershipButton, {
-      //     chain,
-      //     onMembershipChanged: (created) => {
-      //       if (created && !isMember(chain, null)) justJoinedChains.push(chain);
-      //     }
-      //   })
-      // ]),
+      m('.card-left', [
+        m(ChainIcon, { chain: nodeList[0].chain }),
+      ]),
+      m('.card-right', [
+        m('.card-right-top', [
+          m('h3', chainInfo.name),
+          app.user.isMember({
+            account: app.user.activeAccount,
+            chain,
+          }) && justJoinedChains.indexOf(chain) === -1 && [
+            app.isLoggedIn() && !visitedChain && getNewTag(),
+            updatedThreads > 0 && getNewTag(updatedThreads),
+          ],
+        ]),
+        m('p.card-description', chainInfo.description),
+      ]),
     ]);
   }
 };
 
-const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
+const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunities: string[] }> = {
   view: (vnode) => {
     const { justJoinedCommunities, community } = vnode.attrs;
     const visitedCommunity = !!app.user.unseenPosts[community.id];
@@ -53,64 +67,65 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
 
     return m(Card, {
       elevation: 1,
+      interactive: true,
       class: 'home-card',
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${community.id}`);
+      },
     }, [
-      m(CommunityIcon, { community }),
-      m('h3', [
-        community.name,
-        community.privacyEnabled && m('span.icon-lock'),
+      m('.card-left', [
+        m(CommunityIcon, { community }),
       ]),
-      app.user.isMember({ account: app.user.activeAccount, community: community.id })
-        && justJoinedCommunities.indexOf(community.id) === -1
-        && [
-          app.isLoggedIn() && !visitedCommunity && m('.chain-new', m('.new-threads', 'New')),
-          updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
-        ],
-      m('p.card-description', community.description),
-      m(Button, {
-        interactive: true,
-        compact: true,
-        fluid: true,
-        intent: 'primary',
-        onclick: (e) => m.route.set(`/${community.id}`),
-        label: [ 'Go to community ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
-      }),
-      // app.isLoggedIn() && [
-      //   m(MembershipButton, {
-      //     community: community.id,
-      //     onMembershipChanged: (created) => {
-      //       if (created && !isMember(null, community.id)) justJoinedCommunities.push(community.id);
-      //     }
-      //   })
-      // ],
+      m('.card-right', [
+        m('.card-right-top', [
+          m('h3', [
+            community.name,
+            community.privacyEnabled && m('span.icon-lock'),
+          ]),
+          app.user.isMember({ account: app.user.activeAccount, community: community.id })
+            && justJoinedCommunities.indexOf(community.id) === -1
+            && [
+              app.isLoggedIn() && !visitedCommunity && getNewTag(),
+              updatedThreads > 0 && getNewTag(updatedThreads),
+            ],
+        ]),
+        m('p.card-description', community.description),
+      ]),
     ]);
   }
 };
 
-const LockdropToolsCard = {
+const LockdropToolsCard: m.Component<{}> = {
   view: (vnode) => {
     return m(Card, {
       elevation: 1,
       class: 'home-card LockdropToolsCard',
     }, [
-      m('h3', 'Edgeware Lockdrop Tools'),
-      m('p', [
+      m('.card-right', [
+        m('h3', 'Edgeware Lockdrop Tools'),
         m(Button, {
           interactive: true,
           compact: true,
           fluid: true,
           intent: 'primary',
-          onclick: (e) => m.route.set('/edgeware/stats'),
+          size: 'sm',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set('/edgeware/stats');
+          },
           label: [ 'Lockdrop stats ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
         }),
-      ]),
-      m('p', [
         m(Button, {
           interactive: true,
           compact: true,
           fluid: true,
           intent: 'primary',
-          onclick: (e) => m.route.set('/edgeware/unlock'),
+          size: 'sm',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set('/edgeware/unlock');
+          },
           label: [ 'Unlock ETH ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
         }),
       ]),
@@ -118,29 +133,27 @@ const LockdropToolsCard = {
   }
 };
 
-const NewCommunityCard = {
+const NewCommunityCard: m.Component<{}> = {
   view: (vnode) => {
     return m(Card, {
       elevation: 1,
+      interactive: true,
       class: 'home-card NewCommunityCard',
+      onclick: (e) => {
+        e.preventDefault();
+        document.location = 'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
+      }
     }, [
-      m('h3', 'Integrating with Commonwealth'),
-      m('p', [
-        m(Button, {
-          interactive: true,
-          compact: true,
-          fluid: true,
-          intent: 'primary',
-          href: 'https://typeform.com/',
-          target: '_blank',
-          label: [ 'Get more info ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
-        }),
+      m('.card-right', [
+        m('h3', 'Create a new community'),
+        m('p.action', 'Launch and grow your decentralized community on Commonwealth'),
+        link('a.learn-more', 'https://hicommonwealth.typeform.com/to/cRP27Rp5', m.trust('Learn more &raquo;')),
       ]),
     ]);
   }
 };
 
-const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedCommunities }> = {
+const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], justJoinedCommunities: string[] }> = {
   oninit: (vnode) => {
     vnode.state.justJoinedChains = [];
     vnode.state.justJoinedCommunities = [];
@@ -191,11 +204,13 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedComm
         myCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
         otherChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
         otherCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
+        m('.clear'),
       ]),
-      // other
-      m(LockdropToolsCard),
-      m(NewCommunityCard),
-      m('.clear'),
+      m('.other-list', [
+        m(NewCommunityCard),
+        m(LockdropToolsCard),
+        m('.clear'),
+      ]),
     ]);
   }
 };

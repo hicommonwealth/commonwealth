@@ -2,7 +2,7 @@
 
 .NewThreadForm {
     display: flex;
-    max-width: 600px;
+    max-width: 680px;
     &.has-drafts {
         max-width: 810px;
     }
@@ -11,10 +11,10 @@
         margin-bottom: 15px;
     }
     .ql-editor {
-        min-height: 160px;
+        min-height: 170px;
     }
     &.link-post .ql-editor {
-        min-height: 105px;
+        min-height: 119px;
     }
     @include xs-max {
         .ql-editor {
@@ -91,6 +91,14 @@
         }
         .cui-form {
             margin-left: 28px;
+        }
+        @include xs-max {
+            .cui-tabs {
+                padding: 0;
+            }
+            .cui-form {
+                margin: 0 20px;
+            }
         }
     }
     .new-thread-form-sidebar {

@@ -25,7 +25,7 @@ import EthereumAccount from 'controllers/chain/ethereum/account';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { ChainIcon } from 'views/components/chain_icon';
 import CodeBlock from 'views/components/widgets/code_block';
-import { TextInputFormField, CheckboxFormField } from 'views/components/forms';
+import { CheckboxFormField } from 'views/components/forms';
 import HedgehogLoginForm from 'views/components/hedgehog_login_form';
 import User, { UserBlock } from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
@@ -682,14 +682,13 @@ const LinkNewAddressModal: m.Component<{
               m.redraw();
             },
           }),
-          m(TextInputFormField, {
-            options: {
-              name: 'Address',
-              placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here: 5Dvq...'
-                : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here: cosmos123...'
-                  : 'Paste the address here',
-            },
-            callback: async (address) => {
+          m(Input, {
+            name: 'Address',
+            placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here: 5Dvq...'
+              : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here: cosmos123...'
+                : 'Paste the address here',
+            onchange: async (e) => {
+              const address = (e.target as any).value;
               vnode.state.error = null;
               vnode.state.enteredAddress = address;
 
@@ -704,7 +703,7 @@ const LinkNewAddressModal: m.Component<{
                 }
                 try {
                   (await import('@polkadot/keyring')).decodeAddress(address);
-                } catch (e) {
+                } catch (err) {
                   vnode.state.error = 'Invalid address';
                 }
                 if (app.user.activeAccounts.find((acct) => acct.address === address)) {
@@ -718,8 +717,8 @@ const LinkNewAddressModal: m.Component<{
                     address,
                     currentPrefix: (app.chain as Substrate).chain.ss58Format,
                   }), vnode.state.isEd25519 ? 'ed25519' : undefined);
-                } catch (e) {
-                  vnode.state.error = e.responseJSON ? e.responseJSON.error : 'Failed to create user.';
+                } catch (err) {
+                  vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
                 }
               }
 
@@ -750,12 +749,13 @@ const LinkNewAddressModal: m.Component<{
                 m('span.no-select', '<key name> <tx.json>'),
               ]),
             ]),
-            m(TextInputFormField, {
-              options: {
-                name: 'Signature',
-                placeholder: (app.chain.base === ChainBase.CosmosSDK) ? 'Paste the entire output' : 'Paste the signature here',
-              },
-              callback: async (signature) => {
+            m(Input, {
+              name: 'Signature',
+              placeholder: (app.chain.base === ChainBase.CosmosSDK)
+                ? 'Paste the entire output'
+                : 'Paste the signature here',
+              onchange: async (e) => {
+                const signature = (e.target as any).value;
                 const unverifiedAcct = vnode.state.newAddress;
                 const validationToken = unverifiedAcct.validationToken;
                 vnode.state.error = null;
@@ -765,7 +765,7 @@ const LinkNewAddressModal: m.Component<{
                   } else {
                     vnode.state.error = 'Invalid signature';
                   }
-                } catch (e) {
+                } catch (err) {
                   vnode.state.error = 'Invalid signature';
                 }
                 m.redraw();
@@ -892,7 +892,11 @@ const LinkNewAddressModal: m.Component<{
                 $(vvnode.dom).val(vnode.state.newAddress.profile.bio);
             },
           }),
-          m('.error-message', vnode.state.error),
+          vnode.state.error && m('.error-message', [
+            vnode.state.error,
+            m('br'),
+            'Try again?',
+          ]),
           m(Button, {
             intent: 'primary',
             disabled: (vnode.state.uploadsInProgress || !vnode.state.hasName),

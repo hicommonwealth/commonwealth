@@ -24,7 +24,6 @@
     "reset-server": "NO_CLIENT=true RESET_DB=true ts-node --project tsconfig.node.json server.ts",
     "update-events": "UPDATE_EVENTS=true ts-node --project tsconfig.node.json server.ts",
     "update-balances": "UPDATE_BALANCES=true ts-node --project tsconfig.node.json server.ts",
-    "update-supernova": "UPDATE_SUPERNOVA=true ts-node --project tsconfig.node.json server.ts",
     "update-edgeware-lockdrop": "UPDATE_EDGEWARE_LOCKDROP_STATS=true ts-node --project tsconfig.node.json server.ts",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.node.json server.ts",
     "psql": "psql -h localhost commonwealth -U commonwealth"
@@ -58,7 +57,7 @@
     "@polkadot/util": "^2.18.0",
     "@polkadot/util-crypto": "^2.18.0",
     "@popperjs/core": "^2.0.6",
-    "@sendgrid/mail": "^6.3.1",
+    "@sendgrid/mail": "^6.5.0",
     "@tendermint/amino-js": "npm:@tendermint/amino-js@0.5.1",
     "@typechain/ethers-v4": "^1.0.0",
     "@types/bn.js": "^4.11.6",

@@ -41,7 +41,7 @@
             position: relative;
             top: 2px;
         }
-        @include xs-max {
+        @include sm-max {
             .cui-button.mobile-sidebar-trigger {
                 padding-left: 12px;
                 padding-right: 12px;
