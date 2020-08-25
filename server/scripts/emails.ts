@@ -82,8 +82,8 @@ export const createNotificationEmailObject = (
     dynamic_template_data: {
       notification: {
         subject: subjectLine,
-        title: label.heading || decodedTitle,
-        body: label.label,
+        title: label.heading || subjectLine,
+        body: label.label || subjectLine,
         path,
       }
     },
