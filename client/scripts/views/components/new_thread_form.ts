@@ -349,6 +349,9 @@ export const NewThreadForm: m.Component<{
               autocomplete: 'off',
               oninput: (e) => {
                 const { value } = e.target as any;
+                if (vnode.state.quillEditorState && !vnode.state.quillEditorState.alteredText) {
+                  vnode.state.quillEditorState.alteredText = true;
+                }
                 vnode.state.autoTitleOverride = true;
                 vnode.state.form.linkTitle = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.linkTitle);
