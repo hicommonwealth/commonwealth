@@ -214,9 +214,11 @@ class SubstrateDemocracyProposal extends Proposal<
   // TRANSACTIONS
   public submitVoteTx(vote: DepositVote<SubstrateCoin>) {
     // deposit parameter is ignored
+    const params = (api: ApiRx) => (api.tx.democracy.second as any).meta.args.length === 2 ? 
+    [this.data.index, this.getVoters().length] : [this.data.index];
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
-      (api: ApiRx) => (api.tx.democracy.second as any)(this.data.index, this.getVoters().length),
+      (api: ApiRx) => (api.tx.democracy.second as any)(params),
       'secondDemocracyProposal',
       this.title
     );
