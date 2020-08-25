@@ -6,30 +6,16 @@
     .row-left {
         line-height: 1.1;
         flex: $listing-left-flex;
+        display: flex;
         flex-direction: row;
         align-items: center;
+        position: relative;
         .pinned {
-            display: inline-block;
-            // margin: 15px 8px 0 0;
-            .visible-xs {
-                display: none;
-            }
+            width: 34px;
             .icon-pin-outline {
                 display: block;
-            }
-            @include xs-max {
-                margin: 0 0 2px 0;
-                .visible-xs {
-                    display: inline-block;
-                    margin-left: 4px;
-                    font-size: 15px;
-                    color: #999;
-                }
-                .icon-pin-outline {
-                    font-size: 12px;
-                    color: #999;
-                    margin: 0 15px;
-                }
+                font-size: 15px;
+                color: #aaa;
             }
         }
         .title-container {

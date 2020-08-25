@@ -32,7 +32,6 @@ const ListingRow: m.Component<{
       m('.row-left', [
         contentLeft.pinned && m('.pinned', [
           m('span.icon-pin-outline'),
-          m('.visible-xs', 'Pinned'),
         ]),
         m('.title-container', [
           m('.row-header', contentLeft.header),
