@@ -82,7 +82,7 @@ const LinkedAddressesWell: m.Component<{}> = {
     return m('.LinkedAddressesWell', [
       m('h4', 'Linked Addresses'),
       addressGroups.map(([chain_id, addresses]) => m('.address-group', [
-        m('h4', app.config.chains.getById(chain_id).name),
+        m('h4', app.config.chains.getById(chain_id)?.name),
         addresses.sort(orderAccountsByAddress).map((account) => m(AccountRow, { account })),
       ])),
       app.user.addresses.length === 0

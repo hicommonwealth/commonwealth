@@ -169,7 +169,7 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
         throw new Error('chain event notification does not have expected data');
       }
       const chainId = notification.chainEvent.type.chain;
-      const chainName = app.config.chains.getById(chainId).name;
+      const chainName = app.config.chains.getById(chainId)?.name;
       let label: IEventLabel;
       if (SubstrateTypes.EventChains.includes(chainId)) {
         label = SubstrateEvents.Label(
