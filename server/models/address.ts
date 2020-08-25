@@ -146,7 +146,7 @@ export default (
     }
 
     let isValid;
-    if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot') {
+    if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot' || chain.network === 'kulupu') {
       const address = decodeAddress(addressModel.address);
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
       if (addressModel.keytype) {
@@ -162,6 +162,8 @@ export default (
         keyringOptions.ss58Format = 7; // edgeware chain id
       } else if (chain.network === 'polkadot') {
         keyringOptions.ss58Format = 0;
+      } else if (chain.network === 'kulupu') {
+        keyringOptions.ss58Format = 16;
       } else {
         keyringOptions.ss58Format = 42; // default chain id
       }
