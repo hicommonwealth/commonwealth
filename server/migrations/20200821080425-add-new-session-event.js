@@ -1,9 +1,7 @@
 const SequelizeLib = require('sequelize');
 const Op = SequelizeLib.Op;
 
-const SubstrateEventKinds = {
-  NewSession: 'new-session'
-};
+const EventsToAdd = ['new-session'];
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -13,8 +11,8 @@ module.exports = {
         chain,
         event_name
       });
-      const kusamaObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'kusama'));
-      const edgewareObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'edgeware'));
+      const kusamaObjs = EventsToAdd.map((s) => buildObject(s, 'kusama'));
+      const edgewareObjs = EventsToAdd.map((s) => buildObject(s, 'edgeware'));
       const objs = kusamaObjs.concat(edgewareObjs);
 
       return queryInterface.bulkInsert(
@@ -30,9 +28,7 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkDelete('ChainEventTypes', {
-        '$or' : [{
-          event_name: SubstrateEventKinds.NewSession
-        }]
+        event_name: EventsToAdd[0] // new-session
       }, { transaction: t });
     });
   }
