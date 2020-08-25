@@ -159,6 +159,8 @@ export const NewThreadForm: m.Component<{
     vnode.state.form = {};
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
+    debugger
+    vnode.state.fromDraft = Number(localStorage.getItem(`${app.activeId()}-from-draft`));
     if (vnode.state.newType === undefined) {
       vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
     }
@@ -280,9 +282,9 @@ export const NewThreadForm: m.Component<{
                 m(Icon, { name: Icons.ARROW_UP_RIGHT, style: 'margin-left: 5px;' }),
               ],
               onclick: (e) => {
+                localStorage.setItem(`${app.activeId()}-from-draft`, `${fromDraft}`);
                 m.route.set(`/${app.activeId()}/new/thread`);
                 $(e.target).trigger('modalexit');
-                // TODO: transfer any discussion or link into the page editor
               },
             }),
           ]),
