@@ -9,9 +9,7 @@ import { NodeInfo, CommunityInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
 const getNewTag = (labelCount = null) => {
-  const label = labelCount === null
-    ? 'New'
-    : pluralize(labelCount, 'new thread');
+  const label = labelCount === null ? 'New' : labelCount;
   return m('.chain-new', [
     m(Tag, {
       label,
