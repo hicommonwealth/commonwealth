@@ -101,9 +101,10 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
 
     return m(Sublayout, {
       class: 'NewSignalingPage',
+      title: 'New Signaling Proposal',
+      showNewProposalButton: true,
     }, [
       m('.forum-container', [
-        m('h2.page-title', 'New Signaling Proposal'),
         m(Grid, [
           m(Col, { span }, [
             !app.user.activeAccount

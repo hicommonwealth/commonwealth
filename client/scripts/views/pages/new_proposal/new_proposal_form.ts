@@ -3,7 +3,7 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
+import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
@@ -22,8 +22,6 @@ import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 
 import {
-  TextInputFormField,
-  TextareaFormField,
   DropdownFormField,
   RadioSelectorFormField
 } from 'views/components/forms';
@@ -280,15 +278,6 @@ const NewProposalForm = {
         .then(done);
     };
 
-    // construct-ui grid options
-    const span = {
-      xs: 12,
-      sm: 12,
-      md: 11,
-      lg: 10,
-      xl: 8,
-    };
-
     // default state options
     const motions = SubstrateCollectiveProposal.motions;
     if (!vnode.state.councilMotionType) {
@@ -313,9 +302,9 @@ const NewProposalForm = {
 
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
 
-    return m('.NewProposalForm', [
+    return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
-        m(Col, { span }, [
+        m(Col, [
           vnode.state.error && m('.error', vnode.state.error.message),
           hasCouncilMotionChooser && [
             m(DropdownFormField, {
@@ -338,7 +327,8 @@ const NewProposalForm = {
           hasTopics
             && m(TopicSelector, {
               topics: app.topics.getByCommunity(app.activeId()),
-              featuredTopics: app.topics.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+              featuredTopics: app.topics.getByCommunity(app.activeId())
+                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
               updateFormData: (topicName: string, topicId?: number) => {
                 vnode.state.form.topicName = topicName;
                 vnode.state.form.topicId = topicId;
@@ -346,60 +336,70 @@ const NewProposalForm = {
               tabindex: 3,
             }),
           hasTitleAndDescription && [
-            m(TextInputFormField, {
-              options: {
-                name: 'title',
-                placeholder: 'Enter a title',
-                autofocus: true,
-              },
-              callback: (result) => {
-                if (vnode.state.form.title === result) return;
-                vnode.state.form.title = result;
-                m.redraw();
-              },
-            }),
-            m(TextareaFormField, {
-              options: {
-                name: 'description',
-                placeholder: 'Enter a description',
-              },
-              callback: (result) => {
-                if (vnode.state.form.description === result) return;
-                vnode.state.form.description = result;
-                m.redraw();
-              },
-            }),
+            m(FormGroup, [
+              m(FormLabel, 'Title'),
+              m(Input, {
+                options: {
+                  name: 'title',
+                  placeholder: 'Enter a title',
+                  autofocus: true,
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.form.title === result) return;
+                  vnode.state.form.title = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Description'),
+              m(TextArea, {
+                options: {
+                  name: 'description',
+                  placeholder: 'Enter a description',
+                },
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.form.description === result) return;
+                  vnode.state.form.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
           ],
           hasBeneficiaryAndAmount && [
-            m(TextInputFormField, {
-              title: 'Beneficiary',
-              options: {
+            m(FormGroup, [
+              m(FormLabel, 'Beneficiary'),
+              m(Input, {
                 name: 'beneficiary',
                 placeholder: 'Beneficiary of treasury proposal',
+                defaultValue: author.address,
                 oncreate: (vvnode) => {
-                  $(vvnode.dom).val(author.address);
                   vnode.state.form.beneficiary = author.address;
-                }
-              },
-              callback: (result) => {
-                if (vnode.state.form.beneficiary === result) return;
-                vnode.state.form.beneficiary = result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Amount (EDG)',
-              options: {
+                },
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.form.beneficiary === result) return;
+                  vnode.state.form.beneficiary = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Amount (EDG)'),
+              m(Input, {
                 name: 'amount',
                 autofocus: true,
                 placeholder: 'Amount of treasury proposal',
-              },
-              callback: (result) => {
-                if (vnode.state.form.amount === app.chain.chain.coins(parseFloat(result), true)) return;
-                vnode.state.form.amount = app.chain.chain.coins(parseFloat(result), true);
-                m.redraw();
-              },
-            }),
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.form.amount === app.chain.chain.coins(parseFloat(result), true)) return;
+                  vnode.state.form.amount = app.chain.chain.coins(parseFloat(result), true);
+                  m.redraw();
+                },
+              })
+            ]),
             m('p', [
               'Bond: ',
               app.chain.chain.coins(
@@ -437,50 +437,53 @@ const NewProposalForm = {
             }),
           ],
           hasDepositChooser && [
-            m(TextInputFormField, {
-              title: `Deposit (${app.chain.base === ChainBase.Substrate
+            m(FormGroup, [
+              m(FormLabel, `Deposit (${app.chain.base === ChainBase.Substrate
                 ? app.chain.currency
-                : (app.chain as Cosmos).governance.minDeposit.denom})`,
-              options: {
+                : (app.chain as Cosmos).governance.minDeposit.denom})`),
+              m(Input, {
                 name: 'deposit',
                 placeholder: `Min: ${app.chain.base === ChainBase.Substrate
                   ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
                   : +(app.chain as Cosmos).governance.minDeposit}`,
-                oncreate: (vnode_) => $(vnode_.dom).val(app.chain.base === ChainBase.Substrate
+                oncreate: (vvnode) => $(vvnode.dom).val(app.chain.base === ChainBase.Substrate
                   ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
                   : +(app.chain as Cosmos).governance.minDeposit),
-              },
-              callback: (result) => {
-                vnode.state.deposit = parseFloat(result);
-                m.redraw();
-              },
-            }),
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.deposit = parseFloat(result);
+                  m.redraw();
+                },
+              })
+            ]),
           ],
           hasVotingPeriodAndDelaySelector && [
-            m(TextInputFormField, {
-              title: 'Voting Period',
-              options: {
+            m(FormGroup, [
+              m(FormLabel, 'Voting Period'),
+              m(Input, {
                 name: 'voting_period',
                 placeholder: 'Blocks (minimum enforced)',
-              },
-              callback: (result) => {
-                if (vnode.state.votingPeriod === +result) return;
-                vnode.state.votingPeriod = +result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Enactment Delay',
-              options: {
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.votingPeriod === +result) return;
+                  vnode.state.votingPeriod = +result;
+                  m.redraw();
+                },
+              })
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Enactment Delay'),
+              m(Input, {
                 name: 'enactment_delay',
                 placeholder: 'Blocks (minimum enforced)',
-              },
-              callback: (result) => {
-                if (vnode.state.enactmentDelay === +result) return;
-                vnode.state.enactmentDelay = +result;
-                m.redraw();
-              },
-            }),
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.enactmentDelay === +result) return;
+                  vnode.state.enactmentDelay = +result;
+                  m.redraw();
+                },
+              })
+            ]),
           ],
           hasReferendumSelector
             && m(DropdownFormField, {
@@ -520,83 +523,86 @@ const NewProposalForm = {
             },
           }),
           hasThreshold && [
-            m(TextInputFormField, {
-              title: 'Threshold',
-              options: {
+            m(FormGroup, [
+              m(FormLabel, 'Threshold'),
+              m(Input, {
                 name: 'threshold',
                 placeholder: 'How many members must vote yes to execute?',
-              },
-              callback: (result) => {
-                if (vnode.state.threshold === +result) return;
-                vnode.state.threshold = +result;
-                m.redraw();
-              },
-            }),
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.threshold === +result) return;
+                  vnode.state.threshold = +result;
+                  m.redraw();
+                },
+              })
+            ]),
           ],
           hasMolochFields && [
-            m(TextInputFormField, {
-              title: 'Applicant Address',
-              subtitle: 'The person who will get Moloch shares.',
-              options: {
+            m(FormGroup, [
+              m(FormLabel, 'Applicant Address (will receive Moloch shares)'),
+              m(Input, {
                 name: 'applicant_address',
                 placeholder: 'Applicant Address',
-              },
-              callback: (result) => {
-                if (vnode.state.applicantAddress === result) return;
-                vnode.state.applicantAddress = result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Token Tribute',
-              subtitle: 'The amount the applicant is offering Moloch, must pre-approve tokens.',
-              options: {
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.applicantAddress === result) return;
+                  vnode.state.applicantAddress = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Token Tribute (offered to Moloch, must be pre-approved for transfer)'),
+              m(Input, {
                 name: 'token_tribute',
                 placeholder: 'Tribute in tokens',
-              },
-              callback: (result) => {
-                if (vnode.state.tokenTribute === +result) return;
-                vnode.state.tokenTribute = +result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Shares Requested',
-              subtitle: 'The number of shares that the applicant will get in return for the tribute',
-              options: {
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.tokenTribute === +result) return;
+                  vnode.state.tokenTribute = +result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Shares Requested'),
+              m(Input, {
                 name: 'shares_requested',
                 placeholder: 'Moloch shares requested',
-              },
-              callback: (result) => {
-                if (vnode.state.sharesRequested === +result) return;
-                vnode.state.sharesRequested = +result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Title',
-              options: {
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.sharesRequested === +result) return;
+                  vnode.state.sharesRequested = +result;
+                  m.redraw();
+                },
+              })
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Title'),
+              m(Input, {
                 name: 'title',
                 placeholder: 'Proposal Title',
-              },
-              callback: (result) => {
-                if (vnode.state.title === result) return;
-                vnode.state.title = result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Description',
-              options: {
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.title === result) return;
+                  vnode.state.title = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Description'),
+              m(Input, {
                 name: 'description',
                 placeholder: 'Proposal Description',
-              },
-              callback: (result) => {
-                if (vnode.state.description === result) return;
-                vnode.state.description = result;
-                m.redraw();
-              },
-            }),
+                onchange: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.description === result) return;
+                  vnode.state.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
           ],
           m(FormGroup, [
             m(Button, {
