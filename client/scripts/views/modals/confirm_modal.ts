@@ -9,7 +9,8 @@ const ConfirmModal = {
   confirmExit: async () => true,
   view: (vnode) => {
     const confirmText = vnode.attrs.prompt || 'Are you sure?';
-    const [primaryButton, secondaryButton] = vnode.attrs.buttons;
+    const primaryButton = vnode.attrs.primaryButton || 'Yes';
+    const secondaryButton = vnode.attrs.secondaryButton || 'Cancel';
     return m('.ConfirmModal', [
       m('.compact-modal-body', [
         m('h3', confirmText),
@@ -27,7 +28,7 @@ const ConfirmModal = {
           oncreate: (vvnode) => {
             $(vvnode.dom).focus();
           },
-          label: primaryButton || 'Yes',
+          label: primaryButton,
         }),
         m(Button, {
           intent: 'none',
@@ -35,20 +36,20 @@ const ConfirmModal = {
             e.preventDefault();
             $(vnode.dom).trigger('modalexit');
           },
-          label: secondaryButton || 'Cancel',
+          label: secondaryButton,
         }),
       ]),
     ]);
   }
 };
 
-export const confirmationModalWithText = (prompt: string, buttons?: string[]) => {
+export const confirmationModalWithText = (prompt: string, primaryButton?: string, secondaryButton?: string) => {
   return async () : Promise<boolean> => {
     let confirmed = false;
     return new Promise((resolve) => {
       app.modals.create({
         modal: ConfirmModal,
-        data: { prompt, buttons },
+        data: { prompt, primaryButton, secondaryButton },
         completeCallback: () => { confirmed = true; },
         exitCallback: () => resolve(confirmed)
       });

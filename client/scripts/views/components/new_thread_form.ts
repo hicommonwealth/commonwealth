@@ -183,7 +183,7 @@ export const NewThreadForm: m.Component<{
         const modalMsg = fromDraft
           ? 'Update saved draft?'
           : 'Save as draft?';
-        confirmed = await confirmationModalWithText(modalMsg, ['Yes', 'No'])();
+        confirmed = await confirmationModalWithText(modalMsg, null, 'No')();
         if (confirmed) {
           await saveDraft(form, quillEditorState, null, fromDraft);
           notifySuccess('Draft saved');
