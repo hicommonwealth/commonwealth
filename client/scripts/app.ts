@@ -106,6 +106,7 @@ export function handleInviteLinkRedirect() {
       const message = m.route.param('message');
       notifyError(message);
     } else if (m.route.param('invitemessage') === 'success') {
+      if (app.config.invites.length === 0) return;
       app.modals.create({ modal: ConfirmInviteModal });
     } else {
       notifyError('Hmmmm... URL not constructed properly');
