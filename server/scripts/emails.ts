@@ -44,15 +44,11 @@ export const createNotificationEmailObject = (
         chainId,
         (notification_data as IChainEventNotificationData).chainEvent.event_data as IChainEventData
       );
-      //   (notification_data as IChainEventNotificationData).chainEvent.blockNumber,
-      //   chainId,
-      //   (notification_data as IChainEventNotificationData).chainEvent.data,
-      // );
     // } else if (MolochTypes.EventChains.includes(chainId)) {
     //   label = MolochEvents.Label(
-    //     (notification_data as IChainEventNotificationData).chainEvent.blockNumber,
+    //     blockNumber,
     //     chainId,
-    //     (notification_data as IChainEventNotificationData).chainEvent.data,
+    //     (notification_data as IChainEventNotificationData).chainEvent.event_data,
     //   );
     }
   }
