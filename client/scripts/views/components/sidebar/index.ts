@@ -273,56 +273,6 @@ const TopicsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
   }
 };
 
-const SettingsModule: m.Component<{}> = {
-  view: (vnode) => {
-    return m('.SettingsModule.SidebarModule', [
-      m(List, [
-        m(ListItem, {
-          label: 'Settings',
-          class: 'section-header',
-        }),
-        m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.USER }),
-          label: 'My Account',
-          onclick: (e) => m.route.set(
-            app.activeId()
-              ? `/${app.activeId()}/settings`
-              : '/settings'
-          ),
-          active: app.activeId()
-            ? m.route.get() === `/${app.activeId()}/settings`
-            : m.route.get() === '/settings',
-        }),
-        // app.activeId() && m(ListItem, {
-        //   contentLeft: m(Icon, { name: Icons.BELL }),
-        //   label: 'Notifications',
-        //   onclick: (e) => m.route.set(
-        //     app.activeId()
-        //       ? `/${app.activeId()}/notificationSettings`
-        //       : '/notificationSettings'
-        //   ),
-        //   active: app.activeId()
-        //     ? m.route.get() === `/${app.activeId()}/notificationSettings`
-        //     : m.route.get() === '/notificationSettings',
-        // }),
-        // app.activeId() && m(ListItem, {
-        //   contentLeft: m(Icon, { name: Icons.BELL }),
-        //   label: 'Chain Notifications',
-        //   onclick: (e) => m.route.set(
-        //     app.activeId()
-        //       ? `/${app.activeId()}/chainEventSettings`
-        //       : '/chainEventSettings'
-        //   ),
-        //   active: app.activeId()
-        //     ? m.route.get() === `/${app.activeId()}/chainEventSettings`
-        //     : m.route.get() === '/chainEventSettings',
-        // }),
-      ]),
-    ]);
-  }
-};
-
-
 const MobileSidebarHeader: m.Component<{ parentVnode }> = {
   view: (vnode) => {
     const { parentVnode } = vnode.attrs;
@@ -366,7 +316,6 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(TopicsModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
-        app.isLoggedIn() && m(SettingsModule),
         (app.chain || app.community) && m(CommunityInfoModule),
       ])
     ];
