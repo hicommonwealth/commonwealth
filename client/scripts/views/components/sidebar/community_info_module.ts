@@ -27,13 +27,36 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
     const { name, description, website, chat, telegram, github } = meta;
 
     return m('.CommunityInfoModule.SidebarModule', [
-      // m(TopicCaratMenu, { topic }),
-      // topic && [
-      //   m(Subheader, { text: `About #${topic}` }),
-      //   m('p', app.topics.store.getByName(topic, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
-      // ],
-
-      m('.community-name', name),
+      m('.community-name', [
+        m('.community-name-text', name),
+        isAdmin && m('.community-info-action', {
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({ modal: ManageCommunityModal });
+          }
+        }, [
+          m(Icon, { name: Icons.SETTINGS }),
+        ]),
+        // TODO: get this working for chains
+        !app.chain
+          && app.community
+          && app.user?.activeAccount
+          && (app.community.meta.invitesEnabled
+              || app.user.isAdminOrModOfEntity({ community: app.activeCommunityId() }))
+          && m('.community-info-action', {
+            onclick: (e) => {
+              e.preventDefault();
+              app.modals.create({
+                modal: CreateInviteModal,
+                data: {
+                  communityInfo: app.community.meta,
+                },
+              });
+            },
+          }, [
+            m(Icon, { name: Icons.MAIL }),
+          ]),
+      ]),
       m('.community-description', description),
       website && m('.community-info', [
         m(Icon, { name: Icons.GLOBE }),
@@ -63,37 +86,6 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
           href: github
         }, removeUrlPrefix(github)),
       ]),
-      isAdmin && m(Button, {
-        intent: 'primary',
-        size: 'sm',
-        fluid: true,
-        label: 'Manage community',
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.create({ modal: ManageCommunityModal });
-        }
-      }),
-      // TODO: get this working for chains
-      !app.chain
-        && app.community
-        && app.user?.activeAccount
-        && (app.community.meta.invitesEnabled
-            || app.user.isAdminOrModOfEntity({ community: app.activeCommunityId() }))
-        && m(Button, {
-          intent: 'primary',
-          size: 'sm',
-          fluid: true,
-          label: 'Invite members',
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.create({
-              modal: CreateInviteModal,
-              data: {
-                communityInfo: app.community.meta,
-              },
-            });
-          },
-        }),
     ]);
   }
 };

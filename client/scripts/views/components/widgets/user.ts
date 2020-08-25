@@ -33,8 +33,9 @@ const User: m.Component<{
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
-    const adminsAndMods =
-      app.chain ? app.chain.meta.chain.adminsAndMods : app.community ? app.community.meta.adminsAndMods : [];
+    const adminsAndMods = app.chain
+      ? app.chain.meta.chain.adminsAndMods
+      : app.community ? app.community.meta.adminsAndMods : [];
 
     if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !vnode.state.IdentityWidget) {
       vnode.state.identityWidgetLoading = true;
@@ -95,7 +96,7 @@ const User: m.Component<{
             linkify
               ? link(`a.user-display-name${
                 (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-              profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+              profile ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
@@ -118,7 +119,7 @@ const User: m.Component<{
           ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-          profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+          profile ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),

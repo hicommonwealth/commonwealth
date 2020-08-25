@@ -18,7 +18,29 @@ import LoginSelector from 'views/components/header/login_selector';
 import CommunitySelector, { CommunityLabel } from './community_selector';
 import CommunityInfoModule from './community_info_module';
 
-const NavigationModule: m.Component<{}, {}> = {
+const OffchainNavigationModule: m.Component<{}, {}> = {
+  view: (vnode) => {
+    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
+      || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+
+    return m('.OnchainNavigationModule.SidebarModule', [
+      m(List, { size: 'lg' }, [
+        m(ListItem, {
+          label: 'All Discussions',
+          class: 'section-header',
+        }),
+        m(ListItem, {
+          active: onDiscussionsPage(m.route.get()),
+          label: 'Discussions',
+          onclick: (e) => m.route.set(`/${app.activeId()}`),
+          contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+        }),
+      ]),
+    ]);
+  }
+};
+
+const OnchainNavigationModule: m.Component<{}, {}> = {
   view: (vnode) => {
     // // proposal counts
     // const substrateGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.Substrate)
@@ -38,11 +60,11 @@ const NavigationModule: m.Component<{}, {}> = {
       app.chain.base === ChainBase.CosmosSDK
         || app.chain.base === ChainBase.Substrate
         || app.chain.class === ChainClass.Moloch);
+    if (!hasProposals) return;
+
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
 
-    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
-      || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
@@ -58,89 +80,81 @@ const NavigationModule: m.Component<{}, {}> = {
     const onNotificationsPage = (p) => p.startsWith('/notifications');
     if (onNotificationsPage(m.route.get())) return;
 
-    return m('.NavigationModule.SidebarModule', [
+    return m('.OnchainNavigationModule.SidebarModule', [
       m(List, { size: 'lg' }, [
-        // m(ListItem, {
-        //   class: 'section-header',
-        //   label: 'Off-chain',
-        // }),
         m(ListItem, {
-          active: onDiscussionsPage(m.route.get()),
-          label: 'Discussions',
-          onclick: (e) => m.route.set(`/${app.activeId()}`),
-          contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+          label: 'On-chain Governance',
+          class: 'section-header',
         }),
-        hasProposals && [
-          // proposals (substrate, cosmos, moloch only)
-          m(ListItem, {
-            active: onProposalPage(m.route.get()),
-            label: 'Proposals',
-            contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
-            // contentRight: [
-            //   (app.chain?.base === ChainBase.Substrate)
-            //     && m(Tag, {
-            //       rounded: true,
-            //       label: app.chain?.loaded ? allSubstrateGovernanceProposals : '-',
-            //     }),
-            //   (app.chain?.base === ChainBase.CosmosSDK) && m(Tag, {
-            //     rounded: true,
-            //     label: app.chain?.loaded ? cosmosGovernanceProposals : '-',
-            //   }),
-            //   (app.chain?.class === ChainClass.Moloch) && m(Tag, {
-            //     rounded: true,
-            //     label: app.chain?.loaded ? molochProposals : '-',
-            //   }),
-            // ],
-          }),
-          // council (substrate only)
-          !app.community && app.chain?.base === ChainBase.Substrate
-            && m(ListItem, {
-              active: onCouncilPage(m.route.get()),
-              label: 'Council',
-              contentLeft: m(Icon, { name: Icons.AWARD }),
-              onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
-              contentRight: [], // TODO
-            }),
-          // validators (substrate and cosmos only)
-          // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-          //   m(ListItem, {
-          //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
-          //     active: onValidatorsPage(m.route.get()),
-          //     label: 'Validators',
-          //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
+        // proposals (substrate, cosmos, moloch only)
+        m(ListItem, {
+          active: onProposalPage(m.route.get()),
+          label: 'Proposals',
+          contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
+          onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
+          // contentRight: [
+          //   (app.chain?.base === ChainBase.Substrate)
+          //     && m(Tag, {
+          //       rounded: true,
+          //       label: app.chain?.loaded ? allSubstrateGovernanceProposals : '-',
+          //     }),
+          //   (app.chain?.base === ChainBase.CosmosSDK) && m(Tag, {
+          //     rounded: true,
+          //     label: app.chain?.loaded ? cosmosGovernanceProposals : '-',
           //   }),
-          showMolochMemberOptions && m(ListItem, {
-            onclick: (e) => {
-              m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
-            },
-            label: 'New proposal',
-            contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
+          //   (app.chain?.class === ChainClass.Moloch) && m(Tag, {
+          //     rounded: true,
+          //     label: app.chain?.loaded ? molochProposals : '-',
+          //   }),
+          // ],
+        }),
+        // council (substrate only)
+        !app.community && app.chain?.base === ChainBase.Substrate
+          && m(ListItem, {
+            active: onCouncilPage(m.route.get()),
+            label: 'Council',
+            contentLeft: m(Icon, { name: Icons.AWARD }),
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
+            contentRight: [], // TODO
           }),
-          showMolochMemberOptions && m(ListItem, {
-            onclick: (e) => app.modals.lazyCreate('update_delegate_modal', {
-              account: app.user.activeAccount,
-              delegateKey: (app.user.activeAccount as any).delegateKey,
-            }),
-            label: 'Update delegate key',
-            contentLeft: m(Icon, { name: Icons.KEY }),
+        // validators (substrate and cosmos only)
+        // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
+        //   m(ListItem, {
+        //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
+        //     active: onValidatorsPage(m.route.get()),
+        //     label: 'Validators',
+        //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
+        //   }),
+        showMolochMemberOptions && m(ListItem, {
+          onclick: (e) => {
+            m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
+          },
+          label: 'New proposal',
+          contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
+        }),
+        showMolochMemberOptions && m(ListItem, {
+          onclick: (e) => app.modals.lazyCreate('update_delegate_modal', {
+            account: app.user.activeAccount,
+            delegateKey: (app.user.activeAccount as any).delegateKey,
           }),
-          showMolochMemberOptions && m(ListItem, {
-            onclick: (e) => app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount }),
-            label: 'Rage quit',
-            contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
+          label: 'Update delegate key',
+          contentLeft: m(Icon, { name: Icons.KEY }),
+        }),
+        showMolochMemberOptions && m(ListItem, {
+          onclick: (e) => app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount }),
+          label: 'Rage quit',
+          contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
+        }),
+        showMolochMenuOptions && m(ListItem, {
+          onclick: (e) => app.modals.lazyCreate('token_management_modal', {
+            account: app.user.activeAccount,
+            accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
+            contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
+            tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
           }),
-          showMolochMenuOptions && m(ListItem, {
-            onclick: (e) => app.modals.lazyCreate('token_management_modal', {
-              account: app.user.activeAccount,
-              accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
-              contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
-              tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
-            }),
-            label: 'Approve tokens',
-            contentLeft: m(Icon, { name: Icons.POWER }),
-          }),
-        ],
+          label: 'Approve tokens',
+          contentLeft: m(Icon, { name: Icons.POWER }),
+        }),
       ]),
     ]);
   }
@@ -205,7 +219,7 @@ const TopicsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
       m(List, { size: 'lg' }, [
         m(ListItem, {
           class: 'section-header',
-          label: 'Discussion Topics',
+          label: 'Discussions by Topic',
           contentRight: app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
             && m(PopoverMenu, {
               class: 'sidebar-add-topic',
@@ -270,7 +284,7 @@ const SettingsModule: m.Component<{}> = {
         }),
         m(ListItem, {
           contentLeft: m(Icon, { name: Icons.USER }),
-          label: 'Account Settings',
+          label: 'My Account',
           onclick: (e) => m.route.set(
             app.activeId()
               ? `/${app.activeId()}/settings`
@@ -280,30 +294,30 @@ const SettingsModule: m.Component<{}> = {
             ? m.route.get() === `/${app.activeId()}/settings`
             : m.route.get() === '/settings',
         }),
-        app.activeId() && m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.BELL }),
-          label: 'Notifications',
-          onclick: (e) => m.route.set(
-            app.activeId()
-              ? `/${app.activeId()}/notificationSettings`
-              : '/notificationSettings'
-          ),
-          active: app.activeId()
-            ? m.route.get() === `/${app.activeId()}/notificationSettings`
-            : m.route.get() === '/notificationSettings',
-        }),
-        app.activeId() && m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.BELL }),
-          label: 'Chain Notifications',
-          onclick: (e) => m.route.set(
-            app.activeId()
-              ? `/${app.activeId()}/chainEventSettings`
-              : '/chainEventSettings'
-          ),
-          active: app.activeId()
-            ? m.route.get() === `/${app.activeId()}/chainEventSettings`
-            : m.route.get() === '/chainEventSettings',
-        }),
+        // app.activeId() && m(ListItem, {
+        //   contentLeft: m(Icon, { name: Icons.BELL }),
+        //   label: 'Notifications',
+        //   onclick: (e) => m.route.set(
+        //     app.activeId()
+        //       ? `/${app.activeId()}/notificationSettings`
+        //       : '/notificationSettings'
+        //   ),
+        //   active: app.activeId()
+        //     ? m.route.get() === `/${app.activeId()}/notificationSettings`
+        //     : m.route.get() === '/notificationSettings',
+        // }),
+        // app.activeId() && m(ListItem, {
+        //   contentLeft: m(Icon, { name: Icons.BELL }),
+        //   label: 'Chain Notifications',
+        //   onclick: (e) => m.route.set(
+        //     app.activeId()
+        //       ? `/${app.activeId()}/chainEventSettings`
+        //       : '/chainEventSettings'
+        //   ),
+        //   active: app.activeId()
+        //     ? m.route.get() === `/${app.activeId()}/chainEventSettings`
+        //     : m.route.get() === '/chainEventSettings',
+        // }),
       ]),
     ]);
   }
@@ -350,8 +364,9 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
         },
       }, [
         m('.SidebarHeader', m(CommunitySelector)),
-        (app.chain || app.community) && m(NavigationModule),
+        (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(TopicsModule),
+        (app.chain || app.community) && m(OnchainNavigationModule),
         app.isLoggedIn() && m(SettingsModule),
         (app.chain || app.community) && m(CommunityInfoModule),
       ])

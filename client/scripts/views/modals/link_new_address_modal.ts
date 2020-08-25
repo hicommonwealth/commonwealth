@@ -892,7 +892,11 @@ const LinkNewAddressModal: m.Component<{
                 $(vvnode.dom).val(vnode.state.newAddress.profile.bio);
             },
           }),
-          m('.error-message', vnode.state.error),
+          vnode.state.error && m('.error-message', [
+            vnode.state.error,
+            m('br'),
+            'Try again?',
+          ]),
           m(Button, {
             intent: 'primary',
             disabled: (vnode.state.uploadsInProgress || !vnode.state.hasName),

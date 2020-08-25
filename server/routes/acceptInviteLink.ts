@@ -16,8 +16,11 @@ const redirectWithSuccess = (res) => {
 };
 
 const acceptInviteLink = async (models, req, res, next) => {
-  if (!req.user) return redirectWithError(res, 'Must be logged in');
-  if (!req.user.email) return redirectWithError(res, 'Must have email associated with Commonwealth account');
+  if (!req.user) return redirectWithError(res, 'Must be logged in to accept invites');
+  if (!req.user.email) return redirectWithError(
+    res,
+    'Must have an email to accept invites. Try adding one in the Settings panel'
+  );
   const { id } = req.query;
 
   const inviteLink = await models.InviteLink.findOne({

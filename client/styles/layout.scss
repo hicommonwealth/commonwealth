@@ -22,6 +22,33 @@ html {
     height: 100%;
     width: 100%;
 }
+.home-gradient {
+    position: absolute;
+    top: -12px;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background-image: linear-gradient(
+        180deg, #6788F9 0%,
+        rgba(108,141,249,0.91) 4%,
+        rgba(112,145,249,0.83) 9%,
+        rgba(117,149,249,0.75) 13%,
+        rgba(121,153,249,0.67) 18%,
+        rgba(124,156,249,0.60) 23%,
+        rgba(128,160,249,0.53) 29%,
+        rgba(131,163,250,0.45) 35%,
+        rgba(134,166,250,0.39) 42%,
+        rgba(137,169,250,0.32) 49%,
+        rgba(139,171,250,0.25) 57%,
+        rgba(142,174,250,0.19) 66%,
+        rgba(145,177,250,0.13) 77%,
+        rgba(147,179,250,0.06) 88%,
+        rgba(150,182,250,0.00) 100%
+    );
+    @include sm-max {
+        top: 30px;
+    }
+}
 
 // global css
 h1, h2, h3, h4, h5, h6 {
@@ -86,8 +113,17 @@ pre {
     height: 100%;
     background: $background-color-light;
 }
+
 .layout-container {
     padding-left: $sidebar-width;
+}
+.hidden-sidebar {
+    .layout-container {
+        padding-left: 0;
+    }
+    .Sidebar {
+        display: none;
+    }
 }
 @include sm-max {
     $mobile-sidebar-height: 60px;

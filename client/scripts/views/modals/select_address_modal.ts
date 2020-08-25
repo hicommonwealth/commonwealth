@@ -16,6 +16,7 @@ import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown
 const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean }> = {
   view: (vnode) => {
     const activeAccountsByRole: Array<[Account<any>, RoleInfo]> = app.user.getActiveAccountsByRole();
+    const activeEntityInfo = app.community ? app.community.meta : app.chain?.meta?.chain;
 
     const createRole = (e) => {
       vnode.state.loading = true;
@@ -23,7 +24,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       const [account, role] = activeAccountsByRole[vnode.state.selectedIndex];
       const addressInfo = app.user.addresses
         .find((a) => a.address === account.address && a.chain === account.chain.id);
-      const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
       app.user.createRole({
         address: addressInfo,
         chain: app.activeChainId(),
@@ -90,9 +90,9 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
             'No linked addresses'
           ]),
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
-            m(UserBlock, { user: account, showRole: true }),
+            m(UserBlock, { user: account }),
             m('.role-remove', [
-              m('span.already-connected', 'Already joined'),
+              m('span.already-connected', `${formatAsTitleCase(role.permission)} of '${activeEntityInfo?.name}'`),
               m('span.icon', {
                 onclick: deleteRole.bind(this, index)
               }, m(Icon, { name: Icons.X })),
