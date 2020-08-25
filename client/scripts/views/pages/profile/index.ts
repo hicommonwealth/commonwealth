@@ -179,6 +179,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     if (refresh) {
       loadProfile();
       vnode.state.refresh = false;
+      m.redraw();
     }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
