@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import {
   SubstrateTypes, MolochTypes,
-  SubstrateEvents, MolochEvents, IEventLabel, IEventTitle } from '@commonwealth/chain-events';
+  SubstrateEvents, MolochEvents, IEventLabel, IEventTitle, IChainEventData } from '@commonwealth/chain-events';
 import { SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getProposalUrl } from '../../shared/utils';
@@ -20,7 +20,7 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const sendImmediateNotificationEmail = async (subscription, emailObject) => {
   const user = await subscription.getUser();
-  emailObject.to = (process.env.NODE_ENV === 'development') ? 'test@commonwealth.im' : user.email;
+  emailObject.to = (process.env.NODE_ENV === 'development') ? 'zak@commonwealth.im' : user.email;
 
   try {
     await sgMail.send(emailObject);
@@ -33,32 +33,40 @@ export const createNotificationEmailObject = (
   notification_data: IPostNotificationData | IChainEventNotificationData, category_id, chain_name?
 ) => {
   let label: IEventLabel;
-  if ((notification_data as IChainEventNotificationData).chainEvent.type.chain) {
-    // const chainName = app.config.chains.getById(chainId).name;
-    const chainId = (notification_data as IChainEventNotificationData).chainEvent.type.chain;
+  if ((notification_data as IChainEventNotificationData).chainEvent !== undefined) {
+    const chainId = (notification_data as IChainEventNotificationData).chainEventType.chain;
+    const { blockNumber } = (notification_data as IChainEventNotificationData).chainEvent;
     if (SubstrateTypes.EventChains.includes(chainId)) {
+      if (chainId === 'polkadot') { console.log('polkadot event lol'); return; }
       label = SubstrateEvents.Label(
-        (notification_data as IChainEventNotificationData).chainEvent.blockNumber,
+        blockNumber,
         chainId,
-        (notification_data as IChainEventNotificationData).chainEvent.data,
+        (notification_data as IChainEventNotificationData).chainEvent.event_data as IChainEventData
       );
-    } else if (MolochTypes.EventChains.includes(chainId)) {
-      label = MolochEvents.Label(
-        (notification_data as IChainEventNotificationData).chainEvent.blockNumber,
-        chainId,
-        (notification_data as IChainEventNotificationData).chainEvent.data,
-      );
+      //   (notification_data as IChainEventNotificationData).chainEvent.blockNumber,
+      //   chainId,
+      //   (notification_data as IChainEventNotificationData).chainEvent.data,
+      // );
+    // } else if (MolochTypes.EventChains.includes(chainId)) {
+    //   label = MolochEvents.Label(
+    //     (notification_data as IChainEventNotificationData).chainEvent.blockNumber,
+    //     chainId,
+    //     (notification_data as IChainEventNotificationData).chainEvent.data,
+    //   );
     }
+    console.log('label', label);
   }
+
   const { created_at, root_id, root_title, root_type, comment_id, comment_text,
     chain_id, community_id, author_address, author_chain } = (notification_data as IPostNotificationData);
   const decodedTitle = decodeURIComponent(root_title).trim();
-  const subjectLine = (category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
-    : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
-      : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
-        : (category_id === NotificationCategories.NewThread) ? `New thread called '${decodedTitle}'`
-          : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
-            : `${label.heading} on ${chain_name}`;
+  const subjectLine = (label.label)
+    || ((category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
+      : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
+        : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
+          : (category_id === NotificationCategories.NewThread) ? `New thread called '${decodedTitle}'`
+            : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
+              : 'New Notification on Commonwealth');
 
   const pseudoProposal = {
     id: root_id,
@@ -76,8 +84,8 @@ export const createNotificationEmailObject = (
     dynamic_template_data: {
       notification: {
         subject: subjectLine,
-        title: label ? decodedTitle : label.label,
-        path: label ? path: label.linkUrl,
+        title: label?.label || decodedTitle,
+        path: label?.linkUrl || path,
       }
     },
   };

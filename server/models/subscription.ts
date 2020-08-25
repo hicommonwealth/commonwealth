@@ -154,9 +154,11 @@ export default (
     if (!notification_data) return [];
     let msg;
     if (isChainEventData(notification_data)) {
-      const chainId = (notification_data as IChainEventNotificationData).chainEvent.type.chain;
-      const chain = await models.Chain.findOne({ where: { id: chainId }, });
-      msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id, chain.name);
+    //   const chainId = (notification_data as IChainEventNotificationData).chainEvent.type.chain;
+    //   const chain = await models.Chain.findOne({ where: { id: chainId }, });
+    //   msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id, chain.name);
+      msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id);
+      log.info('is chain event!');
     } else {
       msg = createNotificationEmailObject((notification_data as IPostNotificationData), category_id);
     }
