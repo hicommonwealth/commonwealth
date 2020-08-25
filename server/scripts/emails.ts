@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 import {
   SubstrateTypes, MolochTypes,
   SubstrateEvents, MolochEvents, IEventLabel, IEventTitle, IChainEventData } from '@commonwealth/chain-events';
-import { SENDGRID_API_KEY } from '../config';
+import { SENDGRID_API_KEY, SERVER_URL } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getProposalUrl } from '../../shared/utils';
 
@@ -33,8 +33,8 @@ export const createNotificationEmailObject = (
   notification_data: IPostNotificationData | IChainEventNotificationData, category_id, chain_name?
 ) => {
   let label: IEventLabel;
+  const chainId = (notification_data as IChainEventNotificationData).chainEventType?.chain;
   if ((notification_data as IChainEventNotificationData).chainEvent !== undefined) {
-    const chainId = (notification_data as IChainEventNotificationData).chainEventType.chain;
     const { blockNumber } = (notification_data as IChainEventNotificationData).chainEvent;
     if (SubstrateTypes.EventChains.includes(chainId)) {
       if (chainId === 'polkadot') { console.log('polkadot event lol'); return; }
@@ -75,7 +75,10 @@ export const createNotificationEmailObject = (
     community: community_id,
   };
   const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = (getProposalUrl as any)(...args);
+  const path = label.linkUrl ? `${SERVER_URL}${label.linkUrl}`
+    : label ? `${SERVER_URL}/${chainId}`
+      : (getProposalUrl as any)(...args);
+  console.log('path: ', path);
   const msg = {
     to: 'zak@commonwealth.im',
     from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -84,8 +87,8 @@ export const createNotificationEmailObject = (
     dynamic_template_data: {
       notification: {
         subject: subjectLine,
-        title: label?.label || decodedTitle,
-        path: label?.linkUrl || path,
+        title: label.label || decodedTitle,
+        path,
       }
     },
   };
