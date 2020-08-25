@@ -60,7 +60,7 @@ export const createNotificationEmailObject = (
   const { created_at, root_id, root_title, root_type, comment_id, comment_text,
     chain_id, community_id, author_address, author_chain } = (notification_data as IPostNotificationData);
   const decodedTitle = decodeURIComponent(root_title).trim();
-  const subjectLine = (label.label)
+  const subjectLine = (label.heading)
     || ((category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
       : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
         : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
