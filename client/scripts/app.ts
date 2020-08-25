@@ -120,7 +120,7 @@ export function handleUpdateEmailConfirmation() {
       'Step': m.route.param('confirmation'),
     });
     if (m.route.param('confirmation') === 'success') {
-      notifySuccess('Updated email confirmed');
+      notifySuccess('Success! Email confirmed');
     }
   }
 }
