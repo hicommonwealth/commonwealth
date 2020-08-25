@@ -386,6 +386,7 @@ export const NewThreadForm: m.Component<{
                   }
                   try {
                     await newLink(vnode.state.form, vnode.state.quillEditorState, author);
+                    vnode.state.overwriteConfirmationModal = true;
                     vnode.state.saving = false;
                     if (isModal) {
                       $(e.target).trigger('modalcomplete');
