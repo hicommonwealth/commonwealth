@@ -170,9 +170,9 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       vnode.state.loaded = false;
       loadProfile();
     }
-    if (loading) return m(PageLoading);
+    if (loading || !loaded) return m(PageLoading);
     if (!account) {
-      return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
+      return m(PageNotFound, { message: 'This address does not have a Commonwealth profile' });
     }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
