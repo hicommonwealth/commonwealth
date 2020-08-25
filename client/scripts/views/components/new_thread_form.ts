@@ -38,12 +38,16 @@ export const checkForModifications = async (state, modalMsg) => {
   const { fromDraft } = state;
   const quill = state.quillEditorState.editor;
   const Delta = Quill.import('delta');
+  let confirmed = true;
+
+  if (state.alteredText) {
+    confirmed = await confirmationModalWithText(modalMsg)();
+  }
 
   // If overwritten form body comes from a previous draft, we check whether
   // there have been changes made to the draft, and prompt with a confirmation
   // modal if there have been.
   const titleInput = document.querySelector("div.new-thread-form-body input[name='new-thread-title']");
-  let confirmed = true;
   if (fromDraft) {
     let formBodyDelta;
     let formBodyMarkdown;
@@ -179,7 +183,7 @@ export const NewThreadForm: m.Component<{
         const modalMsg = fromDraft
           ? 'Update saved draft?'
           : 'Save as draft?';
-        confirmed = await confirmationModalWithText(modalMsg)();
+        confirmed = await confirmationModalWithText(modalMsg, ['Yes', 'No'])();
         if (confirmed) {
           await saveDraft(form, quillEditorState, null, fromDraft);
           notifySuccess('Draft saved');
