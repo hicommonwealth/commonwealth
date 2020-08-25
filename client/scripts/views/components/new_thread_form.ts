@@ -179,6 +179,7 @@ export const NewThreadForm: m.Component<{
     }
   },
   onremove: async (vnode) => {
+    console.log(vnode.state);
     const { fromDraft, form, quillEditorState, postType, overwriteConfirmationModal } = vnode.state;
     if (postType === PostType.Discussion && !overwriteConfirmationModal) {
       if (quillEditorState?.alteredText) {
@@ -386,7 +387,6 @@ export const NewThreadForm: m.Component<{
                   }
                   try {
                     await newLink(vnode.state.form, vnode.state.quillEditorState, author);
-                    vnode.state.overwriteConfirmationModal = true;
                     vnode.state.saving = false;
                     if (isModal) {
                       $(e.target).trigger('modalcomplete');
@@ -472,6 +472,7 @@ export const NewThreadForm: m.Component<{
                 }
                 try {
                   await newThread(form, quillEditorState, author);
+                  vnode.state.overwriteConfirmationModal = true;
                   vnode.state.saving = false;
                   if (vnode.state.fromDraft && !vnode.state.recentlyDeletedDrafts.includes(fromDraft)) {
                     await app.user.discussionDrafts.delete(fromDraft);
