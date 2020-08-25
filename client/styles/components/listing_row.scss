@@ -3,42 +3,54 @@
 .ListingRow {
     @include listing-row-base;
 
-    .pinned {
-        margin: 8px 15px 0 0;
-        .visible-xs {
-            display: none;
-        }
-        @include xs-max {
-            margin: 0 0 2px 0;
-            .visible-xs {
-                display: inline-block;
-                margin-left: 4px;
-                font-size: 15px;
-                color: #999;
-            }
-            .icon-pin-outline {
-                font-size: 12px;
-                color: #999;
-            }
-        }
-    }
     .row-left {
         line-height: 1.1;
         flex: $listing-left-flex;
-        .row-header,
-        .row-header a {
-            color: $text-color-dark;
-            font-size: $text-size-item-header;
-            text-decoration: none;
-            font-weight: 500;
+        flex-direction: row;
+        align-items: center;
+        .pinned {
+            display: inline-block;
+            // margin: 15px 8px 0 0;
+            .visible-xs {
+                display: none;
+            }
+            .icon-pin-outline {
+                display: block;
+            }
+            @include xs-max {
+                margin: 0 0 2px 0;
+                .visible-xs {
+                    display: inline-block;
+                    margin-left: 4px;
+                    font-size: 15px;
+                    color: #999;
+                }
+                .icon-pin-outline {
+                    font-size: 12px;
+                    color: #999;
+                    margin: 0 15px;
+                }
+            }
         }
-        .row-subheader {
-            display: flex;
-            margin-top: 3px;
-        }
-        .row-subheader a, span {
-            color: $text-color-light;
-            font-size: $text-size-item-meta;
+        .title-container {
+            display: inline-flex;
+            flex-direction: column;
+            align-self: center;
+            .row-header,
+            .row-header a {
+                color: $text-color-dark;
+                font-size: $text-size-item-header;
+                text-decoration: none;
+                font-weight: 500;
+            }
+            .row-subheader {
+                display: flex;
+                margin-top: 3px;
+            }
+            .row-subheader a, span {
+                color: $text-color-light;
+                font-size: $text-size-item-meta;
+            }
         }
     }
     .row-right {
