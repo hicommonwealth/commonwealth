@@ -11,7 +11,6 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import { MultipleButtonSelectorFormField } from 'views/components/forms';
-import SendingFrom from 'views/components/sending_from';
 import User from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { createTXModal } from 'views/modals/tx_signing_modal';
@@ -121,7 +120,6 @@ const CouncilVotingModal = {
               });
           }
         }, 'Retract vote'),
-        m(SendingFrom, { author, showBalance: true }),
       ]),
     ]);
   }

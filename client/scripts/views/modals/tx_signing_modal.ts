@@ -3,6 +3,7 @@ import 'modals/tx_signing_modal.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import { mnemonicValidate } from '@polkadot/util-crypto';
+import { Button, TextArea } from 'construct-ui';
 
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
@@ -12,7 +13,6 @@ import app from 'state';
 import { formatAsTitleCase } from 'helpers';
 import { ITXModalData, ITransactionResult, TransactionStatus, ChainBase } from 'models';
 import SubkeyInstructions from 'views/components/subkey_instructions';
-import SendingFrom from 'views/components/sending_from';
 import Substrate from 'controllers/chain/substrate/main';
 import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
 import { ICosmosTXData } from 'controllers/chain/cosmos/chain';
@@ -131,7 +131,9 @@ const TXSigningCLIOption = {
           m('span.no-select', '<key name> <tx.json>'),
         ])
       ]);
-      submitAction = m('button[type="submit"]', {
+      submitAction = m(Button, {
+        intent: 'primary',
+        type: 'submit',
         onclick: (e) => {
           e.preventDefault();
           // try {
@@ -143,7 +145,8 @@ const TXSigningCLIOption = {
           //  throw new Error('Failed to execute signed transaction');
           // }
         },
-      }, 'Send transaction');
+        label: 'Send transaction',
+      });
     } else if (vnode.state.calldata && app.chain && app.chain.base === ChainBase.Substrate) {
       const calldata = vnode.state.calldata as ISubstrateTXData;
       instructions = m('.instructions', [
@@ -161,7 +164,9 @@ const TXSigningCLIOption = {
         m('span.no-select', 'secret phrase'),
         '"',
       ]);
-      submitAction = m('button[type="submit"]', {
+      submitAction = m(Button, {
+        intent: 'primary',
+        type: 'submit',
         onclick: (e) => {
           e.preventDefault();
           try {
@@ -172,19 +177,21 @@ const TXSigningCLIOption = {
             throw new Error('Failed to execute signed transaction');
           }
         },
-      }, 'Send transaction');
+        label: 'Send transaction'
+      });
     }
     return m('.TXSigningCLIOption', [
       instructions,
       signBlock,
       // action
       m('p', 'Enter the output here:'),
-      m('textarea.signedtx', {
+      m(TextArea, {
+        class: 'signedtx',
+        fluid: true,
         placeholder: app.chain && app.chain.base === ChainBase.CosmosSDK ? 'Signature JSON' : 'Signed TX',
       }),
       vnode.state.error && m('.error-message', vnode.state.error),
       submitAction,
-      submitAction && m(SendingFrom, { author: vnode.attrs.author }),
       !submitAction && m('p.transaction-loading', 'Still loading transaction...'),
     ]);
   }
@@ -223,18 +230,20 @@ const TXSigningWebWalletOption = {
       });
     return m('.TXSigningSeedOrMnemonicOption', [
       m('div', 'Use the polkadot-js extension to sign the transaction:'),
-      m('button[type="submit"]', {
+      m(Button, {
+        type: 'submit',
+        intent: 'primary',
         disabled: !isWebWalletEnabled || !isAuthorInWebWallet,
         onclick: async (e) => { await transact(); },
         oncreate: (vvnode) => $(vvnode.dom).focus(),
-      }, !isWebWalletAvailable
-        ? 'No extension detected'
-        : !isWebWalletEnabled
-          ? 'Connect to extension'
-          : !isAuthorInWebWallet
-            ? 'Signer not in web wallet'
-            : 'Sign and send transaction'),
-      m(SendingFrom, { author: vnode.attrs.author }),
+        label: !isWebWalletAvailable
+          ? 'No extension detected'
+          : !isWebWalletEnabled
+            ? 'Connect to extension'
+            : !isAuthorInWebWallet
+              ? 'Signer not in web wallet'
+              : 'Sign and send transaction'
+      }),
     ]);
   }
 };
@@ -255,11 +264,15 @@ const TXSigningSeedOrMnemonicOption = {
       (!vnode.attrs.author.getSeed() && !vnode.attrs.author.getMnemonic()) ? m('form', [
         m('.instructions', 'Enter your key phrase to sign this transaction:'),
         m('.warn', 'This is insecure. Only use key phrases for testnets or throwaway accounts.'),
-        m('textarea.mnemonic', {
+        m(TextArea, {
+          class: 'mnemonic',
           placeholder: 'Key phrase or seed',
+          fluid: true,
           oncreate: (vvnode) => $(vvnode.dom).focus()
         }),
-        m('button[type="submit"]', {
+        m(Button, {
+          intent: 'primary',
+          type: 'submit',
           onclick: (e) => {
             e.preventDefault();
             const newKey = `${$(vnode.dom).find('textarea.mnemonic').val().toString()
@@ -275,18 +288,20 @@ const TXSigningSeedOrMnemonicOption = {
               throw new Error('Key phrase or seed did not match this account');
             }
           },
-        }, 'Send transaction'),
-        m(SendingFrom, { author: vnode.attrs.author }),
+          label: 'Send transaction'
+        }),
       ]) : [
         m('div', 'This account is already unlocked. Click here to sign the transaction:'),
-        m('button[type="submit"]', {
+        m(Button, {
+          intent: 'primary',
+          type: 'submit',
           onclick: (e) => {
             e.preventDefault();
             transact();
           },
-          oncreate: (vvnode) => $(vvnode.dom).focus()
-        }, 'Send transaction'),
-        m(SendingFrom, { author: vnode.attrs.author }),
+          oncreate: (vvnode) => $(vvnode.dom).focus(),
+          label: 'Send transaction'
+        }),
       ],
     ]);
   }
@@ -388,11 +403,13 @@ const TXSigningModalStates = {
           m('.TXSigningBodyText', 'Waiting for your transaction to be confirmed by the network...'),
           m('span.icon-spinner2.animate-spin'),
           m('br'),
-          m('button', {
+          m(Button, {
+            intent: 'primary',
             type: 'submit',
             disabled: true,
             onclick: (e) => (undefined),
-          }, `Waiting ${vnode.state.timer || 0}s...`),
+            label: `Waiting ${vnode.state.timer || 0}s...`
+          }),
         ]),
       ]);
     }
@@ -409,14 +426,16 @@ const TXSigningModalStates = {
             blockNum: `${vnode.attrs.stateData.blocknum}`,
             timestamp: vnode.attrs.stateData.timestamp ? `${vnode.attrs.stateData.timestamp.format()}` : '--',
           }),
-          m('button', {
+          m(Button, {
+            intent: 'primary',
             type: 'submit',
             oncreate: (vvnode) => $(vvnode.dom).focus(),
             onclick: (e) => {
               e.preventDefault();
               $(vnode.dom).trigger('modalexit');
-            }
-          }, 'Done'),
+            },
+            label: 'Done'
+          }),
         ]),
       ]);
     }
@@ -433,17 +452,21 @@ const TXSigningModalStates = {
             blockNum: vnode.attrs.stateData.blocknum ? `${vnode.attrs.stateData.blocknum}` : '--',
             timestamp: vnode.attrs.stateData.timestamp ? `${vnode.attrs.stateData.timestamp.format()}` : '--',
           }),
-          m('button', {
+          m(Button, {
+            intent: 'primary',
             type: 'submit',
             onclick: (e) => {
               e.preventDefault();
               $(vnode.dom).trigger('modalexit');
-            }
-          }, 'Done'),
-          m('button', {
+            },
+            label: 'Done'
+          }),
+          m(Button, {
+            intent: 'none',
             oncreate: (vvnode) => $(vvnode.dom).focus(),
-            onclick: (e) => { vnode.attrs.next('Intro'); }
-          }, 'Try again'),
+            onclick: (e) => { vnode.attrs.next('Intro'); },
+            label: 'Try again'
+          }),
         ]),
       ]);
     }
