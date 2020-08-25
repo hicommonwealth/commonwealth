@@ -4,11 +4,10 @@ import 'components/new_thread_form.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import moment from 'moment';
 import Quill from 'quill-2.0-dev/quill';
 import {
   Tabs, TabItem, Form, FormGroup, Input, Button,
-  ButtonGroup, Icon, Icons, Grid, Col, Tooltip, List, ListItem, Tag, MenuItem, Card
+  Icon, Icons, List, ListItem, Tag,
 } from 'construct-ui';
 
 import app from 'state';
@@ -159,7 +158,6 @@ export const NewThreadForm: m.Component<{
     vnode.state.form = {};
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
-    debugger
     vnode.state.fromDraft = Number(localStorage.getItem(`${app.activeId()}-from-draft`));
     if (vnode.state.newType === undefined) {
       vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
@@ -379,14 +377,16 @@ export const NewThreadForm: m.Component<{
         ]),
         //
         newType === PostType.Discussion && m(Form, [
-          fromDraft && m(FormGroup, { span: 2, order: { xs: 3, sm: 1 }, class: 'hidden-xs draft-badge-wrap' }, [
-            m(Tag, {
-              class: 'draft-badge',
-              size: 'xs',
-              rounded: true,
-              label: 'Draft',
-            })
-          ]),
+          fromDraft
+            ? m(FormGroup, { span: 2, order: { xs: 3, sm: 1 }, class: 'hidden-xs draft-badge-wrap' }, [
+              m(Tag, {
+                class: 'draft-badge',
+                size: 'xs',
+                rounded: true,
+                label: 'Draft',
+              })
+            ])
+            : null,
           m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 2 }, [
             m(Input, {
               name: 'new-thread-title',
