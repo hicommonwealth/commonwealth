@@ -126,11 +126,12 @@ const NewProposalForm = {
         app.threads.create(
           author.address,
           OffchainThreadKind.Forum,
+          app.activeChainId(),
+          app.activeCommunityId(),
+          vnode.state.form.title,
           vnode.state.form.topicName,
           vnode.state.form.topicId,
-          vnode.state.form.title,
           vnode.state.form.description,
-          vnode.state.form.categoryId,
         ).then(done)
           .then(() => { m.redraw(); })
           .catch((err) => { console.error(err); });
