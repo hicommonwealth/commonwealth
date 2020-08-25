@@ -96,7 +96,7 @@ interface IProfilePageState {
   comments: OffchainComment<any>[];
   loaded: boolean;
   loading: boolean;
-  refresh: boolean;
+  refreshProfile: boolean;
 }
 
 const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
@@ -106,7 +106,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     vnode.state.loading = false;
     vnode.state.threads = [];
     vnode.state.comments = [];
-    vnode.state.refresh = false;
+    vnode.state.refreshProfile = false;
   },
   oncreate: async (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
@@ -162,7 +162,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       });
     };
 
-    const { account, loaded, loading, refresh } = vnode.state;
+    const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
       loadProfile();
       vnode.state.loading = true;
@@ -176,9 +176,9 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     if (!account) {
       return m(PageNotFound, { message: 'This address does not have a Commonwealth profile' });
     }
-    if (refresh) {
+    if (refreshProfile) {
       loadProfile();
-      vnode.state.refresh = false;
+      vnode.state.refreshProfile = false;
       m.redraw();
     }
 
@@ -206,7 +206,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       m('.forum-container-alt', [
         m(ProfileHeader, {
           account,
-          refreshCallback: () => { vnode.state.refresh = true; },
+          refreshCallback: () => { vnode.state.refreshProfile = true; },
         }),
         m('.row.row-narrow.forum-row', [
           m('.col-xs-8', [
