@@ -24,7 +24,7 @@ const OffchainNavigationModule: m.Component<{}, {}> = {
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
 
     return m('.OnchainNavigationModule.SidebarModule', [
-      m(List, { size: 'lg' }, [
+      m(List, [
         m(ListItem, {
           label: 'All Discussions',
           class: 'section-header',
@@ -81,7 +81,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     if (onNotificationsPage(m.route.get())) return;
 
     return m('.OnchainNavigationModule.SidebarModule', [
-      m(List, { size: 'lg' }, [
+      m(List, [
         m(ListItem, {
           label: 'On-chain Governance',
           class: 'section-header',
@@ -216,7 +216,7 @@ const TopicsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
       .map((name, idx) => getTopicRow(featuredTopics[name].id, name, featuredTopics[name].description));
 
     return m('.TopicsModule.SidebarModule', [
-      m(List, { size: 'lg' }, [
+      m(List, [
         m(ListItem, {
           class: 'section-header',
           label: 'Discussions by Topic',
@@ -255,7 +255,6 @@ const TopicsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
         ]
       ]),
       m(List, {
-        size: 'lg',
         onupdate: (vvnode) => {
           if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
               && !vnode.state.dragulaInitialized) {
@@ -269,7 +268,7 @@ const TopicsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
           }
         }
       }, featuredTopicListItems),
-      m(List, { size: 'lg', class: 'more-topics-list' }, otherTopicListItems),
+      m(List, { class: 'more-topics-list' }, otherTopicListItems),
     ]);
   }
 };
@@ -277,7 +276,7 @@ const TopicsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
 const SettingsModule: m.Component<{}> = {
   view: (vnode) => {
     return m('.SettingsModule.SidebarModule', [
-      m(List, { size: 'lg' }, [
+      m(List, [
         m(ListItem, {
           label: 'Settings',
           class: 'section-header',
