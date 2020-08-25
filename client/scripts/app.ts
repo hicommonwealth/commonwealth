@@ -113,6 +113,18 @@ export function handleInviteLinkRedirect() {
   }
 }
 
+export function handleUpdateEmailConfirmation() {
+  if (m.route.param('confirmation')) {
+    mixpanel.track('Update Email Verification Redirect', {
+      'Step No': 1,
+      'Step': m.route.param('confirmation'),
+    });
+    if (m.route.param('confirmation') === 'success') {
+      notifySuccess('Success! Email confirmed');
+    }
+  }
+}
+
 export async function selectCommunity(c?: CommunityInfo): Promise<void> {
   // Check for valid community selection, and that we need to switch
   if (app.community && c === app.community.meta) return;
@@ -526,6 +538,9 @@ $(() => {
       }
 
       handleInviteLinkRedirect();
+
+      // If the user updates their email
+      handleUpdateEmailConfirmation();
 
       app.socket = new WebsocketController(wsUrl, jwt, null);
       if (app.loginState === LoginState.LoggedIn) {

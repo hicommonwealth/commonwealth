@@ -4,6 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 import mixpanel from 'mixpanel-browser';
+import { Button } from 'construct-ui';
 
 import { orderAccountsByAddress } from 'helpers';
 
@@ -86,13 +87,15 @@ const ConfirmInviteModal = {
             m('.community-block-bottom', `commonwealth.im/${invites[vnode.state.location].community_id}`)
           ]),
           vnode.state.accepted.includes(vnode.state.location) ? [
-            m('h4', 'You\'ve already accepted this invite!')
+            m('h4', 'You\'ve accepted this invite!')
           ] : [
             addresses.length > 0
               && m('p', 'Accept the invite with any of your addresses:'),
             addresses,
             addresses.length > 0
-              && m('button.formular-button-primary.submit', {
+              && m(Button, {
+                class: 'submit',
+                intent: 'primary',
                 disabled: vnode.state.accepted.includes(vnode.state.location) || !vnode.state.selectedAddress,
                 onclick: (e) => {
                   e.preventDefault();
@@ -114,12 +117,15 @@ const ConfirmInviteModal = {
                       console.error('Error accepting invite');
                     });
                   }
-                }
-              }, 'Accept invite'),
+                },
+                label: 'Accept invite',
+              }),
             addresses.length > 0
               && m('p', 'Or, reject the invite (you will need to be invited again to join the community):'),
             addresses.length > 0
-              && m('button.formular-button-negative.reject', {
+              && m(Button, {
+                class: 'reject',
+                intent: 'negative',
                 disabled: vnode.state.accepted.includes(vnode.state.location),
                 onclick: (e) => {
                   e.preventDefault();
@@ -140,8 +146,9 @@ const ConfirmInviteModal = {
                   }, (err) => {
                     console.error('Error accepting invite.');
                   });
-                }
-              }, 'Reject invite'),
+                },
+                label: 'Reject invite'
+              }),
             addresses.length === 0
               && m('.no-accounts', 'You must link a new address to join this community.'),
             addresses.length === 0
