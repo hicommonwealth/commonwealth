@@ -163,7 +163,10 @@ export const NewThreadForm: m.Component<{
     vnode.state.form = {};
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
-    vnode.state.fromDraft = Number(localStorage.getItem(`${app.activeId()}-from-draft`));
+    if (localStorage.getItem(`${app.activeId()}-from-draft`)) {
+      vnode.state.fromDraft = Number(localStorage.getItem(`${app.activeId()}-from-draft`));
+      localStorage.removeItem(`${app.activeId()}-from-draft`);
+    }
     vnode.state.overwriteConfirmationModal = false;
     if (vnode.state.postType === undefined) {
       vnode.state.postType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
