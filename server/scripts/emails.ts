@@ -74,7 +74,6 @@ export const createNotificationEmailObject = (
   const path = label.linkUrl ? `${SERVER_URL}${label.linkUrl}`
     : label ? `${SERVER_URL}/${chainId}`
       : (getProposalUrl as any)(...args);
-  console.log('path: ', path);
   const msg = {
     to: 'zak@commonwealth.im',
     from: 'Commonwealth <no-reply@commonwealth.im>',
