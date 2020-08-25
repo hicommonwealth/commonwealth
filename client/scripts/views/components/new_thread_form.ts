@@ -40,7 +40,7 @@ export const checkForModifications = async (state, modalMsg) => {
   const Delta = Quill.import('delta');
   let confirmed = true;
 
-  if (state.alteredText) {
+  if (state.quillEditorState.alteredText) {
     confirmed = await confirmationModalWithText(modalMsg)();
   }
 
@@ -87,7 +87,7 @@ export const loadDraft = async (dom, state, draft) => {
   const titleInput = $(dom).find('div.new-thread-form-body input[name=\'new-thread-title\']');
 
   // First we check if the form has been updated, to avoid losing any unsaved form data
-  const overwriteDraftMsg = 'Load this draft? Your current work will will not be saved.';
+  const overwriteDraftMsg = 'Load this draft? Your current work will not be saved.';
   const confirmed = await checkForModifications(state, overwriteDraftMsg);
   if (!confirmed) return;
 
@@ -349,9 +349,6 @@ export const NewThreadForm: m.Component<{
               autocomplete: 'off',
               oninput: (e) => {
                 const { value } = e.target as any;
-                if (vnode.state.quillEditorState && !vnode.state.quillEditorState.alteredText) {
-                  vnode.state.quillEditorState.alteredText = true;
-                }
                 vnode.state.autoTitleOverride = true;
                 vnode.state.form.linkTitle = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.linkTitle);
@@ -427,9 +424,8 @@ export const NewThreadForm: m.Component<{
               autocomplete: 'off',
               oninput: (e) => {
                 const { value } = (e as any).target;
-                if (!vnode.state.quillEditorState?.alteredText) {
+                if (vnode.state.quillEditorState && !vnode.state.quillEditorState.alteredText) {
                   vnode.state.quillEditorState.alteredText = true;
-                  m.redraw();
                 }
                 vnode.state.form.threadTitle = value;
                 localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
