@@ -81,7 +81,7 @@ const acceptInviteLink = async (models, req, res, next) => {
     }
   });
   if (prevInviteCode) {
-    redirectWithSuccess(res);
+    return redirectWithSuccess(res);
   }
 
   const community = await models.OffchainCommunity.findOne({
