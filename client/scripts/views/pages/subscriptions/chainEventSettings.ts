@@ -274,6 +274,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
           m('th', 'Settings'),
         ]),
         (chain.network === ChainNetwork.Edgeware) && m(EdgewareChainEvents),
+        (chain.network === ChainNetwork.Kulupu) && m(KulupuChainEvents),
         (chain.network === ChainNetwork.Kusama) && m(KusamaChainEvents),
         (chain.network === ChainNetwork.Polkadot) && m(PolkadotChainEvents),
       ]),
