@@ -195,7 +195,6 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
       return (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id) && s.OffchainComment;
     });
     const batchedSubscriptions = sortSubscriptions(filteredSubscriptions, 'objectId');
-    if (filteredSubscriptions.length < 1 && onComments.length < 1) return;
     return [
       m(NewThreadRow, { community, subscriptions }),
       onComments.length > 0 && m(BatchedSubscriptionRow, {
@@ -203,7 +202,7 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
         subscriptions: onComments,
       }),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
-      batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
+      batchedSubscriptions.length > 0 && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, {
           subscriptions: subscriptions2,
           key: subscriptions2[0].id,
