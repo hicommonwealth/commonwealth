@@ -161,20 +161,19 @@ export const NewThreadForm: m.Component<{
 }> = {
   oninit: (vnode) => {
     const { isModal } = vnode.attrs;
+    vnode.state.form = {};
+    vnode.state.recentlyDeletedDrafts = [];
+    vnode.state.uploadsInProgress = 0;
+    vnode.state.overwriteConfirmationModal = false;
     vnode.state.activeTopic = isModal
       ? m.route.param('topic')
       : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
         ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions') + 1]
         : undefined;
-    console.log(vnode.state.activeTopic);
-    vnode.state.form = {};
-    vnode.state.recentlyDeletedDrafts = [];
-    vnode.state.uploadsInProgress = 0;
     if (localStorage.getItem(`${app.activeId()}-from-draft`)) {
       vnode.state.fromDraft = Number(localStorage.getItem(`${app.activeId()}-from-draft`));
       localStorage.removeItem(`${app.activeId()}-from-draft`);
     }
-    vnode.state.overwriteConfirmationModal = false;
     if (vnode.state.postType === undefined) {
       vnode.state.postType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
     }
