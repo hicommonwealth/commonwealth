@@ -41,6 +41,7 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity) => {
 
 export interface IProfileHeaderAttrs {
   account;
+  refreshCallback: Function;
 }
 
 export interface IProfileHeaderState {
@@ -51,7 +52,7 @@ export interface IProfileHeaderState {
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
-    const { account } = vnode.attrs;
+    const { account, refreshCallback } = vnode.attrs;
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
       && account.address === app.user.activeAccount?.address;
 
@@ -97,7 +98,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               onclick: () => {
                 app.modals.create({
                   modal: EditProfileModal,
-                  data: { account },
+                  data: { account, refreshCallback },
                 });
               },
               label: 'Edit profile'
