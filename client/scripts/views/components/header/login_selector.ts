@@ -209,6 +209,19 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
             label: 'Settings'
           }),
           m(MenuItem, {
+            onclick: () => app.activeChainId()
+              ? m.route.set(`/${app.activeChainId()}/notificationSettings`)
+              : m.route.set('/notificationSettings'),
+            label: 'Email notifications'
+          }),
+          m(MenuItem, {
+            onclick: () => app.activeChainId()
+              ? m.route.set(`/${app.activeChainId()}/chainEventSettings`)
+              : m.route.set('/chainEventSettings'),
+            label: 'Chain notifications'
+          }),
+          m(MenuDivider),
+          m(MenuItem, {
             onclick: () => app.modals.create({ modal: FeedbackModal }),
             label: 'Send feedback',
           }),
