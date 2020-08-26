@@ -9,31 +9,32 @@ module.exports = {
 
       await Promise.all(users[0].map(async (user) => {
         const { id, } = user;
+        // Get all addresses for User
         const resAddresses = await queryInterface.sequelize.query(`SELECT * FROM "Addresses" WHERE user_id=${id};`, { transaction: t, });
         const addresses = resAddresses[0];
-        // console.log('addresses', addresses.length);
         const userRoles = [];
 
         await Promise.all(addresses.map(async (address) => {
+          // For each address, get roles and add them to userRoles
           const addressRoles = await queryInterface.sequelize.query(`SELECT * FROM "Roles" WHERE address_id=${address.id};`, { transaction: t, });
-          // console.log('roles', addressRoles[0].length);
           addressRoles[0].forEach((r) => userRoles.push(r));
         }));
 
-        // console.log('User Roles', userRoles);
-
+        // Get all user subscriptions
         const subscriptions = await queryInterface.sequelize.query(`SELECT * FROM "Subscriptions" WHERE subscriber_id=${id};`);
         const existingSubscriptions = [];
+        // Add subscriptions object_id to existingSubscriptions where not included already
         subscriptions[0].forEach((s) => {
           if (!existingSubscriptions.includes(s.object_id)) {
             existingSubscriptions.push(s.object_id);
           }
         });
-        // console.log('existingSubscriptions', existingSubscriptions);
 
         const communityIds = [];
         const chainIds = [];
 
+        // For each role, check community/chain and if its already associated with an existingSubscription
+        // If not, add to communityIds or chainIds respectively
         userRoles.forEach((r) => {
           if (r.offchain_community_id && !communityIds.includes(r.offchain_community_id) && !existingSubscriptions.includes(r.offchain_community_id)) {
             communityIds.push(r.offchain_community_id);
@@ -42,23 +43,15 @@ module.exports = {
           }
         });
 
-        // console.log("Community Ids", communityIds);
-        // console.log("Chain Ids", chainIds);
+        // For each community where a user has a role but no subscription, add one.
+        await Promise.all(communityIds.map(async (communityId) => {
+          await queryInterface.sequelize.query(`INSERT INTO "Subscriptions" (subscriber_id, category_id, object_id, chain_id, community_id, created_at, updated_at) VALUES (${id}, 'new-thread-creation', '${communityId}', NULL, '${communityId}', NOW(), NOW());`, { transaction: t, });
+        }));
 
-        if (communityIds.length + chainIds.length > 0) {
-          console.log('user id', id);
-          console.log('userRoles', userRoles);
-          console.log('subscriptions', existingSubscriptions);
-          console.log('community Ids', communityIds);
-          console.log('chain ids', chainIds);
-        }
-        // await Promise.all(communityIds.map(async (communityId) => {
-        //   await queryInterface.sequelize.query(`INSERT INTO "Subscriptions" (subscriber_id, category_id, object_id, chain_id, community_id) VALUES (${id}, 'new-thread-creation', '${communityId}', NULL, '${communityId}');`)
-        // }));
-
-        // await Promise.all(chainIds.map(async (chainId) => {
-        //   await queryInterface.sequelize.query(`INSERT INTO "Subscriptions" (subscriber_id, category_id, object_id, chain_id, community_id) VALUES (${id}, 'new-thread-creation', '${chainId}', '${chainId}', NULL);`)
-        // }));
+        // For each chain where a user has a role but no subscription, add one.
+        await Promise.all(chainIds.map(async (chainId) => {
+          await queryInterface.sequelize.query(`INSERT INTO "Subscriptions" (subscriber_id, category_id, object_id, chain_id, community_id, created_at, updated_at) VALUES (${id}, 'new-thread-creation', '${chainId}', '${chainId}', NULL, NOW(), NOW());`, { transaction: t, });
+        }));
       }));
     });
   },
@@ -67,12 +60,5 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await Promise.all([]);
     });
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.dropTable('users');
-    */
   }
 };
