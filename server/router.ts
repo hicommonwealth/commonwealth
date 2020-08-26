@@ -213,10 +213,10 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/getInvites', passport.authenticate('jwt', { session: false }), getInvites.bind(this, models));
   router.get('/getOffences', getOffences.bind(this, models));
   router.get('/getRewards', getRewards.bind(this, models));
-  router.get('/getExposureOverTime', getOwnStakeOverTime.bind(this, models));
-  router.get('/getExposureOverTime', getOtherStakeOverTime.bind(this, models));
-  router.get('/getExposureOverTime', getTotalStakeOverTime.bind(this, models));
-  router.get('/getExposureOverTime', getNominatorsOverTime.bind(this, models));
+  router.get('/getOwnStakeOverTime', getOwnStakeOverTime.bind(this, models));
+  router.get('/getOtherStakeOverTime', getOtherStakeOverTime.bind(this, models));
+  router.get('/getTotalStakeOverTime', getTotalStakeOverTime.bind(this, models));
+  router.get('/getNominatorsOverTime', getNominatorsOverTime.bind(this, models));
   // TODO: Change to PUT /invite
   router.post('/acceptInvite', passport.authenticate('jwt', { session: false }), acceptInvite.bind(this, models));
   // TODO: Change to POST /member
