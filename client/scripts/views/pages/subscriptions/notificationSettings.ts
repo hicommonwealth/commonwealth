@@ -99,6 +99,9 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
     vnode.state.subscriptions = vnode.attrs.subscriptions;
   },
   view: (vnode) => {
+    if (vnode.state.subscriptions[0] !== vnode.attrs.subscriptions[0]) {
+      vnode.state.subscriptions = vnode.attrs.subscriptions;
+    }
     const { label, bold } = vnode.attrs;
     const { subscriptions } = vnode.state;
     const someActive = subscriptions.some((s) => s.isActive);
@@ -171,7 +174,7 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
     return subscription && m(BatchedSubscriptionRow, {
       subscriptions: [subscription],
       label: 'New threads',
-      bold: true
+      bold: true,
     });
   },
 };
@@ -191,11 +194,16 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
         && s.category !== NotificationCategories.ChainEvent
         && !s.OffchainComment
     );
+    const newThreads = subscriptions.find(
+      (s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id)
+    );
+    console.log('new threads', newThreads);
     const onComments = subscriptions.filter((s) => {
       return (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id) && s.OffchainComment;
     });
     const batchedSubscriptions = sortSubscriptions(filteredSubscriptions, 'objectId');
     return [
+      // m(BatchedSubscriptionRow, { subscriptions: [newThreads], label: 'New Threads2', }),
       m(NewThreadRow, { community, subscriptions }),
       onComments.length > 0 && m(BatchedSubscriptionRow, {
         label: 'Notifications on Comments',
