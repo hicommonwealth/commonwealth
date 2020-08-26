@@ -25,42 +25,14 @@ class ChainEventsController {
     });
   }
 
-  public getOwnStakeOverTime(stash?: string) {
+  public getExposure(stash?: string) {
     return new Promise((resolve) => {
-      return get('/getOwnStakeOverTime', {
+      return get('/getExposureOverTime', {
         chain: app.chain.id,
         stash
       }, resolve);
     });
   }
-
-  public getTotalStakeOverTime(stash?: string) {
-    return new Promise((resolve) => {
-      return get('/getTotalStakeOverTime', {
-        chain: app.chain.id,
-        stash
-      }, resolve);
-    });
-  }
-
-  public getOtherStakeOverTime(stash?: string) {
-    return new Promise((resolve) => {
-      return get('/getOtherStakeOverTime', {
-        chain: app.chain.id,
-        stash
-      }, resolve);
-    });
-  }
-
-  public getNominatorsOverTime(stash?: string) {
-    return new Promise((resolve) => {
-      return get('/getNominatorsOverTime', {
-        chain: app.chain.id,
-        stash
-      }, resolve);
-    });
-  }
-
 }
 
 export default ChainEventsController;
