@@ -215,7 +215,7 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
             label: 'Email notifications'
           }),
           m(MenuItem, {
-            onclick: () => (app.activeChainId())
+            onclick: () => app.activeChainId()
               ? m.route.set(`/${app.activeChainId()}/chainEventSettings`)
               : m.route.set('/chainEventSettings'),
             label: 'Chain notifications'
