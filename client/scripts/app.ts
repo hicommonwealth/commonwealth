@@ -184,8 +184,8 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   } else if (n.chain.network === ChainNetwork.Kulupu) {
     const Kulupu = (await import(
       /* webpackMode: "lazy" */
-      /* webpackChunkName: "kusama-main" */
-      './controllers/chain/polkadot/main'
+      /* webpackChunkName: "kulupu-main" */
+      './controllers/chain/kulupu/main'
     )).default;
     app.chain = new Kulupu(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
