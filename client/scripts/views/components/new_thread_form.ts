@@ -161,13 +161,12 @@ export const NewThreadForm: m.Component<{
 }> = {
   oninit: (vnode) => {
     const { isModal } = vnode.attrs;
-    const route = isModal
-      ? m.route.get().split('/')
-      : app.lastNavigatedFrom().split('/');
-    if (route.length > 3) {
-      console.log(route[3]);
-      vnode.state.activeTopic = route[3];
-    }
+    vnode.state.activeTopic = isModal
+      ? m.route.param('topic')
+      : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
+        ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions')]
+        : undefined;
+
     vnode.state.form = {};
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
