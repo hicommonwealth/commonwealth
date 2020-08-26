@@ -6,6 +6,11 @@ class Kulupu extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
     super(n, app, ChainClass.Polkadot);
   }
+
+  public async initData() {
+    // use old democracy logic
+    super.initData(false);
+  }
 }
 
 export default Kulupu;
