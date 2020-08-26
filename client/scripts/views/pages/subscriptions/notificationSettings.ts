@@ -107,10 +107,13 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
     const someActive = subscriptions.some((s) => s.isActive);
     const everyActive = subscriptions.every((s) => s.isActive);
     const someEmail = subscriptions.some((s) => s.immediateEmail);
-    if (everyActive && someEmail) {
+    const everyEmail = subscriptions.some((s) => s.immediateEmail);
+    if (everyActive && everyEmail) {
       vnode.state.option = 'Notifications on (app + email)';
-    } else if (everyActive) {
+    } else if (everyActive && !someEmail) {
       vnode.state.option = 'Notifications on (app only)';
+    } else if (someActive) {
+      vnode.state.option = 'Some notifications on';
     } else {
       vnode.state.option = 'Notifications off';
     }
