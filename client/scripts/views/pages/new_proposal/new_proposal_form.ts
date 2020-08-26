@@ -178,14 +178,17 @@ const NewProposalForm = {
         if (!vnode.state.threshold) throw new Error('Invalid threshold');
         const threshold = vnode.state.threshold;
         if (vnode.state.councilMotionType === 'createExternalProposal') {
-          args = [author, threshold, EdgewareFunctionPicker.getMethod()];
-          createFunc = ([a, t, m]) => (app.chain as Substrate).council.createExternalProposal(a, t, m);
+          args = [author, threshold, EdgewareFunctionPicker.getMethod(), 
+            EdgewareFunctionPicker.getMethod().encodedLength];
+          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposal(a, t, m, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalMajority') {
-          args = [author, threshold, EdgewareFunctionPicker.getMethod()];
-          createFunc = ([a, t, m]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, m);
+          args = [author, threshold, EdgewareFunctionPicker.getMethod(), 
+            EdgewareFunctionPicker.getMethod().encodedLength];
+          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, m, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalDefault') {
-          args = [author, threshold, EdgewareFunctionPicker.getMethod()];
-          createFunc = ([a, t, m]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, m);
+          args = [author, threshold, EdgewareFunctionPicker.getMethod(), 
+            EdgewareFunctionPicker.getMethod().encodedLength];
+          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, m, l);
         } else if (vnode.state.councilMotionType === 'createFastTrack') {
           args = [author, threshold, vnode.state.nextExternalProposalHash,
             vnode.state.votingPeriod, vnode.state.enactmentDelay];
