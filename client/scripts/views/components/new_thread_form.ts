@@ -164,9 +164,9 @@ export const NewThreadForm: m.Component<{
     vnode.state.activeTopic = isModal
       ? m.route.param('topic')
       : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
-        ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions')]
+        ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions') + 1]
         : undefined;
-
+    console.log(vnode.state.activeTopic);
     vnode.state.form = {};
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
