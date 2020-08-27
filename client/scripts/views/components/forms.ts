@@ -4,81 +4,6 @@ import m from 'mithril';
 import $ from 'jquery';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 
-interface ITextFormFieldAttrs {
-  callback?: CallableFunction;
-  options?: ITextOptions;
-  style?: string;
-  subtitle?: string;
-  title?: string;
-}
-
-interface ITextOptions {
-  autocomplete?: string;
-  autofocus?: boolean;
-  callback?: CallableFunction;
-  class?: string;
-  disabled?: boolean;
-  name?: string;
-  placeholder?: string;
-  oncreate?: any;
-  oninput?: Function;
-  onfocus?: Function;
-  onblur?: Function;
-  tabindex?: number;
-  value?: string | number;
-}
-
-export const TextInputFormField: m.Component<ITextFormFieldAttrs> = {
-  view: (vnode: m.VnodeDOM<ITextFormFieldAttrs>) => {
-    const { options, title, subtitle } = vnode.attrs;
-
-    if (options.autocomplete === undefined) options.autocomplete = 'off';
-
-    const oninput = options.oninput || (() => (undefined));
-    options.oninput = (e) => {
-      e.redraw = false;
-      if (vnode.attrs.callback) {
-        vnode.attrs.callback($(e.target).val());
-      } else if (options.callback) {
-        options.callback($(e.target).val()); // Not recommended. See: https://app.clubhouse.io/commonwealth/story/1193
-      }
-      oninput.call(this, e);
-    };
-
-    return m('.TextInputFormField.FormField', [
-      m('.form-group', [
-        title && m('.form-title', title),
-        subtitle && m('.form-subtitle', subtitle),
-        m('input[type="text"].form-field', options),
-      ]),
-    ]);
-  }
-};
-
-export const TextareaFormField: m.Component<ITextFormFieldAttrs> = {
-  view: (vnode: m.VnodeDOM<ITextFormFieldAttrs>) => {
-    const { options, title, subtitle } = vnode.attrs;
-
-    const oninput = options.oninput || (() => (undefined));
-    options.oninput = (e) => {
-      e.redraw = false;
-      if (vnode.attrs.callback) {
-        vnode.attrs.callback($(e.target).val());
-      }
-      oninput.call(this, e);
-    };
-    options.class = `${options.class || ''} form-field`;
-
-    return m('.TextareaFormField.FormField', [
-      m('.form-group', [
-        title && m('.form-title', title),
-        subtitle && m('.form-subtitle', subtitle),
-        m(ResizableTextarea, options),
-      ]),
-    ]);
-  }
-};
-
 interface IDropdownFormFieldAttrs {
   callback?: CallableFunction;
   choices: IDropdownFormFieldChoice[];
@@ -228,37 +153,6 @@ interface IButtonSelectorChoice {
   name?: string;
   value: number | string;
 }
-
-export const ButtonSelectorFormField: m.Component<IButtonSelectorAttrs, IButtonSelectorState> = {
-  view: (vnode: m.VnodeDOM<IButtonSelectorAttrs, IButtonSelectorState>) => {
-    const { choices, defaultSelection, subtitle, title } = vnode.attrs;
-
-    if (!vnode.state.initialized) {
-      vnode.state.initialized = true;
-      vnode.state.selection = defaultSelection;
-    }
-
-    return m('.ButtonSelectorFormField.FormField', [
-      m('.form-group', [
-        title && m('.form-title', title),
-        subtitle && m('.form-subtitle', subtitle),
-        m('.form-field.buttons', choices.map((item) => {
-          return m('button', {
-            disabled: item.disabled,
-            class: vnode.state.selection === item.value ? 'active' : '',
-            onclick: (e) => {
-              e.preventDefault();
-              vnode.state.selection = item.value;
-              if (vnode.attrs.callback) {
-                vnode.attrs.callback(item.value);
-              }
-            },
-          }, item.label);
-        })),
-      ]),
-    ]);
-  }
-};
 
 export const MultipleButtonSelectorFormField: m.Component<IButtonSelectorAttrs, IButtonSelectorState> = {
   view: (vnode: m.VnodeDOM<IButtonSelectorAttrs, IButtonSelectorState>) => {

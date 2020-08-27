@@ -3,9 +3,11 @@ import 'modals/token_management_modal.scss';
 import Web3 from 'web3';
 import m from 'mithril';
 import $ from 'jquery';
-import { TextInputFormField, RadioSelectorFormField } from 'views/components/forms';
-import { ERC20Token } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
+import { FormGroup, FormLabel, Input, Button } from 'construct-ui';
+
+import { ERC20Token } from 'adapters/chain/ethereum/types';
+import { RadioSelectorFormField } from 'views/components/forms';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 
@@ -44,36 +46,35 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
     const content = [];
     if (vnode.state.toggleValue === 'approve') {
       content.push(
-        m(TextInputFormField, {
-          title: 'Amount of token to approve',
-          subtitle: 'If you want to become a DAO member, you must allow it to handle some of your tokens.',
-          options: {
-            value: vnode.state.tokenAmount,
-            // eslint-disable-next-line no-shadow
-            oncreate: (vnode) => {
-              $(vnode.dom).focus();
+        m(FormGroup, [
+          m(FormLabel, 'Amount of token to approve (If you want to become a DAO member, you must allow it to handle some of your tokens)'),
+          m(Input, {
+            defaultValue: vnode.state.tokenAmount,
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
+            },
+            onchange: (e) => {
+              const result = (e.target as any).value;
+              vnode.state.tokenAmount = result.toString();
+              m.redraw(); // TODO: comment why this is needed?
             }
-          },
-          callback: (val) => {
-            vnode.state.tokenAmount = val.toString();
-            m.redraw();
-          }
-        }),
+          })
+        ]),
         m('.token-data-label', [ `Moloch contract address: ${vnode.attrs.contractAddress}` ]),
         m('.token-data-label',
           [ `ERC20 Tokens allocated to contract: ${vnode.state.tokensAllocatedToContract || '--'}` ]),
       );
     } else if (vnode.state.toggleValue === 'transfer') {
       content.push(
-        m(TextInputFormField, {
-          title: 'Token recipient',
-          options: {
-            // eslint-disable-next-line no-shadow
-            oncreate: (vnode) => {
-              $(vnode.dom).focus();
+        m(FormGroup, [
+          m(FormLabel, 'Token recipient'),
+          m(Input, {
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
             },
-            callback: (val) => {
-              vnode.state.recipient = val.toString();
+            onchange: (e) => {
+              const result = (e.target as any).value;
+              vnode.state.recipient = result.toString();
 
               // once recipient is entered, fetch its token balance
               if (Web3.utils.isAddress(vnode.state.recipient)) {
@@ -86,22 +87,22 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
                 });
               }
             },
-          },
-        }),
-        m(TextInputFormField, {
-          title: 'Amount of token to transfer',
-          options: {
-            value: vnode.state.tokenAmount,
-            // eslint-disable-next-line no-shadow
-            oncreate: (vnode) => {
-              $(vnode.dom).focus();
+          }),
+        ]),
+        m(FormGroup, [
+          m(FormLabel, 'Amount of token to transfer'),
+          m(Input, {
+            defaultValue: vnode.state.tokenAmount,
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
             },
-          },
-          callback: (val) => {
-            vnode.state.tokenAmount = val.toString();
-            m.redraw();
-          },
-        }),
+            onchange: (e) => {
+              const result = (e.target as any).value;
+              vnode.state.tokenAmount = result.toString();
+              m.redraw(); // TODO: comment why this is necessary?
+            }
+          })
+        ]),
         m('.token-data-label', [ `Recipient holdings: ${vnode.state.recipientHoldings || '--'}` ]),
       );
     } else {

@@ -8,9 +8,9 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const nodes = [
   [ 'ws://localhost:9944', 'edgeware-local' ],
-  [ 'wss://berlin1.edgewa.re', 'edgeware-testnet' ],
-  [ 'wss://berlin2.edgewa.re', 'edgeware-testnet' ],
-  [ 'wss://berlin3.edgewa.re', 'edgeware-testnet' ],
+  [ 'wss://beresheet1.edgewa.re', 'edgeware-testnet' ],
+  [ 'wss://beresheet2.edgewa.re', 'edgeware-testnet' ],
+  [ 'wss://beresheet3.edgewa.re', 'edgeware-testnet' ],
   [ 'ws://mainnet2.edgewa.re:9944', 'edgeware' ],
   // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],

@@ -1,7 +1,9 @@
 import m from 'mithril';
 import app from 'state';
-import { TextInputFormField, DropdownFormField } from 'views/components/forms';
+import { FormLabel, FormGroup, Input } from 'construct-ui';
+
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { DropdownFormField } from 'views/components/forms';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 
 interface IActionFormAttrs {
@@ -26,13 +28,16 @@ interface IActionFormState {
 const ActionForm: m.Component<IActionFormAttrs, IActionFormState> = {
   view: (vnode) => {
     const inputComponent = (vnode.attrs.isTextInput)
-      ? m(TextInputFormField, {
-        title: vnode.attrs.titleMsg,
-        options: {
+      ? m(FormGroup, [
+        m(FormLabel, vnode.attrs.titleMsg),
+        m(Input, {
           placeholder: vnode.attrs.placeholder,
-          callback: (result) => { vnode.state.data = vnode.attrs.onChangeHandler(result); },
-        },
-      })
+          onchange: (e) => {
+            const result= (e.target as any).value;
+            vnode.state.data = vnode.attrs.onChangeHandler(result);
+          },
+        }),
+      ])
       : m(DropdownFormField, {
         title: vnode.attrs.titleMsg,
         options: vnode.attrs.options,

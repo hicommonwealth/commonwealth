@@ -3,6 +3,7 @@ import 'modals/message_signing_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
+import { Button } from 'construct-ui';
 
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
@@ -21,7 +22,8 @@ const MessageSigningSeedOrMnemonicOption = {
           class: 'mnemonic',
           placeholder: 'Key phrase or seed',
         }),
-        m('button[type="submit"]', {
+        m(Button, {
+          type: 'submit',
           onclick: (e) => {
             e.preventDefault();
             vnode.state.error = null;
@@ -37,8 +39,9 @@ const MessageSigningSeedOrMnemonicOption = {
               vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Signature check failed.';
               m.redraw();
             });
-          }
-        }, 'Sign message'),
+          },
+          label: 'Sign message'
+        }),
         vnode.state.error && m('.error-message', vnode.state.error),
       ]),
     ]);
@@ -76,7 +79,7 @@ const MessageSigningCLIOption = {
       }),
       vnode.state.error && m('.error-message', vnode.state.error),
       m('br'),
-      m('button', {
+      m(Button, {
         type: 'submit',
         onclick: (e) => {
           vnode.state.error = null;
@@ -96,7 +99,8 @@ const MessageSigningCLIOption = {
             vnode.state.error = 'Invalid signature';
           }
         },
-      }, 'Submit signature'),
+        label: 'Submit signature'
+      }),
     ]);
   }
 };

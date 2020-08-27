@@ -60,9 +60,8 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
   }
 
   // create and email the token
-  const path = '/';
-  const tokenObj = await models.LoginToken.createForEmail(email, path);
-  const loginLink = `${SERVER_URL}/api/finishLogin?token=${tokenObj.token}&email=${encodeURIComponent(email)}`;
+  const tokenObj = await models.LoginToken.createForEmail(email);
+  const loginLink = `${SERVER_URL}/api/finishLogin?token=${tokenObj.token}&email=${encodeURIComponent(email)}&confirmation=success`;
   const msg = {
     to: email,
     from: 'Commonwealth <no-reply@commonwealth.im>',

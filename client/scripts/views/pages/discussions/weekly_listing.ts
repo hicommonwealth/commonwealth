@@ -40,13 +40,16 @@ const WeeklyDiscussionListing: m.Component<IWeeklyDiscussionListingAttrs, IWeekl
     };
 
     const proposals = vnode.attrs.proposals.sort(orderDiscussionsbyLastComment).filter((p) => !p.pinned);
+    if (proposals.length === 0) {
+      return;
+    }
     const firstProposal = proposals[0];
     const lastProposal = proposals[proposals.length - 1];
     const isEntireWeekSeen = () => getLastUpdate(firstProposal) < lastVisited;
     const isEntireWeekUnseen = () => getLastUpdate(lastProposal) > lastVisited;
 
     const discussionRow = (proposal) => m(DiscussionRow, { proposal });
-    const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'New posts'), m('hr') ]);
+    const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last visit'), m('hr') ]);
     const threadGroup = '.discussion-group-wrap';
 
     const proposalsByLastViewed = () => {
@@ -78,9 +81,6 @@ const WeeklyDiscussionListing: m.Component<IWeeklyDiscussionListingAttrs, IWeekl
       return sortedProposals;
     };
 
-    if (proposals.length === 0) {
-      return;
-    }
     return m('.WeeklyDiscussionListing', [
       // m('h4', heading),
       vnode.attrs.lastVisited

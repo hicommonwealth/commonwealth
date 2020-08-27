@@ -2,9 +2,13 @@ import 'components/proposals/convictions_table.scss';
 
 import m from 'mithril';
 import { formatDuration, blockperiodToDuration } from 'helpers';
-import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy_referendum';
-import Substrate from 'controllers/chain/substrate/main';
+import { Button } from 'construct-ui';
+
 import app from 'state';
+import {
+  convictionToWeight, convictionToLocktime, convictions
+} from 'controllers/chain/substrate/democracy_referendum';
+import Substrate from 'controllers/chain/substrate/main';
 import SubstrateChain from 'client/scripts/controllers/chain/substrate/shared';
 
 export const ConvictionsChooser = {
@@ -18,16 +22,16 @@ export const ConvictionsChooser = {
         vnode.attrs.callback(c.toString());
       }
     }, [
-      convictions().map((c) => m('button', {
-        class: vnode.state.selectedConviction === c.toString() ? 'formular-button-secondary' : '',
+      convictions().map((c) => m(Button, {
+        intent: 'primary',
+        active: vnode.state.selectedConviction === c.toString(),
         onclick: ((e) => {
           e.preventDefault();
           vnode.state.selectedConviction = c.toString();
           vnode.attrs.callback(c.toString());
-        })
-      }, [
-        `${convictionToWeight(c)}x weight (${convictionToLocktime(c)}x locktime)`
-      ]))
+        }),
+        label: `${convictionToWeight(c)}x weight (${convictionToLocktime(c)}x locktime)`,
+      }))
     ]);
   }
 };

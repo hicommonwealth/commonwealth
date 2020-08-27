@@ -15,7 +15,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
     requestTimeout: 10000
   },
   pool: {
-    max: 100,
+    max: 10,
     min: 0,
     acquire: 30000,
     idle: 10000,

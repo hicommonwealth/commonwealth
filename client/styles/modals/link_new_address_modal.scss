@@ -292,9 +292,10 @@
     }
 
     // for step 3
-    textarea.ResizableTextarea.new-profile-bio {
+    textarea[name="bio"] {
         min-height: 68px;
         margin-bottom: 18px;
+        padding-top: 11px;
     }
 
     // for step 4

@@ -62,7 +62,7 @@ export const TopicEditorButton: m.Component<{ openTopicEditor: Function }, { isO
     return m('.TopicEditorButton', [
       m(MenuItem, {
         fluid: true,
-        label: 'Move to another topic',
+        label: 'Edit topic',
         onclick: (e) => {
           e.preventDefault();
           openTopicEditor();
@@ -105,6 +105,9 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
         closeOnContentClick: true,
         menuAttrs: {},
         content: [
+          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
+          m(ThreadSubscriptionButton, { proposal }),
+          hasAdminPermissions && m(MenuDivider),
           hasAdminPermissions && m(MenuItem, {
             class: 'pin-thread-toggle',
             onclick: (e) => {
@@ -128,9 +131,6 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
           hasAdminPermissions && m(TopicEditorButton, {
             openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; }
           }),
-          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
-          (isAuthor || hasAdminPermissions) && m(MenuDivider),
-          m(ThreadSubscriptionButton, { proposal }),
         ],
         inline: true,
         trigger: m(Icon, {

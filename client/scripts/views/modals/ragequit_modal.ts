@@ -2,7 +2,8 @@ import 'modals/ragequit_modal.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { TextInputFormField } from 'views/components/forms';
+import { Button, Input, FormLabel, FormGroup } from 'construct-ui';
+
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { notifyError } from 'controllers/app/notifications';
 import BN from 'bn.js';
@@ -22,21 +23,22 @@ const RagequitModal: m.Component<IAttrs, IState> = {
       m('.header', 'Ragequit'),
       m('.compact-modal-body', [
         m('.data-label', [ `Share holdings: ${acct?.shares?.format() ?? '--'}` ]),
-        m(TextInputFormField, {
-          title: 'Shares to burn',
-          subtitle: 'Exchange your shares for ETH.',
-          options: {
+        m(FormGroup, [
+          m(FormLabel, 'Shares to burn (to exchange for ETH)'),
+          m(Input, {
             value: vnode.state.sharesToBurn,
             oncreate: (vvnode) => {
               $(vvnode.dom).focus();
+            },
+            onchange: (e) => {
+              const result = (e.target as any).value;
+              vnode.state.sharesToBurn = result.toString();
             }
-          },
-          callback: (val) => {
-            vnode.state.sharesToBurn = val.toString();
-          }
-        }),
-        m('button', {
+          })
+        ]),
+        m(Button, {
           type: 'submit',
+          intent: 'primary',
           onclick: (e) => {
             e.preventDefault();
             const toBurn = new BN(vnode.state.sharesToBurn);
@@ -46,8 +48,9 @@ const RagequitModal: m.Component<IAttrs, IState> = {
                 m.redraw();
               })
               .catch((err) => notifyError(err));
-          }
-        }, 'Ragequit'),
+          },
+          label: 'Ragequit'
+        }),
       ]),
     ]);
   }

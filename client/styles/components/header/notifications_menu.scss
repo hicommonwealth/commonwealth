@@ -1,20 +1,20 @@
 @import 'client/styles/shared';
 
 .NotificationsMenuButton {
+    padding: 0 11px !important;
     @include xs-max {
-        padding: 0 11px !important;
+        .notification-count {
+            position: relative;
+            top: 1px;
+        }
     }
     .cui-icon {
         margin-right: 0 !important;
         position: relative;
         top: -1px;
         @include xs-max {
-            top: 0;
+            top: 1px;
         }
-    }
-    .notification-count {
-        position: relative;
-        top: 1px;
     }
     &.has-notifications {
         .cui-icon {
@@ -63,7 +63,7 @@
         list-style: none;
         text-align: center;
         padding-top: 230px;
-        color: #546e7d;
+        color: #111;
         font-weight: 500;
     }
     .NotificationButtons {
@@ -76,8 +76,12 @@
                 text-align: center;
                 color: #333;
             }
+            &:after {
+                // suppress button group styling
+                display: none !important;
+            }
         }
-        .cui-button:nth-child(1) {
+        > .cui-button:nth-child(1) {
             border-right: 1px #d8dee0 solid;
         }
     }

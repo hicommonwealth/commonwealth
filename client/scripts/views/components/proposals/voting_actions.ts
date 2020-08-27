@@ -2,6 +2,8 @@ import 'components/proposals/voting_actions.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { hexToUtf8 } from 'web3-utils';
+import { Button } from 'construct-ui';
 
 import app from 'state';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
@@ -23,7 +25,6 @@ import Edgeware from 'controllers/chain/edgeware/main';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
-import { hexToUtf8 } from 'web3-utils';
 import MolochProposal, {
   MolochProposalVote,
   MolochVote,
@@ -37,7 +38,11 @@ const CannotVote: m.Component<{ text?, action? }> = {
     return m('.CannotVote', [
       vnode.attrs.text && m('.proposal-voting-box-text', vnode.attrs.text),
       vnode.attrs.action && m('.proposal-voting-box-action', [
-        m('button.formular-button-positive.disabled', vnode.attrs.action),
+        m(Button, {
+          intent: 'positive',
+          disabled: true,
+          label: vnode.attrs.action,
+        }),
       ]),
     ]);
   }
@@ -74,24 +79,20 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
         ],
         proposal.stage === SignalingProposalStage.Completed
           && 'Signaling proposal complete.',
-        (proposal.data.author === user.address) && [
-          m('button.formular-button-positive', {
-            class: proposal.stage === SignalingProposalStage.PreVoting ? '' : 'disabled',
+        (proposal.data.author === user.address)
+          && m(Button, {
+            intent: 'positive',
+            disabled: (proposal.stage !== SignalingProposalStage.PreVoting),
             onclick: advanceSignalingProposal,
-          }, proposalStageMsg)
-        ]
+            label: proposalStageMsg,
+          }),
       ]);
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyReferendum) {
       if (!vnode.attrs.setConviction) throw new Error('Misconfigured');
       return m('.ProposalExtensions', [
-        m('h4', 'Quadratically weighted conviction voting'),
-        m('p', [
-          'If the proposal passes, yes-voters\' coins will be timelocked ',
-          'according to the weight they have chosen.',
-        ]),
-        m('p', [
-          'Timelocked coins can still participate in staking or nominating.',
-        ]),
+        m('strong', 'Conviction voting'),
+        m('p', 'The winning side\'s coins will be timelocked according to their chosen weight.'),
+        m('p', 'Timelocked coins can still participate in staking and governance.'),
         m(ConvictionsChooser, { callback: vnode.attrs.setConviction }),
       ]);
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyProposal) {
@@ -387,78 +388,96 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       buttons = choices.map((c, inx) => {
         let cl;
         if (choices.length > 2) {
-          cl = ['.yes-button', 'button.formular-button-positive'];
+          cl = ['.yes-button', 'positive'];
         } else if (inx === 1) {
-          cl = ['.no-button', 'button.formular-button-negative'];
+          cl = ['.no-button', 'negative'];
         } else {
-          cl = ['.yes-button', 'button.formular-button-positive'];
+          cl = ['.yes-button', 'positive'];
         }
 
         return m(`${cl[0]}`, [
-          m(`${cl[1]}`, {
+          m(Button, {
+            intent: cl[1],
             class: canVote && !hasVotedForChoice[c.toHex()] ? '' : 'disabled',
             onclick: (e) => voteForChoice(e, c),
-          }, hasVotedForChoice[c.toHex()]
-            ? `Voted ${hexToUtf8(c.toHex())}`
-            : `Vote ${hexToUtf8(c.toHex())}`),
+            label: hasVotedForChoice[c.toHex()]
+              ? `Voted ${hexToUtf8(c.toHex())}`
+              : `Vote ${hexToUtf8(c.toHex())}`
+          }),
         ]);
       });
     }
     const yesButton = m('.yes-button', [
-      m('button.formular-button-positive', {
+      m(Button, {
+        intent: 'positive',
         class: canVote && !hasVotedYes ? '' : 'disabled',
         onclick: voteYes,
-      }, hasVotedYes ? 'Voted yes' : 'Vote yes')
+        label: hasVotedYes ? 'Voted yes' : 'Vote yes'
+      }),
     ]);
     const noButton = m('.no-button', [
-      m('button.formular-button-negative', {
+      m(Button, {
+        intent: 'negative',
         class: canVote && !hasVotedNo ? '' : 'disabled',
         onclick: voteNo,
-      }, hasVotedNo ? 'Voted no' : 'Vote no')
+        label: hasVotedNo ? 'Voted no' : 'Vote no'
+      })
     ]);
     // substrate: multi-deposit approve
     const multiDepositApproveButton = m('.approve-button', [
-      m('button.formular-button-positive', {
+      m(Button, {
+        intent: 'positive',
         class: canVote ? '' : 'disabled',
         onclick: voteYes,
-      }, (hasVotedYes && !canVote) ? 'Already approved' : 'Second')
+        label: (hasVotedYes && !canVote) ? 'Already approved' : 'Second'
+      }),
     ]);
     // cosmos: abstain
     const abstainButton = m('.abstain-button', [
-      m('button.formular-button-tertiary', {
+      m(Button, {
+        intent: 'none',
         class: canVote && !hasVotedAbstain ? '' : 'disabled',
         onclick: voteAbstain,
-      }, hasVotedAbstain ? 'Voted abstain' : 'Vote abstain')
+        label: hasVotedAbstain ? 'Voted abstain' : 'Vote abstain'
+      }),
     ]);
     // cosmos: abstain
     const noWithVetoButton = m('.veto-button', [
-      m('button.formular-button-negative', {
+      m(Button, {
+        intent: 'negative',
         class: canVote && !hasVotedVeto ? '' : 'disabled',
         onclick: voteVeto,
-      }, hasVotedVeto ? 'Vetoed' : 'Veto')
+        label: hasVotedVeto ? 'Vetoed' : 'Veto'
+      }),
     ]);
     // moloch: cancel
     const cancelButton = (proposal.votingType === VotingType.MolochYesNo) && m('.veto-button', [
-      m('button.formular-button-negative', {
+      m(Button, {
+        intent: 'negative',
         class: (proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed ? '' : 'disabled',
         onclick: cancelProposal,
-      }, (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel')
+        label: (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel'
+      }),
     ]);
     // V2 only: moloch: sponsor
     // const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
-    //  m('button.formular-button-positive', {
+    //  m(Button, {
+    //    intent: 'positive',
     //    class: !(proposal as MolochProposal).state.sponsored &&
     //    !(proposal as MolochProposal).state.processed
     //      ? '' : 'disabled',
     //    onclick: sponsorProposal,
-    //  }, (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor')
+    //    label: (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor',
+    //  }),
     // ]);
     // moloch: process
     const processButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
-      m('button.formular-button-tertiary', {
+      m(Button, {
+        intent: 'none',
         class: (proposal as MolochProposal).state === MolochProposalState.ReadyToProcess ? '' : 'disabled',
         onclick: processProposal,
-      }, (proposal as MolochProposal).data.processed ? 'Processed' : 'Process')
+        label: (proposal as MolochProposal).data.processed ? 'Processed' : 'Process'
+      })
     ]);
 
     let votingActionObj;

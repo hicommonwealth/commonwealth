@@ -29,13 +29,14 @@ const ListingRow: m.Component<{
     if (vnode.attrs.class) attrs['class'] = vnode.attrs.class;
     const initialOffset = 12 - rightColSpacing.reduce((t, n) => t + n);
     return m('.ListingRow', attrs, [
-      contentLeft.pinned && m('.pinned', [
-        m('span.icon-pin-outline'),
-        m('.visible-xs', 'Pinned'),
-      ]),
       m('.row-left', [
-        m('.row-header', contentLeft.header),
-        m('.row-subheader', contentLeft.subheader),
+        contentLeft.pinned && m('.pinned', [
+          m('span.icon-pin-outline'),
+        ]),
+        m('.title-container', [
+          m('.row-header', contentLeft.header),
+          m('.row-subheader', contentLeft.subheader),
+        ]),
       ]),
       m('.row-right', [
         m(Grid, contentRight.map((ele, idx) => {

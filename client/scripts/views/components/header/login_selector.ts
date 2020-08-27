@@ -164,12 +164,9 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
             vnode.state.showAddressSelectionHint = false;
           },
           label: [
-            m('span.hidden-xs', [
-              (!app.chain && !app.community) ? 'Select a community'
-                : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
-                : 'Select an address',
-            ]),
-            m(Icon, { name: Icons.CHEVRON_DOWN }),
+            (!app.chain && !app.community) ? m(Icon, { name: Icons.USER })
+              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
+                : app.user.activeAccounts.length === 0 ? 'Connect an address' : 'Select an address',
           ],
         }),
         content: m(Menu, { class: 'LoginSelectorMenu' }, [
@@ -211,6 +208,19 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
               : m.route.set('/settings'),
             label: 'Settings'
           }),
+          m(MenuItem, {
+            onclick: () => app.activeChainId()
+              ? m.route.set(`/${app.activeChainId()}/notificationSettings`)
+              : m.route.set('/notificationSettings'),
+            label: 'Email notifications'
+          }),
+          m(MenuItem, {
+            onclick: () => app.activeChainId()
+              ? m.route.set(`/${app.activeChainId()}/chainEventSettings`)
+              : m.route.set('/chainEventSettings'),
+            label: 'Chain notifications'
+          }),
+          m(MenuDivider),
           m(MenuItem, {
             onclick: () => app.modals.create({ modal: FeedbackModal }),
             label: 'Send feedback',

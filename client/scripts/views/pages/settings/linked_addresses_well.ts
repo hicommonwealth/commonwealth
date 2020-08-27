@@ -81,23 +81,12 @@ const LinkedAddressesWell: m.Component<{}> = {
 
     return m('.LinkedAddressesWell', [
       m('h4', 'Linked Addresses'),
-      m('.address-listing-explanation', 'Log into your account using any of these addresses'),
       addressGroups.map(([chain_id, addresses]) => m('.address-group', [
-        m('h4', app.config.chains.getById(chain_id).name),
+        m('h4', app.config.chains.getById(chain_id)?.name),
         addresses.sort(orderAccountsByAddress).map((account) => m(AccountRow, { account })),
       ])),
       app.user.addresses.length === 0
         && m('.no-accounts', 'No addresses'),
-      m(Button, {
-        intent: 'primary',
-        class: 'add-account',
-        onclick: () => app.modals.lazyCreate('link_new_address_modal', {
-          successCallback: () => {
-            // TODO XX: set membership
-          }
-        }),
-        label: `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`
-      }),
     ]);
   },
 };

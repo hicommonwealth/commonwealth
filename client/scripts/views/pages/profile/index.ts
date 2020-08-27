@@ -96,17 +96,22 @@ interface IProfilePageState {
   comments: OffchainComment<any>[];
   loaded: boolean;
   loading: boolean;
+  refreshProfile: boolean;
 }
 
 const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
     vnode.state.loaded = false;
-    vnode.state.loading = true;
+    vnode.state.loading = false;
     vnode.state.threads = [];
     vnode.state.comments = [];
+    vnode.state.refreshProfile = false;
   },
   oncreate: async (vnode) => {
+    mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
+  },
+  view: (vnode) => {
     const loadProfile = async () => {
       const chain = (m.route.param('base'))
         ? m.route.param('base')
@@ -156,15 +161,27 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
         }
       });
     };
-    mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
-    loadProfile();
-  },
-  view: (vnode) => {
-    const { account, loaded, loading } = vnode.state;
-    if (loading) return m(PageLoading);
-    if (!account) {
-      return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
+
+    const { account, loaded, loading, refreshProfile } = vnode.state;
+    if (!loading && !loaded) {
+      loadProfile();
+      vnode.state.loading = true;
     }
+    if (account && account.address !== vnode.attrs.address) {
+      vnode.state.loading = true;
+      vnode.state.loaded = false;
+      loadProfile();
+    }
+    if (loading || !loaded) return m(PageLoading);
+    if (!account) {
+      return m(PageNotFound, { message: 'This address does not have a Commonwealth profile' });
+    }
+    if (refreshProfile) {
+      loadProfile();
+      vnode.state.refreshProfile = false;
+      m.redraw();
+    }
+
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
     // TODO: search for signaling proposals ->
     // Commented-out lines from previous version which included signaling proposals in proposals var:
@@ -187,7 +204,10 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       class: 'ProfilePage',
     }, [
       m('.forum-container-alt', [
-        m(ProfileHeader, { account }),
+        m(ProfileHeader, {
+          account,
+          refreshCallback: () => { vnode.state.refreshProfile = true; },
+        }),
         m('.row.row-narrow.forum-row', [
           m('.col-xs-8', [
             m(Tabs, [{
