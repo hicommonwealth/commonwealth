@@ -12,7 +12,7 @@ import {
   IStorageFetcher,
   IEventProcessor,
   IEventSubscriber,
-  SubstrateTypes
+  SubstrateTypes,
 } from '@commonwealth/chain-events';
 
 export enum EntityRefreshOption {
@@ -42,12 +42,19 @@ class ChainEntityController {
 
   public getPreimage(hash: string) {
     const preimage = this.store.getByType(SubstrateTypes.EntityKind.DemocracyPreimage)
-      .find((preimageEntity) => preimageEntity.typeId === hash);
+      .find((preimageEntity) => {
+        return preimageEntity.typeId === hash && preimageEntity.chainEvents.length > 0;
+      });
     if (preimage) {
       const notedEvent = preimage.chainEvents.find(
         (event) => event.data.kind === SubstrateTypes.EventKind.PreimageNoted
       );
-      return (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
+      if (notedEvent && notedEvent.data) {
+        const result = (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
+        return result;
+      } else {
+        return null;
+      }
     } else {
       return null;
     }
@@ -117,11 +124,13 @@ class ChainEntityController {
     fetcher: IStorageFetcher<Api>,
     subscriber: IEventSubscriber<Api, RawEvent>,
     processor: IEventProcessor<Api, RawEvent>,
+    eventSortFn?: (a: CWEvent, b: CWEvent) => number,
   ) {
     const chain = chainAdapter.meta.chain.id;
     this._subscriber = subscriber;
     // get existing events
     const existingEvents = await fetcher.fetch();
+    if (eventSortFn) existingEvents.sort(eventSortFn);
     // eslint-disable-next-line no-restricted-syntax
     for (const cwEvent of existingEvents) {
       const result = this._handleCWEvent(chain, cwEvent);

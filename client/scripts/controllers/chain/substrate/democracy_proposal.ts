@@ -117,7 +117,7 @@ class SubstrateDemocracyProposal extends Proposal<
     if (preimage) {
       this._method = preimage.method;
       this._section = preimage.section;
-      this._title = `${this._section}.${this.method}(${preimage.args.join(', ')})`;
+      this._title = formatCall(preimage);
     } else {
       this._title = eventData.proposalHash;
     }

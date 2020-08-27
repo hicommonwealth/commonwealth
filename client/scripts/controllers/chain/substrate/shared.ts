@@ -313,6 +313,12 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       fetcher,
       subscriber,
       processor,
+      // ensure Preimages come LAST
+      (e1, e2) => {
+        if (e1.data.kind === SubstrateTypes.EventKind.PreimageNoted) return 1;
+        if (e2.data.kind === SubstrateTypes.EventKind.PreimageNoted) return -1;
+        return 0;
+      },
     );
   }
 
