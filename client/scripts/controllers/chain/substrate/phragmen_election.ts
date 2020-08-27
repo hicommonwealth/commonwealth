@@ -244,7 +244,9 @@ export class SubstratePhragmenElection extends Proposal<
     );
   }
   public async submitCandidacyTx(candidate: SubstrateAccount) {
-    const txFunc = (api: ApiRx) => api.tx[this.moduleName].submitCandidacy();
+    const params = (api: ApiRx) => api.tx[this.moduleName].submitCandidacy.meta.args.length === 1 ? 
+      [this.candidates] : [];
+    const txFunc = (api: ApiRx) => api.tx[this.moduleName].submitCandidacy(params);
     return this._Chain.createTXModalData(
       candidate,
       txFunc,

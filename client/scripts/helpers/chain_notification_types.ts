@@ -159,3 +159,58 @@ export const KusamaChainNotificationTypes = {
     'kusama-vote-delegated',
   ],
 };
+
+export const KulupuChainNotificationTypes = {
+  Council: [
+    'kulupu-collective-approved',
+    'kulupu-collective-disapproved',
+    'kulupu-collective-executed',
+    'kulupu-collective-member-executed',
+    'kulupu-collective-proposed',
+    'kulupu-collective-voted',
+    'kulupu-election-candidacy-submitted',
+    'kulupu-election-empty-term',
+    'kulupu-election-member-kicked',
+    'kulupu-election-member-renounced',
+    'kulupu-election-new-term',
+  ],
+  Democracy: [
+    'kulupu-democracy-cancelled',
+    'kulupu-democracy-executed',
+    'kulupu-democracy-not-passed',
+    'kulupu-democracy-passed',
+    'kulupu-democracy-proposed',
+    'kulupu-democracy-started',
+    'kulupu-democracy-tabled',
+  ],
+  Preimage: [
+    'kulupu-preimage-invalid',
+    'kulupu-preimage-missing',
+    'kulupu-preimage-noted',
+    'kulupu-preimage-reaped',
+    'kulupu-preimage-used',
+  ],
+  // Signaling: [
+  //     'kulupu-signaling-commit-started',
+  //     'kulupu-signaling-new-proposal',
+  //     'kulupu-signaling-voting-completed',
+  //     'kulupu-signaling-voting-started',
+  // ],
+  // Treasury: [
+  //     'kulupu-treasury-awarded',
+  //     'kulupu-treasury-proposed',
+  //     'kulupu-treasury-rejected',
+  //     'kulupu-treasury-reward-minting',
+  //     'kulupu-treasury-reward-minting-v2'
+  // ],
+  Validator: [
+    'kulupu-bonded',
+    'kulupu-reward',
+    'kulupu-slash',
+    'kulupu-unbonded',
+  ],
+  Vote: [
+    'kulupu-vote-delegated',
+  ],
+};
+
