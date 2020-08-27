@@ -10,7 +10,6 @@ interface IEventData {
     block_number: BlockNumber;
 }
 
-let stakeOverTime;
 // eslint-disable-next-line prefer-const
 let validators: { [key: string]: any[] } = {};
 
@@ -36,8 +35,7 @@ const getStakeOverTime = async (models, req: Request, res: Response, next: NextF
   };
 
   // if stash is given
-  // eslint-disable-next-line no-unused-expressions
-  stash && (where['$HistoricalValidatorStatistic.stash$'] = stash);
+  if (stash) where['$HistoricalValidatorStatistic.stash$'] = stash;
 
   if (startDate && endDate) {
     where.created_at = {
@@ -45,7 +43,7 @@ const getStakeOverTime = async (models, req: Request, res: Response, next: NextF
     };
   }
 
-  stakeOverTime = await models.HistoricalValidatorStatistic.findAll({
+  const stakeOverTime = await models.HistoricalValidatorStatistic.findAll({
     where,
     order: [
       ['created_at', 'ASC']
@@ -53,10 +51,11 @@ const getStakeOverTime = async (models, req: Request, res: Response, next: NextF
     attributes: ['stash', 'exposure', 'block'],
     include: [ { model: models.ChainEventType } ]
   });
+  return stakeOverTime;
 };
 
 const getTotalStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
-  getStakeOverTime(models, req, res, next);
+  const stakeOverTime = await getStakeOverTime(models, req, res, next);
   validators = {};
 
   if (stakeOverTime) { if (!stakeOverTime.length) return []; } else { return []; }
@@ -77,7 +76,7 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
 };
 
 const getOwnStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
-  getStakeOverTime(models, req, res, next);
+  const stakeOverTime = await getStakeOverTime(models, req, res, next);
   validators = {};
 
   if (stakeOverTime) { if (!stakeOverTime.length) return []; } else { return []; }
@@ -98,7 +97,7 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
 };
 
 const getOtherStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
-  getStakeOverTime(models, req, res, next);
+  const stakeOverTime = await getStakeOverTime(models, req, res, next);
   validators = {};
 
   if (stakeOverTime) { if (!stakeOverTime.length) return []; } else { return []; }
@@ -119,7 +118,7 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
 };
 
 const getNominatorsOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
-  getStakeOverTime(models, req, res, next);
+  const stakeOverTime = await getStakeOverTime(models, req, res, next);
   validators = {};
 
   if (stakeOverTime) { if (!stakeOverTime.length) return []; } else { return []; }
