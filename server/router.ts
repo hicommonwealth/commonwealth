@@ -104,7 +104,6 @@ import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 
 import bulkEntities from './routes/bulkEntities';
-import addValidator from './routes/addValidator';
 function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
@@ -325,7 +324,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
-  router.post('/addValidator', addValidator.bind(this, models));
   app.use('/api', router);
 }
 export default setupRouter;
