@@ -53,6 +53,7 @@ module.exports = {
         network: 'kulupu',
         symbol: 'KLP',
         name: 'Kulupu',
+        description: 'A proof of work blockchain with on-chain governance, online upgrade, and signed mining.',
         icon_url: '/static/img/protocols/klp.png',
         active: true,
         type: 'chain',
@@ -94,4 +95,3 @@ module.exports = {
     });
   }
 };
-
