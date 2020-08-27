@@ -12,27 +12,28 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
-    const notificationSubscription = app.user.notifications.subscriptions
-      .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
+
+    const commentAndReactionSubscriptions = app.user.notifications.subscriptions
+      .filter((v) => v.objectId === proposal.uniqueIdentifier);
+
+    const bothActive = (commentAndReactionSubscriptions[0]?.isActive && commentAndReactionSubscriptions[1]?.isActive);
 
     return m(MenuItem, {
-      onclick: (e) => {
+      onclick: async (e) => {
         e.preventDefault();
-        if (notificationSubscription && notificationSubscription.isActive) {
-          app.user.notifications.disableSubscriptions([notificationSubscription]).then(() => {
-            m.redraw();
-          });
-        } else if (notificationSubscription) { // subscription, but not active
-          app.user.notifications.enableSubscriptions([notificationSubscription]).then(() => {
-            m.redraw();
-          });
+        if (commentAndReactionSubscriptions.length !== 2) {
+          await Promise.all([
+            app.user.notifications.subscribe(NotificationCategories.NewReaction, proposal.uniqueIdentifier),
+            app.user.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier),
+          ]);
+        } else if (bothActive) {
+          await app.user.notifications.disableSubscriptions(commentAndReactionSubscriptions);
         } else {
-          app.user.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier).then(() => {
-            m.redraw();
-          });
+          await app.user.notifications.enableSubscriptions(commentAndReactionSubscriptions);
         }
+        m.redraw();
       },
-      label: notificationSubscription?.isActive ? 'Turn off notifications' : 'Turn on notifications',
+      label: (bothActive) ? 'Turn off notifications' : 'Turn on notifications',
     });
   },
 };
