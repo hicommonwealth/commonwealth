@@ -4,7 +4,7 @@ import m from 'mithril';
 import _ from 'lodash';
 import { Checkbox, Table, SelectList, Icons, Button, ListItem } from 'construct-ui';
 import {
-  SubstrateEvents, SubstrateTypes, IChainEventKind, EventSupportingChains, TitlerFilter
+  SubstrateEvents, SubstrateTypes, IChainEventKind, TitlerFilter
 } from '@commonwealth/chain-events';
 import { ChainInfo, CommunityInfo, ChainNetwork } from 'models';
 import app from 'state';
