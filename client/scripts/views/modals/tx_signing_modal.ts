@@ -3,19 +3,21 @@ import 'modals/tx_signing_modal.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import { mnemonicValidate } from '@polkadot/util-crypto';
-import { Button, TextArea } from 'construct-ui';
+import { Button, TextArea, Grid, Col } from 'construct-ui';
+
+import app from 'state';
+import { formatAsTitleCase } from 'helpers';
+import { ITXModalData, ITransactionResult, TransactionStatus, ChainBase } from 'models';
+
+import Substrate from 'controllers/chain/substrate/main';
+import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
+import { ICosmosTXData } from 'controllers/chain/cosmos/chain';
 
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import { CompactModalExitButton } from 'views/modal';
-import app from 'state';
-import { formatAsTitleCase } from 'helpers';
-import { ITXModalData, ITransactionResult, TransactionStatus, ChainBase } from 'models';
 import SubkeyInstructions from 'views/components/subkey_instructions';
-import Substrate from 'controllers/chain/substrate/main';
-import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
-import { ICosmosTXData } from 'controllers/chain/cosmos/chain';
 
 const createProposalTransactionLabels = {
   // substrate: accounts
@@ -407,6 +409,7 @@ const TXSigningModalStates = {
             intent: 'primary',
             type: 'submit',
             disabled: true,
+            fluid: true,
             onclick: (e) => (undefined),
             label: `Waiting ${vnode.state.timer || 0}s...`
           }),
@@ -429,6 +432,7 @@ const TXSigningModalStates = {
           m(Button, {
             intent: 'primary',
             type: 'submit',
+            fluid: true,
             oncreate: (vvnode) => $(vvnode.dom).focus(),
             onclick: (e) => {
               e.preventDefault();
@@ -452,21 +456,27 @@ const TXSigningModalStates = {
             blockNum: vnode.attrs.stateData.blocknum ? `${vnode.attrs.stateData.blocknum}` : '--',
             timestamp: vnode.attrs.stateData.timestamp ? `${vnode.attrs.stateData.timestamp.format()}` : '--',
           }),
-          m(Button, {
-            intent: 'primary',
-            type: 'submit',
-            onclick: (e) => {
-              e.preventDefault();
-              $(vnode.dom).trigger('modalexit');
-            },
-            label: 'Done'
-          }),
-          m(Button, {
-            intent: 'none',
-            oncreate: (vvnode) => $(vvnode.dom).focus(),
-            onclick: (e) => { vnode.attrs.next('Intro'); },
-            label: 'Try again'
-          }),
+          m(Grid, [
+            m(Col, { span: 6 }, [
+              m(Button, {
+                intent: 'primary',
+                type: 'submit',
+                onclick: (e) => {
+                  e.preventDefault();
+                  $(vnode.dom).trigger('modalexit');
+                },
+                label: 'Done'
+              }),
+            ]),
+            m(Col, { span: 6 }, [
+              m(Button, {
+                intent: 'none',
+                oncreate: (vvnode) => $(vvnode.dom).focus(),
+                onclick: (e) => { vnode.attrs.next('Intro'); },
+                label: 'Try again'
+              }),
+            ]),
+          ]),
         ]),
       ]);
     }
