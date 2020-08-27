@@ -99,15 +99,21 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
     vnode.state.subscriptions = vnode.attrs.subscriptions;
   },
   view: (vnode) => {
+    if (vnode.state.subscriptions[0] !== vnode.attrs.subscriptions[0]) {
+      vnode.state.subscriptions = vnode.attrs.subscriptions;
+    }
     const { label, bold } = vnode.attrs;
     const { subscriptions } = vnode.state;
     const someActive = subscriptions.some((s) => s.isActive);
     const everyActive = subscriptions.every((s) => s.isActive);
     const someEmail = subscriptions.some((s) => s.immediateEmail);
-    if (everyActive && someEmail) {
+    const everyEmail = subscriptions.some((s) => s.immediateEmail);
+    if (everyActive && everyEmail) {
       vnode.state.option = 'Notifications on (app + email)';
-    } else if (everyActive) {
+    } else if (everyActive && !someEmail) {
       vnode.state.option = 'Notifications on (app only)';
+    } else if (someActive) {
+      vnode.state.option = 'Some notifications on';
     } else {
       vnode.state.option = 'Notifications off';
     }
@@ -171,7 +177,7 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
     return subscription && m(BatchedSubscriptionRow, {
       subscriptions: [subscription],
       label: 'New threads',
-      bold: true
+      bold: true,
     });
   },
 };
@@ -191,19 +197,23 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
         && s.category !== NotificationCategories.ChainEvent
         && !s.OffchainComment
     );
+    const newThreads = subscriptions.find(
+      (s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id)
+    );
+    console.log('new threads', newThreads);
     const onComments = subscriptions.filter((s) => {
       return (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id) && s.OffchainComment;
     });
     const batchedSubscriptions = sortSubscriptions(filteredSubscriptions, 'objectId');
-    if (filteredSubscriptions.length < 1 && onComments.length < 1) return;
     return [
+      // m(BatchedSubscriptionRow, { subscriptions: [newThreads], label: 'New Threads2', }),
       m(NewThreadRow, { community, subscriptions }),
       onComments.length > 0 && m(BatchedSubscriptionRow, {
         label: 'Notifications on Comments',
         subscriptions: onComments,
       }),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
-      batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
+      batchedSubscriptions.length > 0 && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, {
           subscriptions: subscriptions2,
           key: subscriptions2[0].id,
