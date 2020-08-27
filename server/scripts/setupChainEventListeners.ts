@@ -39,13 +39,32 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
 };
 
 const setupChainEventListeners = async (
-  models, wss: WebSocket.Server, skipCatchup?: boolean
+  models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean
 ): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
   log.info('Fetching node urls...');
   await sequelize.authenticate();
-  const nodes: ChainNodeInstance[] = (await Promise.all(EventSupportingChains.map((c) => {
-    return models.ChainNode.findOne({ where: { chain: c } });
-  }))).filter((n) => !!n);
+  const nodes: ChainNodeInstance[] = [];
+  if (chains === 'all') {
+    const n = (await Promise.all(EventSupportingChains.map((c) => {
+      return models.ChainNode.findOne({ where: { chain: c } });
+    }))).filter((c) => !!c);
+    nodes.push(...n);
+  } else if (chains !== 'none') {
+    const n = (await Promise.all(EventSupportingChains
+      .filter((c) => chains.includes(c))
+      .map((c) => {
+        return models.ChainNode.findOne({ where: { chain: c } });
+      })))
+      .filter((c) => !!c);
+    nodes.push(...n);
+  } else {
+    log.info('No event listeners configured.');
+    return {};
+  }
+  if (nodes.length === 0) {
+    log.info('No event listeners found.');
+    return {};
+  }
 
   log.info('Setting up event listeners...');
   const subscribers = await Promise.all(nodes.map(async (node) => {

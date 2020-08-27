@@ -94,20 +94,26 @@
 
         .AdminPanelTabs {
             .UpgradeRolesForm, .WebhooksForm {
-                padding: 0 20px 10px;
+                padding: 0;
+                > * {
+                    margin: 20px 0;
+                    padding: 0 20px;
+                }
             }
             .members-list {
-                min-height: 160px;
-                max-height: 160px;
+                min-height: none;
+                max-height: 300px;
                 overflow-y: scroll;
-            }
-            .admin-panel-tab-button {
-                margin-top: 20px;
             }
             .active-webhooks {
-                min-height: 160px;
-                max-height: 160px;
+                min-height: none;
+                max-height: 300px;
                 overflow-y: scroll;
+            }
+            .cui-list-item {
+                overflow-wrap: anywhere;
+                padding: 0;
+                margin-bottom: 6px;
             }
         }
     }
