@@ -5,6 +5,7 @@ import { Button } from 'construct-ui';
 import * as clipboard from 'clipboard-polyfill';
 import { Unsubscribable } from 'rxjs';
 
+import { initChain } from 'app';
 import app from 'state';
 import { Account, ChainBase } from 'models';
 
@@ -20,7 +21,7 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const editIdentityAction = (account, currentIdentity: SubstrateIdentity) => {
+const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
   if (!chainObj) return;
 
@@ -28,14 +29,29 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity) => {
   return (account.chain.indexOf('edgeware') !== -1 || account.chain.indexOf('kusama') !== -1) && m(Button, {
     intent: 'primary',
     // wait for info to load before making it clickable
-    class: currentIdentity ? '' : 'disabled',
+    disabled: vnode.state.chainLoading,
     onclick: async () => {
+      if (!app.chain?.loaded) {
+        vnode.state.chainLoading = true;
+        initChain().then(() => {
+          vnode.state.chainLoading = false;
+          app.modals.create({
+            modal: EditIdentityModal,
+            data: { account, currentIdentity },
+          });
+        }).catch((err) => {
+          vnode.state.chainLoading = false;
+        });
+        return;
+      }
       app.modals.create({
         modal: EditIdentityModal,
         data: { account, currentIdentity },
       });
     },
-    label: currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
+    label: vnode.state.chainLoading
+      ? 'Loading chain (may take some time)...'
+      : currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
   });
 };
 
@@ -92,7 +108,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-actions', [
           onOwnProfile ? [
-            editIdentityAction(account, vnode.state.identity),
+            editIdentityAction(account, vnode.state.identity, vnode),
             m(Button, {
               intent: 'primary',
               onclick: () => {

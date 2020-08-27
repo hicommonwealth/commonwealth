@@ -461,6 +461,8 @@ const TXSigningModalStates = {
               m(Button, {
                 intent: 'primary',
                 type: 'submit',
+                style: 'margin-right: 10px',
+                fluid: true,
                 onclick: (e) => {
                   e.preventDefault();
                   $(vnode.dom).trigger('modalexit');
@@ -471,6 +473,8 @@ const TXSigningModalStates = {
             m(Col, { span: 6 }, [
               m(Button, {
                 intent: 'none',
+                fluid: true,
+                style: 'margin-left: 10px',
                 oncreate: (vvnode) => $(vvnode.dom).focus(),
                 onclick: (e) => { vnode.attrs.next('Intro'); },
                 label: 'Try again'
