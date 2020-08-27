@@ -12,13 +12,12 @@ module.exports = {
         // Get all addresses for User
         const resAddresses = await queryInterface.sequelize.query(`SELECT * FROM "Addresses" WHERE user_id=${id};`, { transaction: t, });
         const addresses = resAddresses[0];
-        const userRoles = [];
+        const addressIds = addresses.map((a) => a.id);
 
-        await Promise.all(addresses.map(async (address) => {
-          // For each address, get roles and add them to userRoles
-          const addressRoles = await queryInterface.sequelize.query(`SELECT * FROM "Roles" WHERE address_id=${address.id};`, { transaction: t, });
-          addressRoles[0].forEach((r) => userRoles.push(r));
-        }));
+        if (addressIds.length === 0) return;
+        const addressRoles = await queryInterface.sequelize.query(`SELECT * FROM "Roles" WHERE address_id IN (${[...addressIds]});`, { transaction: t, });
+        const userRoles = addressRoles[0];
+        console.log(userRoles);
 
         // Get all user subscriptions
         const subscriptions = await queryInterface.sequelize.query(`SELECT * FROM "Subscriptions" WHERE subscriber_id=${id};`);
