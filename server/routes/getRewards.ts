@@ -63,7 +63,12 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   const validators: { [key: string]: any[] } = {};
   // No rewards
   if (!rewards.length)
-    return [];
+    return res.json({
+      status: 'Success',
+      result: {
+        validators
+      }
+    });
 
   rewards.forEach((reward) => {
     const event_data: IEventData = reward.dataValues.event_data;
