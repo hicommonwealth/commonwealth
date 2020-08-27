@@ -27,7 +27,7 @@ class ChainEntityStore extends Store<ChainEntity> {
   }
 
   public remove(entity: ChainEntity) {
-    super.remove(entity);
+    super.remove(entity, (e) => e.eq(entity));
     if (this._storeType[entity.type] && this._storeType[entity.type][entity.stringId]) {
       delete this._storeType[entity.type][entity.stringId];
     }

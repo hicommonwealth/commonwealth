@@ -177,7 +177,7 @@ export class SubstrateDemocracyReferendum
     // see if preimage exists and populate data if it does
     const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
-      this._title = `${preimage.section}.${preimage.method}(${preimage.args.join(', ')})`;
+      this._title = formatCall(preimage);
     } else {
       this._title = `Referendum #${this.data.index}`;
     }
