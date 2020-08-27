@@ -52,6 +52,7 @@ const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
 const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
 const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
 const NO_EVENTS = process.env.NO_EVENTS === 'true';
+const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
 
 const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -195,7 +196,14 @@ async function main() {
 
       let exitCode = 0;
       try {
-        const subscribers = await setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP);
+        // configure chain list from events
+        let chains: string[] | 'all' | 'none' = [ 'edgeware' ];
+        if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
+          chains = CHAIN_EVENTS;
+        } else if (CHAIN_EVENTS) {
+          chains = CHAIN_EVENTS.split(',');
+        }
+        const subscribers = await setupChainEventListeners(models, wss, chains, SKIP_EVENT_CATCHUP);
 
         // construct storageFetchers needed for the identity cache
         const fetchers = {};
