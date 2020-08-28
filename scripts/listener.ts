@@ -1,4 +1,4 @@
-import { Mainnet } from '@edgeware/node-types';
+import { Mainnet, Beresheet } from '@edgeware/node-types';
 import { IEventHandler, CWEvent, SubstrateEvents, MolochEvents } from '../dist/index';
 
 const args = process.argv.slice(2);
@@ -8,6 +8,7 @@ console.log(`Listening to events on ${chain}.`);
 const networks = {
   'edgeware': 'ws://mainnet1.edgewa.re:9944',
   'edgeware-local': 'ws://localhost:9944',
+  'edgeware-beresheet': 'wss://beresheet1.edgewa.re',
   'kusama': 'wss://kusama-rpc.polkadot.io',
   'polkadot': 'wss://rpc.polkadot.io',
   'kulupu': 'ws://rpc.kulupu.corepaper.org/ws',
@@ -36,8 +37,8 @@ if (SubstrateEvents.Types.EventChains.includes(chain)) {
   // TODO: update this for Beresheet
   SubstrateEvents.createApi(
     url,
-    chain.includes('edgeware') ? Mainnet.types : {},
-    chain.includes('edgeware') ? Mainnet.typesAlias : {},
+    chain === 'edgeware-beresheet' ? Beresheet.types : chain.includes('edgeware') ? Mainnet.types : {},
+    chain === 'edgeware-beresheet' ? Beresheet.typesAlias : chain.includes('edgeware') ? Mainnet.typesAlias : {},
   )
   .then(async (api) => {
     const fetcher = new SubstrateEvents.StorageFetcher(api);

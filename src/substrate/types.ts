@@ -5,6 +5,7 @@ import {
 export const EventChains = [
   'edgeware',
   'edgeware-local',
+  'edgeware-beresheet',
   'kusama',
   'kusama-local',
   'polkadot',

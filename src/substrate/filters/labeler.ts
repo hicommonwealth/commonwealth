@@ -39,7 +39,7 @@ function formatNumberShort(num: number) {
 const edgBalanceFormatter = (chain, balance: BalanceString): string => {
   const denom = chain === 'edgeware'
     ? 'EDG'
-    : chain === 'edgeware-local' || chain === 'edgeware-testnet'
+    : chain === 'edgeware-local' || chain === 'edgeware-testnet' || chain === 'edgeware-beresheet'
       ? 'tEDG'
       : chain === 'kusama'
         ? 'KSM'
