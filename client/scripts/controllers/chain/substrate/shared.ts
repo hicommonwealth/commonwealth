@@ -525,9 +525,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           console.log(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
 
           // loop through each of the parameters, displaying the type and data
-          event.data.forEach((data, index) => {
-            console.log(`\t\t\t${types[index].type}: ${data.toString()}`);
-          });
+          if (event.data && event.data.forEach) {
+            event.data.forEach((data, index) => {
+              console.log(`\t\t\t${types[index].type}: ${data.toString()}`);
+            });
+          }
         }
       });
     },
