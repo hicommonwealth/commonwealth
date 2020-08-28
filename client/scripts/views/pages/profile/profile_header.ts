@@ -31,13 +31,10 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
     // wait for info to load before making it clickable
     disabled: vnode.state.chainLoading,
     onclick: async () => {
-      console.log(currentIdentity);
       if (!app.chain?.loaded) {
         vnode.state.chainLoading = true;
         initChain().then(() => {
           vnode.state.chainLoading = false;
-          // console.log(app.chain);
-          // console.log(currentIdentity);
           app.modals.create({
             modal: EditIdentityModal,
             data: { account, currentIdentity },
