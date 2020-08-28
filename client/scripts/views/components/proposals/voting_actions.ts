@@ -39,8 +39,9 @@ const CannotVote: m.Component<{ text?, action? }> = {
       vnode.attrs.text && m('.proposal-voting-box-text', vnode.attrs.text),
       vnode.attrs.action && m('.proposal-voting-box-action', [
         m(Button, {
-          intent: 'positive',
+          intent: 'primary',
           disabled: true,
+          fluid: true,
           label: vnode.attrs.action,
         }),
       ]),
@@ -121,9 +122,9 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     } else if (!app.isLoggedIn()) {
       return m(CannotVote, { action: 'Log in to vote' });
     } else if (!app.user.activeAccount) {
-      return m(CannotVote, { action: 'Create a Web3 address' });
+      return m(CannotVote, { action: 'Connect an address to vote' });
     } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
-      return m(CannotVote, { text: 'Cannot vote from this account' });
+      return m(CannotVote, { text: 'Cannot vote from this address' });
     }
 
     let user;
@@ -522,7 +523,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
           m(ProposalExtensions, { proposal }) ]
       ];
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
-      votingActionObj = m(CannotVote, { text: '(TODO) Ranked choice voting unimplemented' });
+      votingActionObj = m(CannotVote, { text: 'Ranked choice voting unimplemented' });
     } else if (proposal.votingType === VotingType.None) {
       votingActionObj = m(CannotVote, { text: 'Cannot be voted on directly' });
     } else {
