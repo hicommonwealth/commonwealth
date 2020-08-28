@@ -43,6 +43,9 @@
     .HorizontalTabs .tab-content {
         width: 490px;
         min-height: 440px;
+        @incude sm-max {
+            width: initial;
+        }
     }
 
     &.Intro {

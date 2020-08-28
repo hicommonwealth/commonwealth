@@ -105,12 +105,14 @@
             color: #111;
         }
     }
+    @include sm-max {
+        .info-row {
+            flex-direction: column;
+        }
+    }
     @include xxs-max {
         .ProfileHeader, .Tabs {
             padding: 0 17px 12px 17px !important;
-            .info-row {
-                flex-direction: column;
-            }
             .tab-bar {
                 display: flex;
                 flex-direction: column;
