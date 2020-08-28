@@ -23,6 +23,16 @@ describe('Event Tests', () => {
       .get('/api/getRewards')
       .set('Accept', 'application/json')
       .query({ chain });
-    console.log(res.body);
+    expect(res.body.status).to.be.equal('Success');
+    expect(res.body.validators).to.not.be.null;
+  });
+
+  it('should grab all slashes events for Edgeware', async () => {
+    const res = await chai.request(app)
+      .get('/api/getSlashes')
+      .set('Accept', 'application/json')
+      .query({ chain });
+    expect(res.body.status).to.be.equal('Success');
+    expect(res.body.slashes).to.not.be.null;
   });
 });
