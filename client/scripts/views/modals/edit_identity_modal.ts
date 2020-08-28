@@ -64,8 +64,6 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
     }
   },
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    console.log(vnode.attrs.account);
-    console.log(vnode.state.dynamic);
     const updateIdentity = () => {
       const data = {
         display: `${$(vnode.dom).find('input[name=display]').val()}`.trim(),
