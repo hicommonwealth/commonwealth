@@ -1,4 +1,3 @@
-import { Validators } from './../../client/scripts/views/pages/validators/index';
 import * as Sequelize from 'sequelize';
 
 export interface HistoricalValidatorStatsAttributes {
@@ -11,8 +10,10 @@ export interface HistoricalValidatorStatsAttributes {
     apr?: string;
     uptime?: string;
     movingAverages?: number;
-    created_At: number;
     isLatest: boolean;
+    hasMessage: boolean;
+    isOnline: boolean;
+    eraPoints: number;
 }
 
 export interface HistoricalValidatorStatsInstance extends Sequelize.Instance<HistoricalValidatorStatsAttributes>, HistoricalValidatorStatsAttributes {
@@ -28,7 +29,6 @@ export default (
     dataTypes: Sequelize.DataTypes,
 ): HistoricalValidatorStatsModel => {
     const HistoricalValidatorStats = sequelize.define<HistoricalValidatorStatsInstance, HistoricalValidatorStatsAttributes>('HistoricalValidatorStats', {
-        // stash_id: { type: dataTypes.STRING, allowNull: false }, //AccountID
         id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true }, //primary-key
         stash_id: { type: dataTypes.STRING, allowNull: false },
         block: { type: dataTypes.STRING, allowNull: false }, // blocknumber
@@ -39,8 +39,10 @@ export default (
         uptime: { type: dataTypes.STRING, allowNull: false },
         movingAverages: { type: dataTypes.INTEGER, allowNull: false },
         isLatest: { type: dataTypes.BOOLEAN, allowNull: false },
-        created_At: { type: dataTypes.NOW, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP'), }
-    }, { timestamps: false });
+        hasMessage: { type: dataTypes.BOOLEAN, allowNull: false },
+        isOnline: { type: dataTypes.BOOLEAN, allowNull: false },
+        eraPoints: { type: dataTypes.INTEGER, allowNull: false }
+    });
 
     HistoricalValidatorStats.associate = (models) => {
         models.HistoricalValidatorStats.belongsTo(models.Validators, { foreignKey: 'stash_id' });

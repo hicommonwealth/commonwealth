@@ -12,7 +12,13 @@ module.exports = {
       uptime: { type: DataTypes.STRING, allowNull: false },
       movingAverages: { type: DataTypes.INTEGER, allowNull: false },
       isLatest: { type: dataTypes.BOOLEAN, allowNull: false },
-      created_At: {
+      hasMessage: { type: dataTypes.BOOLEAN, allowNull: false },
+      isOnline: { type: dataTypes.BOOLEAN, allowNull: false },
+      eraPoints: { type: dataTypes.INTEGER, allowNull: false },
+      createdAt: {
+        type: DataTypes.DATE
+      },
+      updatedAt: {
         type: DataTypes.DATE
       }
     });
