@@ -104,7 +104,8 @@ import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 
 import bulkEntities from './routes/bulkEntities';
-
+import getGlobalStatistics from './routes/getGlobalStatistics';
+import getValidatorDetails from './routes/getValidatorDetails';
 function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
@@ -302,7 +303,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // settings
   // TODO: Change to POST /userSetting
   router.post('/writeUserSetting', passport.authenticate('jwt', { session: false }),
-              writeUserSetting.bind(this, models));
+    writeUserSetting.bind(this, models));
 
   // send feedback button
   // TODO: Change to POST /feedback
@@ -325,7 +326,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
-
+  router.get('/getGlobalStatistics', getGlobalStatistics.bind(this, models));
+  router.get('/getValidatorDetails', getValidatorDetails.bind(this, models));
   app.use('/api', router);
 }
 export default setupRouter;
