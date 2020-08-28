@@ -140,7 +140,7 @@ const resetServer = (models, closeMiddleware) => {
       }),
       models.Chain.create({
         id: 'kulupu',
-        network: 'Kulupu',
+        network: 'kulupu',
         symbol: 'KLP',
         name: 'Kulupu',
         icon_url: '/static/img/protocols/klp.png',
