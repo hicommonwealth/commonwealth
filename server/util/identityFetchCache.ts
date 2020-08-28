@@ -9,7 +9,7 @@ const log = factory.getLogger(formatFilename(__filename));
 type CacheT = { [chain: string]: string[] }
 
 export default class IdentityFetchCache extends JobRunner<CacheT> {
-  private _fetchers: { [chain: string]: SubstrateEvents.StorageFetcher };
+  private _fetchers: { [chain: string]: SubstrateEvents.StorageFetcher } = {};
   private _models;
 
   constructor(_jobTimeS: number) {
