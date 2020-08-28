@@ -39,6 +39,7 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
     const identity = vnode.state.dynamic.identity;
     const displayName = identity?.exists ? identity.username : undefined;
     const quality = identity?.exists ? identity.quality : undefined;
+    // return m('a', `${identity?.exists ? identity.info.toString() : 's'}`);
     if (displayName && quality) {
       const name = [ displayName, m(`span.identity-icon${
         quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'

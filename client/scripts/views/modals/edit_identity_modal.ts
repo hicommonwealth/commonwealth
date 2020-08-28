@@ -17,18 +17,27 @@ import { IdentityInfoProps } from 'controllers/chain/substrate/identities';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import AvatarUpload from 'views/components/avatar_upload';
 import { createTXModal } from 'views/modals/tx_signing_modal';
+import { makeDynamicComponent } from 'models/mithril';
 
 interface IAttrs {
+  account: SubstrateAccount;
   currentIdentity?: SubstrateIdentity;
 }
 
 interface IState {
+  dynamic: {
+    identity: SubstrateIdentity | null;
+  },
   saving: boolean;
 }
 
-const EditIdentityModal: m.Component<IAttrs, IState> = {
+const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
+  getObservables: (attrs) => ({
+    groupKey: attrs.account.address,
+    identity: (app.chain as Substrate).identities.get(attrs.account),
+  }),
   oncreate: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    if (vnode.attrs.currentIdentity?.info) {
+    if (vnode.state.dynamic.identity?.info) {
       const {
         additional,
         display,
@@ -39,7 +48,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         // pgpFingerprint,
         image,
         twitter
-      } = vnode.attrs.currentIdentity.info;
+      } = vnode.state.dynamic.identity?.info;
 
       // do not display SHA values, only raw strings
       const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
@@ -55,6 +64,8 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
     }
   },
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+    console.log(vnode.attrs.account);
+    console.log(vnode.state.dynamic);
     const updateIdentity = () => {
       const data = {
         display: `${$(vnode.dom).find('input[name=display]').val()}`.trim(),
@@ -149,6 +160,6 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
       ])
     ]);
   }
-};
+});
 
 export default EditIdentityModal;
