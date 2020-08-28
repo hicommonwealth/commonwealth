@@ -9,6 +9,7 @@ import { Vec } from '@polkadot/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateCollectiveProposal } from './collective_proposal';
+import { AnyKindOfDictionary } from 'lodash';
 
 class SubstrateCollective extends ProposalModule<
   ApiRx,
@@ -111,7 +112,7 @@ class SubstrateCollective extends ProposalModule<
             api.tx.technicalCommittee.propose(threshold, action))
         : ((api: ApiRx) => api.tx.council.propose.meta.args.length === 3 ?
         api.tx.council.propose(threshold, action, length) : 
-          api.tx.council.propose(threshold, action, null));
+          (api.tx.council.propose as any)(threshold, action, null));
     return this._Chain.createTXModalData(
       author,
       txFunc,
