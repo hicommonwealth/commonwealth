@@ -106,8 +106,12 @@ class SubstrateCollective extends ProposalModule<
     // TODO: check council status
     const title = this._Chain.methodToTitle(action);
     const txFunc = fromTechnicalCommittee
-      ? ((api: ApiRx) => api.tx.technicalCommittee.propose(threshold, action, length))
-        : ((api: ApiRx) => api.tx.council.propose(threshold, action, length));
+      ? ((api: ApiRx) => api.tx.technicalCommittee.propose.meta.args.length === 3 ?
+          api.tx.technicalCommittee.propose(threshold, action, length) : 
+            api.tx.technicalCommittee.propose(threshold, action))
+        : ((api: ApiRx) => api.tx.council.propose.meta.args.length === 3 ?
+        api.tx.council.propose(threshold, action, length) : 
+          api.tx.council.propose(threshold, action, null));
     return this._Chain.createTXModalData(
       author,
       txFunc,
