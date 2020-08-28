@@ -27,6 +27,42 @@ describe('Event Tests', () => {
     expect(res.body.validators).to.not.be.null;
   });
 
+  it('should grab getOwnStakeOverTime for Edgeware', async () => {
+    const res = await chai.request(app)
+      .get('/api/getOwnStakeOverTime')
+      .set('Accept', 'application/json')
+      .query({ chain });
+    expect(res.body.status).to.be.equal('Success');
+    expect(res.body.validators).to.not.be.null;
+  });
+
+  it('should grab getOtherStakeOverTime for Edgeware', async () => {
+    const res = await chai.request(app)
+      .get('/api/getOtherStakeOverTime')
+      .set('Accept', 'application/json')
+      .query({ chain });
+    expect(res.body.status).to.be.equal('Success');
+    expect(res.body.validators).to.not.be.null;
+  });
+
+  it('should grab getTotalStakeOverTime for Edgeware', async () => {
+    const res = await chai.request(app)
+      .get('/api/getTotalStakeOverTime')
+      .set('Accept', 'application/json')
+      .query({ chain });
+    expect(res.body.status).to.be.equal('Success');
+    expect(res.body.validators).to.not.be.null;
+  });
+
+  it('should grab getNominatorsOverTime for Edgeware', async () => {
+    const res = await chai.request(app)
+      .get('/api/getNominatorsOverTime')
+      .set('Accept', 'application/json')
+      .query({ chain });
+    expect(res.body.status).to.be.equal('Success');
+    expect(res.body.nominators).to.not.be.null;
+  });
+
   it('should grab all slashes events for Edgeware', async () => {
     const res = await chai.request(app)
       .get('/api/getSlashes')
