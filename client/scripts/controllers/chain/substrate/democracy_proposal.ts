@@ -215,6 +215,7 @@ class SubstrateDemocracyProposal extends Proposal<
   public submitVoteTx(vote: DepositVote<SubstrateCoin>) {
     // deposit parameter is ignored
 
+    // handle differing versions of substrate API
     const txFunc = (api: ApiRx) => {
       if ((api.tx.democracy.second as any).meta.args.length === 2) {
         return api.tx.democracy.second(this.data.index, this.getVoters().length);

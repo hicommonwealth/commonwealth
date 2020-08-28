@@ -9,7 +9,6 @@ import { Vec } from '@polkadot/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateCollectiveProposal } from './collective_proposal';
-import { AnyKindOfDictionary } from 'lodash';
 
 class SubstrateCollective extends ProposalModule<
   ApiRx,
@@ -106,13 +105,15 @@ class SubstrateCollective extends ProposalModule<
   public createTx(author: SubstrateAccount, threshold: number, action: Call, length?: number, fromTechnicalCommittee?: boolean) {
     // TODO: check council status
     const title = this._Chain.methodToTitle(action);
+
+    // handle differing versions of substrate API
     const txFunc = fromTechnicalCommittee
-      ? ((api: ApiRx) => api.tx.technicalCommittee.propose.meta.args.length === 3 ?
-          api.tx.technicalCommittee.propose(threshold, action, length) : 
-            api.tx.technicalCommittee.propose(threshold, action))
-        : ((api: ApiRx) => api.tx.council.propose.meta.args.length === 3 ?
-        api.tx.council.propose(threshold, action, length) : 
-          (api.tx.council.propose as any)(threshold, action, null));
+      ? ((api: ApiRx) => api.tx.technicalCommittee.propose.meta.args.length === 3
+        ? api.tx.technicalCommittee.propose(threshold, action, length)
+        : api.tx.technicalCommittee.propose(threshold, action))
+      : ((api: ApiRx) => api.tx.council.propose.meta.args.length === 3
+        ? api.tx.council.propose(threshold, action, length)
+        : (api.tx.council.propose as any)(threshold, action, null));
     return this._Chain.createTXModalData(
       author,
       txFunc,

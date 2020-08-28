@@ -244,6 +244,7 @@ export class SubstratePhragmenElection extends Proposal<
     );
   }
   public async submitCandidacyTx(candidate: SubstrateAccount) {
+    // handle differing versions of Substrate API
     const txFunc = (api: ApiRx) => {
       if (api.tx[this.moduleName].submitCandidacy.meta.args.length === 1) {
         return api.tx[this.moduleName].submitCandidacy(this.candidates);
