@@ -240,7 +240,7 @@ const SubstrateLinkAccountItem: m.Component<{
         m('.account-item-address', formatAddressShort(AddressSwapper({
           address: account.address,
           currentPrefix: (app.chain as Substrate).chain.ss58Format,
-        }))),
+        }), account.chain)),
       ]),
       m('.account-item-right', [
         vnode.state.linking

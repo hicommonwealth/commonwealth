@@ -28,7 +28,7 @@ export const NewCosmosDelegationModal : m.Component<{ validatorAddr }, ICosmosDe
 
     return m('.ManageStakingModal', [
       m('.compact-modal-title', [
-        m('h3', `Create delegation to ${formatAddressShort(vnode.attrs.validatorAddr)}`),
+        m('h3', `Create delegation to ${formatAddressShort(vnode.attrs.validatorAddr, null)}`), // TODO: provide chain
       ]),
       m('.compact-modal-body', [
         m('.NewStashForm', [

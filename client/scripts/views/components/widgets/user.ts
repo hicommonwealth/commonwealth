@@ -94,8 +94,7 @@ const User: m.Component<{
           ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
             linkify
-              ? link(`a.user-display-name${
-                (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
+              ? link('a.user-display-name.username',
               profile ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
@@ -122,7 +121,7 @@ const User: m.Component<{
           profile ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
           profile ? profile.displayName : '--',)
       ]),
-      m('.user-address', formatAddressShort(profile.address)),
+      m('.user-address', formatAddressShort(profile.address, profile.chain)),
       showRole && roleTag,
     ]);
 
@@ -177,7 +176,7 @@ export const UserBlock: m.Component<{
         m('.user-block-address', {
           class: profile?.address ? '' : 'no-address',
         }, [
-          profile?.address && formatAddressShort(profile.address),
+          profile?.address && formatAddressShort(profile.address, profile.chain),
         ]),
       ]),
       m('.user-block-right', [
