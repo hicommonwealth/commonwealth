@@ -14,6 +14,7 @@ export const Errors = {
   InvalidParent: 'Invalid parent',
   MissingTextOrAttachment: 'Must provide text or attachment',
   ThreadNotFound: 'Cannot comment; thread not found',
+  ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
 };
 
@@ -137,6 +138,10 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     });
   } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
     proposal = await proposalIdToEntity(models, chain.id, finalComment.root_id);
+    if (!proposal) {
+      await finalComment.destroy();
+      return next(new Error(Errors.ChainEntityNotFound));
+    }
   } else {
     log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
   }
