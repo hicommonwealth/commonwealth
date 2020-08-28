@@ -42,6 +42,13 @@
             top: 2px;
         }
         @include sm-max {
+            .MobileNewProposalButton .cui-button {
+                padding: 0 10px;
+                .cui-icon {
+                    position: relative;
+                    top: -1px;
+                }
+            }
             .cui-button.mobile-sidebar-trigger {
                 padding-left: 12px;
                 padding-right: 12px;
