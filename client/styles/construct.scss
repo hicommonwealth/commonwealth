@@ -209,6 +209,14 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
     }
 }
 
+// set text color on active buttons
+.cui-button.cui-primary,
+.cui-button-group.cui-primary .cui-button {
+    a {
+        color: #fff;
+    }
+}
+
 // reduce callout spacing
 .cui-callout {
     line-height: 1.2;
