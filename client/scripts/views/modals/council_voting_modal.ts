@@ -25,7 +25,7 @@ const CouncilVotingModal = {
 
     // get currently set approvals
     const currentVote = (app.chain as Substrate).phragmenElections.activeElection.getVotes(author);
-    const currentStake = (app.chain as Substrate).phragmenElections.activeElection.getVotes(author)[0].stake.inDollars || 0;
+    const currentStake = (currentVote[0]) ? currentVote[0].stake.inDollars : 0;
     const currentApprovals = (currentVote && currentVote.length > 0 && currentVote[0].votes) || [];
     const hasApprovals = currentApprovals.length > 0;
     const defaultSelection = candidates
