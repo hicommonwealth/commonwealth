@@ -13,23 +13,26 @@ export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }>
   view: (vnode) => {
     const { proposal } = vnode.attrs;
 
-    const commentAndReactionSubscriptions = app.user.notifications.subscriptions
-      .filter((v) => v.objectId === proposal.uniqueIdentifier);
+    const commentSubscription = app.user.notifications.subscriptions
+      .find((v) => v.objectId === proposal.uniqueIdentifier && v.category === NotificationCategories.NewComment);
 
-    const bothActive = (commentAndReactionSubscriptions[0]?.isActive && commentAndReactionSubscriptions[1]?.isActive);
+    const reactionSubscription = app.user.notifications.subscriptions
+      .find((v) => v.objectId === proposal.uniqueIdentifier && v.category === NotificationCategories.NewReaction);
+
+    const bothActive = (commentSubscription?.isActive && reactionSubscription?.isActive);
 
     return m(MenuItem, {
       onclick: async (e) => {
         e.preventDefault();
-        if (commentAndReactionSubscriptions.length !== 2) {
+        if (!commentSubscription || !reactionSubscription) {
           await Promise.all([
             app.user.notifications.subscribe(NotificationCategories.NewReaction, proposal.uniqueIdentifier),
             app.user.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier),
           ]);
         } else if (bothActive) {
-          await app.user.notifications.disableSubscriptions(commentAndReactionSubscriptions);
+          await app.user.notifications.disableSubscriptions([commentSubscription, reactionSubscription]);
         } else {
-          await app.user.notifications.enableSubscriptions(commentAndReactionSubscriptions);
+          await app.user.notifications.enableSubscriptions([commentSubscription, reactionSubscription]);
         }
         m.redraw();
       },
