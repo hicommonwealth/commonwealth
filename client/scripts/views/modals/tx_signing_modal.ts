@@ -371,17 +371,19 @@ const TXSigningModalStates = {
         m.redraw();
       }, 1000);
 
-      // for edgeware mainnet, timeout after 30 sec
+      // for edgeware mainnet, timeout after 10 sec
       // TODO: remove this after the runtime upgrade to Substrate 2.0 rc3+
-      vnode.state.timeoutHandle = setTimeout(() => {
-        clearInterval(vnode.state.timeoutHandle);
-        vnode.attrs.next('SentTransactionSuccess', {
-          hash: 'Not available (this chain is using an out of date API)',
-          blocknum: '--',
-          timestamp: '--',
-        });
-        $parent.trigger('modalcomplete');
-      }, 10000);
+      if (app.chain?.meta?.chain?.id === 'edgeware') {
+        vnode.state.timeoutHandle = setTimeout(() => {
+          clearInterval(vnode.state.timeoutHandle);
+          vnode.attrs.next('SentTransactionSuccess', {
+            hash: 'Not available (this chain is using an out of date API)',
+            blocknum: '--',
+            timestamp: '--',
+          });
+          $parent.trigger('modalcomplete');
+        }, 10000);
+      }
 
       vnode.attrs.stateData.obs.subscribe((data: ITransactionResult) => {
         if (data.status === TransactionStatus.Success) {
