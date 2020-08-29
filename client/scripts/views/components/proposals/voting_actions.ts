@@ -33,14 +33,14 @@ import MolochProposal, {
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 
-const CannotVote: m.Component<{ text?, action? }> = {
+const CannotVote: m.Component<{ action }> = {
   view: (vnode) => {
     return m('.CannotVote', [
-      vnode.attrs.text && m('.proposal-voting-box-text', vnode.attrs.text),
-      vnode.attrs.action && m('.proposal-voting-box-action', [
+      m('.proposal-voting-box-action', [
         m(Button, {
-          intent: 'positive',
+          intent: 'primary',
           disabled: true,
+          fluid: true,
           label: vnode.attrs.action,
         }),
       ]),
@@ -117,13 +117,13 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (proposal instanceof SubstrateTreasuryProposal) {
-      return m(CannotVote, { text: 'Treasury proposals are processed by council motion or democracy proposal' });
+      return m(CannotVote, { action: 'Send to council or democracy' });
     } else if (!app.isLoggedIn()) {
       return m(CannotVote, { action: 'Log in to vote' });
     } else if (!app.user.activeAccount) {
-      return m(CannotVote, { action: 'Create a Web3 address' });
+      return m(CannotVote, { action: 'Connect an address to vote' });
     } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
-      return m(CannotVote, { text: 'Cannot vote from this account' });
+      return m(CannotVote, { action: 'Cannot vote from this address' });
     }
 
     let user;
@@ -138,7 +138,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     } else if (proposal instanceof MolochProposal) {
       user = app.user.activeAccount as EthereumAccount;
     } else {
-      return m(CannotVote, { text: 'Unrecognized proposal type' });
+      return m(CannotVote, { action: 'Unrecognized proposal type' });
     }
 
     const voteYes = (e) => {
@@ -522,11 +522,11 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
           m(ProposalExtensions, { proposal }) ]
       ];
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
-      votingActionObj = m(CannotVote, { text: '(TODO) Ranked choice voting unimplemented' });
+      votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else if (proposal.votingType === VotingType.None) {
-      votingActionObj = m(CannotVote, { text: 'Cannot be voted on directly' });
+      votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else {
-      votingActionObj = m(CannotVote, { text: 'Unrecognized proposal type' });
+      votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     }
 
     return m('.VotingActions', [votingActionObj]);

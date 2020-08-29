@@ -69,10 +69,10 @@
             }
             // space between title and topic
             .topic-selection-drop-menu {
-                margin-left: 12px;
+                margin-right: 12px;
                 width: calc(100% - 12px);
                 @include xs-max {
-                    margin-left: 0;
+                    margin-right: 0;
                     width: 100%;
                 }
             }

@@ -92,7 +92,7 @@ class SubstrateTreasury extends ProposalModule<
       author,
       (api: ApiRx) => api.tx.treasury.proposeSpend(value, beneficiary.address),
       'proposeSpend',
-      `proposeSpend(${value.format()}, ${formatAddressShort(beneficiary.address)})`
+      `proposeSpend(${value.format()}, ${formatAddressShort(beneficiary.address, beneficiary.chain.id)})`
     );
   }
 }

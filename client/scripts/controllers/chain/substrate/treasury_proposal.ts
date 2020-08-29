@@ -35,8 +35,8 @@ export class SubstrateTreasuryProposal
   public get title() {
     const account = this._Accounts.fromAddress(this.beneficiaryAddress);
     const displayName = account.profile && account.profile.name
-      ? `${account.profile.name} (${formatAddressShort(this.beneficiaryAddress)})`
-      : formatAddressShort(this.beneficiaryAddress);
+      ? `${account.profile.name} (${formatAddressShort(this.beneficiaryAddress, account.chain.id)})`
+      : formatAddressShort(this.beneficiaryAddress, account.chain.id);
     return `Proposed spend: ${formatCoin(this.value)} to ${displayName}`;
   }
   public get description() { return null; }

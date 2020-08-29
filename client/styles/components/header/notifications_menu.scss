@@ -12,7 +12,7 @@
         margin-right: 0 !important;
         position: relative;
         top: -1px;
-        @include xs-max {
+        @include sm-max {
             top: 1px;
         }
     }

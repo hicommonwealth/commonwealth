@@ -1,4 +1,4 @@
-import { Mainnet } from '@edgeware/node-types';
+import { Mainnet, Beresheet } from '@edgeware/node-types';
 
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareChain from 'controllers/chain/edgeware/shared';
@@ -53,7 +53,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   }
 
   public async initApi() {
-    await this.chain.resetApi(this.meta, Mainnet);
+    await this.chain.resetApi(this.meta, this.meta.chain.id.includes('testnet') ? Beresheet : Mainnet);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
     await super.initApi();
@@ -64,7 +64,8 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.phragmenElections.init(this.chain, this.accounts, 'elections'),
       this.council.init(this.chain, this.accounts),
       this.democracyProposals.init(this.chain, this.accounts),
-      this.democracy.init(this.chain, this.accounts, false),
+      // use redesign logic on all non-mainnet chains
+      this.democracy.init(this.chain, this.accounts, this.meta.chain.id !== 'edgeware'),
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
       this.signaling.init(this.chain, this.accounts),

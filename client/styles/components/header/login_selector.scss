@@ -58,6 +58,7 @@
     .cui-popover-content {
         padding: 0;
         .cui-menu.LoginSelectorMenu {
+            min-width: 260px;
             border: none;
             .cui-menu-item.cui-button.switch-user {
                 height: 40px;

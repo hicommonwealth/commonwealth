@@ -13,7 +13,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import PageError from 'views/pages/error';
 import {
-  EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkdotChainNotificationTypes
+  EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkdotChainNotificationTypes, KulupuChainNotificationTypes
 } from 'helpers/chain_notification_types';
 
 
@@ -251,6 +251,19 @@ const PolkadotChainEvents: m.Component = {
   }
 };
 
+const KulupuChainEvents: m.Component = {
+  view: (vnode) => {
+    return [
+      m(EventSubscriptionTypeRow, { title: 'Council events', notificationTypeArray: KulupuChainNotificationTypes.Council, }),
+      m(EventSubscriptionTypeRow, { title: 'Democracy events', notificationTypeArray: KulupuChainNotificationTypes.Democracy, }),
+      m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: KulupuChainNotificationTypes.Preimage, }),
+      // m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: PolkdotChainNotificationTypes.Treasury, }),
+      m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: KulupuChainNotificationTypes.Validator, }),
+      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: KulupuChainNotificationTypes.Vote, }),
+    ];
+  }
+};
+
 const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
   view: (vnode) => {
     const { chain } = vnode.attrs;
@@ -261,6 +274,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
           m('th', 'Settings'),
         ]),
         (chain.network === ChainNetwork.Edgeware) && m(EdgewareChainEvents),
+        (chain.network === ChainNetwork.Kulupu) && m(KulupuChainEvents),
         (chain.network === ChainNetwork.Kusama) && m(KusamaChainEvents),
         (chain.network === ChainNetwork.Polkadot) && m(PolkadotChainEvents),
       ]),
@@ -278,7 +292,7 @@ const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { se
   view: (vnode) => {
     const { chains } = vnode.attrs;
     if (chains.length < 1) return;
-    const validChains = [ChainNetwork.Edgeware, ChainNetwork.Polkadot, ChainNetwork.Kusama];
+    const validChains = [ChainNetwork.Edgeware, ChainNetwork.Polkadot, ChainNetwork.Kusama, ChainNetwork.Kulupu];
     const filteredChains = chains.filter((c) => validChains.includes(c.network)).sort((a, b) => (a.id > b.id) ? 1 : -1);
     return m('ChainNotificationManagementPage', [
       m(SelectList, {

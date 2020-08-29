@@ -1,13 +1,14 @@
 import m from 'mithril';
 import jdenticon from 'jdenticon';
 
+import { formatAddressShort } from 'helpers';
+
 class Profile {
   private _name: string;
   private _headline: string;
   private _bio: string;
   private _avatarUrl: string;
   private _initialized: boolean;
-  private _anonymous: boolean;
   get name() { return this._name; }
   get headline() { return this._headline; }
   get bio() { return this._bio; }
@@ -27,7 +28,6 @@ class Profile {
   }
   public initialize(name, headline, bio, avatarUrl) {
     this._initialized = true;
-    this._anonymous = false;
     this._name = name;
     this._headline = headline;
     this._bio = bio;
@@ -36,8 +36,7 @@ class Profile {
 
   get displayName() : string {
     if (!this._initialized) return 'Loading...';
-    if (this._anonymous) return 'Anonymous';
-    return this.name || 'Anonymous';
+    return this.name || formatAddressShort(this.address, this.chain);
   }
 
   public getAvatar(size: number) {

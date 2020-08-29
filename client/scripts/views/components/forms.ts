@@ -2,6 +2,8 @@ import 'components/forms.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
+import { Button } from 'construct-ui';
+
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 
 interface IDropdownFormFieldAttrs {
@@ -168,9 +170,9 @@ export const MultipleButtonSelectorFormField: m.Component<IButtonSelectorAttrs, 
         title && m('.form-title', title),
         subtitle && m('.form-subtitle', subtitle),
         m('.form-field.buttons', choices.map((item) => {
-          return m('button', {
+          return m(Button, {
             disabled: item.disabled,
-            class: vnode.state.selection.indexOf(item.value) !== -1 ? 'active' : '',
+            intent: vnode.state.selection.indexOf(item.value) !== -1 ? 'primary' : 'none',
             onclick: (e) => {
               e.preventDefault();
               const index = vnode.state.selection.indexOf(item.value);
@@ -183,7 +185,8 @@ export const MultipleButtonSelectorFormField: m.Component<IButtonSelectorAttrs, 
                 vnode.attrs.callback(vnode.state.selection);
               }
             },
-          }, item.label);
+            label: item.label
+          });
         })),
       ]),
     ]);

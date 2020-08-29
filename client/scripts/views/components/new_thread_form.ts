@@ -325,7 +325,17 @@ export const NewThreadForm: m.Component<{
           ]),
         ]),
         postType === PostType.Link && m(Form, [
-          m(FormGroup, { span: { xs: 12, sm: 8 }, order: { xs: 2, sm: 1 } }, [
+          m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
+            m(TopicSelector, {
+              defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
+              topics: app.topics.getByCommunity(app.activeId()),
+              featuredTopics: app.topics.getByCommunity(app.activeId())
+                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+              updateFormData: updateTopicState,
+              tabindex: 2,
+            }),
+          ]),
+          m(FormGroup, { span: { xs: 12, sm: 8 }, order: 2 }, [
             m(Input, {
               placeholder: 'https://',
               oninput: (e) => {
@@ -336,16 +346,6 @@ export const NewThreadForm: m.Component<{
               },
               defaultValue: vnode.state.form.url,
               tabindex: 1,
-            }),
-          ]),
-          m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 1, sm: 2 } }, [
-            m(TopicSelector, {
-              defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
-              topics: app.topics.getByCommunity(app.activeId()),
-              featuredTopics: app.topics.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
-              updateFormData: updateTopicState,
-              tabindex: 2,
             }),
           ]),
           m(FormGroup, { order: 3 },  [
@@ -415,7 +415,7 @@ export const NewThreadForm: m.Component<{
         //
         postType === PostType.Discussion && m(Form, [
           fromDraft
-            ? m(FormGroup, { span: 2, order: { xs: 3, sm: 1 }, class: 'hidden-xs draft-badge-wrap' }, [
+            ? m(FormGroup, { span: 2, order: { xs: 1, sm: 1 }, class: 'hidden-xs draft-badge-wrap' }, [
               m(Tag, {
                 class: 'draft-badge',
                 size: 'xs',
@@ -424,7 +424,19 @@ export const NewThreadForm: m.Component<{
               })
             ])
             : null,
-          m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 2 }, [
+          m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 2, sm: 2 } }, [
+            m(TopicSelector, {
+              defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
+                ? vnode.state.activeTopic
+                : localStorage.getItem(`${app.activeId()}-active-tag`),
+              topics: app.topics.getByCommunity(app.activeId()),
+              featuredTopics: app.topics.getByCommunity(app.activeId())
+                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+              updateFormData: updateTopicState,
+              tabindex: 2,
+            }),
+          ]),
+          m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 3 }, [
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
@@ -439,18 +451,6 @@ export const NewThreadForm: m.Component<{
               },
               defaultValue: vnode.state.form.threadTitle,
               tabindex: 1,
-            }),
-          ]),
-          m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 1, sm: 3 } }, [
-            m(TopicSelector, {
-              defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
-                ? vnode.state.activeTopic
-                : localStorage.getItem(`${app.activeId()}-active-tag`),
-              topics: app.topics.getByCommunity(app.activeId()),
-              featuredTopics: app.topics.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
-              updateFormData: updateTopicState,
-              tabindex: 2,
             }),
           ]),
           m(FormGroup, { order: 4 }, [

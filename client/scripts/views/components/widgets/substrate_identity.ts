@@ -57,7 +57,7 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
 
     // return offchain name while identity is loading
     return linkify
-      ? link(`a.user-display-name${(profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
+      ? link('a.user-display-name.username',
         profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
         profile ? profile.displayName : '--',)
       : m('a.user-display-name.username', profile ? profile.displayName : '--');

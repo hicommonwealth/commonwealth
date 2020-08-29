@@ -4,6 +4,7 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import app from 'state';
+import { Button, Input } from 'construct-ui';
 
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { formatCoin } from 'adapters/currency';
@@ -76,9 +77,10 @@ const CouncilVotingModal = {
             'voting for withdraws their candidacies). Once inactive, anyone can evict your voter record and claim ',
             'your bond.'
           ]),
-          m('input[type="text"]', {
+          m(Input, {
             class: 'phragmen-vote-amount',
             name: 'amount',
+            fluid: true,
             placeholder: 'Amount to lock',
             autocomplete: 'off',
             oninput: (e) => {
@@ -102,12 +104,18 @@ const CouncilVotingModal = {
         ])
       ]),
       m('.compact-modal-actions', [
-        m('button', {
+        m(Button, {
           type: 'submit',
           onclick: submitVote,
-        }, hasApprovals ? 'Update vote' : 'Submit vote'),
-        hasApprovals && m('button.retract-vote.formular-button-negative', {
-          href: '#',
+          fluid: true,
+          label: hasApprovals ? 'Update vote' : 'Submit vote',
+          intent: 'primary',
+        }),
+        hasApprovals && m(Button, {
+          class: 'retract-vote',
+          intent: 'negative',
+          fluid: true,
+          style: 'margin-top: 10px;',
           onclick: (e) => {
             e.preventDefault();
             const account = app.user.activeAccount as SubstrateAccount;
@@ -118,8 +126,9 @@ const CouncilVotingModal = {
                 if (err) vnode.state.error = err;
                 m.redraw();
               });
-          }
-        }, 'Retract vote'),
+          },
+          label: 'Retract vote'
+        }),
       ]),
     ]);
   }

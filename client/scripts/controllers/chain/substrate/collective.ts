@@ -56,32 +56,32 @@ class SubstrateCollective extends ProposalModule<
 
   public createEmergencyCancellation(author: SubstrateAccount, threshold: number, referendumId: number) {
     const func = this._Chain.getTxMethod('democracy', 'emergencyCancel');
-    return this.createTx(author, threshold, func(referendumId).method);
+    return this.createTx(author, threshold, func(referendumId).method, func(referendumId).method.encodedLength);
   }
   public vetoNextExternal(author: SubstrateAccount, hash: string) {
     const func = this._Chain.getTxMethod('democracy', 'vetoExternal');
-    return this.createTx(author, 1, func(hash).method);
+    return this.createTx(author, 1, func(hash).method, func(hash).encodedLength);
   }
   public createTreasuryApprovalMotion(author: SubstrateAccount, threshold: number, treasuryIdx: number) {
     const func = this._Chain.getTxMethod('treasury', 'approveProposal');
-    return this.createTx(author, threshold, func(treasuryIdx).method);
+    return this.createTx(author, threshold, func(treasuryIdx).method, func(treasuryIdx).encodedLength);
   }
   public createTreasuryRejectionMotion(author: SubstrateAccount, threshold: number, treasuryIdx: number) {
     const func = this._Chain.getTxMethod('treasury', 'rejectProposal');
-    return this.createTx(author, threshold, func(treasuryIdx).method);
+    return this.createTx(author, threshold, func(treasuryIdx).method, func(treasuryIdx).method.encodedLength);
   }
-  public createExternalProposal(author: SubstrateAccount, threshold: number, action: Call) {
+  public createExternalProposal(author: SubstrateAccount, threshold: number, action: Call, length: number) {
     const func = this._Chain.getTxMethod('democracy', 'externalPropose');
-    return this.createTx(author, threshold, func(action.hash).method);
+    return this.createTx(author, threshold, func(action.hash).method, length);
   }
-  public createExternalProposalMajority(author: SubstrateAccount, threshold: number, action: Call) {
+  public createExternalProposalMajority(author: SubstrateAccount, threshold: number, action: Call, length) {
     const func = this._Chain.getTxMethod('democracy', 'externalProposeMajority');
-    return this.createTx(author, threshold, func(action.hash).method);
+    return this.createTx(author, threshold, func(action.hash).method, length);
   }
-  public createExternalProposalDefault(author: SubstrateAccount, threshold: number, action: Call) {
+  public createExternalProposalDefault(author: SubstrateAccount, threshold: number, action: Call, length) {
     // only on kusama
     const func = this._Chain.getTxMethod('democracy', 'externalProposeDefault');
-    return this.createTx(author, threshold, func(action.hash).method);
+    return this.createTx(author, threshold, func(action.hash).method, length);
   }
   public createFastTrack(
     author: SubstrateAccount,
@@ -97,16 +97,23 @@ class SubstrateCollective extends ProposalModule<
     return this.createTx(
       author,
       threshold,
-      func(hash, votingPeriod, delay).method
+      func(hash, votingPeriod, delay).method,
+      func(hash, votingPeriod, delay).method.encodedLength
     );
   }
 
-  public createTx(author: SubstrateAccount, threshold: number, action: Call, fromTechnicalCommittee?: boolean) {
+  public createTx(author: SubstrateAccount, threshold: number, action: Call, length?: number, fromTechnicalCommittee?: boolean) {
     // TODO: check council status
     const title = this._Chain.methodToTitle(action);
+
+    // handle differing versions of substrate API
     const txFunc = fromTechnicalCommittee
-      ? ((api: ApiRx) => api.tx.technicalCommittee.propose(threshold, action))
-      : ((api: ApiRx) => (api.tx.council.propose as any)(threshold, action));
+      ? ((api: ApiRx) => api.tx.technicalCommittee.propose.meta.args.length === 3
+        ? api.tx.technicalCommittee.propose(threshold, action, length)
+        : api.tx.technicalCommittee.propose(threshold, action))
+      : ((api: ApiRx) => api.tx.council.propose.meta.args.length === 3
+        ? api.tx.council.propose(threshold, action, length)
+        : (api.tx.council.propose as any)(threshold, action, null));
     return this._Chain.createTXModalData(
       author,
       txFunc,
