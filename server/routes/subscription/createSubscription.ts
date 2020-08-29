@@ -26,8 +26,8 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   const p_entity = parsed_object_id[0];
   let chain;
 
-  switch (true) {
-    case (category.name === 'new-thread-creation'): {
+  switch (category.name) {
+    case 'new-thread-creation': {
       chain = await models.Chain.findOne({
         where: {
           id: p_entity,
@@ -45,7 +45,8 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       }
       break;
     }
-    case (category.name === 'new-comment-creation' || category.name === 'new-reaction'): {
+    case 'new-comment-creation':
+    case 'new-reaction': {
       if (p_entity === 'discussion') {
         const thread = await models.OffchainThread.findOne({ where: { id: Number(p_id), } });
         if (!thread) return next(new Error(Errors.NoThread));
@@ -70,9 +71,9 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       }
       break;
     }
-    case (category.name === 'new-mention'):
+    case 'new-mention':
       return next(new Error(Errors.NoMentions));
-    case (category.name === 'chain-event'): {
+    case 'chain-event': {
       chain = await models.Chain.findOne({
         where: {
           id: p_entity,
