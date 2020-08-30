@@ -30,18 +30,17 @@ const getValidatorDetails = async (models, req: Request, res: Response, next: Ne
         if (!stats) {
             return next(new Error('Validator details not found'));
         }
-        if (stats) {
-            log.info("Validator details fetched successfully");
-            return res.json({
-                status: 'Success',
-                result: {
-                    data: stats.rows,
-                    pagination: {
-                        ...pagination, totalRecords: stats.count
-                    }
+
+        log.info("Validator details fetched successfully");
+        return res.json({
+            status: 'Success',
+            result: {
+                data: stats.rows,
+                pagination: {
+                    ...pagination, totalRecords: stats.count
                 }
-            })
-        }
+            }
+        });
 
     }
     catch (e) {
