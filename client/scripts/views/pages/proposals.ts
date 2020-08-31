@@ -101,7 +101,7 @@ const ProposalsPage: m.Component<{}> = {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
   },
   view: (vnode) => {
-    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain...', title: 'Proposals' });
+    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Proposals' });
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 
