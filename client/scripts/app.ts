@@ -222,7 +222,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
       './controllers/chain/near/main'
     )).default;
     app.chain = new Near(n, app);
-    app.chain.initApi();
+    app.chain.initApi(); // required for loading NearAccounts
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
