@@ -255,7 +255,7 @@ const SubstrateLinkAccountItem: m.Component<{
 };
 
 const LinkNewAddressModal: m.Component<{
-  loggingInWithAddress?: boolean; // determines whether the header says "Link new address" or "Login with address"
+  loggingInWithAddress?: boolean; // determines whether the header says "Connect a new address" or "Login with address"
   joiningCommunity: string,       // join community after verification
   joiningChain: string,           // join chain after verification
   alreadyInitializedAccount?: Account<any>; // skip verification, go straight to profile creation (only used for NEAR)
@@ -326,7 +326,7 @@ const LinkNewAddressModal: m.Component<{
     }
 
     const linkAddressHeader = m('.compact-modal-title', [
-      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Link new address'),
+      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
     ]);
 
     const isMobile = $(window).width() <= 440;
@@ -602,8 +602,8 @@ const LinkNewAddressModal: m.Component<{
           (app.chain as Substrate || app.chain as Ethereum).webWallet
             && (app.chain as Substrate || app.chain as Ethereum).webWallet.enabled && m('.accounts-caption', [
             (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length ? [
-              m('p', 'Select an account to link.'),
-              m('p.small-text', 'If a popup does not appear, click your browser extension.'),
+              m('p', 'Select an address:'),
+              m('p.small-text', 'If a popup does not appear, check your wallet/browser extension.'),
             ] : [
               m('p', 'Wallet connected, but no accounts were found.'),
             ],
@@ -944,7 +944,7 @@ const LinkNewAddressModal: m.Component<{
 
 // inject confirmExit property
 LinkNewAddressModal['confirmExit'] = confirmationModalWithText(
-  app.isLoggedIn() ? 'Cancel out of linking address?' : 'Cancel out of logging in?'
+  app.isLoggedIn() ? 'Cancel connecting new address?' : 'Cancel out of logging in?'
 );
 
 export default LinkNewAddressModal;

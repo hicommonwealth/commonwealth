@@ -111,7 +111,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
               ? m(Callout, {
                 icon: Icons.ALERT_TRIANGLE,
                 intent: 'primary',
-                content: 'Link an address to create a signaling proposal.'
+                content: 'Connect an address to create a signaling proposal.'
               })
               : m(Callout, {
                 icon: Icons.INFO,

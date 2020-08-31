@@ -156,7 +156,7 @@ const ConfirmInviteModal: m.Component<{}, {
                   label: 'Delete invite'
                 }),
               addresses.length === 0
-                && m('.no-accounts', 'You must link a new address to join this community.'),
+                && m('.no-accounts', 'You must connect an address to join this community.'),
               addresses.length === 0
               && m('a.btn.add-account', {
                 href: '#',
@@ -169,7 +169,7 @@ const ConfirmInviteModal: m.Component<{}, {
                     }
                   });
                 }
-              }, `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
+              }, 'Connect a new address'),
             ],
         ])
         : m('.compact-modal-body', [
