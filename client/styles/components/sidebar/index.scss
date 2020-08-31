@@ -215,8 +215,7 @@
         }
     }
 
-
-    .TopicsModule {
+    .OffchainNavigationModule {
         > .cui-list {
             .cui-list.more-topics-list {
                 border-top: 1px solid $background-color-light-hover;
@@ -228,11 +227,11 @@
         }
 
         // tag icons
-        .cui-list-item {
+        .topic-row.cui-list-item {
             @include proposal-topic-inline;
         }
-        .cui-list .cui-list-item-content-left {
-            padding-left: 4px !important;
+        .cui-list .topic-row.cui-list-item .cui-list-item-content-left {
+            padding-left: 3px !important;
             padding-right: 8px !important;
         }
         .proposal-topic-icon {

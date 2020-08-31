@@ -18,24 +18,127 @@ import LoginSelector from 'views/components/header/login_selector';
 import CommunitySelector, { CommunityLabel } from './community_selector';
 import CommunityInfoModule from './community_info_module';
 
-const OffchainNavigationModule: m.Component<{}, {}> = {
+const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
   view: (vnode) => {
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
 
-    return m('.OnchainNavigationModule.SidebarModule', [
+    const featuredTopics = {};
+    const otherTopics = {};
+    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
+
+    const getTopicRow = (id, name, description) => m(ListItem, {
+      class: 'topic-row',
+      key: id,
+      contentLeft: m('.proposal-topic-icon'),
+      contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
+        && app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+        && m(PopoverMenu, {
+          class: 'sidebar-edit-topic',
+          position: 'bottom',
+          transitionDuration: 0,
+          hoverCloseDelay: 0,
+          closeOnContentClick: true,
+          trigger: m(Icon, {
+            name: Icons.CHEVRON_DOWN,
+          }),
+          content: m(MenuItem, {
+            label: 'Edit topic',
+            onclick: (e) => {
+              app.modals.create({
+                modal: EditTopicModal,
+                data: { description, id, name }
+              });
+            }
+          })
+        }),
+      label: [
+        name,
+      ],
+      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeId()}/discussions/${name}`);
+      },
+    });
+
+    app.topics.getByCommunity(app.activeId()).forEach((topic) => {
+      const { id, name, description } = topic;
+      if (featuredTopicIds.includes(`${topic.id}`)) {
+        featuredTopics[topic.name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
+      } else {
+        otherTopics[topic.name] = { id, name, description };
+      }
+    });
+    const otherTopicListItems = Object.keys(otherTopics)
+      .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
+      .map((name, idx) => getTopicRow(otherTopics[name].id, name, otherTopics[name].description));
+    const featuredTopicListItems = Object.keys(featuredTopics)
+      .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
+      .map((name, idx) => getTopicRow(featuredTopics[name].id, name, featuredTopics[name].description));
+
+    return m('.OffchainNavigationModule.SidebarModule', [
       m(List, [
         m(ListItem, {
-          label: 'All Discussions',
           class: 'section-header',
+          label: 'Off-chain Discussions',
+          contentRight: app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+            && m(PopoverMenu, {
+              class: 'sidebar-add-topic',
+              position: 'bottom',
+              transitionDuration: 0,
+              hoverCloseDelay: 0,
+              closeOnContentClick: true,
+              trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+              content: m(MenuItem, {
+                label: 'New topic',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({ modal: NewTopicModal });
+                }
+              }),
+            }),
         }),
         m(ListItem, {
           active: onDiscussionsPage(m.route.get()),
-          label: 'Discussions',
+          label: 'All Discussions',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
         }),
       ]),
+      m(List, [
+        featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && [
+          app.threads.initialized
+            ? m(ListItem, {
+              class: 'section-callout',
+              label: m(Callout, {
+                size: 'sm',
+                intent: 'primary',
+                icon: Icons.ALERT_TRIANGLE,
+                content: 'The admin has not configured this community with topics yet',
+              }),
+            })
+            : m(ListItem, {
+              class: 'section-callout',
+              label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
+            }),
+        ]
+      ]),
+      m(List, {
+        onupdate: (vvnode) => {
+          if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+              && !vnode.state.dragulaInitialized) {
+            vnode.state.dragulaInitialized = true;
+            dragula([vvnode.dom]).on('drop', async (el, target, source) => {
+              const reorder = Array.from(source.children).map((child) => {
+                return (child as HTMLElement).id;
+              });
+              await app.community.meta.updateFeaturedTopics(reorder);
+            });
+          }
+        }
+      }, featuredTopicListItems),
+      m(List, { class: 'more-topics-list' }, otherTopicListItems),
     ]);
   }
 };
@@ -160,119 +263,6 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
   }
 };
 
-const TopicsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
-  view: (vnode) => {
-    const featuredTopics = {};
-    const otherTopics = {};
-    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
-
-    const getTopicRow = (id, name, description) => m(ListItem, {
-      key: id,
-      contentLeft: m('.proposal-topic-icon'),
-      contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
-        && app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-        && m(PopoverMenu, {
-          class: 'sidebar-edit-topic',
-          position: 'bottom',
-          transitionDuration: 0,
-          hoverCloseDelay: 0,
-          closeOnContentClick: true,
-          trigger: m(Icon, {
-            name: Icons.CHEVRON_DOWN,
-          }),
-          content: m(MenuItem, {
-            label: 'Edit topic',
-            onclick: (e) => {
-              app.modals.create({
-                modal: EditTopicModal,
-                data: { description, id, name }
-              });
-            }
-          })
-        }),
-      label: [
-        name,
-      ],
-      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeId()}/discussions/${name}`);
-      },
-    });
-
-    app.topics.getByCommunity(app.activeId()).forEach((topic) => {
-      const { id, name, description } = topic;
-      if (featuredTopicIds.includes(`${topic.id}`)) {
-        featuredTopics[topic.name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
-      } else {
-        otherTopics[topic.name] = { id, name, description };
-      }
-    });
-    const otherTopicListItems = Object.keys(otherTopics)
-      .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
-      .map((name, idx) => getTopicRow(otherTopics[name].id, name, otherTopics[name].description));
-    const featuredTopicListItems = Object.keys(featuredTopics)
-      .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
-      .map((name, idx) => getTopicRow(featuredTopics[name].id, name, featuredTopics[name].description));
-
-    return m('.TopicsModule.SidebarModule', [
-      m(List, [
-        m(ListItem, {
-          class: 'section-header',
-          label: 'Discussions by Topic',
-          contentRight: app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-            && m(PopoverMenu, {
-              class: 'sidebar-add-topic',
-              position: 'bottom',
-              transitionDuration: 0,
-              hoverCloseDelay: 0,
-              closeOnContentClick: true,
-              trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
-              content: m(MenuItem, {
-                label: 'New topic',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({ modal: NewTopicModal });
-                }
-              }),
-            }),
-        }),
-        featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && [
-          app.threads.initialized
-            ? m(ListItem, {
-              class: 'section-callout',
-              label: m(Callout, {
-                size: 'sm',
-                intent: 'primary',
-                icon: Icons.ALERT_TRIANGLE,
-                content: 'The admin has not configured this community with topics yet',
-              }),
-            })
-            : m(ListItem, {
-              class: 'section-callout',
-              label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
-            }),
-        ]
-      ]),
-      m(List, {
-        onupdate: (vvnode) => {
-          if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-              && !vnode.state.dragulaInitialized) {
-            vnode.state.dragulaInitialized = true;
-            dragula([vvnode.dom]).on('drop', async (el, target, source) => {
-              const reorder = Array.from(source.children).map((child) => {
-                return (child as HTMLElement).id;
-              });
-              await app.community.meta.updateFeaturedTopics(reorder);
-            });
-          }
-        }
-      }, featuredTopicListItems),
-      m(List, { class: 'more-topics-list' }, otherTopicListItems),
-    ]);
-  }
-};
-
 const MobileSidebarHeader: m.Component<{ parentVnode }> = {
   view: (vnode) => {
     const { parentVnode } = vnode.attrs;
@@ -318,7 +308,6 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
       }, [
         m('.SidebarHeader', m(CommunitySelector)),
         (app.chain || app.community) && m(OffchainNavigationModule),
-        (app.chain || app.community) && m(TopicsModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(CommunityInfoModule),
       ])
