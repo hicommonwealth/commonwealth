@@ -300,7 +300,11 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
             label: m(Icon, { name: Icons.MENU }),
           }),
           app.isLoggedIn() && m(MobileNewProposalButton),
+        ]),
+        m('.mobile-sidebar-center', [
           m('.community-label', m(CommunitySelector)),
+        ]),
+        m('.mobile-sidebar-right', [
           app.isLoggedIn() && m(NotificationsMenu, { small: false }),
           m(LoginSelector, { small: false }),
         ]),
