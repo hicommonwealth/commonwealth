@@ -181,7 +181,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   public get denom() { return this.app.chain.currency; }
 
-  private readonly _silencedEvents = { };
+  private readonly _silencedEvents = {};
 
   private _blockSubscription: Unsubscribable;
   private _timestampSubscription: Unsubscribable;
@@ -202,6 +202,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   public coins(n: number | BN | SubstrateCoin | Compact<u128>, inDollars?: boolean) {
+
     if (typeof n !== 'undefined') {
       return new SubstrateCoin(this._tokenSymbol, n, new BN(10).pow(new BN(this._tokenDecimals)), inDollars);
     }
@@ -299,7 +300,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return this._api.isReady;
   }
 
-  public get apiInitialized() : boolean {
+  public get apiInitialized(): boolean {
     return !!this._api;
   }
 
@@ -327,7 +328,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return Object.keys(this._api.tx).filter((mod) => !!(mod.trim()));
   }
 
-  public listModuleFunctions(mod : string) {
+  public listModuleFunctions(mod: string) {
     if (!mod || !this._api.tx) {
       return [];
     }
@@ -390,7 +391,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       ]: [
           string, string, string, Moment, BlockNumber,
           Balance, Balance, Balance, AccountId, ChainProperties, Balance
-      ]) => {
+        ]) => {
         this.app.chain.name = chainname;
         this.app.chain.version = chainversion;
         this.app.chain.runtimeName = chainruntimename;
@@ -434,13 +435,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           resolve();
         });
       },
-      (err) => reject(new Error(err)));
+        (err) => reject(new Error(err)));
     });
   }
 
   public silenceEvent(moduleName: string, eventName: string) {
     if (!this._silencedEvents[moduleName]) {
-      this._silencedEvents[moduleName] = { };
+      this._silencedEvents[moduleName] = {};
     }
     if (!this._silencedEvents[moduleName][eventName]) {
       this._silencedEvents[moduleName][eventName] = true;
@@ -525,9 +526,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         }
       });
     },
-    (err: string) => {
-      console.error(`Failed to get chain events: ${err}`);
-    });
+      (err: string) => {
+        console.error(`Failed to get chain events: ${err}`);
+      });
     this._eventsInitialized = true;
   }
 

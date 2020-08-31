@@ -9,6 +9,7 @@ import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_p
 import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import ChainEntityController from 'controllers/server/chain_entities';
+import StakingController from 'controllers/server/staking';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
 import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent, NodeInfo } from 'models';
 import { IApp } from 'state';
@@ -36,6 +37,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public readonly chainEntities = new ChainEntityController();
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Edgeware;
+  public stakingAdapter = new StakingController();
 
   public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
     handleSubstrateEntityUpdate(this, entity, event);

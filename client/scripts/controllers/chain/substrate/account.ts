@@ -47,10 +47,25 @@ export interface IValidatorValue {
   blockCount?: u32,
   hasMessage?: boolean,
   isOnline?: boolean,
-  otherTotal?: BN,
+  otherTotal?: BN
+}
+
+export interface IValidatorProps {
+  exposure: Exposure,
+  controller: string
+  commissionPer?: number,
+  eraPoints?: string,
+  blockCount?: u32,
+  hasMessage?: boolean,
+  isOnline?: boolean,
+  otherTotal?: BN
+}
+export interface IValidatorData {
+  stats: {}
 }
 export interface IValidators {
-  [address: string]: IValidatorValue;
+  [address: string]: IValidatorValue,
+
 }
 
 class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccount> {
@@ -162,7 +177,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       }),
       auditTime(100),
       map(([currentSet, toBeElected, controllers, exposures, nextUpControllers, nextUpExposures, validatorsInfo]:
-        [ AccountId[], AccountId[], Vec<AccountId>, Exposure[], Vec<AccountId>, Exposure[], IValidatorInfo ]) => {
+        [AccountId[], AccountId[], Vec<AccountId>, Exposure[], Vec<AccountId>, Exposure[], IValidatorInfo]) => {
         const result: IValidators = {};
         for (let i = 0; i < currentSet.length; ++i) {
           const key = currentSet[i].toString();
@@ -207,7 +222,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
 
 export default SubstrateAccounts;
 
-type Delegation = [ AccountId, Conviction ] & Codec;
+type Delegation = [AccountId, Conviction] & Codec;
 
 export class SubstrateAccount extends Account<SubstrateCoin> {
   // GETTERS AND SETTERS
@@ -242,8 +257,8 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
       .pipe(map(({ availableBalance, votingBalance }) =>
-      // we compute illiquid balance by doing (total - available), because there's no query
-      // or parameter to fetch it
+        // we compute illiquid balance by doing (total - available), because there's no query
+        // or parameter to fetch it
         this._Chain.coins(votingBalance.sub(availableBalance))));
   }
 
@@ -323,17 +338,17 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   */
 
   // Accounts may delegate their voting power for democracy referenda. This always incurs the maximum locktime
-  public get delegation(): Observable<[ SubstrateAccount, number ]> {
+  public get delegation(): Observable<[SubstrateAccount, number]> {
     if (!this._Chain?.apiInitialized) return;
     // we have to hack around the type here because of the linked_map wrapper
     return this._Chain.query((api: ApiRx) => api.query.democracy.delegations<Delegation[]>(this.address))
-      .pipe(map(([ delegation ]: [ Delegation ]) => {
-        const [ delegatedTo, conviction ] = delegation;
+      .pipe(map(([delegation]: [Delegation]) => {
+        const [delegatedTo, conviction] = delegation;
         if (delegatedTo.isEmpty || delegatedTo.toString() === this.address) {
           return null;
         } else {
           // console.log('set delegation for acct: ' + this.address);
-          return [ this._Accounts.fromAddress(delegatedTo.toString()), conviction.index ];
+          return [this._Accounts.fromAddress(delegatedTo.toString()), conviction.index];
         }
       }));
   }
@@ -342,8 +357,8 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   public get nominees(): Observable<SubstrateAccount[]> {
     return this._Accounts.validators.pipe(
       map((validators: IValidators) => Object.entries(validators)
-        .filter(([ stash, { exposure }]) => exposure.others.findIndex(({ who }) => who.toString() === this.address) !== -1)
-        .map(([ stash ]) => this._Accounts.get(stash))),
+        .filter(([stash, { exposure }]) => exposure.others.findIndex(({ who }) => who.toString() === this.address) !== -1)
+        .map(([stash]) => this._Accounts.get(stash))),
     );
   }
 

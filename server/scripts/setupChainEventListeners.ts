@@ -18,7 +18,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
     limit: 1,
-    order: [ [ 'block_number', 'DESC' ]],
+    order: [['block_number', 'DESC']],
     // this $...$ queries the data inside the include (ChainEvents don't have `chain` but ChainEventTypes do)...
     // we might be able to replicate this behavior with where and required: true inside the include
     where: {
@@ -51,9 +51,11 @@ const setupChainEventListeners = async (
     const notificationHandler = new EventNotificationHandler(models, wss);
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
     const identityHandler = new IdentityHandler(models, node.chain);
-    const handlers: IEventHandler[] = [ storageHandler, notificationHandler, entityArchivalHandler ];
+    const handlers: IEventHandler[] = [storageHandler, notificationHandler, entityArchivalHandler];
     let subscriber: IEventSubscriber<any, any>;
     if (SubstrateTypes.EventChains.includes(node.chain)) {
+
+      console.log("------ substrate events --------------")
       // only handle identities on substrate chains
       handlers.push(identityHandler);
 
@@ -89,9 +91,9 @@ const setupChainEventListeners = async (
         subscriber.unsubscribe();
       }
     });
-    return [ node.chain, subscriber ];
+    return [node.chain, subscriber];
   }));
-  return _.object<{ [chain: string]:  IEventSubscriber<any, any> }>(subscribers);
+  return _.object<{ [chain: string]: IEventSubscriber<any, any> }>(subscribers);
 };
 
 export default setupChainEventListeners;

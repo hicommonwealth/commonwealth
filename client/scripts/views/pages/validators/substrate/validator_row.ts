@@ -73,7 +73,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
     const nominatorsList = vnode.attrs.nominators;
     const commission = vnode.attrs.commission || 0;
     const apr = vnode.attrs?.apr || 0;
-
+    // console.log("------------ vnode.attrs --------- ", vnode.attrs)
     return m('tr.ValidatorRow', [
       m('td.val-stash', m(Popover, {
         interactionType: 'hover',
@@ -85,7 +85,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       ]),
       m('td.val-own', formatCoin(app.chain.chain.coins(vnode.attrs.bonded), true)),
       m('td.val-other', [
-        formatCoin(app.chain.chain.coins(vnode.attrs.otherTotal), true),
+        formatCoin(app.chain.chain.coins(+vnode.attrs.otherTotal), true),
         nominatorsList.length > 0 && [
           m('a.val-nominators.padding-left-2', {
             href: '#',

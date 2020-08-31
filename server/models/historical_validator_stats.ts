@@ -6,13 +6,19 @@ export interface HistoricalValidatorStatsAttributes {
     stash_id: string;
     block: string;
     exposure: string[];
-    commission?: string;
+    commissionPer?: number;
     preferences?: number;
-    apr?: string;
+    apr?: number;
     uptime?: string;
     movingAverages?: number;
-    created_At: number;
     isLatest: boolean;
+    hasMessage: boolean;
+    isOnline: boolean,
+    eraPoints: number,
+    isElected: boolean,
+    toBeElected: boolean,
+    blockCount: number,
+    otherTotal: string
 }
 
 export interface HistoricalValidatorStatsInstance extends Sequelize.Instance<HistoricalValidatorStatsAttributes>, HistoricalValidatorStatsAttributes {
@@ -32,15 +38,22 @@ export default (
         id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true }, //primary-key
         stash_id: { type: dataTypes.STRING, allowNull: false },
         block: { type: dataTypes.STRING, allowNull: false }, // blocknumber
-        exposure: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false },
-        commission: { type: dataTypes.STRING, allowNull: false },
+        exposure: { type: dataTypes.JSON, allowNull: false },
+        commissionPer: { type: dataTypes.FLOAT, allowNull: false },
         preferences: { type: dataTypes.INTEGER, allowNull: false },// preferences - ValidatorPrefs
-        apr: { type: dataTypes.STRING, allowNull: false },
+        apr: { type: dataTypes.FLOAT, allowNull: false },
         uptime: { type: dataTypes.STRING, allowNull: false },
         movingAverages: { type: dataTypes.INTEGER, allowNull: false },
         isLatest: { type: dataTypes.BOOLEAN, allowNull: false },
-        created_At: { type: dataTypes.NOW, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP'), }
-    }, { timestamps: false });
+        hasMessage: { type: dataTypes.BOOLEAN, allowNull: false },
+        isOnline: { type: dataTypes.BOOLEAN, allowNull: false },
+        eraPoints: { type: dataTypes.INTEGER, allowNull: false },
+        isElected: { type: dataTypes.BOOLEAN, allowNull: false },
+        toBeElected: { type: dataTypes.BOOLEAN, allowNull: false },
+        blockCount: { type: dataTypes.INTEGER, allowNull: false },
+        otherTotal: { type: dataTypes.STRING, allowNull: false },
+    });
+
 
     HistoricalValidatorStats.associate = (models) => {
         models.HistoricalValidatorStats.belongsTo(models.Validators, { foreignKey: 'stash_id' });

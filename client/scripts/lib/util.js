@@ -9,6 +9,7 @@ export const uuidv4 = () => {
 };
 
 export const get = (route, args, callback) => {
+  console.log("argsssssssssssssssssss", args)
   return $.get(app.serverUrl() + route, args).then((resp) => {
     if (resp.status === 'Success') {
       callback(resp.result);

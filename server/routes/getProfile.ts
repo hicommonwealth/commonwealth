@@ -50,7 +50,7 @@ const getProfile = async (models, req: Request, res: Response, next: NextFunctio
       address,
       chain,
     },
-    include: [ models.OffchainProfile, ],
+    include: [models.OffchainProfile,],
   });
   if (!addressModel) return next(new Error(Errors.NoAddressFound));
 
@@ -63,7 +63,7 @@ const getProfile = async (models, req: Request, res: Response, next: NextFunctio
         chain: { [Op.in]: visibleChainIds }
       }]
     },
-    include: [ models.Address, ],
+    include: [models.Address,],
   });
 
   const comments = await models.OffchainComment.findAll({

@@ -20,7 +20,7 @@ import {
   DeriveSessionProgress, DeriveAccountInfo, DeriveAccountRegistration,
   DeriveHeartbeatAuthor, DeriveStakingElected
 } from '@polkadot/api-derive/types';
-import { IValidators } from './account';
+import { IValidators, IValidatorData } from './account';
 import SubstrateChain from './shared';
 
 const MAX_HEADERS = 50;
@@ -54,7 +54,17 @@ export interface IAccountInfo extends DeriveAccountRegistration {
   isReasonable: boolean;
   waitCount: number;
 }
-
+export interface IValidatorPageStateNew {
+  dynamic: {
+    validators: {
+      "status": "Success",
+      "stats": {
+        "count": 20,
+        rows: []
+      }
+    }
+  };
+}
 function extractNominators(nominations: [StorageKey, Option<Nominations>][]): Record<string, iInfo[]> {
   return nominations.reduce((mapped: Record<string, iInfo[]>, [key, optNoms]) => {
     if (optNoms.isSome) {
@@ -156,6 +166,13 @@ class SubstrateStaking implements StorageModule {
       return info;
     }));
   }
+
+
+  // { stash: AccountId; controller: AccountId; sessionKeys: AccountId[]; state: Active | Waiting | Inactive;
+  //  lastUpdate: BlockNumber; }
+  public globalstatistics() {
+    return this._app.staking.globalStatistics();
+  }
   public get validators(): Observable<IValidators> {
     return this._Chain.api.pipe(
       switchMap((api: ApiRx) => combineLatest(
@@ -165,15 +182,15 @@ class SubstrateStaking implements StorageModule {
         api.derive.staking.stashes(),
         api.derive.staking.currentPoints(),
         api.derive.imOnline.receivedHeartbeats(),
-        api.derive.staking.electedInfo()
+        api.derive.staking.electedInfo(),
       )),
 
       // fetch balances alongside validators
       flatMap((
         [api, { nextElected, validators: currentSet }, era, allStashes,
-          queryPoints, imOnline, electedInfo]:
+          queryPoints, imOnline, electedInfo, stats]:
           [ApiRx, DeriveStakingValidators, EraIndex, AccountId[],
-            EraRewardPoints, Record<string, DeriveHeartbeatAuthor>, DeriveStakingElected]
+            EraRewardPoints, Record<string, DeriveHeartbeatAuthor>, DeriveStakingElected, {}]
       ) => {
         const eraPoints: Record<string, string> = {};
         const entries = [...queryPoints.individual.entries()]
@@ -207,18 +224,18 @@ class SubstrateStaking implements StorageModule {
           of(waiting),
           of(eraPoints),
           of(imOnline),
-          of(commissionInfo)
+          of(commissionInfo), of(stats)
         );
       }),
       auditTime(100),
       map(([
         currentSet, toBeElected, controllers, exposures,
         nextUpControllers, nextUpExposures, waiting, eraPoints,
-        imOnline, commissionInfo
+        imOnline, commissionInfo, stats
       ]: [
           AccountId[], AccountId[], Vec<AccountId>, Exposure[],
           Vec<AccountId>, Exposure[], Uint32Array[], Record<string, string>,
-          Record<string, DeriveHeartbeatAuthor>, ICommissionInfo
+          Record<string, DeriveHeartbeatAuthor>, ICommissionInfo, {}
         ]) => {
         const result: IValidators = {};
         for (let i = 0; i < currentSet.length; ++i) {
@@ -233,7 +250,8 @@ class SubstrateStaking implements StorageModule {
             blockCount: imOnline[key]?.blockCount,
             hasMessage: imOnline[key]?.hasMessage,
             isOnline: imOnline[key]?.isOnline,
-            commissionPer: Number(commissionInfo[key])
+            commissionPer: Number(commissionInfo[key]),
+
           };
         }
         // add set of next elected

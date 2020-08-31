@@ -8,18 +8,14 @@ export const Errors = {
 };
 
 const upsertHistoricalValidatorStats = async (models, req: Request, res: Response, next: NextFunction) => {
-    let { stash_id = '', block = '', preferences = 0, commission = '', exposure = [], apr = '', uptime = '', movingAverages = '' } = req.body;
+    let { stash_id = '' } = req.body;
+    console.log(req.body);
+
     if (stash_id && stash_id.trim()) {
         try {
             const stats_added = await models.HistoricalValidatorStats.create({
-                stash_id,
-                block,
-                exposure,
-                commission,
-                preferences,
-                apr,
-                uptime,
-                movingAverages,
+
+                ...req.body
             });
             return res.json({ status: 'Success', result: stats_added.toJSON() });
         } catch (err) {

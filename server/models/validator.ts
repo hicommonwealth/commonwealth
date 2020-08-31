@@ -6,8 +6,7 @@ export interface ValidatorAttributes {
     controller: string;
     sessionKeys: string[];
     state: string;
-    lastUpdate?: string;
-    createdAt: number
+    lastUpdate: string;
 }
 
 export interface ValidatorInstance extends Sequelize.Instance<ValidatorAttributes>, ValidatorAttributes {
@@ -28,8 +27,7 @@ export default (
         controller: { type: dataTypes.STRING, allowNull: false }, // AccountId
         sessionKeys: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false }, //AccountID[]
         state: { type: dataTypes.STRING, allowNull: false }, //Active/waiting/inactive
-        lastUpdate: { type: dataTypes.INTEGER, allowNull: false },//blocknumber,
-        createdAt: { type: dataTypes.NOW, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP'), }
-    }, { timestamps: false })
+        lastUpdate: { type: dataTypes.BIGINT, allowNull: false },//blocknumber,
+    })
     return Validators;
 };

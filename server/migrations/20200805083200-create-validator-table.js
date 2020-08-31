@@ -7,8 +7,11 @@ module.exports = {
       controller: { type: DataTypes.STRING, allowNull: false }, // AccountId
       sessionKeys: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false }, //AccountID[]
       state: { type: DataTypes.STRING, allowNull: false }, //Active/waiting/inactive
-      lastUpdate: { type: DataTypes.INTEGER, allowNull: false },//blocknumber
+      lastUpdate: { type: DataTypes.BIGINT, allowNull: false },//blocknumber
       createdAt: {
+        type: DataTypes.DATE
+      },
+      updateAt: {
         type: DataTypes.DATE
       }
     });

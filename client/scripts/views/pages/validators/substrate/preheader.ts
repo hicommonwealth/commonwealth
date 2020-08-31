@@ -59,6 +59,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
 
     const denominator = Object.keys(annualPercentRate || {}).length || 1;
     const apr = (totalPercentage / denominator).toFixed(2);
+    console.log("sessionInfo from preheader  >>>>>>>>> ", sessionInfo)
     const { validatorCount, currentEra,
       currentIndex, sessionLength,
       sessionProgress, eraLength,
@@ -78,10 +79,11 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           }
         });
     }
-
+    console.log("~~~~~~~~~ Validator from preheader +++++++++++++++++  ", JSON.stringify(validators));
     Object.entries(validators).forEach(([_stash, { exposure, isElected }]) => {
+      console.log("----------- exposure --------------------- ", exposure)
       const valStake = (app.chain as Substrate).chain.coins(exposure?.total.toBn())
-      || (app.chain as Substrate).chain.coins(0);
+        || (app.chain as Substrate).chain.coins(0);
       totalStaked = (app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));
 
       // count total nominators
@@ -128,18 +130,18 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         ]),
         (isEpoch
           && sessionProgress && m(CardSummary, {
-          title: 'Epoch',
-          total: sessionLength,
-          value: sessionProgress,
-          currentBlock: formatNumber(currentIndex)
-        })),
+            title: 'Epoch',
+            total: sessionLength,
+            value: sessionProgress,
+            currentBlock: formatNumber(currentIndex)
+          })),
         eraProgress
-          && m(CardSummary, {
-            title: 'Era',
-            total: eraLength,
-            value: eraProgress,
-            currentBlock: formatNumber(currentEra)
-          }),
+        && m(CardSummary, {
+          title: 'Era',
+          total: eraLength,
+          value: eraProgress,
+          currentBlock: formatNumber(currentEra)
+        }),
         m('.validators-preheader-item', [
           m('h3', 'Est. APR'),
           m('.preheader-item-text', `${apr}%`),
@@ -199,12 +201,12 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                 createTXModal((nominators.length === 0)
                   ? sender.chillTx()
                   : sender.nominateTx(nominators)).then(() => {
-                  // vnode.attrs.sending = false;
-                  m.redraw();
-                }, () => {
-                  // vnode.attrs.sending = false;
-                  m.redraw();
-                });
+                    // vnode.attrs.sending = false;
+                    m.redraw();
+                  }, () => {
+                    // vnode.attrs.sending = false;
+                    m.redraw();
+                  });
               }
             }, 'Update'),
           ]),

@@ -1,5 +1,5 @@
 import 'pages/validators.scss';
-
+import { from } from 'rxjs';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 
@@ -8,8 +8,9 @@ import { formatAddressShort } from 'helpers/index';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
 import { u32 } from '@polkadot/types';
+import { DeriveSessionProgress } from '@polkadot/api-derive/types';
 import { HeaderExtended } from '@polkadot/api-derive';
-import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
+import { IValidators, SubstrateAccount, IValidatorData } from 'controllers/chain/substrate/account';
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
 import User from 'views/components/widgets/user';
 import PageLoading from 'views/pages/loading';
@@ -20,7 +21,7 @@ import Sublayout from 'views/sublayout';
 import { ICommissionInfo } from 'controllers/chain/substrate/staking';
 
 import * as CosmosValidationViews from './cosmos';
-import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
+import { SubstratePreHeader, SubstratePresentationComponent, PrePreHeader, SubstratePresentationComponent_ } from './substrate';
 
 export interface IValidatorAttrs {
   stash: string;
@@ -50,9 +51,9 @@ export interface IValidatorPageState {
     validators: IValidators | { [address: string]: ICosmosValidator };
     lastHeader: HeaderExtended,
     annualPercentRate: ICommissionInfo;
+    sessionInfo: DeriveSessionProgress;
   };
 }
-
 export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
   view: (vnode) => {
     return m('.ViewNominatorsModal', [
@@ -92,6 +93,7 @@ export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiti
 };
 
 export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
+
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
@@ -99,6 +101,13 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
     currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
     activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,
+    sessionInfo: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.sessionInfo
+      : null,
+    // validatorDetails: from(app.staking.validatorDetails()),
+    // currentValidators: from(app.staking.currentValidators({}, {})),
+    // waitingValidators: from(app.staking.waitingValidators({}, {})),
+    // globalStats: from(app.staking.globalStatistics()), // convert promise into observable
     stakingLedger: (app.chain.base === ChainBase.Substrate && app.user.activeAccount)
       ? (app.user.activeAccount as SubstrateAccount).stakingLedger
       : null,
@@ -117,21 +126,26 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     switch (app.chain.class) {
       case ChainClass.Edgeware:
         vComponents = [
-          m(SubstratePreHeader, {
-            sender: app.user.activeAccount as SubstrateAccount,
-            annualPercentRate: vnode.state.dynamic.annualPercentRate
-          }),
-          SubstratePresentationComponent(vnode.state, app.chain as Substrate),
+          // m(PrePreHeader, {}),
+          // m(SubstratePreHeader, {
+          //   sender: app.user.activeAccount as SubstrateAccount,
+          //   annualPercentRate: vnode.state.dynamic.annualPercentRate,
+          // }),
+          // SubstratePresentationComponent(vnode.state, app.chain as Substrate),
+          m(SubstratePresentationComponent_, {})
         ];
         break;
       case ChainClass.Kusama:
       case ChainClass.Polkadot: {
         vComponents = [
-          m(SubstratePreHeader, {
-            sender: app.user.activeAccount as SubstrateAccount,
-            annualPercentRate: vnode.state.dynamic.annualPercentRate
-          }),
-          SubstratePresentationComponent(vnode.state, app.chain as Substrate),
+          m(PrePreHeader, {}),
+          // m(SubstratePreHeader, {
+          //   sender: app.user.activeAccount as SubstrateAccount,
+          //   annualPercentRate: vnode.state.dynamic.annualPercentRate,
+          // }),
+          // SubstratePresentationComponent(vnode.state, app.chain as Substrate),
+          m(SubstratePresentationComponent_)
+
         ];
         break;
       }
@@ -175,4 +189,5 @@ const ValidatorPage: m.Component = {
   },
 };
 
-export default ValidatorPage;
+
+export default ValidatorPage

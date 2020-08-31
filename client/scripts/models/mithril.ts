@@ -14,7 +14,7 @@ export type IDynamicObservableObject = { groupKey: string } & { [prop: string]: 
 
 export interface IDynamicComponent<
   Attrs = {}, State extends IDynamicVnodeStateLifecycle<Attrs, State> = { dynamic: {} }
-> extends m.Component<Attrs, State> {
+  > extends m.Component<Attrs, State> {
   getObservables: (attrs: Attrs) => IDynamicObservableObject;
   view(vnode: m.VnodeDOM<Attrs, State>): m.Children | null | void;
   oninit?(this: State, vnode: m.VnodeDOM<Attrs, State>): any;
@@ -24,9 +24,9 @@ export interface IDynamicComponent<
 export const makeDynamicComponent = <
   Attrs = {}, State extends IDynamicVnodeStateLifecycle<Attrs, State> = { dynamic: {} }
 >(
-    component: IDynamicComponent<Attrs, State>,
-    debounceTime: number = 100,
-  ): IDynamicComponent<Attrs, State> => {
+  component: IDynamicComponent<Attrs, State>,
+  debounceTime: number = 100,
+): IDynamicComponent<Attrs, State> => {
   const oninit = component.oninit;
   const onremove = component.onremove;
   const onbeforeupdate = component.onbeforeupdate;

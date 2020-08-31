@@ -63,13 +63,17 @@ const PresentationComponent = (state, chain: Substrate) => {
     });
 
 
-  // let vals = JSON.stringify(validators);
+  let vals = JSON.stringify(validators);
+  // console.log('valsssssssssssssssssssssssssss', vals)
   // for (let i = 0; i < 3; i++) {
-  console.log("validators == ", JSON.stringify(Object.keys(validators)));
+  Object.keys(validators).map((validator) => {
+    console.log(validators[validator], "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
+  })
+  // console.log("validators ==================== ", JSON.stringify(Object.keys(validators)));
   // }
   let lh = (app.chain as Substrate).staking.lastHeaders
   for (let i = 0; i < 3; i++) {
-    console.log("lh == ", JSON.stringify(lh[i]));
+    // console.log("lh == ", JSON.stringify(lh[i]));
   }
   // let lh = JSON.stringify((app.chain as Substrate).staking.lastHeaders)
   // console.log("valdiators === ", vals);
@@ -81,7 +85,7 @@ const PresentationComponent = (state, chain: Substrate) => {
   model.total.current = Object.keys(validators).filter(
     (validator) => (validators[validator].isElected === true)
   ).length;
-
+  // console.log("model.total.current ", model.total.current)
   model.total.waiting = Object.keys(validators).filter(
     (validator) => (validators[validator].isElected === false)
   ).length;
@@ -95,8 +99,10 @@ const PresentationComponent = (state, chain: Substrate) => {
     .slice(model.perPage * (model.currentPage - 1), model.perPage * model.currentPage);
 
   const waitingValidators = Object.keys(validators).filter((validator) => (validators[validator].isElected === false))
-    .sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
-    .slice(model.perPage * (model.currentPage - 1), model.perPage * model.currentPage);
+  // .sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
+  // .slice(model.perPage * (model.currentPage - 1), model.perPage * model.currentPage);
+
+  console.log(JSON.stringify(waitingValidators[0]), "waiting validators -------------------------")
 
   // const filtered = Object.keys(annualPercentRate)
   //   .map((elt) => annualPercentRate[elt])
@@ -145,6 +151,7 @@ const PresentationComponent = (state, chain: Substrate) => {
           m('th.val-action', ''),
         ]),
         currentValidators.map((validator) => {
+
           // total stake
           const total = chain.chain.coins(validators[validator].exposure.total);
           // own stake
@@ -153,6 +160,7 @@ const PresentationComponent = (state, chain: Substrate) => {
             stash: who.toString(),
             balance: chain.chain.coins(value),
           }));
+          console.log("other total ", validators[validator]?.otherTotal, " ", typeof validators[validator]?.otherTotal)
           const controller = validators[validator].controller;
           const eraPoints = validators[validator].eraPoints;
           const blockCount = validators[validator].blockCount;
