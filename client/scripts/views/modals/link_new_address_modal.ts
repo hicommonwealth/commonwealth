@@ -163,10 +163,10 @@ const EthereumLinkAccountItem: m.Component<{
           .catch(errorCallback);
       },
     }, [
-      // m('.account-item-left', [
-      //   m('.account-item-name', account.meta.name),
-      //   m('.account-item-address', account.meta.name),
-      // ]),
+      m('.account-item-left', [
+        m('.account-item-name', 'Ethereum account'),
+        m('.account-item-address', `${address.slice(0, 16)}...`),
+      ]),
       m('.account-item-right', [
         vnode.state.linking
           ? m('.account-waiting', [
