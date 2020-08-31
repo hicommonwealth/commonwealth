@@ -187,16 +187,18 @@ const SubstrateLinkAccountItem: m.Component<{
 }, { linking }> = {
   view: (vnode) => {
     const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode } = vnode.attrs;
+    const address = AddressSwapper({
+      address: account.address,
+      currentPrefix: (app.chain as Substrate).chain.ss58Format,
+    });
+
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
 
         try {
-          const signerAccount = await createUserWithAddress(AddressSwapper({
-            address: account.address,
-            currentPrefix: (app.chain as Substrate).chain.ss58Format,
-          })) as SubstrateAccount;
-          const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
+          const signerAccount = await createUserWithAddress(address) as SubstrateAccount;
+          const signer = await (app.chain as Substrate).webWallet.getSigner(address);
           vnode.state.linking = true;
           m.redraw();
 
@@ -236,11 +238,7 @@ const SubstrateLinkAccountItem: m.Component<{
     }, [
       m('.account-item-left', [
         m('.account-item-name', account.meta.name),
-        // TODO: format this address correctly
-        m('.account-item-address', formatAddressShort(AddressSwapper({
-          address: account.address,
-          currentPrefix: (app.chain as Substrate).chain.ss58Format,
-        }), account.chain)),
+        m('.account-item-address', formatAddressShort(address, account.chain)),
       ]),
       m('.account-item-right', [
         vnode.state.linking
@@ -248,7 +246,7 @@ const SubstrateLinkAccountItem: m.Component<{
             // TODO: show a (?) icon with a tooltip explaining to check your wallet
             m(Spinner, { size: 'xs', active: true })
           ])
-          : m('.account-user', m(User, { user: app.chain.accounts.get(account.address) })),
+          : m('.account-user', m(User, { user: app.chain.accounts.get(address) })),
       ]),
     ]);
   }
