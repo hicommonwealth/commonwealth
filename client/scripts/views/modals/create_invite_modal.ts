@@ -209,14 +209,16 @@ const CreateInviteModal: m.Component<{
       m('.compact-modal-body', [
         m(Form, [
           m(FormGroup, { span: 4 }, [
-            m(FormLabel, 'Chain'),
+            m(FormLabel, { class: 'formLabel' }, 'Chain'),
             m(Select, {
               name: 'invitedAddressChain',
-              defaultValue: app.config.chains.getAll()[0].id,
-              options: app.config.chains.getAll().map((chain) => ({
-                label: chain.name.toString(),
-                value: chain.id.toString(),
-              })),
+              defaultValue: chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id,
+              options: chainInfo
+                ? [{ label: chainInfo.name, value: chainInfo.id, }]
+                : app.config.chains.getAll().map((chain) => ({
+                  label: chain.name.toString(),
+                  value: chain.id.toString(),
+                })),
               oncreate: (vvnode) => {
                 vnode.state.invitedAddressChain = (vvnode.dom as any).value;
               },
