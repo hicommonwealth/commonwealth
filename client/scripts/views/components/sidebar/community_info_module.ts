@@ -25,6 +25,7 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
 
     const meta = app.chain ? app.chain.meta.chain : app.community.meta;
     const { name, description, website, chat, telegram, github } = meta;
+    console.log(isAdmin)
 
     return m('.CommunityInfoModule.SidebarModule', [
       m('.community-name', [
@@ -38,19 +39,17 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
           m(Icon, { name: Icons.SETTINGS }),
         ]),
         // TODO: get this working for chains
-        !app.chain
-          && app.community
-          && app.user?.activeAccount
-          && (app.community.meta.invitesEnabled
-              || app.user.isAdminOrModOfEntity({ community: app.activeCommunityId() }))
+        (app.community?.meta.invitesEnabled
+              || isAdmin)
           && m('.community-info-action', {
             onclick: (e) => {
               e.preventDefault();
+              const data = app.activeCommunityId()
+                ? { communityInfo: app.community.meta }
+                : { chainInfo: app.chain.meta.chain }
               app.modals.create({
                 modal: CreateInviteModal,
-                data: {
-                  communityInfo: app.community.meta,
-                },
+                data,
               });
             },
           }, [
