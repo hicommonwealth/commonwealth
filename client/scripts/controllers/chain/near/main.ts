@@ -15,6 +15,7 @@ export default class Near extends IChainAdapter<NearToken, any> {
     super(meta, app);
     this.chain = new NearChain(this.app);
     this.accounts = new NearAccounts(this.app);
+    this.initApi();
   }
 
   public async initApi() {
