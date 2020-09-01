@@ -296,6 +296,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
+          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
           m.route.set(proposalLink);
         },
       })
@@ -306,7 +307,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
-          localStorage[`${app.activeId()}-scrollY`] = window.scrollY;
+          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
           m.route.set(proposalLink);
         },
       }, [

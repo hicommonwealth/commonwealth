@@ -105,9 +105,12 @@ const ProposalsPage: m.Component<{}> = {
         returningFromThread = true;
       }
     });
-    if (returningFromThread && localStorage[`${app.activeId()}-scrollY`]) {
+    console.log(returningFromThread);
+    console.log(Number(localStorage[`${app.activeId()}-proposals-scrollY`]));
+    if (returningFromThread && localStorage[`${app.activeId()}-proposals-scrollY`]) {
       setTimeout(() => {
-        window.scrollTo(0, Number(localStorage[`${app.activeId()}-scrollY`]));
+        console.log('SCROLLING');
+        window.scrollTo(0, Number(localStorage[`${app.activeId()}-proposals-scrollY`]));
       }, 1);
     }
   },
