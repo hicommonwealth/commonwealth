@@ -114,6 +114,10 @@ class CommentsController {
       });
       const { result } = res;
       this._store.add(modelFromServer(result));
+      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+      updateLastVisited(app.activeCommunityId()
+        ? (activeEntity.meta as CommunityInfo)
+        : (activeEntity.meta as NodeInfo).chain, true);
       // update childComments of parent, if necessary
       if (result.parent_id) {
         const parent = this._store.getById(+result.parent_id);
@@ -149,10 +153,6 @@ class CommentsController {
         this._store.remove(this._store.getById(result.id));
       }
       this._store.add(result);
-      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
-      updateLastVisited(app.activeCommunityId()
-        ? (activeEntity.meta as CommunityInfo)
-        : (activeEntity.meta as NodeInfo).chain, true);
       return result;
     } catch (err) {
       console.log('Failed to edit comment');
