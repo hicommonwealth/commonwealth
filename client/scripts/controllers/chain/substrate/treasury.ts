@@ -80,7 +80,6 @@ class SubstrateTreasury extends ProposalModule<
           this._potSubscription = this._Chain.api.pipe(
             switchMap((api: ApiRx) => api.derive.balances.account(TREASURY_ACCOUNT)
           )).subscribe((pot: DeriveBalancesAccount) => {
-            console.log('hmm', pot)
             this._pot.next(this._Chain.coins(pot.freeBalance));
             innerResolve();
           });
