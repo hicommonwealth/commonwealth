@@ -1,7 +1,8 @@
 import { BehaviorSubject, Unsubscribable } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { first, switchMap } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
+import { DeriveBalancesAccount } from '@polkadot/api-derive/types';
 import { formatAddressShort } from 'helpers';
 import {
   ISubstrateTreasuryProposal,
@@ -12,6 +13,7 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
+import { stringToU8a, u8aToHex } from '@polkadot/util';
 
 class SubstrateTreasury extends ProposalModule<
   ApiRx,
@@ -69,21 +71,25 @@ class SubstrateTreasury extends ProposalModule<
         this._spendPeriod = +(api.consts.treasury.spendPeriod as BlockNumber);
         this._burnPct = +(api.consts.treasury.burn as Permill) / 1_000_000;
 
-        /* TODO: no way to fetch the pot?
-        this._potSubscription = this._Chain.api.pipe(
-          switchMap((api: ApiRx) => api.query.treasury.pot())
-        ).subscribe((pot: BalanceOf) => {
-          this._pot.next(this._Chain.coins(pot));
-        });
-        */
         const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryProposal);
         const constructorFunc = (e) => new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, e);
         const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
+        const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
 
-        this._initialized = true;
-        resolve();
-      },
-      (err) => reject(new Error(err)));
+        new Promise((innerResolve) => {
+          this._potSubscription = this._Chain.api.pipe(
+            switchMap((api: ApiRx) => api.derive.balances.account(TREASURY_ACCOUNT)
+          )).subscribe((pot: DeriveBalancesAccount) => {
+            this._pot.next(this._Chain.coins(pot.freeBalance));
+            innerResolve();
+          });
+        }).then(() => {
+          this._initialized = true;
+          resolve();
+        }).catch((err) => {
+          reject(err);
+        });
+      });
     });
   }
 
