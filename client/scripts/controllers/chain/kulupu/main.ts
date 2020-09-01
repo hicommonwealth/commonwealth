@@ -9,7 +9,7 @@ class Kulupu extends Substrate {
 
   public async initData() {
     // use old democracy logic
-    super.initData(false);
+    super.initData(true);
   }
 }
 
