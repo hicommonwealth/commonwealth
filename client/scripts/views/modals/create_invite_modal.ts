@@ -6,7 +6,7 @@ import mixpanel from 'mixpanel-browser';
 import { Button, Input, Form, FormGroup, FormLabel, Select, CustomSelect } from 'construct-ui';
 
 import app from 'state';
-import { CommunityInfo } from 'models';
+import { CommunityInfo, ChainInfo } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 
 interface IInviteButtonAttrs {
@@ -16,7 +16,8 @@ interface IInviteButtonAttrs {
   invitedAddress?: string,
   invitedEmail?: string,
   invitedAddressChain?: string,
-  community: CommunityInfo,
+  community?: CommunityInfo,
+  chain?: ChainInfo,
 }
 
 const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
@@ -25,7 +26,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
   },
   view: (vnode) => {
     const { selection, successCallback, failureCallback,
-      invitedAddress, invitedEmail, invitedAddressChain, community } = vnode.attrs;
+      invitedAddress, invitedEmail, invitedAddressChain, community, chain } = vnode.attrs;
     return m(Button, {
       class: 'create-invite-button',
       intent: 'primary',
@@ -58,10 +59,15 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
           return;
         }
 
+        const chainOrCommunityObj = chain ? { chain: chain.id }
+          : community ? { community:  community.id }
+            : null;
+        if (!chainOrCommunityObj) return;
+
         $.post(app.serverUrl() + postType, {
           address: app.user.activeAccount.address,
           author_chain: app.user.activeAccount.chain,
-          community: community.id,
+          ...chainOrCommunityObj,
           invitedAddress: selection === 'address' ? address : '',
           invitedAddressChain: selection === 'address' ? selectedChain : '',
           invitedEmail: selection === 'email' ? emailAddress : '',
@@ -171,7 +177,8 @@ const CreateInviteLink: m.Component<{ onChangeHandler?: Function }, {
 };
 
 const CreateInviteModal: m.Component<{
-  communityInfo: CommunityInfo;
+  communityInfo?: CommunityInfo;
+  chainInfo?: ChainInfo;
 }, {
   success: boolean;
   failure: boolean;
@@ -189,9 +196,11 @@ const CreateInviteModal: m.Component<{
     });
   },
   view: (vnode) => {
-    const { communityInfo } = vnode.attrs;
-    const { name, id, privacyEnabled, invitesEnabled, defaultChain } = communityInfo;
-
+    const { communityInfo, chainInfo } = vnode.attrs;
+    const chainOrCommunityObj = chainInfo ? { chain: chainInfo }
+      : communityInfo ? { community: communityInfo }
+        : null;
+    if (!chainOrCommunityObj) return;
     return m('.CreateInviteModal', [
       m('.compact-modal-title', [
         m('h3', 'Invite members'),
@@ -200,14 +209,16 @@ const CreateInviteModal: m.Component<{
       m('.compact-modal-body', [
         m(Form, [
           m(FormGroup, { span: 4 }, [
-            m(FormLabel, 'Chain'),
+            m(FormLabel, { class: 'chainSelectLabel' }, 'Chain'),
             m(Select, {
               name: 'invitedAddressChain',
-              defaultValue: app.config.chains.getAll()[0].id,
-              options: app.config.chains.getAll().map((chain) => ({
-                label: chain.name.toString(),
-                value: chain.id.toString(),
-              })),
+              defaultValue: chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id,
+              options: chainInfo
+                ? [{ label: chainInfo.name, value: chainInfo.id, }]
+                : app.config.chains.getAll().map((chain) => ({
+                  label: chain.name.toString(),
+                  value: chain.id.toString(),
+                })),
               oncreate: (vvnode) => {
                 vnode.state.invitedAddressChain = (vvnode.dom as any).value;
               },
@@ -241,10 +252,10 @@ const CreateInviteModal: m.Component<{
             },
             invitedAddress: vnode.state.invitedAddress,
             invitedAddressChain: vnode.state.invitedAddressChain,
-            community: communityInfo,
+            ...chainOrCommunityObj
           }),
         ]),
-        m(Form, [
+        communityInfo && m(Form, [
           m(FormGroup, [
             m(FormLabel, 'Email'),
             m(Input, {
@@ -269,10 +280,10 @@ const CreateInviteModal: m.Component<{
               m.redraw();
             },
             invitedEmail: vnode.state.invitedEmail,
-            community: communityInfo,
+            ...chainOrCommunityObj
           }),
         ]),
-        m(CreateInviteLink),
+        communityInfo && m(CreateInviteLink), // TODO: Allow chains to make invite link
         vnode.state.success && m('.success-message', [
           'Success! Your invite was sent',
         ]),
