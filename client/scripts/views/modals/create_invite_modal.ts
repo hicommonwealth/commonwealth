@@ -209,7 +209,7 @@ const CreateInviteModal: m.Component<{
       m('.compact-modal-body', [
         m(Form, [
           m(FormGroup, { span: 4 }, [
-            m(FormLabel, { class: 'formLabel' }, 'Chain'),
+            m(FormLabel, { class: 'chainSelectLabel' }, 'Chain'),
             m(Select, {
               name: 'invitedAddressChain',
               defaultValue: chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id,
@@ -255,7 +255,7 @@ const CreateInviteModal: m.Component<{
             ...chainOrCommunityObj
           }),
         ]),
-        m(Form, [
+        communityInfo && m(Form, [
           m(FormGroup, [
             m(FormLabel, 'Email'),
             m(Input, {
