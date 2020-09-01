@@ -431,7 +431,7 @@ const LinkNewAddressModal: m.Component<{
           // cli -- cosmos-sdk and substrate chains supported
           [ChainBase.CosmosSDK, ChainBase.Substrate].indexOf(app.chain.base) !== -1 && m('.link-address-option', {
             class: (vnode.state.selectedWallet === LinkNewAddressWallets.CLIWallet ? 'selected' : '')
-              + isMobile ? ' mobile-disabled' : '',
+              + (isMobile ? ' mobile-disabled' : ''),
             onclick: (e) => {
               vnode.state.selectedWallet = LinkNewAddressWallets.CLIWallet;
               setTimeout(() => {
