@@ -15,8 +15,7 @@ export const Errors = {
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const { body, title, kind, thread_id, version_history, } = req.body;
-  console.log(thread_id);
-  console.log(req.user);
+
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
   }
@@ -46,14 +45,12 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
 
   try {
     const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
-    console.log(userOwnedAddressIds);
     const thread = await models.OffchainThread.findOne({
       where: {
         id: thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    console.log(thread);
     if (!thread) return next(new Error('No thread with that id found'));
     const arr = thread.version_history;
     arr.unshift(version_history);

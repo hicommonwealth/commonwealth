@@ -303,7 +303,6 @@ describe('Thread Tests', () => {
   });
 
   describe('/createComment', () => {
-
     beforeEach(async () => {
       const res2 = await modelUtils.createThread({
         address: userAddress,
@@ -517,7 +516,8 @@ describe('Thread Tests', () => {
     it('should succeed in updating a thread body', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
-      const recentEdit : any = { timestamp: moment(), body: thread.body };
+      const newBody = 'new Body';
+      const recentEdit : any = { timestamp: moment(), body: newBody };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
@@ -527,16 +527,15 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread_id,
           'kind': thread_kind,
-          'body': thread.body,
+          'body': newBody,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
           'read_only': readOnly,
           'jwt': adminJWT,
         });
-      expect(res.body.error).to.be.null;
-      expect(res.body.result.body).to.be.equal(thread.body);
       expect(res.status).to.be.equal(200);
+      expect(res.body.result.body).to.be.equal(newBody);
     });
 
     it('should succeed in updating a thread title', async () => {
@@ -561,9 +560,8 @@ describe('Thread Tests', () => {
           'read_only': readOnly,
           'jwt': adminJWT,
         });
-      expect(res.body.error).to.be.null;
-      expect(res.body.result.title).to.be.equal(newTitle);
       expect(res.status).to.be.equal(200);
+      expect(res.body.result.title).to.be.equal(newTitle);
     });
 
     it.skip('should fail to show private threads to a user without access', async () => {
@@ -622,65 +620,64 @@ describe('Thread Tests', () => {
     });
 
     it('should fail without read_only or privacy', async () => {
-      let res = await chai.request(app)
-      .post('/api/setPrivacy')
-      .set('Accept', 'application/json')
-      .send({
-        thread_id: tempThread.id,
-        jwt: adminJWT,
-      });
+      const res = await chai.request(app)
+        .post('/api/setPrivacy')
+        .set('Accept', 'application/json')
+        .send({
+          thread_id: tempThread.id,
+          jwt: adminJWT,
+        });
       expect(res.status).to.be.equal(500);
       expect(res.body.error).to.be.equal(setPrivacyErrors.PrivateOrReadOnly);
     });
 
 
     it('should fail without thread_id', async () => {
-      let res = await chai.request(app)
-      .post('/api/setPrivacy')
-      .set('Accept', 'application/json')
-      .send({
-        privacy: 'true',
-        read_only: 'true',
-        jwt: adminJWT,
-      });
+      const res = await chai.request(app)
+        .post('/api/setPrivacy')
+        .set('Accept', 'application/json')
+        .send({
+          privacy: 'true',
+          read_only: 'true',
+          jwt: adminJWT,
+        });
       expect(res.status).to.be.equal(500);
       expect(res.body.error).to.be.equal(setPrivacyErrors.NoThreadId);
     });
 
     it('should fail with an invalid thread_id', async () => {
-      let res = await chai.request(app)
-      .post('/api/setPrivacy')
-      .set('Accept', 'application/json')
-      .send({
-        thread_id: 123458,
-        privacy: 'true',
-        read_only: 'true',
-        jwt: adminJWT,
-      });
+      const res = await chai.request(app)
+        .post('/api/setPrivacy')
+        .set('Accept', 'application/json')
+        .send({
+          thread_id: 123458,
+          privacy: 'true',
+          read_only: 'true',
+          jwt: adminJWT,
+        });
       expect(res.status).to.be.equal(500);
       expect(res.body.error).to.be.equal(setPrivacyErrors.NoThread);
     });
 
     it('should fail if not an admin or author', async () => {
       // create new user + jwt
-      let res = await modelUtils.createAndVerifyAddress({ chain });
+      const res = await modelUtils.createAndVerifyAddress({ chain });
       const newUserJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      let res2 = await chai.request(app)
-      .post('/api/setPrivacy')
-      .set('Accept', 'application/json')
-      .send({
-        thread_id: tempThread.id,
-        privacy: 'true',
-        read_only: 'true',
-        jwt: newUserJWT,
-      });
+      const res2 = await chai.request(app)
+        .post('/api/setPrivacy')
+        .set('Accept', 'application/json')
+        .send({
+          thread_id: tempThread.id,
+          privacy: 'true',
+          read_only: 'true',
+          jwt: newUserJWT,
+        });
       expect(res2.status).to.be.equal(500);
       expect(res2.body.error).to.be.equal(setPrivacyErrors.NotAdmin);
-    })
+    });
   });
 
   describe('/editComment', () => {
-
     it('should edit a comment', async () => {
       const text = 'tes text';
       const tRes = await modelUtils.createThread({
@@ -718,7 +715,6 @@ describe('Thread Tests', () => {
   });
 
   describe('/viewCount', () => {
-
     it('should track views on chain', async () => {
       let res = await modelUtils.createThread({
         address: userAddress,
