@@ -99,6 +99,17 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
+    let returningFromThread = false;
+    Object.values(ProposalType).forEach((type) => {
+      if (app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/${type}/`)) {
+        returningFromThread = true;
+      }
+    });
+    if (returningFromThread && localStorage[`${app.activeId()}-proposals-scrollY`]) {
+      setTimeout(() => {
+        window.scrollTo(0, Number(localStorage[`${app.activeId()}-proposals-scrollY`]));
+      }, 1);
+    }
   },
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Proposals' });

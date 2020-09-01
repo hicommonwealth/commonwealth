@@ -40,9 +40,9 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     });
 
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
-    if (returningFromThread && localStorage[`${app.activeId()}-scrollY`]) {
+    if (returningFromThread && localStorage[`${app.activeId()}-discussions-scrollY`]) {
       setTimeout(() => {
-        window.scrollTo(0, Number(localStorage[`${app.activeId()}-scrollY`]));
+        window.scrollTo(0, Number(localStorage[`${app.activeId()}-discussions-scrollY`]));
       }, 1);
     }
 
