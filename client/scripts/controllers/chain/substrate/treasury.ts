@@ -74,14 +74,12 @@ class SubstrateTreasury extends ProposalModule<
         const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryProposal);
         const constructorFunc = (e) => new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, e);
         const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
-        const TREASURY_ACCOUNT = stringToU8a('modlpy/trsry'.padEnd(32, '\0'));
+        const TREASURY_ACCOUNT = 'modlpy/trsry'.padEnd(32, '\0');
 
         new Promise((innerResolve) => {
           this._potSubscription = this._Chain.api.pipe(
-            switchMap((api: ApiRx) => api.derive.balances.account('modlpy/trsry')
+            switchMap((api: ApiRx) => api.derive.balances.account(TREASURY_ACCOUNT)
           )).subscribe((pot: DeriveBalancesAccount) => {
-            console.log('freeBalance', pot.freeBalance.div(bnToBn(10).pow(bnToBn(10000))).toString(10));
-            console.log('pot?', pot);
             this._pot.next(this._Chain.coins(pot.freeBalance));
             innerResolve();
           });
