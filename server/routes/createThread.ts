@@ -264,7 +264,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       [ finalThread.Address.address ],
     );
   }));
-
+  console.log(finalThread.id);
   return res.json({ status: 'Success', result: finalThread.toJSON() });
 };
 

@@ -482,7 +482,7 @@ describe('Thread Tests', () => {
           'attachments[]': null,
           'privacy': privacy,
           'read_only': readOnly,
-          'jwt': userJWT,
+          'jwt': adminJWT,
         });
       expect(res.body.error).to.not.be.null;
       expect(res.status).to.be.equal(500);
@@ -507,43 +507,17 @@ describe('Thread Tests', () => {
           'attachments[]': null,
           'privacy': privacy,
           'read_only': readOnly,
-          'jwt': userJWT,
+          'jwt': adminJWT,
         });
       expect(res.body.error).to.not.be.null;
       expect(res.status).to.be.equal(500);
       expect(res.body.error).to.be.equal(EditThreadErrors.NoBodyOrAttachment);
     });
 
-    it('should fail to edit a thread without passing a thread id', async () => {
-      const thread_kind = thread.kind;
-      const newBody = thread.body;
-      const recentEdit : any = { timestamp: moment(), body: newBody };
-      const versionHistory = JSON.stringify(recentEdit);
-      const readOnly = false;
-      const privacy = true;
-      const res = await chai.request(app)
-        .put('/api/editThread')
-        .set('Accept', 'application/json')
-        .send({
-          'thread_id': null,
-          'kind': thread_kind,
-          'body': encodeURIComponent(newBody),
-          'version_history': versionHistory,
-          'attachments[]': null,
-          'privacy': privacy,
-          'read_only': readOnly,
-          'jwt': userJWT,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.status).to.be.equal(500);
-      expect(res.body.error).to.be.equal(EditThreadErrors.NoThreadId);
-    });
-
     it('should succeed in updating a thread body', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
-      const newBody = thread.body;
-      const recentEdit : any = { timestamp: moment(), newBody };
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
@@ -553,24 +527,23 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread_id,
           'kind': thread_kind,
-          'body': encodeURIComponent(body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
           'read_only': readOnly,
-          'jwt': userJWT,
+          'jwt': adminJWT,
         });
       expect(res.body.error).to.be.null;
-      expect(res.body.result.body).to.be.equal(newBody);
+      expect(res.body.result.body).to.be.equal(thread.body);
       expect(res.status).to.be.equal(200);
     });
 
     it('should succeed in updating a thread title', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
-      const newBody = thread.body;
       const newTitle = 'new Title';
-      const recentEdit : any = { timestamp: moment(), newBody };
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
@@ -580,13 +553,13 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread_id,
           'kind': thread_kind,
-          'body': encodeURIComponent(body),
+          'body': thread.body,
           'title': newTitle,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
           'read_only': readOnly,
-          'jwt': userJWT,
+          'jwt': adminJWT,
         });
       expect(res.body.error).to.be.null;
       expect(res.body.result.title).to.be.equal(newTitle);
