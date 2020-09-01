@@ -66,6 +66,10 @@ $discussion-title-font-size: 1.45rem;
         }
         .proposal-top-left {
             flex: 1;
+            .cui-input {
+                width: 70%;
+                padding-bottom: 10px;
+            }
         }
         .proposal-content {
             display: flex;

@@ -14,7 +14,7 @@ export const Errors = {
 };
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, kind, thread_id, version_history, } = req.body;
+  const { body, title, kind, thread_id, version_history, } = req.body;
 
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
@@ -56,6 +56,9 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     arr.unshift(version_history);
     thread.version_history = arr;
     thread.body = body;
+    if (title) {
+      thread.title = title;
+    }
     await thread.save();
     await attachFiles();
     const finalThread = await models.OffchainThread.findOne({
