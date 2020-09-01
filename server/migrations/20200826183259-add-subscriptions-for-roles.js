@@ -17,7 +17,6 @@ module.exports = {
         if (addressIds.length === 0) return;
         const addressRoles = await queryInterface.sequelize.query(`SELECT * FROM "Roles" WHERE address_id IN (${[...addressIds]});`, { transaction: t, });
         const userRoles = addressRoles[0];
-        console.log(userRoles);
 
         // Get all user subscriptions
         const subscriptions = await queryInterface.sequelize.query(`SELECT * FROM "Subscriptions" WHERE subscriber_id=${id};`);
