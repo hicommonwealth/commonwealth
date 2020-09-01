@@ -10,9 +10,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { makeDynamicComponent } from 'models/mithril';
-// import {
-//     AccountId, Exposure, BlockNumber
-// } from '@polkadot/types/interfaces';
+
 
 const offence = {
     count: null,
@@ -70,7 +68,6 @@ export const PreHeader_ = makeDynamicComponent<{}, IPreHeaderState>({
 
         rows.forEach((stats) => {
             let { exposure = {}, isElected = false } = stats;
-            // console.log("~~~ EXPOSURE ~~~~~~~", exposure)
             const valStake = (app.chain as Substrate).chain.coins(+exposure?.total)
                 || (app.chain as Substrate).chain.coins(0);
             totalStaked = (app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));

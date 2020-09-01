@@ -21,7 +21,7 @@ import Sublayout from 'views/sublayout';
 import { ICommissionInfo } from 'controllers/chain/substrate/staking';
 
 import * as CosmosValidationViews from './cosmos';
-import { SubstratePreHeader, SubstratePresentationComponent, PrePreHeader, SubstratePresentationComponent_ } from './substrate';
+import { SubstratePreHeader, SubstratePresentationComponent, PreHeader_, SubstratePresentationComponent_ } from './substrate';
 
 export interface IValidatorAttrs {
   stash: string;
@@ -126,19 +126,19 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     switch (app.chain.class) {
       case ChainClass.Edgeware:
         vComponents = [
-          // m(PrePreHeader, {}),
+          m(PreHeader_, {}),
           // m(SubstratePreHeader, {
           //   sender: app.user.activeAccount as SubstrateAccount,
           //   annualPercentRate: vnode.state.dynamic.annualPercentRate,
           // }),
           // SubstratePresentationComponent(vnode.state, app.chain as Substrate),
-          m(SubstratePresentationComponent_, {})
+          m(SubstratePresentationComponent_)
         ];
         break;
       case ChainClass.Kusama:
       case ChainClass.Polkadot: {
         vComponents = [
-          m(PrePreHeader, {}),
+          m(PreHeader_, {}),
           // m(SubstratePreHeader, {
           //   sender: app.user.activeAccount as SubstrateAccount,
           //   annualPercentRate: vnode.state.dynamic.annualPercentRate,

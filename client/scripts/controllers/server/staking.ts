@@ -21,7 +21,6 @@ class StakingController {
         });
     }
     public currentValidators(searchCriteria, pagination) {
-        console.log(pagination, "=========== pagination")
         return new Promise((resolve) => {
             return get('/getCurrentValidators', {
                 searchCriteria,

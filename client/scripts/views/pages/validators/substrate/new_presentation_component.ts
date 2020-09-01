@@ -15,6 +15,7 @@ import RecentBlock from './recent_block';
 const model = {
     scroll: 1,
     searchBy: '',
+    searchIsOn: false,
     searchCriteria: {},
     searchByOptions: [{ label: 'Select', value: '' }, { label: 'name', value: 'name' }, { label: 'address', value: 'stash_id' }],
     setValue(result: string) {
@@ -47,7 +48,7 @@ const model = {
     },
     sortKey: 'exposure.total',
     sortAsc: true,
-    async change(mode: string) {
+    async fetchNext(mode: string) {
         const current_val: any = await app.staking[mode](model.searchCriteria, model.pagination);
         model[mode][mode] = [...model[mode][mode], ...current_val[mode]];
         console.log("fetched next ", model[mode]);
@@ -72,15 +73,17 @@ const model = {
     },
     onChangeHandler() {
         if (model.currentTab === 'current') {
-            model.change('currentValidators');
+            model.fetchNext('currentValidators');
             return;
         }
-        model.change('waitingValidators');
+        model.fetchNext('waitingValidators');
     },
     onSearchHandler(value?: string) {
+        model.searchIsOn = true;
         // if search box is empty then refresh
         if (!value) {
             model.refresh();
+            model.searchIsOn = false;
         }
         // if search option is provided
         if (model.searchBy && value) {
@@ -315,6 +318,7 @@ export const PresentationComponent_ = {
                         m('th.val-block-hash', 'Hash'),
                         m('th.val-block-author', 'Author')
                     ]),
+                    !model.searchIsOn &&
                     lastHeaders.map((lastHeader) => {
                         if (!lastHeader)
                             return null;
