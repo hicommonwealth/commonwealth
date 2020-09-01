@@ -15,7 +15,6 @@ import { Errors as pinThreadErrors } from 'server/routes/pinThread';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
-import { isTestChain } from '@polkadot/util';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -517,8 +516,8 @@ describe('Thread Tests', () => {
 
     it('should fail to edit a thread without passing a thread id', async () => {
       const thread_kind = thread.kind;
-      const body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body };
+      const newBody = thread.body;
+      const recentEdit : any = { timestamp: moment(), body: newBody };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
@@ -528,7 +527,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': null,
           'kind': thread_kind,
-          'body': encodeURIComponent(body),
+          'body': encodeURIComponent(newBody),
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -540,11 +539,11 @@ describe('Thread Tests', () => {
       expect(res.body.error).to.be.equal(EditThreadErrors.NoThreadId);
     });
 
-    it('should fail to edit a thread without passing a body', async () => {
+    it('should succeed in updating a thread body', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
-      const body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body };
+      const newBody = thread.body;
+      const recentEdit : any = { timestamp: moment(), newBody };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
@@ -554,16 +553,44 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread_id,
           'kind': thread_kind,
-          'body': null,
+          'body': encodeURIComponent(body),
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
           'read_only': readOnly,
           'jwt': userJWT,
         });
-      expect(res.body.error).to.not.be.null;
-      expect(res.status).to.be.equal(500);
-      expect(res.body.error).to.be.equal(EditThreadErrors.NoBodyOrAttachment);
+      expect(res.body.error).to.be.null;
+      expect(res.body.result.body).to.be.equal(newBody);
+      expect(res.status).to.be.equal(200);
+    });
+
+    it('should succeed in updating a thread title', async () => {
+      const thread_id = thread.id;
+      const thread_kind = thread.kind;
+      const newBody = thread.body;
+      const newTitle = 'new Title';
+      const recentEdit : any = { timestamp: moment(), newBody };
+      const versionHistory = JSON.stringify(recentEdit);
+      const readOnly = false;
+      const privacy = true;
+      const res = await chai.request(app)
+        .put('/api/editThread')
+        .set('Accept', 'application/json')
+        .send({
+          'thread_id': thread_id,
+          'kind': thread_kind,
+          'body': encodeURIComponent(body),
+          'title': newTitle,
+          'version_history': versionHistory,
+          'attachments[]': null,
+          'privacy': privacy,
+          'read_only': readOnly,
+          'jwt': userJWT,
+        });
+      expect(res.body.error).to.be.null;
+      expect(res.body.result.title).to.be.equal(newTitle);
+      expect(res.status).to.be.equal(200);
     });
 
     it.skip('should fail to show private threads to a user without access', async () => {
@@ -575,7 +602,7 @@ describe('Thread Tests', () => {
   describe('/setPrivacy', () => {
     let tempThread;
     it('should create a private thread as non-admin', async () => {
-      let res = await modelUtils.createThread({
+      const res = await modelUtils.createThread({
         address: userAddress,
         kind,
         chainId: chain,
@@ -593,7 +620,7 @@ describe('Thread Tests', () => {
     });
 
     it('should turn off privacy as non-admin and turn on readonly', async () => {
-      let res = await chai.request(app)
+      const res = await chai.request(app)
         .post('/api/setPrivacy')
         .set('Accept', 'application/json')
         .send({
@@ -608,14 +635,14 @@ describe('Thread Tests', () => {
     });
 
     it('should turn off readonly as an admin of community', async () => {
-      let res = await chai.request(app)
-      .post('/api/setPrivacy')
-      .set('Accept', 'application/json')
-      .send({
-        thread_id: tempThread.id,
-        read_only: 'false',
-        jwt: adminJWT,
-      });
+      const res = await chai.request(app)
+        .post('/api/setPrivacy')
+        .set('Accept', 'application/json')
+        .send({
+          thread_id: tempThread.id,
+          read_only: 'false',
+          jwt: adminJWT,
+        });
       expect(res.status).to.be.equal(200);
       expect(res.body.result.private).to.be.false;
       expect(res.body.result.read_only).to.be.false;
