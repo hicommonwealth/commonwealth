@@ -51,42 +51,6 @@ export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
   }
 };
 
-interface ICheckboxFormFieldAttrs {
-  callback?: CallableFunction;
-  label?: string;
-  name: string;
-  options?: ICheckboxFormFieldOptions;
-  title?: string;
-}
-
-interface ICheckboxFormFieldOptions {
-  class: string;
-}
-
-export const CheckboxFormField: m.Component<ICheckboxFormFieldAttrs> = {
-  view: (vnode: m.VnodeDOM<ICheckboxFormFieldAttrs>) => {
-    const { callback, label, name, title } = vnode.attrs;
-    const defaultOptions = {
-      id: name,
-      oninput: (e) => {
-        if (callback) {
-          callback(e.target.checked);
-        }
-      },
-    };
-    const options = Object.assign(defaultOptions, vnode.attrs.options || {});
-    return m('.CheckboxFormField.FormField', [
-      m('.form-group', [
-        title && m('.form-title', title),
-        m('form.form-field', [
-          m('input[type="checkbox"]', options),
-          m('label', { for: name }, label),
-        ]),
-      ]),
-    ]);
-  }
-};
-
 interface IRadioSelectorFormFieldAttrs {
   callback?: any;
   choices: IRadioSelectorChoice[];

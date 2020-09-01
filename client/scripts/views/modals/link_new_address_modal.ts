@@ -7,7 +7,7 @@ import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
-import { Button, Callout, Input, TextArea, Icon, Icons, Spinner } from 'construct-ui';
+import { Button, Callout, Input, TextArea, Icon, Icons, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { formatAddressShort, isSameAccount } from 'helpers';
@@ -25,7 +25,6 @@ import EthereumAccount from 'controllers/chain/ethereum/account';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { ChainIcon } from 'views/components/chain_icon';
 import CodeBlock from 'views/components/widgets/code_block';
-import { CheckboxFormField } from 'views/components/forms';
 import HedgehogLoginForm from 'views/components/hedgehog_login_form';
 import User, { UserBlock } from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
@@ -658,10 +657,11 @@ const LinkNewAddressModal: m.Component<{
               m('span.no-select', '<name>'),
             ]),
           ],
-          app.chain.base === ChainBase.Substrate && m(CheckboxFormField, {
+          app.chain.base === ChainBase.Substrate && m(Checkbox, {
             name: 'is-ed25519',
             label: 'Key is ed25519 format',
-            callback: async (result) => {
+            onchange: async (e) => {
+              const result = (e.target as any).checked;
               vnode.state.isEd25519 = !!result;
 
               // resubmit creation if they check box after pasting address
@@ -682,8 +682,9 @@ const LinkNewAddressModal: m.Component<{
           }),
           m(Input, {
             name: 'Address',
-            placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here: 5Dvq...'
-              : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here: cosmos123...'
+            fluid: true,
+            placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
+              : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here (e.g. cosmos123...)'
                 : 'Paste the address here',
             onchange: async (e) => {
               const address = (e.target as any).value;
@@ -749,6 +750,7 @@ const LinkNewAddressModal: m.Component<{
             ]),
             m(Input, {
               name: 'Signature',
+              fluid: true,
               placeholder: (app.chain.base === ChainBase.CosmosSDK)
                 ? 'Paste the entire output'
                 : 'Paste the signature here',
@@ -770,37 +772,32 @@ const LinkNewAddressModal: m.Component<{
               },
             }),
             vnode.state.error && vnode.state.newAddress && m('.error-message', vnode.state.error),
-            app.chain.base === ChainBase.Substrate && m(CheckboxFormField, {
+            app.chain.base === ChainBase.Substrate && m(Checkbox, {
               name: 'secret-phrase-saved',
               label: 'My secret phrase is saved somewhere safe',
-              callback: (result) => {
+              onchange: async (e) => {
+                const result = (e.target as any).checked;
                 vnode.state.secretPhraseSaved = result;
               },
             }),
-            (vnode.state.validSig
-             && (app.chain.base !== ChainBase.Substrate || vnode.state.secretPhraseSaved)
-            ) ? [
-                m('button.formular-button-primary', {
-                  onclick: async (e) => {
-                    e.preventDefault();
-                    const unverifiedAcct: Account<any> = vnode.state.newAddress;
-                    unverifiedAcct.validate(vnode.state.validSig).then(() => {
-                    // if no exception was raised, account must be valid
-                      accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address), vnode);
-                    }, (err) => {
-                      vnode.state.error = 'Verification failed. There was an inconsistency error; '
-                      + 'please report this to the developers.';
-                      m.redraw();
-                    });
-                  }
-                }, 'Continue'),
-              ] : [
-                m('button.disabled', {
-                  onclick: (e) => {
-                    e.preventDefault();
-                  }
-                }, 'Continue'),
-              ],
+            m(Button, {
+              intent: 'primary',
+              onclick: async (e) => {
+                e.preventDefault();
+                const unverifiedAcct: Account<any> = vnode.state.newAddress;
+                unverifiedAcct.validate(vnode.state.validSig).then(() => {
+                  // if no exception was raised, account must be valid
+                  accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address), vnode);
+                }, (err) => {
+                  vnode.state.error = 'Verification failed. There was an inconsistency error; '
+                    + 'please report this to the developers.';
+                  m.redraw();
+                });
+              },
+              label: 'Continue',
+              disabled: !(vnode.state.validSig
+                          && (app.chain.base !== ChainBase.Substrate || vnode.state.secretPhraseSaved))
+            }),
           ]),
         ]),
       ]) : vnode.state.step === LinkNewAddressSteps.Step2VerifyWithHedgehog ? m('.link-address-step', [
