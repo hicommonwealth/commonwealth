@@ -13,7 +13,7 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
-import { stringToU8a, bnToBn, u8aToHex } from '@polkadot/util';
+import { stringToU8a, u8aToHex } from '@polkadot/util';
 
 class SubstrateTreasury extends ProposalModule<
   ApiRx,
