@@ -17,13 +17,11 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
         if (!result) {
             return next(new Error('No statistics found'));
         }
-        if (result) {
-            log.info("Global statistics fetched successfully");
-            return res.json({
-                status: 'Success',
-                result
-            });
-        }
+        log.info("Global statistics fetched successfully");
+        return res.json({
+            status: 'Success',
+            result
+        });
 
     }
     catch (e) {

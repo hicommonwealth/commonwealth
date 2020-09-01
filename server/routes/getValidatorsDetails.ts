@@ -4,10 +4,7 @@ import { factory, formatFilename } from '../../shared/logging';
 import { Op } from 'sequelize';
 const log = factory.getLogger(formatFilename(__filename));
 
-// let pagination = {
-//     pageSize: 10,
-//     currentPageNo: 1
-// };
+
 function flatten(validators) {
     validators = JSON.parse(JSON.stringify(validators));
     const filteredValidators = validators.rows.map((row) => {
@@ -18,16 +15,11 @@ function flatten(validators) {
     return filteredValidators;
 }
 
-export const getCurrentValidators = async (models, req: Request, res: Response, next: NextFunction) => {
-    console.log("reqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq", req.query);
-    let { pagination = { currentPageNo: 1, pageSize: 20 }, searchCriteria } = req.query;
-
-
+function formatData(searchCriteria) {
     for (let key in searchCriteria) {
         if (key === 'name' || key === 'stash_id') {
             let temp = { ...searchCriteria };
             delete searchCriteria[key];
-
             searchCriteria = {
                 ...searchCriteria,
                 [key]: {
@@ -37,14 +29,16 @@ export const getCurrentValidators = async (models, req: Request, res: Response, 
             }
         }
     }
-    console.log("\n\n +++++++++++++++++++++++++++ \n searchCriteria \n", searchCriteria)
-    // pagination = { ...pagination, ...req.query.pagination };
+    return searchCriteria;
+}
+export const getCurrentValidators = async (models, req: Request, res: Response, next: NextFunction) => {
+    let { pagination = { currentPageNo: 1, pageSize: 20 }, searchCriteria } = req.query;
+    searchCriteria = formatData(searchCriteria);
     try {
         let currentValidators = await models.HistoricalValidatorStats.findAndCountAll({
             include: {
                 model: models.Validators
             },
-            // [Op.like]: '%' + request.body.query + '%'
             where: { ...searchCriteria, isElected: true,/*isLatest: true*/ },
             offset: pagination?.pageSize * (pagination?.currentPageNo - 1),
             limit: pagination?.pageSize,
@@ -56,7 +50,7 @@ export const getCurrentValidators = async (models, req: Request, res: Response, 
         if (!currentValidators) {
             return next(new Error('getCurrentValidator not found'));
         }
-        log.info("getCurrentValidators fetched successfully");
+        log.info("CurrentValidators fetched successfully");
         console.log(flatten(currentValidators), "flatten(currentValidators)")
         return res.json({
             status: 'Success',
@@ -82,22 +76,8 @@ export const getCurrentValidators = async (models, req: Request, res: Response, 
 
 };
 export const getWaitingValidators = async (models, req: Request, res: Response, next: NextFunction) => {
-    // console.log("reqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq", req.query.pagination);
     let { pagination = { currentPageNo: 1, pageSize: 20 }, searchCriteria } = req.query;
-    // console.log("\n\n +++++++++++++++++++++++++++ \n searchCriteria \n", searchCriteria)
-    for (let key in searchCriteria) {
-        if (key === 'name' || key === 'stash_id') {
-            let temp = { ...searchCriteria };
-            delete searchCriteria[key];
-            searchCriteria = {
-                ...searchCriteria,
-                [key]: {
-                    [Op.iLike]: `%${temp[key]}%`
-                }
-            }
-        }
-    }
-    console.log("\n\n +++++++++++++++++++++++++++ \n searchCriteria \n", searchCriteria)
+    searchCriteria = formatData(searchCriteria);
     try {
         let waitingValidators = await models.HistoricalValidatorStats.findAndCountAll({
             include: {
@@ -114,9 +94,7 @@ export const getWaitingValidators = async (models, req: Request, res: Response, 
         if (!waitingValidators) {
             return next(new Error('ValidagetCurrentValidator not found'));
         }
-        log.info("get waitingValidators fetched successfully");
-
-        // console.log("flatten(waitingValidators) ", flatten(waitingValidators));
+        log.info("WaitingValidators fetched successfully");
         return res.json({
             status: 'Success',
             result: {
@@ -139,15 +117,4 @@ export const getWaitingValidators = async (models, req: Request, res: Response, 
     }
 
 };
-
-// export const getValidatorDetails = (models, req: Request, res: Response, next: NextFunction) => {
-//     let sc = req.body?.searchCriteria;
-//     delete sc?.isElected;
-//     req.body.searchCriteria = sc;
-//     let validatorsDetails = {
-//         CurrentValodators: getCurrentValidators(models, req, res, next),
-//         WaitingValidators: getWaitingValidators(models, req, res, next),
-//     }
-//     return validatorsDetails;
-// }
 
