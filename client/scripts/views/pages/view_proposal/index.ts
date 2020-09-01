@@ -144,7 +144,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalHeaderViewCount, { viewCount }),
             m(ProposalBodyReaction, { item: proposal }),
-            // TODO: PROPOSAL EDITING
           ]),
           proposal instanceof OffchainThread
             && proposal.kind === OffchainThreadKind.Link
@@ -157,40 +156,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           m(ProposalBodyAvatar, { item: proposal }),
         ]),
         m('.proposal-content-right', [
-          // m('.proposal-content-meta', [
-          //   m(ProposalBodyAuthor, { item: proposal }),
-          //   m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
-          //   m(ProposalBodyLastEdited, { item: proposal }),
-          //   app.isLoggedIn() && !getSetGlobalEditingStatus(GlobalStatus.Get) && m(PopoverMenu, {
-          //     transitionDuration: 0,
-          //     closeOnOutsideClick: true,
-          //     closeOnContentClick: true,
-          //     menuAttrs: { size: 'default' },
-          //     content: [
-          //       canEdit && m(ProposalBodyEditMenuItem, {
-          //         item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
-          //       }),
-          //       canEdit && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-          //       canEdit && proposal instanceof OffchainThread && m(TopicEditorButton, {
-          //         openTopicEditor: () => {
-          //           vnode.state.topicEditorIsOpen = true;
-          //         }
-          //       }),
-          //       canEdit && m(ProposalHeaderPrivacyButtons, { proposal }),
-          //       canEdit && m(MenuDivider),
-          //       m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
-          //     ],
-          //     inline: true,
-          //     trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
-          //   }),
-          //   vnode.state.topicEditorIsOpen && proposal instanceof OffchainThread && m(TopicEditor, {
-          //     thread: vnode.attrs.proposal as OffchainThread,
-          //     popoverMenu: true,
-          //     onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
-          //     openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
-          //   })
-          // ]),
-
           !vnode.state.editing
             && m(ProposalBodyText, { item: proposal }),
 

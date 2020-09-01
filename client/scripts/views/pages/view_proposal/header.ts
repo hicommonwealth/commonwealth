@@ -121,7 +121,6 @@ export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyPropos
 
     return m(Input, {
       name: 'edit-thread-title',
-      // placeholder: item.title,
       autocomplete: 'off',
       oninput: (e) => {
         const { value } = (e as any).target;
