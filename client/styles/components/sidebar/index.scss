@@ -241,6 +241,32 @@
     }
 }
 
+.MobileSidebarHeader,
+.Sidebar {
+    .ChainStatusModule {
+        position: absolute;
+        bottom: 14px;
+        left: 15px;
+        margin-bottom: 0 !important;
+        width: calc(100% - 34px);
+        max-width: calc(100% - 34px);
+        height: 72px;
+
+        // background
+        background: $background-color-light-hover;
+        padding: 16px 18px;
+        border-radius: 4px;
+        line-height: 1.2;
+        font-size: 0.94rem;
+        .chain-url {
+            margin-bottom: 2px;
+        }
+        .chain-deferred {
+            color: #777;
+        }
+    }
+}
+
 .cui-popover.sidebar-edit-topic .cui-menu,
 .cui-popover.sidebar-add-topic .cui-menu {
     padding: 4px 0;

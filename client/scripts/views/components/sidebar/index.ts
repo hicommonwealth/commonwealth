@@ -12,6 +12,7 @@ import { ChainClass, ChainBase, AddressInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
+import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
@@ -263,9 +264,21 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
   }
 };
 
-const MobileSidebarHeader: m.Component<{ parentVnode }> = {
+const ChainStatusModule: m.Component<{}> = {
   view: (vnode) => {
-    const { parentVnode } = vnode.attrs;
+    const url = app.chain?.meta?.url;
+    if (!url) return;
+
+    const formattedUrl = url
+      .replace('ws://', '')
+      .replace('wss://', '')
+      .split('/')[0]
+      .split(':')[0];
+
+    return m('.ChainStatusModule', [
+      m('.chain-url', formattedUrl),
+      app.chain.deferred ? m('.chain-deferred', 'Ready to connect') : m(ChainStatusIndicator),
+    ]);
   }
 };
 
@@ -310,6 +323,7 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(CommunityInfoModule),
+        app.chain && m(ChainStatusModule),
       ])
     ];
   },
