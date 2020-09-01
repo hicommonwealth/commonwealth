@@ -6,8 +6,9 @@ import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
 import { CommentsStore } from 'stores';
-import { OffchainComment, OffchainAttachment, IUniqueId, AnyProposal, OffchainThread, AddressInfo } from 'models';
+import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
+import { updateLastVisited } from '../app/login';
 // tslint:disable: object-literal-key-quotes
 
 export enum CommentParent {
@@ -148,6 +149,10 @@ class CommentsController {
         this._store.remove(this._store.getById(result.id));
       }
       this._store.add(result);
+      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+      updateLastVisited(app.activeCommunityId()
+        ? (activeEntity.meta as CommunityInfo)
+        : (activeEntity.meta as NodeInfo).chain, true);
       return result;
     } catch (err) {
       console.log('Failed to edit comment');
