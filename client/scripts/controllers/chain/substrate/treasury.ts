@@ -13,7 +13,7 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
-import { stringToU8a, bnToBn } from '@polkadot/util';
+import { stringToU8a, bnToBn, u8aToHex } from '@polkadot/util';
 
 class SubstrateTreasury extends ProposalModule<
   ApiRx,
@@ -74,12 +74,13 @@ class SubstrateTreasury extends ProposalModule<
         const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryProposal);
         const constructorFunc = (e) => new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, e);
         const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
-        const TREASURY_ACCOUNT = 'modlpy/trsry'.padEnd(32, '\0');
+        const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
 
         new Promise((innerResolve) => {
           this._potSubscription = this._Chain.api.pipe(
             switchMap((api: ApiRx) => api.derive.balances.account(TREASURY_ACCOUNT)
           )).subscribe((pot: DeriveBalancesAccount) => {
+            console.log('hmm', pot)
             this._pot.next(this._Chain.coins(pot.freeBalance));
             innerResolve();
           });
