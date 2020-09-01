@@ -58,9 +58,7 @@ export type HandlerId = number;
 
 // creates a substrate API provider and waits for it to emit a connected event
 async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
-  const nodeUrl = constructSubstrateUrl(node.url, [
-    'edgewa.re', 'kusama-rpc.polkadot.io', 'rpc.polkadot.io',
-  ]);
+  const nodeUrl = constructSubstrateUrl(node.url);
   const provider = new WsProvider(nodeUrl, 10 * 1000);
   let unsubscribe: () => void;
   await new Promise((resolve) => {
