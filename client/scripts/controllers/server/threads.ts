@@ -104,9 +104,11 @@ class ThreadsController {
   public async edit(
     proposal: OffchainThread,
     body?: string,
+    title?: string,
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
+    const newTitle = title || proposal.title;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
     await $.ajax({
@@ -116,6 +118,7 @@ class ThreadsController {
         'thread_id': proposal.id,
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
+        'title': newTitle,
         'version_history': versionHistory,
         'attachments[]': attachments,
         'jwt': app.user.jwt

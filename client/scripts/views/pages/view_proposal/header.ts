@@ -105,6 +105,9 @@ export const ProposalHeaderViewCount: m.Component<{ viewCount: number }> = {
 };
 
 export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyProposal, parentState }> = {
+  oninit: (vnode) => {
+    vnode.attrs.parentState.updatedTitle = vnode.attrs.item.title;
+  },
   view: (vnode) => {
     const { item, parentState } = vnode.attrs;
     if (!item) return;
@@ -118,13 +121,13 @@ export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyPropos
 
     return m(Input, {
       name: 'edit-thread-title',
-      placeholder: item.title,
+      // placeholder: item.title,
       autocomplete: 'off',
       oninput: (e) => {
         const { value } = (e as any).target;
         parentState.updatedTitle = value;
       },
-      // defaultValue: parentState.updatedTitle,
+      defaultValue: parentState.updatedTitle,
       tabindex: 1,
     });
   }
