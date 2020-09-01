@@ -19,7 +19,8 @@ import {
   DispatchError,
   ActiveEraInfo,
   EraIndex,
-  SessionIndex
+  SessionIndex,
+  AccountInfo
 } from '@polkadot/types/interfaces';
 
 import { Vec, Compact } from '@polkadot/types/codec';
@@ -593,7 +594,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
               switchMap((api: ApiRx) => {
                 return combineLatest(
                   of(txFunc(api).method.toHex()),
-                  api.query.system.accountNonce(author.address),
+                  api.query.system.accountNonce
+                    ? api.query.system.accountNonce(author.address)
+                    : api.query.system.account(author.address).pipe(map((a) => a.nonce)),
                   of(api.genesisHash)
                 );
               }),
