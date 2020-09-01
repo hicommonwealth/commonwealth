@@ -60,7 +60,7 @@ module.exports = {
       }], { transaction: t });
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'kulupu',
-        url: 'ws://rpc.kulupu.corepaper.org/ws',
+        url: 'wss://rpc.kulupu.corepaper.org/ws',
       }], { transaction: t });
 
       const buildObject = (event_name, chain) => ({
