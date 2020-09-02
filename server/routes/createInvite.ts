@@ -88,10 +88,15 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
       email: invitedEmail,
     },
   });
+
+  const inviteChainOrCommObj = chain
+    ? { chain_id: chain.id, community_name: chain.name }
+    : { community_id: community.id, community_name: community.name }
   const previousInvite = await models.InviteCode.findOne({
     where: {
       invited_email: invitedEmail,
-      community_id: community.id,
+      // community_id: community.id,
+      ...inviteChainOrCommObj
     }
   });
   if (previousInvite && previousInvite.used === true) { await previousInvite.update({ used: false, }); }
@@ -100,8 +105,9 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
     const inviteCode = crypto.randomBytes(24).toString('hex');
     invite = await models.InviteCode.create({
       id: inviteCode,
-      community_id: community.id,
-      community_name: community.name,
+      // community_id: community.id,
+      // community_name: community.name,
+      ...inviteChainOrCommObj,
       creator_id: req.user.id,
       invited_email: invitedEmail,
       used: false,
@@ -116,7 +122,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
     from: 'Commonwealth <no-reply@commonwealth.im>',
     templateId: DynamicTemplate.EmailInvite,
     dynamic_template_data: {
-      community_name: invite.community_id,
+      community_name: invite.community_id || invite.chain_id,
       inviter: address.name,
       joinOrLogIn,
       invite_link: signupLink,
