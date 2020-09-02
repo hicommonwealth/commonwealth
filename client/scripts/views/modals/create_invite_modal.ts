@@ -255,7 +255,7 @@ const CreateInviteModal: m.Component<{
             ...chainOrCommunityObj
           }),
         ]),
-        communityInfo && m(Form, [
+        m(Form, [
           m(FormGroup, [
             m(FormLabel, 'Email'),
             m(Input, {
