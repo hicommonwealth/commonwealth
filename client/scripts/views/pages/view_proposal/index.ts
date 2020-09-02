@@ -170,7 +170,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           vnode.state.editing
             && m('.proposal-body-button-group', [
               m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
-              m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+              m(ProposalBodyCancelEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
             ]),
 
           !vnode.state.editing
@@ -302,7 +302,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
             m(ProposalBodyReaction, { item: comment }),
           ]),
           vnode.state.editing && m('.comment-body-bottom-right', [
-            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+            m(ProposalBodyCancelEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
             m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
           ]),
         ]),

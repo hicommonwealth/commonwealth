@@ -297,7 +297,11 @@ export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStat
           if (!confirmed) return;
           parentState.editing = false;
           getSetGlobalEditingStatus(GlobalStatus.Set, false);
-          localStorage.removeItem(`${app.activeId()}-editing-thread-${item.id}`);
+          if (item instanceof OffchainComment) {
+            localStorage.removeItem(`${app.activeId()}-edit-comment-${item.id}`);
+          } else {
+            localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}`);
+          }
           m.redraw();
         }
       }, 'Cancel')
@@ -415,11 +419,14 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
     const { item, parentState } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
-    const body = item instanceof OffchainComment
-      ? item.text
-      : (item instanceof OffchainThread
-        ? item.body
-        : null);
+    const savedEdits = isThread
+      ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}`)
+      : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}`);
+    const body = savedEdits || item instanceof OffchainComment
+      ? (item as OffchainComment<any>).text
+      : item instanceof OffchainThread
+        ? (item as OffchainThread).body
+        : null;
     if (!body) return;
 
     return m('.ProposalBodyEditor', [
@@ -439,8 +446,8 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
         tabindex: 1,
         theme: 'snow',
         editorNamespace: isThread
-          ? `-editing-comment-${item.id}`
-          : `-editing-thread-${item.id}`,
+          ? `edit-comment-${item.id}`
+          : `edit-thread-${item.id}`,
       })
     ]);
   }
