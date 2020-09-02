@@ -19,9 +19,16 @@ export default {
       xValues: [],
       datasets: [{
         label: '',
-        backgroundColor: "rgba(255, 10, 13, 0.1)",
+        fill: true,
+        pointBackgroundColor: '#fff',
         borderColor: chartColors.red,
-        yValues: [1, 2],
+        pointRadius: 5, // size of points
+        borderWidth: 3, // line width
+        lineTension: 0,
+
+        /* point options */
+
+        pointBorderWidth: 3, // size of outer circle
       }, ]
     },
     options: {
@@ -38,32 +45,45 @@ export default {
         mode: 'point',
         intersect: true
       },
-      legend:{
-        display:false
+      legend: {
+        display: false
       },
       scales: {
         xAxes: [{
+          offset: true,
           display: true,
-          scaleLabel: {
-            display: true,
-            labelString: ''
+          ticks: {
+            fontFamily: 'Inter',
+            fontColor: '#B0BAC9',
+            fontSize: 12,
+            padding: 20,
+            maxRotation: 0,
+            minRotation: 0,
+            stepSize: 500,
+          },
+          gridLines: {
+            display: false
           }
         }],
         yAxes: [{
-          ticks: {
-            fontSize: 10
-        },
           display: true,
-          scaleLabel: {
-            display: true,
-            labelString: '',
-           
+          ticks: {
+            fontFamily: 'Inter',
+            fontColor: '#B0BAC9',
+            fontSize: 12,
+
+            suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+            // OR //
+            beginAtZero: true,  // minimum value will be 0.
+            maxTicksLimit: 2000,
+            stepSize: 500,
+            padding: 5,
+          },
+          gridLines: {
+            display: false
           }
-          
         }]
       }
     }
   }
 };
-
-

@@ -188,10 +188,9 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
     const graphsTabTitle = 'Graphs';
 
-    const xValues = [1, 2, 3, 2, 1, 0]; // nested arrays or json will be implemented for actual different graphs
-    const yValues = [1, 2, 300, 2, 1, 0];
-    const titles = ['REWARDS OVER TIME','SLASHES OVER TIME','NOMINATIONS OVER TIME','ELECTED STAKE','OFFENCES OVER TIME','IM ONLINE EVENTS OVER TIME','NOMINATORS OVER TIME']
-
+    const xValues = [403, 406, 409, 412, 415, 418, 430, 433, 436, 439, 452, 455, 458, 461, 471]; // nested arrays or json will be implemented for actual different graphs
+    const yValues = [500, 325, 600, 350, 400, 380, 690, 800, 1000, 1600, 1200, 1150, 1300, 1400, 1400];
+    const titles = ['REWARDS OVER TIME', 'SLASHES OVER TIME', 'NOMINATIONS OVER TIME', 'ELECTED STAKE', 'OFFENCES OVER TIME', 'IM ONLINE EVENTS OVER TIME', 'NOMINATORS OVER TIME'];
 
 
     return m(Sublayout, {
@@ -226,7 +225,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
               name: graphsTabTitle,
               content: [
                 m(graphs, {
-                  xValues, yValues ,titles
+                  xValues, yValues, titles
                 }),
               ],
             }

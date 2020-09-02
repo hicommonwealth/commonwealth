@@ -159,7 +159,7 @@
     .cover {
         width: calc(100% + 24px * 2);
         height: 96px;
-        background: linear-gradient(180deg, #404040 0%, #111 100%);
+        background: #3D3D41;
         margin: 0 -24px;
         @include xs-max {
             width: calc(100% + 17px * 2);
