@@ -275,9 +275,9 @@ export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | Of
   }
 };
 
-export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, parentState }> = {
+export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStatus, parentState }> = {
   view: (vnode) => {
-    const { getSetGlobalEditingStatus, parentState } = vnode.attrs;
+    const { item, getSetGlobalEditingStatus, parentState } = vnode.attrs;
 
     return m('.ProposalBodyCancelEdit', [
       m(Button, {
@@ -297,6 +297,7 @@ export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, pa
           if (!confirmed) return;
           parentState.editing = false;
           getSetGlobalEditingStatus(GlobalStatus.Set, false);
+          localStorage.removeItem(`${app.activeId()}-editing-thread-${item.id}`);
           m.redraw();
         }
       }, 'Cancel')
@@ -437,8 +438,9 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
         },
         tabindex: 1,
         theme: 'snow',
-        editorNamespace: document.location.pathname
-          + (isThread ? `-editing-comment-${item.id}` : '-editing-thread'),
+        editorNamespace: isThread
+          ? `-editing-comment-${item.id}`
+          : `-editing-thread-${item.id}`,
       })
     ]);
   }
