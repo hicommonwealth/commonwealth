@@ -438,13 +438,11 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
     const savedEdits = isThread
       ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
       : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
-    console.log(savedEdits);
     const body = savedEdits || (item instanceof OffchainComment
       ? (item as OffchainComment<any>).text
       : item instanceof OffchainThread
         ? (item as OffchainThread).body
         : null);
-    console.log(body);
     if (!body) return;
 
     return m('.ProposalBodyEditor', [
