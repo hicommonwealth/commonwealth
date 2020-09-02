@@ -22,12 +22,8 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!req.user) return next(new Error('Not logged in'));
 
-  if (req.body.invitedAddress || req.body.invitedEmail) {
+  if (!req.body.invitedAddress && !req.body.invitedEmail) {
     return next(new Error(Errors.NoEmailOrAddress));
-  }
-
-  if (req.body.invitedAddress && req.body.invitedEmail) {
-    return next(new Error(Errors.NoEmailAndAddress));
   }
 
   const chainOrCommObj = chain
