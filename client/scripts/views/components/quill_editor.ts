@@ -815,7 +815,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
-    debugger
     if (!contentsDoc
       && !vnode.state.markdownMode
       && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {

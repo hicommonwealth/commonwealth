@@ -185,7 +185,6 @@ export const NewThreadForm: m.Component<{
     }
   },
   onremove: async (vnode) => {
-    console.log(vnode.state);
     const { fromDraft, form, quillEditorState, postType, overwriteConfirmationModal } = vnode.state;
     if (postType === PostType.Discussion && !overwriteConfirmationModal) {
       if (quillEditorState?.alteredText) {

@@ -298,9 +298,9 @@ export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStat
           parentState.editing = false;
           getSetGlobalEditingStatus(GlobalStatus.Set, false);
           if (item instanceof OffchainComment) {
-            localStorage.removeItem(`${app.activeId()}-edit-comment-${item.id}`);
-          } else {
-            localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}`);
+            localStorage.removeItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+          } else if (item instanceof OffchainThread) {
+            localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
           }
           m.redraw();
         }
@@ -415,18 +415,36 @@ export const ProposalBodyAttachments: m.Component<{ item: OffchainThread | Offch
 };
 
 export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainComment<any>, parentState }> = {
+  onremove: async (vnode) => {
+    const { item } = vnode.attrs;
+    // const { quillEditorState } = vnode.attrs.parentState;
+    let confirmed = false;
+    const modalMsg = 'Discard edits?';
+    confirmed = await confirmationModalWithText(modalMsg, 'Discard', 'Continue editing')();
+    if (confirmed) {
+      if (item instanceof OffchainThread) {
+        localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
+      } else if (item instanceof OffchainComment) {
+        localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
+      }
+    } else {
+      console.log(m.route.set(app.lastNavigatedFrom()));
+    }
+  },
   view: (vnode) => {
     const { item, parentState } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
     const savedEdits = isThread
-      ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}`)
-      : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}`);
-    const body = savedEdits || item instanceof OffchainComment
+      ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
+      : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+    console.log(savedEdits);
+    const body = savedEdits || (item instanceof OffchainComment
       ? (item as OffchainComment<any>).text
       : item instanceof OffchainThread
         ? (item as OffchainThread).body
-        : null;
+        : null);
+    console.log(body);
     if (!body) return;
 
     return m('.ProposalBodyEditor', [
@@ -446,8 +464,8 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
         tabindex: 1,
         theme: 'snow',
         editorNamespace: isThread
-          ? `edit-comment-${item.id}`
-          : `edit-thread-${item.id}`,
+          ? `edit-thread-${item.id}`
+          : `edit-comment-${item.id}`,
       })
     ]);
   }

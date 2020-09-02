@@ -54,6 +54,8 @@ interface IProposalHeaderAttrs {
 }
 
 interface IProposalHeaderState {
+  canEdit: boolean;
+  savedEdit: string;
   editing: boolean;
   saving: boolean;
   quillEditorState: any;
@@ -63,8 +65,31 @@ interface IProposalHeaderState {
 }
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
+  oninit: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (proposal instanceof OffchainThread) {
+      vnode.state.canEdit = (app.user.activeAccount?.address === proposal.author
+            && app.user.activeAccount?.chain.id === proposal.authorChain)
+        || (app.user.isRoleOfCommunity({
+          role: 'admin',
+          chain: app.activeChainId(),
+          community: app.activeCommunityId()
+        }) || app.user.isRoleOfCommunity({
+          role: 'moderator',
+          chain: app.activeChainId(),
+          community: app.activeCommunityId()
+        }));
+
+      vnode.state.savedEdit = localStorage.getItem(`${app.activeId()}-edit-thread-${proposal.id}-storedText`);
+
+      if (vnode.state.canEdit && vnode.state.savedEdit) {
+        vnode.state.editing = true;
+      }
+    }
+  },
   view: (vnode) => {
     const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
+    const { canEdit } = vnode.state;
     const isThread = proposal instanceof OffchainThread;
     const description = isThread ? false : (proposal as AnyProposal).description;
     const body = isThread ? (proposal as OffchainThread).body : false;
@@ -81,19 +106,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
 
     const notificationSubscription = app.user.notifications.subscriptions
       .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
-
-    const canEdit = (proposal instanceof OffchainThread
-                     && app.user.activeAccount?.address === proposal.author
-                     && app.user.activeAccount?.chain.id === proposal.authorChain)
-      || (app.user.isRoleOfCommunity({
-        role: 'admin',
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      }) || app.user.isRoleOfCommunity({
-        role: 'moderator',
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      }));
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
