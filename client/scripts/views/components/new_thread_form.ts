@@ -332,7 +332,7 @@ export const NewThreadForm: m.Component<{
               featuredTopics: app.topics.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
               updateFormData: updateTopicState,
-              tabindex: 2,
+              tabindex: 1,
             }),
           ]),
           m(FormGroup, { span: { xs: 12, sm: 8 }, order: 2 }, [
@@ -345,7 +345,7 @@ export const NewThreadForm: m.Component<{
                 if (detectURL(value)) getUrlForLinkPost();
               },
               defaultValue: vnode.state.form.url,
-              tabindex: 1,
+              tabindex: 2,
             }),
           ]),
           m(FormGroup, { order: 3 },  [
@@ -433,7 +433,7 @@ export const NewThreadForm: m.Component<{
               featuredTopics: app.topics.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
               updateFormData: updateTopicState,
-              tabindex: 2,
+              tabindex: 1,
             }),
           ]),
           m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 3 }, [
@@ -450,7 +450,7 @@ export const NewThreadForm: m.Component<{
                 localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
               },
               defaultValue: vnode.state.form.threadTitle,
-              tabindex: 1,
+              tabindex: 2,
             }),
           ]),
           m(FormGroup, { order: 4 }, [

@@ -2,11 +2,12 @@
 import _ from 'lodash';
 import moment from 'moment-twitter';
 import { ProposalStore, TopicStore } from 'stores';
-import { OffchainThread, OffchainAttachment, CommunityInfo } from 'models';
+import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo } from 'models';
 
 import $ from 'jquery';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
+import { updateLastVisited } from '../app/login';
 
 const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
@@ -93,6 +94,10 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+      updateLastVisited(app.activeCommunityId()
+        ? (activeEntity.meta as CommunityInfo)
+        : (activeEntity.meta as NodeInfo).chain, true);
       return result;
     } catch (err) {
       console.log('Failed to create thread');
