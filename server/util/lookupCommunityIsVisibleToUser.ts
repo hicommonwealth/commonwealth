@@ -10,17 +10,11 @@ const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFu
     },
     include: [
       {
-        model: models.OffchainTag,
-        as: 'tags',
+        model: models.OffchainTopic,
+        as: 'topics',
         required: false,
         attributes: ['id', 'name', 'community_id', 'chain_id'],
       },
-      {
-        model: models.ChainObjectVersion,
-        as: 'ChainObjectVersion',
-        required: false,
-        attributes: ['id'],
-      }
     ],
   });
   const community = await models.OffchainCommunity.findOne({
@@ -28,8 +22,8 @@ const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFu
       id: params.community,
     },
     include: {
-      model: models.OffchainTag,
-      as: 'tags',
+      model: models.OffchainTopic,
+      as: 'topics',
     },
   });
   // searching for both chain and community

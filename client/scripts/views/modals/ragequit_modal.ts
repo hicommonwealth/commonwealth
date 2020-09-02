@@ -3,14 +3,12 @@ import 'modals/ragequit_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import { TextInputFormField } from 'views/components/forms';
-import { MolochShares } from 'adapters/chain/ethereum/types';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { notifyError } from 'controllers/app/notifications';
 import BN from 'bn.js';
 
 interface IAttrs {
   account: MolochMember;
-  balance: MolochShares;
 }
 
 interface IState {
@@ -19,9 +17,11 @@ interface IState {
 
 const RagequitModal: m.Component<IAttrs, IState> = {
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+    const acct = vnode.attrs.account;
     return m('.RagequitModal', [
       m('.header', 'Ragequit'),
       m('.compact-modal-body', [
+        m('.data-label', [ `Share holdings: ${acct?.shares?.format() ?? '--'}` ]),
         m(TextInputFormField, {
           title: 'Shares to burn',
           subtitle: 'Exchange your shares for ETH.',

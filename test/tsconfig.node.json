@@ -8,7 +8,7 @@
     "outDir": "./build",
     "baseUrl": ".",
     "paths": {
-      "*": ["../*", "../shared/*", "../client/scripts/*"]
+      "*": ["../*", "../shared/*", "../client/scripts/*", "../eth/types/*"]
     },
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -16,13 +16,14 @@
     "traceResolution": true
   },
   "include": [
-    "./client",
-    "./client/scripts",
-    "./shared/adapters",
-    "./test"
+    "../client",
+    "../client/scripts",
+    "../shared/adapters",
+    "../",
+    "../eth/types"
   ],
   "exclude": [
-    "./node_modules",
-    "client/scripts/controllers/chain/ethereum/contracts/*"
+    "../node_modules",
+    "../client/scripts/controllers/chain/ethereum/contracts/*"
   ]
 }

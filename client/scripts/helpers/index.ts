@@ -2,7 +2,6 @@ import m from 'mithril';
 import moment from 'moment-twitter';
 
 import app from 'state';
-import { Account } from 'models';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -26,12 +25,20 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
       e.preventDefault();
       e.stopPropagation();
-      m.route.set(target);
+      if (window.location.href.split('?')[0] === target.split('?')[0]) {
+        m.route.set(target, {}, { replace: true });
+      } else {
+        m.route.set(target);
+      }
     },
   };
   if (extraAttrs) Object.assign(attrs, extraAttrs);
   return m(selector, attrs, children);
 }
+
+/*
+ * general links
+ */
 
 export function extractDomain(url) {
   const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');
@@ -148,6 +155,21 @@ export function formatAsTitleCase(str : string) {
   }).join(' ');
 }
 
+export function formatLastUpdated(timestamp) {
+  if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
+  if (timestamp.isBefore(moment().subtract(30, 'days'))) return timestamp.format('MMM D');
+  const formatted = timestamp.fromNow(true);
+  if (formatted.indexOf(' month') !== -1) {
+    return timestamp.format('MMM D');
+  } else {
+    return formatted
+      .replace(' days', 'd')
+      .replace(' day', 'd')
+      .replace(' hours', 'h')
+      .replace(' hour', 'h');
+  }
+};
+
 // duplicated in adapters/currency.ts
 export function formatNumberLong(num : number) {
   // format small numbers with decimals, large numbers with commas
@@ -165,20 +187,20 @@ export function formatPercentShort(num : number) {
   return `${(num * 100).toFixed(1)}%`;
 }
 
-export function formatDuration(duration : moment.Duration) {
+export function formatDuration(duration : moment.Duration, includeSeconds = true) {
   const days = Math.floor(duration.asDays());
   return [
     (days) ? (`${days}d `) : '',
     (days || duration.hours()) ? (`${duration.hours()}h `) : '',
     (days || duration.minutes()) ? (`${duration.minutes()}m `) : '',
-    `${duration.seconds()}s`,
+    (includeSeconds) ? `${duration.seconds()}s` : '',
   ].join('');
 }
 
 export function formatAddressShort(addr : string) {
   if (!addr) return;
   if (addr.length < 16) return addr;
-  return `${addr.slice(0, 5)}…${addr.slice(addr.length - 3)}`;
+  return `${addr.slice(0, 5)}…`;
 }
 
 export function formatProposalHashShort(hash : string) {

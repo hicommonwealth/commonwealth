@@ -7,22 +7,19 @@ import { Vec } from '@polkadot/types';
 import { ITuple } from '@polkadot/types/types';
 import { AccountId, BalanceOf } from '@polkadot/types/interfaces';
 import { isFunction } from '@polkadot/util';
-import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
+import { ISubstrateDemocracyProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
-import {
-  SubstrateEventKind, ISubstrateDemocracyProposed,
-  SubstrateEntityKind, ISubstratePreimageNoted,
-} from 'events/edgeware/types';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
-  event: ISubstrateDemocracyProposed,
+  event: SubstrateTypes.IDemocracyProposed,
 ): ISubstrateDemocracyProposal => {
   const enc = new TextEncoder();
   return {
@@ -100,19 +97,23 @@ class SubstrateDemocracyProposal extends Proposal<
     super('democracyproposal', backportEventToAdapter(
       ChainInfo,
       entity.chainEvents
-        .find((e) => e.data.kind === SubstrateEventKind.DemocracyProposed).data as ISubstrateDemocracyProposed
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyProposed
+        ).data as SubstrateTypes.IDemocracyProposed
     ));
     const eventData = entity.chainEvents
-      .find((e) => e.data.kind === SubstrateEventKind.DemocracyProposed).data as ISubstrateDemocracyProposed;
+      .find(
+        (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyProposed
+      ).data as SubstrateTypes.IDemocracyProposed;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Proposals = Proposals;
     this.deposit = this._Chain.coins(new BN(eventData.deposit, 10));
     this._author = this._Accounts.fromAddress(eventData.proposer);
     this.hash = eventData.proposalHash;
-
+    this.createdAt = entity.createdAt;
     // see if preimage exists and populate data if it does
-    const preimage = this._Proposals.app.chainEntities.getPreimage(eventData.proposalHash);
+    const preimage = this._Proposals.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
       this._method = preimage.method;
       this._section = preimage.section;
@@ -137,19 +138,19 @@ class SubstrateDemocracyProposal extends Proposal<
 
   public update(e: ChainEvent) {
     switch (e.data.kind) {
-      case SubstrateEventKind.DemocracyProposed: {
+      case SubstrateTypes.EventKind.DemocracyProposed: {
         break;
       }
-      case SubstrateEventKind.DemocracyTabled: {
+      case SubstrateTypes.EventKind.DemocracyTabled: {
         this.complete();
         break;
       }
-      case SubstrateEventKind.PreimageNoted: {
-        const preimage = this._Proposals.app.chainEntities.getPreimage(this.hash);
+      case SubstrateTypes.EventKind.PreimageNoted: {
+        const preimage = this._Proposals.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._method = preimage.method;
           this._section = preimage.section;
-          this._title = `${this._section}.${this.method}(${preimage.args.join(', ')})`;
+          this._title = formatCall(preimage);
         }
         break;
       }
@@ -215,7 +216,7 @@ class SubstrateDemocracyProposal extends Proposal<
     // deposit parameter is ignored
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
-      (api: ApiRx) => api.tx.democracy.second(this.data.index),
+      (api: ApiRx) => (api.tx.democracy.second as any)(this.data.index),
       'secondDemocracyProposal',
       this.title
     );

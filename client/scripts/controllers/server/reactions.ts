@@ -2,13 +2,11 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 import _ from 'lodash';
-import moment from 'moment-twitter';
 
 import app from 'state';
-import { uniqueIdToProposal } from 'identifiers';
 
-import { ReactionsStore } from 'stores';
-import { OffchainReaction, IUniqueId, AnyProposal, OffchainComment, OffchainThread } from 'models';
+import { ReactionStore } from 'stores';
+import { OffchainReaction, AnyProposal, OffchainComment, OffchainThread, Proposal, ChainEntity } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
 const modelFromServer = (reaction) => {
@@ -19,16 +17,17 @@ const modelFromServer = (reaction) => {
     reaction.community,
     reaction.reaction,
     reaction.thread_id,
+    reaction.proposal_id,
     reaction.comment_id,
     reaction.Address.chain,
   );
 };
 
 class ReactionsController {
-  private _store: ReactionsStore = new ReactionsStore();
+  private _store: ReactionStore = new ReactionStore();
   public get store() { return this._store; }
 
-  public getByPost(post: OffchainThread | OffchainComment<any>) {
+  public getByPost(post: OffchainThread | AnyProposal | OffchainComment<any>) {
     return this._store.getByPost(post);
   }
 
@@ -41,26 +40,30 @@ class ReactionsController {
       reaction,
       jwt: app.user.jwt,
     };
-    if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
-    else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
-
+    if (post instanceof OffchainThread) {
+      options['thread_id'] = (post as OffchainThread).id;
+    } else if (post instanceof Proposal) {
+      options['proposal_id'] = `${(post as AnyProposal).slug}_${(post as AnyProposal).identifier}`;
+    } else if (post instanceof OffchainComment) {
+      options['comment_id'] = (post as OffchainComment<any>).id;
+    }
     try {
       // TODO: Change to POST /reaction
       const response = await $.post(`${app.serverUrl()}/createReaction`, options);
       const { result } = response;
       this._store.add(modelFromServer(result));
     } catch (err) {
-      console.log('Failed to create reaction');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to create reaction');
+      notifyError('Failed to save reaction');
     }
   }
 
   public async refresh(post: any, chainId: string, communityId: string) {
     const options = { chain: chainId, community: communityId };
-    if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).identifier;
-    else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
+    // TODO: ensure identifier vs id use is correct; see also create method
+    if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
+    else if (post instanceof Proposal) {
+      options['proposal_id'] = `${(post as AnyProposal).slug}_${(post as AnyProposal).identifier}`;
+    } else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
       // TODO: Remove any verbs from these route names '/reactions'
@@ -99,7 +102,7 @@ class ReactionsController {
         resolve(result);
       }).catch((e) => {
         console.error(e);
-        notifyError('Could not delete reaction');
+        notifyError('Failed to save reaction');
         reject(e);
       });
     });

@@ -1,6 +1,6 @@
-import { SubstrateEntityKind } from '../../shared/events/edgeware/types';
+import { SubstrateTypes, MolochTypes } from '@commonwealth/chain-events';
 
-// given an "old style" identifier such as treasuryproposal_4, attempts to
+// this function takes an "old style" identifier such as treasuryproposal_4 and attempts
 // fetch the corresponding chain entity from the database
 export default async function (models, chain: string, identifier: string) {
   console.log(`Looking up proposal: ${chain}: ${identifier}`);
@@ -10,22 +10,25 @@ export default async function (models, chain: string, identifier: string) {
   };
   switch (prefix) {
     case 'referendum': {
-      return findEntity(SubstrateEntityKind.DemocracyReferendum.toString());
+      return findEntity(SubstrateTypes.EntityKind.DemocracyReferendum.toString());
     }
     case 'democracyproposal': {
-      return findEntity(SubstrateEntityKind.DemocracyProposal.toString());
+      return findEntity(SubstrateTypes.EntityKind.DemocracyProposal.toString());
     }
     case 'signalingproposal': {
-      return findEntity(SubstrateEntityKind.SignalingProposal.toString());
+      return findEntity(SubstrateTypes.EntityKind.SignalingProposal.toString());
     }
     case 'technicalcommitteemotion':
     case 'councilmotion': {
-      return findEntity(SubstrateEntityKind.CollectiveProposal.toString());
+      return findEntity(SubstrateTypes.EntityKind.CollectiveProposal.toString());
     }
     case 'treasuryproposal': {
-      return findEntity(SubstrateEntityKind.TreasuryProposal.toString());
+      return findEntity(SubstrateTypes.EntityKind.TreasuryProposal.toString());
     }
-    // TODO: cosmosproposal, molochproposal
+    case 'molochproposal': {
+      return findEntity(MolochTypes.EntityKind.Proposal.toString());
+    }
+    // TODO: cosmosproposal
     // ignore council elections -- no commenting on them
     default: {
       return null;

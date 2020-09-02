@@ -503,6 +503,18 @@
       "css": "check-empty",
       "code": 61590,
       "src": "fontawesome"
+    },
+    {
+      "uid": "p57wgnf4glngbchbucdi029iptu8oxb8",
+      "css": "pin",
+      "code": 59453,
+      "src": "typicons"
+    },
+    {
+      "uid": "6373242453e92e8ce419b8391463867a",
+      "css": "pin-outline",
+      "code": 59454,
+      "src": "typicons"
     }
   ]
 }

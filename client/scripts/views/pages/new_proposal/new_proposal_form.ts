@@ -3,30 +3,33 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import app from 'state';
+import { FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import { notifyError } from 'controllers/app/notifications';
+
+import app from 'state';
+import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
+import { CosmosToken } from 'adapters/chain/cosmos/types';
+
+import { notifyError } from 'controllers/app/notifications';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import Substrate from 'controllers/chain/substrate/main';
+import Cosmos from 'controllers/chain/cosmos/main';
+import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+
 import {
   TextInputFormField,
   TextareaFormField,
   DropdownFormField,
   RadioSelectorFormField
 } from 'views/components/forms';
-import { CosmosToken } from 'adapters/chain/cosmos/types';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
-import Substrate from 'controllers/chain/substrate/main';
-import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
-import Cosmos from 'controllers/chain/cosmos/main';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
-import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
-
+import TopicSelector from 'views/components/topic_selector';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -48,7 +51,7 @@ const NewProposalForm = {
     let hasToggle : boolean;
     let hasPreimageInput : boolean;
     let hasTitleAndDescription : boolean;
-    let hasTags : boolean;
+    let hasTopics : boolean;
     let hasBeneficiaryAndAmount : boolean;
     let hasPhragmenInfo : boolean;
     let hasDepositChooser : boolean;
@@ -87,7 +90,7 @@ const NewProposalForm = {
       hasTitleAndDescription = true;
     } else if (proposalTypeEnum === ProposalType.OffchainThread) {
       hasTitleAndDescription = true;
-      hasTags = true;
+      hasTopics = true;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
       hasBeneficiaryAndAmount = true;
       const treasury = (app.chain as Substrate).treasury;
@@ -123,8 +126,8 @@ const NewProposalForm = {
         app.threads.create(
           author.address,
           OffchainThreadKind.Forum,
-          vnode.state.form.tagName,
-          vnode.state.form.tagId,
+          vnode.state.form.topicName,
+          vnode.state.form.topicId,
           vnode.state.form.title,
           vnode.state.form.description,
           vnode.state.form.categoryId,
@@ -252,6 +255,7 @@ const NewProposalForm = {
         if (!vnode.state.title) throw new Error('Invalid title');
         const details = JSON.stringify({ title: vnode.state.title, description: vnode.state.description || '' });
         (app.chain as Moloch).governance.createPropWebTx(
+          author as MolochMember,
           vnode.state.applicantAddress,
           new BN(vnode.state.tokenTribute),
           new BN(vnode.state.sharesRequested),
@@ -330,18 +334,13 @@ const NewProposalForm = {
           ],
           // actions
           hasAction && m(EdgewareFunctionPicker),
-          hasTags
-            && m(AutoCompleteTagForm, {
-              tags: app.tags.getByCommunity(app.activeId()),
-              featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: (tagName: string, tagId?: number) => {
-                vnode.state.form.tagName = tagName;
-                vnode.state.form.tagId = tagId;
-              },
-              updateParentErrors: (err: string) => {
-                if (err) vnode.state.error = err;
-                else delete vnode.state.error;
-                m.redraw();
+          hasTopics
+            && m(TopicSelector, {
+              topics: app.topics.getByCommunity(app.activeId()),
+              featuredTopics: app.topics.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+              updateFormData: (topicName: string, topicId?: number) => {
+                vnode.state.form.topicName = topicName;
+                vnode.state.form.topicId = topicId;
               },
               tabindex: 3,
             }),
@@ -376,8 +375,8 @@ const NewProposalForm = {
               options: {
                 name: 'beneficiary',
                 placeholder: 'Beneficiary of treasury proposal',
-                oncreate: (vnode2) => {
-                  $(vnode2.dom).val(author.address);
+                oncreate: (vvnode) => {
+                  $(vvnode.dom).val(author.address);
                   vnode.state.form.beneficiary = author.address;
                 }
               },
@@ -605,7 +604,7 @@ const NewProposalForm = {
               intent: 'primary',
               label: proposalTypeEnum === ProposalType.OffchainThread
                 ? 'Create thread'
-                : 'Go to send transaction',
+                : 'Send transaction',
               onclick: (e) => {
                 e.preventDefault();
                 createNewProposal();

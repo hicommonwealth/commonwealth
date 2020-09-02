@@ -1,7 +1,11 @@
 @import 'client/styles/shared';
 
-.PageNotFound .cui-empty-state {
-    top: -15px !important;
-    height: calc(100vh - #{$header-height + $vertical-padding * 2}) !important;
-    width: 100%;
+.PageNotFound {
+    .page-not-found-container {
+        position: relative;
+    }
+    .cui-empty-state {
+        height: 100%;
+        width: 100%;
+    }
 }

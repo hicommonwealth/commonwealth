@@ -1,6 +1,0 @@
-@import 'client/styles/pages/supernova/shared';
-
-.SupernovaLockNotesPage {
-    @include supernovaLockPage();
-    max-width: 800px;
-}

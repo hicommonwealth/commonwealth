@@ -7,9 +7,6 @@ import createGist from './routes/createGist';
 
 import edgewareLockdropEvents from './routes/edgeware_lockdrop_events';
 import edgewareLockdropBalances from './routes/edgeware_lockdrop_balances';
-import supernovaLockdropATOMLocks from './routes/supernova_lockdrop_atom_locks';
-import supernovaLockdropBTCLocks from './routes/supernova_lockdrop_btc_locks';
-import supernovaLockdropETHLocks from './routes/supernova_lockdrop_eth_locks';
 
 import createHedgehogAuthentication from './routes/createHedgehogAuthentication';
 import getHedgehogAuthentication from './routes/getHedgehogAuthentication';
@@ -54,6 +51,10 @@ import createInvite from './routes/createInvite';
 import getInvites from './routes/getInvites';
 import getOffences from './routes/getOffences';
 import getRewards from './routes/getRewards';
+import getOwnStakeOverTime from './routes/getOwnStakeOverTime';
+import getOtherStakeOverTime from './routes/getOtherStakeOverTime';
+import getTotalStakeOverTime from './routes/getTotalStakeOverTime';
+import getNominatorsOverTime from './routes/getNominatorsOverTime';
 import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
@@ -61,17 +62,22 @@ import createInviteLink from './routes/createInviteLink';
 import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
+import getProfile from './routes/getProfile';
+
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
 
 import getUploadSignature from './routes/getUploadSignature';
-import registerWaitingList from './routes/registerWaitingList';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
 import bulkThreads from './routes/bulkThreads';
+import createDraft from './routes/drafts/createDraft';
+import deleteDraft from './routes/drafts/deleteDraft';
+import editDraft from './routes/drafts/editDraft';
+import getDrafts from './routes/drafts/getDrafts';
 import addChainNode from './routes/addChainNode';
 import deleteChain from './routes/deleteChain';
 import deleteChainNode from './routes/deleteChainNode';
@@ -81,29 +87,26 @@ import updateProfile from './routes/updateProfile';
 import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
-import createTag from './routes/createTag';
-import updateTags from './routes/updateTags';
-import editTag from './routes/editTag';
-import deleteTag from './routes/deleteTag';
-import bulkTags from './routes/bulkTags';
+import createTopic from './routes/createTopic';
+import updateTopics from './routes/updateTopics';
+import editTopic from './routes/editTopic';
+import deleteTopic from './routes/deleteTopic';
+import bulkTopics from './routes/bulkTopics';
+import setPrivacy from './routes/setPrivacy';
+import pinThread from './routes/pinThread';
 
-import addChainObjectQuery from './routes/addChainObjectQuery';
-import deleteChainObjectQuery from './routes/deleteChainObjectQuery';
-import viewChainObjectQueries from './routes/viewChainObjectQueries';
-import viewChainObjects from './routes/viewChainObjects';
-import refreshChainObjects from './routes/refreshChainObjects';
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
 import createWebhook from './routes/webhooks/createWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
+import IdentityFetchCache from './util/identityFetchCache';
 
 import bulkEntities from './routes/bulkEntities';
 
-function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
+function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
-
   router.get('/status', status.bind(this, models));
 
   // TODO: Change to POST /gist
@@ -148,6 +151,17 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
 
+  router.get('/profile', getProfile.bind(this, models));
+
+  router.post('/setPrivacy', passport.authenticate('jwt', { session: false }), setPrivacy.bind(this, models));
+  router.post('/pinThread', passport.authenticate('jwt', { session: false }), pinThread.bind(this, models));
+
+  // offchain discussion drafts
+  router.post('/drafts', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));
+  router.get('/drafts', getDrafts.bind(this, models));
+  router.delete('/drafts', passport.authenticate('jwt', { session: false }), deleteDraft.bind(this, models));
+  router.patch('/drafts', passport.authenticate('jwt', { session: false }), editDraft.bind(this, models));
+
   // offchain comments
   // TODO: Change to POST /comment
   router.post('/createComment', passport.authenticate('jwt', { session: false }), createComment.bind(this, models));
@@ -160,17 +174,17 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // TODO: Change to GET /comments
   router.get('/bulkComments', bulkComments.bind(this, models));
 
-  // offchain tags
-  // TODO: Change to POST /tag
-  router.post('/createTag', passport.authenticate('jwt', { session: false }), createTag.bind(this, models));
-  // TODO: Change to PUT /tags
-  router.post('/updateTags', passport.authenticate('jwt', { session: false }), updateTags.bind(this, models));
-  // TODO: Change to PUT /tag
-  router.post('/editTag', passport.authenticate('jwt', { session: false }), editTag.bind(this, models));
-  // TODO: Change to DELETE /tag
-  router.post('/deleteTag', passport.authenticate('jwt', { session: false }), deleteTag.bind(this, models));
-  // TODO: Change to GET /tags
-  router.get('/bulkTags', bulkTags.bind(this, models));
+  // offchain topics
+  // TODO: Change to POST /topic
+  router.post('/createTopic', passport.authenticate('jwt', { session: false }), createTopic.bind(this, models));
+  // TODO: Change to PUT /topics
+  router.post('/updateTopics', passport.authenticate('jwt', { session: false }), updateTopics.bind(this, models));
+  // TODO: Change to PUT /topic
+  router.post('/editTopic', passport.authenticate('jwt', { session: false }), editTopic.bind(this, models));
+  // TODO: Change to DELETE /topic
+  router.post('/deleteTopic', passport.authenticate('jwt', { session: false }), deleteTopic.bind(this, models));
+  // TODO: Change to GET /topics
+  router.get('/bulkTopics', bulkTopics.bind(this, models));
 
   // offchain reactions
   // TODO: Change to POST /reaction
@@ -199,6 +213,10 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.get('/getInvites', passport.authenticate('jwt', { session: false }), getInvites.bind(this, models));
   router.get('/getOffences', getOffences.bind(this, models));
   router.get('/getRewards', getRewards.bind(this, models));
+  router.get('/getOwnStakeOverTime', getOwnStakeOverTime.bind(this, models));
+  router.get('/getTotalStakeOverTime', getTotalStakeOverTime.bind(this, models));
+  router.get('/getOtherStakeOverTime', getOtherStakeOverTime.bind(this, models));
+  router.get('/getNominatorsOverTime', getNominatorsOverTime.bind(this, models));
   // TODO: Change to PUT /invite
   router.post('/acceptInvite', passport.authenticate('jwt', { session: false }), acceptInvite.bind(this, models));
   // TODO: Change to POST /member
@@ -234,7 +252,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
 
   // offchain profiles
   // TODO: Change to PUT /profile
-  router.post('/updateProfile', passport.authenticate('jwt', { session: false }), updateProfile.bind(this, models));
+  router.post('/updateProfile', passport.authenticate('jwt', { session: false }), updateProfile.bind(this, models, identityFetchCache));
   // TODO: Change to GET /profiles
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
 
@@ -248,10 +266,6 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // attachments
   // TODO: Change to POST /uploadSignature
   router.post('/getUploadSignature', passport.authenticate('jwt', { session: false }), getUploadSignature.bind(this, models));
-
-  // homepage and waiting lists
-  // TODO: Change to POST /waitingList
-  router.post('/registerWaitingList', registerWaitingList.bind(this, models));
 
   // notifications
   // TODO: Change to GET /subscriptions
@@ -298,10 +312,6 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // edgeware
   router.get('/stats/edgeware/lockdrop/events', edgewareLockdropEvents.bind(this, models));
   router.get('/stats/edgeware/lockdrop/balances', edgewareLockdropBalances.bind(this, models));
-  // supernova
-  router.get('/stats/supernova/lockdrop/atom', supernovaLockdropATOMLocks.bind(this, models));
-  router.get('/stats/supernova/lockdrop/btc', supernovaLockdropBTCLocks.bind(this, models));
-  router.get('/stats/supernova/lockdrop/eth', supernovaLockdropETHLocks.bind(this, models));
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
@@ -309,16 +319,6 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.get('/auth/github/callback', passport.authenticate('github', { successRedirect: '/', failureRedirect: '/#!/login' }));
   // logout
   router.get('/logout', logout.bind(this, models));
-
-  // TODO: Delete these routes if we don't use them anymore
-  router.post('/addChainObjectQuery', passport.authenticate('jwt', { session: false }),
-    addChainObjectQuery.bind(this, models));
-  router.post('/deleteChainObjectQuery', passport.authenticate('jwt', { session: false }),
-    deleteChainObjectQuery.bind(this, models));
-  router.post('/viewChainObjectQueries', passport.authenticate('jwt', { session: false }),
-    viewChainObjectQueries.bind(this, models));
-  router.get('/viewChainObjects', viewChainObjects.bind(this, models));
-  router.get('/refreshChainObjects', refreshChainObjects.bind(this, models, fetcher));
 
   router.get('/edgewareLockdropLookup', edgewareLockdropLookup.bind(this, models));
   router.get('/edgewareLockdropStats', edgewareLockdropStats.bind(this, models));

@@ -83,7 +83,7 @@
     a.CommunityMenuCommunity {
         .icon-inner {
             text-align: center;
-            color: #eee;
+            color: $background-color-light;
             background: #36393f;
             height: $size;
             width: $size;
@@ -136,7 +136,7 @@
 }
 .community-menu-popover {
     .cui-popover-content {
-        padding-top: $header-height + 15px;
+        padding-top: 15px;
         border: none;
         border-radius: 0;
         padding: 0;

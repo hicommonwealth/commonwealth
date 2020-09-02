@@ -43,7 +43,7 @@
         align-items: center;
         margin-left: 37px;
         span {
-            color: $lighttextgrey;
+            color: $text-color-light;
         }
         &.img-spinner {
             height: 55px;
@@ -57,12 +57,9 @@
         margin-bottom: $small-margin;
     }
 
-    .AutoCompleteTagForm {
+    .TopicSelector {
         margin-left: $left-margin;
         margin-bottom: $small-margin;
-        .AutoCompletePureForm {
-            margin: 0;
-        }
     }
 
     .bottom-panel .actions {
@@ -78,9 +75,9 @@
     }
 
     .error-message {
-        color: $error-red;
+        color: $negative-text-color;
         font-size: 14px;
-        font-weight: 700;
+        font-weight: 500;
         margin-bottom: 20px;
         margin-left: $left-margin;
     }

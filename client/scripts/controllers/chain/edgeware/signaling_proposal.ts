@@ -1,10 +1,9 @@
 import _ from 'underscore';
 import { takeWhile, switchMap, flatMap, take } from 'rxjs/operators';
+import { SubstrateTypes } from '@commonwealth/chain-events';
+import { VoteOutcome, VoteRecord } from '@edgeware/node-types';
 import { ApiRx } from '@polkadot/api';
-import { Option, Vec } from '@polkadot/types';
-import { ITuple } from '@polkadot/types/types';
-import { AccountId } from '@polkadot/types/interfaces';
-import { VoteRecord } from 'edgeware-node-types/dist/types';
+import { Option } from '@polkadot/types';
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
 import {
   Account, Proposal, ProposalStatus, ProposalEndTime, IVote, VotingType,
@@ -14,8 +13,6 @@ import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { BehaviorSubject, Unsubscribable, combineLatest, of } from 'rxjs';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { ISubstrateSignalingNewProposal, SubstrateEventKind } from 'events/edgeware/types';
-import { VoteOutcome } from 'edgeware-node-types/dist';
 import EdgewareSignaling from './signaling';
 
 export enum SignalingProposalStage {
@@ -27,7 +24,7 @@ export enum SignalingProposalStage {
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
-  event: ISubstrateSignalingNewProposal,
+  event: SubstrateTypes.ISignalingNewProposal,
 ): IEdgewareSignalingProposal => {
   return {
     identifier: event.proposalHash,
@@ -162,11 +159,14 @@ export class EdgewareSignalingProposal
     super('signalingproposal', backportEventToAdapter(
       ChainInfo,
       entity.chainEvents
-        .find((e) => e.data.kind === SubstrateEventKind.SignalingNewProposal).data as ISubstrateSignalingNewProposal
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.SignalingNewProposal
+        ).data as SubstrateTypes.ISignalingNewProposal
     ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Signaling = Signaling;
+    this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
 
@@ -184,10 +184,10 @@ export class EdgewareSignalingProposal
       return;
     }
     switch (e.data.kind) {
-      case SubstrateEventKind.SignalingNewProposal: {
+      case SubstrateTypes.EventKind.SignalingNewProposal: {
         break;
       }
-      case SubstrateEventKind.SignalingCommitStarted: {
+      case SubstrateTypes.EventKind.SignalingCommitStarted: {
         if (this.stage !== SignalingProposalStage.PreVoting) {
           console.error('signaling stage out of order!');
           return;
@@ -196,7 +196,7 @@ export class EdgewareSignalingProposal
         this._endBlock.next(e.data.endBlock);
         break;
       }
-      case SubstrateEventKind.SignalingVotingStarted: {
+      case SubstrateTypes.EventKind.SignalingVotingStarted: {
         if (this.stage !== SignalingProposalStage.Commit && this.stage !== SignalingProposalStage.PreVoting) {
           console.error('signaling stage out of order!');
           return;
@@ -205,7 +205,7 @@ export class EdgewareSignalingProposal
         this._endBlock.next(e.data.endBlock);
         break;
       }
-      case SubstrateEventKind.SignalingVotingCompleted: {
+      case SubstrateTypes.EventKind.SignalingVotingCompleted: {
         if (this.stage !== SignalingProposalStage.Voting) {
           console.error('signaling stage out of order!');
           return;
@@ -246,21 +246,6 @@ export class EdgewareSignalingProposal
   }
 
   public submitVoteTx(vote: SignalingVote) {
-    if (this.stage !== SignalingProposalStage.Voting) {
-      throw new Error('Proposal not in voting stage');
-    }
-    if (vote.choices.find((p) => !this.data.choices.map((d) => d.toHex()).includes(p.toHex()))) {
-      throw new Error('invalid choice in vote');
-    }
-    if (this.data.voteType.toString() === 'RankedChoice') {
-      if (vote.choices.length !== this.data.choices.length) {
-        throw new Error('must provide rankings for all choices');
-      }
-    } else {
-      if (vote.choices.length !== 1) {
-        throw new Error('can only vote for one option');
-      }
-    }
     return this._Chain.createTXModalData(
       vote.account,
       (api: ApiRx) => api.tx.voting.reveal(this.data.voteIndex, vote.choices, null),

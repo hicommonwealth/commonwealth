@@ -11,7 +11,6 @@ import { formatNumber } from '@polkadot/util';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
 import CardSummary from './card_summary';
-import BN from 'bn.js';
 
 interface IPreHeaderState {
   dynamic: {
@@ -58,7 +57,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       });
     }
 
-    const apr = (totalPercentage / Object.keys(annualPercentRate).length).toFixed(2);
+    const denominator = Object.keys(annualPercentRate || {}).length || 1;
+    const apr = (totalPercentage / denominator).toFixed(2);
     const { validatorCount, currentEra,
       currentIndex, sessionLength,
       sessionProgress, eraLength,
@@ -127,18 +127,19 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           m('.preheader-item-text', formatNumber((app.chain as Substrate).block.height)),
         ]),
         (isEpoch
+          && sessionProgress && m(CardSummary, {
+          title: 'Epoch',
+          total: sessionLength,
+          value: sessionProgress,
+          currentBlock: formatNumber(currentIndex)
+        })),
+        eraProgress
           && m(CardSummary, {
-            title: 'Epoch',
-            total: sessionLength,
-            value: sessionProgress,
-            currentBlock: formatNumber(currentIndex)
-          })),
-        m(CardSummary, {
-          title: 'Era',
-          total: eraLength,
-          value: eraProgress,
-          currentBlock: formatNumber(currentEra)
-        }),
+            title: 'Era',
+            total: eraLength,
+            value: eraProgress,
+            currentBlock: formatNumber(currentEra)
+          }),
         m('.validators-preheader-item', [
           m('h3', 'Est. APR'),
           m('.preheader-item-text', `${apr}%`),

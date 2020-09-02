@@ -4,13 +4,13 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
+import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
+
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import { NotificationCategories } from '../../../shared/types';
 import StorageHandler from '../../../server/eventHandlers/storage';
 import NotificationHandler from '../../../server/eventHandlers/notifications';
-import { CWEvent } from '../../../shared/events/interfaces';
-import { SubstrateEventKind } from '../../../shared/events/edgeware/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;
@@ -77,7 +77,7 @@ describe('Event Handler Tests', () => {
     const event: CWEvent = {
       blockNumber: 10,
       data: {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 0,
         endBlock: 100,
         proposalHash: 'hash',
@@ -114,7 +114,7 @@ describe('Event Handler Tests', () => {
       blockNumber: 11,
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: SubstrateEventKind.Slash,
+        kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
         amount: '10000',
       }
@@ -151,7 +151,7 @@ describe('Event Handler Tests', () => {
       blockNumber: 12,
       excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 1,
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',
@@ -189,7 +189,7 @@ describe('Event Handler Tests', () => {
       blockNumber: 12,
       excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 1,
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',

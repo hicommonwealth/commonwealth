@@ -1,0 +1,12 @@
+@import 'client/styles/shared';
+
+.TopicSelector {
+    @include dragula;
+    .topic-count {
+        display: inline-block;
+        width: 60px;
+    }
+    .ToggleFeaturedTopicButton {
+        margin-right: 10px;
+    }
+}

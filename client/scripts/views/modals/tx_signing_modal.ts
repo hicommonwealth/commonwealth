@@ -7,7 +7,7 @@ import { mnemonicValidate } from '@polkadot/util-crypto';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
-import { ModalExitButton } from 'views/modal';
+import { CompactModalExitButton } from 'views/modal';
 import app from 'state';
 import { formatAsTitleCase } from 'helpers';
 import { ITXModalData, ITransactionResult, TransactionStatus, ChainBase } from 'models';
@@ -102,7 +102,9 @@ const TXSigningCLIOption = {
         if (txData.status === TransactionStatus.Ready) {
           vnode.attrs.next('WaitingToConfirmTransaction', { obs });
         } else {
-          vnode.attrs.next('SentTransactionRejected', { error: new Error('Transaction Failed'), hash: null });
+          vnode.attrs.next('SentTransactionRejected', {
+            error: new Error('Transaction Failed'), hash: null, err: txData.err
+          });
         }
       });
     };
@@ -205,7 +207,7 @@ const TXSigningWebWalletOption = {
           if (txData.status === TransactionStatus.Ready) {
             vnode.attrs.next('WaitingToConfirmTransaction', { obs });
           } else {
-            vnode.attrs.next('SentTransactionRejected', { error: new Error('Transaction Failed'), hash: null });
+            vnode.attrs.next('SentTransactionRejected', { hash: null, error: txData.err });
           }
         });
       } catch (e) { console.log(e); }
@@ -245,7 +247,7 @@ const TXSigningSeedOrMnemonicOption = {
         if (txData.status === TransactionStatus.Ready) {
           vnode.attrs.next('WaitingToConfirmTransaction', { obs });
         } else {
-          vnode.attrs.next('SentTransactionRejected', { error: new Error('Transaction Failed'), hash: null });
+          vnode.attrs.next('SentTransactionRejected', { error: txData.err, hash: null });
         }
       });
     };
@@ -298,9 +300,10 @@ const TXSigningModalStates = {
       return m('.TXSigningModalBody.Intro', [
         m('.compact-modal-title', [
           m('h3', [
-            `Sign ${formatAsTitleCase(app.chain.class.replace('-', ' '))} transaction`,
+            'Sign transaction',
             (txLabel ? `: ${txLabel}` : '')
           ]),
+          m(CompactModalExitButton),
         ]),
         m('.compact-modal-body', [
           m(HorizontalTabs, [{
@@ -365,7 +368,7 @@ const TXSigningModalStates = {
         }
         if (data.status === TransactionStatus.Failed || data.status === TransactionStatus.Error) {
           vnode.attrs.next('SentTransactionRejected', {
-            error: new Error('Transaction Failed'),
+            error: data.err,
             hash: data.hash,
             blocknum: data.blocknum,
             timestamp: data.timestamp
@@ -425,7 +428,7 @@ const TXSigningModalStates = {
         m('.compact-modal-body', [
           m(TXSigningTransactionBox, {
             success: false,
-            status: 'Fail',
+            status: vnode.attrs.stateData.error,
             blockHash: vnode.attrs.stateData.hash ? `${vnode.attrs.stateData.hash}` : '--',
             blockNum: vnode.attrs.stateData.blocknum ? `${vnode.attrs.stateData.blocknum}` : '--',
             timestamp: vnode.attrs.stateData.timestamp ? `${vnode.attrs.stateData.timestamp.format()}` : '--',
@@ -452,7 +455,6 @@ const TXSigningModal = {
     const DEFAULT_STATE = 'Intro';
     return [
       m('.TXSigningModal', [
-        m(ModalExitButton),
         m(TXSigningModalStates[vnode.state.stateName || DEFAULT_STATE], {
           // pass transaction down to each step's view
           author: vnode.attrs.author,

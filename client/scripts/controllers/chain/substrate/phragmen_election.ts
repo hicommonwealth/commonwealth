@@ -220,11 +220,6 @@ export class SubstratePhragmenElection extends Proposal<
   }
 
   public submitVoteTx(vote: PhragmenElectionVote) {
-    if (this.candidates.length === 0) throw new Error('cannot vote when no candidates or members');
-    if (vote.votes.length === 0) throw new Error('must vote for at least one candidate');
-    if (vote.votes.length > this.candidates.length) {
-      throw new Error('cannot vote more than candidates');
-    }
     return this._Chain.createTXModalData(
       vote.account,
       (api: ApiRx) => api.tx[this.moduleName].vote(vote.votes, vote.stake),
@@ -233,9 +228,6 @@ export class SubstratePhragmenElection extends Proposal<
     );
   }
   public removeVoterTx(voter: SubstrateAccount) {
-    if (!this.hasVoted(voter)) {
-      throw new Error('must be a voter');
-    }
     return this._Chain.createTXModalData(
       voter,
       (api: ApiRx) => api.tx[this.moduleName].removeVoter(),
@@ -244,9 +236,6 @@ export class SubstratePhragmenElection extends Proposal<
     );
   }
   public reportDefunctVoterTx(reporter: SubstrateAccount, voter: SubstrateAccount) {
-    if (reporter.address === voter.address) throw new Error('cannot report self');
-    if (!this.hasVoted(reporter)) throw new Error('reporter must be a voter');
-    if (!this.isDefunctVoter(voter)) throw new Error('voter not defunct');
     return this._Chain.createTXModalData(
       reporter,
       (api: ApiRx) => api.tx[this.moduleName].reportDefunctVoter(voter.address),
@@ -255,13 +244,7 @@ export class SubstratePhragmenElection extends Proposal<
     );
   }
   public async submitCandidacyTx(candidate: SubstrateAccount) {
-    if (this.candidates.includes(candidate.address)) {
-      throw new Error('duplicate candidate');
-    }
     const txFunc = (api: ApiRx) => api.tx[this.moduleName].submitCandidacy();
-    if (!(await this._Chain.canPayFee(candidate, txFunc, this._Elections.candidacyBond))) {
-      throw new Error('insufficient funds');
-    }
     return this._Chain.createTXModalData(
       candidate,
       txFunc,
@@ -270,9 +253,6 @@ export class SubstratePhragmenElection extends Proposal<
     );
   }
   public renounceCandidacyTx(candidate: SubstrateAccount) {
-    if (!this.candidates.includes(candidate.address)) {
-      throw new Error('must be candidate, member, or runner-up');
-    }
     return this._Chain.createTXModalData(
       candidate,
       (api: ApiRx) => api.tx[this.moduleName].renounceCandidacy(),

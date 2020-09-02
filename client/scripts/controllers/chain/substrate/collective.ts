@@ -2,8 +2,8 @@ import { first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Call, AccountId } from '@polkadot/types/interfaces';
 import { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from 'events/edgeware/types';
-import { ProposalModule, ChainEntity } from 'models';
+import { SubstrateTypes } from '@commonwealth/chain-events';
+import { ProposalModule } from 'models';
 import { Unsubscribable } from 'rxjs';
 import { Vec } from '@polkadot/types';
 import SubstrateChain from './shared';
@@ -34,7 +34,7 @@ class SubstrateCollective extends ProposalModule<
     this._Accounts = Accounts;
     this._moduleName = moduleName;
     return new Promise((resolve, reject) => {
-      const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.CollectiveProposal);
+      const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.CollectiveProposal);
       const constructorFunc = (e) => new SubstrateCollectiveProposal(this._Chain, this._Accounts, this, e);
       const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 
@@ -106,7 +106,7 @@ class SubstrateCollective extends ProposalModule<
     const title = this._Chain.methodToTitle(action);
     const txFunc = fromTechnicalCommittee
       ? ((api: ApiRx) => api.tx.technicalCommittee.propose(threshold, action))
-      : ((api: ApiRx) => api.tx.council.propose(threshold, action));
+      : ((api: ApiRx) => (api.tx.council.propose as any)(threshold, action));
     return this._Chain.createTXModalData(
       author,
       txFunc,

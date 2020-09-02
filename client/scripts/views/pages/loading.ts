@@ -1,18 +1,23 @@
 import 'pages/loading.scss';
 
+import $ from 'jquery';
 import m from 'mithril';
 import { Spinner } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 
-const LoadingPage: m.Component<{ message?: string }> = {
+const LoadingPage: m.Component<{ title?: string, message?: string, narrow?: boolean, showNewProposalButton?: boolean }> = {
   view: (vnode) => {
+    const { title, message, narrow, showNewProposalButton } = vnode.attrs;
+
     return m(Sublayout, {
       class: 'LoadingPage',
-      leftSidebar: null,
+      title,
+      showNewProposalButton,
+      rightSidebar: narrow ? [] : null,
     }, [
       m(Spinner, {
         fill: true,
-        message: vnode.attrs.message,
+        message,
         size: 'xl',
         style: 'visibility: visible; opacity: 1;'
       }),

@@ -1,18 +1,25 @@
 import WebSocket from 'ws';
+import _ from 'underscore';
+import {
+  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
+  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents
+} from '@commonwealth/chain-events';
+import { Mainnet } from '@edgeware/node-types';
+
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
-import EdgewareMigrationHandler from '../eventHandlers/edgeware/migration';
-import EdgewareEntityArchivalHandler from '../eventHandlers/edgeware/entityArchival';
-import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
-import { IDisconnectedRange, EventSupportingChains, IEventHandler } from '../../shared/events/interfaces';
-
+import EntityArchivalHandler from '../eventHandlers/entityArchival';
+import IdentityHandler from '../eventHandlers/identity';
+import { sequelize } from '../database';
+import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
+import { ChainNodeInstance } from '../models/chain_node';
 const log = factory.getLogger(formatFilename(__filename));
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
     limit: 1,
-    order: [ [ 'created_at', 'DESC' ]],
+    order: [ [ 'block_number', 'DESC' ]],
     // this $...$ queries the data inside the include (ChainEvents don't have `chain` but ChainEventTypes do)...
     // we might be able to replicate this behavior with where and required: true inside the include
     where: {
@@ -31,55 +38,62 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   }
 };
 
-const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup?: boolean, migrate?: string) => {
+const setupChainEventListeners = async (
+  models, wss: WebSocket.Server, skipCatchup?: boolean
+): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
   log.info('Fetching node urls...');
-  const nodes = await models.ChainNode.findAll();
+  await sequelize.authenticate();
+  const nodes: ChainNodeInstance[] = (await Promise.all(EventSupportingChains.map((c) => {
+    return models.ChainNode.findOne({ where: { chain: c } });
+  }))).filter((n) => !!n);
+
   log.info('Setting up event listeners...');
-  await Promise.all(nodes
-    .filter((node) => EventSupportingChains.includes(node.chain))
-    // filter out duplicate nods per-chain, only use one node
-    .filter((node) => nodes.map((n) => n.chain).indexOf(node.chain) === nodes.indexOf(node))
-    // if migrating, only use chain specified, unless "all"
-    .filter((node) => (!migrate || migrate === 'all') ? true : node.chain === migrate)
-    .map(async (node) => {
-      const handlers: IEventHandler[] = [];
-      if (migrate) {
-        const migrationHandler = new EdgewareMigrationHandler(models, node.chain);
-        const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain);
-        handlers.push(migrationHandler, entityArchivalHandler);
-      } else {
-        const storageHandler = new EventStorageHandler(models, node.chain);
-        const notificationHandler = new EventNotificationHandler(models, wss);
-        const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain, wss);
-        handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
-      }
-      let url: string = node.url;
-      if (node.chain === 'edgeware') {
-        // must be ws
-        const urlNoProtocol = url.replace(/ws?s:\/\//, '');
-        url = `ws://${urlNoProtocol}:9944`;
-      } else if (node.chain === 'kusama') {
-        // requires wss and no port
-        const urlPath = url.replace(/^ws?s:\/\//, '').replace(/:[0-9]*$/, '');
-        url = `wss://${urlPath}`;
-      }
-      const subscriber = await subscribeEdgewareEvents(
-        node.chain,
-        url,
+  const subscribers = await Promise.all(nodes.map(async (node) => {
+    const storageHandler = new EventStorageHandler(models, node.chain);
+    const notificationHandler = new EventNotificationHandler(models, wss);
+    const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
+    const identityHandler = new IdentityHandler(models, node.chain);
+    const handlers: IEventHandler[] = [ storageHandler, notificationHandler, entityArchivalHandler ];
+    let subscriber: IEventSubscriber<any, any>;
+    if (SubstrateTypes.EventChains.includes(node.chain)) {
+      // only handle identities on substrate chains
+      handlers.push(identityHandler);
+
+      const nodeUrl = constructSubstrateUrl(node.url);
+      const api = await SubstrateEvents.createApi(
+        nodeUrl,
+        node.chain.includes('edgeware') ? Mainnet.types : {},
+        node.chain.includes('edgeware') ? Mainnet.typesAlias : {},
+      );
+      subscriber = await SubstrateEvents.subscribeEvents({
+        chain: node.chain,
         handlers,
         skipCatchup,
-        () => discoverReconnectRange(models, node.chain),
-        !!migrate,
-      );
-
-      // hook for clean exit
-      process.on('SIGTERM', () => {
-        if (subscriber) {
-          subscriber.unsubscribe();
-        }
+        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+        api,
       });
-      return subscriber;
-    }));
+    } else if (MolochTypes.EventChains.includes(node.chain)) {
+      const contractVersion = 1;
+      const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
+      subscriber = await MolochEvents.subscribeEvents({
+        chain: node.chain,
+        handlers,
+        skipCatchup,
+        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+        api,
+        contractVersion,
+      });
+    }
+
+    // hook for clean exit
+    process.on('SIGTERM', () => {
+      if (subscriber) {
+        subscriber.unsubscribe();
+      }
+    });
+    return [ node.chain, subscriber ];
+  }));
+  return _.object<{ [chain: string]:  IEventSubscriber<any, any> }>(subscribers);
 };
 
 export default setupChainEventListeners;

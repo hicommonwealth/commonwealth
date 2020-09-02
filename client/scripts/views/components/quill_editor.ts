@@ -44,7 +44,6 @@ const instantiateEditor = (
   let quill;
 
   // Set up markdown mode helper
-  // TODO: Avoid using jquery to inspect
   const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
 
   // Remove existing editor, if there is one
@@ -228,6 +227,111 @@ const instantiateEditor = (
   Quill.register('modules/clipboard', CustomClipboard, true);
   Quill.register('formats/twitter', TwitterBlot, true);
   Quill.register('formats/video', VideoBlot, true);
+
+  const searchMentionableAddresses = async (searchTerm: string) => {
+    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+      limit: 6,
+      searchTerm,
+      order: ['name', 'ASC']
+    });
+    if (response.status !== 'Success') {
+      throw new Error(`got unsuccessful status: ${response.status}`);
+    }
+    return response.result;
+  };
+
+  let typingListener;
+  const queryMentions = async (searchTerm, renderList, mentionChar) => {
+    if (mentionChar !== '@') return;
+    // Optional code for tagging roles:
+    // if (app.activeCommunityId()) roleData = await searchRoles();
+    // const truncRoles = roleData.filter(
+    //   (role) => role.name.includes(searchTerm) || role.address.includes(searchTerm));
+
+    let members = [];
+    let formattedMatches;
+    if (searchTerm.length === 0) {
+      typingListener = setTimeout(() => {
+        const node = document.createElement('div');
+        const tip = document.createElement('span');
+        tip.innerText = 'Type to tag a member';
+        node.appendChild(tip);
+        formattedMatches = [{
+          link: '#',
+          name: '',
+          component: node.outerHTML,
+        }];
+        renderList(formattedMatches, searchTerm);
+      }, 300);
+    } else if (searchTerm.length > 0) {
+      if (typingListener) clearTimeout(typingListener);
+      members = await searchMentionableAddresses(searchTerm);
+      formattedMatches = members.map((addr) => {
+        const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
+        const node = document.createElement('div');
+
+        let avatar;
+        if (profile.avatarUrl) {
+          avatar = document.createElement('img');
+          (avatar as HTMLImageElement).src = profile.avatarUrl;
+          avatar.className = 'ql-mention-avatar';
+          node.appendChild(avatar);
+        } else {
+          avatar = document.createElement('div');
+          avatar.className = 'ql-mention-avatar';
+          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 16);
+        }
+
+        const nameSpan = document.createElement('span');
+        nameSpan.innerText = addr.name;
+        nameSpan.className = 'ql-mention-name';
+
+        const addrSpan = document.createElement('span');
+        addrSpan.innerText = addr.chain === 'near' ? addr.address : `${addr.address.slice(0, 6)}...`;
+        addrSpan.className = 'ql-mention-addr';
+
+        const textWrap = document.createElement('div');
+        textWrap.className = 'ql-mention-text-wrap';
+
+        node.appendChild(avatar);
+        textWrap.appendChild(nameSpan);
+        textWrap.appendChild(addrSpan);
+        node.appendChild(textWrap);
+
+        return ({
+          link: `/${addr.chain}/account/${addr.address}`,
+          name: addr.name,
+          component: node.outerHTML,
+        });
+      });
+    }
+    renderList(formattedMatches, searchTerm);
+  };
+
+  const selectMention = (item) => {
+    if (item.link === '#' && item.name === '') return;
+    const text = quill.getText();
+    const cursorIdx = quill.selection.savedRange.index;
+    const mentionLength = text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
+    const beforeText = text.slice(0, cursorIdx - mentionLength);
+    const afterText = text.slice(cursorIdx).replace(/\n$/, '');
+    if (isMarkdownMode()) {
+      const fullText = `${beforeText}[@${item.name}](${item.link}) ${afterText.replace(/^ /, '')}`;
+      quill.setText(fullText);
+      quill.setSelection(fullText.length - afterText.length + (afterText.startsWith(' ') ? 1 : 0));
+    } else {
+      const delta = new Delta()
+        .retain(beforeText.length)
+        .delete(mentionLength)
+        .insert(`@${item.name}`, { link: item.link });
+      if (!afterText.startsWith(' ')) delta.insert(' ');
+      quill.updateContents(delta);
+      quill.setSelection(quill.getLength() - afterText.length - (afterText.startsWith(' ') ? 0 : 1), 0);
+    }
+  };
+
   // Setup custom keyboard bindings, override Quill default bindings where necessary
   const bindings = {
     // Don't insert hard tabs
@@ -247,6 +351,22 @@ const instantiateEditor = (
         const isEmbed = insertEmbeds(textContent);
         // if embed, stopPropogation; otherwise continue
         return !isEmbed;
+      }
+    },
+    // Check for mentions on return
+    'add-mention': {
+      key: 'Enter',
+      shortKey: false,
+      shiftKey: null,
+      handler: (range, context) => {
+        const mentions = quill.getModule('mention');
+        if (mentions.isOpen) {
+          selectMention(mentions.getItemData());
+          mentions.escapeHandler();
+          return false;
+        } else {
+          return true;
+        }
       }
     },
     // Submit on cmd-Enter/ctrl-Enter
@@ -419,20 +539,6 @@ const instantiateEditor = (
     }
   };
 
-  const searchMentionableAddresses = async (searchTerm: string) => {
-    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-      limit: 6,
-      searchTerm,
-      order: ['name', 'ASC']
-    });
-    if (response.status !== 'Success') {
-      throw new Error(`got unsuccessful status: ${response.status}`);
-    }
-    return response.result;
-  };
-
   // const searchRoles = async () => {
   //   if (!app.activeCommunityId) return [];
   //   const response = await $.get(`${app.serverUrl()}/bulkMembers`, {
@@ -449,96 +555,6 @@ const instantiateEditor = (
   //   }));
   //   return res;
   // };
-
-  let typingListener;
-  const queryMentions = async (searchTerm, renderList, mentionChar) => {
-    if (mentionChar !== '@') return;
-    // Optional code for tagging roles:
-    // if (app.activeCommunityId()) roleData = await searchRoles();
-    // const truncRoles = roleData.filter(
-    //   (role) => role.name.includes(searchTerm) || role.address.includes(searchTerm));
-
-    let members = [];
-    let formattedMatches;
-    if (searchTerm.length === 0) {
-      typingListener = setTimeout(() => {
-        const node = document.createElement('div');
-        const tip = document.createElement('span');
-        tip.innerText = 'Type to tag a member';
-        node.appendChild(tip);
-        formattedMatches = [{
-          link: '#',
-          name: '',
-          component: node.outerHTML,
-        }];
-        renderList(formattedMatches, searchTerm);
-      }, 300);
-    } else if (searchTerm.length > 0) {
-      if (typingListener) clearTimeout(typingListener);
-      members = await searchMentionableAddresses(searchTerm);
-      formattedMatches = members.map((addr) => {
-        const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
-        const node = document.createElement('div');
-
-        let avatar;
-        if (profile.avatarUrl) {
-          avatar = document.createElement('img');
-          (avatar as HTMLImageElement).src = profile.avatarUrl;
-          avatar.className = 'ql-mention-avatar';
-          node.appendChild(avatar);
-        } else {
-          avatar = document.createElement('div');
-          avatar.className = 'ql-mention-avatar';
-          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 16);
-        }
-
-        const nameSpan = document.createElement('span');
-        nameSpan.innerText = addr.name;
-        nameSpan.className = 'ql-mention-name';
-
-        const addrSpan = document.createElement('span');
-        addrSpan.innerText = addr.chain === 'near' ? addr.address : `${addr.address.slice(0, 6)}...`;
-        addrSpan.className = 'ql-mention-addr';
-
-        const textWrap = document.createElement('div');
-        textWrap.className = 'ql-mention-text-wrap';
-
-        node.appendChild(avatar);
-        textWrap.appendChild(nameSpan);
-        textWrap.appendChild(addrSpan);
-        node.appendChild(textWrap);
-
-        return ({
-          link: `/${addr.chain}/account/${addr.address}`,
-          name: addr.name,
-          component: node.outerHTML,
-        });
-      });
-    }
-    renderList(formattedMatches, searchTerm);
-  };
-
-  const selectMention = (item) => {
-    if (item.link === '#' && item.name === '') return;
-    const text = quill.getText();
-    const cursorIdx = quill.selection.savedRange.index;
-    const mentionLength = text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
-    const beforeText = text.slice(0, cursorIdx - mentionLength);
-    const afterText = text.slice(cursorIdx).replace(/\n$/, '');
-    if (isMarkdownMode()) {
-      const fullText = `${beforeText}[@${item.name}](${item.link}) ${afterText.replace(/^ /, '')}`;
-      quill.setText(fullText);
-      quill.setSelection(fullText.length - afterText.length + (afterText.startsWith(' ') ? 1 : 0));
-    } else {
-      const delta = new Delta()
-        .retain(beforeText.length)
-        .delete(mentionLength)
-        .insert(`@${item.name}`, { link: item.link });
-      if (!afterText.startsWith(' ')) delta.insert(' ');
-      quill.updateContents(delta);
-      quill.setSelection(quill.getLength() - afterText.length - (afterText.startsWith(' ') ? 0 : 1), 0);
-    }
-  };
 
   quill = new Quill($editor[0], {
     debug: 'error',
@@ -725,16 +741,19 @@ const instantiateEditor = (
 
   // Save editor content in localStorage
   state.unsavedChanges = new Delta();
-  quill.on('text-change', (delta) => {
+  quill.on('text-change', (delta, oldDelta, source) => {
     state.unsavedChanges = state.unsavedChanges.compose(delta);
+    if (source === 'user' && !state.alteredText) {
+      state.alteredText = true;
+      m.redraw();
+    }
   });
 
   setInterval(() => {
     if (state.unsavedChanges.length() > 0) {
       // Save the entire updated text to localStorage
       const data = JSON.stringify(quill.getContents());
-      localStorage.setItem(`${editorNamespace}-storedText`, data);
-      localStorage.setItem(`${editorNamespace}-markdownMode`, state.markdownMode);
+      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, data);
       state.unsavedChanges = new Delta();
     }
   }, 2500);
@@ -751,6 +770,7 @@ interface IQuillEditorAttrs {
   theme?: string;
   onkeyboardSubmit?;
   editorNamespace: string;
+  onkeyup?;
 }
 
 interface IQuillEditorState {
@@ -759,6 +779,7 @@ interface IQuillEditorState {
   uploading?: boolean;
   // for localStorage drafts:
   beforeunloadHandler;
+  alteredText;
   unsavedChanges;
   clearUnsavedChanges;
 }
@@ -766,7 +787,7 @@ interface IQuillEditorState {
 const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
   oncreate: (vnode) => {
     // Only bind the alert if we are actually trying to persist the user's changes
-    if (vnode.attrs.contentsDoc === undefined) {
+    if (!vnode.attrs.contentsDoc) {
       vnode.state.beforeunloadHandler = () => {
         if (vnode.state.unsavedChanges && vnode.state.unsavedChanges.length() > 0) {
           return 'There are unsaved changes. Are you sure you want to leave?';
@@ -776,53 +797,69 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     }
   },
   onremove: (vnode) => {
-    if (vnode.attrs.contentsDoc === undefined)
+    const { editor, markdownMode } = vnode.state;
+    const { editorNamespace } = vnode.attrs;
+    const body = markdownMode
+      ? editor?.getText()
+      : JSON.stringify(editor?.getContents());
+    if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
+      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
+    }
+    if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
+    }
   },
-  view: (vnode: m.VnodeDOM<IQuillEditorAttrs, IQuillEditorState>) => {
+  view: (vnode) => {
     const theme = vnode.attrs.theme || 'snow';
     const { imageUploader, placeholder, tabindex, editorNamespace, onkeyboardSubmit } = vnode.attrs;
     const oncreateBind = vnode.attrs.oncreateBind || (() => null);
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
-    if (vnode.state.markdownMode === undefined
-        && contentsDoc === undefined
-        && localStorage.getItem(`${editorNamespace}-storedText`) !== null) {
+
+    if (!contentsDoc
+      && !vnode.state.markdownMode
+      && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
       try {
-        contentsDoc = JSON.parse(localStorage.getItem(`${editorNamespace}-storedText`));
-        if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
-          vnode.state.markdownMode = true;
-        } else if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false') {
-          vnode.state.markdownMode = false;
-        }
+        contentsDoc = JSON.parse(localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`));
+        vnode.state.markdownMode = false;
       } catch (e) {
-        return;
-      } // do nothing if text fails to parse
-    }
-    // Otherwise, just set vnode.state.markdownMode based on the app setting
-    if (vnode.state.markdownMode === undefined) {
-      vnode.state.markdownMode = !!(app.user?.disableRichText);
+        contentsDoc = localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`);
+        vnode.state.markdownMode = true;
+      }
+    } else if (vnode.state.markdownMode === undefined) {
+      if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
+        vnode.state.markdownMode = true;
+      } else if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false') {
+        vnode.state.markdownMode = false;
+      } else {
+        // Otherwise, just set vnode.state.markdownMode based on the app setting
+        vnode.state.markdownMode = !!(app.user?.disableRichText);
+      }
     }
 
     // Set vnode.state.clearUnsavedChanges on first initialization
     if (vnode.state.clearUnsavedChanges === undefined) {
       vnode.state.clearUnsavedChanges = () => {
-        localStorage.removeItem(`${editorNamespace}-storedText`);
         localStorage.removeItem(`${editorNamespace}-markdownMode`);
+        localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
+        localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
+        if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link') {
+          localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
+        }
+        localStorage.removeItem(`${app.activeId()}-post-type`);
       };
     }
-
     return m('.QuillEditor', {
       class: vnode.state.markdownMode ? 'markdown-mode' : 'richtext-mode',
       oncreate: (childVnode) => {
-        const $editor = $(vnode.dom).find('.quill-editor');
+        const $editor = $(childVnode.dom).find('.quill-editor');
         vnode.state.editor = instantiateEditor(
           $editor, theme, true, imageUploader, placeholder, editorNamespace,
           vnode.state, onkeyboardSubmit
         );
         // once editor is instantiated, it can be updated with a tabindex
-        $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+        $(childVnode.dom).find('.ql-editor').attr('tabindex', tabindex);
         if (contentsDoc && typeof contentsDoc === 'string') {
           const res = vnode.state.editor.setText(contentsDoc);
           vnode.state.markdownMode = true;
@@ -839,20 +876,20 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
           ? m(Tooltip, {
             trigger: m(Tag, {
               label: 'Markdown',
-              size: 'sm',
+              size: 'xs',
               onclick: (e) => {
                 if (!vnode.state.markdownMode) return;
                 const cachedContents = vnode.state.editor.getContents();
                 // switch editor to rich text
                 vnode.state.markdownMode = false;
-                const $editor = $(vnode.dom).find('.quill-editor');
+                const $editor = $(e.target).closest('.QuillEditor').find('.quill-editor');
                 vnode.state.editor.container.tabIndex = tabindex;
                 vnode.state.editor = instantiateEditor(
                   $editor, theme, true, imageUploader, placeholder, editorNamespace,
                   vnode.state, onkeyboardSubmit
                 );
                 // once editor is instantiated, it can be updated with a tabindex
-                $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+                $(e.target).closest('.QuillEditor').find('.ql-editor').attr('tabindex', tabindex);
                 vnode.state.editor.setContents(cachedContents);
                 vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
                 vnode.state.editor.focus();
@@ -868,7 +905,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
           : m(Tooltip, {
             trigger: m(Tag, {
               label: 'Rich text',
-              size: 'sm',
+              size: 'xs',
               onclick: async (e) => {
                 if (vnode.state.markdownMode) return;
 
@@ -892,13 +929,13 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                 vnode.state.editor.removeFormat(0, vnode.state.editor.getText().length - 1);
                 cachedContents = vnode.state.editor.getContents();
                 vnode.state.markdownMode = true;
-                const $editor = $(vnode.dom).find('.quill-editor');
+                const $editor = $(e.target).closest('.QuillEditor').find('.quill-editor');
                 vnode.state.editor = instantiateEditor(
                   $editor, theme, true, imageUploader, placeholder, editorNamespace,
                   vnode.state, onkeyboardSubmit
                 );
                 // once editor is instantiated, it can be updated with a tabindex
-                $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+                $(e.target).closest('.QuillEditor').find('.ql-editor').attr('tabindex', tabindex);
                 vnode.state.editor.container.tabIndex = tabindex;
                 vnode.state.editor.setContents(cachedContents);
                 vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);

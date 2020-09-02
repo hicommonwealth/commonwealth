@@ -9,7 +9,9 @@ import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import Edgeware from 'controllers/chain/edgeware/main';
-import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy_referendum';
+import {
+  convictionToWeight, convictionToLocktime, convictions
+} from 'controllers/chain/substrate/democracy_referendum';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import ConvictionsTable from 'views/components/proposals/convictions_table';
@@ -20,205 +22,213 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
+import { Grid, Col, List } from 'construct-ui';
+import moment from 'moment';
+import Listing from './listing';
+
+const SubstrateProposalStats: m.Component<{}, {}> = {
+  view: (vnode) => {
+    if (!app.chain) return;
+
+    return m(Grid, {
+      align: 'middle',
+      class: 'stats-container',
+      gutter: 5,
+      justify: 'space-between'
+    }, [
+      m(Col, { span: { xs: 6, md: 3 } }, [
+        m('.stats-tile', [
+          m('.stats-heading', 'Next referendum'),
+          (app.chain as Substrate).democracyProposals.nextLaunchBlock
+            ? m(CountdownUntilBlock, {
+              block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
+              includeSeconds: false
+            })
+            : '--',
+        ]),
+      ]),
+      m(Col, { span: { xs: 6, md: 3 } }, [
+        m('.stats-tile', [
+          m('.stats-heading', 'Enactment delay'),
+          (app.chain as Substrate).democracy.enactmentPeriod
+            ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
+            : '--',
+          ' days'
+        ]),
+      ]),
+      m(Col, { span: { xs: 6, md: 3 } }, [
+        m('.stats-tile', [
+          m('.stats-heading', 'Next treasury spend'),
+          (app.chain as Substrate).treasury.nextSpendBlock
+            ? m(CountdownUntilBlock, {
+              block: (app.chain as Substrate).treasury.nextSpendBlock,
+              includeSeconds: false
+            })
+            : '--',
+        ]),
+      ]),
+      m(Col, { span: { xs: 6, md: 3 } }, [
+        // TODO: Pot is under construction
+        m('.stats-tile', [
+          m('.stats-heading', 'Treasury balance'),
+          app.chain && formatCoin((app.chain as Substrate).treasury.pot),
+        ]),
+      ]),
+    ]);
+    // onMoloch && m('.stats-tile', [
+    //   m('.stats-tile-label', 'DAO Basics'),
+    //   m('.stats-tile-figure-minor', [
+    //     `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
+    //   ]),
+    //   m('.stats-tile-figure-minor', [
+    //     `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
+    //   ]),
+    //   m('.stats-tile-figure-minor', [
+    //     `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
+    //   ]),
+    //   m('.stats-tile-figure-minor', [
+    //     `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
+    //   ]),
+    //   m('.stats-tile-figure-minor', [
+    //     `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
+    //   ]),
+    // ]),
+  }
+};
 
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
   },
   view: (vnode) => {
-    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Chain is loading...' });
+    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain...', title: 'Proposals' });
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 
-    // new proposals
-    const visibleMolochProposals = onMoloch && (app.chain as Moloch).governance.store.getAll()
-      .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
+    // active proposals
+    const activeDemocracyReferenda = onSubstrate
+      && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed);
+    const activeDemocracyProposals = onSubstrate
+      && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed);
+    const activeCouncilProposals = onSubstrate
+      && (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed);
+    const activeSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
+      && (app.chain as Edgeware).signaling.store.getAll()
+        .filter((p) => !p.completed).sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
+    const activeTreasuryProposals = onSubstrate
+      && (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed);
+    const activeCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
+      && (app.chain as Cosmos).governance.store.getAll()
+        .filter((p) => !p.completed).sort((a, b) => +b.identifier - +a.identifier);
+    const activeMolochProposals = onMoloch
+      && (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed)
+        .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
-    // do not display the dispatch queue as full proposals for now
-    const visibleDispatchQueue = []; // onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && p.passed);
-    const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll(); // .filter((p) => !p.completed && !p.passed);
+    const activeProposalContent = !activeDemocracyReferenda?.length
+      && !activeDemocracyProposals?.length
+      && !activeCouncilProposals?.length
+      && !activeSignalingProposals?.length
+      && !activeCosmosProposals?.length
+      && !activeMolochProposals?.length
+      ? [ m('.no-proposals', 'None') ]
+      : (activeDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }))
+        .concat((activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((activeCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((activeSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((activeCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
 
-    const visibleDemocracyProposals = onSubstrate && (app.chain as Substrate).democracyProposals.store.getAll();
-    const visibleCouncilProposals = onSubstrate && (app.chain as Substrate).council.store.getAll();
-    const visibleSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
-      && (app.chain as Edgeware).signaling.store.getAll().sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
-    const visibleCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
-      && (app.chain as Cosmos).governance.store.getAll().sort((a, b) => +b.identifier - +a.identifier);
-    const visibleTreasuryProposals = onSubstrate && (app.chain as Substrate).treasury.store.getAll();
+    const activeTreasuryContent = activeTreasuryProposals.length
+      ? activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
+      : [ m('.no-proposals', 'None') ];
+
+    // inactive proposals
+    const inactiveDemocracyReferenda = onSubstrate
+      && (app.chain as Substrate).democracy.store.getAll().filter((p) => p.completed);
+    const inactiveDemocracyProposals = onSubstrate
+      && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => p.completed);
+    const inactiveCouncilProposals = onSubstrate
+      && (app.chain as Substrate).council.store.getAll().filter((p) => p.completed);
+    const inactiveSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
+      && (app.chain as Edgeware).signaling.store.getAll()
+        .filter((p) => p.completed).sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
+    const inactiveTreasuryProposals = onSubstrate
+      && (app.chain as Substrate).treasury.store.getAll().filter((p) => p.completed);
+    const inactiveCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
+      && (app.chain as Cosmos).governance.store.getAll()
+        .filter((p) => p.completed).sort((a, b) => +b.identifier - +a.identifier);
+    const inactiveMolochProposals = onMoloch
+      && (app.chain as Moloch).governance.store.getAll().filter((p) => p.completed)
+        .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
+
+    const inactiveProposalContent = !inactiveDemocracyReferenda?.length
+      && !inactiveDemocracyProposals?.length
+      && !inactiveCouncilProposals?.length
+      && !inactiveSignalingProposals?.length
+      && !inactiveCosmosProposals?.length
+      && !inactiveMolochProposals?.length
+      ? [ m('.no-proposals', 'None') ]
+      : (inactiveDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }))
+        .concat((inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((inactiveSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
+
+    const inactiveTreasuryContent = inactiveTreasuryProposals.length
+      ? inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
+      : [ m('.no-proposals', 'None') ];
 
     // XXX: display these
-    const visibleTechnicalCommitteeProposals = app.chain && app.chain.class === ChainClass.Kusama
+    const visibleTechnicalCommitteeProposals = app.chain
+      && (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot)
       && (app.chain as Substrate).technicalCommittee.store.getAll();
 
-    let nextReferendum;
-    let nextReferendumDetail;
-    if (!onSubstrate) {
-      // do nothing
-    } else if ((app.chain as Substrate).democracyProposals.lastTabledWasExternal) {
-      if (visibleDemocracyProposals)
-        [nextReferendum, nextReferendumDetail] = ['Democracy', ''];
-      else
-        [nextReferendum, nextReferendumDetail] = ['Council',
-          'Last was council, but no democracy proposal was found'];
-    } else if ((app.chain as Substrate).democracyProposals.nextExternal)
-      [nextReferendum, nextReferendumDetail] = ['Council', ''];
-    else
-      [nextReferendum, nextReferendumDetail] = ['Democracy',
-        'Last was democracy, but no council proposal was found'];
+    // let nextReferendum;
+    // let nextReferendumDetail;
+    // if (!onSubstrate) {
+    //   // do nothing
+    // } else if ((app.chain as Substrate).democracyProposals.lastTabledWasExternal) {
+    //   if (visibleDemocracyProposals)
+    //     [nextReferendum, nextReferendumDetail] = ['Democracy', ''];
+    //   else
+    //     [nextReferendum, nextReferendumDetail] = ['Council',
+    //       'Last was council, but no democracy proposal was found'];
+    // } else if ((app.chain as Substrate).democracyProposals.nextExternal)
+    //   [nextReferendum, nextReferendumDetail] = ['Council', ''];
+    // else
+    //   [nextReferendum, nextReferendumDetail] = ['Democracy',
+    //     'Last was democracy, but no council proposal was found'];
 
     const maxConvictionWeight = Math.max.apply(this, convictions().map((c) => convictionToWeight(c)));
     const maxConvictionLocktime = Math.max.apply(this, convictions().map((c) => convictionToLocktime(c)));
 
     return m(Sublayout, {
       class: 'ProposalsPage',
-      rightSidebar: [
-        onMoloch && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'DAO Basics'),
-          m('.stats-tile-figure-minor', [
-            `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
-          ]),
-        ]),
-        onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Next referendum'),
-          m('.stats-tile-figure-major', [
-            onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
-              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock })
-              : '--'
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Block ${onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock}`
-          ]),
-        ]),
-        onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Next referendum draws from'),
-          m('.stats-tile-figure-major', nextReferendum),
-          m('.stats-tile-figure-minor', nextReferendumDetail),
-        ]),
-        onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Next-up council referendum'),
-          m('.stats-tile-figure-major', [
-            (app.chain as Substrate).democracyProposals.nextExternal
-              // ((app.chain as Substrate).democracyProposals.nextExternal[0].sectionName + '.' +
-              // (app.chain as Substrate).chain.methodToTitle(
-              //   (app.chain as Substrate).democracyProposals.nextExternal[0])
-              // ) : '--'
-              ? `${(app.chain as Substrate).democracyProposals.nextExternal[0].toString().slice(2, 8)}...` : '--'
-          ]),
-          m('.stats-tile-figure-minor', (app.chain as Substrate).democracyProposals.nextExternal ? [
-            m('p', `Hash: ${(app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(2, 8)}...`),
-            m('p', (app.chain as Substrate).democracyProposals.nextExternal[1].toString()),
-          ] : 'None'),
-        ]),
-        onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Next treasury spend'),
-          m('.stats-tile-figure-major', [
-            app.chain && (app.chain as Substrate).treasury.nextSpendBlock
-              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock })
-              : '--',
-          ]),
-          m('.stats-tile-figure-minor', `Block ${app.chain && (app.chain as Substrate).treasury.nextSpendBlock}`),
-        ]),
-        onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Treasury balance'),
-          m('.stats-tile-figure-major', app.chain && formatCoin((app.chain as Substrate).treasury.pot))
-        ]),
-        onSubstrate && m('.forum-container', [
-          m('ul', [
-            m('h4', 'Referenda'),
-            m('li', [
-              'Referenda are voted on by all coinholders, in a timelock-weighted yes/no vote. ',
-            ]),
-            m('li', [
-              'If a referendum passes, winning voters\' coins are locked for up to ',
-              `${(app.chain as Substrate).democracy.enactmentPeriod * maxConvictionLocktime} blocks `,
-              `(${formatDuration(blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod * maxConvictionLocktime))}). `,
-              'Locked coins can still be staked or voted.',
-            ]),
-            m('li', [
-              'If a referendum is approved, it executes after a delay of ',
-              `${(app.chain as Substrate).democracy.enactmentPeriod} blocks `,
-              `(${formatDuration(blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod))}).`,
-            ]),
-            m(ConvictionsTable),
-            m('h4', 'Council Motions'),
-            m('li', [
-              'The council can propose referenda, approve/reject treasury expenses, and ',
-              'create emergency proposals/cancellations by creating council motions.'
-            ]),
-            m('li', [
-              'Council motions are voted on by all councillors on a 1-person-1-vote basis.',
-              'Motions are approved when enough councillors vote yes, or removed when enough ',
-              'councillors vote no that approval becomes impossible.',
-            ]),
-            m('h4', 'Democracy Proposals'),
-            m('li', [
-              'Any coinholder can propose a referendum, by placing a bond of at least ',
-              `${app.chain && formatCoin((app.chain as Substrate).democracyProposals.minimumDeposit)}. `,
-            ]),
-            m('li', [
-              'Anyone can second the proposal in amounts equal to the original bond, as many times as they wish.',
-            ]),
-          ]),
-        ]),
-      ],
+      title: 'Proposals',
+      showNewProposalButton: true,
     }, [
-      !visibleReferenda
-        && !visibleCouncilProposals
-        && !visibleDemocracyProposals
-        && !visibleCosmosProposals
-        && !visibleMolochProposals
-        && m('.no-proposals', 'No referenda, motions, or proposals'),
-      //
-      (visibleDispatchQueue.length > 0) && m('h4.proposals-subheader', 'Referenda - final voting'),
-      visibleDispatchQueue && visibleDispatchQueue.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      //
-      (visibleReferenda.length > 0) && m('h4.proposals-subheader', 'Referenda - final voting'),
-      visibleReferenda && visibleReferenda.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      (visibleCouncilProposals.length > 0) && m('h4.proposals-subheader', 'Council motions'),
-      visibleCouncilProposals && visibleCouncilProposals.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      (visibleDemocracyProposals.length > 0) && m('h4.proposals-subheader', [
-        'Democracy Proposed Referenda',
-      ]),
-      visibleDemocracyProposals
-        && visibleDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      (visibleSignalingProposals.length > 0) && m('h4.proposals-subheader', [
-        'Signaling proposals',
-      ]),
-      visibleSignalingProposals
-        && visibleSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      (visibleTreasuryProposals.length > 0) && m('h4.proposals-subheader', [
-        'Treasury proposals',
-      ]),
-      visibleTreasuryProposals
-        && visibleTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      visibleCosmosProposals && m('h4.proposals-subheader', [
-        'Cosmos proposals',
-        m('a.proposals-action', {
-          onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.CosmosProposal }),
-        }, 'New'),
-      ]),
-      visibleCosmosProposals && visibleCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      visibleMolochProposals && m('h4.proposals-subheader', 'DAO proposals'),
-      visibleMolochProposals && visibleMolochProposals.map((proposal) => m(ProposalRow, { proposal })),
+      onSubstrate && m(SubstrateProposalStats),
+      m(Listing, {
+        content: activeProposalContent,
+        columnHeaders: ['Active Proposals', 'Replies', 'Likes', 'Updated'],
+        rightColSpacing: [4, 4, 4]
+      }),
+      m(Listing, {
+        content: activeTreasuryContent,
+        columnHeaders: ['Active Treasury Proposals'],
+        rightColSpacing: [0]
+      }),
+      m(Listing, {
+        content: inactiveProposalContent,
+        columnHeaders: ['Inactive Proposals', 'Replies', 'Likes', 'Updated'],
+        rightColSpacing: [4, 4, 4]
+      }),
+      m(Listing, {
+        content: inactiveTreasuryContent,
+        columnHeaders: ['Inactive Treasury Proposals'],
+        rightColSpacing: [0]
+      })
     ]);
   }
 };

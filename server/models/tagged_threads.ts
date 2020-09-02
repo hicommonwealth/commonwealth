@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 
 export interface TaggedThreadAttributes {
-  tag_id: string;
+  topic_id: string;
   thread_id: number;
   created_at?: Date;
   updated_at?: Date;
@@ -21,7 +21,7 @@ export default (
   dataTypes: Sequelize.DataTypes,
 ): TaggedThreadModel => {
   const TaggedThread = sequelize.define<TaggedThreadInstance, TaggedThreadAttributes>('TaggedThread', {
-    tag_id: { type: dataTypes.STRING, allowNull: false },
+    topic_id: { type: dataTypes.STRING, allowNull: false },
     thread_id: { type: dataTypes.INTEGER, allowNull: false },
   }, {
     timestamps: true,

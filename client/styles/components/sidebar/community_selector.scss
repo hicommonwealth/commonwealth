@@ -1,0 +1,72 @@
+@import 'client/styles/shared';
+
+.CommunitySelector {
+    button.cui-button {
+        border: none !important;
+        border-radius: 0 !important;
+    }
+}
+
+.CommunitySelectList {
+    .cui-popover-content {
+        max-height: 100vh;
+        overflow-y: auto;
+        text-align: left;
+        @include xs-max {
+            margin: 0 10px;
+            width: calc(100vw - 20px);
+        }
+    }
+    .cui-menu {
+        max-width: 300px;
+        width: 300px;
+        padding: 20px 0;
+        @include xs-max {
+            max-width: 100%;
+            width: 100%;
+        }
+        h4 {
+            margin: 20px 24px 10px;
+            color: #999;
+            font-weight: 400;
+            font-size: 16px;
+        }
+        h4:first-child {
+            margin-top: 0;
+        }
+        .community-placeholder {
+            margin: 0 24px;
+            font-size: 16px;
+            color: #999;
+        }
+    }
+    .cui-list-item {
+        padding: 4px 20px 4px 24px;
+        border: none;
+        user-select: none;
+        &.cui-selected {
+            color: #111;
+        }
+        .CommunityLabel .community-name-row {
+            position: relative;
+            top: -2px;
+        }
+    }
+    .cui-list-item.select-list-back-home {
+        margin: 15px 0;
+        font-size: 16px;
+    }
+
+    // stars
+    .community-star-toggle .cui-icon svg {
+        stroke: lighten(#546e7b, 40%);
+    }
+    $star-color: #ecbc00;
+    .community-star-toggle .cui-icon:hover svg {
+        stroke: $star-color !important;
+    }
+    .cui-list-item.starred .community-star-toggle .cui-icon svg {
+        stroke: $star-color !important;
+        fill: $star-color !important;
+    }
+}

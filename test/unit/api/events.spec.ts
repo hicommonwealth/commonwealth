@@ -3,18 +3,11 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import jwt from 'jsonwebtoken';
-import sleep from 'sleep-promise';
-import moment from 'moment';
-import { Errors as TagErrors } from 'server/routes/editTag';
-import app, { resetDatabase } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
+import app from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 const markdownThread = require('../../util/fixtures/markdownThread');
-
 
 describe('Event Tests', () => {
   const chain = 'edgeware';
@@ -24,6 +17,7 @@ describe('Event Tests', () => {
       .get('/api/getRewards')
       .set('Accept', 'application/json')
       .query({ chain });
-    console.log(res.body);
+    expect(res.body.status).to.be.equal('Success');
+    expect(res.body.validators).to.not.be.null;
   });
 });

@@ -1,7 +1,5 @@
 import { ApiStatus, IApp } from 'state';
-
-// Note: due to strange issues with Web3, we can't seem to use the
-// `Web3` class type, so it's marked in comments below
+import Web3 from 'web3';
 
 import {
   NodeInfo,
@@ -10,7 +8,7 @@ import {
   IChainModule
 } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { EthereumAccount } from './account';
+import EthereumAccount from './account';
 
 export interface IEthereumTXData extends ITXData {
   chainId: string;
@@ -53,7 +51,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     return new EthereumCoin('ETH', n, inDollars);
   }
 
-  private _api: any /* Web3 */;
+  private _api: Web3;
   private _eventHandlers = {};
   private _metadataInitialized: boolean = false;
   private _totalbalance: EthereumCoin;
@@ -61,10 +59,9 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public get totalbalance() { return this._totalbalance; }
 
   public initApi(node?: NodeInfo): Promise<any> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       // TODO: check for ethereum-local should probably be elsewhere
       // TODO: for dapp browsers, we should fall back to infura if connecting via the JS window object fails
-      const Web3 = (await import('web3')).default;
       if (node.chain.id === 'ethereum-local') {
         // Local node
         try {
@@ -106,13 +103,12 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
           return reject(error);
         }
       }
-      const isListening = await this._api.eth.net.isListening();
-      if (isListening) {
-        this.app.chain.networkStatus = ApiStatus.Connected;
-        resolve(this._api);
-      } else {
-        return reject(this._api);
-      }
+      this._api.eth.net.isListening()
+        .then((isListening) => {
+          this.app.chain.networkStatus = ApiStatus.Connected;
+          resolve(this._api);
+        })
+        .catch((err) => reject(this._api));
     });
   }
 
@@ -125,17 +121,16 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     // TODO: deinit the API, if necessary
     // ...
     if (this._api) {
-     // https://web3js.readthedocs.io/en/v1.2.0/web3-net.html
+      // https://web3js.readthedocs.io/en/v1.2.0/web3-net.html
       const isListening = await this._api.eth.net.isListening();
-      if (isListening && this.api.currentProvider.connection !== undefined ) {
-        await this._api.currentProvider.connection.close();
+      if (isListening && (this.api.currentProvider as any).connection !== undefined) {
+        await (this._api.currentProvider as any).connection.close();
       }
-      return this._api = null;
+      this._api = null;
     }
   }
 
-  // TODO: return type?
-  public get api(): any /* Web3 */ {
+  public get api(): Web3 {
     if (!this._api) {
       throw new Error('Must initialize API before using.');
     }
@@ -143,12 +138,8 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   }
 
   // Loads chain metadata such as issuance and block period
-  public initMetadata(): Promise<void> {
-
-    return new Promise(async (resolve, reject) => {
-      this._metadataInitialized = true;
-      resolve();
-    });
+  public async initMetadata(): Promise<void> {
+    this._metadataInitialized = true;
   }
 
   public deinitMetadata() {
@@ -163,7 +154,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     this.addEventHandler(
       'newBlockHeaders',
       (data) => data,
-      (err) => { throw new Error('EthereumChain.eventHandlers.newBlockHeaders err' + err ); },
+      (err) => { throw new Error(`EthereumChain.eventHandlers.newBlockHeaders err ${err}`); },
     );
   }
 
@@ -172,7 +163,8 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       console.log('deinitEventLoop');
       console.log(this._eventHandlers);
 
-      for (const event in this._eventHandlers) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const event of Object.keys(this._eventHandlers)) {
         if (this._eventHandlers[event]) {
           this.removeEventHandler(this._eventHandlers[event]);
         }
@@ -184,7 +176,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     console.log('EthereumChain.addEventHandler', eventName);
 
     // Map event name to Web3 EventEmitter object
-    this._eventHandlers[eventName] = this._api.eth.subscribe(eventName, (err, res) => {
+    this._eventHandlers[eventName] = this._api.eth.subscribe(eventName as any, (err, res) => {
       if (!err) return;
       console.error(err);
     });
@@ -210,7 +202,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       }
       // TODO: maybe have removeEventHandler return Promise<Boolean>
     });
-    delete this._eventHandlers[eventName] ;
+    delete this._eventHandlers[eventName];
     return true;
   }
 
@@ -225,7 +217,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
     this._api.eth.sendTransaction(transactionObject, (err, result) => {
       if (err) {
-        throw new Error('Error in EthereumChain.sendTransaction' + err);
+        throw new Error(`Error in EthereumChain.sendTransaction ${err}`);
       }
       console.log('EthereumChain.sendTransaction result', result);
 

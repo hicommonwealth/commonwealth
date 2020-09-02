@@ -1,4 +1,3 @@
-/* eslint-disable quotes */
 'use strict';
 
 module.exports = {
@@ -14,7 +13,7 @@ module.exports = {
       created_at: { type: DataTypes.DATE, allowNull: false },
       updated_at: { type: DataTypes.DATE, allowNull: false },
     });
-    const [threads] = await queryInterface.sequelize.query(`SELECT * FROM "OffchainThreads";`);
+    const [threads] = await queryInterface.sequelize.query('SELECT * FROM "OffchainThreads";');
     await Promise.all(threads.map(async (thread) => {
       const { id, tag_id } = thread;
       if (tag_id) {

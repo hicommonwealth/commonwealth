@@ -6,46 +6,22 @@ import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
-import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem, EmptyState } from 'construct-ui';
+import { Spinner } from 'construct-ui';
 
 import app from 'state';
-import { updateRoute } from 'app';
-import { link, articlize } from 'helpers';
+import { pluralize } from 'helpers';
+import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
+
+import { updateLastVisited } from 'controllers/app/login';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import User from 'views/components/widgets/user';
-import EmptyChannelPlaceholder from 'views/components/empty_channel_placeholder';
+import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
-import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
-import { updateLastVisited } from '../../../controllers/app/login';
-// import InlineThreadComposer from '../../components/inline_thread_composer';
+
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
-import ChainOrCommunityRoles from './roles';
-import TagCaratMenu from './tag_carat_menu';
-
-const CommunitySidebar: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
-  view: (vnode) => {
-    const { communityName, communityDescription, tag } = vnode.attrs;
-    if (!app.chain && !app.community) return;
-
-    return m('.CommunitySidebar', [
-      m(TagCaratMenu, { tag }),
-      tag && [
-        m('h4', `About #${tag}`),
-        m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
-      ],
-      m('h4', `About ${communityName}`),
-      m('p', communityDescription),
-      m('h4', 'Admins & Mods'),
-      (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
-        return m('.community-admin', [
-          m(User, { user: new AddressInfo(r.id, r.address, r.address_chain, null), showRole: true })
-        ]);
-      }),
-    ]);
-  }
-};
+import Listing from '../listing';
+import PinnedListing from './pinned_listing';
 
 interface IDiscussionPageState {
   lookback?: number;
@@ -55,7 +31,7 @@ interface IDiscussionPageState {
   defaultLookback: number;
 }
 
-const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
+const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
@@ -75,11 +51,11 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     $(window).on('scroll', onscroll);
   },
   view: (vnode) => {
+    const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading);
+    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: topic || 'Discussions' });
 
-    const { tag } = vnode.attrs;
     const activeAddressInfo = app.user.activeAccount && app.user.addresses
       .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
 
@@ -112,7 +88,14 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       return tsB - tsA;
     };
 
-    const getSingleTagListing = (tag) => {
+    const orderByDateReverseChronological = (a, b) => {
+      // tslint:disable-next-line
+      const tsB = Math.max(+b.createdAt);
+      const tsA = Math.max(+a.createdAt);
+      return tsA - tsB;
+    };
+
+    const getSingleTopicListing = (topic_) => {
       if (!activeEntity || !activeEntity.serverLoaded) {
         return m('.discussions-main', [
           m(ProposalsLoadingRow),
@@ -127,8 +110,15 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       let list = [];
       const divider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last Visited'), m('hr') ]);
       const sortedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.tag && thread.tag.name === tag)
+        .filter((thread) => thread.topic && thread.topic.name === topic_ && !thread.pinned)
         .sort(orderDiscussionsbyLastComment);
+
+      const pinnedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
+        .filter((thread) => thread.topic && thread.topic.name === topic_ && thread.pinned)
+        .sort(orderByDateReverseChronological);
+      if (pinnedThreads.length > 0) {
+        list.push(m(PinnedListing, { proposals: pinnedThreads }));
+      }
 
       if (sortedThreads.length > 0) {
         const firstThread = sortedThreads[0];
@@ -150,16 +140,26 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
             }
           });
         }
+
         if (list.length > 0) {
-          return m('.discussions-main', list);
+          return m('.discussions-main', [
+            m(Listing, {
+              content: list,
+              rightColSpacing: [4, 4, 4],
+              columnHeaders: [
+                'Title',
+                'Replies',
+                'Likes',
+                'Updated'
+              ],
+              menuCarat: true,
+            })
+          ]);
         }
       }
 
-      return m('.discussions-main.empty-list', [
-        m(EmptyState, {
-          icon: Icons.LAYERS,
-          content: m('p', { style: 'color: #546e7b;' }, 'No threads found'),
-        })
+      return m('.discussions-main', [
+        m(EmptyTopicPlaceholder, { topicName: topic }),
       ]);
     };
 
@@ -204,6 +204,10 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       const getRecentPostsSortedByWeek = () => {
         const arr = [];
         let count = 0;
+        const pinnedThreads = allProposals.filter((t) => t.pinned);
+        if (pinnedThreads.length > 0) {
+          arr.push(m(PinnedListing, { proposals: pinnedThreads }));
+        }
         weekIndexes.sort((a, b) => Number(a) - Number(b)).forEach((msecAgo) => {
           let proposals;
           if (allProposals.length < vnode.state.lookback) {
@@ -242,21 +246,47 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       return m('.discussions-main', [
         // m(InlineThreadComposer),
         allProposals.length === 0
-        && [
-          m(EmptyChannelPlaceholder, { communityName }),
-        ],
-        allProposals.length !== 0
-        && getRecentPostsSortedByWeek()
+          ? m(EmptyTopicPlaceholder, { communityName })
+          : m(Listing, {
+            content: getRecentPostsSortedByWeek(),
+            rightColSpacing: [4, 4, 4],
+            columnHeaders: [
+              'Title',
+              'Replies',
+              'Likes',
+              'Updated'
+            ],
+            menuCarat: true,
+          }),
+        // TODO: Incorporate infinite scroll into generic Listing component
+        getRecentPostsSortedByWeek().length && vnode.state.postsDepleted
+          ? m('.infinite-scroll-reached-end', [
+            `Showing all ${allProposals.length} of ${pluralize(allProposals.length, 'posts')}`
+          ])
+          : getRecentPostsSortedByWeek().length
+            ? m('.infinite-scroll-spinner-wrap', [
+              m(Spinner, { active: !vnode.state.postsDepleted })
+            ])
+            : null
       ]);
     };
 
+    let topicDescription;
+    if (topic && app.activeId()) {
+      const topics = app.topics.getByCommunity(app.activeId());
+      const topicObject = topics.find((t) => t.name === topic);
+      topicDescription = topicObject?.description;
+    }
+
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      rightSidebar: (app.chain || app.community) && m(CommunitySidebar, { communityName, communityDescription, tag })
+      title: topic || 'Discussions',
+      description: topicDescription,
+      showNewProposalButton: true,
     }, [
       (app.chain || app.community) && [
-        tag
-          ? getSingleTagListing(tag)
+        topic
+          ? getSingleTopicListing(topic)
           : getHomepageListing(),
       ]
     ]);

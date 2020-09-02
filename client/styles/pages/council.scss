@@ -7,7 +7,7 @@
     }
     .proposal-status {
         color: #999;
-        font-weight: 700;
+        font-weight: 500;
         &.pass {
             color: #06983a;
         }
@@ -17,16 +17,67 @@
     }
     .proposal-comments {
         display: inline-block;
-        font-weight: 700;
+        font-weight: 500;
         color: #999;
     }
 }
 
-.CollectiveMember, .CouncilCandidate, .CouncilElectionVoter {
+.CouncilPage {
+    padding-bottom: 36px;
+    .stats-container {
+        display: flex;
+        align-items: flex-start;
+        margin-top: 25px;
+        padding: 12px 20px 13px;
+        background-color: $background-color-light;
+        border-radius: 5px;
+        .stats-heading {
+            font-weight: 500;
+        }
+    }
+    .council-section-header {
+        font-size: 0.94rem;
+        font-weight: 400;
+        color: $text-color-light;
+        padding: 10px 0;
+        margin: 22px 0 0;
+        border-bottom: 1px solid #ededed;
+    }
+    h4.proposals-subheader {
+        text-transform: uppercase;
+        color: #999;
+        letter-spacing: 0.4px;
+        margin-top: 26px;
+        font-weight: 500;
+    }
+    a.proposals-action {
+        float: right;
+        margin-left: 10px;
+        color: #999;
+        cursor: pointer;
+        &:hover {
+            color: #555;
+        }
+        @include xs-max {
+            float: none;
+        }
+    }
+    .Listing {
+        margin-top: 20px;
+    }
+    @include sm-max {
+        .stats-container {
+            padding-bottom: 0;
+        }
+        .cui-col-xs-6 {
+            margin-bottom: 18px;
+        }
+    }
+}
+
+.CouncilCandidate, .CouncilElectionVoter {
     display: flex;
-    border: 1px solid #eee;
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
-    background: #fff;
+    background: $background-color-white;
     border-radius: 3px;
     margin: 10px 0;
     padding: 17px 20px 13px;
@@ -83,7 +134,7 @@
     // left
     .proposal-row-left {
         .proposal-display-id {
-            font-weight: 700;
+            font-weight: 400;
             font-size: 16px;
             line-height: 1.2;
         }
@@ -116,7 +167,7 @@
         }
 
         .proposal-row-metadata {
-            font-weight: 600;
+            font-weight: 500;
             min-width: 90px;
 
             @include xs-max {
@@ -197,29 +248,6 @@
         }
         .proposal-row-right {
             padding: 0;
-        }
-    }
-}
-
-.CouncilPage {
-    // TODO: duplicated
-    h4.proposals-subheader {
-        text-transform: uppercase;
-        color: #999;
-        letter-spacing: 0.4px;
-        margin-top: 26px;
-        font-weight: 500;
-    }
-    a.proposals-action {
-        float: right;
-        margin-left: 10px;
-        color: #999;
-        cursor: pointer;
-        &:hover {
-            color: #555;
-        }
-        @include xs-max {
-            float: none;
         }
     }
 }

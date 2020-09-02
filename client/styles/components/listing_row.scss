@@ -1,0 +1,90 @@
+@import 'client/styles/shared';
+
+.ListingRow {
+    @include listing-row-base;
+
+    .pinned {
+        margin: 8px 15px 0 0;
+        .visible-xs {
+            display: none;
+        }
+        @include xs-max {
+            margin: 0 0 2px 0;
+            .visible-xs {
+                display: inline-block;
+                margin-left: 4px;
+                font-size: 15px;
+                color: #999;
+            }
+            .icon-pin-outline {
+                font-size: 12px;
+                color: #999;
+            }
+        }
+    }
+    .row-left {
+        line-height: 1.1;
+        flex: $listing-left-flex;
+        .row-header,
+        .row-header a {
+            color: $text-color-dark;
+            font-size: $text-size-item-header;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .row-subheader {
+            display: flex;
+            margin-top: 3px;
+        }
+        .row-subheader a, span {
+            color: $text-color-light;
+            font-size: $text-size-item-meta;
+        }
+    }
+    .row-right {
+        display: flex;
+        flex: $listing-right-flex;
+        align-items: center;
+        padding-left: 10px;
+        .cui-grid {
+            width: 100%;
+            > div {
+                display: flex;
+                justify-content: flex-end;
+                .UserGallery {
+                    margin-right: 8px;
+                    text-align: right;
+                    white-space: nowrap;
+                    .overflow-users {
+                        font-size: 13.5px;
+                    }
+                }
+                .ReactionButton {
+                    width: min-content;
+                    height: min-content;
+                }
+                .last-updated {
+                    text-align: right;
+                    font-size: $text-size-item-meta;
+                    color: $text-color-light;
+                    &.older {
+                        min-width: 116px;
+                    }
+                    a {
+                        font-size: inherit;
+                        color: inherit;
+                        &:hover {
+                            color: darken($text-color-light, 8%);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    @include xs-max {
+        display: block;
+        .row-right {
+            display: none;
+        }
+    }
+}

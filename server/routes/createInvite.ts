@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
+import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -113,7 +114,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
   const msg = {
     to: invitedEmail,
     from: 'Commonwealth <no-reply@commonwealth.im>',
-    templateId: 'd-000c08160c07459798b46c927b638b9a',
+    templateId: DynamicTemplate.EmailInvite,
     dynamic_template_data: {
       community_name: invite.community_id,
       inviter: address.name,

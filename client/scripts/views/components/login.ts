@@ -2,85 +2,24 @@ import 'components/login.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import mixpanel from 'mixpanel-browser';
-import { WalletAccount } from 'nearlib';
-import { Button, Input, Icons, Form, FormGroup } from 'construct-ui';
+import { Button, Input, Form, FormGroup, PopoverMenu, MenuItem, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { ChainBase } from 'models';
-import { formatAsTitleCase } from 'helpers';
-import Near from 'controllers/chain/near/main';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
+import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 
-interface IAttrs {
-  creatingAccount?: boolean;
-  hideHeader?: boolean;
-}
-
-interface IState {
+const Login: m.Component<{}, {
   disabled: boolean;
   success: boolean;
   failure: boolean;
   error: Error | string;
   forceRegularLogin: boolean; // show regular login form from NEAR page
-}
-
-const Login: m.Component<IAttrs, IState> = {
-  view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    const { hideHeader, creatingAccount } = vnode.attrs;
-
-    if (app.chain && app.chain.base === ChainBase.NEAR && !vnode.state.forceRegularLogin) {
-      return m('.Login', {
-        onclick: (e) => {
-          e.stopPropagation();
-        }
-      }, [
-        !hideHeader && m('h4', 'Log in or sign up'),
-        m(Button, {
-          class: 'login-button-black',
-          onclick: (e) => {
-            e.preventDefault();
-            $(e.target).trigger('menuclose');
-
-            // set post-login redirect path
-            localStorage.setItem('nearPostAuthRedirect', JSON.stringify({
-              timestamp: (+new Date()).toString(),
-              path: m.route.get()
-            }));
-
-            // redirect to NEAR page for login
-            const wallet = new WalletAccount((app.chain as Near).chain.api, null);
-            if (wallet.isSignedIn()) {
-              // get rid of pre-existing wallet info to make way for new account
-              wallet.signOut();
-            }
-            const redirectUrl = `${window.location.origin}/${app.activeChainId()}/finishNearLogin`;
-            wallet.requestSignIn('commonwealth', 'commonwealth', redirectUrl, redirectUrl);
-          },
-          label: [
-            m('img.login-wallet-icon', { src: '/static/img/near_transparent_white.png' }),
-            'Go to NEAR wallet',
-          ]
-        }),
-        m('.more-options', [
-          m('a', {
-            href: '#',
-            onclick: (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              vnode.state.forceRegularLogin = true;
-            }
-          }, 'More options'),
-        ]),
-      ]);
-    }
-
+}> = {
+  view: (vnode) => {
     return m('.Login', {
       onclick: (e) => {
         e.stopPropagation();
       }
     }, [
-      !hideHeader && m('h4', creatingAccount ? 'Create account' : 'Log in or create account'),
       m(Form, { gutter: 10 }, [
         m(FormGroup, { span: 9 }, [
           m(Input, {
@@ -105,7 +44,7 @@ const Login: m.Component<IAttrs, IState> = {
             onclick: (e) => {
               e.preventDefault();
               e.stopPropagation();
-              const email = $(vnode.dom).find('[name="email"]').val().toString();
+              const email = $(e.target).closest('.Login').find('[name="email"]').val().toString();
               const path = m.route.get();
               if (!email) return;
               vnode.state.disabled = true;
@@ -127,16 +66,13 @@ const Login: m.Component<IAttrs, IState> = {
                 m.redraw();
               });
             },
-            label: creatingAccount
-              ? (vnode.state.disabled ? 'Creating account...' : 'Sign up')
-              : (vnode.state.disabled ? 'Logging in...' : 'Log in')
+            label: 'Go',
+            loading: vnode.state.disabled,
           }),
         ])
       ]),
       vnode.state.success && m('.login-message.success', [
-        creatingAccount
-          ? 'Check your email to finish creating your account.'
-          : 'Check your email to finish logging in.'
+        'Check your email to continue.'
       ]),
       vnode.state.failure && m('.login-message.failure', [
         vnode.state.error || 'An error occurred.'
@@ -155,24 +91,17 @@ const Login: m.Component<IAttrs, IState> = {
                 path: m.route.get()
               }));
             },
-            label: creatingAccount ? 'Sign up with Github' : 'Log in with Github'
+            label: 'Continue with Github'
           }),
         ]),
       ]),
       m(Form, { gutter: 10 }, [
         m(FormGroup, { span: 12 }, [
-          m(Button, {
-            intent: 'primary',
-            fluid: true,
-            class: 'login-with-web3',
-            onclick: (e) => {
-              e.preventDefault();
-              $(e.target).trigger('menuclose');
-              app.modals.create({ modal: LinkNewAddressModal, data: { loggingInWithAddress: true } });
-            },
-            label: creatingAccount
-              ? `Sign up with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`
-              : `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`,
+          m(LoginWithWalletDropdown, {
+            label: 'Continue with wallet',
+            joiningChain: null,
+            joiningCommunity: null,
+            loggingInWithAddress: true,
           }),
         ]),
       ]),

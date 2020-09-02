@@ -1,0 +1,19 @@
+@import 'client/styles/shared';
+
+.MobileNewProposalButton {
+    padding: 0;
+    @include xs-max {
+        .cui-button {
+            padding: 0 13px;
+            .cui-icon {
+                display: block;
+                margin-left: -3px;
+                margin-right: -3px;
+            }
+        }
+    }
+}
+
+.cui-popover.NewProposalButton {
+    z-index: 51;
+}
