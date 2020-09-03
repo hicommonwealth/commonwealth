@@ -235,7 +235,7 @@ const CreateInviteModal: m.Component<{
               name: 'address',
               autocomplete: 'off',
               placeholder: 'Address',
-              onkeyup: (e) => {
+              oninput: (e) => {
                 vnode.state.invitedAddress = (e.target as any).value;
               }
             }),
@@ -264,7 +264,7 @@ const CreateInviteModal: m.Component<{
               name: 'emailAddress',
               autocomplete: 'off',
               placeholder: 'satoshi@protonmail.com',
-              onkeyup: (e) => {
+              oninput: (e) => {
                 vnode.state.invitedEmail = (e.target as any).value;
               }
             }),
