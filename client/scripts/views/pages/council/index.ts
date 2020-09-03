@@ -196,7 +196,7 @@ const CouncilPage: m.Component<{}> = {
         ]),
         m(Col, { span: { xs: 6, md: 3 } }, [
           m('.stats-heading', 'Runners-up'),
-          m('.stats-tile', `${candidates?.length - councillors?.length} / ${nRunnersUpSeats}`),
+          m('.stats-tile', `${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)} / ${nRunnersUpSeats}`),
         ]),
         m(Col, { span: { xs: 6, md: 3 } }, [
           m('.stats-heading', 'Next council'),
