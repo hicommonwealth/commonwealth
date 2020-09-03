@@ -89,14 +89,16 @@ const User: m.Component<{
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
+        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
           // substrate name
           ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
             linkify
               ? link('a.user-display-name.username',
-              profile ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-              profile ? profile.displayName : '--',)
+                profile
+                  ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+                  : 'javascript:',
+                profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
         showRole && roleTag,

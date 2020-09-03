@@ -26,7 +26,7 @@ export interface ISubstrateIdentityState {
   },
 }
 
-const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
+const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
   getObservables: (attrs) => ({
     groupKey: attrs.account.address,
     identity: (attrs.account instanceof SubstrateAccount) && (!attrs.profile.isOnchain)
@@ -72,5 +72,43 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
       : m('a.user-display-name.username', profile ? profile.displayName : '--');
   }
 });
+
+const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
+  view: (vnode) => {
+    const { profile, linkify } = vnode.attrs;
+
+    const quality = getIdentityQuality(Object.values(profile.judgements));
+
+    if (profile.isOnchain && profile.name && quality) {
+      const name = [ profile.name, m(`span.identity-icon${
+        quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
+      }${quality === IdentityQuality.Good
+        ? '.green' : quality === IdentityQuality.Bad
+          ? '.red' : '.gray'}`) ];
+
+      return linkify
+        ? link(
+          `a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`,
+          profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+          name
+        )
+        : m(`a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`, name);
+    }
+
+    // return offchain name while identity is loading
+    return linkify
+      ? link('a.user-display-name.username',
+        profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+        profile ? profile.displayName : '--',)
+      : m('a.user-display-name.username', profile ? profile.displayName : '--');
+  }
+};
+
+const SubstrateIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
+  view: (vnode) => {
+    if (app.chain.loaded) return m(SubstrateOnlineIdentityWidget, vnode.attrs);
+    else return m(SubstrateOfflineIdentityWidget, vnode.attrs);
+  }
+};
 
 export default SubstrateIdentityWidget;

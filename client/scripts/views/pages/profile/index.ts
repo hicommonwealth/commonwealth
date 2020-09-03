@@ -140,7 +140,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
                 profileData.headline,
                 profileData.bio,
                 profileData.avatarUrl,
-                a.OffchianProfile.judgements
+                a.OffchainProfile.judgements
               );
             } else {
               profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
