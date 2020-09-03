@@ -21,7 +21,6 @@ export const Errors = {
 const createInvite = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!req.user) return next(new Error('Not logged in'));
-
   if (!req.body.invitedAddress && !req.body.invitedEmail) {
     return next(new Error(Errors.NoEmailOrAddress));
   }
@@ -39,7 +38,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
   });
   if (!address) return next(new Error(Errors.AddressNotFound));
 
-  if (!community.invitesEnabled) {
+  if (community && !community.invitesEnabled) {
     const requesterIsAdminOrMod = await models.Role.findAll({
       where: {
         ...chainOrCommObj,
@@ -88,6 +87,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
   const inviteChainOrCommObj = chain
     ? { chain_id: chain.id, community_name: chain.name }
     : { community_id: community.id, community_name: community.name }
+
   const previousInvite = await models.InviteCode.findOne({
     where: {
       invited_email: invitedEmail,
@@ -95,6 +95,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
       ...inviteChainOrCommObj
     }
   });
+
   if (previousInvite && previousInvite.used === true) { await previousInvite.update({ used: false, }); }
   let invite = previousInvite;
   if (!previousInvite) {
