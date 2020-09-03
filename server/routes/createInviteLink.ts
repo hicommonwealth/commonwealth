@@ -15,10 +15,10 @@ export const Errors = {
 };
 
 const createInviteLink = async (models, req, res, next) => {
+  if (!req.body.community && !req.body.chain) return next(new Error(Errors.NoCommunityId));
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { time } = req.body;
-  if (!community && !chain) return next(new Error(Errors.NoCommunityId));
   if (community && chain) return next(new Error(Errors.NoChainAndCommunity));
   if (!time) return next(new Error(Errors.NoTimeLimit));
 
