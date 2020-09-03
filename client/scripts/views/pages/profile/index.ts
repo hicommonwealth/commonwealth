@@ -133,7 +133,18 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           const profile = new Profile(a.chain, a.address);
           if (a.OffchainProfile) {
             const profileData = JSON.parse(a.OffchainProfile.data);
-            profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
+            // ignore off-chain name if substrate id exists
+            if (a.OffchainProfile.identity) {
+              profile.initializeWithChain(
+                a.OffchainProfile.identity,
+                profileData.headline,
+                profileData.bio,
+                profileData.avatarUrl,
+                a.OffchianProfile.judgements
+              );
+            } else {
+              profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
+            }
           } else {
             profile.initializeEmpty();
           }
