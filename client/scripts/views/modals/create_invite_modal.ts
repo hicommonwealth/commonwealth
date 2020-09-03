@@ -292,7 +292,7 @@ const CreateInviteModal: m.Component<{
             ...chainOrCommunityObj
           }),
         ]),
-        communityInfo && m(CreateInviteLink), // TODO: Allow chains to make invite link
+        communityInfo && m(CreateInviteLink, { ...chainOrCommunityObj }), // TODO: Allow chains to make invite link
         vnode.state.success && m('.success-message', [
           'Success! Your invite was sent',
         ]),

@@ -1,11 +1,13 @@
 import crypto from 'crypto';
 import { factory, formatFilename } from '../../shared/logging';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NoCommunityId: 'Error finding community',
+  NoCommunityId: 'Error finding community or chain',
+  NoChainAndCommunity: 'Must provide only chain/community',
   NoTimeLimit: 'Must provide a time limit',
   InvalidCommunity: 'Invalid community',
   NotAdminMod: 'Must be an admin/mod to create invite links in this community',
@@ -13,19 +15,17 @@ export const Errors = {
 };
 
 const createInviteLink = async (models, req, res, next) => {
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  const { community_id, time } = req.body;
-  if (!community_id) return next(new Error(Errors.NoCommunityId));
+  const { time } = req.body;
+  if (!community && !chain) return next(new Error(Errors.NoCommunityId));
+  if (community && chain) return next(new Error(Errors.NoChainAndCommunity));
   if (!time) return next(new Error(Errors.NoTimeLimit));
 
-  const community = await models.OffchainCommunity.findOne({
-    where: {
-      id: community_id,
-    },
-  });
-  if (!community) return next(new Error(Errors.InvalidCommunity));
+  const chainOrCommunityObj = chain ? { chain_id: chain.id }
+    : { community_id: community.id };
 
-  if (!community.invitesEnabled) {
+  if (community && !community.invitesEnabled) {
     const requesterIsAdminOrMod = await models.Role.findAll({
       where: {
         address_id: req.user.address_id, // this is overriding the search, bc null
@@ -50,7 +50,8 @@ const createInviteLink = async (models, req, res, next) => {
   if (uses === null && time === 'none') {
     const foreverInvite = await models.InviteLink.findOne({
       where: {
-        community_id: community.id,
+        // community_id: community.id,
+        ...chainOrCommunityObj,
         creator_id: req.user.id,
         multi_use: uses, // null
         time_limit: time, // 'none'
@@ -68,7 +69,8 @@ const createInviteLink = async (models, req, res, next) => {
 
   const inviteLink = await models.InviteLink.create({
     id: inviteId,
-    community_id: community.id,
+    // community_id: community.id,
+    ... chainOrCommunityObj,
     creator_id: req.user.id,
     active: true,
     multi_use: uses,
