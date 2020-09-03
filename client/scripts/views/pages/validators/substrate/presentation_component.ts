@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import Substrate from 'controllers/chain/substrate/main';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
-import { Icon, Icons, Spinner } from 'construct-ui';
+import { Icon, Icons, Spinner, TextArea, Select } from 'construct-ui';
 import PageLoading from 'views/pages/loading';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
@@ -96,6 +96,15 @@ const PresentationComponent = (state, chain: Substrate) => {
       callback: model.reset,
       name: 'Current Validators',
       content: m('table.validators-table', [
+        m(Select, {
+          options: ['Address', 'Name'],
+          defaultValue: 'Address',
+          onchange: () => null
+        }),
+        m('input', {
+          type: 'text',
+          autofocus: true,
+        }),
         m('tr.validators-heading', [
           m('th.val-stash', 'Stash'),
           m('th.val-total', 'Total Stake',
@@ -160,6 +169,16 @@ const PresentationComponent = (state, chain: Substrate) => {
       callback: model.reset,
       name: 'Waiting Validators',
       content: m('table.validators-table', [
+        m(Select, {
+          options: ['Address', 'Name'],
+          defaultValue: 'Address',
+          onchange: () => null
+        }),
+        m('input', {
+          type: 'text',
+          autofocus: true,
+          placeholder:'Search for a name, address or index...'
+        }),
         m('tr.validators-heading', [
           m('th.val-stash-waiting', 'Stash'),
           m('th.val-nominations', 'Nominations'),

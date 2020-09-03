@@ -10,7 +10,7 @@ import $ from 'jquery';
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
-import { Card, Icons, Icon } from 'construct-ui';
+import { Card, Icons, Icon, Select, TextArea } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';
 import PageLoading from 'views/pages/loading';
@@ -205,8 +205,26 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
         // m('.col-xs-12', [
         m('div', [
           m(graphs, {
-            xValues, yValues, titles
+            xValues, yValues, title: '1'
           }),
+          m(graphs, {
+            xValues, yValues, title: '2'
+          }),
+          m(graphs, {
+            xValues, yValues, title: '3'
+          }),
+          m(graphs, {
+            xValues, yValues, title: '4'
+          }),
+          m(graphs, {
+            xValues, yValues, title: '5'
+          }),
+          m(graphs, {
+            xValues, yValues, title: '6'
+          }),
+          m(graphs, {
+            xValues, yValues, title: '7'
+          })
         ])
         // ]),
         // ]),
