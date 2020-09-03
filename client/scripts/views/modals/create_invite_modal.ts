@@ -37,7 +37,6 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
         ? 'Invite Commonwealth user' : selection === 'email' ? 'Invite email' : 'Add',
       onclick: (e) => {
         e.preventDefault();
-        console.log(vnode.attrs);
         const address = invitedAddress;
         const emailAddress = invitedEmail;
         const selectedChain = invitedAddressChain;

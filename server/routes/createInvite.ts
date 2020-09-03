@@ -26,7 +26,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
   }
   if (req.body.invitedAddress && req.body.invitedEmail) {
     return next(new Error(Errors.NoEmailAndAddress));
-  } 
+  }
 
   const chainOrCommObj = chain
     ? { chain_id: chain.id }
