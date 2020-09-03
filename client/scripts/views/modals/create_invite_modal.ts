@@ -30,12 +30,14 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
     return m(Button, {
       class: 'create-invite-button',
       intent: 'primary',
+      name: selection,
       loading: vnode.state.disabled,
       type: 'submit',
       label: selection === 'address'
         ? 'Invite Commonwealth user' : selection === 'email' ? 'Invite email' : 'Add',
       onclick: (e) => {
         e.preventDefault();
+        console.log(vnode.attrs);
         const address = invitedAddress;
         const emailAddress = invitedEmail;
         const selectedChain = invitedAddressChain;
@@ -234,7 +236,7 @@ const CreateInviteModal: m.Component<{
               name: 'address',
               autocomplete: 'off',
               placeholder: 'Address',
-              onchange: (e) => {
+              onkeyup: (e) => {
                 vnode.state.invitedAddress = (e.target as any).value;
               }
             }),
@@ -263,7 +265,7 @@ const CreateInviteModal: m.Component<{
               name: 'emailAddress',
               autocomplete: 'off',
               placeholder: 'satoshi@protonmail.com',
-              onchange: (e) => {
+              onkeyup: (e) => {
                 vnode.state.invitedEmail = (e.target as any).value;
               }
             }),
