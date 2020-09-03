@@ -143,14 +143,6 @@ export const newThread = async (
   const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
-  // const $textarea = $(vnode.dom).find('.DropzoneTextarea textarea');
-  // const unescapedText = '' + $textarea.val();
-  // const attachments = vnode.state.files ?
-  //   vnode.state.files.map((f) => f.uploadURL && f.uploadURL.replace(/\?.*/, '')) : [];
-  // if (!unescapedText.trim() && !attachments) {
-  //   return vnode.state.error = 'Description or attachments are required.';
-  //   throw new Error();
-  // }
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
 

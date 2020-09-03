@@ -165,11 +165,15 @@ export const NewThreadForm: m.Component<{
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
     vnode.state.overwriteConfirmationModal = false;
-    vnode.state.activeTopic = isModal
-      ? m.route.param('topic')
-      : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
-        ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions') + 1]
-        : undefined;
+    try {
+      vnode.state.activeTopic = isModal
+        ? m.route.param('topic')
+        : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
+          ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions') + 1]
+            : undefined;
+    } catch (e) {
+      // couldn't extract activeTopic
+    }
     if (localStorage.getItem(`${app.activeId()}-from-draft`)) {
       vnode.state.fromDraft = Number(localStorage.getItem(`${app.activeId()}-from-draft`));
       localStorage.removeItem(`${app.activeId()}-from-draft`);
