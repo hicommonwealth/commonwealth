@@ -37,6 +37,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
         ? 'Invite Commonwealth user' : selection === 'email' ? 'Invite email' : 'Add',
       onclick: (e) => {
         e.preventDefault();
+        console.log(vnode.attrs);
         const address = invitedAddress;
         const emailAddress = invitedEmail;
         const selectedChain = invitedAddressChain;
@@ -95,7 +96,11 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
   }
 };
 
-const CreateInviteLink: m.Component<{ onChangeHandler?: Function }, {
+const CreateInviteLink: m.Component<{
+  chain?: ChainInfo,
+  community?: CommunityInfo,
+  onChangeHandler?: Function,
+}, {
   link: string,
   inviteUses: string,
   inviteTime: string,
@@ -106,6 +111,9 @@ const CreateInviteLink: m.Component<{ onChangeHandler?: Function }, {
     vnode.state.inviteTime = 'none';
   },
   view: (vnode) => {
+    const { chain, community, onChangeHandler } = vnode.attrs;
+    const chainOrCommunityObj = chain ? { chain: chain.id }
+      : { community: community.id }
     return m(Form, { class: 'CreateInviteLink' }, [
       m(FormGroup, { span: 4 }, [
         m(FormLabel, { for: 'uses', }, 'Generate invite link'),
@@ -148,14 +156,15 @@ const CreateInviteLink: m.Component<{ onChangeHandler?: Function }, {
             e.preventDefault();
             // TODO: Change to POST /inviteLink
             $.post(`${app.serverUrl()}/createInviteLink`, {
-              community_id: app.activeCommunityId(),
+              // community_id: app.activeCommunityId(),
+              ...chainOrCommunityObj,
               time: vnode.state.inviteTime,
               uses: vnode.state.inviteUses,
               jwt: app.user.jwt,
             }).then((response) => {
               const linkInfo = response.result;
               const url = (app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
-              if (vnode.attrs.onChangeHandler) vnode.attrs.onChangeHandler(linkInfo);
+              if (onChangeHandler) onChangeHandler(linkInfo);
               vnode.state.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${linkInfo.id}`;
               m.redraw();
             });
@@ -283,7 +292,7 @@ const CreateInviteModal: m.Component<{
             ...chainOrCommunityObj
           }),
         ]),
-        communityInfo && m(CreateInviteLink), // TODO: Allow chains to make invite link
+        m(CreateInviteLink, { ...chainOrCommunityObj }),
         vnode.state.success && m('.success-message', [
           'Success! Your invite was sent',
         ]),

@@ -12,7 +12,8 @@ export enum InviteLinkTimeLimit {
 
 export interface InviteLinkAttributes {
   id?: number;
-  community_id: string;
+  community_id?: string;
+  chain_id?: string;
   creator_id: number;
   active?: boolean;
   multi_use?: number;
@@ -39,7 +40,8 @@ export default (
 ): InviteLinkModel => {
   const InviteLink = sequelize.define<InviteLinkInstance, InviteLinkAttributes>('InviteLink', {
     id: { type: dataTypes.STRING, primaryKey: true, allowNull: false },
-    community_id: { type: dataTypes.STRING, allowNull: false },
+    community_id: { type: dataTypes.STRING, allowNull: true },
+    chain_id: { type: dataTypes.STRING, allowNull: true },
     creator_id: { type: dataTypes.INTEGER, allowNull: false },
     active: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     multi_use: { type: dataTypes.INTEGER, allowNull: true, defaultValue: null },
