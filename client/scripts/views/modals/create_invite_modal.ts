@@ -66,7 +66,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
 
         $.post(app.serverUrl() + postType, {
           address: app.user.activeAccount.address,
-          author_chain: app.user.activeAccount.chain,
+          // author_chain: app.user.activeAccount.chain,
           ...chainOrCommunityObj,
           invitedAddress: selection === 'address' ? address : '',
           invitedAddressChain: selection === 'address' ? selectedChain : '',
