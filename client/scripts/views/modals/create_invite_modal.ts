@@ -30,6 +30,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
     return m(Button, {
       class: 'create-invite-button',
       intent: 'primary',
+      name: selection,
       loading: vnode.state.disabled,
       type: 'submit',
       label: selection === 'address'
@@ -66,7 +67,6 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
 
         $.post(app.serverUrl() + postType, {
           address: app.user.activeAccount.address,
-          author_chain: app.user.activeAccount.chain,
           ...chainOrCommunityObj,
           invitedAddress: selection === 'address' ? address : '',
           invitedAddressChain: selection === 'address' ? selectedChain : '',
@@ -234,7 +234,7 @@ const CreateInviteModal: m.Component<{
               name: 'address',
               autocomplete: 'off',
               placeholder: 'Address',
-              onchange: (e) => {
+              oninput: (e) => {
                 vnode.state.invitedAddress = (e.target as any).value;
               }
             }),
@@ -255,7 +255,7 @@ const CreateInviteModal: m.Component<{
             ...chainOrCommunityObj
           }),
         ]),
-        communityInfo && m(Form, [
+        m(Form, [
           m(FormGroup, [
             m(FormLabel, 'Email'),
             m(Input, {
@@ -263,7 +263,7 @@ const CreateInviteModal: m.Component<{
               name: 'emailAddress',
               autocomplete: 'off',
               placeholder: 'satoshi@protonmail.com',
-              onchange: (e) => {
+              oninput: (e) => {
                 vnode.state.invitedEmail = (e.target as any).value;
               }
             }),
