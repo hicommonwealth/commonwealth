@@ -7,6 +7,7 @@ module.exports = {
         queryInterface.addColumn('InviteCodes', 'chain_id', {
           type: DataTypes.STRING, allowNull: true,
         }, { transaction: t }),
+        queryInterface.changeColumn('InviteCodes', 'community_id', { type: DataTypes.STRING, allowNull: true }, { transaction: t })
       ]);
     });
   },
