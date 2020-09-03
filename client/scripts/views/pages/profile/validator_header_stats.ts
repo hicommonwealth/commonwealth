@@ -51,7 +51,7 @@ export interface IValidatorAttrs {
     account:any
 }
 
-export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPageState>({
+export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValidatorPageState>({
   getObservables: (attrs) => ({
     groupKey: app.chain.class.toString(),
     validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
@@ -79,33 +79,23 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
     //   style: 'visibility: visible; opacity: 1;'
     // })));
     return m('div',
-      m(Card, {
-        elevation: 0,
-        class: 'home-card',
-        fluid: true
-      }, [ // Dummy Data for now TODOO: Change it to provide real data
-        //     m('td',
-        //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].exposure.total), true)),
-        //     m('td',
-        //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].exposure.own), true)),
-        //     m('td',
-        //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address]
-        //         .otherTotal), true)),
-        //     m('td',
-        //       validators && validators[vnode.attrs.address].commissionPer),
-        //     m('td',
-        //       validators && validators[vnode.attrs.address].eraPoints)
-        //   ]),
+      [ // Dummy Data for now TODOO: Change it to provide real data
         m('tr',
           [
+            m('th',
+              'TOTAL STAKE'),
+            m('th',
+              'OWN STAKE'),
+            m('th',
+              'OTHER STAKE'),
+            m('th',
+              'COMMISION'),
+            m('th',
+              'ERA POINTS'),
             m('th',
               'APR'),
             m('th',
               'TOTAL OFFENCES'),
-            m('th',
-              'TOTAL SLASHES'),
-            m('th',
-              'TOTAL REWARDS')
           ]),
         m('tr',
           [
@@ -114,53 +104,30 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
             m('td',
               '2.40m EDG'),
             m('td',
-              '5 (1.23m EDG)'),
+              '3.13m EDG'),
             m('td',
-              '30 (3.29m EDG)'),
-            m('td', m('.bio-actions', [
-              !onOwnProfile ? [
-                editIdentityAction(account, vnode.state.identity)
-              ] : [
-                // TODO: actions for others' accounts
-              ]
-            ]))
+              '100%'),
+            m('td',
+              '220'),
+            m('td',
+              '11.1%'),
+            m('td',
+              '0')
           ]),
-        m('tr',
-          [
-            m('th',
-              'IMONLINE'),
-            m('th',
-              'SLASHES (30 DAYS)'),
-            m('th',
-              'REWARDS (30 DAYS)')
-          ]),
-        m('tr',
-          [
-            m('td',
-              '35.0%'),
-            m('td',
-              '0'),
-            m('td',
-              '3 (1.05m EDG)'),
-            m('td', m('.bio-actions', [
-              !onOwnProfile ? [
-                m(Button, {
-                  intent: 'primary',
-                  onclick: () => {
-                    app.modals.create({
-                      modal: EditProfileModal,
-                      data: { account },
-                    });
-                  },
-                  label: 'Edit profile'
-                }),
-              ] : [
-                // TODO: actions for others' accounts
-              ]
-            ]))
-          ]),
-      ]));
+      //     m('td',
+      //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].exposure.total), true)),
+      //     m('td',
+      //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].exposure.own), true)),
+      //     m('td',
+      //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address]
+      //         .otherTotal), true)),
+      //     m('td',
+      //       validators && validators[vnode.attrs.address].commissionPer),
+      //     m('td',
+      //       validators && validators[vnode.attrs.address].eraPoints)
+      //   ]),
+      ]);
   }
 });
 
-export default ValidatorStats;
+export default ValidatorHeaderStats;

@@ -15,6 +15,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import User from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
+import { ValidatorHeaderStats } from './validator_header_stats';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -68,7 +69,6 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             m('.User', account.profile.displayName),
             // TODO: Badges for identity verification, etc.
           ]),
-          m('p', ' hahshas'),
           m('.info-row', [
             m('span.profile-headline', account.profile && account.profile.headline
               ? account.profile.headline
@@ -92,23 +92,24 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             vnode.state.copied && m('span.copy-done', 'Copied'),
           ]),
         ]),
-        m('.bio-actions', [
-          !onOwnProfile ? [
-            editIdentityAction(account, vnode.state.identity),
-            m(Button, {
-              intent: 'primary',
-              onclick: () => {
-                app.modals.create({
-                  modal: EditProfileModal,
-                  data: { account },
-                });
-              },
-              label: 'Edit profile'
-            }),
-          ] : [
-            // TODO: actions for others' accounts
-          ]
-        ]),
+        m(ValidatorHeaderStats, { account, address: account.address }),
+        // m('.bio-actions', [
+        //   !onOwnProfile ? [
+        //     editIdentityAction(account, vnode.state.identity),
+        //     m(Button, {
+        //       intent: 'primary',
+        //       onclick: () => {
+        //         app.modals.create({
+        //           modal: EditProfileModal,
+        //           data: { account },
+        //         });
+        //       },
+        //       label: 'Edit profile'
+        //     }),
+        //   ] : [
+        //     // TODO: actions for others' accounts
+        //   ]
+        // ]),
       ])
     ]);
   }

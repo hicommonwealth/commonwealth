@@ -200,20 +200,16 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       m('.forum-container-alt', [
         m(ProfileHeader, { account }),
         // Quick stats for a validator section
-        m(ValidatorStats, { address: account.address }),
-        m('.row.row-narrow.forum-row', [
-          m('.col-xs-12', [
-            m(Tabs, [{
-              name: ' ',
-              content: [
-                m(graphs, {
-                  xValues, yValues, titles
-                }),
-              ],
-            }
-            ]),
-          ]),
-        ]),
+        m(ValidatorStats, { address: account.address, account }),
+        // m('.row.row-narrow.forum-row', [
+        // m('.col-xs-12', [
+        m('div', [
+          m(graphs, {
+            xValues, yValues, titles
+          }),
+        ])
+        // ]),
+        // ]),
       ]),
     ],);
   },
