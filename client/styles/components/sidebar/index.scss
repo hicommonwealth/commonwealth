@@ -7,6 +7,7 @@
 
     .mobile-sidebar-center {
         flex: 1;
+        max-width: calc(100% - 202px);
     }
     .mobile-sidebar-left {
         padding-left: 6px !important;
@@ -79,6 +80,9 @@
                     margin-right: 0;
                 }
                 .user-display-name {
+                    display: none;
+                }
+                .cui-tag.role-tag {
                     display: none;
                 }
                 .cui-button-label .cui-icon-user {

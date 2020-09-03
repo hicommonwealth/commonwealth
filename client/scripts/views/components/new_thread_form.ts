@@ -165,11 +165,15 @@ export const NewThreadForm: m.Component<{
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
     vnode.state.overwriteConfirmationModal = false;
-    vnode.state.activeTopic = isModal
-      ? m.route.param('topic')
-      : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
-        ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions') + 1]
-        : undefined;
+    try {
+      vnode.state.activeTopic = isModal
+        ? m.route.param('topic')
+        : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
+          ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions') + 1]
+            : undefined;
+    } catch (e) {
+      // couldn't extract activeTopic
+    }
     if (localStorage.getItem(`${app.activeId()}-from-draft`)) {
       vnode.state.fromDraft = Number(localStorage.getItem(`${app.activeId()}-from-draft`));
       localStorage.removeItem(`${app.activeId()}-from-draft`);
@@ -185,7 +189,6 @@ export const NewThreadForm: m.Component<{
     }
   },
   onremove: async (vnode) => {
-    console.log(vnode.state);
     const { fromDraft, form, quillEditorState, postType, overwriteConfirmationModal } = vnode.state;
     if (postType === PostType.Discussion && !overwriteConfirmationModal) {
       if (quillEditorState?.alteredText) {
@@ -332,7 +335,7 @@ export const NewThreadForm: m.Component<{
               featuredTopics: app.topics.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
               updateFormData: updateTopicState,
-              tabindex: 2,
+              tabindex: 1,
             }),
           ]),
           m(FormGroup, { span: { xs: 12, sm: 8 }, order: 2 }, [
@@ -345,7 +348,7 @@ export const NewThreadForm: m.Component<{
                 if (detectURL(value)) getUrlForLinkPost();
               },
               defaultValue: vnode.state.form.url,
-              tabindex: 1,
+              tabindex: 2,
             }),
           ]),
           m(FormGroup, { order: 3 },  [
@@ -433,7 +436,7 @@ export const NewThreadForm: m.Component<{
               featuredTopics: app.topics.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
               updateFormData: updateTopicState,
-              tabindex: 2,
+              tabindex: 1,
             }),
           ]),
           m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 3 }, [
@@ -450,7 +453,7 @@ export const NewThreadForm: m.Component<{
                 localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
               },
               defaultValue: vnode.state.form.threadTitle,
-              tabindex: 1,
+              tabindex: 2,
             }),
           ]),
           m(FormGroup, { order: 4 }, [
