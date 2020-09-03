@@ -94,7 +94,6 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
   const previousInvite = await models.InviteCode.findOne({
     where: {
       invited_email: invitedEmail,
-      // community_id: community.id,
       ...inviteChainOrCommObj
     }
   });
@@ -105,8 +104,6 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
     const inviteCode = crypto.randomBytes(24).toString('hex');
     invite = await models.InviteCode.create({
       id: inviteCode,
-      // community_id: community.id,
-      // community_name: community.name,
       ...inviteChainOrCommObj,
       creator_id: req.user.id,
       invited_email: invitedEmail,
