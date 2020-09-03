@@ -56,7 +56,9 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       && account.address === app.user.activeAccount?.address;
 
     return m('.ProfileHeader', [
-      m('.cover'),
+      m('.cover', [
+        // ADD ICON COMPONENT HERE
+      ]),
       m('.bio-main', [
         m('.bio-left', [ // TODO: Rename class to non-bio to avoid confusion with Bio component
           m('.avatar', account.profile.getAvatar(90)),
@@ -66,6 +68,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             m('.User', account.profile.displayName),
             // TODO: Badges for identity verification, etc.
           ]),
+          m('p', ' hahshas'),
           m('.info-row', [
             m('span.profile-headline', account.profile && account.profile.headline
               ? account.profile.headline
@@ -90,7 +93,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ]),
         ]),
         m('.bio-actions', [
-          onOwnProfile ? [
+          !onOwnProfile ? [
             editIdentityAction(account, vnode.state.identity),
             m(Button, {
               intent: 'primary',

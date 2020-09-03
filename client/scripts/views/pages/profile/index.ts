@@ -10,11 +10,12 @@ import $ from 'jquery';
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
-import { Card } from 'construct-ui';
+import { Card, Icons, Icon } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
+import { ValidatorStats } from './validator_profile_stats';
 import graphs from './graphs';
 
 import ProfileHeader from './profile_header';
@@ -183,114 +184,27 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       .sort((a, b) => +b.createdAt - +a.createdAt);
 
 
-    const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
-    const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
-    const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
-    const graphsTabTitle = 'Graphs';
+    // const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
+    // const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
+    // const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
+    const graphsTabTitle = 'Statistics';
 
     const xValues = [403, 406, 409, 412, 415, 418, 430, 433, 436, 439, 452, 455, 458, 461, 471];
     const yValues = [500, 325, 600, 350, 400, 380, 690, 800, 1000, 1600, 1200, 1150, 1300, 1400, 1400];
     const titles = ['REWARDS OVER TIME', 'SLASHES OVER TIME', 'NOMINATIONS OVER TIME',
       'ELECTED STAKE', 'OFFENCES OVER TIME', 'IM ONLINE EVENTS OVER TIME', 'NOMINATORS OVER TIME'];
 
-
     return m(Sublayout, {
       class: 'ProfilePage',
     }, [
       m('.forum-container-alt', [
         m(ProfileHeader, { account }),
-        // TODO: add the stats sestion here
-        m(Card, {
-          elevation: 1,
-          class: 'home-card',
-          fluid: true
-        }, [
-          m('tr',
-            [
-              m('th',
-                'TOTAL STAKE'),
-              m('th',
-                'OWN STAKE'),
-              m('th',
-                'OTHER STAKE'),
-              m('th',
-                'COMMISION'),
-              m('th',
-                'POINTS'),
-              m('th',
-                'APR'),
-              m('th',
-                'TOTAL OFFENCES'),
-            ]),
-          m('tr',
-            [
-              m('td',
-                '5.53m EDG'),
-              m('td',
-                '2.40m EDG'),
-              m('td',
-                '3.13m EDG'),
-              m('td',
-                '100%'),
-              m('td',
-                '220'),
-              m('td',
-                '11.1%'),
-              m('td',
-                '0')
-            ]),
-          m('tr',
-            [
-              m('th',
-                'TOTAL SLASHES'),
-              m('th',
-                'TOTAL REWARDS'),
-              m('th',
-                'IMONLINE'),
-              m('th',
-                'SLASHES (30 DAYS)'),
-              m('th',
-                'REWARDS (30 DAYS)')
-            ]),
-          m('tr',
-            [
-              m('td',
-                '5 (1.23m EDG)'),
-              m('td',
-                '30 (3.29m EDG)'),
-              m('td',
-                '35.0%'),
-              m('td',
-                '0'),
-              m('td',
-                '3 (1.05m EDG)')
-            ])
-        ]),
+        // Quick stats for a validator section
+        m(ValidatorStats, { address: account.address }),
         m('.row.row-narrow.forum-row', [
-          m('.col-xs-8', [
+          m('.col-xs-12', [
             m(Tabs, [{
-              name: allTabTitle,
-              content: m(ProfileContent, {
-                account,
-                type: UserContent.All,
-                content: { allContent }
-              })
-            }, {
-              name: threadsTabTitle,
-              content: m(ProfileContent, {
-                account,
-                type: UserContent.Threads,
-                content: { proposals }
-              }),
-            }, {
-              name: commentsTabTitle,
-              content: m(ProfileContent, {
-                account,
-                type: UserContent.Comments,
-                content: { comments }
-              }),
-            }, {
-              name: graphsTabTitle,
+              name: ' ',
               content: [
                 m(graphs, {
                   xValues, yValues, titles
@@ -298,9 +212,6 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
               ],
             }
             ]),
-          ]),
-          m('.col-xs-4', [
-            m(ProfileBio, { account }),
           ]),
         ]),
       ]),
