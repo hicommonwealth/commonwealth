@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import BN from 'bn.js';
 import { Identity } from 'models';
 import { IHasId, ISerializable } from 'stores';
@@ -40,6 +39,21 @@ export interface ISubstrateIdentity extends IHasId {
   quality: IdentityQuality;
   deposit: string;
   exists: boolean;
+}
+
+// fetch quality based on Polkadot identity judgements. See:
+// https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L126
+// https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L182
+export function getIdentityQuality(judgements: string[]): IdentityQuality {
+  const isGood = judgements.some((j) => j === 'KnownGood' || j === 'Reasonable');
+  const isBad = judgements.some((j) => j === 'Erroneous' || j === 'LowQuality');
+  if (isGood) {
+    return IdentityQuality.Good;
+  } else if (isBad) {
+    return IdentityQuality.Bad;
+  } else {
+    return IdentityQuality.Unknown;
+  }
 }
 
 export default class SubstrateIdentity
@@ -87,18 +101,9 @@ export default class SubstrateIdentity
     // update username
     const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
     this.username = d2s(this._info.display);
-
-    // update quality based on Polkadot identity judgements. See:
-    // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L126
-    // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L182
-    const isGood = _.some(this._judgements, (j) => j[1].toString() === 'KnownGood' || j[1].toString() === 'Reasonable');
-    const isBad = _.some(this._judgements, (j) => j[1].toString() === 'Erroneous' || j[1].toString() === 'LowQuality');
-    if (isGood) {
-      this._quality = IdentityQuality.Good;
-    } else if (isBad) {
-      this._quality = IdentityQuality.Bad;
-    } else if (!this._quality) {
-      this._quality = IdentityQuality.Unknown;
+    const quality = getIdentityQuality(this._judgements.map((j) => j[1].toString()));
+    if (!this._quality || quality !== IdentityQuality.Unknown) {
+      this._quality = quality;
     }
     if (this._Identities.store.getById(this.id)) {
       this._Identities.store.update(this);

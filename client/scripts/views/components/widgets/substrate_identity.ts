@@ -11,7 +11,7 @@ import { Account, Profile } from 'models';
 import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
-import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
+import SubstrateIdentity, { IdentityQuality, getIdentityQuality } from 'controllers/chain/substrate/identity';
 
 export interface ISubstrateIdentityAttrs {
   account: Account<any>;
@@ -29,16 +29,25 @@ export interface ISubstrateIdentityState {
 const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
   getObservables: (attrs) => ({
     groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount)
+    identity: (attrs.account instanceof SubstrateAccount) && (!attrs.profile.isOnchain)
       ? (app.chain as Substrate).identities.get(attrs.account)
       : null,
   }),
   view: (vnode) => {
     const { profile, linkify, account } = vnode.attrs;
     // return polkadot identity if possible
-    const identity = vnode.state.dynamic.identity;
-    const displayName = identity?.exists ? identity.username : undefined;
-    const quality = identity?.exists ? identity.quality : undefined;
+    let displayName: string;
+    let quality: IdentityQuality;
+    if (profile.isOnchain) {
+      // first try to use identity fetched from server
+      displayName = profile.displayName;
+      quality = getIdentityQuality(Object.values(profile.judgements));
+    } else if (vnode.state.dynamic?.identity?.exists) {
+      // then attempt to use identity fetched from chain
+      displayName = vnode.state.dynamic.identity.username;
+      quality = vnode.state.dynamic.identity.quality;
+    }
+
     if (displayName && quality) {
       const name = [ displayName, m(`span.identity-icon${
         quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
