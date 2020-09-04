@@ -380,10 +380,10 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, { order: 5 }, [
             m(Button, {
-              class: !author ? 'disabled' : '',
               intent: 'primary',
               label: 'Create thread',
               name: 'submit',
+              disabled: !author || vnode.state.saving,
               onclick: async (e) => {
                 vnode.state.saving = true;
                 if (!detectURL(vnode.state.form.url)) {
@@ -468,8 +468,7 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, { order: 5 }, [
             m(Button, {
-              class: !author || saving || vnode.state.uploadsInProgress > 0
-                ? 'disabled' : '',
+              disabled: !author || saving || vnode.state.uploadsInProgress > 0,
               intent: 'primary',
               onclick: async (e) => {
                 vnode.state.saving = true;
@@ -505,12 +504,8 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
             m(Button, {
-              class: !author
-                || saving
-                || vnode.state.uploadsInProgress > 0
-                || (fromDraft && !vnode.state.quillEditorState?.alteredText)
-                ? 'disabled'
-                : '',
+              disabled: !author || saving || vnode.state.uploadsInProgress > 0
+                || (fromDraft && !vnode.state.quillEditorState?.alteredText),
               intent: 'none',
               onclick: async (e) => {
                 const { form, quillEditorState } = vnode.state;

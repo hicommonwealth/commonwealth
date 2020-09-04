@@ -1,13 +1,15 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
 import moment from 'moment-twitter';
+import m from 'mithril';
+import $ from 'jquery';
+
+import app from 'state';
 import { ProposalStore, TopicStore } from 'stores';
 import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo } from 'models';
 
-import $ from 'jquery';
-import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { updateLastVisited } from '../app/login';
+import { updateLastVisited } from 'controllers/app/login';
 
 const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
@@ -153,6 +155,7 @@ class ThreadsController {
         'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);
+        m.redraw();
         resolve(result);
       }).catch((e) => {
         console.error(e);
