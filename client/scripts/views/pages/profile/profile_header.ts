@@ -1,20 +1,22 @@
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import { Button } from 'construct-ui';
+import { Button, Icons, Icon } from 'construct-ui';
 import * as clipboard from 'clipboard-polyfill';
 import { Unsubscribable } from 'rxjs';
+import { externalLink, formatAddressShort, isSameAccount } from 'helpers';
 
 import app from 'state';
 import { Account, ChainBase } from 'models';
 
-import { formatAddressShort, isSameAccount } from 'helpers';
+
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import User from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
+import { getMaxListeners } from 'superagent';
 import { ValidatorHeaderStats } from './validator_header_stats';
 
 function capitalizeFirstLetter(string) {
@@ -59,6 +61,24 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     return m('.ProfileHeader', [
       m('.cover', [
         // ADD ICON COMPONENT HERE
+        m('div.row', [
+          m('.icon-to-be-elected', m(Icon, { name: Icons.ARROW_LEFT_CIRCLE, size: 'lg' })),
+          m('.icon-imonline', m(Icon, { name: Icons.WIFI, size: 'lg' })),
+          m('icon.message', m(Icon, { name: Icons.MESSAGE_SQUARE, size: 'lg' })),
+          m('p.email-container', [
+            m('.at-sign', m(Icon, { name: Icons.AT_SIGN, size: 'sm' })),
+            m('p.email-address', 'nblogist@gmail.com')
+          ]),
+          m('p.web-container', [
+            m('.at-sign', m(Icon, { name: Icons.GLOBE, size: 'sm' })),
+            m('p.website-address', 'stake.com')
+          ]),
+          m('p.twitter-container', [
+            m('.twitter-sign', m(Icon, { name: Icons.TWITTER, size: 'sm' })),
+            m('p.titter-handle', '@stakedotfish')
+          ]),
+
+        ])
       ]),
       m('.bio-main', [
         m('.bio-left', [ // TODO: Rename class to non-bio to avoid confusion with Bio component
