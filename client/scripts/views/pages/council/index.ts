@@ -83,6 +83,7 @@ export const CollectiveVotingButton: m.Component<{
         label: 'Set council vote',
         onclick: (e) => {
           e.preventDefault();
+          console.log('opening');
           app.modals.create({
             modal: CouncilVotingModal,
             data: { candidates },
@@ -131,15 +132,14 @@ export const CandidacyButton: m.Component<{
     // TODO: Retract candidacy buttons
     return menuStyle
       ? m(MenuItem, {
-        disabled: !app.user.activeAccount,
-        label: 'Set council vote',
+        disabled: (!app.user.activeAccount || activeAccountIsCandidate
+          || app.chain.networkStatus !== ApiStatus.Connected),
+        label: activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy',
         onclick: (e) => {
           e.preventDefault();
-          app.modals.create({
-            modal: CouncilVotingModal,
-            data: { candidates },
-          });
-        }
+          if (app.modals.getList().length > 0) return;
+          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
+        },
       })
       : buttonStyle
         ? m(Button, {

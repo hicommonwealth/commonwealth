@@ -51,10 +51,12 @@ const Sublayout: m.Component<{
       }),
       app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
       showNewProposalButton && m(NewProposalButton, { fluid: false, councilCandidates }),
-      showCouncilButtons && [
-        m(CollectiveVotingButton, { buttonStyle: true, candidates: councilCandidates }),
-        m(CandidacyButton, { buttonStyle: true, candidates: councilCandidates }),
-      ]
+      showCouncilButtons
+        && councilCandidates
+        && [
+          m(CollectiveVotingButton, { buttonStyle: true, candidates: councilCandidates }),
+          m(CandidacyButton, { buttonStyle: true, candidates: councilCandidates }),
+        ]
     ]);
 
     return m('.Sublayout', { class: vnode.attrs.class }, [
