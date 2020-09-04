@@ -65,47 +65,22 @@ interface IProposalHeaderState {
 }
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
-  oninit: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (proposal instanceof OffchainThread) {
-      vnode.state.canEdit = (app.user.activeAccount?.address === proposal.author
-            && app.user.activeAccount?.chain.id === proposal.authorChain)
-        || (app.user.isRoleOfCommunity({
-          role: 'admin',
-          chain: app.activeChainId(),
-          community: app.activeCommunityId()
-        }) || app.user.isRoleOfCommunity({
-          role: 'moderator',
-          chain: app.activeChainId(),
-          community: app.activeCommunityId()
-        }));
-
-      vnode.state.savedEdit = localStorage.getItem(`${app.activeId()}-edit-thread-${proposal.id}-storedText`);
-
-      if (vnode.state.canEdit && vnode.state.savedEdit) {
-        vnode.state.editing = true;
-      }
-    }
-  },
   view: (vnode) => {
     const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
     const { canEdit } = vnode.state;
     const isThread = proposal instanceof OffchainThread;
-    const description = isThread ? false : (proposal as AnyProposal).description;
-    const body = isThread ? (proposal as OffchainThread).body : false;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;
     const versionHistory = (proposal as OffchainThread).versionHistory;
-    const lastEdit = versionHistory?.length > 1 ? JSON.parse(versionHistory[0]) : null;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
+    const description = isThread ? false : (proposal as AnyProposal).description;
+    const body = isThread ? (proposal as OffchainThread).body : false;
+    const lastEdit = versionHistory?.length > 1 ? JSON.parse(versionHistory[0]) : null;
     const author : Account<any> = proposal instanceof OffchainThread
       ? (!app.community
         ? app.chain.accounts.get(proposal.author)
         : app.community.accounts.get(proposal.author, proposal.authorChain))
       : proposal.author;
-
-    const notificationSubscription = app.user.notifications.subscriptions
-      .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`

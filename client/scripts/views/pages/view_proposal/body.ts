@@ -414,10 +414,21 @@ export const ProposalBodyAttachments: m.Component<{ item: OffchainThread | Offch
   }
 };
 
-export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainComment<any>, parentState }> = {
+export const ProposalBodyEditor: m.Component<{
+  item: OffchainThread | OffchainComment<any>,
+  parentState
+},  {
+  savedEdits: string
+} > = {
+  oninit: (vnode) => {
+    const { item } = vnode.attrs;
+    const isThread = item instanceof OffchainThread;
+    vnode.state.savedEdits = isThread
+      ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
+      : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+  },
   onremove: async (vnode) => {
     const { item } = vnode.attrs;
-    // const { quillEditorState } = vnode.attrs.parentState;
     let confirmed = false;
     const modalMsg = 'Discard edits?';
     confirmed = await confirmationModalWithText(modalMsg, 'Discard', 'Continue editing')();
@@ -433,11 +444,10 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
   },
   view: (vnode) => {
     const { item, parentState } = vnode.attrs;
+    const { savedEdits } = vnode.state;
+
     if (!item) return;
     const isThread = item instanceof OffchainThread;
-    const savedEdits = isThread
-      ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
-      : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
     const body = savedEdits || (item instanceof OffchainComment
       ? (item as OffchainComment<any>).text
       : item instanceof OffchainThread
