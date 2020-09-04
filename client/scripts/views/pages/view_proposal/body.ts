@@ -429,10 +429,12 @@ export const ProposalBodyEditor: m.Component<{
       : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
   },
   oncreate: async (vnode) => {
-    let confirmed = false;
-    confirmed = await confirmationModalWithText('Previous changes found. Restore edits?')();
-    if (confirmed) {
-      vnode.state.restoreEdits = true;
+    if (vnode.state.savedEdits) {
+      let confirmed = false;
+      confirmed = await confirmationModalWithText('Previous changes found. Restore edits?')();
+      if (confirmed) {
+        vnode.state.restoreEdits = true;
+      }
     }
   },
   onremove: async (vnode) => {
@@ -456,7 +458,8 @@ export const ProposalBodyEditor: m.Component<{
 
     if (!item) return;
     const isThread = item instanceof OffchainThread;
-    const body =  restoreEdits
+    console.log({ restoreEdits, savedEdits });
+    const body = restoreEdits
       ? savedEdits
       : item instanceof OffchainComment
         ? (item as OffchainComment<any>).text

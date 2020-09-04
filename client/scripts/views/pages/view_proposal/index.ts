@@ -65,6 +65,20 @@ interface IProposalHeaderState {
 }
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
+  oninit: (vnode) => {
+    const { proposal } = vnode.attrs;
+    vnode.state.canEdit = (app.user.activeAccount?.address === proposal.author
+          && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain)
+      || (app.user.isRoleOfCommunity({
+        role: 'admin',
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      }) || app.user.isRoleOfCommunity({
+        role: 'moderator',
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      }));
+  },
   view: (vnode) => {
     const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
     const { canEdit } = vnode.state;
