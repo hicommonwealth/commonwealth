@@ -68,7 +68,7 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
     }
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
       && account.address === app.user.activeAccount?.address;
-    // SPINNER
+    // SPINNER TODOO: un comment this once it loads.
     // if (!validators) return m('div', m(Card, {
     //   elevation: 1,
     //   class: 'home-card',
@@ -97,69 +97,97 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
         //     m('td',
         //       validators && validators[vnode.attrs.address].eraPoints)
         //   ]),
-        m('tr',
-          [
-            m('th',
-              'APR'),
-            m('th',
-              'TOTAL OFFENCES'),
-            m('th',
-              'TOTAL SLASHES'),
-            m('th',
-              'TOTAL REWARDS')
-          ]),
-        m('tr',
-          [
-            m('td',
-              '5.53m EDG'),
-            m('td',
-              '2.40m EDG'),
-            m('td',
-              '5 (1.23m EDG)'),
-            m('td',
-              '30 (3.29m EDG)'),
-            m('td', m('.bio-actions', [
-              !onOwnProfile ? [
-                editIdentityAction(account, vnode.state.identity)
-              ] : [
-                // TODO: actions for others' accounts
-              ]
-            ]))
-          ]),
-        m('tr',
-          [
-            m('th',
-              'IMONLINE'),
-            m('th',
-              'SLASHES (30 DAYS)'),
-            m('th',
-              'REWARDS (30 DAYS)')
-          ]),
-        m('tr',
-          [
-            m('td',
-              '35.0%'),
-            m('td',
-              '0'),
-            m('td',
-              '3 (1.05m EDG)'),
-            m('td', m('.bio-actions', [
-              !onOwnProfile ? [
-                m(Button, {
-                  intent: 'primary',
-                  onclick: () => {
-                    app.modals.create({
-                      modal: EditProfileModal,
-                      data: { account },
-                    });
-                  },
-                  label: 'Edit profile'
-                }),
-              ] : [
-                // TODO: actions for others' accounts
-              ]
-            ]))
-          ]),
+        m('.total-stake', // TODOO: Integrate real data here.
+          m('.data-row',
+            m('.profile-header',
+              'APR')),
+          m('.info-row',
+            m('.profile-data',
+              '11.1%'))),
+        m('.own-stake',
+          m('.data-row',
+            m('.profile-header',
+              'TOTAL OFFENCES')),
+          m('.info-row',
+            m('.profile-data',
+              '0'))),
+        m('.other-stake',
+          m('.data-row',
+            m('.profile-header',
+              'TOTAL SLASHES')),
+          m('.info-row',
+            m('.profile-data',
+              '5 (1.23m EDG)'))),
+        m('.commision',
+          m('.data-row',
+            m('.profile-header',
+              'TOTAL REWARDS')),
+          m('.info-row',
+            m('.profile-data',
+              '30 (3.29m EDG)'))),
+        m('.era-points',
+          m('.data-row',
+            m('.profile-header',
+              'IMONLINE')),
+          m('.info-row',
+            m('.profile-data',
+              '100%'))),
+        m('.offences-days',
+          m('.data-row',
+            m('.profile-header',
+              'OFFENCES (30 DAYS)')),
+          m('.info-row',
+            m('.profile-data',
+              '0'))),
+        m('.slashes-days',
+          m('.data-row',
+            m('.profile-header',
+              'SLASHES (30 DAYS)')),
+          m('.info-row',
+            m('.profile-data',
+              '3 (1.05m EDG)'))),
+        m('.rewards-days',
+          m('.data-row',
+            m('.profile-header',
+              'REWARDS (30 DAYS)')),
+          m('.info-row',
+            m('.profile-data',
+              '11 (1.52m EDG)'))),
+        m('.button-set-identity',
+        //   m('.data-row',
+        //     m('.profile-header',
+        //       '')),
+          m('.info-row',
+            m('.profile-data',
+              m('.bio-actions', [
+                !onOwnProfile ? [
+                  editIdentityAction(account, vnode.state.identity)
+                ] : [
+                  // TODO: actions for others' accounts
+                ]
+              ])))),
+        m('.button-edit-profile',
+        //   m('.data-row',
+        //     m('.profile-header',
+        //       '')),
+          m('.info-row',
+            m('.profile-data',
+              m('.bio-actions', [
+                !onOwnProfile ? [
+                  m(Button, {
+                    intent: 'primary',
+                    onclick: () => {
+                      app.modals.create({
+                        modal: EditProfileModal,
+                        data: { account },
+                      });
+                    },
+                    label: 'Edit profile'
+                  }),
+                ] : [
+                  // TODO: actions for others' accounts
+                ]
+              ])))),
       ]));
   }
 });

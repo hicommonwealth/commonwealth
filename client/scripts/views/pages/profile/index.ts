@@ -205,25 +205,25 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
         // m('.col-xs-12', [
         m('.row', [
           m(graphs, {
-            xValues, yValues, title: '1'
+            xValues, yValues, title: 'REWARDS OVER TIME'
           }),
           m(graphs, {
-            xValues, yValues, title: '2'
+            xValues, yValues, title: 'SLASHES OVER TIME'
           }),
           m(graphs, {
-            xValues, yValues, title: '3'
+            xValues, yValues, title: 'ELECTED STAKE'
           }),
           m(graphs, {
-            xValues, yValues, title: '4'
+            xValues, yValues, title: 'NUMBER OF NOMINATORS'
           }),
           m(graphs, {
-            xValues, yValues, title: '5'
+            xValues, yValues, title: 'IMONLINE EVENTS OVER TIME'
           }),
           m(graphs, {
-            xValues, yValues, title: '6'
+            xValues, yValues, title: 'OFFENCES OVER TIME'
           }),
           m(graphs, {
-            xValues, yValues, title: '7'
+            xValues, yValues, title: 'NOMINATORS OVER TIME'
           }),
         ])
         // ]),
