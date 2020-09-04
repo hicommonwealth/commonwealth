@@ -7,7 +7,7 @@ import chartComponent from '../../components/chart';
 
 function renderChart(model, xValues, yValues, title) {
   return model.loaded
-    ? m('.column', m(chartComponent, { model, x:xValues, y:yValues, title }))
+    ? m(chartComponent, { model, x:xValues, y:yValues, title })
     : m('.column.has-text-centered', 'Loading...');
 }
 
@@ -15,9 +15,7 @@ const graphContent: m.Component<{ xValues: number[], yValues: number[], title:st
   view(vnode) {
     const { xValues, yValues, title } = vnode.attrs;
     return [
-      m('.columns', [
-        renderChart(lineModel, xValues, yValues, title)
-      ]),
+      renderChart(lineModel, xValues, yValues, title)
     ];
   }
 };

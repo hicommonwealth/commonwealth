@@ -203,7 +203,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
         m(ValidatorStats, { address: account.address, account }),
         // m('.row.row-narrow.forum-row', [
         // m('.col-xs-12', [
-        m('div', [
+        m('.row', [
           m(graphs, {
             xValues, yValues, title: '1'
           }),
@@ -224,7 +224,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           }),
           m(graphs, {
             xValues, yValues, title: '7'
-          })
+          }),
         ])
         // ]),
         // ]),

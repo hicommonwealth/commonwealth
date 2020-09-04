@@ -1,5 +1,6 @@
 
 import m from 'mithril';
+import { ALIGN_CENTER, ALIGN_LEFT } from 'construct-ui/lib/esm/components/icon/generated/IconNames';
 
 export const chartColors = {
   red: 'rgb(255, 99, 132)',
@@ -33,10 +34,6 @@ export default {
     },
     options: {
       responsive: true,
-      title: {
-        display: true,
-        text: 'Declared values'
-      },
       tooltips: {
         mode: 'point',
         intersect: true,

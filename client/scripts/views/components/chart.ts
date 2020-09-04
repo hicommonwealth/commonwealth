@@ -26,27 +26,25 @@ export default {
     model.config.data.labels = vnode.attrs.x; // values sent to module for X axis
     model.config.data.datasets[0].data = vnode.attrs.y;// values sent to module for Y axis
     const title:string  = vnode.attrs.title;
-    return m(`.${model.config.type}`, [
-      m('.col-xs-6', [
-        m('#canvas-holder', [
-          m(`canvas#chart${title}`, {
-            oncreate() {
-              console.log(title+'####');
-              const canvas = <HTMLCanvasElement>document.getElementById(`chart${title}`); // access created canvas
-              const ctx = canvas.getContext('2d');
-              const gradient = ctx.createLinearGradient(0, 0, 0, 105);
-              gradient.addColorStop(0, 'rgba(53, 212, 19, 0.23)');
-              gradient.addColorStop(1, 'rgba(53, 212, 19, 0)');
-              model.config.data.datasets[0].borderColor = chartColors.green;
-              model.config.data.datasets[0].backgroundColor = gradient;
-              model.config.options.title.text = title;
-              model.instance = new Chart(ctx, model.config);
-              model.loaded = true;
-              m.redraw();
-            }
-          }),
-        ])
-      ]),
+    return  m('.col-xs-6.graph-container', [
+      m('div.row.graph-title', m('p', title)),
+      m('#canvas-holder', [
+        m(`canvas#chart${title}`, {
+          oncreate() {
+            console.log(`${title}####`);
+            const canvas = <HTMLCanvasElement>document.getElementById(`chart${title}`); // access created canvas
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 160);
+            gradient.addColorStop(0, 'rgba(53, 212, 19, 0.23)');
+            gradient.addColorStop(1, 'rgba(53, 212, 19, 0)');
+            model.config.data.datasets[0].borderColor = chartColors.green;
+            model.config.data.datasets[0].backgroundColor = gradient;
+            model.instance = new Chart(ctx, model.config);
+            model.loaded = true;
+            m.redraw();
+          }
+        }),
+      ])
     ]);
   }
 };

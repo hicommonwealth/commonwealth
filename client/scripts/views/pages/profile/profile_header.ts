@@ -93,24 +93,24 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ]),
         ]),
         m(ValidatorHeaderStats, { account, address: account.address }),
-        // m('.bio-actions', [
-        //   !onOwnProfile ? [
-        //     editIdentityAction(account, vnode.state.identity),
-        //     m(Button, {
-        //       intent: 'primary',
-        //       onclick: () => {
-        //         app.modals.create({
-        //           modal: EditProfileModal,
-        //           data: { account },
-        //         });
-        //       },
-        //       label: 'Edit profile'
-        //     }),
-        //   ] : [
-        //     // TODO: actions for others' accounts
-        //   ]
-        // ]),
       ])
+      // m('.bio-actions', [
+      //   !onOwnProfile ? [
+      //     editIdentityAction(account, vnode.state.identity),
+      //     m(Button, {
+      //       intent: 'primary',
+      //       onclick: () => {
+      //         app.modals.create({
+      //           modal: EditProfileModal,
+      //           data: { account },
+      //         });
+      //       },
+      //       label: 'Edit profile'
+      //     }),
+      //   ] : [
+      //     // TODO: actions for others' accounts
+      //   ]
+      // ]),
     ]);
   }
 };
