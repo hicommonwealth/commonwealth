@@ -118,21 +118,7 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
       m('.info-row',
         m('.profile-data',
         //       validators && validators[vnode.attrs.address].eraPoints)
-          '220'))),
-    m('.apr',
-      m('.data-row',
-        m('.profile-header',
-          'APR')),
-      m('.info-row',
-        m('.profile-data',
-          '11.1%'))),
-    m('.total-offences',
-      m('.data-row',
-        m('.profile-header',
-          'TOTAL OFFENCES')),
-      m('.info-row',
-        m('.profile-data',
-          '0')))];
+          '220')))];
   }
 });
 
