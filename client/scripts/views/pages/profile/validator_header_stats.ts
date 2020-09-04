@@ -1,5 +1,6 @@
 import m from 'mithril';
 import { makeDynamicComponent } from 'models/mithril';
+import 'pages/validatorprofile.scss';
 import app from 'state';
 import { ChainBase } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
@@ -79,7 +80,7 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
     //   style: 'visibility: visible; opacity: 1;'
     // })));
     return [ m('.total-stake',
-      m('.name-row',
+      m('.data-row',
         m('.profile-header',
           'TOTAL STAKE')),
       m('.info-row',
@@ -87,7 +88,7 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
           //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].exposure.total), true)),
           '5.53m EDG'))),
     m('.own-stake',
-      m('.name-row',
+      m('.data-row',
         m('.profile-header',
           'OWN STAKE')),
       m('.info-row',
@@ -95,7 +96,7 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
         //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].exposure.own), true)),
           '2.40m EDG'))),
     m('.other-stake',
-      m('.name-row',
+      m('.data-row',
         m('.profile-header',
           'OTHER STAKE')),
       m('.info-row',
@@ -103,7 +104,7 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
         //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].otherTotal), true)),
           '3.13m EDG'))),
     m('.commision',
-      m('.name-row',
+      m('.data-row',
         m('.profile-header',
           'COMMISION')),
       m('.info-row',
@@ -111,7 +112,7 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
         //       validators && validators[vnode.attrs.address].commissionPer),
           '100%'))),
     m('.era-points',
-      m('.name-row',
+      m('.data-row',
         m('.profile-header',
           'ERA POINTS')),
       m('.info-row',
@@ -119,14 +120,14 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
         //       validators && validators[vnode.attrs.address].eraPoints)
           '220'))),
     m('.total-stake',
-      m('.name-row',
+      m('.data-row',
         m('.profile-header',
           'APR')),
       m('.info-row',
         m('.profile-data',
           '11.1%'))),
     m('.total-stake',
-      m('.name-row',
+      m('.data-row',
         m('.profile-header',
           'TOTAL OFFENCES')),
       m('.info-row',

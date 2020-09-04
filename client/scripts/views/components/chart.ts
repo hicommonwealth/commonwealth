@@ -1,6 +1,7 @@
 
 import m from 'mithril';
 import Chart from 'chart.js';
+import 'pages/validatorprofile.scss';
 
 export const chartColors = {
   red: 'rgb(255, 99, 132)',
@@ -26,7 +27,7 @@ export default {
     model.config.data.labels = vnode.attrs.x; // values sent to module for X axis
     model.config.data.datasets[0].data = vnode.attrs.y;// values sent to module for Y axis
     const title:string  = vnode.attrs.title;
-    return  m('.col-xs-6.graph-container', [
+    return  m('.col-xs-5 .col-xs-offset-1 .graph-container', [
       m('div.row.graph-title', m('p', title)),
       m('#canvas-holder', [
         m(`canvas#chart${title}`, {

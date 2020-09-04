@@ -1,5 +1,5 @@
 import 'pages/profile.scss';
-
+import 'pages/validatorprofile.scss';
 import m from 'mithril';
 import moment from 'moment';
 import _ from 'lodash';

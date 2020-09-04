@@ -1,5 +1,6 @@
 import m from 'mithril';
 import { makeDynamicComponent } from 'models/mithril';
+import 'pages/validatorprofile.scss';
 import app from 'state';
 import { ChainBase } from 'models';
 import Substrate from 'controllers/chain/substrate/main';

@@ -1,0 +1,73 @@
+@import "client/styles/shared";
+
+.ProfileHeader{
+    margin-bottom: 32px !important;
+    border: 1px solid rgba(231, 231, 231, 0.5) !important;
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07) !important;
+    border-radius: 3px !important;
+}
+
+
+.data-row{
+    margin-top: 26px;
+}
+
+.profile-header{
+    font-family: 'Inter', sans-serif;    
+    font-style: normal;
+    font-weight: bold;
+    font-size: 11px;
+    line-height: 120%;
+    color: #999999;
+    text-align: left;
+    padding-left: 7px;
+}
+
+.profile-data{
+    font-family: 'Inter', sans-serif;    
+    padding-top: 8px;
+    padding-left: 7px;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    letter-spacing: -0.2px;
+    color: #000000;
+}
+
+// Middle Component
+
+.home-card{
+    background: #FFFFFF !important;
+    border: 1px solid rgba(231, 231, 231, 0.5) !important;
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07) !important;
+    border-radius: 3px !important; 
+}
+
+// Graph
+.col-xs-offset-1 {
+    margin-left: 2% !important;
+}
+.col-xs-5 {
+    flex-basis: 47%;
+    max-width: 47%;
+}
+.graph-container{
+    background: #FFFFFF;
+    border: 1px solid rgba(231, 231, 231, 0.5);
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
+    border-radius: 3px;
+    margin-top: 22px;
+}
+
+.graph-title{
+    padding-left: 25px;
+}
+
+.graph-title p{
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #999999;
+}

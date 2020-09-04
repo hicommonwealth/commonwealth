@@ -1,8 +1,7 @@
 
 import m from 'mithril';
-
+import 'pages/validatorprofile.scss';
 import lineModel from './graph_models/linemodel';
-
 import chartComponent from '../../components/chart';
 
 function renderChart(model, xValues, yValues, title) {

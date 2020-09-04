@@ -1,4 +1,4 @@
-
+import 'pages/validatorprofile.scss';
 import m from 'mithril';
 import { ALIGN_CENTER, ALIGN_LEFT } from 'construct-ui/lib/esm/components/icon/generated/IconNames';
 
