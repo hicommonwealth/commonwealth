@@ -418,6 +418,7 @@ export const ProposalBodyEditor: m.Component<{
   item: OffchainThread | OffchainComment<any>,
   parentState
 },  {
+  restoreEdits: boolean,
   savedEdits: string
 } > = {
   oninit: (vnode) => {
@@ -426,6 +427,13 @@ export const ProposalBodyEditor: m.Component<{
     vnode.state.savedEdits = isThread
       ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
       : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+  },
+  oncreate: async (vnode) => {
+    let confirmed = false;
+    confirmed = await confirmationModalWithText('Previous changes found. Restore edits?')();
+    if (confirmed) {
+      vnode.state.restoreEdits = true;
+    }
   },
   onremove: async (vnode) => {
     const { item } = vnode.attrs;
@@ -444,15 +452,17 @@ export const ProposalBodyEditor: m.Component<{
   },
   view: (vnode) => {
     const { item, parentState } = vnode.attrs;
-    const { savedEdits } = vnode.state;
+    const { restoreEdits, savedEdits } = vnode.state;
 
     if (!item) return;
     const isThread = item instanceof OffchainThread;
-    const body = savedEdits || (item instanceof OffchainComment
-      ? (item as OffchainComment<any>).text
-      : item instanceof OffchainThread
-        ? (item as OffchainThread).body
-        : null);
+    const body =  restoreEdits
+      ? savedEdits
+      : item instanceof OffchainComment
+        ? (item as OffchainComment<any>).text
+        : item instanceof OffchainThread
+          ? (item as OffchainThread).body
+          : null;
     if (!body) return;
 
     return m('.ProposalBodyEditor', [
