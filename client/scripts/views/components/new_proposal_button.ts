@@ -8,9 +8,11 @@ import app from 'state';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
+import { CandidacyButton, CollectiveVotingButton } from '../pages/council';
 
-const getNewProposalMenu = () => {
+const getNewProposalMenu = (candidates?) => {
   const activeAccount = app.user.activeAccount;
+  const onCouncilPage = m.route.get().includes(`${app.activeId()}/council`) && candidates;
   return [
     m(MenuItem, {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
@@ -47,6 +49,12 @@ const getNewProposalMenu = () => {
       }),
       label: 'New council motion'
     }),
+    onCouncilPage
+      && [
+        m(MenuDivider),
+        m(CandidacyButton, { candidates }),
+        m(CollectiveVotingButton, { candidates })
+      ]
   ];
 };
 
@@ -74,9 +82,9 @@ export const MobileNewProposalButton: m.Component<{}> = {
   }
 };
 
-const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean }> = {
+const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean, councilCandidates? }> = {
   view: (vnode) => {
-    const { fluid, threadOnly } = vnode.attrs;
+    const { fluid, threadOnly, councilCandidates } = vnode.attrs;
 
     if (!app.isLoggedIn()) return;
     if (!app.chain && !app.community) return;
@@ -117,7 +125,7 @@ const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean }> =
         menuAttrs: {
           align: 'left',
         },
-        content: getNewProposalMenu(),
+        content: getNewProposalMenu(councilCandidates),
       }),
     ]);
 
