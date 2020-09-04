@@ -45,8 +45,9 @@ export interface ISubstrateIdentity extends IHasId {
 // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L126
 // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L182
 export function getIdentityQuality(judgements: string[]): IdentityQuality {
-  const isGood = judgements.some((j) => j === 'KnownGood' || j === 'Reasonable');
-  const isBad = judgements.some((j) => j === 'Erroneous' || j === 'LowQuality');
+  const isGood = judgements.some((j) => j === 'KnownGood' || j === 'known-good'
+                                 || j === 'Reasonable' || j === 'reasonable');
+  const isBad = judgements.some((j) => j === 'Erroneous' || j === 'erroneous');
   if (isGood) {
     return IdentityQuality.Good;
   } else if (isBad) {
