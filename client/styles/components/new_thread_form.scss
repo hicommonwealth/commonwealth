@@ -2,18 +2,27 @@
 
 .NewThreadForm {
     display: flex;
-    max-width: 680px;
-    &.has-drafts {
+    &.is-modal {
+        max-width: 680px;
+    }
+    &.is-modal.has-drafts {
         max-width: 810px;
     }
 
     .cui-form-group {
         margin-bottom: 15px;
     }
+
     .ql-editor {
+        min-height: 320px;
+        @include xs-max {
+            min-height: calc(100vh - 440px);
+        }
+    }
+    &.is-modal .ql-editor {
         min-height: 170px;
     }
-    &.link-post .ql-editor {
+    &.is-modal.link-post .ql-editor {
         min-height: 119px;
     }
     @include xs-max {

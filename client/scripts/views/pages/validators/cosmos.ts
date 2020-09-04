@@ -44,7 +44,7 @@ export const NewCosmosDelegationModal : m.Component<{ validatorAddr }, ICosmosDe
           ]),
           m(Button, {
             intent: 'primary',
-            class: app.user.activeAccount ? '' : 'disabled',
+            disabled: !app.user.activeAccount,
             onclick: (e) => {
               e.preventDefault();
               try {
@@ -100,8 +100,10 @@ export const CosmosValidatorRow: m.Component<IValidatorAttrs> = {
       m('td.val-stash', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
       m('td.val-total', formatCoin(vnode.attrs.total, true)),
       m('td.val-action', [
-        !isDelegated && m('button.nominate-validator.formular-button-primary', {
-          class: app.user.activeAccount ? '' : 'disabled',
+        !isDelegated && m(Button, {
+          class: 'nominate-validator',
+          intent: 'primary',
+          disabled: !app.user.activeAccount,
           onclick: (e) => {
             e.preventDefault();
             app.modals.create({
@@ -110,8 +112,10 @@ export const CosmosValidatorRow: m.Component<IValidatorAttrs> = {
             });
           }
         }, 'Delegate'),
-        isDelegated && m('button.nominate-validator.formular-button-primary', {
-          class: app.user.activeAccount ? '' : 'disabled',
+        isDelegated && m(Button, {
+          class: 'nominate-validator',
+          intent: 'primary',
+          disabled: !app.user.activeAccount,
           onclick: (e) => {
             e.preventDefault();
             app.modals.create({

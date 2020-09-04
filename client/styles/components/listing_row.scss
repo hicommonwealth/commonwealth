@@ -33,7 +33,7 @@
                 display: flex;
                 margin-top: 3px;
             }
-            .row-subheader a, span {
+            .row-subheader a, > span {
                 color: $text-color-light;
                 font-size: $text-size-item-meta;
             }

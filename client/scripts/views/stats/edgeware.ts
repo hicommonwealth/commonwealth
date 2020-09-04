@@ -598,7 +598,7 @@ const EdgewareStatsPage = {
               m(Button, {
                 id: 'LOCK_LOOKUP_BTN',
                 intent: 'primary',
-                class: vnode.state.lookupLoading ? 'disabled' : '',
+                disabled: vnode.state.lookupLoading,
                 onclick: async (e) => {
                   e.preventDefault();
                   const addrText = `${$('#LOCKDROP_PARTICIPANT_ADDRESS').val()}`;

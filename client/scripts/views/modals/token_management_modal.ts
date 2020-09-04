@@ -125,9 +125,9 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
           name: 'token-action-switcher',
         }),
         ...content,
-        m('button', {
+        m(Button, {
           type: 'submit',
-          class: !vnode.state.tokensAvailable || !vnode.state.tokenAmount ? 'disabled' : '',
+          disabled: !vnode.state.tokensAvailable || !vnode.state.tokenAmount,
           onclick: (e) => {
             e.preventDefault();
             const tokens = new ERC20Token(vnode.attrs.tokenAddress, new BN(vnode.state.tokenAmount));
@@ -156,8 +156,9 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
                 console.error(err);
                 vnode.state.error = err.message;
               });
-          }
-        }, 'Approve'),
+          },
+          label: 'Approve',
+        }),
         vnode.state.error && m('.error', vnode.state.error),
       ]),
     ]);

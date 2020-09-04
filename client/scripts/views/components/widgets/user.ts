@@ -54,15 +54,18 @@ const User: m.Component<{
       const address = vnode.attrs.user.address;
       if (!chainId || !address) return;
       // only load account if it's possible to, using the current chain
-      if (app.chain?.loaded && app.chain.id === chainId) {
+      if (app.chain && app.chain.id === chainId) {
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
       role = adminsAndMods.find((r) => r.address === address && r.address_chain === chainId);
     } else {
       account = vnode.attrs.user;
-      profile = app.profiles.getProfile(account.chain.id, account.address);
-      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain == account.chain.id);
+      // TODO: we should remove this, since account should always be of type Account,
+      // but we currently inject objects of type 'any' on the profile page
+      const chainId = typeof account.chain === 'string' ? account.chain : account.chain.id;
+      profile = app.profiles.getProfile(chainId, account.address);
+      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === chainId);
     }
     const roleTag = role ? m(Tag, {
       class: 'role-tag',
@@ -89,14 +92,16 @@ const User: m.Component<{
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
+        (app.chain && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
           // substrate name
           ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
             linkify
               ? link('a.user-display-name.username',
-              profile ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-              profile ? profile.displayName : '--',)
+                profile
+                  ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+                  : 'javascript:',
+                profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
         showRole && roleTag,
@@ -114,11 +119,13 @@ const User: m.Component<{
             : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
+        (app.chain && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
           ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-          profile ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+          profile
+            ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+            : 'javascript:',
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address, profile.chain)),

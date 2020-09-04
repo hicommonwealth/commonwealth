@@ -165,11 +165,15 @@ export const NewThreadForm: m.Component<{
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
     vnode.state.overwriteConfirmationModal = false;
-    vnode.state.activeTopic = isModal
-      ? m.route.param('topic')
-      : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
-        ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions') + 1]
-        : undefined;
+    try {
+      vnode.state.activeTopic = isModal
+        ? m.route.param('topic')
+        : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
+          ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions') + 1]
+            : undefined;
+    } catch (e) {
+      // couldn't extract activeTopic
+    }
     if (localStorage.getItem(`${app.activeId()}-from-draft`)) {
       vnode.state.fromDraft = Number(localStorage.getItem(`${app.activeId()}-from-draft`));
       localStorage.removeItem(`${app.activeId()}-from-draft`);
@@ -331,7 +335,7 @@ export const NewThreadForm: m.Component<{
               featuredTopics: app.topics.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
               updateFormData: updateTopicState,
-              tabindex: 2,
+              tabindex: 1,
             }),
           ]),
           m(FormGroup, { span: { xs: 12, sm: 8 }, order: 2 }, [
@@ -344,7 +348,7 @@ export const NewThreadForm: m.Component<{
                 if (detectURL(value)) getUrlForLinkPost();
               },
               defaultValue: vnode.state.form.url,
-              tabindex: 1,
+              tabindex: 2,
             }),
           ]),
           m(FormGroup, { order: 3 },  [
@@ -376,10 +380,10 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, { order: 5 }, [
             m(Button, {
-              class: !author ? 'disabled' : '',
               intent: 'primary',
               label: 'Create thread',
               name: 'submit',
+              disabled: !author || vnode.state.saving,
               onclick: async (e) => {
                 vnode.state.saving = true;
                 if (!detectURL(vnode.state.form.url)) {
@@ -432,7 +436,7 @@ export const NewThreadForm: m.Component<{
               featuredTopics: app.topics.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
               updateFormData: updateTopicState,
-              tabindex: 2,
+              tabindex: 1,
             }),
           ]),
           m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 3 }, [
@@ -449,7 +453,7 @@ export const NewThreadForm: m.Component<{
                 localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
               },
               defaultValue: vnode.state.form.threadTitle,
-              tabindex: 1,
+              tabindex: 2,
             }),
           ]),
           m(FormGroup, { order: 4 }, [
@@ -464,8 +468,7 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, { order: 5 }, [
             m(Button, {
-              class: !author || saving || vnode.state.uploadsInProgress > 0
-                ? 'disabled' : '',
+              disabled: !author || saving || vnode.state.uploadsInProgress > 0,
               intent: 'primary',
               onclick: async (e) => {
                 vnode.state.saving = true;
@@ -501,12 +504,8 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
             m(Button, {
-              class: !author
-                || saving
-                || vnode.state.uploadsInProgress > 0
-                || (fromDraft && !vnode.state.quillEditorState?.alteredText)
-                ? 'disabled'
-                : '',
+              disabled: !author || saving || vnode.state.uploadsInProgress > 0
+                || (fromDraft && !vnode.state.quillEditorState?.alteredText),
               intent: 'none',
               onclick: async (e) => {
                 const { form, quillEditorState } = vnode.state;
@@ -608,7 +607,7 @@ export const NewThreadForm: m.Component<{
           });
         })),
         // m(Button, {
-        //   class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+        //   disabled: !author || vnode.state.uploadsInProgress > 0,
         //   intent: 'none',
         //   onclick: () => cancelDraft(vnode.state),
         //   label: 'Cancel editing draft',

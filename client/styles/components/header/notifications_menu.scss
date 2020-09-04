@@ -1,7 +1,16 @@
 @import 'client/styles/shared';
 
 .NotificationsMenuButton {
-    padding: 0 11px !important;
+    padding: 0 10px !important;
+
+    .notification-count {
+        background: $negative-bg-color;
+        border-radius: 9999px;
+        padding: 1px 7px;
+        text-align: center;
+        color: #fff;
+    }
+
     @include xs-max {
         .notification-count {
             position: relative;
@@ -17,6 +26,7 @@
         }
     }
     &.has-notifications {
+        padding: 0 7px !important;
         .cui-icon {
             display: none;
         }
@@ -44,13 +54,13 @@
         }
     }
     .cui-menu {
-        max-width: 342px;
+        max-width: 340px;
         margin: 0;
         padding: 0;
         background: none;
         overflow: hidden;
         @include xs-max {
-            max-width: calc(100vw - 20px);
+            max-width: calc(100vw - 24px);
         }
     }
     .cui-popover-arrow {

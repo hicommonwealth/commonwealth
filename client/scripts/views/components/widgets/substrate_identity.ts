@@ -11,7 +11,7 @@ import { Account, Profile } from 'models';
 import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
-import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
+import SubstrateIdentity, { IdentityQuality, getIdentityQuality } from 'controllers/chain/substrate/identity';
 
 export interface ISubstrateIdentityAttrs {
   account: Account<any>;
@@ -26,19 +26,28 @@ export interface ISubstrateIdentityState {
   },
 }
 
-const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
+const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
   getObservables: (attrs) => ({
     groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount)
+    identity: (attrs.account instanceof SubstrateAccount) && (!attrs.profile.isOnchain)
       ? (app.chain as Substrate).identities.get(attrs.account)
       : null,
   }),
   view: (vnode) => {
     const { profile, linkify, account } = vnode.attrs;
     // return polkadot identity if possible
-    const identity = vnode.state.dynamic.identity;
-    const displayName = identity?.exists ? identity.username : undefined;
-    const quality = identity?.exists ? identity.quality : undefined;
+    let displayName: string;
+    let quality: IdentityQuality;
+    if (profile.isOnchain) {
+      // first try to use identity fetched from server
+      displayName = profile.displayName;
+      quality = getIdentityQuality(Object.values(profile.judgements));
+    } else if (vnode.state.dynamic?.identity?.exists) {
+      // then attempt to use identity fetched from chain
+      displayName = vnode.state.dynamic.identity.username;
+      quality = vnode.state.dynamic.identity.quality;
+    }
+
     if (displayName && quality) {
       const name = [ displayName, m(`span.identity-icon${
         quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
@@ -63,5 +72,43 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
       : m('a.user-display-name.username', profile ? profile.displayName : '--');
   }
 });
+
+const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
+  view: (vnode) => {
+    const { profile, linkify } = vnode.attrs;
+
+    const quality = getIdentityQuality(Object.values(profile.judgements));
+
+    if (profile.isOnchain && profile.name && quality) {
+      const name = [ profile.name, m(`span.identity-icon${
+        quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
+      }${quality === IdentityQuality.Good
+        ? '.green' : quality === IdentityQuality.Bad
+          ? '.red' : '.gray'}`) ];
+
+      return linkify
+        ? link(
+          `a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`,
+          profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+          name
+        )
+        : m(`a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`, name);
+    }
+
+    // return offchain name while identity is loading
+    return linkify
+      ? link('a.user-display-name.username',
+        profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+        profile ? profile.displayName : '--',)
+      : m('a.user-display-name.username', profile ? profile.displayName : '--');
+  }
+};
+
+const SubstrateIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
+  view: (vnode) => {
+    if (app.chain?.loaded && vnode.attrs.account) return m(SubstrateOnlineIdentityWidget, vnode.attrs);
+    else return m(SubstrateOfflineIdentityWidget, vnode.attrs);
+  }
+};
 
 export default SubstrateIdentityWidget;
