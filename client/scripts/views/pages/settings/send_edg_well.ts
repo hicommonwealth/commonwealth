@@ -2,6 +2,7 @@ import 'pages/settings/send_edg_well.scss';
 
 import m from 'mithril';
 import app from 'state';
+import { Button } from 'construct-ui';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { featherIcon } from 'helpers';
