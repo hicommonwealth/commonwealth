@@ -421,20 +421,17 @@ export const ProposalBodyEditor: m.Component<{
   restoreEdits: boolean,
   savedEdits: string
 } > = {
-  oninit: (vnode) => {
+  oninit: async (vnode) => {
     const { item } = vnode.attrs;
     const isThread = item instanceof OffchainThread;
     vnode.state.savedEdits = isThread
       ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
       : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
-  },
-  oncreate: async (vnode) => {
     if (vnode.state.savedEdits) {
       let confirmed = false;
       confirmed = await confirmationModalWithText('Previous changes found. Restore edits?')();
-      if (confirmed) {
-        vnode.state.restoreEdits = true;
-      }
+      vnode.state.restoreEdits = confirmed;
+      m.redraw();
     }
   },
   view: (vnode) => {
@@ -452,27 +449,30 @@ export const ProposalBodyEditor: m.Component<{
           ? (item as OffchainThread).body
           : null;
     if (!body) return;
-
+    const answeredModalPrompt = restoreEdits !== undefined;
+    console.log(body);
     return m('.ProposalBodyEditor', [
-      m(QuillEditor, {
-        contentsDoc: (() => {
-          try {
-            const doc = JSON.parse(body);
-            if (!doc.ops) throw new Error();
-            return doc;
-          } catch (e) {
-            return body;
-          }
-        })(),
-        oncreateBind: (state) => {
-          parentState.quillEditorState = state;
-        },
-        tabindex: 1,
-        theme: 'snow',
-        editorNamespace: isThread
-          ? `edit-thread-${item.id}`
-          : `edit-comment-${item.id}`,
-      })
+      answeredModalPrompt 
+        ? m(QuillEditor, {
+          contentsDoc: (() => {
+            try {
+              const doc = JSON.parse(body);
+              if (!doc.ops) throw new Error();
+              return doc;
+            } catch (e) {
+              return body;
+            }
+          })(),
+          oncreateBind: (state) => {
+            parentState.quillEditorState = state;
+          },
+          tabindex: 1,
+          theme: 'snow',
+          editorNamespace: isThread
+            ? `edit-thread-${item.id}`
+            : `edit-comment-${item.id}`,
+        })
+        : m(QuillEditor)
     ]);
   }
 };

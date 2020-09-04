@@ -801,9 +801,10 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     const body = markdownMode
       ? editor?.getText()
       : JSON.stringify(editor?.getContents());
-    if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
-      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
-    }
+    console.log(body);
+    // if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
+    //   localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
+    // }
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
     }
