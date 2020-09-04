@@ -80,8 +80,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', account.profile.displayName),
-            // TODO: Badges for identity verification, etc.
+            m('.User', m(User, { user: account, hideAvatar: true })),
           ]),
           m('.info-row', [
             m('span.profile-headline', account.profile && account.profile.headline
