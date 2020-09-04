@@ -437,21 +437,6 @@ export const ProposalBodyEditor: m.Component<{
       }
     }
   },
-  onremove: async (vnode) => {
-    const { item } = vnode.attrs;
-    let confirmed = false;
-    const modalMsg = 'Discard edits?';
-    confirmed = await confirmationModalWithText(modalMsg, 'Discard', 'Continue editing')();
-    if (confirmed) {
-      if (item instanceof OffchainThread) {
-        localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
-      } else if (item instanceof OffchainComment) {
-        localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
-      }
-    } else {
-      console.log(m.route.set(app.lastNavigatedFrom()));
-    }
-  },
   view: (vnode) => {
     const { item, parentState } = vnode.attrs;
     const { restoreEdits, savedEdits } = vnode.state;
