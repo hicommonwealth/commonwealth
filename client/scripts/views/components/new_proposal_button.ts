@@ -12,7 +12,6 @@ import { CandidacyButton, CollectiveVotingButton } from '../pages/council';
 
 const getNewProposalMenu = (candidates?) => {
   const activeAccount = app.user.activeAccount;
-  const onCouncilPage = m.route.get().includes(`${app.activeId()}/council`) && candidates;
   return [
     m(MenuItem, {
       onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
@@ -49,7 +48,7 @@ const getNewProposalMenu = (candidates?) => {
       }),
       label: 'New council motion'
     }),
-    onCouncilPage
+    candidates
       && [
         m(MenuDivider),
         m(CandidacyButton, { candidates }),
