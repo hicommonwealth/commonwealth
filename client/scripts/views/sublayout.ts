@@ -10,6 +10,7 @@ import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import { CollectiveVotingButton, CandidacyButton } from './pages/council/index';
 import { SubstrateAccount } from '../controllers/chain/substrate/account';
+import Substrate from '../controllers/chain/substrate/main';
 
 const Sublayout: m.Component<{
   class: string,
@@ -17,7 +18,6 @@ const Sublayout: m.Component<{
   description?: string,
   showNewProposalButton?: boolean,
   showCouncilButtons?: boolean,
-  councilCandidates?: Array<[SubstrateAccount, number]>,
   rightSidebar?
 }> = {
   view: (vnode) => {
@@ -27,8 +27,20 @@ const Sublayout: m.Component<{
       rightSidebar,
       showNewProposalButton,
       showCouncilButtons,
-      councilCandidates
     } = vnode.attrs;
+
+    let councilCandidates: Array<[SubstrateAccount, number]>;
+    if (app.chain) {
+      councilCandidates = app.chain
+        && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || [])
+          .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ])
+          .sort((a, b) => {
+            const va = (app.chain as Substrate).phragmenElections.backing(a[0]);
+            const vb = (app.chain as Substrate).phragmenElections.backing(b[0]);
+            if (va === undefined || vb === undefined) return 0;
+            return vb.cmp(va);
+          });
+    }
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [
       m(LoginSelector),                                                 // login selector
@@ -38,12 +50,8 @@ const Sublayout: m.Component<{
         onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
       }),
       app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
-      !showCouncilButtons
-        && showNewProposalButton
-        && m(NewProposalButton, { fluid: false }),
+      showNewProposalButton && m(NewProposalButton, { fluid: false, councilCandidates }),
       showCouncilButtons && [
-        showNewProposalButton
-          && m(NewProposalButton, { fluid: false, councilCandidates }),
         m(CollectiveVotingButton, { buttonStyle: true, candidates: councilCandidates }),
         m(CandidacyButton, { buttonStyle: true, candidates: councilCandidates }),
       ]

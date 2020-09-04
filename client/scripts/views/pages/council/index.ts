@@ -181,7 +181,6 @@ const CouncilPage: m.Component<{}> = {
       title: 'Council',
       showCouncilButtons: true,
       showNewProposalButton: true,
-      councilCandidates: candidates,
     }, [
       // stats
       m(Grid, {
