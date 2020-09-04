@@ -78,7 +78,7 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
     //   size: 'xs',
     //   style: 'visibility: visible; opacity: 1;'
     // })));
-    return m('div',
+    return m('div.validator-profile-stats',
       m(Card, {
         elevation: 0,
         class: 'home-card',
