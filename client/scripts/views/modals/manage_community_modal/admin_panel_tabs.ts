@@ -190,6 +190,11 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
               ...chainOrCommObj,
               jwt: app.user.jwt,
             }).then((r) => {
+              if (r.status === 'Success') {
+                notifySuccess('Member upgraded');
+              } else {
+                notifyError('Upgrade failed');
+              }
               onRoleUpgrade(user, r.result);
             });
           },
