@@ -106,7 +106,7 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
 
 const SubstrateIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
   view: (vnode) => {
-    if (app.chain.loaded) return m(SubstrateOnlineIdentityWidget, vnode.attrs);
+    if (app.chain?.loaded && vnode.attrs.account) return m(SubstrateOnlineIdentityWidget, vnode.attrs);
     else return m(SubstrateOfflineIdentityWidget, vnode.attrs);
   }
 };
