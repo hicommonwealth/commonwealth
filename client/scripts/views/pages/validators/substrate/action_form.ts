@@ -1,6 +1,6 @@
 import m from 'mithril';
 import app from 'state';
-import { FormLabel, FormGroup, Input } from 'construct-ui';
+import { Button, FormLabel, FormGroup, Input } from 'construct-ui';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { DropdownFormField } from 'views/components/forms';
@@ -47,8 +47,9 @@ const ActionForm: m.Component<IActionFormAttrs, IActionFormState> = {
 
     return m('.NewStashForm', [
       (vnode.attrs.onChangeHandler) ? inputComponent : m('h4', vnode.attrs.titleMsg),
-      (vnode.attrs.actionHandler) && m('button.formular-button-primary', {
-        class: app.user.activeAccount ? '' : 'disabled',
+      (vnode.attrs.actionHandler) && m(Button, {
+        class: 'formular-button-primary',
+        disabled: !app.user.activeAccount,
         onclick: (e) => {
           e.preventDefault();
           const value = vnode.state.data || vnode.attrs.defaultValue;
@@ -62,20 +63,21 @@ const ActionForm: m.Component<IActionFormAttrs, IActionFormState> = {
                   vnode.state.sending = false;
                   m.redraw();
                 })
-                .catch(e => {
+                .catch((err) => {
                   vnode.state.sending = false;
                   m.redraw();
                 });
             } else {
               throw new Error(vnode.attrs.errorMsg);
             }
-          } catch (e) {
-            vnode.state.error = e.message;
+          } catch (err) {
+            vnode.state.error = err.message;
             vnode.state.sending = false;
             m.redraw();
           }
         },
-      }, vnode.attrs.actionName),
+        label: vnode.attrs.actionName
+      }),
     ]);
   },
 };

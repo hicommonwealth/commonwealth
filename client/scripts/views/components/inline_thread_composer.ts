@@ -106,7 +106,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
       m('.bottom-panel', [
         m('.actions', [
           m(Button, {
-            class: !author || formDataIncomplete(vnode.state) ? 'disabled' : '',
+            disabled: !author || !!formDataIncomplete(vnode.state),
             type: 'submit',
             intent: 'primary',
             onclick: createLink,
@@ -114,7 +114,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
             label: 'Create thread'
           }),
           m(Button, {
-            class: !author ? 'disabled' : '',
+            disabled: !author,
             type: 'cancel',
             onclick: closeComposer,
             basic: true,
@@ -195,7 +195,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
       m('.bottom-panel', [
         m('.actions', [
           m(Button, {
-            class: !author || formDataIncomplete(vnode.state) ? 'disabled' : '',
+            disabled: !author || !!formDataIncomplete(vnode.state),
             type: 'submit',
             intent: 'primary',
             onclick: createThread,
@@ -203,7 +203,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             label: 'Create thread'
           }),
           m(Button, {
-            class: !author ? 'disabled' : '',
+            disabled: !author,
             type: 'cancel',
             onclick: closeComposer,
             basic: true,

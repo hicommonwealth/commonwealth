@@ -398,7 +398,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         return m(`${cl[0]}`, [
           m(Button, {
             intent: cl[1],
-            class: canVote && !hasVotedForChoice[c.toHex()] ? '' : 'disabled',
+            disabled: !canVote || hasVotedForChoice[c.toHex()],
             onclick: (e) => voteForChoice(e, c),
             label: hasVotedForChoice[c.toHex()]
               ? `Voted ${hexToUtf8(c.toHex())}`
@@ -410,7 +410,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const yesButton = m('.yes-button', [
       m(Button, {
         intent: 'positive',
-        class: canVote && !hasVotedYes ? '' : 'disabled',
+        disabled: !canVote || hasVotedYes,
         onclick: voteYes,
         label: hasVotedYes ? 'Voted yes' : 'Vote yes'
       }),
@@ -418,7 +418,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const noButton = m('.no-button', [
       m(Button, {
         intent: 'negative',
-        class: canVote && !hasVotedNo ? '' : 'disabled',
+        disabled: !canVote || hasVotedNo,
         onclick: voteNo,
         label: hasVotedNo ? 'Voted no' : 'Vote no'
       })
@@ -427,7 +427,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const multiDepositApproveButton = m('.approve-button', [
       m(Button, {
         intent: 'positive',
-        class: canVote ? '' : 'disabled',
+        disabled: !canVote,
         onclick: voteYes,
         label: (hasVotedYes && !canVote) ? 'Already approved' : 'Second'
       }),
@@ -436,7 +436,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const abstainButton = m('.abstain-button', [
       m(Button, {
         intent: 'none',
-        class: canVote && !hasVotedAbstain ? '' : 'disabled',
+        disabled: !canVote || hasVotedAbstain,
         onclick: voteAbstain,
         label: hasVotedAbstain ? 'Voted abstain' : 'Vote abstain'
       }),
@@ -445,7 +445,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const noWithVetoButton = m('.veto-button', [
       m(Button, {
         intent: 'negative',
-        class: canVote && !hasVotedVeto ? '' : 'disabled',
+        disabled: !canVote || hasVotedVeto,
         onclick: voteVeto,
         label: hasVotedVeto ? 'Vetoed' : 'Veto'
       }),
@@ -454,7 +454,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const cancelButton = (proposal.votingType === VotingType.MolochYesNo) && m('.veto-button', [
       m(Button, {
         intent: 'negative',
-        class: (proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed ? '' : 'disabled',
+        disabled: !((proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed),
         onclick: cancelProposal,
         label: (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel'
       }),
@@ -463,9 +463,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     // const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
     //  m(Button, {
     //    intent: 'positive',
-    //    class: !(proposal as MolochProposal).state.sponsored &&
-    //    !(proposal as MolochProposal).state.processed
-    //      ? '' : 'disabled',
+    //    disabled: (proposal as MolochProposal).state.sponsored ||
+    //    (proposal as MolochProposal).state.processed,
     //    onclick: sponsorProposal,
     //    label: (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor',
     //  }),
@@ -474,7 +473,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const processButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
       m(Button, {
         intent: 'none',
-        class: (proposal as MolochProposal).state === MolochProposalState.ReadyToProcess ? '' : 'disabled',
+        disabled: (proposal as MolochProposal).state !== MolochProposalState.ReadyToProcess,
         onclick: processProposal,
         label: (proposal as MolochProposal).data.processed ? 'Processed' : 'Process'
       })

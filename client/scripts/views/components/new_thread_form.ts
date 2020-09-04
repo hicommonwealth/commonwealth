@@ -607,7 +607,7 @@ export const NewThreadForm: m.Component<{
           });
         })),
         // m(Button, {
-        //   class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+        //   disabled: !author || vnode.state.uploadsInProgress > 0,
         //   intent: 'none',
         //   onclick: () => cancelDraft(vnode.state),
         //   label: 'Cancel editing draft',
