@@ -154,24 +154,8 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
             m('.profile-data',
               '11 (1.52m EDG)'))),
         m('.button-set-identity',
-        //   m('.data-row',
-        //     m('.profile-header',
-        //       '')),
-          m('.info-row',
-            m('.profile-data',
-              m('.bio-actions', [
-                !onOwnProfile ? [
-                  editIdentityAction(account, vnode.state.identity)
-                ] : [
-                  // TODO: actions for others' accounts
-                ]
-              ])))),
-        m('.button-edit-profile',
-        //   m('.data-row',
-        //     m('.profile-header',
-        //       '')),
-          m('.info-row',
-            m('.profile-data',
+          m('.data-row',
+            m('.profile-header',
               m('.bio-actions', [
                 !onOwnProfile ? [
                   m(Button, {
@@ -184,6 +168,15 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                     },
                     label: 'Edit profile'
                   }),
+                ] : [
+                  // TODO: actions for others' accounts
+                ]
+              ]))),
+          m('.info-row',
+            m('.profile-data',
+              m('.bio-actions', [
+                !onOwnProfile ? [
+                  editIdentityAction(account, vnode.state.identity)
                 ] : [
                   // TODO: actions for others' accounts
                 ]
