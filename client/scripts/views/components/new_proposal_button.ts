@@ -11,7 +11,6 @@ import NewThreadModal from 'views/modals/new_thread_modal';
 import { CandidacyButton, CollectiveVotingButton } from '../pages/council';
 
 const getNewProposalMenu = (candidates?) => {
-  console.log(candidates);
   const activeAccount = app.user.activeAccount;
   return [
     m(MenuItem, {
@@ -52,8 +51,8 @@ const getNewProposalMenu = (candidates?) => {
     candidates
       && [
         m(MenuDivider),
-        m(CandidacyButton, { candidates }),
-        m(CollectiveVotingButton, { candidates })
+        m(CandidacyButton, { candidates, menuStyle: true }),
+        m(CollectiveVotingButton, { candidates, menuStyle: true })
       ]
   ];
 };
