@@ -23,7 +23,7 @@ const FeedbackModal = {
           ]),
           m(FormGroup, [
             m(Button, {
-              class: vnode.state.sending ? 'disabled' : '',
+              disabled: vnode.state.sending,
               intent: 'primary',
               loading: vnode.state.sending,
               label: 'Send feedback',

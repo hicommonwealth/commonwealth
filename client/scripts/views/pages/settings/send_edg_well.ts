@@ -182,11 +182,12 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
         ]),
         checks.map((check) => m('.send-edg-check', check)),
       ]),
-      m('button.formular-primary-button', {
-        class: (!vnode.state.recipientBalance
+      m(Button, {
+        class: 'formular-primary-button',
+        disabled: (!vnode.state.recipientBalance
                 || !vnode.state.amount
                 || !canTransfer
-                || vnode.state.sending) ? 'disabled' : '',
+                || vnode.state.sending),
         type: 'submit',
         onclick: async (e) => {
           e.preventDefault();

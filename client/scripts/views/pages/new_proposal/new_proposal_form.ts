@@ -177,15 +177,15 @@ const NewProposalForm = {
         if (!vnode.state.threshold) throw new Error('Invalid threshold');
         const threshold = vnode.state.threshold;
         if (vnode.state.councilMotionType === 'createExternalProposal') {
-          args = [author, threshold, EdgewareFunctionPicker.getMethod(), 
+          args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
           createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposal(a, t, m, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalMajority') {
-          args = [author, threshold, EdgewareFunctionPicker.getMethod(), 
+          args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
           createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, m, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalDefault') {
-          args = [author, threshold, EdgewareFunctionPicker.getMethod(), 
+          args = [author, threshold, EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength];
           createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, m, l);
         } else if (vnode.state.councilMotionType === 'createFastTrack') {
@@ -609,8 +609,8 @@ const NewProposalForm = {
           ],
           m(FormGroup, [
             m(Button, {
-              class: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
-                && !(author as SubstrateAccount).isCouncillor) ? 'disabled' : '',
+              disabled: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
+                && !(author as SubstrateAccount).isCouncillor),
               intent: 'primary',
               label: proposalTypeEnum === ProposalType.OffchainThread
                 ? 'Create thread'

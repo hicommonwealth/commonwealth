@@ -66,7 +66,7 @@ const NewTopicModal: m.Component<{
           ]),
           m(Button, {
             intent: 'primary',
-            class: vnode.state.saving ? 'disabled' : '',
+            disabled: vnode.state.saving,
             onclick: async (e) => {
               e.preventDefault();
               if (!vnode.state.form.name.trim()) return;

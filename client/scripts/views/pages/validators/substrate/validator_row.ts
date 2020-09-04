@@ -38,14 +38,17 @@ const ValidatorRow: m.Component<IValidatorAttrs, IValidatorState> = {
       ]),
       // m('td.val-age', '--'),
       // m('td.val-action', [
-      //   m('button.nominate-validator.formular-button-primary', {
-      //     class: app.user.activeAccount ? '' : 'disabled',
+      //   m(Button, {
+      //     class: 'nominate-validator',
+      //     intent: 'primary',
+      //     disabled: !app.user.activeAccount,
       //     onclick: (e) => {
       //       e.preventDefault();
       //       vnode.state.isNominating = !vnode.state.isNominating;
       //       vnode.attrs.onChangeHandler(vnode.attrs.stash);
-      //     }
-      //   }, vnode.state.isNominating ? 'Un-Nominate' : 'Nominate'),
+      //     },
+      //     label: vnode.state.isNominating ? 'Un-Nominate' : 'Nominate'
+      //   }),
       // ]),
     ]);
   }
