@@ -179,8 +179,7 @@ const CouncilPage: m.Component<{}> = {
     return m(Sublayout, {
       class: 'CouncilPage',
       title: 'Council',
-      showCouncilVoteButton: true,
-      showCandidacyButton: true,
+      showCouncilButtons: true,
       councilCandidates: candidates,
     }, [
       // stats
