@@ -194,6 +194,9 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
             }).then((r) => {
               if (r.status === 'Success') {
                 notifySuccess('Member upgraded');
+                delete vnode.state.user;
+                delete vnode.state.role;
+                m.redraw();
               } else {
                 notifyError('Upgrade failed');
               }
