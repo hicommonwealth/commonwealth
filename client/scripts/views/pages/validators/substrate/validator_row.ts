@@ -83,7 +83,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       m('td.val-total', [
         formatCoin(app.chain.chain.coins(vnode.attrs.total), true), ' '
       ]),
-      m('td.val-own', formatCoin(app.chain.chain.coins(vnode.attrs.bonded), true)),
+      // m('td.val-own', formatCoin(app.chain.chain.coins(vnode.attrs.bonded), true)),
       m('td.val-other', [
         formatCoin(app.chain.chain.coins(vnode.attrs.otherTotal), true),
         nominatorsList.length > 0 && [
@@ -99,9 +99,10 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
           }, `(${nominatorsList.length})`)],
       ]),
       m('td.val-commission', `${commission.toFixed(2)}%`),
+      m('th.val-rewards-slashes-offenses', false /* TODOO: integrate count for the heading herer */ || '11/10/12'),
       m('td.val-points', vnode.attrs.eraPoints || '0'),
       m('td.val-apr', `${apr.toFixed(2)}%`),
-      m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
+      // m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
       m(ImOnline, {
         toBeElected: vnode.attrs.toBeElected,
         isOnline: vnode.attrs.isOnline,

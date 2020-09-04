@@ -102,7 +102,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     const totalbalance = (app.chain as Substrate).chain.totalbalance;
     const staked = `${(totalStaked.muln(10000).div(totalbalance).toNumber() / 100).toFixed(2)}%`;
 
-    return [
+    return m('div.validator-preheader-container', [
       m('.validators-preheader', [
         m('.validators-preheader-item', [
           m('h3', 'Validators'),
@@ -210,7 +210,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           ]),
         ]),
       ])
-    ];
+    ]);
   }
 });
 
