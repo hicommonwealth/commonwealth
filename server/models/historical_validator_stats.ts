@@ -7,7 +7,6 @@ export interface HistoricalValidatorStatsAttributes {
     block: string;
     exposure: string[];
     commissionPer?: number;
-    preferences?: number;
     apr?: number;
     uptime?: string;
     movingAverages?: number;
@@ -39,7 +38,6 @@ export default (
         block: { type: dataTypes.STRING, allowNull: false }, // blocknumber
         exposure: { type: dataTypes.JSON, allowNull: false },
         commissionPer: { type: dataTypes.FLOAT, allowNull: false },
-        preferences: { type: dataTypes.INTEGER, allowNull: false },// preferences - ValidatorPrefs
         apr: { type: dataTypes.FLOAT, allowNull: false },
         uptime: { type: dataTypes.STRING, allowNull: false },
         movingAverages: { type: dataTypes.INTEGER, allowNull: false },

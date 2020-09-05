@@ -7,7 +7,6 @@ module.exports = {
       block: { type: DataTypes.STRING, allowNull: false }, // blocknumber
       exposure: { type: DataTypes.JSON, allowNull: false },
       commissionPer: { type: DataTypes.FLOAT, allowNull: false },
-      preferences: { type: DataTypes.INTEGER, allowNull: false },// preferences - ValidatorPrefs
       apr: { type: DataTypes.FLOAT, allowNull: false },
       uptime: { type: DataTypes.STRING, allowNull: false },
       movingAverages: { type: DataTypes.INTEGER, allowNull: false },
