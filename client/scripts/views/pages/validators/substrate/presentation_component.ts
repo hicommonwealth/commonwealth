@@ -96,18 +96,15 @@ const PresentationComponent = (state, chain: Substrate) => {
       callback: model.reset,
       name: 'Current Validators',
       content: m('table.validators-table', [
-        m(Select, {
-          options: ['Address', 'Name'],
-          defaultValue: 'Address',
-          onchange: () => null
-        }),
-        m('input', {
-          type: 'text',
-          autofocus: true,
-          placeholder: 'Search for a name, address or index...'
-        }),
+        m('div.row-input',
+          m('input', {
+            type: 'text',
+            autofocus: true,
+            placeholder: 'Search for a name, address or index...'
+          })),
         m('tr.validators-heading', [
           m('th.val-stash', 'Stash'),
+          m('th.val-action', ''),
           m('th.val-total', 'Total Stake',
             m(Icon, { name: model.sortIcon('exposure.total'),
               size: 'lg',
@@ -124,14 +121,13 @@ const PresentationComponent = (state, chain: Substrate) => {
             m(Icon, { name: model.sortIcon('commissionPer'),
               size: 'lg',
               onclick: () => model.changeSort('commissionPer') })),
-          m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses'),
           m('th.val-points', 'Points',
             m(Icon, { name: model.sortIcon('eraPoints'),
               size: 'lg',
               onclick: () => model.changeSort('eraPoints') })),
           m('th.val-apr', 'Est. APR'),
           // m('th.val-last-hash', 'last #'),
-          m('th.val-action', ''),
+          m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses')
         ]),
         currentValidators.map((validator) => {
           // total stake

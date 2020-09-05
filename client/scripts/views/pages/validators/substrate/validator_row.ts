@@ -80,35 +80,40 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
         content: m(Identity, { stash: vnode.attrs.stash }),
         trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
       })),
+      m(ImOnline, {
+        toBeElected: vnode.attrs.toBeElected,
+        isOnline: vnode.attrs.isOnline,
+        hasMessage: vnode.attrs.hasMessage,
+        blockCount: vnode.attrs.blockCount
+      }),
       m('td.val-total', [
         formatCoin(app.chain.chain.coins(vnode.attrs.total), true), ' '
       ]),
       // m('td.val-own', formatCoin(app.chain.chain.coins(vnode.attrs.bonded), true)),
       m('td.val-other', [
         formatCoin(app.chain.chain.coins(vnode.attrs.otherTotal), true),
-        nominatorsList.length > 0 && [
-          m('a.val-nominators.padding-left-2', {
-            href: '#',
-            onclick: (e) => {
-              e.preventDefault();
-              app.modals.create({
-                modal: ViewNominatorsModal,
-                data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash }
-              });
-            }
-          }, `(${nominatorsList.length})`)],
+        m(Popover, {
+          interactionType: 'hover',
+          content: [
+            nominatorsList.length > 0 && [
+              m('a.val-nominators.padding-left-2', {
+                href: '#',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: ViewNominatorsModal,
+                    data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash }
+                  });
+                }
+              }, `(${nominatorsList.length})`)]],
+          trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
+        })
       ]),
       m('td.val-commission', `${commission.toFixed(2)}%`),
-      m('th.val-rewards-slashes-offenses', false /* TODOO: integrate count for the heading herer */ || '11/10/12'),
       m('td.val-points', vnode.attrs.eraPoints || '0'),
       m('td.val-apr', `${apr.toFixed(2)}%`),
       // m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
-      m(ImOnline, {
-        toBeElected: vnode.attrs.toBeElected,
-        isOnline: vnode.attrs.isOnline,
-        hasMessage: vnode.attrs.hasMessage,
-        blockCount: vnode.attrs.blockCount
-      })
+      m('th.val-rewards-slashes-offenses', false /* TODOO: integrate count for the heading herer */ || '11/10/12'),
     ]);
   }
 });
