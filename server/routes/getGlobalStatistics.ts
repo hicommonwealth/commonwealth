@@ -1,10 +1,11 @@
 /* eslint-disable guard-for-in */
 import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from '../../shared/logging';
 
 
 const getGlobalStatistics = async (models, req: Request, res: Response, next: NextFunction) => {
     let result: any = [];
+
+    // fetch recently updated records i.e where isLatest = true
     result = await models.HistoricalValidatorStats.findAndCountAll({
         // where: {
         //     // isLatest: true

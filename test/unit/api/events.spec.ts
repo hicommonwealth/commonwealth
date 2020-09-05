@@ -21,43 +21,26 @@ describe('Event Tests', () => {
     expect(res.body.validators).to.not.be.null;
   });
   it('should fetch global statistics from HistoricalValidator and Validator model', async () => {
-    chai.request(app)
+    const res = await chai.request(app)
       .get('/api/getGlobalStatistics')
       .set('Accept', 'application/json')
-      .then((res) => {
-        expect(res.body.status).to.equal('Success');
-        expect(res.body.result).to.not.be.null;
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    expect(res.body.status).to.equal('Success');
+    expect(res.body.result).to.not.be.null;
 
   });
 
   it('should fetch current validator details database', async () => {
-    chai.request(app)
+    const res = await chai.request(app)
       .get('/api/getCurrentValidators')
-      .set('Accept', 'application/json')
-      .then((res) => {
-        expect(res.body.status).to.equal('Success');
-        expect(res.body.result.currentValidators).to.not.be.null;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-
+      .set('Accept', 'application/json');
+    expect(res.body.status).to.equal('Success');
+    expect(res.body.result.currentValidators).to.not.be.null;
   });
   it('should fetch waiting validator details database', async () => {
-    chai.request(app)
-      .get('/api/getWaitingValidators')
-      .set('Accept', 'application/json')
-      .then((res) => {
-        expect(res.body.status).to.equal('Success');
-        expect(res.body.result.waitingValidators).to.not.be.null;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-
-  });
+    const res = await chai.request(app)
+      .get('/api/getCurrentValidators')
+      .set('Accept', 'application/json');
+    expect(res.body.status).to.equal('Success');
+    expect(res.body.result.waitingValidators).to.not.be.null;
+  })
 });

@@ -1,7 +1,7 @@
 /* eslint-disable guard-for-in */
 import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from '../../shared/logging';
 import { Op } from 'sequelize';
+
 function flatten(validators) {
     validators = JSON.parse(JSON.stringify(validators));
     const filteredValidators = validators.rows.map((row) => {
@@ -30,6 +30,7 @@ function formatData(searchCriteria) {
 }
 export const getCurrentValidators = async (models, req: Request, res: Response, next: NextFunction) => {
     let currentValidators: any = [];
+    // fetch recently updated records i.e where isLatest = true
     let { pagination = { currentPageNo: 1, pageSize: 20 }, searchCriteria } = req.query;
     searchCriteria = formatData(searchCriteria);
     currentValidators = await models.HistoricalValidatorStats.findAndCountAll({
@@ -58,6 +59,8 @@ export const getWaitingValidators = async (models, req: Request, res: Response, 
     let waitingValidators: any = [];
     let { pagination = { currentPageNo: 1, pageSize: 20 }, searchCriteria } = req.query;
     searchCriteria = formatData(searchCriteria);
+
+    // fetch recently updated records i.e where isLatest = true
     waitingValidators = await models.HistoricalValidatorStats.findAndCountAll({
         include: {
             model: models.Validators
