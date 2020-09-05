@@ -72,6 +72,42 @@
     padding-left: 0.3em !important;
 }
 
+.validator-preheader-container{
+    background: #FFFFFF;
+    border: 1px solid rgba(231, 231, 231, 0.5);
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
+    border-radius: 3px;
+    padding-left: 20px;
+    padding-top: 20px;
+    margin-bottom: 23px;
+}
+
+.validators-container{
+    background: #FFFFFF;
+    border: 1px solid rgba(231, 231, 231, 0.5);
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
+    border-radius: 3px;
+}
+
+.Tabs{
+    padding: 20px;
+}
+
+.tab-bar{
+    margin-bottom: 16px !important;
+}
+
+.row-input input{
+    width: 100%;
+    background: #FFFFFF;
+    border: 1px solid #C7CDD1;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+    padding: 10px;
+    margin-bottom: 16px !important;
+}
+
 .ViewNominatorsModal {
     position: relative !important;
     box-shadow: 0px 16px 24px rgba(67, 90, 111, 0.3) !important;
@@ -258,7 +294,7 @@
         td {
             font-size: 1vw !important;
             padding: 1vw 0.5vw !important;
-       }
+        }
     }
     @include sm-max {
         .val-nominated {
