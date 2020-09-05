@@ -167,16 +167,12 @@ const PresentationComponent = (state, chain: Substrate) => {
       callback: model.reset,
       name: 'Waiting Validators',
       content: m('table.validators-table', [
-        m(Select, {
-          options: ['Address', 'Name'],
-          defaultValue: 'Address',
-          onchange: () => null
-        }),
-        m('input', {
-          type: 'text',
-          autofocus: true,
-          placeholder:'Search for a name, address or index...'
-        }),
+        m('div.row-input',
+          m('input', {
+            type: 'text',
+            autofocus: true,
+            placeholder: 'Search for a name, address or index...'
+          })),
         m('tr.validators-heading', [
           m('th.val-stash-waiting', 'Stash'),
           m('th.val-nominations', 'Nominations'),
