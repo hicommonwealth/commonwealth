@@ -29,6 +29,7 @@ export default async function (models, chain?: string): Promise<void> {
 
   // 2. for each node, fetch and migrate chain entities
   for (const node of nodes) {
+    console.log('Fetching and migrating chain entities for', node.chain);
     const migrationHandler = new MigrationHandler(models, node.chain);
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain);
 
