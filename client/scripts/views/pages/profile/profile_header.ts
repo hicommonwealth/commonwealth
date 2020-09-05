@@ -18,6 +18,8 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { getMaxListeners } from 'superagent';
 import { ValidatorHeaderStats } from './validator_header_stats';
+import validatorIdentity from '../validators/substrate/validator_identity';
+
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -60,25 +62,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
 
     return m('.ProfileHeader', [
       m('.cover', [
-        // ADD ICON COMPONENT HERE
-        m('div.row', [
-          m('.icon-to-be-elected', m(Icon, { name: Icons.ARROW_LEFT_CIRCLE, size: 'lg' })),
-          m('.icon-imonline', m(Icon, { name: Icons.WIFI, size: 'lg' })),
-          m('icon.message', m(Icon, { name: Icons.MESSAGE_SQUARE, size: 'lg' })),
-          m('p.email-container', [
-            m('.at-sign', m(Icon, { name: Icons.AT_SIGN, size: 'sm' })),
-            m('p.email-address', 'nblogist@gmail.com')
-          ]),
-          m('p.web-container', [
-            m('.at-sign', m(Icon, { name: Icons.GLOBE, size: 'sm' })),
-            m('p.website-address', 'stake.com')
-          ]),
-          m('p.twitter-container', [
-            m('.twitter-sign', m(Icon, { name: Icons.TWITTER, size: 'sm' })),
-            m('p.titter-handle', '@stakedotfish')
-          ]),
-
-        ])
+        m('div.row-validator', m(validatorIdentity, { stash: account.address }))
       ]),
       m('.bio-main', [
         m('.bio-left', [ // TODO: Rename class to non-bio to avoid confusion with Bio component
