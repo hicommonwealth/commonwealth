@@ -66,7 +66,7 @@ import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
 import getProfile from './routes/getProfile';
-
+import getSlashes from './routes/getSlashes'
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -106,10 +106,12 @@ import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 
 import bulkEntities from './routes/bulkEntities';
-
+import addValidator from './routes/addValidator';
+import upsertHistoricalValidatorStats from './routes/upsertHistoricalValidatorStats';
 
 import getGlobalStatistics from './routes/getGlobalStatistics';
 import { getCurrentValidators, getWaitingValidators } from './routes/getValidatorDetail';
+import getValidatorNamesAndAddresses from './routes/getValidatorNamesAndAddresses'
 
 function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
@@ -219,6 +221,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/getInvites', passport.authenticate('jwt', { session: false }), getInvites.bind(this, models));
   router.get('/getOffences', getOffences.bind(this, models));
   router.get('/getRewards', getRewards.bind(this, models));
+  router.get('/getSlashes', getSlashes.bind(this, models));
   router.get('/getOwnStakeOverTime', getOwnStakeOverTime.bind(this, models));
   router.get('/getTotalStakeOverTime', getTotalStakeOverTime.bind(this, models));
   router.get('/getOtherStakeOverTime', getOtherStakeOverTime.bind(this, models));
@@ -335,11 +338,15 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
-
+  router.get('/getValidatorNamesAndAddresses', getValidatorNamesAndAddresses.bind(this, models));
   router.get('/getCurrentValidators', getCurrentValidators.bind(this, models));
   router.get('/getWaitingValidators', getWaitingValidators.bind(this, models));
   router.get('/getGlobalStatistics', getGlobalStatistics.bind(this, models));
 
+
+
+  router.post('/addValidator', addValidator.bind(this, models));
+  router.post('/upsertHistoricalValidatorStats', upsertHistoricalValidatorStats.bind(this, models));
   app.use('/api', router);
 }
 export default setupRouter;
