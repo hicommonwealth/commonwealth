@@ -57,12 +57,12 @@ export interface IProfileHeaderState {
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account } = vnode.attrs;
-    const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
-      && account.address === app.user.activeAccount?.address;
+    // const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
+    //   && account.address === app.user.activeAccount?.address;
 
     return m('.ProfileHeader', [
       m('.cover', [
-        m('div.row-validator', m(validatorIdentity, { stash: account.address }))
+        m('div.row-validator', m(validatorIdentity, { stash: account.address, onlyIcon:false }))
       ]),
       m('.bio-main', [
         m('.bio-left', [ // TODO: Rename class to non-bio to avoid confusion with Bio component
@@ -70,7 +70,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', account.profile.displayName),
+            m('.User', account.profile.displayName, m(validatorIdentity, { stash: account.address, onlyIcon:true })),
             // TODO: Badges for identity verification, etc.
           ]),
           m('.info-row', [
