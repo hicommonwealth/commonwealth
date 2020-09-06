@@ -117,7 +117,7 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
           m('.button-set-identity',
             m('.data-row-block',
               m('.profile-header-block',
-                m('.bio-actions', [
+                m('.bio-actions-edit-profile', [
                   !onOwnProfile ? [
                     m(Button, {
                       intent: 'primary',
@@ -166,7 +166,7 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
           m('.button-set-identity',
             m('.info-row-block',
               m('.profile-data-block',
-                m('.bio-actions', [
+                m('.bio-actions-edit-identity', [
                   !onOwnProfile ? [
                     editIdentityAction(account, vnode.state.identity)
                   ] : [
