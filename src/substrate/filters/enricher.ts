@@ -2,7 +2,7 @@ import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
-  ReferendumInfo
+  ReferendumInfo, SessionIndex, ValidatorId, Exposure, EraIndex
 } from '@polkadot/types/interfaces';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
@@ -18,6 +18,7 @@ import { EventKind, IEventData, isEvent, parseJudgement, IdentityJudgement } fro
  * Once fetched, the function marshalls the event data and the additional information
  * into the interface, and returns a fully-formed event, ready for database storage.
  */
+
 export async function Enrich(
   api: ApiPromise,
   blockNumber: number,
@@ -31,6 +32,43 @@ export async function Enrich(
   }> => {
     switch (kind) {
       /**
+       * Staking Events
+       */
+      case EventKind.NewSession: {
+        const [ sessionIndex ] = event.data as unknown as [ SessionIndex ] & Codec
+        const validators = await api.derive.staking.validators();
+        const currentEra = await api.query.staking.currentEra<Option<EraIndex>>();
+        let active : Array<ValidatorId>
+        let waiting : Array<ValidatorId>
+        // erasStakers(EraIndex, AccountId): Exposure -> api.query.staking.erasStakers // KUSAMA
+        // stakers(AccountId): Exposure -> api.query.staking.stakers // EDGEWARE
+        const stakersCall = (api.query.staking.stakers)
+          ? api.query.staking.stakers
+          : api.query.staking.erasStakers;
+        const stakersCallArgs = (account) => (api.query.staking.stakers)
+        ? account
+        : [+currentEra, account];
+        let activeExposures : {[key: string]: any} = {}
+        if (validators && currentEra) { // if currentEra isn't empty
+          active = validators.validators;
+          waiting = validators.nextElected;
+          await Promise.all(active.map(async (validator) => {
+            const tmp_exposure = await stakersCall(stakersCallArgs(validator)) as unknown as Exposure & Codec;
+            activeExposures[validator.toString()] = tmp_exposure.toHuman();
+          }));
+        }
+        return {
+          data: {
+            kind,
+            activeExposures,
+            active: active?.map((v) => v.toString())
+            waiting: waiting?.map((v) => v.toString()),
+            sessionIndex: +sessionIndex,
+            currentEra: +currentEra
+          }
+        }
+      }
+       /**
        * Staking Events
        */
       case EventKind.Reward: {

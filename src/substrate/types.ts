@@ -1,16 +1,14 @@
 import {
-  Header, EventRecord, Extrinsic, Event, IdentityJudgement as SubstrateJudgement
+  Header, EventRecord, Extrinsic, AccountId as _AccountId, Event, IdentityJudgement as SubstrateJudgement, Exposure, SessionIndex
 } from '@polkadot/types/interfaces';
 
 export const EventChains = [
   'edgeware',
   'edgeware-local',
-  'edgeware-testnet',
   'kusama',
   'kusama-local',
   'polkadot',
   'polkadot-local',
-  'kulupu',
 ];
 
 /**
@@ -126,11 +124,25 @@ export enum EventKind {
   JudgementGiven = 'identity-judgement-given',
   IdentityCleared = 'identity-cleared',
   IdentityKilled = 'identity-killed',
+
+  NewSession = 'new-session'
 }
 
 interface IEvent {
   kind: EventKind;
 }
+
+/**
+ * Session Event
+ */
+export interface INewSession extends IEvent {
+  kind: EventKind.NewSession
+  activeExposures: {[key: string]: any}
+  waiting: Array<AccountId>
+  sessionIndex: number
+  currentEra?: number
+}
+
 
 /**
  * Staking Events
@@ -480,6 +492,7 @@ export type IEventData =
   | IJudgementGiven
   | IIdentityCleared
   | IIdentityKilled
+  | INewSession
 // eslint-disable-next-line semi-style
 ;
 
