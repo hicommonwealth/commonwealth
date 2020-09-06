@@ -19,6 +19,7 @@ describe('Event Tests', () => {
       .query({ chain });
     expect(res.body.status).to.be.equal('Success');
     expect(res.body.validators).to.not.be.null;
+
   });
   it('should fetch global statistics from HistoricalValidator and Validator model', async () => {
     const res = await chai.request(app)
@@ -26,7 +27,6 @@ describe('Event Tests', () => {
       .set('Accept', 'application/json')
     expect(res.body.status).to.equal('Success');
     expect(res.body.result).to.not.be.null;
-
   });
 
   it('should fetch current validator details database', async () => {

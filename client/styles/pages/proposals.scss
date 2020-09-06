@@ -1,27 +1,38 @@
 @import 'client/styles/shared';
 
 .ProposalsPage {
-    // TODO: duplicated
-    h4.proposals-subheader {
-        text-transform: uppercase;
-        color: #999;
-        letter-spacing: 0.4px;
-        margin-top: 26px;
-        font-weight: 500;
-    }
-    a.proposals-action {
-        float: right;
-        margin-left: 10px;
-        color: #999;
-        cursor: pointer;
-        &:hover {
-            color: #555;
-        }
-        @include xs-max {
-            float: none;
+    padding-bottom: 36px;
+    .sublayout-body {
+        flex-direction: column;
+        .cui-list {
+            overflow-y: visible;
+            max-height: max-content;
         }
     }
-    .proposals {
-        padding-top: 10px;
+    .stats-container {
+        display: flex;
+        align-items: flex-start;
+        margin-top: 25px;
+        padding: 12px 20px 13px;
+        background-color: $background-color-light;
+        border-radius: 5px;
+        .stats-heading {
+            font-weight: 500;
+        }
+    }
+    .Listing {
+        margin-top: 20px;
+    }
+    .no-proposals {
+        margin-top: 10px;
+        color: $text-color-light;
+    }
+    @include sm-max {
+        .stats-container {
+            padding-bottom: 0;
+        }
+        .cui-col-xs-6 {
+            margin-bottom: 18px;
+        }
     }
 }

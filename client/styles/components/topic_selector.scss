@@ -22,4 +22,10 @@
             }
         }
     }
+    @include xs-max {
+        width: calc(100vw - 53px);
+        .cui-popover-content {
+            width: 100%;
+        }
+    }
 }

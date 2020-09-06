@@ -72,6 +72,11 @@ export interface IApp {
   isProduction(): boolean;
   serverUrl(): string;
   loadingError: string;
+
+  _lastNavigatedBack: boolean;
+  _lastNavigatedFrom: string;
+  lastNavigatedBack(): boolean;
+  lastNavigatedFrom(): string;
 }
 
 const app: IApp = {
@@ -119,6 +124,11 @@ const app: IApp = {
   },
   serverUrl: () => '/api',
   loadingError: null,
+
+  _lastNavigatedFrom: null,
+  _lastNavigatedBack: false,
+  lastNavigatedBack: () => app._lastNavigatedBack,
+  lastNavigatedFrom: () => app._lastNavigatedFrom,
 };
 
 export default app;

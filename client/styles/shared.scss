@@ -32,13 +32,27 @@ $text-color-medium: #777;               // medium text on any background
 $text-color-dark: #222;                 // black text on any background
 
 $form-border-color: #c5cdd1;
-$form-active-color: #08c;
 
 $positive-text-color: $positive-bg-color;
 $negative-text-color: $negative-bg-color;
 
 $sidebar-width: 230px;
 $layout-max-width: 970px;
+
+// forum listing components
+$text-size-item-header: 19px;
+$text-size-item-meta: 17px;
+$listing-left-flex: 4;
+$listing-right-flex: 3;
+@mixin listing-row-base {
+    display: flex;
+    padding: 12px 20px;
+    margin: 0 -20px;
+    cursor: pointer;
+    &:hover {
+        background: $background-color-white-hover;
+    }
+}
 
 @mixin formfield-base {
     display: block;
@@ -48,7 +62,7 @@ $layout-max-width: 970px;
     outline: none;
     box-shadow: none;
     &:focus {
-        border-color: $form-active-color;
+        border-color: $theme-focus-border;
     }
 }
 

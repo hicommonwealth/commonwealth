@@ -26,7 +26,6 @@ import IdentityFetchCache from './server/util/identityFetchCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
-import { updateSupernovaStats } from './server/lockdrops/supernova';
 import resetServer from './server/scripts/resetServer';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
@@ -47,7 +46,6 @@ const DEV = process.env.NODE_ENV !== 'production';
 const SHOULD_RESET_DB = process.env.RESET_DB === 'true';
 const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
 const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
-const SHOULD_UPDATE_SUPERNOVA_STATS = process.env.UPDATE_SUPERNOVA === 'true';
 const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
@@ -174,14 +172,6 @@ async function main() {
     await fetchStats(models, 'mainnet');
     log.info('Finished adding Lockdrop statistics into the DB');
     process.exit(0);
-  } else if (SHOULD_UPDATE_SUPERNOVA_STATS) {
-    // MAINNET Cosmos
-    // const cosmosRestUrl = 'http://cosmoshub1.commonwealth.im:1318';
-    // const cosmosChainType = 'cosmos';
-    // TESTNET Cosmos
-    const cosmosRestUrl = 'http://gaia13k1.commonwealth.im:1318';
-    const cosmosChainType = 'gaia13k1';
-    await updateSupernovaStats(models, cosmosRestUrl, cosmosChainType);
   } else {
     if (NO_EVENTS) {
       setupServer(app, wss, sessionParser);
@@ -190,12 +180,14 @@ async function main() {
       if (ENTITY_MIGRATION) {
         // "all" means run for all supported chains, otherwise we pass in the name of
         // the specific chain to migrate
+        log.info('Started migrating chain entities into the DB');
         await migrateChainEntities(models, ENTITY_MIGRATION === 'all' ? undefined : ENTITY_MIGRATION);
         log.info('Finished migrating chain entities into the DB');
         process.exit(0);
       }
 
       if (IDENTITY_MIGRATION) {
+        log.info('Started migrating chain identities into the DB');
         await migrateIdentities(models);
         log.info('Finished migrating chain identities into the DB');
         process.exit(0);

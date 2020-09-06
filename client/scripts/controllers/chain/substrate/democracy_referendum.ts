@@ -172,6 +172,7 @@ export class SubstrateDemocracyReferendum
     this._Democracy = Democracy;
     this._endBlock = this.data.endBlock;
     this.hash = eventData.proposalHash;
+    this.createdAt = entity.createdAt;
 
     // see if preimage exists and populate data if it does
     const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);

@@ -60,6 +60,8 @@
 .icon-network:before { content: '\e83a'; } /* '' */
 .icon-up-open:before { content: '\e83b'; } /* '' */
 .icon-left-open:before { content: '\e83c'; } /* '' */
+.icon-pin:before { content: '\e83d'; } /* '' */
+.icon-pin-outline:before { content: '\e83e'; } /* '' */
 .icon-resize-full-1:before { content: '\e842'; } /* '' */
 .icon-calendar:before { content: '\e843'; } /* '' */
 .icon-cogs:before { content: '\e844'; } /* '' */

@@ -12,6 +12,7 @@
 // 6. image upload spinner
 // 7. preview button
 // 8. mentions container
+// 9. progress bar
 //
 
 .QuillEditor {
@@ -126,6 +127,11 @@
     }
     .ql-tooltip {
         z-index: 9999;
+    }
+    @include xs-max {
+        .ql-toolbar .ql-formats:last-child {
+            padding-right: 80px;
+        }
     }
 
     // 5. toolbar markdown mode

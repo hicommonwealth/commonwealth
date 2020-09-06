@@ -40,22 +40,20 @@ class ReactionsController {
       reaction,
       jwt: app.user.jwt,
     };
-
-    if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
-    else if (post instanceof Proposal) {
+    if (post instanceof OffchainThread) {
+      options['thread_id'] = (post as OffchainThread).id;
+    } else if (post instanceof Proposal) {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${(post as AnyProposal).identifier}`;
-    } else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
-
+    } else if (post instanceof OffchainComment) {
+      options['comment_id'] = (post as OffchainComment<any>).id;
+    }
     try {
       // TODO: Change to POST /reaction
       const response = await $.post(`${app.serverUrl()}/createReaction`, options);
       const { result } = response;
       this._store.add(modelFromServer(result));
     } catch (err) {
-      console.log('Failed to create reaction');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to create reaction');
+      notifyError('Failed to save reaction');
     }
   }
 
@@ -104,7 +102,7 @@ class ReactionsController {
         resolve(result);
       }).catch((e) => {
         console.error(e);
-        notifyError('Could not delete reaction');
+        notifyError('Failed to save reaction');
         reject(e);
       });
     });
