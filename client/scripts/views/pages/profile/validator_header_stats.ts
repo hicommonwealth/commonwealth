@@ -10,7 +10,7 @@ import { Card, Spinner, Button } from 'construct-ui';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
-
+import { ViewNominatorsModal } from '../validators/index';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity) => {
   const chainObj = app.config.chains.getById(account.chain);
@@ -98,7 +98,7 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
     m('.other-stake',
       m('.data-row',
         m('.profile-header',
-          'OTHER STAKE')),
+          'OTHER STAKE')), // TODOO: ADD A MODAL ON CLICK  by adding ViewNominatorsModal
       m('.info-row',
         m('.profile-data',
         //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].otherTotal), true)),

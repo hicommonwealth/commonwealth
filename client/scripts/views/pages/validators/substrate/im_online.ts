@@ -6,7 +6,7 @@ interface ImOnlineAttrs {
   toBeElected: Boolean;
   hasMessage: Boolean;
   isOnline: Boolean;
-  blockCount: u32;
+  blockCount?: u32;
 }
 
 const ImOnline: m.Component<ImOnlineAttrs, {}> = {

@@ -8,6 +8,7 @@ import { externalLink } from 'helpers';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
 import { IAccountInfo } from 'controllers/chain/substrate/staking';
+import ImOnline from './im_online';
 
 const truncLength = {
   length: 20
@@ -23,6 +24,9 @@ export interface IValidatorState {
 export interface IdentityAttrs {
   stash: string;
   onlyIcon?: boolean;
+  toBeElected?: boolean;
+  isOnline?: boolean;
+  hasMessage?: boolean;
 }
 const info = {
   isGood:true,
@@ -36,7 +40,7 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: attrs.stash,
-    // info: (app.chain.base === ChainBase.Substrate)
+    // info: (app.chain.base === ChainBase.Substrate) // TODOO: uncomment this
     //   ? (app.chain as Substrate).staking.info(attrs.stash)
     //   : null
   }),
@@ -61,29 +65,35 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
     return m('div.identity',
       m('div.row', [
         // m(`span.identity-icon${clsName}`, ''),
+        // TODOO: plan is to get the commented values  from vnode.attrs that is being called from profile_header
+        m('div.validator-profile-imonline-icons', m(ImOnline, {
+          toBeElected: true, // vnode.attrs.toBeElected,
+          isOnline: true, // vnode.attrs.isOnline,
+          hasMessage: true, // vnode.attrs.hasMessage,
+        })),
         info.email
-          && m('div', [
+          && m('div.validator-profile-identity-icons', [
             m(Icon, { name: Icons.AT_SIGN, size: 'sm' }),
             m('label.left-5',
               externalLink('a', `mailto:${info.email}`,
                 truncate(info.email, truncLength)))
           ]),
         info.web
-          && m('div', [
+          && m('div.validator-profile-identity-icons', [
             m(Icon, { name: Icons.GLOBE, size: 'sm' }),
             m('label.left-5',
               externalLink('a', info.web,
                 truncate(info.web, truncLength)))
           ]),
         info.twitter
-          && m('div', [
+          && m('div.validator-profile-identity-icons', [
             m(Icon, { name: Icons.TWITTER, size: 'sm' }),
             m('label.left-5',
               externalLink('a', `https://twitter.com/${info.twitter}`,
                 truncate(info.twitter, truncLength)))
           ]),
         info.riot
-          && m('div', [
+          && m('div.validator-profile-identity-icons', [
             m(Icon, { name: Icons.FIGMA, size: 'sm' }),
             m('label.left-5',
               externalLink('a', `https://riot.im/app/#/user/${info.riot}`,
