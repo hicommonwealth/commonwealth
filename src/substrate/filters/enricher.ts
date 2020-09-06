@@ -2,7 +2,7 @@ import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
-  ReferendumInfo, SessionIndex, ValidatorId, Exposure, EraIndex
+  ReferendumInfo, SessionIndex, ValidatorId, Exposure, EraIndex, AuthorityId, IdentificationTuple
 } from '@polkadot/types/interfaces';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
@@ -32,7 +32,42 @@ export async function Enrich(
   }> => {
     switch (kind) {
       /**
-       * Staking Events
+       * ImOnline Events
+       */
+      case EventKind.HeartbeatReceived: {
+        const [ authorityId ] = event.data as unknown as [ AuthorityId ] & Codec
+        return {
+          data: {
+            kind,
+            authorityId: authorityId.toString()
+          }
+        }
+      }
+      case EventKind.SomeOffline: {
+        const [ validators ] = event.data as unknown as [ Vec<IdentificationTuple> ];
+        const sessionIndex = await api.query.session.currentIndex();
+        return {
+          data: {
+            kind,
+            sessionIndex: +sessionIndex - 1,
+            validators: validators?.map((v) => v.toString()),
+          }
+        }
+      }
+      case EventKind.AllGood: {
+        const validators = await api.derive.staking.validators();
+        const sessionIndex = await api.query.session.currentIndex();
+        return {
+          data: {
+            kind,
+            sessionIndex: +sessionIndex - 1,
+            validators: validators.validators?.map((v) => v.toString()),
+          }
+        }
+      }
+
+      /**
+       * Session Events
        */
       case EventKind.NewSession: {
         const [ sessionIndex ] = event.data as unknown as [ SessionIndex ] & Codec
@@ -61,13 +96,14 @@ export async function Enrich(
           data: {
             kind,
             activeExposures,
-            active: active?.map((v) => v.toString())
+            active: active?.map((v) => v.toString()),
             waiting: waiting?.map((v) => v.toString()),
             sessionIndex: +sessionIndex,
             currentEra: +currentEra
           }
         }
       }
+
        /**
        * Staking Events
        */

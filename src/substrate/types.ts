@@ -1,6 +1,7 @@
 import {
-  Header, EventRecord, Extrinsic, AccountId as _AccountId, Event, IdentityJudgement as SubstrateJudgement, Exposure, SessionIndex
+  Header, EventRecord, Extrinsic, ValidatorId, Event, IdentityJudgement as SubstrateJudgement,
 } from '@polkadot/types/interfaces';
+import { Vec } from '@polkadot/types';
 
 export const EventChains = [
   'edgeware',
@@ -125,7 +126,10 @@ export enum EventKind {
   IdentityCleared = 'identity-cleared',
   IdentityKilled = 'identity-killed',
 
-  NewSession = 'new-session'
+  NewSession = 'new-session',
+  AllGood = 'all-good',
+  HeartbeatReceived = 'heartbeat-received',
+  SomeOffline = 'some-offline',
 }
 
 interface IEvent {
@@ -133,14 +137,35 @@ interface IEvent {
 }
 
 /**
+ * ImOnline Events
+ */
+export interface IAllGood extends IEvent {
+  kind: EventKind.AllGood;
+  sessionIndex: number;
+  validators: Array<AccountId>;
+}
+
+export interface IHeartbeatReceived extends IEvent {
+  kind: EventKind.HeartbeatReceived;
+  authorityId: string;
+}
+
+export interface ISomeOffline extends IEvent {
+  kind: EventKind.SomeOffline;
+  sessionIndex: number;
+  validators: Array<AccountId>;
+}
+
+/**
  * Session Event
  */
 export interface INewSession extends IEvent {
-  kind: EventKind.NewSession
-  activeExposures: {[key: string]: any}
-  waiting: Array<AccountId>
-  sessionIndex: number
-  currentEra?: number
+  kind: EventKind.NewSession;
+  activeExposures: { [key: string]: any };
+  active: Array<AccountId>;
+  waiting: Array<AccountId>;
+  sessionIndex: number;
+  currentEra?: number;
 }
 
 
@@ -493,6 +518,9 @@ export type IEventData =
   | IIdentityCleared
   | IIdentityKilled
   | INewSession
+  | IHeartbeatReceived
+  | ISomeOffline
+  | IAllGood
 // eslint-disable-next-line semi-style
 ;
 

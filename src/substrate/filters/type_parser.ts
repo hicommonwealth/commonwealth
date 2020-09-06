@@ -13,6 +13,14 @@ export function ParseType (
   // TODO: we can unify this with the enricher file: parse out the kind, and then
   //   marshall the rest of the types in the same place. But for now, we can leave as-is.
   switch (section) {
+    case 'im-online':
+      switch (method) {
+        case 'AllGood': return EventKind.AllGood;
+        case 'HeartbeatReceived': return EventKind.HeartbeatReceived;
+        case 'SomeOffline': return EventKind.SomeOffline;
+        default: return null;
+      }
+
     case 'staking':
       switch (method) {
         case 'Slash': return EventKind.Slash;
@@ -78,13 +86,13 @@ export function ParseType (
       }
     case 'treasuryReward':
       switch (method) {
-        // case 'TreasuryMinting': {
-        //   if (versionNumber < 34) {
-        //     return EventKind.TreasuryRewardMinting;
-        //   } else {
-        //     return EventKind.TreasuryRewardMintingV2;
-        //   }
-        // }
+        case 'TreasuryMinting': {
+          if (versionNumber < 34) {
+            return EventKind.TreasuryRewardMinting;
+          } else {
+            return EventKind.TreasuryRewardMintingV2;
+          }
+        }
         default: return null;
       }
     case 'identity': {
