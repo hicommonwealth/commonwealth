@@ -17,6 +17,8 @@ import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 import { ValidatorStats } from './validator_profile_stats';
 import graphs from './graphs';
+import chartComponent from '../../components/chart';
+import lineModel from './graph_models/linemodel';
 
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
@@ -178,22 +180,6 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     //   .filter((p) => p instanceof EdgewareSignalingProposal && p.data.author === account.address);
     // return [].concat(signaling, discussions);
 
-    const comments = vnode.state.comments;
-    const proposals = vnode.state.threads;
-    const allContent = [].concat(proposals || []).concat(comments || [])
-      .sort((a, b) => +b.createdAt - +a.createdAt);
-
-
-    // const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
-    // const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
-    // const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
-    const graphsTabTitle = 'Statistics';
-
-    const xValues = [403, 406, 409, 412, 415, 418, 430, 433, 436, 439, 452, 455, 458, 461, 471];
-    const yValues = [500, 325, 600, 350, 400, 380, 690, 800, 1000, 1600, 1200, 1150, 1300, 1400, 1400];
-    const titles = ['REWARDS OVER TIME', 'SLASHES OVER TIME', 'NOMINATIONS OVER TIME',
-      'ELECTED STAKE', 'OFFENCES OVER TIME', 'IM ONLINE EVENTS OVER TIME', 'NOMINATORS OVER TIME'];
-
     return m(Sublayout, {
       class: 'ProfilePage',
     }, [
@@ -204,26 +190,82 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
         // m('.row.row-narrow.forum-row', [
         // m('.col-xs-12', [
         m('.row', [
-          m(graphs, {
-            xValues, yValues, title: 'REWARDS OVER TIME'
+          m(chartComponent, {
+            title: 'REWARDS OVER TIME',
+            model: lineModel,
+            xvalues:[5, 159, 285, 1040, 71],
+            yvalues:[213, 261, 212, 252, 256],
+            xLabelString:'SESSION',
+            yLabelString:'REWARD',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
           }),
-          m(graphs, {
-            xValues, yValues, title: 'SLASHES OVER TIME'
+          m(chartComponent, {
+            title: 'SLASHES OVER TIME',
+            model: lineModel,
+            xvalues:[815, 859, 985, 40, 971],
+            yvalues:[213, 461, 712, 352, 956],
+            xLabelString:'SESSION',
+            yLabelString:'SLASH',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
           }),
-          m(graphs, {
-            xValues, yValues, title: 'ELECTED STAKE'
+          m(chartComponent, {
+            title: 'XXXXX',
+            model: lineModel,
+            xvalues:[1, 89, 120, 850, 971],
+            yvalues:[213, 86, 712, 15, 96],
+            xLabelString:'XXXXX',
+            yLabelString:'XXXXX',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
           }),
-          m(graphs, {
-            xValues, yValues, title: 'NUMBER OF NOMINATORS'
+          m(chartComponent, {
+            title: 'IMONLINE EVENTS OVER TIME',
+            model: lineModel,
+            xvalues:[12, 82139, 1240, 8505, 9741],
+            yvalues:[213, 861, 72, 152, 56],
+            xLabelString:'BLOCK',
+            yLabelString:'HEARTBEAT',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
           }),
-          m(graphs, {
-            xValues, yValues, title: 'IMONLINE EVENTS OVER TIME'
+          m(chartComponent, {
+            title: 'OFFENCES OVER TIME',
+            model: lineModel,
+            xvalues:[1, 89, 120, 850, 971],
+            yvalues:[23, 861, 71, 152, 956],
+            xLabelString:'SESSION',
+            yLabelString:'OFFENCE',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
           }),
-          m(graphs, {
-            xValues, yValues, title: 'OFFENCES OVER TIME'
+          m(chartComponent, {
+            title: 'NOMINATORS OVER TIME',
+            model: lineModel,
+            xvalues:[12, 89, 12, 850, 97],
+            yvalues:[213, 861, 712, 152, 956],
+            xLabelString:'BLOCK',
+            yLabelString:'yaixs',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
           }),
-          m(graphs, {
-            xValues, yValues, title: 'NOMINATORS OVER TIME'
+          m(chartComponent, {
+            title: 'NOMINATORS OVER TIME',
+            model: lineModel,
+            xvalues:[12, 89, 12, 850, 97],
+            yvalues:[213, 861, 712, 152, 956],
+            xLabelString:'BLOCK',
+            yLabelString:'yaixs',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
           }),
         ])
         // ]),
