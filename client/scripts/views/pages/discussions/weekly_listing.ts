@@ -39,7 +39,7 @@ const WeeklyDiscussionListing: m.Component<IWeeklyDiscussionListingAttrs, IWeekl
       return tsB - tsA;
     };
 
-    const proposals = vnode.attrs.proposals.sort(orderDiscussionsbyLastComment);
+    const proposals = vnode.attrs.proposals.sort(orderDiscussionsbyLastComment).filter((p) => !p.pinned);
     const firstProposal = proposals[0];
     const lastProposal = proposals[proposals.length - 1];
     const isEntireWeekSeen = () => getLastUpdate(firstProposal) < lastVisited;

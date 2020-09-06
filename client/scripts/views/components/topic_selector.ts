@@ -8,22 +8,27 @@ import NewTopicModal from 'views/modals/new_topic_modal';
 import { OffchainTopic } from 'models';
 
 const TopicSelector: m.Component<{
-  activeTopic?: OffchainTopic | string | boolean;
+  defaultTopic?: OffchainTopic | string | boolean;
   featuredTopics: OffchainTopic[];
   tabindex?: number;
   topics: OffchainTopic[];
   updateFormData: Function;
 }, {
   error: string;
-  selectedTopic?: OffchainTopic | string;
+  selectedTopic?: OffchainTopic;
 }> = {
-  view: (vnode) => {
-    const { activeTopic, featuredTopics, tabindex, topics, updateFormData } = vnode.attrs;
-    if (activeTopic === false) {
-      delete vnode.state.selectedTopic;
-    } else if (activeTopic) {
-      (vnode.state.selectedTopic as any) = activeTopic;
+  oninit: (vnode) => {
+    const { defaultTopic, topics } = vnode.attrs;
+    if (defaultTopic === false) {
+      vnode.state.selectedTopic = undefined;
+    } else if (defaultTopic && typeof defaultTopic === 'string') {
+      vnode.state.selectedTopic = topics.find((t) => t.name === defaultTopic);
+    } else if (defaultTopic && defaultTopic instanceof OffchainTopic) {
+      vnode.state.selectedTopic = defaultTopic;
     }
+  },
+  view: (vnode) => {
+    const { defaultTopic, featuredTopics, tabindex, topics, updateFormData } = vnode.attrs;
 
     const itemRender = (topic) => {
       return m(ListItem, {
@@ -38,6 +43,12 @@ const TopicSelector: m.Component<{
 
     const itemPredicate = (query: string, item: OffchainTopic) => {
       return item.name.toLowerCase().includes(query.toLowerCase());
+    };
+
+    const oncreate = () => {
+      if (vnode.state.selectedTopic) {
+        updateFormData(vnode.state.selectedTopic.name, vnode.state.selectedTopic.id);
+      }
     };
 
     const onSelect = (item: OffchainTopic) => {
@@ -81,6 +92,7 @@ const TopicSelector: m.Component<{
       itemPredicate,
       itemRender,
       items: sortTopics(topics),
+      oncreate,
       onSelect,
       trigger: m(Button, {
         align: 'left',
@@ -91,7 +103,7 @@ const TopicSelector: m.Component<{
           ? [
             m('span.proposal-topic-icon'),
             m('span.topic-name', [
-              (vnode.state.selectedTopic as OffchainTopic).name || (vnode.state.selectedTopic as string)
+              vnode.state.selectedTopic.name
             ]),
           ]
           : '',

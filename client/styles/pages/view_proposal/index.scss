@@ -35,7 +35,10 @@ $discussion-title-font-size: 1.45rem;
     .ProposalHeader,
     .ProposalComment,
     .CreateComment {
-        padding-top: $discussion-inner-padding;
+        padding-top: 36px;
+        @include xs-max {
+            padding-top: 30px;
+        }
     }
     .ProposalComments.no-active-account,
     .CreateComment {
@@ -75,14 +78,15 @@ $discussion-title-font-size: 1.45rem;
         .proposal-content-right {
             flex: 1;
             margin-left: $discussion-comment-padding;
-            margin-right: $discussion-outer-padding;
+            @include xs-max {
+                margin-right: 10px;
+            }
             .proposal-content-meta {
                 padding-bottom: $discussion-meta-padding;
                 font-size: $discussion-meta-font-size;
             }
         }
         .proposal-title {
-            margin: 4px 0 0;
             .ProposalHeaderTitle {
                 display: inline;
                 font-size: $discussion-title-font-size;
@@ -130,6 +134,11 @@ $discussion-title-font-size: 1.45rem;
         }
         .comment-body-bottom {
             padding: 4px 0 2px;
+        }
+        .comment-body-content {
+            @include xs-max {
+                margin-right: 10px;
+            }
         }
     }
 
@@ -220,5 +229,18 @@ $discussion-title-font-size: 1.45rem;
         left: 19px;
         width: 2px;
         z-index: -1;
+    }
+
+    // responsive styles
+    .proposal-mobile-sidebar {
+        display: none;
+    }
+    @include sm-max {
+        .ProposalSidebar {
+            display: none;
+        }
+        .proposal-mobile-sidebar {
+            display: block;
+        }
     }
 }

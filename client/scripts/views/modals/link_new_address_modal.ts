@@ -361,14 +361,8 @@ const LinkNewAddressModal: m.Component<{
         ]),
         // wallet options
         m('.link-address-options', [
-          // mobile error message -- if not Ethereum or NEAR
-          isMobile && app.chain.base !== ChainBase.Ethereum && app.chain.base !== ChainBase.NEAR
-            && m('.mobile-error-message', [
-              m('p', 'No mobile wallet available.'),
-              m('p', 'Link an address on desktop first.'),
-            ]),
           // browser extension -- for Substrate chains
-          !isMobile && app.chain.base === ChainBase.Substrate && m('.link-address-option', {
+          app.chain.base === ChainBase.Substrate && m('.link-address-option', {
             class: (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS ? 'selected ' : ' ')
               + (((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available) ? '' : 'disabled'),
             onclick: (e) => {
@@ -421,9 +415,7 @@ const LinkNewAddressModal: m.Component<{
                 ]),
                 m('.link-address-title', 'Metamask'),
               ]),
-              m('.link-address-description', [
-                `Use a Metamask-compatible ${isMobile ? 'mobile app' : 'browser extension'}`,
-              ]),
+              m('.link-address-description', 'Use a Metamask-compatible wallet'),
               m('.link-address-link', isMobile ? [
                 m('a', { href: 'https://wallet.coinbase.com/', target: '_blank' }, 'Coinbase Wallet'),
                 m.trust(' &middot; '),
@@ -439,9 +431,9 @@ const LinkNewAddressModal: m.Component<{
           ]),
 
           // cli -- cosmos-sdk and substrate chains supported
-          !isMobile && [ChainBase.CosmosSDK, ChainBase.Substrate
-          ].indexOf(app.chain.base) !== -1 && m('.link-address-option', {
-            class: (vnode.state.selectedWallet === LinkNewAddressWallets.CLIWallet ? 'selected' : ''),
+          [ChainBase.CosmosSDK, ChainBase.Substrate].indexOf(app.chain.base) !== -1 && m('.link-address-option', {
+            class: (vnode.state.selectedWallet === LinkNewAddressWallets.CLIWallet ? 'selected' : '')
+              + isMobile ? ' mobile-disabled' : '',
             onclick: (e) => {
               vnode.state.selectedWallet = LinkNewAddressWallets.CLIWallet;
               setTimeout(() => {

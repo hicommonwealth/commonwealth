@@ -38,8 +38,8 @@ const updateTopics = async (models, req, res: Response, next: NextFunction) => {
     },
   });
   const isAdminOrMod = roles.length > 0;
-  const isAuthor = (thread.address_id === userAddress.id);
-  if (!isAdminOrMod && !isAuthor) {
+  // const isAuthor = (thread.address_id === userAddress.id);
+  if (!isAdminOrMod) {
     return next(new Error(UpdateTopicsErrors.NoPermission));
   }
 

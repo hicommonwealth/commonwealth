@@ -8,8 +8,7 @@
         right: 0;
         position: fixed;
         background: rgba(0,0,0,0.2);
-        z-index: 51;
-
+        z-index: 101;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -32,7 +31,8 @@
     }
     @include xs-max {
         .popup {
-            min-width: 310px;
+            min-width: calc(100vw - 20px);
+            max-height: calc(100vh - 20px);
         }
     }
 
@@ -63,10 +63,7 @@
     }
     @include xs-max {
         .compact-modal-title {
-            padding: 14px 20px 12px;
-            h1, h2, h3 {
-                font-size: 16px;
-            }
+            padding: 14px 20px 13px;
         }
         .compact-modal-body,
         .compact-modal-actions {

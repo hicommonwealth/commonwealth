@@ -43,7 +43,7 @@ class ProfilesController {
     return new Promise((resolve, reject) => {
       // TODO: Change to PUT /profile
       $.post(`${app.serverUrl()}/updateProfile`, {
-        chain: account.chain.id,
+        chain: (typeof account.chain === 'string') ? account.chain : account.chain.id,
         address: account.address,
         data: JSON.stringify(data),
         auth: true,
