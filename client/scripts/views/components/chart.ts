@@ -50,8 +50,8 @@ export default {
             model.config.data.datasets[0].backgroundColor = gradient;
             model.config.data.labels = xvalues;
             model.config.data.datasets[0].data = yvalues;
-            model.config.options.scales.xAxes[0].scaleLabel.labelString = xLabelString;
-            model.config.options.scales.yAxes[0].scaleLabel.labelString = yLabelString;
+            // model.config.options.scales.xAxes[0].scaleLabel.labelString = xLabelString;
+            // model.config.options.scales.yAxes[0].scaleLabel.labelString = yLabelString;
             model.instance = new Chart(ctx, model.config);
             model.loaded = true;
           }

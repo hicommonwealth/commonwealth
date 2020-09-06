@@ -193,8 +193,8 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           m(chartComponent, {
             title: 'REWARDS OVER TIME',
             model: lineModel,
-            xvalues:[5, 159, 285, 1040, 71],
-            yvalues:[213, 261, 212, 252, 256],
+            xvalues:[403, 406, 409, 412, 415, 418, 430, 433, 436, 439, 452, 455, 458, 461, 471],
+            yvalues:[500, 325, 600, 350, 400, 380, 690, 800, 1000, 1600, 1200, 1150, 1300, 1400, 1400],
             xLabelString:'SESSION',
             yLabelString:'REWARD',
             addColorStop0: 'rgba(53, 212, 19, 0.23)',
