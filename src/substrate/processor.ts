@@ -52,10 +52,7 @@ export class Processor extends IEventProcessor<ApiPromise, Block> {
       }
     };
 
-    const events = await Promise.all(block.events.map(({ event }) => {
-      console.log(event.toHuman());
-      return applyFilters(event);
-    }));
+    const events = await Promise.all(block.events.map(({ event }) => applyFilters(event)));
     const extrinsics = await Promise.all(block.extrinsics.map((extrinsic) => applyFilters(extrinsic)));
     return [...events, ...extrinsics].filter((e) => !!e); // remove null / unwanted events
   }

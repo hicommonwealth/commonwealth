@@ -72,7 +72,7 @@ export async function Enrich(
       case EventKind.NewSession: {
         const [ sessionIndex ] = event.data as unknown as [ SessionIndex ] & Codec
         const validators = await api.derive.staking.validators();
-        const currentEra = await api.query.staking.currentEra<Option<EraIndex>>();
+        const currentEra = (await api.query.staking.currentEra<Option<EraIndex>>()).unwrap();
         let active : Array<ValidatorId>
         let waiting : Array<ValidatorId>
         // erasStakers(EraIndex, AccountId): Exposure -> api.query.staking.erasStakers // KUSAMA
@@ -81,14 +81,16 @@ export async function Enrich(
           ? api.query.staking.stakers
           : api.query.staking.erasStakers;
         const stakersCallArgs = (account) => (api.query.staking.stakers)
-        ? account
-        : [+currentEra, account];
+        ? [account]
+        : [currentEra as EraIndex, account];
         let activeExposures : {[key: string]: any} = {}
         if (validators && currentEra) { // if currentEra isn't empty
           active = validators.validators;
           waiting = validators.nextElected;
           await Promise.all(active.map(async (validator) => {
-            const tmp_exposure = await stakersCall(stakersCallArgs(validator)) as unknown as Exposure & Codec;
+            console.log(`Validator ${validator}, ${(api.query.staking.stakers)}`)
+            const tmp_exposure = await stakersCall(...stakersCallArgs(validator));
+            console.log(tmp_exposure);
             activeExposures[validator.toString()] = tmp_exposure.toHuman();
           }));
         }
