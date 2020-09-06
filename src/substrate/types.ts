@@ -1,16 +1,15 @@
 import {
-  Header, EventRecord, Extrinsic, Event, IdentityJudgement as SubstrateJudgement
+  Header, EventRecord, Extrinsic, ValidatorId, Event, IdentityJudgement as SubstrateJudgement,
 } from '@polkadot/types/interfaces';
+import { Vec } from '@polkadot/types';
 
 export const EventChains = [
   'edgeware',
   'edgeware-local',
-  'edgeware-testnet',
   'kusama',
   'kusama-local',
   'polkadot',
   'polkadot-local',
-  'kulupu',
 ];
 
 /**
@@ -126,11 +125,49 @@ export enum EventKind {
   JudgementGiven = 'identity-judgement-given',
   IdentityCleared = 'identity-cleared',
   IdentityKilled = 'identity-killed',
+
+  NewSession = 'new-session',
+  AllGood = 'all-good',
+  HeartbeatReceived = 'heartbeat-received',
+  SomeOffline = 'some-offline',
 }
 
 interface IEvent {
   kind: EventKind;
 }
+
+/**
+ * ImOnline Events
+ */
+export interface IAllGood extends IEvent {
+  kind: EventKind.AllGood;
+  sessionIndex: number;
+  validators: Array<AccountId>;
+}
+
+export interface IHeartbeatReceived extends IEvent {
+  kind: EventKind.HeartbeatReceived;
+  authorityId: string;
+}
+
+export interface ISomeOffline extends IEvent {
+  kind: EventKind.SomeOffline;
+  sessionIndex: number;
+  validators: Array<AccountId>;
+}
+
+/**
+ * Session Event
+ */
+export interface INewSession extends IEvent {
+  kind: EventKind.NewSession;
+  activeExposures: { [key: string]: any };
+  active: Array<AccountId>;
+  waiting: Array<AccountId>;
+  sessionIndex: number;
+  currentEra?: number;
+}
+
 
 /**
  * Staking Events
@@ -480,6 +517,10 @@ export type IEventData =
   | IJudgementGiven
   | IIdentityCleared
   | IIdentityKilled
+  | INewSession
+  | IHeartbeatReceived
+  | ISomeOffline
+  | IAllGood
 // eslint-disable-next-line semi-style
 ;
 

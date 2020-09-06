@@ -37,8 +37,12 @@ if (SubstrateEvents.Types.EventChains.includes(chain)) {
   // TODO: update this for Beresheet
   SubstrateEvents.createApi(
     url,
-    chain === 'edgeware-testnet' ? Beresheet.types : chain.includes('edgeware') ? Mainnet.types : {},
-    chain === 'edgeware-testnet' ? Beresheet.typesAlias : chain.includes('edgeware') ? Mainnet.typesAlias : {},
+    (chain === 'edgeware-testnet' || chain === 'edgeware=local')
+      ? Beresheet.types
+      : chain.includes('edgeware') ? Mainnet.types : {},
+    (chain === 'edgeware-testnet' || chain === 'edgeware=local')
+      ? Beresheet.typesAlias : chain.includes('edgeware')
+      ? Mainnet.typesAlias : {},
   )
   .then(async (api) => {
     const fetcher = new SubstrateEvents.StorageFetcher(api);

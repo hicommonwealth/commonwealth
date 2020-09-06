@@ -77,6 +77,43 @@ export const Label: LabelerFilter = (
   const balanceFormatter = (bal) => edgBalanceFormatter(chainId, bal);
   switch (data.kind) {
     /**
+     * ImOnline Events
+     */
+    case EventKind.HeartbeatReceived: {
+      const { authorityId } = data;
+      return {
+        heading: 'Heartbeat Received',
+        label: ` A new heartbeat was received from ${fmtAddr(authorityId)}.`,
+      };
+    }
+    case EventKind.SomeOffline: {
+      const { sessionIndex } = data;
+      return {
+        heading: 'Some Offline',
+        label: `At the end of the session: ${sessionIndex}, at least one validator was found to be offline.`,
+      };
+    }
+    case EventKind.AllGood: {
+      const { sessionIndex } = data;
+      return {
+        heading: 'All Good',
+        label: `At the end of the session: ${sessionIndex}, no offence was committed.`,
+      };
+    }
+
+    /**
+     * Session Events
+     */
+    case EventKind.NewSession: {
+      const { sessionIndex } = data;
+      return {
+        heading: 'New Session',
+        label: `Session ${sessionIndex.toString()} has begun.`,
+        // TODO: get link to validator page
+      };
+    }
+
+    /**
      * Staking Events
      */
     case EventKind.Slash: {
