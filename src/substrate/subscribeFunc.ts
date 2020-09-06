@@ -55,7 +55,6 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
   const { chain, api, handlers, skipCatchup, discoverReconnectRange, verbose } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>) => {
-    console.log(event);
     let prevResult = null;
     /* eslint-disable-next-line no-restricted-syntax */
     for (const handler of handlers) {
