@@ -88,9 +88,7 @@ export async function Enrich(
           active = validators.validators;
           waiting = validators.nextElected;
           await Promise.all(active.map(async (validator) => {
-            console.log(`Validator ${validator}, ${(api.query.staking.stakers)}`)
             const tmp_exposure = await stakersCall(...stakersCallArgs(validator));
-            console.log(tmp_exposure);
             activeExposures[validator.toString()] = tmp_exposure.toHuman();
           }));
         }
