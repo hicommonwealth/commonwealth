@@ -150,7 +150,6 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
 
     return m(Sublayout, {
       class: 'StakingCalculatorPage',
-      title: 'Staking Calulator',
       showNewProposalButton: true,
     }, [
       m(Grid, {
