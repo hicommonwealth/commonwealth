@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-syntax */
-import app from 'state';
 import { get } from 'lib/util';
 import { ChainEntityStore } from 'stores';
 import { ChainEntity, ChainEvent, ChainEventType, IChainAdapter } from 'models';

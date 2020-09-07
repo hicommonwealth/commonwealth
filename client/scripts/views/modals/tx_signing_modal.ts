@@ -7,7 +7,7 @@ import { mnemonicValidate } from '@polkadot/util-crypto';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
-import { ModalExitButton } from 'views/modal';
+import { CompactModalExitButton } from 'views/modal';
 import app from 'state';
 import { formatAsTitleCase } from 'helpers';
 import { ITXModalData, ITransactionResult, TransactionStatus, ChainBase } from 'models';
@@ -300,9 +300,10 @@ const TXSigningModalStates = {
       return m('.TXSigningModalBody.Intro', [
         m('.compact-modal-title', [
           m('h3', [
-            `Sign ${formatAsTitleCase(app.chain.class.replace('-', ' '))} transaction`,
+            'Sign transaction',
             (txLabel ? `: ${txLabel}` : '')
           ]),
+          m(CompactModalExitButton),
         ]),
         m('.compact-modal-body', [
           m(HorizontalTabs, [{
@@ -454,7 +455,6 @@ const TXSigningModal = {
     const DEFAULT_STATE = 'Intro';
     return [
       m('.TXSigningModal', [
-        m(ModalExitButton),
         m(TXSigningModalStates[vnode.state.stateName || DEFAULT_STATE], {
           // pass transaction down to each step's view
           author: vnode.attrs.author,

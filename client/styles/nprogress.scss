@@ -15,7 +15,7 @@ $nprogress-color: $theme-base-color;
         left: 0;
 
         width: 100%;
-        height: 2px;
+        height: 3px;
     }
 
     // Fancy blur effect
@@ -35,27 +35,27 @@ $nprogress-color: $theme-base-color;
     }
 
     // Remove these to get rid of the spinner
-    .spinner {
-        display: block;
-        position: fixed;
-        z-index: 10001;
-        top: 15px;
-        right: 15px;
-    }
+    /* .spinner { */
+    /*     display: block; */
+    /*     position: fixed; */
+    /*     z-index: 10001; */
+    /*     top: 15px; */
+    /*     right: 15px; */
+    /* } */
 
-    .spinner-icon {
-        width: 18px;
-        height: 18px;
-        box-sizing: border-box;
+    /* .spinner-icon { */
+    /*     width: 18px; */
+    /*     height: 18px; */
+    /*     box-sizing: border-box; */
 
-        border: solid 2px transparent;
-        border-top-color: $nprogress-color;
-        border-left-color: $nprogress-color;
-        border-radius: 50%;
+    /*     border: solid 2px transparent; */
+    /*     border-top-color: $nprogress-color; */
+    /*     border-left-color: $nprogress-color; */
+    /*     border-radius: 50%; */
 
-        -webkit-animation: nprogress-spinner 400ms linear infinite;
-        animation: nprogress-spinner 400ms linear infinite;
-    }
+    /*     -webkit-animation: nprogress-spinner 400ms linear infinite; */
+    /*     animation: nprogress-spinner 400ms linear infinite; */
+    /* } */
 
     .nprogress-custom-parent & {
         overflow: hidden;

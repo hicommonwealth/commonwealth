@@ -79,6 +79,7 @@ export class SubstrateCollectiveProposal
     this._Accounts = Accounts;
     this._Collective = Collective;
     this._title = formatCall(eventData.call);
+    this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
 

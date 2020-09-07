@@ -2,8 +2,9 @@ import 'components/sidebar/index.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
+import $ from 'jquery';
 import dragula from 'dragula';
-import { Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner } from 'construct-ui';
+import { Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
@@ -11,6 +12,9 @@ import { ChainClass, ChainBase, AddressInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
+import { MobileNewProposalButton } from 'views/components/new_proposal_button';
+import NotificationsMenu from 'views/components/header/notifications_menu';
+import LoginSelector from 'views/components/header/login_selector';
 import CommunitySelector from './community_selector';
 import CommunityInfoModule from './community_info_module';
 
@@ -131,27 +135,27 @@ const NavigationModule: m.Component<{}, {}> = {
             contentLeft: m(Icon, { name: Icons.POWER }),
           }),
           (app.community || app.chain)
-            && m('h4', 'Staking'),
+          && m('h4', 'Staking'),
           // validators (substrate and cosmos only)
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
-            && [
-              m(ListItem, {
-                active: onValidatorsPage(m.route.get()),
-                label: 'Validators',
-                onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
-                contentLeft: m(Icon, { name: Icons.BOX }),
-              }),
-              m(ListItem, {
-                active: onManageStakingPage(m.route.get()),
-                label: 'Manage Staking',
-                onclick: (e) => m.route.set(`/${app.activeChainId()}/manageStaking`),
-              }),
-              m(ListItem, {
-                active: onStakingCalculatorPage(m.route.get()),
-                label: 'Staking Calculator',
-                onclick: (e) => m.route.set(`/${app.activeChainId()}/stakingCalculator`),
-              })
-            ]
+          && [
+            m(ListItem, {
+              active: onValidatorsPage(m.route.get()),
+              label: 'Validators',
+              onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
+              contentLeft: m(Icon, { name: Icons.BOX }),
+            }),
+            m(ListItem, {
+              active: onManageStakingPage(m.route.get()),
+              label: 'Manage Staking',
+              onclick: (e) => m.route.set(`/${app.activeChainId()}/manageStaking`),
+            }),
+            m(ListItem, {
+              active: onStakingCalculatorPage(m.route.get()),
+              label: 'Staking Calculator',
+              onclick: (e) => m.route.set(`/${app.activeChainId()}/stakingCalculator`),
+            })
+          ]
         ],
       ]),
     ]);
@@ -297,39 +301,77 @@ const SettingsModule: m.Component<{}> = {
           label: 'Notifications',
           onclick: (e) => m.route.set(
             app.activeId()
-              ? `/${app.activeId()}/notification-settings`
-              : '/notification-settings'
+              ? `/${app.activeId()}/notificationSettings`
+              : '/notificationSettings'
           ),
           active: app.activeId()
-            ? m.route.get() === `/${app.activeId()}/notification-settings`
-            : m.route.get() === '/notification-settings',
+            ? m.route.get() === `/${app.activeId()}/notificationSettings`
+            : m.route.get() === '/notificationSettings',
         }),
         app.activeId() && m(ListItem, {
           contentLeft: m(Icon, { name: Icons.BELL }),
           label: 'Chain Notifications',
           onclick: (e) => m.route.set(
             app.activeId()
-              ? `/${app.activeId()}/chain-event-settings`
-              : '/chain-event-settings'
+              ? `/${app.activeId()}/chainEventSettings`
+              : '/chainEventSettings'
           ),
           active: app.activeId()
-            ? m.route.get() === `/${app.activeId()}/chain-event-settings`
-            : m.route.get() === '/chain-event-settings',
+            ? m.route.get() === `/${app.activeId()}/chainEventSettings`
+            : m.route.get() === '/chainEventSettings',
         }),
       ]),
     ]);
   }
 };
 
-const Sidebar: m.Component<{}> = {
+
+const MobileSidebarHeader: m.Component<{ parentVnode }> = {
   view: (vnode) => {
-    return m('.Sidebar', [
-      m('.SidebarHeader', m(CommunitySelector)),
-      (app.chain || app.community) && m(NavigationModule),
-      (app.chain || app.community) && m(TopicsModule),
-      app.isLoggedIn() && m(SettingsModule),
-      (app.chain || app.community) && m(CommunityInfoModule),
-    ]);
+    const { parentVnode } = vnode.attrs;
+  }
+};
+
+const Sidebar: m.Component<{}, { open: boolean }> = {
+  view: (vnode) => {
+    return [
+      m('.MobileSidebarHeader', {
+        onclick: (e) => {
+          // clicking anywhere outside the trigger should close the sidebar
+          const onTrigger = $(e.target).hasClass('mobile-sidebar-trigger')
+            || $(e.target).closest('.mobile-sidebar-trigger').length > 0;
+          if (!onTrigger && vnode.state.open) vnode.state.open = false;
+        },
+      }, [
+        m('.mobile-sidebar-left', [
+          m(Button, {
+            class: 'mobile-sidebar-trigger',
+            compact: true,
+            onclick: (e) => {
+              vnode.state.open = !vnode.state.open;
+            },
+            label: m(Icon, { name: Icons.MENU }),
+          }),
+          app.isLoggedIn() && m(MobileNewProposalButton),
+          m('.community-label', m(CommunitySelector)),
+          app.isLoggedIn() && m(NotificationsMenu, { small: false }),
+          m(LoginSelector, { small: false }),
+        ]),
+      ]),
+      m('.Sidebar', {
+        class: vnode.state.open ? 'open' : '',
+        onclick: (e) => {
+          // clicking inside the sidebar should close the sidebar
+          vnode.state.open = false;
+        },
+      }, [
+        m('.SidebarHeader', m(CommunitySelector)),
+        (app.chain || app.community) && m(NavigationModule),
+        (app.chain || app.community) && m(TopicsModule),
+        app.isLoggedIn() && m(SettingsModule),
+        (app.chain || app.community) && m(CommunityInfoModule),
+      ])
+    ];
   },
 };
 

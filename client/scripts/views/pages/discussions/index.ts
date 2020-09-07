@@ -6,11 +6,10 @@ import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
-import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem, EmptyState, Spinner } from 'construct-ui';
+import { Spinner } from 'construct-ui';
 
 import app from 'state';
-import { updateRoute } from 'app';
-import { link, articlize, pluralize } from 'helpers';
+import { pluralize } from 'helpers';
 import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -21,19 +20,8 @@ import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
-import TopicCaratMenu from './topic_carat_menu';
-
-const DiscussionRowHeader = {
-  view: (vnode) => {
-    return m('.DiscussionRowHeader', [
-      m('.discussion-row-header-col.discussion-row-header-title', 'Title'),
-      m('.discussion-row-header-col.discussion-row-header-replies', 'Replies'),
-      m('.discussion-row-header-col', 'Likes'),
-      m('.discussion-row-header-col', 'Activity'),
-      app.isLoggedIn() && m('.discussion-row-header-col.discussion-row-menu'),
-    ]);
-  }
-};
+import Listing from '../listing';
+import PinnedListing from './pinned_listing';
 
 interface IDiscussionPageState {
   lookback?: number;
@@ -100,6 +88,13 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       return tsB - tsA;
     };
 
+    const orderByDateReverseChronological = (a, b) => {
+      // tslint:disable-next-line
+      const tsB = Math.max(+b.createdAt);
+      const tsA = Math.max(+a.createdAt);
+      return tsA - tsB;
+    };
+
     const getSingleTopicListing = (topic_) => {
       if (!activeEntity || !activeEntity.serverLoaded) {
         return m('.discussions-main', [
@@ -115,8 +110,15 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       let list = [];
       const divider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last Visited'), m('hr') ]);
       const sortedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.topic && thread.topic.name === topic_)
+        .filter((thread) => thread.topic && thread.topic.name === topic_ && !thread.pinned)
         .sort(orderDiscussionsbyLastComment);
+
+      const pinnedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
+        .filter((thread) => thread.topic && thread.topic.name === topic_ && thread.pinned)
+        .sort(orderByDateReverseChronological);
+      if (pinnedThreads.length > 0) {
+        list.push(m(PinnedListing, { proposals: pinnedThreads }));
+      }
 
       if (sortedThreads.length > 0) {
         const firstThread = sortedThreads[0];
@@ -138,10 +140,20 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             }
           });
         }
+
         if (list.length > 0) {
           return m('.discussions-main', [
-            m(DiscussionRowHeader),
-            list
+            m(Listing, {
+              content: list,
+              rightColSpacing: [4, 4, 4],
+              columnHeaders: [
+                'Title',
+                'Replies',
+                'Likes',
+                'Updated'
+              ],
+              menuCarat: true,
+            })
           ]);
         }
       }
@@ -192,6 +204,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const getRecentPostsSortedByWeek = () => {
         const arr = [];
         let count = 0;
+        const pinnedThreads = allProposals.filter((t) => t.pinned);
+        if (pinnedThreads.length > 0) {
+          arr.push(m(PinnedListing, { proposals: pinnedThreads }));
+        }
         weekIndexes.sort((a, b) => Number(a) - Number(b)).forEach((msecAgo) => {
           let proposals;
           if (allProposals.length < vnode.state.lookback) {
@@ -231,17 +247,27 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         // m(InlineThreadComposer),
         allProposals.length === 0
           ? m(EmptyTopicPlaceholder, { communityName })
-          : [
-            m(DiscussionRowHeader),
-            getRecentPostsSortedByWeek(),
-            vnode.state.postsDepleted
-              ? m('.infinite-scroll-reached-end', [
-                `Showing all ${allProposals.length} of ${pluralize(allProposals.length, 'posts')}`
-              ])
-              : m('.infinite-scroll-spinner-wrap', [
-                m(Spinner, { active: !vnode.state.postsDepleted })
-              ])
-          ],
+          : m(Listing, {
+            content: getRecentPostsSortedByWeek(),
+            rightColSpacing: [4, 4, 4],
+            columnHeaders: [
+              'Title',
+              'Replies',
+              'Likes',
+              'Updated'
+            ],
+            menuCarat: true,
+          }),
+        // TODO: Incorporate infinite scroll into generic Listing component
+        getRecentPostsSortedByWeek().length && vnode.state.postsDepleted
+          ? m('.infinite-scroll-reached-end', [
+            `Showing all ${allProposals.length} of ${pluralize(allProposals.length, 'posts')}`
+          ])
+          : getRecentPostsSortedByWeek().length
+            ? m('.infinite-scroll-spinner-wrap', [
+              m(Spinner, { active: !vnode.state.postsDepleted })
+            ])
+            : null
       ]);
     };
 
@@ -256,7 +282,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',
       description: topicDescription,
-      showNewButton: true,
+      showNewProposalButton: true,
     }, [
       (app.chain || app.community) && [
         topic

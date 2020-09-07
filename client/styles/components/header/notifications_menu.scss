@@ -1,8 +1,47 @@
+@import 'client/styles/shared';
+
+.NotificationsMenuButton {
+    @include xs-max {
+        padding: 0 11px !important;
+    }
+    .cui-icon {
+        margin-right: 0 !important;
+        position: relative;
+        top: -1px;
+        @include xs-max {
+            top: 0;
+        }
+    }
+    .notification-count {
+        position: relative;
+        top: 1px;
+    }
+    &.has-notifications {
+        .cui-icon {
+            display: none;
+        }
+    }
+    &.no-notifications {
+        .notification-count {
+            display: none;
+        }
+    }
+}
+
 .NotificationsMenu {
+    .cui-popover-content {
+        @include xs-max {
+            position: relative;
+            margin: 0 9px;
+        }
+    }
     .notification-list {
         height: 480px;
         background: #fff;
         width: 340px;
+        @include xs-max {
+            width: calc(100vw - 20px);
+        }
     }
     .cui-menu {
         max-width: 342px;
@@ -10,6 +49,9 @@
         padding: 0;
         background: none;
         overflow: hidden;
+        @include xs-max {
+            max-width: calc(100vw - 20px);
+        }
     }
     .cui-popover-arrow {
         background: white;
