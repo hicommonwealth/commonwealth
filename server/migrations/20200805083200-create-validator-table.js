@@ -1,19 +1,27 @@
 'use strict';
+
 module.exports = {
   up: (queryInterface, DataTypes) => {
     return queryInterface.createTable('Validators', {
-      stash: { type: DataTypes.STRING, allowNull: false, primaryKey: true }, //AccountID
+      stash: { type: DataTypes.STRING, allowNull: false, primaryKey: true },
       name: { type: DataTypes.STRING },
-      controller: { type: DataTypes.STRING, allowNull: false }, // AccountId
-      sessionKeys: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false }, //AccountID[]
-      state: { type: DataTypes.STRING, allowNull: false }, //Active/waiting/inactive
-      lastUpdate: { type: DataTypes.BIGINT, allowNull: false },//blocknumber
-      createdAt: {
-        type: DataTypes.DATE
+      controller: { type: DataTypes.STRING, allowNull: false },
+      sessionKeys: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false },
+      state: {
+        type: DataTypes.ENUM,
+        values: ['active', 'waiting', 'inactive'],
+        defaultValue: 'inactive',
+        allowNull: false,
       },
-      updatedAt: {
-        type: DataTypes.DATE
-      }
+      preferences: {
+        type: DataTypes.ENUM,
+        values: ['stash-staked', 'stash-unstaked', 'controller'],
+        defaultValue: 'stash-staked',
+        allowNull: false,
+      },
+      lastUpdate: { type: DataTypes.BIGINT, allowNull: false },
+      createdAt: { type: DataTypes.DATE },
+      updatedAt: { type: DataTypes.DATE },
     });
   },
 
@@ -21,4 +29,3 @@ module.exports = {
     return queryInterface.dropTable('Validators');
   }
 };
-
