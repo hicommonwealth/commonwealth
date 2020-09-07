@@ -12,10 +12,10 @@
 }
 
 .select-asset {
-    width: 141px;
+    width: 150px;
     float: left;
     font-size: 13px;
-    margin: 0px 5px;
+    margin: 0px 1px;
 }
 
 .select-asset label {
@@ -28,10 +28,10 @@
 
 .titlewithnumber_div {
     font-size: 18px;
-    font-weight: bold;
     color: #000000;
     float: left;
     margin: 0 25px 0 10px;
+    text-align: center;
 }
 
 .titlewithnumber_div span {
@@ -45,9 +45,8 @@
     text-align: center;
     width: 30%;
     float: left;
-    padding: 40px;
+    padding: 10px;
     box-sizing: border-box;
-    margin-bottom: 30px;
 }
 
 .returns_content_div.borderleft_right {
@@ -59,6 +58,21 @@
     margin: 20px 0;
 }
 
+.asset-list-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.select-list-button-image {
+    width: 24px;
+    height: 24px;
+    float: left;
+}
+
 .returns_content_div span {
     display: inline-block;
+}
+
+.select-list-button {
+    float: left;
 }

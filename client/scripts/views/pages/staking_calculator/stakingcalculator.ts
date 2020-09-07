@@ -10,35 +10,143 @@ import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount, IValidators } from 'controllers/chain/substrate/account';
 import { DeriveSessionProgress } from '@polkadot/api-derive/types';
 import { Grid, Col, Button, Input, Form, FormGroup, PopoverMenu, MenuItem, Icon, Icons, Tag, Switch, Select, SelectList, ListItem } from 'construct-ui';
-
+import { ICommissionInfo } from 'controllers/chain/substrate/staking';
+import { makeDynamicComponent } from 'models/mithril';
+import { ChainBase } from 'models';
+import { ChainInfo, CommunityInfo } from 'models';
+import { stringList } from 'aws-sdk/clients/datapipeline';
 
 interface IPreHeaderState {
   dynamic: {
     validators: IValidators;
     sessionInfo: DeriveSessionProgress;
   },
+  selected_asset: AssetInfo;
+  selected_rate: number;
+  switch_mode: boolean;
+  usd_price: string;
 }
+
+interface IPreHeaderAttrs {
+  sender: SubstrateAccount;
+  annualPercentRate: ICommissionInfo;
+  chain: ChainInfo;
+}
+const offence = {
+  count: null,
+  setCount(offences) {
+    offence.count = offences.length;
+    m.redraw();
+  }
+};
 
 class AssetInfo {
   name: string
   sym: string
+  icon: string
 }
 
-const assets_list: AssetInfo[] = [
-  { name: "Edgeware", sym: "EDG" },
-  { name: "Kusama", sym: "KSM" },
-  { name: "SomethingElse", sym: "STE" },
+let assets_list: AssetInfo[] = [
 ]
 
-const StakingCalculatorPage: m.Component<{}, { selected_asset: AssetInfo, selected_rate: number }> = {
+const unique = (value, index, self) => {
+  return self.map(s => s.name).indexOf(value.name) === index
+}
 
-  oncreate: (vnode) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'StakingCalculatorPage' });
+const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
+
+  oncreate: async (vnode) => {
     vnode.state.selected_rate = 13.3;
-    vnode.state.selected_asset = assets_list[0];
+    vnode.state.switch_mode = true;
+    const offences = await app.chainEvents.offences();
+    offence.setCount(offences);
+    mixpanel.track('PageVisit', { 'Page Name': 'StakingCalculatorPage' });
   },
+  getObservables: (attrs) => ({
+    // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
+    groupKey: app.chain.class.toString(),
+    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
+    sessionInfo: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.sessionInfo
+      : null
+  }),
   view: (vnode) => {
-    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain...', title: 'Staking Calculator' });
+
+    if (!app.chain) return m(PageLoading, { message: 'Chain is loading...' });
+
+    if (assets_list.length == 0) {
+      assets_list = app.config.nodes.getAll().map(n => {
+        return {
+          name: n.chain.network.substr(0, 1).toUpperCase() + n.chain.network.substr(1, n.chain.network.length - 1),
+          sym: n.chain.symbol,
+          icon: n.chain.iconUrl
+        }
+      })
+        .filter(unique)
+    }
+    if (!vnode.attrs.chain) {
+      vnode.attrs.chain = app.chain.meta.chain;
+    }
+    if (!vnode.state.selected_asset) {
+      vnode.state.selected_asset = assets_list.filter(a => a.name.toLowerCase() === app.chain.meta.chain.network)[0];
+
+    }
+    const { validators, sessionInfo } = vnode.state.dynamic;
+    const { sender, annualPercentRate } = vnode.attrs;
+    if (!validators && !sessionInfo) return;
+
+    let totalPercentage = 0.0;
+    if (annualPercentRate) {
+      Object.entries(annualPercentRate).forEach(([key, value]) => {
+        totalPercentage += Number(value);
+      });
+    }
+
+    const denominator = Object.keys(annualPercentRate || {}).length || 1;
+    const apr = (totalPercentage / denominator).toFixed(2);
+    const { validatorCount, currentEra,
+      currentIndex, sessionLength,
+      sessionProgress, eraLength,
+      eraProgress, isEpoch } = sessionInfo;
+
+    const nominators: string[] = [];
+    let elected: number = 0;
+    let waiting: number = 0;
+    let totalStaked = (app.chain as Substrate).chain.coins(0);
+    let hasClaimablePayouts = false;
+
+    if (app.chain.base === ChainBase.Substrate) {
+      (app.chain as Substrate).chain.api.toPromise()
+        .then((api) => {
+          if (api.query.staking.erasStakers) {
+            hasClaimablePayouts = true;
+          }
+        });
+    }
+
+    Object.entries(validators).forEach(([_stash, { exposure, isElected }]) => {
+      const valStake = (app.chain as Substrate).chain.coins(exposure?.total.toBn())
+        || (app.chain as Substrate).chain.coins(0);
+      totalStaked = (app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));
+
+      // count total nominators
+      const others = exposure?.others || [];
+      others.forEach((indv) => {
+        const nominator = indv.who.toString();
+        if (!nominators.includes(nominator)) {
+          nominators.push(nominator);
+        }
+      });
+      // count elected and waiting validators
+      if (isElected) {
+        elected++;
+      } else {
+        waiting++;
+      }
+    });
+    const totalbalance = (app.chain as Substrate).chain.totalbalance;
+    const staked = `${(totalStaked.muln(10000).div(totalbalance).toNumber() / 100).toFixed(2)}%`;
+    console.log('staked: ', staked)
 
     return m(Sublayout, {
       class: 'StakingCalculatorPage',
@@ -50,16 +158,6 @@ const StakingCalculatorPage: m.Component<{}, { selected_asset: AssetInfo, select
       }, [m(".title_div", [m("h4", "Staking Calculator")],
 
         m(".select-asset", [m("label", "SELECT ASSET"),
-        //  m(Select, {
-        //   onchange: (e: Event) => {
-        //     ctrl.selected_val = (e.target as any).value
-        //     ctrl.doSomething();
-        //   },
-        //   id: 'id-asset-select',
-        //   options: ctrl.opts,
-        //   defaultValue: ctrl.selected_val
-        // })
-
 
         m(SelectList, {
           class: 'AssetSelectList',
@@ -69,21 +167,26 @@ const StakingCalculatorPage: m.Component<{}, { selected_asset: AssetInfo, select
           inputAttrs: {
             class: 'AssetSelectRow',
           },
+          popoverAttrs: {
+            hasArrow: false
+          },
           itemRender: (item: AssetInfo) => {
             return m(ListItem, {
               label: item.name,
+              contentLeft: [m("img", { src: item.icon, class: 'asset-list-icon' })],
               selected: (vnode.state.selected_asset === item),
             });
           },
           items: assets_list,
-          trigger: m(Button, {
+          trigger: m(".AssetSelectListButton", [m("img", { class: "select-list-button-image", src: vnode.state.selected_asset.icon }), m(".select-list-button", m(Button, {
             align: 'left',
             compact: true,
             iconRight: Icons.CHEVRON_DOWN,
+            // iconLeft: Icons.SETTINGS,
             label: vnode.state.selected_asset
               ? vnode.state.selected_asset.name
               : 'Select Asset',
-          }),
+          }))]),
           onSelect: (item: AssetInfo) => {
             vnode.state.selected_asset = item;
             m.redraw();
@@ -130,7 +233,9 @@ const StakingCalculatorPage: m.Component<{}, { selected_asset: AssetInfo, select
 
         m(".select-asset", [m("label", "REINVEST?"), m(Switch, {
           fluid: true,
-
+          label: vnode.state.switch_mode ? "YES" : "NO",
+          checked: vnode.state.switch_mode,
+          onchange: (e) => { vnode.state.switch_mode = !vnode.state.switch_mode }
         })
         ]),
 
@@ -142,9 +247,9 @@ const StakingCalculatorPage: m.Component<{}, { selected_asset: AssetInfo, select
       m(Grid, {
         class: 'staking_calc_wrpr'
       }, [
-        m(".titlewithnumber_div", [m("span", "CURRENT HOLDING VALUE"), m("label", '500 EDG (3250 USD)')]),
-        m(".titlewithnumber_div", [m("span", "REWARD VALUE"), m("label", '18.3 EDG (119.27 USD)')]),
-        m(".titlewithnumber_div", [m("span", "REWART RATE"), m("label", '3.3%')]),
+        m(".titlewithnumber_div", [m("span", "CURRENT HOLDING VALUE"), m("label", '500 EDG'), m("span"), m("label", "(3250 USD)")]),
+        m(".titlewithnumber_div", [m("span", "REWARD VALUE"), m("label", '18.3 EDG'), m("span"), m("label", "(119.27 USD)")]),
+        m(".titlewithnumber_div", [m("span", "REWARD RATE"), m("label", '3.3%')]),
         m(".titlewithnumber_div", [m("span", "REWARD FREQUENCY"), m("label", '1 day')]),
         m(".titlewithnumber_div", [m("span", "NETWORK VALUE"), m("label", '0.0134%')]),
         m(".titlewithnumber_div", [m("span", "ADJUSTED REWARD"), m("label", '0.70%')])
@@ -160,6 +265,7 @@ const StakingCalculatorPage: m.Component<{}, { selected_asset: AssetInfo, select
       )
     ]);
   }
-};
+});
+
 
 export default StakingCalculatorPage;
