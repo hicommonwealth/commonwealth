@@ -1,0 +1,64 @@
+@import 'client/styles/shared';
+
+.staking_calc_wrpr {
+    border-radius: 5px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.16);
+    width: 100%;
+    padding: 25px;
+    margin: 10px 0px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.select-asset {
+    width: 141px;
+    float: left;
+    font-size: 13px;
+    margin: 0px 5px;
+}
+
+.select-asset label {
+    display: block;
+}
+
+.title_div {
+    margin: -30px 0;
+}
+
+.titlewithnumber_div {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000000;
+    float: left;
+    margin: 0 25px 0 10px;
+}
+
+.titlewithnumber_div span {
+    font-size: 13px;
+    color: #b1b1b1;
+    display: block;
+    font-weight: 600;
+}
+
+.returns_content_div {
+    text-align: center;
+    width: 30%;
+    float: left;
+    padding: 40px;
+    box-sizing: border-box;
+    margin-bottom: 30px;
+}
+
+.returns_content_div.borderleft_right {
+    border-left: #DDD solid 1px;
+    border-right: #DDD solid 1px;
+}
+
+.returns_content_div p {
+    margin: 20px 0;
+}
+
+.returns_content_div span {
+    display: inline-block;
+}
