@@ -74,26 +74,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             // TODO: Badges for identity verification, etc.
           ]),
           m('.info-row', [
-            m('span.profile-headline', account.profile && account.profile.headline
-              ? account.profile.headline
-              : m('.no-headline', 'No headline')),
-            m('span.username', formatAddressShort(account.address)),
-            !vnode.state.copied && m('a.copy-address', {
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                clipboard.writeText(account.address);
-                vnode.state.copied = true;
-                setTimeout(() => {
-                  $(e.target).next('.copy-done').fadeOut(1000).promise()
-                    .done(() => {
-                      vnode.state.copied = false;
-                      m.redraw();
-                    });
-                }, 1500);
-              }
-            }, 'Copy address'),
-            vnode.state.copied && m('span.copy-done', 'Copied'),
+            m('span.username.address', formatAddressShort(account.address)),
           ]),
         ]),
         m(ValidatorHeaderStats, { account, address: account.address }),
