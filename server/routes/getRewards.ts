@@ -75,6 +75,9 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
       validators[key] = [reward];
     }
   });
+
+  if (stash_id)
+    return res.json({ status: 'Success', result: { validator: validators[stash_id] || [] } });
   return res.json({ status: 'Success', result: { validators: validators || [] } });
 };
 
