@@ -1,5 +1,73 @@
 @import 'client/styles/shared';
 
+
+// Range Slider Check
+
+/* Special styling for WebKit/Blink */
+.cui-input input:focus, .cui-input textarea:focus {
+    border: none !important;
+}
+
+input[type=range] {
+    -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+    width: 100%; /* Specific width is required for Firefox. */
+    border: none;
+    overflow: hidden;
+    background-color: #DFE8EE;
+}
+input[type=range]::-webkit-slider-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50% !important;
+    border: 1px solid #C7CDD1;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+    -webkit-appearance: none;
+    &:focus{
+        border: none;
+        box-shadow: none;
+    }
+}
+
+input[type=range]::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50% !important;
+    border: 1px solid #C7CDD1;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+    -webkit-appearance: none;
+    &:focus{
+        border: none;
+        box-shadow: none;
+    }
+}
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    box-shadow: none;
+    background: #999999;
+    color: #999999;
+}
+input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    box-shadow: none;
+    background: #DFE8EE;
+
+}
+
+input[type="range"]::-moz-range-progress {
+    background-color: #999999; 
+}
+
+  
+// Page Styling
+
 .staking-heading{
     margin-bottom: 14px;
 }
@@ -21,11 +89,11 @@
     box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
     border-radius: 3px;
     width: 100%;
-    margin: 30px 0px 23px 0px;
+    margin: 30px 0px 30px 0px;
     box-sizing: border-box;
     overflow: hidden;
     padding-left: 42px;
-    padding-right: 32px;
+    padding-right: 24px;
 }
 
 .select-asset {
@@ -36,9 +104,9 @@
     width: 100px;
 }
 .select-asset-edg{
-    width: 100px;
+    width: 130px;
 }
-.select-asset span.thead, .select-asset-switch span.thead, .select-asset-edg span.thead{
+.select-asset span.thead{
     display: inline-block;
     font-family: 'Inter', sans-serif;
     font-style: normal;
@@ -131,6 +199,31 @@
     letter-spacing: -0.2px;
     color: #000000;
 }
+.select-asset-edg span.thead{
+    display: inline-block;
+    padding-bottom: 19px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 10px;
+    line-height: 150%;
+    letter-spacing: -0.2px;
+    color: #999999;
+}
+span.thead_switch{
+    display: inline-block;
+    padding-bottom: 23px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 10px;
+    line-height: 150%;
+    letter-spacing: -0.2px;
+    color: #999999;
+}
+.select-asset-switch label{
+    padding-top: 2px;
+}
 
 .title_div {
     padding-bottom: 40px;
@@ -147,7 +240,7 @@ span#rate-val{
     border: 1px solid rgba(231, 231, 231, 0.5);
     box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
     border-radius: 3px;
-    margin-bottom: 26px;
+    margin-bottom: 30px;
 }
 
 
@@ -178,7 +271,10 @@ span#rate-val{
     letter-spacing: -0.2px;
     color: #000000;
 }
-
+span.column-below{
+    display: block;
+    padding-top: 8px;
+}
 .titlewithnumber_div .bracket{
     font-family: 'Inter', sans-serif;
     font-style: normal;

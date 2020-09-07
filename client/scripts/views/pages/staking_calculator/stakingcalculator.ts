@@ -207,7 +207,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
         m(".select-asset .col", [m("span.thead", "ENTER STAKING AMOUNT"), m(Input, {
           fluid: true,
           name: 'stake_amt',
-          placeholder: 'Enter Amount',
+          placeholder: 'Amount',
           autocomplete: 'off',
           onclick: (e) => {
             e.stopPropagation();
@@ -218,7 +218,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
         m(".select-asset .col", [m("span.thead", "ENTER STAKING LENGTH"), m(Input, {
           fluid: true,
           name: 'stake_days',
-          placeholder: 'Enter Amount',
+          placeholder: 'Amount',
           autocomplete: 'off',
           onclick: (e) => {
             e.stopPropagation();
@@ -240,7 +240,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
         })
         ]),
 
-        m(".select-asset-switch .col", [m("span.thead", "REINVEST?"), m(Switch, {
+        m(".select-asset-switch .col", [m("span.thead_switch", "REINVEST?"), m(Switch, {
           fluid: true,
           label: vnode.state.switch_mode ? "YES" : "NO",
           checked: vnode.state.switch_mode,
@@ -258,10 +258,10 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
       }, [
         m(".titlewithnumber_div", [m("span", "CURRENT HOLDING VALUE"), m("label", '500 EDG'), m("span"), m("label.bracket", "(3250 USD)")]),
         m(".titlewithnumber_div", [m("span", "REWARD VALUE"), m("label", '18.3 EDG'), m("span"), m("label.bracket", "(119.27 USD)")]),
-        m(".titlewithnumber_div", [m("span", "REWARD RATE"), m("label", '3.3%')]),
-        m(".titlewithnumber_div", [m("span", "REWARD FREQUENCY"), m("label", '1 day')]),
-        m(".titlewithnumber_div", [m("span", "NETWORK VALUE"), m("label", '0.0134%')]),
-        m(".titlewithnumber_div", [m("span", "ADJUSTED REWARD"), m("label", '0.70%')])
+        m(".titlewithnumber_div", [m("span.column-below", "REWARD RATE"), m("label", '3.3%')]),
+        m(".titlewithnumber_div", [m("span.column-below", "REWARD FREQUENCY"), m("label", '1 day')]),
+        m(".titlewithnumber_div", [m("span.column-below", "NETWORK VALUE"), m("label", '0.0134%')]),
+        m(".titlewithnumber_div", [m("span.column-below", "ADJUSTED REWARD"), m("label", '0.70%')])
       ]),
 
       m(Grid, {
@@ -272,7 +272,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
       m(".returns_content_div .borderleft_right.col-lg-4", [m("strong", "1 Month @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")]),
       m(".returns_content_div.col-lg-4", [m("strong", "1 Year @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")])
       ])
-    ,m(Button, {align: 'left',
+    ,m(Button, {align: 'center',
     compact: true,
     label: 'Test',}
     
