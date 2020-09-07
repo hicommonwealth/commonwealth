@@ -32,7 +32,7 @@ function whereClause(searchCriteria, where) {
 }
 export const getCurrentValidators = async (models, req: Request, res: Response, next: NextFunction) => {
     let currentValidators: any = [];
-    let where: any = { state: 'Active' };
+    let where: any = { state: 'active' };
     // fetch recently updated records i.e where isLatest = true
     let { pagination = { currentPageNo: 1, pageSize: 20 }, searchCriteria } = req.body;
 
@@ -67,7 +67,7 @@ export const getCurrentValidators = async (models, req: Request, res: Response, 
 
 export const getWaitingValidators = async (models, req: Request, res: Response, next: NextFunction) => {
     let waititngValidator: any = [];
-    let where: any = { state: 'Waiting' };
+    let where: any = { state: 'waiting' };
     // fetch recently updated records i.e where isLatest = true
     let { pagination = { currentPageNo: 1, pageSize: 20 }, searchCriteria } = req.body;
 
