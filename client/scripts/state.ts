@@ -18,7 +18,7 @@ import CommunitiesController from './controllers/server/communities';
 import ChainEventsController from './controllers/server/chain_events';
 import ChainEntityController from './controllers/server/chain_entities';
 import UserController from './controllers/server/user/index';
-
+import StakingController from './controllers/server/staking';
 export enum ApiStatus {
   Disconnected = 'disconnected',
   Connecting = 'connecting',
@@ -48,6 +48,7 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
+  staking: StakingController;
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
   activeCommunityId(): string;
@@ -96,7 +97,7 @@ const app: IApp = {
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
-
+  staking: new StakingController(),
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),

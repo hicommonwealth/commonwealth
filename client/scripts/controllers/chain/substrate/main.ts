@@ -12,7 +12,7 @@ import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateIdentities from './identities';
 import SubstrateChain, { handleSubstrateEntityUpdate } from './shared';
-
+import StakingController from 'controllers/server/staking';
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;
   public accounts: SubstrateAccounts;
@@ -26,7 +26,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public identities: SubstrateIdentities;
   public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly chainEntities = new ChainEntityController();
-
+  public stakingAdapter = new StakingController();
   public readonly base = ChainBase.Substrate;
   public readonly class: ChainClass;
 

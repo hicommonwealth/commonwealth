@@ -87,12 +87,13 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
         blockCount: vnode.attrs.blockCount
       }),
       m('td.val-total', [
-        formatCoin(app.chain.chain.coins(vnode.attrs.total), true), ' '
+        // formatCoin(app.chain.chain.coins(vnode.attrs.total), true), ' '
+        formatCoin(app.chain.chain.coins(+vnode.attrs.otherTotal), true), ' ',
       ]),
       // m('td.val-own', formatCoin(app.chain.chain.coins(vnode.attrs.bonded), true)),
       m('td.val-other', [
-        formatCoin(app.chain.chain.coins(vnode.attrs.otherTotal), true),
-        nominatorsList.length > 0 && [
+        formatCoin(app.chain.chain.coins(+vnode.attrs.otherTotal), true),
+        nominatorsList?.length > 0 && [
           m('a.val-nominators.padding-left-2', {
             href: '#',
             onclick: (e) => {
