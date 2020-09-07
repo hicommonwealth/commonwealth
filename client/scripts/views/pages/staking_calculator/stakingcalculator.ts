@@ -156,7 +156,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
         class: 'staking_calc_wrpr'
       }, [  m(".staking-heading .row",m("h4", "Staking Calculator")),m(".title_div .row", [],
 
-        m(".select-asset", [m("label", "SELECT ASSET"),
+        m(".select-asset .col", [m("span.thead", "SELECT ASSET"),
 
         m(SelectList, {
           class: 'AssetSelectList',
@@ -194,7 +194,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
 
         ]),
 
-        m(".select-asset", [m("label", "ENTER STAKING AMOUNT"), m(Input, {
+        m(".select-asset .col", [m("span.thead", "ENTER STAKING AMOUNT"), m(Input, {
           fluid: true,
           name: 'stake_amt',
           placeholder: 'Enter Amount',
@@ -205,7 +205,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
           contentRight: m(Tag, { label: vnode.state.selected_asset ? vnode.state.selected_asset.sym : "--", id: 'stake-sym-tag' })
         })
         ]),
-        m(".select-asset", [m("label", "ENTER STAKING LENGTH"), m(Input, {
+        m(".select-asset .col", [m("span.thead", "ENTER STAKING LENGTH"), m(Input, {
           fluid: true,
           name: 'stake_days',
           placeholder: 'Enter Amount',
@@ -216,7 +216,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
           contentRight: m(Tag, { "label": "Days" })
         })
         ]),
-        m(".select-asset", [m("label", "STAKING RATE", [m("#rate-val", (vnode.state.selected_rate ? +vnode.state.selected_rate : 0) + '%')]), m(Input, {
+        m(".select-asset .col", [m("span.thead", "STAKING RATE: ", [m("span#rate-val", (vnode.state.selected_rate ? +vnode.state.selected_rate : 0) + '%')]), m(Input, {
           fluid: true,
           name: 'stake_rate',
           type: 'range',
@@ -230,7 +230,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
         })
         ]),
 
-        m(".select-asset", [m("label", "REINVEST?"), m(Switch, {
+        m(".select-asset-switch .col", [m("span.thead", "REINVEST?"), m(Switch, {
           fluid: true,
           label: vnode.state.switch_mode ? "YES" : "NO",
           checked: vnode.state.switch_mode,
@@ -238,7 +238,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
         })
         ]),
 
-        m(".select-asset", [m("label", "EDG PRICE"), m("label", '123 USD')
+        m(".select-asset-edg .col", [m("span.thead", "EDG PRICE"), m("div", '123 USD')
         ])
       )
 
