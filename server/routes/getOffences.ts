@@ -37,11 +37,8 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
       { model: models.ChainEventType }
     ]
   });
-  // No Offences
-  if (offences) { if (!offences.length) return []; } else { return []; }
 
-
-  return res.json({ status: 'Success', result: offences });
+  return res.json({ status: 'Success', result: offences || [] });
 };
 
 export default getOffences;
