@@ -155,7 +155,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
     }, [
       m(Grid, {
         class: 'staking_calc_wrpr'
-      }, [m(".title_div", [m("h4", "Staking Calculator")],
+      }, [  m(".staking-heading .row",m("h4", "Staking Calculator")),m(".title_div .row", [],
 
         m(".select-asset", [m("label", "SELECT ASSET"),
 
