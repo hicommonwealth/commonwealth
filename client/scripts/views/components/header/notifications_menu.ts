@@ -4,7 +4,7 @@ import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import app from 'state';
 
-import { PopoverMenu, Button, Icons, ButtonGroup } from 'construct-ui';
+import { PopoverMenu, Button, Icon, Icons, ButtonGroup } from 'construct-ui';
 import NotificationRow from 'views/components/notification_row';
 import { Notification } from 'models';
 import { sortNotifications } from 'helpers/notifications';
@@ -33,20 +33,27 @@ const NotificationButtons: m.Component = {
   }
 };
 
-const NotificationsMenu: m.Component = {
+const NotificationsMenu: m.Component<{ small?: boolean }> = {
   view: (vnode) => {
     // TODO: Add helper directly on controller
+    const { small } = vnode.attrs;
     const notifications = app.user.notifications
       ? app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
       : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
     const sortedNotifications = sortNotifications(notifications).reverse();
     return m(PopoverMenu, {
+      hasArrow: false,
       transitionDuration: 0,
       hoverCloseDelay: 0,
       trigger: m(Button, {
-        iconLeft: Icons.BELL,
-        label: m('.notification-badge', unreadNotifications),
+        class: `NotificationsMenuButton ${unreadNotifications > 0 ? 'has-notifications' : 'no-notifications'}`,
+        label: [
+          m(Icon, { name: Icons.BELL }),
+          m('.notification-count', unreadNotifications),
+        ],
+        size: small ? 'sm' : 'default',
+        compact: true,
       }),
       position: 'bottom-end',
       inline: true,

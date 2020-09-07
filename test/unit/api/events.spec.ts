@@ -3,17 +3,11 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import jwt from 'jsonwebtoken';
-import sleep from 'sleep-promise';
-import moment from 'moment';
-import app, { resetDatabase } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
+import app from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 const markdownThread = require('../../util/fixtures/markdownThread');
-
 
 describe('Event Tests', () => {
   const chain = 'edgeware';

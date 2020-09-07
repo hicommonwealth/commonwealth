@@ -10,6 +10,7 @@ import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
+import { sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
@@ -41,6 +42,7 @@ const setupChainEventListeners = async (
   models, wss: WebSocket.Server, skipCatchup?: boolean
 ): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
   log.info('Fetching node urls...');
+  await sequelize.authenticate();
   const nodes: ChainNodeInstance[] = (await Promise.all(EventSupportingChains.map((c) => {
     return models.ChainNode.findOne({ where: { chain: c } });
   }))).filter((n) => !!n);
