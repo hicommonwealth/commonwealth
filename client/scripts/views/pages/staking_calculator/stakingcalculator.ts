@@ -179,11 +179,10 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
           items: assets_list,
           trigger:
             m("Button", {
-              class: "cui-button cui-align-left cui-compact",
+              class: "cui-button cui-align-left cui-compact compact-dropdown",
               label: vnode.state.selected_asset ? vnode.state.selected_asset.name : "NA"
             }
-              , [m("img", { class: "select-list-button-image", src: vnode.state.selected_asset.icon }), m("span.asset-button-label", vnode.state.selected_asset ? vnode.state.selected_asset.name : "NA"), m(".cui-icon .cui-icon-chevron-down", [m("svg", { viewBox: "0 0 24 24" }, m("polyline", { points: "6 9 12 15 18 9" }))])]
-            )
+            , [m("img", { class: "select-list-button-image", src: vnode.state.selected_asset.icon }), m("span.asset-button-label", vnode.state.selected_asset ? vnode.state.selected_asset.name : "NA"), m('span.dropdown-box',m(".cui-icon .cui-icon-chevron-down", [m("svg", { viewBox: "0 0 24 24" }, m("polyline", { points: "6 9 12 15 18 9" }))]))]            )
 
           // m(".AssetSelectListButton", [m("img", { class: "select-list-button-image", src: vnode.state.selected_asset.icon }), m(".select-list-button", m(Button, {
           //   align: 'left',
@@ -255,10 +254,10 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
 
       ]),
       m(Grid, {
-        class: 'staking_calc_wrpr'
+        class: 'staking_calc_wrpr_2'
       }, [
-        m(".titlewithnumber_div", [m("span", "CURRENT HOLDING VALUE"), m("label", '500 EDG'), m("span"), m("label", "(3250 USD)")]),
-        m(".titlewithnumber_div", [m("span", "REWARD VALUE"), m("label", '18.3 EDG'), m("span"), m("label", "(119.27 USD)")]),
+        m(".titlewithnumber_div", [m("span", "CURRENT HOLDING VALUE"), m("label", '500 EDG'), m("span"), m("label.bracket", "(3250 USD)")]),
+        m(".titlewithnumber_div", [m("span", "REWARD VALUE"), m("label", '18.3 EDG'), m("span"), m("label.bracket", "(119.27 USD)")]),
         m(".titlewithnumber_div", [m("span", "REWARD RATE"), m("label", '3.3%')]),
         m(".titlewithnumber_div", [m("span", "REWARD FREQUENCY"), m("label", '1 day')]),
         m(".titlewithnumber_div", [m("span", "NETWORK VALUE"), m("label", '0.0134%')]),
@@ -267,11 +266,18 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
 
       m(Grid, {
         class: 'staking_calc_wrpr'
-      }, [m(".title_div", [m("h5", "Returns")]),
-      m(".returns_content_div", [m("strong", "1 Day @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")]),
-      m(".returns_content_div .borderleft_right", [m("strong", "1 Month @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")]),
-      m(".returns_content_div", [m("strong", "1 Year @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")])
-      ]
+      }, [m(".row.title-row", [m(".title-div.col-xs-12",m("h5", "Returns"))]),
+      m(".row.content-row",[
+      m(".returns_content_div.col-lg-4", [m("strong", "1 Day @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")]),
+      m(".returns_content_div .borderleft_right.col-lg-4", [m("strong", "1 Month @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")]),
+      m(".returns_content_div.col-lg-4", [m("strong", "1 Year @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")])
+      ])
+    ,m(Button, {align: 'left',
+    compact: true,
+    label: 'Test',}
+    
+    )  
+    ]
       )
     ]);
   }
