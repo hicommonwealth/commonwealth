@@ -46,9 +46,7 @@ const slashQuery = async (models, req: Request, res: Response, next: NextFunctio
 const getSlashes  = async (models, req: Request, res: Response, next: NextFunction) => {
   const slashes = await slashQuery(models, req, res, next);
 
-  if (slashes) { if (!slashes.length) return []; } else return [];
-
-  return res.json({ status: 'Success', result: { slashes } });
+  return res.json({ status: 'Success', result: { slashes: slashes || [] } });
 };
 
 export default getSlashes;
