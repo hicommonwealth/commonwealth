@@ -114,7 +114,7 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
     m('.era-points',
       m('.data-row',
         m('.profile-header',
-          'ERA POINTS')),
+          'POINTS')),
       m('.info-row',
         m('.profile-data',
         //       validators && validators[vnode.attrs.address].eraPoints)
