@@ -38,7 +38,8 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     ]
   });
   // No Offences
-  if (!offences.length) return [];
+  if (offences) { if (!offences.length) return []; } else { return []; }
+
 
   return res.json({ status: 'Success', result: offences });
 };
