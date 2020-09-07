@@ -37,11 +37,13 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     return next(new Error(Errors.InvalidChain));
   }
 
+  // if start and end date isn't given, we set it for 30 days for now
   if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
-    startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 1);
-    startDate = new Date(startDate);
     endDate = new Date();
+    startDate = new Date();
+    endDate = endDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // today's date
+    startDate.setDate(startDate.getDate() - 30);
+    startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
 
   const rewards = await models.ChainEvent.findAll({
