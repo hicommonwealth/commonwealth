@@ -154,7 +154,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
     }, [
       m(Grid, {
         class: 'staking_calc_wrpr'
-      }, [  m(".staking-heading .row",m("h4", "Staking Calculator")),m(".title_div .row", [],
+      }, [m(".staking-heading .row", m("h4", "Staking Calculator")), m(".title_div .row", [],
 
         m(".select-asset", [m("label", "SELECT ASSET"),
 
@@ -177,15 +177,26 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
             });
           },
           items: assets_list,
-          trigger: m(".AssetSelectListButton", [m("img", { class: "select-list-button-image", src: vnode.state.selected_asset.icon }), m(".select-list-button", m(Button, {
-            align: 'left',
-            compact: true,
-            iconRight: Icons.CHEVRON_DOWN,
-            // iconLeft: Icons.SETTINGS,
-            label: vnode.state.selected_asset
-              ? vnode.state.selected_asset.name
-              : 'Select Asset',
-          }))]),
+          trigger:
+            m("Button", {
+              class: "cui-button cui-align-left cui-compact",
+              label: vnode.state.selected_asset ? vnode.state.selected_asset.name : "NA"
+            }
+              , [m("img", { class: "select-list-button-image", src: vnode.state.selected_asset.icon }), m("span.asset-button-label", vnode.state.selected_asset ? vnode.state.selected_asset.name : "NA"), m(".cui-icon .cui-icon-chevron-down", [m("svg", { viewBox: "0 0 24 24" }, m("polyline", { points: "6 9 12 15 18 9" }))])]
+            )
+
+          // m(".AssetSelectListButton", [m("img", { class: "select-list-button-image", src: vnode.state.selected_asset.icon }), m(".select-list-button", m(Button, {
+          //   align: 'left',
+          //   compact: true,
+          //   iconRight: Icons.CHEVRON_DOWN,
+          //   // iconLeft: Icons.SETTINGS,
+          //   label: vnode.state.selected_asset
+          //     ? vnode.state.selected_asset.name
+          //     : 'Select Asset',
+          // }))])
+
+
+          ,
           onSelect: (item: AssetInfo) => {
             vnode.state.selected_asset = item;
             m.redraw();
