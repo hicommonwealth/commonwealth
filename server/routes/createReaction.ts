@@ -42,7 +42,8 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
   else if (proposal_id) {
     const chainEntity = await proposalIdToEntity(models, chain.id, proposal_id);
     if (!chainEntity) return next(new Error(Errors.NoProposalMatch));
-    proposal = { id: proposal_id, title: chainEntity.title };
+    const [prefix, id] = proposal_id.split('_');
+    proposal = { id };
     root_type = proposal_id.split('_')[0];
     options['proposal_id'] = proposal_id;
   } else if (comment_id) options['comment_id'] = comment_id;
@@ -76,7 +77,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
         });
       } else {
         const chainEntity = await proposalIdToEntity(models, chain.id, comment.root_id);
-        proposal = { id: comment.root_id, title: chainEntity.title };
+        proposal = { id };
       }
       cwUrl = getProposalUrl(prefix, proposal, comment);
       root_type = prefix;
