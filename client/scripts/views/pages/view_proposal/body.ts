@@ -67,8 +67,8 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
 
     const author : Account<any> = (item instanceof OffchainThread || item instanceof OffchainComment)
       ? (app.community
-         ? app.community.accounts.get(item.author, item.authorChain)
-         : app.chain.accounts.get(item.author))
+        ? app.community.accounts.get(item.author, item.authorChain)
+        : app.chain.accounts.get(item.author))
       : item.author;
 
     return m('.ProposalBodyAuthor', [
@@ -422,15 +422,14 @@ export const ProposalBodyEditor: m.Component<{
   savedEdits: string
 } > = {
   oninit: async (vnode) => {
+    debugger;
     const { item } = vnode.attrs;
     const isThread = item instanceof OffchainThread;
     vnode.state.savedEdits = isThread
       ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
       : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
     if (vnode.state.savedEdits) {
-      let confirmed = false;
-      confirmed = await confirmationModalWithText('Previous changes found. Restore edits?')();
-      vnode.state.restoreEdits = confirmed;
+      vnode.state.restoreEdits = await confirmationModalWithText('Previous changes found. Restore edits?')();
       m.redraw();
     }
   },
@@ -441,38 +440,36 @@ export const ProposalBodyEditor: m.Component<{
     if (!item) return;
     const isThread = item instanceof OffchainThread;
     console.log({ restoreEdits, savedEdits });
-    const body = restoreEdits
+    const body = (restoreEdits && savedEdits)
       ? savedEdits
       : item instanceof OffchainComment
         ? (item as OffchainComment<any>).text
         : item instanceof OffchainThread
           ? (item as OffchainThread).body
           : null;
-    if (!body) return;
-    const answeredModalPrompt = restoreEdits !== undefined;
-    console.log(body);
+    if (!body || (savedEdits && (restoreEdits === undefined))) return;
+
     return m('.ProposalBodyEditor', [
-      answeredModalPrompt 
-        ? m(QuillEditor, {
-          contentsDoc: (() => {
-            try {
-              const doc = JSON.parse(body);
-              if (!doc.ops) throw new Error();
-              return doc;
-            } catch (e) {
-              return body;
-            }
-          })(),
-          oncreateBind: (state) => {
-            parentState.quillEditorState = state;
-          },
-          tabindex: 1,
-          theme: 'snow',
-          editorNamespace: isThread
-            ? `edit-thread-${item.id}`
-            : `edit-comment-${item.id}`,
-        })
-        : m(QuillEditor)
+      m(QuillEditor, {
+        contentsDoc: (() => {
+          debugger
+          try {
+            const doc = JSON.parse(body);
+            if (!doc.ops) throw new Error();
+            return doc;
+          } catch (e) {
+            return body;
+          }
+        })(),
+        oncreateBind: (state) => {
+          parentState.quillEditorState = state;
+        },
+        tabindex: 1,
+        theme: 'snow',
+        editorNamespace: isThread
+          ? `edit-thread-${item.id}`
+          : `edit-comment-${item.id}`,
+      })
     ]);
   }
 };
