@@ -179,7 +179,7 @@ export const newThread = async (
   await app.user.notifications.refresh();
   m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
 
-  if (result.topic.name) {
+  if (result.topic) {
     try {
       const topicNames = Array.isArray(activeEntity?.meta?.topics)
         ? activeEntity.meta.topics.map((t) => t.name)
