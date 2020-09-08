@@ -39,6 +39,16 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
         description: 'A new session begins.'
       }
     }
+    
+    /**
+     * Offences Events
+     */
+    case EventKind.Offence: {
+      return {
+        title: 'Offence Reported',
+        description: 'An offence of given type is reported at timeslot.',
+      };
+    }
 
     /**
      * Staking Events

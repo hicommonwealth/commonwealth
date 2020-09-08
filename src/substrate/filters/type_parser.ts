@@ -110,6 +110,12 @@ export function ParseType (
         default: return null;
       }
     }
+    case 'offences': {
+      switch (method) {
+        case 'Offence': return EventKind.Offence;
+        default: return null;
+      }
+    }
     default:
       return null;
   }

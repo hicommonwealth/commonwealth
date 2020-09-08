@@ -1,7 +1,7 @@
 import {
   Header, EventRecord, Extrinsic, ValidatorId, Event, IdentityJudgement as SubstrateJudgement,
 } from '@polkadot/types/interfaces';
-import { Vec } from '@polkadot/types';
+import { Offender } from '@polkadot/types/interfaces/offences';
 
 export const EventChains = [
   'edgeware',
@@ -132,6 +132,9 @@ export enum EventKind {
   AllGood = 'all-good',
   HeartbeatReceived = 'heartbeat-received',
   SomeOffline = 'some-offline',
+
+  // offences events
+  Offence = 'offences-offence'
 }
 
 interface IEvent {
@@ -156,6 +159,17 @@ export interface ISomeOffline extends IEvent {
   kind: EventKind.SomeOffline;
   sessionIndex: number;
   validators: Array<AccountId>;
+}
+
+/**
+ * Offences Events
+ */
+export interface IOffence extends IEvent {
+  kind: EventKind.Offence;
+  offenceKind: string;
+  opaqueTimeSlot: string;
+  applied: boolean;
+  offenders: Array<ValidatorId>
 }
 
 /**
@@ -523,6 +537,7 @@ export type IEventData =
   | IHeartbeatReceived
   | ISomeOffline
   | IAllGood
+  | IOffence
 // eslint-disable-next-line semi-style
 ;
 

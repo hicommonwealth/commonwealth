@@ -7,6 +7,7 @@ import {
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
+import { Kind, OpaqueTimeSlot, Offender, OffenceDetails } from '@polkadot/types/interfaces/offences';
 import { CWEvent } from '../../interfaces';
 import { EventKind, IEventData, isEvent, parseJudgement, IdentityJudgement } from '../types';
 
@@ -66,6 +67,25 @@ export async function Enrich(
         }
       }
 
+      /**
+       * Offences Events
+       */
+      case EventKind.Offence: {
+        const [ offenceKind, opaqueTimeSlot, applied ] = event.data as unknown as [ Kind, OpaqueTimeSlot, boolean ];
+        const reportIds = await api.query.offences.concurrentReportsIndex(offenceKind, opaqueTimeSlot);
+        const offenceDetails: Option<OffenceDetails>[] = await api.query.offences.reports
+          .multi(reportIds.map((reportId) => reportId.toString()));
+        const offenders : Array<ValidatorId> = offenceDetails.map((offence) => offence.unwrap().offender[0]);
+        return {
+          data: {
+            kind,
+            offenceKind: offenceKind.toString(),
+            opaqueTimeSlot: opaqueTimeSlot.toString(),
+            applied: typeof applied === 'undefined' ? true : applied,
+            offenders
+          }
+        };
+      }
       /**
        * Session Events
        */
