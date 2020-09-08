@@ -214,6 +214,7 @@ const CouncilPage: m.Component<{}> = {
       class: 'CouncilPage',
       title: 'Council',
       showNewProposalButton: true,
+      showCouncilMenu: true,
     }, [
       // stats
       m(Grid, {

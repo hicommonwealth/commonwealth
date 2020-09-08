@@ -17,7 +17,7 @@ const Sublayout: m.Component<{
   title?: string,
   description?: string,
   showNewProposalButton?: boolean,
-  showCouncilButtons?: boolean,
+  showCouncilMenu?: boolean,
   rightSidebar?
 }> = {
   view: (vnode) => {
@@ -26,11 +26,11 @@ const Sublayout: m.Component<{
       description,
       rightSidebar,
       showNewProposalButton,
-      showCouncilButtons,
+      showCouncilMenu,
     } = vnode.attrs;
 
     let councilCandidates: Array<[SubstrateAccount, number]>;
-    if (app.chain) {
+    if (app.chain && showCouncilMenu) {
       councilCandidates = app.chain
         && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || [])
           .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ])
@@ -51,12 +51,6 @@ const Sublayout: m.Component<{
       }),
       app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
       showNewProposalButton && m(NewProposalButton, { fluid: false, councilCandidates }),
-      showCouncilButtons
-        && councilCandidates
-        && [
-          m(CollectiveVotingButton, { buttonStyle: true, candidates: councilCandidates }),
-          m(CandidacyButton, { buttonStyle: true, candidates: councilCandidates }),
-        ]
     ]);
 
     return m('.Sublayout', { class: vnode.attrs.class }, [
