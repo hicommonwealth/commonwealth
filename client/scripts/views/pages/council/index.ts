@@ -83,7 +83,9 @@ export const CollectiveVotingButton: m.Component<{
         label: 'Set council vote',
         onclick: (e) => {
           e.preventDefault();
-          console.log('opening');
+          if (!m.route.get().includes(`${app.activeId()}/council`)) {
+            m.route.set(`${app.activeId()}/council`);
+          }
           app.modals.create({
             modal: CouncilVotingModal,
             data: { candidates },
@@ -211,7 +213,6 @@ const CouncilPage: m.Component<{}> = {
     return m(Sublayout, {
       class: 'CouncilPage',
       title: 'Council',
-      showCouncilButtons: true,
       showNewProposalButton: true,
     }, [
       // stats
@@ -237,6 +238,12 @@ const CouncilPage: m.Component<{}> = {
           m('.stats-heading', 'Candidacy bond'),
           m('.stats-tile', candidacyBond),
         ]),
+      ]),
+      m('.button-wrap', {
+        style: 'margin: 15px 0 0; text-align: end'
+      }, [
+        m(CollectiveVotingButton, { buttonStyle: true, candidates }),
+        m(CandidacyButton, { buttonStyle: true, candidates }),
       ]),
       // councillors
       m(Listing, {
