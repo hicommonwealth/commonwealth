@@ -33,6 +33,10 @@ interface IPreHeaderState {
   stakingAmount: number;
   stakingLength: number;
   staked: number;
+  rewardValue: number;
+  networkValue: number;
+  adjustedReward: number;
+  rewardEdgPerDay: number
 }
 
 interface IPreHeaderAttrs {
@@ -45,6 +49,9 @@ class AssetInfo {
   icon: string
   usd_value: number
   consts: ChainConstant
+  calculatedInterestRate: number
+  commission: number
+  rewardFrequencyDays: number
 }
 
 let assets_list: AssetInfo[] = [
@@ -58,6 +65,10 @@ function resetValues(vnode){
   vnode.state.selected_rate = vnode.state.staked;
   vnode.state.switch_mode = false;
   vnode.state.stakingAmount = 0;
+  vnode.state.rewardValue = 0;  
+  vnode.state.networkValue = 0;
+  vnode.state.adjustedReward = 0;
+  vnode.state.rewardEdgPerDay = 0;
 }
 
 const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
@@ -66,7 +77,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
     resetValues(vnode);
     vnode.state.totalStaked = undefined;
     vnode.state.totalbalance = undefined;
-    vnode.state.staked = NaN;
+    vnode.state.staked = -1;
     mixpanel.track('PageVisit', { 'Page Name': 'StakingCalculatorPage' });
   },
   getObservables: (attrs) => ({
@@ -89,7 +100,10 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
           sym: n.chain.symbol,
           icon: n.chain.iconUrl,
           usd_value: NaN,
-          consts: undefined
+          consts: undefined,
+          calculatedInterestRate: 0,
+          commission: 0.1,
+          rewardFrequencyDays: 6
         }
       })
         .filter(unique)
@@ -144,7 +158,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
       vnode.state.selected_rate = vnode.state.staked;
     }
     
-    if (vnode.state.staked == NaN) return m(PageLoading, { message: 'Calculating Current Staked Value...' });
+    if (vnode.state.staked === -1) return m(PageLoading, { message: 'Calculating Current Staked Value...' });
 
     return m(Sublayout, {
       class: 'StakingCalculatorPage',
@@ -253,7 +267,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
         })
         ]),
 
-        m(".select-asset-edg .col", [m("span.thead", "EDG PRICE"), m("div", '123 USD')
+        m(".select-asset-edg .col", [m("span.thead", "EDG PRICE"), m("div", vnode.state.selected_asset.usd_value.toFixed(3) + ' USD')
         ])
       )
 
@@ -261,21 +275,21 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
       m(Grid, {
         class: 'staking_calc_wrpr_2'
       }, [
-        m(".titlewithnumber_div", [m("span", "CURRENT HOLDING VALUE"), m("label", vnode.state.stakingAmount ), m("span"), m("label.bracket", "("+(vnode.state.stakingAmount * vnode.state.selected_asset.usd_value) + " USD)")]),
-        m(".titlewithnumber_div", [m("span", "REWARD VALUE"), m("label", '18.3 EDG'), m("span"), m("label.bracket", "(119.27 USD)")]),
-        m(".titlewithnumber_div", [m("span.column-below", "REWARD RATE"), m("label", '3.3%')]),
-        m(".titlewithnumber_div", [m("span.column-below", "REWARD FREQUENCY"), m("label", '1 day')]),
-        m(".titlewithnumber_div", [m("span.column-below", "NETWORK VALUE"), m("label", '0.0134%')]),
-        m(".titlewithnumber_div", [m("span.column-below", "ADJUSTED REWARD"), m("label", '0.70%')])
+        m(".titlewithnumber_div", [m("span", "CURRENT HOLDING VALUE"), m("label", vnode.state.stakingAmount ), m("span"), m("label.bracket", "("+(vnode.state.stakingAmount * vnode.state.selected_asset.usd_value).toFixed(3) + " USD)")]),
+        m(".titlewithnumber_div", [m("span", "REWARD VALUE"), m("label", vnode.state.rewardValue.toFixed(3)+' EDG'), m("span"), m("label.bracket", "("+(vnode.state.rewardValue *vnode.state.selected_asset.usd_value).toFixed(3) +" USD)")]),
+        m(".titlewithnumber_div", [m("span.column-below", "REWARD RATE"), m("label", vnode.state.selected_asset.calculatedInterestRate + '%')]),
+        m(".titlewithnumber_div", [m("span.column-below", "REWARD FREQUENCY"), m("label", vnode.state.selected_asset.rewardFrequencyDays +' day' + (vnode.state.selected_asset.rewardFrequencyDays > 1 ? 's' :'') )]),
+        m(".titlewithnumber_div", [m("span.column-below", "NETWORK VALUE"), m("label", vnode.state.networkValue.toFixed(3)+'%')]),
+        m(".titlewithnumber_div", [m("span.column-below", "ADJUSTED REWARD"), m("label", vnode.state.adjustedReward.toFixed(3)+'%')])
       ]),
 
       m(Grid, {
         class: 'staking_calc_wrpr'
       }, [m(".row.title-row", [m(".title-div.col-xs-12", m("h5", "Returns"))]),
       m(".row.content-row", [
-        m(".returns_content_div.col-lg-4", [m("strong", "1 Day @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")]),
-        m(".returns_content_div .borderleft_right.col-lg-4", [m("strong", "1 Month @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")]),
-        m(".returns_content_div.col-lg-4", [m("strong", "1 Year @ 0.071%"), m("p", "0.098 EDG"), m("span", "($0.70)")])
+        m(".returns_content_div.col-lg-4", [m("strong", "1 Day @ "+vnode.state.rewardValue.toFixed()+"%"), m("p", vnode.state.rewardEdgPerDay.toFixed(3)+" EDG"), m("span", "($"+ ((vnode.state.rewardEdgPerDay) *vnode.state.selected_asset.usd_value).toFixed(3)  +")")]),
+        m(".returns_content_div .borderleft_right.col-lg-4", [m("strong", "1 Month @ "+vnode.state.rewardValue.toFixed()+"%"), m("p",  (vnode.state.rewardEdgPerDay  * 30) .toFixed(3)+" EDG"), m("span", "($"+ ((vnode.state.rewardEdgPerDay * 30 ) *vnode.state.selected_asset.usd_value).toFixed(3)  +")")]),
+        m(".returns_content_div.col-lg-4", [m("strong", "1 Year @ "+vnode.state.rewardValue.toFixed()+"%"), m("p", (vnode.state.rewardEdgPerDay  * 365) .toFixed(3)+" EDG"), m("span", "($"+ ((vnode.state.rewardEdgPerDay * 365 ) *vnode.state.selected_asset.usd_value).toFixed(3)  +")")])
       ])
         ,
       m(".row", m(".col-xs-12", m(Button, { align: 'center', compact: true, label: 'Reset values to default' ,
