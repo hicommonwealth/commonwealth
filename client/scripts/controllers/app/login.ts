@@ -95,11 +95,11 @@ export function updateActiveAddresses(chain?: ChainInfo) {
     chain
       ? app.user.addresses
         .filter((a) => a.chain === chain.id)
-        .map((addr) => app.chain.accounts.get(addr.address, addr.keytype))
+        .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
         .filter((addr) => addr)
       : app.user.addresses
         .filter((addr) => app.config.chains.getById(addr.chain))
-        .map((addr) => app.community.accounts.get(addr.address, addr.chain))
+        .map((addr) => app.community?.accounts.get(addr.address, addr.chain))
         .filter((addr) => addr)
   );
 
