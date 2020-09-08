@@ -10,7 +10,6 @@ export function ParseType (
   section: string,
   method: string,
 ): EventKind | null {
-  console.log(section);
   // TODO: we can unify this with the enricher file: parse out the kind, and then
   //   marshall the rest of the types in the same place. But for now, we can leave as-is.
   switch (section) {
@@ -92,7 +91,6 @@ export function ParseType (
         default: return null;
       }
     case 'treasuryReward':
-      console.log(method);
       switch (method) {
         case 'TreasuryMinting': {
           if (versionNumber < 34) {

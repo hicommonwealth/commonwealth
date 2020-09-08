@@ -6,11 +6,13 @@ import { Vec } from '@polkadot/types';
 export const EventChains = [
   'edgeware',
   'edgeware-local',
+  'edgeware-testnet',
   'kusama',
   'kusama-local',
   'polkadot',
   'polkadot-local',
-];
+  'kulupu',
+] as const;
 
 /**
  * To implement a new form of event, add it to this enum, and add its

@@ -10,7 +10,8 @@ export type IChainEntityKind = SubstrateTypes.EntityKind | MolochTypes.EntityKin
 export type IChainEventData = SubstrateTypes.IEventData | MolochTypes.IEventData;
 export type IChainEventKind = SubstrateTypes.EventKind | MolochTypes.EventKind;
 export const ChainEventKinds = [...SubstrateTypes.EventKinds, ...MolochTypes.EventKinds];
-export const EventSupportingChains = [...SubstrateTypes.EventChains, ...MolochTypes.EventChains];
+export const EventSupportingChains = [...SubstrateTypes.EventChains, ...MolochTypes.EventChains] as const;
+export type EventSupportingChainT = typeof EventSupportingChains[number];
 export enum EntityEventKind {
   Create = 0,
   Update,
@@ -58,7 +59,7 @@ export abstract class IEventSubscriber<Api, RawEvent> {
 }
 
 export interface ISubscribeOptions<Api> {
-  chain: string;
+  chain: EventSupportingChainT;
   api: Api;
   handlers: IEventHandler<IChainEventData>[];
   skipCatchup?: boolean;
