@@ -9,7 +9,7 @@ export type ProposalV2 = UnPromisify<ReturnType<Moloch2['functions']['proposals'
 
 export type Api = Moloch1 | Moloch2;
 
-export const EventChains = [ 'moloch', 'moloch-local' ];
+export const EventChains = [ 'moloch', 'moloch-local' ] as const;
 
 export type RawEvent = Event;
 

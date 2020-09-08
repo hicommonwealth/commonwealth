@@ -203,10 +203,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@edgeware/node-types@^2.4.4":
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-2.4.4.tgz#8795f84c83ceca362a0bfab5d0078463d9597cbe"
-  integrity sha512-NQVcPe2AfwxlsVXmTxICCPHu4qTrYROsiB9JbaAsHDaw/BCuyruKYTTGWMVHBR8VR58yjFe2Me8t4EwCnYrvJg==
+"@edgeware/node-types@^2.4.5":
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-2.4.5.tgz#ac2af46e4ab648bb127cfe3b0cb895303bbc5441"
+  integrity sha512-SzLo71Wu+FvY/9ijzDFrNeedY/A5XRkwFInPq6ObjyeFkVaapmzXKc9gucejTutrLHbaWbuQUJu5Nro2A43uIw==
 
 "@ethersproject/abi@5.0.0-beta.153":
   version "5.0.0-beta.153"

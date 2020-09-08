@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 
-import { IEventLabel, LabelerFilter } from '../../interfaces';
+import { IEventLabel, LabelerFilter, EventSupportingChainT } from '../../interfaces';
 import { BalanceString, EventKind, IEventData } from '../types';
 
 function fmtAddr(addr : string) {
@@ -36,20 +36,27 @@ function formatNumberShort(num: number) {
     num.toString();
 }
 
-const edgBalanceFormatter = (chain, balance: BalanceString): string => {
-  const denom = chain === 'edgeware'
-    ? 'EDG'
-    : chain === 'edgeware-local' || chain === 'edgeware-testnet'
-      ? 'tEDG'
-      : chain === 'kusama'
-        ? 'KSM'
-        : chain === 'kusama-local'
-          ? 'tKSM' 
-          : chain === 'kulupu' 
-            ? 'KLP' : null;
-  if (!denom) {
-    throw new Error('unexpected chain');
+const getDenom = (chain: EventSupportingChainT): string => {
+  switch (chain) {
+    case 'edgeware': return 'EDG';
+    case 'edgeware-local':
+    case 'edgeware-testnet': return 'tEDG';
+    case 'kusama': return 'KSM';
+    case 'kusama-local': return 'tKSM';
+    case 'kulupu': return 'KLP';
+    case 'polkadot': return 'DOT';
+    case 'polkadot-local': return 'tDOT';
+    case 'moloch': return 'Shares';
+    case 'moloch-local': return 'tShares';
+    default: {
+      const _dummy: never = chain;
+      throw new Error('invalid chain');
+    }
   }
+}
+
+const edgBalanceFormatter = (chain, balance: BalanceString): string => {
+  const denom = getDenom(chain);
   let dollar;
   if (chain.startsWith('edgeware')) {
     dollar = (new BN(10)).pow(new BN(EDG_DECIMAL));
