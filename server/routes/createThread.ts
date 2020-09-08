@@ -105,7 +105,10 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       return next(err);
     }
   } else {
-    return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
+    console.log(community);
+    if (community.topics.length) {
+      return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
+    }
   }
 
   let thread;
