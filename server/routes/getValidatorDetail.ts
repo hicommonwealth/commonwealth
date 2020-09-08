@@ -3,14 +3,17 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 
 
-const getCurrentValidators = async (models, req: Request, res: Response, next: NextFunction) => {
-    let validators: any = [];
-    let where: any = req.params && req.params.state ? { state: req.params.state } : { state: 'Active' };
-    
-    if (req.body && req.body.validatorStashes){
-        where.stash_id = { [Op.in]: req.body.validatorStashes };
-    }
+const getValidatorDetail = async (models, req: Request, res: Response, next: NextFunction) => {
+    // console.log("reqqqqqqq ", req.params)
+    console.log("body ", req.query.validatorStashes);
 
+    let validators: any = [];
+    let where: any = { state: req.query?.state ? req.query?.state : 'Active' };
+
+    if (req.query?.validatorStashes?.length) {
+        where.stash_id = { [Op.in]: req?.query?.validatorStashes };
+    }
+    console.log("where ======== ", where)
     validators = await models.Validators.findAll({
         where: where,
         include: {
@@ -20,8 +23,10 @@ const getCurrentValidators = async (models, req: Request, res: Response, next: N
     });
 
     validators = JSON.parse(JSON.stringify(validators));
-    validators.map(row => {
-        row.HistoricalValidatorStats = row.HistoricalValidatorStats && row.HistoricalValidatorStats.length > 0 ? [row.HistoricalValidatorStats[0]]: [];
+    validators = validators.map(row => {
+        row = { ...row.HistoricalValidatorStats?.[0], ...row };
+        delete row.HistoricalValidatorStats;
+        return row;
     });
 
     return res.json({
@@ -33,5 +38,4 @@ const getCurrentValidators = async (models, req: Request, res: Response, next: N
     });
 };
 
-
-export default getCurrentValidators;
+export default getValidatorDetail;

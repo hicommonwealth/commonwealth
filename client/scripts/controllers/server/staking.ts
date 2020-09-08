@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 /* eslint-disable no-restricted-syntax */
 import app from 'state';
-import { get } from 'lib/util';
+import { get, post } from 'lib/util';
 
 class StakingController {
     public constructor() {
@@ -13,27 +13,16 @@ class StakingController {
             return get('/getGlobalStatistics', {}, resolve);
         });
     }
-    public validatorNamesAddrss(searchCriteria?: any, pagination?: any) {
+    public validatorNamesAddress() {
         return new Promise((resolve) => {
             return get('/getValidatorNamesAndAddresses', {}, resolve);
         });
     }
-    public currentValidators(searchCriteria, pagination) {
-        console.log("cccccccccccccccc ", searchCriteria)
-        // if (searchCriteria?.validatorStashes?.length)
+    public validatorDetail(state?: string, stashes?: any) {
         return new Promise((resolve) => {
-            return get('/getCurrentValidators', {
-                searchCriteria,
-                pagination
-            }, resolve);
-        });
-    }
-    public waitingValidators(searchCriteria?: any, pagination?: any) {
-        console.log("wwwwwwwwwwwwwwwww ", searchCriteria)
-        // if (searchCriteria)
-        return new Promise((resolve) => {
-            return get('/getWaitingValidators', {
-                searchCriteria, pagination
+            return get('/getValidatorDetail', {
+                state,
+                validatorStashes: stashes
             }, resolve);
         });
     }

@@ -1,20 +1,26 @@
 import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
+import mithrilSelect from "mithril-select"
 import { get } from 'lodash';
+import { DropdownFormField, TextareaFormField } from 'views/components/forms';
 import Substrate from 'controllers/chain/substrate/main';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
-import { Icon, Icons, Spinner, TextArea, Select } from 'construct-ui';
+import { Icon, Icons, Spinner, ListItem, Select, InputSelect } from 'construct-ui';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
 import ValidatorRowWaiting from './validator_row_waiting';
 import RecentBlock from './recent_block';
 
+let result = { validators: [] };
 const model = {
+  scroll: false,
+  state: 'Active',
   prevIndex: 0,
   nextIndex: 0,
-  scroll: 1,
+  pageSize: 5,
+  // scroll: 1,
   searchValue: '',
   searchBy: '',
   searchIsOn: false,
@@ -30,14 +36,6 @@ const model = {
     pageSize: 7,
     currentPageNo: 1,
   },
-  currentValidators: {
-    pagination: {},
-    currentValidators: []
-  },
-  waitingValidators: {
-    pagination: {},
-    waitingValidators: []
-  },
   currentTab: 'current',
   show: true,
   addresses: [],
@@ -51,76 +49,26 @@ const model = {
       fetchedRecords: 0
     },
   },
+  activeStashes: [],
+  waitingStashes: [],
   sortKey: 'exposure.total',
   sortAsc: true,
-  async fetchNext(address) {
-    // alertalert("test")
-    model.searchCriteria = { validatorStashes: address };
-    // const current_val: any = await app.staking[mode](model.searchCriteria, model.pagination);
+  extraOp: [],
 
-    if ((model.searchCriteria as any)?.validatorStashes?.length) {
-      const current_val = await app.staking.currentValidators({ validatorStashes: address }, model.pagination);
-
-      const waiting_val = await app.staking.waitingValidators({ validatorStashes: address }, model.pagination);
-
-      let new_current: any = [...model.currentValidators?.currentValidators, ...current_val['currentValidators']];
-
-      new_current = new_current.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i)
-
-      model.currentValidators.currentValidators = new_current
-
-      console.log("fetched next  model.currentValidators ", model.currentValidators);
-      // model.pagination = new_current.pagination;
-
-      let waiting_validator: any = [...model.waitingValidators?.waitingValidators, ...waiting_val['waitingValidators']];
-      waiting_validator = waiting_validator.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i)
-      model.waitingValidators.waitingValidators = waiting_validator
-
-      // model.pagination = waiting_validator.pagination;
-      console.log("fetched next  model.waitingValidators ", model.waitingValidators);
-      // model[mode][mode] = [...model[mode][mode], ...current_val[mode]];
-      //
-      // model[mode].pagination = { ...model.pagination };
-      m.redraw();
-    }
-    return;
-  },
-  async search(mode: string, value: string) {
-    // alert(mode)
-    let current_data: any;
-    current_data = model[mode][mode].filter(row => row.stash_id === value);
-    if (current_data.length) {
-      model[mode][mode] = current_data;
-      console.log(mode, "current_data ====== ", current_data,)
-      m.redraw();
-      return;
-    }
-    current_data = await app.staking[mode](model.searchCriteria);
-
-    // console.log(current_data, "current_dataaaaaaaaaaaaaaaaaaa")
-    // console.log(model[mode], "model[mode]")
-    model[mode][mode] = current_data[mode];
-    // model[mode].pagination = current_data.pagination;
-
-    console.log("current_data ====== ", current_data);
-    m.redraw();
-    return;
-  },
-  onChangeHandler(address) {
-    console.log("new address ", address);
-    model.fetchNext(address);
-    // if (model.currentTab === 'current') {
-    //   model.fetchNext('currentValidators', address);
-    //   return;
-    // }
-    // model.fetchNext('waitingValidators', address);
-  },
   onSearchHandler(value?: string) {
-    // alert("search")
+    console.log("valueee ", value)
     model.searchIsOn = true;
     // if search box is empty then refresh
     if (!value) {
-      model.refresh(model.allAddresses.slice(model.prevIndex, model.nextIndex));
+      if (model.state === 'Active') {
+        console.log(model.profile, "model.profile")
+        model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
+      }
+      else {
+        console.log(model.waitingStashes, "waitingStashes");
+        model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
+      }
+      model.refresh();
       model.searchIsOn = false;
       m.redraw();
     }
@@ -128,25 +76,63 @@ const model = {
     if (value) {
       model.searchValue = value;
       model.searchCriteria = { value };
-      if (model.currentTab === 'current') {
-        model.search('currentValidators', value);
+      let mapNamesAddress = [];
+      const temp = [...model.profile];
+      if (model.state === 'Active') {
+        mapNamesAddress = temp.filter(row => row.state === 'Active')
+      } else {
+        mapNamesAddress = temp.filter(row => row.state === 'Waiting');
+      }
+      mapNamesAddress = mapNamesAddress.map(ele => { return { name: ele.name, address: ele.address } });
+      for (let i of mapNamesAddress) {
+        model.extraOp = [...model.extraOp, i.name, i.address];
+      }
+      let validators = [];
+      value = value.toLowerCase();
+
+      //fetch from already fetched list
+      result.validators.forEach((ele => {
+
+        if (ele.name?.toLowerCase().includes(value) || ele.stash_id.toLowerCase().includes(value)) {
+          validators.push(ele);
+        }
+      }));
+
+      if (!validators.length) {
+        console.log("fetching from outside")
+        let obj = [];
+        model.extraOp.forEach((ele) => {
+          if (ele.toLowerCase().includes(value)) {
+            obj = [...obj, ele];
+          }
+        });
+        model.state === 'Active' ? model.activeStashes = obj : model.waitingStashes = obj;
+        console.log(obj, "obj");
+        model.refresh();
+        m.redraw()
         return;
       }
-      // alert("tets waiting")
-      model.search('waitingValidators', value);
-      m.redraw();
+      console.log("fetched")
+      result.validators = validators;
+      m.redraw()
+      return;
     }
   },
-  async refresh(address) {
-
-    // console.log("records fetched from " + model.prevIndex + " to " + model.nextIndex);
-    const staking = app.staking as any;
-    model.searchValue = '';
-    let criteria = { validatorStashes: address };
-    if (criteria?.validatorStashes?.length) {
-      model.currentValidators = await staking.currentValidators(criteria, model.pagination);
-      model.waitingValidators = await staking.waitingValidators(criteria, model.pagination);
+  async refresh() {
+    let validatorStashes: any = model.activeStashes;
+    if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
+    let { prevIndex, nextIndex, pageSize } = model;
+    let validators: any = [];
+    if (validatorStashes.length >= prevIndex) {
+      validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
+      prevIndex = nextIndex;
+      nextIndex = nextIndex + pageSize;
+      model.prevIndex = prevIndex;
+      model.nextIndex = nextIndex;
     }
+    result.validators = [...result.validators, ...validators.validators];
+    result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+    m.redraw();
   },
   sortIcon(key: string) {
     return model.sortKey === key
@@ -155,30 +141,36 @@ const model = {
         : Icons.ARROW_DOWN
       : Icons.MINUS;
   },
+  profile: [],
   reset(index) {
     model.pagination.currentPageNo = 1;
     model.show = true;
     if (index === 0) {
       model.currentTab = 'current';
+      model.state = 'Active';
+      window.scrollTo(0, 0);
+      model.prevIndex = 0;
+      model.nextIndex = model.prevIndex + model.pageSize;
+      console.log("state ", model.state);
+      model.refresh();
     }
     if (index === 1) {
       model.currentTab = 'waiting';
+      model.state = 'Waiting';
+      window.scrollTo(0, 0);
+      model.prevIndex = 0;
+      model.nextIndex = model.prevIndex + model.pageSize;
+      console.log("state ", model.state);
+      model.refresh();
     }
     if (index > 1) {
       model.show = false;
-      model.refresh(model.allAddresses.slice(model.prevIndex, model.nextIndex));
       m.redraw();
     }
     if (model.searchValue)
       model.onSearchHandler(model.searchValue);
   },
-  next(address) {
-    // if (model.pagination.currentPageNo < Math.ceil(model.recordCount[model.currentTab].totalRecords / model.pagination.pageSize)) {
-    // model.pagination.currentPageNo++;
-    model.onChangeHandler(address);
-    // }
 
-  },
   changeSort(key: string) {
     if (key === model.sortKey)
       model.sortAsc = !model.sortAsc;
@@ -189,18 +181,19 @@ const model = {
 export const PresentationComponent_ = {
 
   oninit: async () => {
-    model.validatorNamesAddrss = await app.staking.validatorNamesAddrss({}, {});
-    model.allAddresses = (model.validatorNamesAddrss as any).map((addr) => addr.address);
-    console.log("addresses ======", model.allAddresses);
-    model.refresh(model.allAddresses.slice(model.nextIndex, model.nextIndex + model.pagination.pageSize));
-    model.prevIndex = model.nextIndex;
-    model.nextIndex = model.nextIndex + model.pagination.pageSize;
+    model.validatorNamesAddrss = await app.staking.validatorNamesAddress();
+    model.profile = (model.validatorNamesAddrss as any).profileData;
+    console.log("profile ======", model.profile);
 
+    model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address);
+    model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
+    model.refresh();
+    // console.log("validators ", result);
   },
   view: () => {
-    let { changeSort, reset, setValue, searchBy, searchByOptions, currentValidators, waitingValidators, recordCount, sortAsc, sortIcon, sortKey, next, onSearchHandler, scroll } = model;
+    let { changeSort, reset, sortAsc, sortIcon, sortKey, onSearchHandler } = model;
 
-    if (!currentValidators?.currentValidators?.length && !waitingValidators?.waitingValidators?.length)
+    if (!result?.validators?.length)
       return m(Spinner, {
         fill: true,
         message: 'Loading Validators...',
@@ -208,42 +201,28 @@ export const PresentationComponent_ = {
         style: 'visibility: visible; opacity: 1;'
       });
     const chain = app.chain as Substrate;
-
-    recordCount['current'].totalRecords = (currentValidators?.pagination as any).totalRecords;
-    recordCount['waiting'].totalRecords = (waitingValidators?.pagination as any).totalRecords;
-
-    recordCount['current'].fetchedRecords = currentValidators?.currentValidators?.length;
-    recordCount['waiting'].fetchedRecords = waitingValidators?.waitingValidators?.length;
-
-
-    console.log("currentValidators ", currentValidators);
-    console.log("waitingValidators ", waitingValidators);
-    let current_validators = currentValidators.currentValidators;
-    let waiting_validators = waitingValidators.waitingValidators;
+    console.log("validators ", result.validators);
 
     const lastHeaders = (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.lastHeaders
       : [];
 
-    current_validators = current_validators.sort((val1, val2) => {
+    result.validators = result.validators?.sort((val1, val2) => {
       if (sortAsc)
         return get(val2, sortKey, 0) - get(val1, sortKey, 0);
       return get(val1, sortKey, 0) - get(val2, sortKey, 0);
-    });
-    waiting_validators = waiting_validators
-      .sort((val1, val2) => val2.exposure - val1.exposure);
+    })
+    // result.validators = result.validators?.sort((val1, val2) => val2?.exposure - val1?.exposure);
+
 
     //onscroll fetch next N record
     $(window).scroll(function () {
-      if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
-        // addresses
-        // console.log("allAddresses ", model.allAddresses)
-
-        if (model.allAddresses.length >= model.prevIndex) {
-          // console.log("slice more ", model.nextIndex, model.nextIndex + model.pagination.pageSize)
-          next(model.allAddresses.slice(model.nextIndex, model.nextIndex + model.pagination.pageSize));
-          model.prevIndex = model.nextIndex;
-          model.nextIndex = model.nextIndex + model.pagination.pageSize;
+      if (!model.scroll) {
+        // End of the document reached?
+        if ($(document).height() - $(this).height() - 100 < $(this).scrollTop()) {
+          // alert('Just 100 pixels above to Bottom');
+          model.scroll = true;
+          model.refresh()
         }
       }
     });
@@ -253,6 +232,7 @@ export const PresentationComponent_ = {
     //   .filter((elt) => elt > -1.0 && elt < 1000.0);
     // const aprSum = filtered.reduce((prev, curr) => prev + curr, 0.0);
     // const aprAvg = (aprSum * 1.0) / filtered.length;
+
     return m('div.validators-container',
       m(Tabs, [
         {
@@ -304,7 +284,7 @@ export const PresentationComponent_ = {
               // m('th.val-last-hash', 'last #'),
               m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses')
             ]),
-            current_validators.map((validator) => {
+            result.validators.map((validator) => {
               // console.log("validator.exposure ===== ", validator.exposure, validator.stash_id)
               // total stake
               const total = chain.chain.coins(+validator.exposure?.total);
@@ -362,7 +342,7 @@ export const PresentationComponent_ = {
               m('th.val-waiting-commission', 'Commission'),
               m('th.val-action', ''),
             ]),
-            waiting_validators.map((validator) => {
+            result.validators.map((validator) => {
               const stash = validator.stash_id;
               const controller = validator.controller;
               const eraPoints = validator.eraPoints;
@@ -381,7 +361,8 @@ export const PresentationComponent_ = {
                 blockCount,
                 hasMessage,
                 isOnline,
-                commission, name
+                commission,
+                name
               });
             }),
           ])

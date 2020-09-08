@@ -67,7 +67,7 @@ const getValidatorNamesAndAddresses = async (models, req: Request, res: Response
         return res.json({
             status: 'Success',
             total: profileData.length,
-            result: profileData
+            result: { profileData }
         });
     }
 

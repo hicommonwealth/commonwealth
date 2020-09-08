@@ -48,8 +48,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
   }),
   view: vnode => {
     let { sessionInfo, globalStatistics, sender } = vnode.state.dynamic;
-    console.log('globalStatistics ====', globalStatistics);
-    console.log("sessionInfo ", sessionInfo)
+    // console.log('globalStatistics ====', globalStatistics);
+    // console.log("sessionInfo ", sessionInfo)
     if (!sessionInfo && !globalStatistics) return;
     // console.log("globalStatistics ", JSON.stringify(globalStatistics));
     let { count = 0, rows = [] } = globalStatistics;

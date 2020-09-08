@@ -108,7 +108,7 @@ import addValidator from './routes/addValidator';
 import upsertHistoricalValidatorStats from './routes/upsertHistoricalValidatorStats';
 
 import getGlobalStatistics from './routes/getGlobalStatistics';
-import getCurrentValidators from './routes/getValidatorDetail';
+import getValidatorDetail from './routes/getValidatorDetail';
 import getValidatorNamesAndAddresses from './routes/getValidatorNamesAndAddresses'
 function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
@@ -332,8 +332,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/bulkEntities', bulkEntities.bind(this, models));
 
   router.get('/getValidatorNamesAndAddresses', getValidatorNamesAndAddresses.bind(this, models));
-  router.get('/getCurrentValidators/', getCurrentValidators.bind(this, models));
-  router.get('/getCurrentValidators/:state', getCurrentValidators.bind(this, models));
+  router.get('/getValidatorDetail/', getValidatorDetail.bind(this, models));
+  router.get('/getValidatorDetail/:state', getValidatorDetail.bind(this, models));
   router.get('/getGlobalStatistics', getGlobalStatistics.bind(this, models));
 
 
