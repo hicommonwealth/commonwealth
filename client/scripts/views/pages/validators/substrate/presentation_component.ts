@@ -166,11 +166,12 @@ const model = {
       model.currentTab = 'current';
       model.state = 'Active';
       window.scrollTo(0, 0);
+      model.scroll = false;
       model.prevIndex = 0;
-      model.nextIndex = model.prevIndex + model.pageSize;
+      model.nextIndex = 0;
       console.log("state ", model.state);
       model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
-
+      m.redraw();
       model.refresh();
     }
     if (index === 1) {
@@ -178,9 +179,11 @@ const model = {
       model.state = 'Waiting';
       window.scrollTo(0, 0);
       model.prevIndex = 0;
-      model.nextIndex = model.prevIndex + model.pageSize;
+      model.nextIndex = 0;
+      model.scroll = false;
       console.log("state ", model.state);
       model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
+      m.redraw();
       model.refresh();
     }
     if (index > 1) {
