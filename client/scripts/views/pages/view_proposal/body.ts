@@ -422,14 +422,21 @@ export const ProposalBodyEditor: m.Component<{
   savedEdits: string
 } > = {
   oninit: async (vnode) => {
-    debugger;
     const { item } = vnode.attrs;
     const isThread = item instanceof OffchainThread;
     vnode.state.savedEdits = isThread
       ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
       : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
     if (vnode.state.savedEdits) {
-      vnode.state.restoreEdits = await confirmationModalWithText('Previous changes found. Restore edits?')();
+      const modalMsg = 'Previous changes found. Restore edits?';
+      vnode.state.restoreEdits = await confirmationModalWithText(modalMsg, 'Yes', 'No')();
+      if (!vnode.state.restoreEdits) {
+        if (isThread) {
+          localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
+        } else {
+          localStorage.removeItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+        }
+      }
       m.redraw();
     }
   },
@@ -439,7 +446,6 @@ export const ProposalBodyEditor: m.Component<{
 
     if (!item) return;
     const isThread = item instanceof OffchainThread;
-    console.log({ restoreEdits, savedEdits });
     const body = (restoreEdits && savedEdits)
       ? savedEdits
       : item instanceof OffchainComment
@@ -447,12 +453,15 @@ export const ProposalBodyEditor: m.Component<{
         : item instanceof OffchainThread
           ? (item as OffchainThread).body
           : null;
-    if (!body || (savedEdits && (restoreEdits === undefined))) return;
+
+    if (!body) return;
+    if (savedEdits && (restoreEdits === undefined)) {
+      return m(QuillEditor);
+    }
 
     return m('.ProposalBodyEditor', [
       m(QuillEditor, {
         contentsDoc: (() => {
-          debugger
           try {
             const doc = JSON.parse(body);
             if (!doc.ops) throw new Error();
