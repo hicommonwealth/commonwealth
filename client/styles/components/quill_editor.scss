@@ -108,9 +108,11 @@
     .ql-bubble .ql-editor {
         padding: 1px 8px 8px 1px;
     }
-    .ql-bubble .ql-editor blockquote {
-        margin-top: 0;
-        margin-bottom: 0;
+    .ql-snow .ql-editor,
+    .ql-bubble .ql-editor {
+        blockquote {
+            margin: 6px 0;
+        }
     }
 
 
