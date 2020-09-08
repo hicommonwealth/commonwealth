@@ -178,18 +178,28 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
         m(Button, {
           class: 'admin-panel-tab-button',
           label: 'Upgrade Member',
+          disabled: (!vnode.state.role || !vnode.state.user),
           onclick: () => {
             const indexOfName = names.indexOf(vnode.state.user);
             const user = noAdmins[indexOfName];
             const newRole = (vnode.state.role === 'Admin') ? 'admin'
               : (vnode.state.role === 'Moderator') ? 'moderator' : '';
             if (!user) return;
+            if (!newRole) return;
             $.post(`${app.serverUrl()}/upgradeMember`, {
               new_role: newRole,
               address: user.Address.address,
               ...chainOrCommObj,
               jwt: app.user.jwt,
             }).then((r) => {
+              if (r.status === 'Success') {
+                notifySuccess('Member upgraded');
+                delete vnode.state.user;
+                delete vnode.state.role;
+                m.redraw();
+              } else {
+                notifyError('Upgrade failed');
+              }
               onRoleUpgrade(user, r.result);
             });
           },
