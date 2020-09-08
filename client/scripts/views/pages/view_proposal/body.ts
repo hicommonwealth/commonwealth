@@ -31,6 +31,14 @@ export enum GlobalStatus {
   Set = 'set'
 }
 
+const clearEditingLocalStorage = (item, isThread: boolean) => {
+  if (isThread) {
+    localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
+  } else {
+    localStorage.removeItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+  }
+};
+
 export const activeQuillEditorHasText = () => {
   // TODO: Better lookup than document.getElementsByClassName[0]
   // TODO: This should also check whether the Quill editor has changed, rather than whether it has text
@@ -250,7 +258,10 @@ export const ProposalBodyDelete: m.Component<{ item: OffchainThread | OffchainCo
   }
 };
 
-export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | OffchainComment<any>, refresh?: Function, }> = {
+export const ProposalBodyDeleteMenuItem: m.Component<{
+  item: OffchainThread | OffchainComment<any>,
+  refresh?: Function,
+}> = {
   view: (vnode) => {
     const { item, refresh } = vnode.attrs;
     if (!item) return;
@@ -297,11 +308,7 @@ export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStat
           if (!confirmed) return;
           parentState.editing = false;
           getSetGlobalEditingStatus(GlobalStatus.Set, false);
-          if (item instanceof OffchainComment) {
-            localStorage.removeItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
-          } else if (item instanceof OffchainThread) {
-            localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
-          }
+          clearEditingLocalStorage(item, item instanceof OffchainThread);
           m.redraw();
         }
       }, 'Cancel')
@@ -339,6 +346,7 @@ export const ProposalBodySaveEdit: m.Component<{
               m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;
+              clearEditingLocalStorage(item, true);
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               m.redraw();
               // TODO: set notification bar for 'thread edited' (?)
@@ -347,6 +355,7 @@ export const ProposalBodySaveEdit: m.Component<{
             app.comments.edit(item, itemText).then((c) => {
               parentState.editing = false;
               parentState.saving = false;
+              clearEditingLocalStorage(item, false);
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               callback();
             });
@@ -430,13 +439,7 @@ export const ProposalBodyEditor: m.Component<{
     if (vnode.state.savedEdits) {
       const modalMsg = 'Previous changes found. Restore edits?';
       vnode.state.restoreEdits = await confirmationModalWithText(modalMsg, 'Yes', 'No')();
-      if (!vnode.state.restoreEdits) {
-        if (isThread) {
-          localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
-        } else {
-          localStorage.removeItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
-        }
-      }
+      clearEditingLocalStorage(item, isThread);
       m.redraw();
     }
   },
