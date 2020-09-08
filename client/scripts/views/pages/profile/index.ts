@@ -96,6 +96,7 @@ interface IProfilePageState {
   comments: OffchainComment<any>[];
   loaded: boolean;
   loading: boolean;
+  refreshProfile: boolean;
 }
 
 const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
@@ -105,6 +106,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     vnode.state.loading = false;
     vnode.state.threads = [];
     vnode.state.comments = [];
+    vnode.state.refreshProfile = false;
   },
   oncreate: async (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
@@ -131,7 +133,18 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           const profile = new Profile(a.chain, a.address);
           if (a.OffchainProfile) {
             const profileData = JSON.parse(a.OffchainProfile.data);
-            profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
+            // ignore off-chain name if substrate id exists
+            if (a.OffchainProfile.identity) {
+              profile.initializeWithChain(
+                a.OffchainProfile.identity,
+                profileData.headline,
+                profileData.bio,
+                profileData.avatarUrl,
+                a.OffchainProfile.judgements
+              );
+            } else {
+              profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
+            }
           } else {
             profile.initializeEmpty();
           }
@@ -160,7 +173,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       });
     };
 
-    const { account, loaded, loading } = vnode.state;
+    const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
       loadProfile();
       vnode.state.loading = true;
@@ -173,6 +186,11 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     if (loading || !loaded) return m(PageLoading);
     if (!account) {
       return m(PageNotFound, { message: 'This address does not have a Commonwealth profile' });
+    }
+    if (refreshProfile) {
+      loadProfile();
+      vnode.state.refreshProfile = false;
+      m.redraw();
     }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
@@ -197,7 +215,10 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       class: 'ProfilePage',
     }, [
       m('.forum-container-alt', [
-        m(ProfileHeader, { account }),
+        m(ProfileHeader, {
+          account,
+          refreshCallback: () => { vnode.state.refreshProfile = true; },
+        }),
         m('.row.row-narrow.forum-row', [
           m('.col-xs-8', [
             m(Tabs, [{

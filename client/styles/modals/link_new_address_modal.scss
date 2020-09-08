@@ -184,6 +184,17 @@
     .link-address-cli-explainer {
         margin-bottom: 20px;
     }
+    .cui-control.cui-checkbox {
+        margin-bottom: 12px;
+    }
+    .link-address-cli-verification {
+        margin-top: 20px;
+        .cui-control.cui-checkbox {
+            margin-bottom: 20px;
+        }
+    }
+
+    //
     .accounts-list {
         margin: 26px auto;
         border-radius: 5px;
@@ -240,11 +251,6 @@
             border-bottom: 1px solid $background-color-border;
             border-bottom-right-radius: 6px;
             border-bottom-left-radius: 6px;
-        }
-    }
-    .CheckboxFormField.FormField {
-        label {
-            color: $text-color-medium;
         }
     }
 

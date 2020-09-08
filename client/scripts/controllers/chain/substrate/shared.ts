@@ -19,7 +19,8 @@ import {
   DispatchError,
   ActiveEraInfo,
   EraIndex,
-  SessionIndex
+  SessionIndex,
+  AccountInfo
 } from '@polkadot/types/interfaces';
 
 import { Vec, Compact } from '@polkadot/types/codec';
@@ -58,9 +59,7 @@ export type HandlerId = number;
 
 // creates a substrate API provider and waits for it to emit a connected event
 async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
-  const nodeUrl = constructSubstrateUrl(node.url, [
-    'edgewa.re', 'kusama-rpc.polkadot.io', 'rpc.polkadot.io',
-  ]);
+  const nodeUrl = constructSubstrateUrl(node.url);
   const provider = new WsProvider(nodeUrl, 10 * 1000);
   let unsubscribe: () => void;
   await new Promise((resolve) => {
@@ -313,6 +312,12 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       fetcher,
       subscriber,
       processor,
+      // ensure Preimages come LAST
+      (e1, e2) => {
+        if (e1.data.kind === SubstrateTypes.EventKind.PreimageNoted) return 1;
+        if (e2.data.kind === SubstrateTypes.EventKind.PreimageNoted) return -1;
+        return 0;
+      },
     );
   }
 
@@ -519,9 +524,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           console.log(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
 
           // loop through each of the parameters, displaying the type and data
-          event.data.forEach((data, index) => {
-            console.log(`\t\t\t${types[index].type}: ${data.toString()}`);
-          });
+          if (event.data && event.data.forEach) {
+            event.data.forEach((data, index) => {
+              console.log(`\t\t\t${types[index].type}: ${data.toString()}`);
+            });
+          }
         }
       });
     },
@@ -587,7 +594,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
               switchMap((api: ApiRx) => {
                 return combineLatest(
                   of(txFunc(api).method.toHex()),
-                  api.query.system.accountNonce(author.address),
+                  api.query.system.accountNonce
+                    ? api.query.system.accountNonce(author.address)
+                    : api.query.system.account(author.address).pipe(map((a) => a.nonce)),
                   of(api.genesisHash)
                 );
               }),
@@ -691,7 +700,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       switch (argType) {
         case 'Proposal': return this.methodToTitle(arg);
         case 'Bytes': return u8aToHex(arg).toString().slice(0, 16);
-        case 'Address': return formatAddressShort(this.createType('AccountId', arg).toString());
+        // TODO: provide chain to formatAddressShort
+        case 'Address': return formatAddressShort(this.createType('AccountId', arg).toString(), null);
         // TODO: when do we actually see this Moment in practice? is this a correct decoding?
         case 'Compact<Moment>':
           return moment(new Date(this.createType('Compact<Moment>', arg).toNumber())).utc().toString();

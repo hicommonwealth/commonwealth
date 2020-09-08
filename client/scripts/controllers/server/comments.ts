@@ -6,8 +6,9 @@ import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
 import { CommentsStore } from 'stores';
-import { OffchainComment, OffchainAttachment, IUniqueId, AnyProposal, OffchainThread, AddressInfo } from 'models';
+import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
+import { updateLastVisited } from '../app/login';
 // tslint:disable: object-literal-key-quotes
 
 export enum CommentParent {
@@ -113,6 +114,10 @@ class CommentsController {
       });
       const { result } = res;
       this._store.add(modelFromServer(result));
+      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+      updateLastVisited(app.activeCommunityId()
+        ? (activeEntity.meta as CommunityInfo)
+        : (activeEntity.meta as NodeInfo).chain, true);
       // update childComments of parent, if necessary
       if (result.parent_id) {
         const parent = this._store.getById(+result.parent_id);

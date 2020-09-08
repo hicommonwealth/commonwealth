@@ -1,12 +1,15 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
 import moment from 'moment-twitter';
-import { ProposalStore, TopicStore } from 'stores';
-import { OffchainThread, OffchainAttachment, CommunityInfo } from 'models';
-
+import m from 'mithril';
 import $ from 'jquery';
+
 import app from 'state';
+import { ProposalStore, TopicStore } from 'stores';
+import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo } from 'models';
+
 import { notifyError } from 'controllers/app/notifications';
+import { updateLastVisited } from 'controllers/app/login';
 
 const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
@@ -93,6 +96,10 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+      updateLastVisited(app.activeCommunityId()
+        ? (activeEntity.meta as CommunityInfo)
+        : (activeEntity.meta as NodeInfo).chain, true);
       return result;
     } catch (err) {
       console.log('Failed to create thread');
@@ -104,9 +111,11 @@ class ThreadsController {
   public async edit(
     proposal: OffchainThread,
     body?: string,
+    title?: string,
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
+    const newTitle = title || proposal.title;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
     await $.ajax({
@@ -116,6 +125,7 @@ class ThreadsController {
         'thread_id': proposal.id,
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
+        'title': newTitle,
         'version_history': versionHistory,
         'attachments[]': attachments,
         'jwt': app.user.jwt
@@ -145,6 +155,7 @@ class ThreadsController {
         'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);
+        m.redraw();
         resolve(result);
       }).catch((e) => {
         console.error(e);

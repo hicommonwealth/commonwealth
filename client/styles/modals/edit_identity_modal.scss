@@ -2,6 +2,9 @@
 
 .EditIdentityModal {
     width: 620px;
+    @include sm-max {
+        width: initial;
+    }
     .form {
         padding: 20px 32px 32px;
         .text-input-wrapper {

@@ -3,19 +3,17 @@ import m from 'mithril';
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatAddressShort, pluralize } from 'helpers';
-import { createTXModal } from 'views/modals/tx_signing_modal';
-
-import { CosmosToken } from 'adapters/chain/cosmos/types';
-import { ICosmosValidator, CosmosAccount, CosmosValidatorState } from 'controllers/chain/cosmos/account';
-
-import User from 'views/components/widgets/user';
-import { TextInputFormField, DropdownFormField } from 'views/components/forms';
+import { FormGroup, FormLabel, Input, Button } from 'construct-ui';
 
 import { Account } from 'models';
+import { CosmosToken } from 'adapters/chain/cosmos/types';
 import Cosmos from 'controllers/chain/cosmos/main';
-import { IValidatorAttrs } from '.';
+import { ICosmosValidator, CosmosAccount, CosmosValidatorState } from 'controllers/chain/cosmos/account';
+import { createTXModal } from 'views/modals/tx_signing_modal';
+import User from 'views/components/widgets/user';
+import Tabs from 'views/components/widgets/tabs';
 
-import Tabs from '../../components/widgets/tabs';
+import { IValidatorAttrs } from '.';
 
 export interface ICosmosDelegationState {
   error: any;
@@ -30,19 +28,23 @@ export const NewCosmosDelegationModal : m.Component<{ validatorAddr }, ICosmosDe
 
     return m('.ManageStakingModal', [
       m('.compact-modal-title', [
-        m('h3', `Create delegation to ${formatAddressShort(vnode.attrs.validatorAddr)}`),
+        m('h3', `Create delegation to ${formatAddressShort(vnode.attrs.validatorAddr, null)}`), // TODO: provide chain
       ]),
       m('.compact-modal-body', [
         m('.NewStashForm', [
-          m(TextInputFormField, {
-            title: 'Amount',
-            options: {
+          m(FormGroup, [
+            m(FormLabel, 'Amount'),
+            m(Input, {
               placeholder: 'Enter amount to delegate:',
-              callback: (result) => { vnode.state.delegationAmount = app.chain.chain.coins(parseFloat(result), true); }
-            }
-          }),
-          m('button.formular-button-primary', {
-            class: app.user.activeAccount ? '' : 'disabled',
+              onchange: (e) => {
+                const result = (e.target as any).value;
+                vnode.state.delegationAmount = app.chain.chain.coins(parseFloat(result), true);
+              }
+            })
+          ]),
+          m(Button, {
+            intent: 'primary',
+            disabled: !app.user.activeAccount,
             onclick: (e) => {
               e.preventDefault();
               try {
@@ -67,8 +69,9 @@ export const NewCosmosDelegationModal : m.Component<{ validatorAddr }, ICosmosDe
                 vnode.state.sending = false;
                 m.redraw();
               }
-            }
-          }, 'Delegate')
+            },
+            label: 'Delegate'
+          }),
         ]),
       ])
     ]);
@@ -97,8 +100,10 @@ export const CosmosValidatorRow: m.Component<IValidatorAttrs> = {
       m('td.val-stash', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
       m('td.val-total', formatCoin(vnode.attrs.total, true)),
       m('td.val-action', [
-        !isDelegated && m('button.nominate-validator.formular-button-primary', {
-          class: app.user.activeAccount ? '' : 'disabled',
+        !isDelegated && m(Button, {
+          class: 'nominate-validator',
+          intent: 'primary',
+          disabled: !app.user.activeAccount,
           onclick: (e) => {
             e.preventDefault();
             app.modals.create({
@@ -107,8 +112,10 @@ export const CosmosValidatorRow: m.Component<IValidatorAttrs> = {
             });
           }
         }, 'Delegate'),
-        isDelegated && m('button.nominate-validator.formular-button-primary', {
-          class: app.user.activeAccount ? '' : 'disabled',
+        isDelegated && m(Button, {
+          class: 'nominate-validator',
+          intent: 'primary',
+          disabled: !app.user.activeAccount,
           onclick: (e) => {
             e.preventDefault();
             app.modals.create({

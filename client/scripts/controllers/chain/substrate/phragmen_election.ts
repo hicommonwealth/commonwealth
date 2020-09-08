@@ -244,7 +244,14 @@ export class SubstratePhragmenElection extends Proposal<
     );
   }
   public async submitCandidacyTx(candidate: SubstrateAccount) {
-    const txFunc = (api: ApiRx) => api.tx[this.moduleName].submitCandidacy();
+    // handle differing versions of Substrate API
+    const txFunc = (api: ApiRx) => {
+      if (api.tx[this.moduleName].submitCandidacy.meta.args.length === 1) {
+        return api.tx[this.moduleName].submitCandidacy(this.candidates);
+      } else {
+        return api.tx[this.moduleName].submitCandidacy();
+      }
+    };
     return this._Chain.createTXModalData(
       candidate,
       txFunc,

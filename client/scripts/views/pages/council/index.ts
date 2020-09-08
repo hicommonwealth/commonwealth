@@ -142,11 +142,11 @@ const CouncilPage: m.Component<{}> = {
     });
   },
   view: (vnode) => {
-    if (!app.chain) return m(PageLoading, { message: 'Connecting to chain...', title: 'Council' });
+    if (!app.chain) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
 
     const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
 
-    if (!initialized) return m(PageLoading, { message: 'Connecting to chain...', title: 'Council' });
+    if (!initialized) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
 
     const councillors: SubstrateAccount[] = app.chain
       && ((app.chain as Substrate).phragmenElections.members || [])
@@ -196,7 +196,7 @@ const CouncilPage: m.Component<{}> = {
         ]),
         m(Col, { span: { xs: 6, md: 3 } }, [
           m('.stats-heading', 'Runners-up'),
-          m('.stats-tile', `${candidates?.length - councillors?.length} / ${nRunnersUpSeats}`),
+          m('.stats-tile', `${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)} / ${nRunnersUpSeats}`),
         ]),
         m(Col, { span: { xs: 6, md: 3 } }, [
           m('.stats-heading', 'Next council'),

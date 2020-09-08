@@ -7,6 +7,9 @@
     font-weight: 400;
     align-items: center;
 
+    &.CommunityLabelPlaceholder {
+        font-weight: 500;
+    }
     .site-brand {
         font-size: 16px;
         font-weight: 500;
@@ -47,10 +50,10 @@
 .LoginSelector {
     > button.cui-button .cui-icon {
         position: relative;
-        top: -1px;
+        top: -2px;
     }
     > button.cui-button {
-        padding: 0 11px;
+        padding: 0 10px;
     }
 }
 
@@ -58,6 +61,7 @@
     .cui-popover-content {
         padding: 0;
         .cui-menu.LoginSelectorMenu {
+            min-width: 260px;
             border: none;
             .cui-menu-item.cui-button.switch-user {
                 height: 40px;

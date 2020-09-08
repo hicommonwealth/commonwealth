@@ -19,7 +19,6 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import SendingFrom from 'views/components/sending_from';
 import { ChainClass } from 'models';
 
 export interface ISignalingPageState {
@@ -102,16 +101,17 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
 
     return m(Sublayout, {
       class: 'NewSignalingPage',
+      title: 'New Signaling Proposal',
+      showNewProposalButton: true,
     }, [
       m('.forum-container', [
-        m('h2.page-title', 'New Signaling Proposal'),
         m(Grid, [
           m(Col, { span }, [
             !app.user.activeAccount
               ? m(Callout, {
                 icon: Icons.ALERT_TRIANGLE,
                 intent: 'primary',
-                content: 'Link an address to create a signaling proposal.'
+                content: 'Connect an address to create a signaling proposal.'
               })
               : m(Callout, {
                 icon: Icons.INFO,

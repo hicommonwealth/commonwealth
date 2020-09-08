@@ -68,8 +68,8 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
       : m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title || community_name) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ' reacted 👍 to your post ', m('span.commented-obj', decoded_title) ])
-      : m('span', [ actorName, ' reacted 👍 to your comment in ', m('span.commented-obj', decoded_title || community_name) ]);
+      ? m('span', [ actorName, ' liked your post ', m('span.commented-obj', decoded_title) ])
+      : m('span', [ actorName, ' liked your comment in ', m('span.commented-obj', decoded_title || community_name) ]);
   }
   const pseudoProposal = {
     id: root_id,
@@ -121,18 +121,53 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
     notificationHeader = parent_comment_id
-      ? m('span', [ actorName, ` and ${length} others commented on `, m('span.commented-obj', decoded_title) ])
-      : m('span', [ actorName, ` and ${length} others responded in `, m('span.commented-obj', decoded_title) ]);
+      ? m('span', [
+        actorName,
+        length > 0 && ` and ${length} others`,
+        ' commented on ',
+        m('span.commented-obj', decoded_title)
+      ])
+      : m('span', [
+        actorName,
+        length > 0 && ` and ${length} others`,
+        ' responded in ',
+        m('span.commented-obj', decoded_title)
+      ]);
   } else if (category === NotificationCategories.NewThread) {
-    notificationHeader = m('span', [ actorName, ` and ${length} others created new threads in `, m('span.commented-obj', community_name) ]);
+    notificationHeader = m('span', [
+      actorName,
+      length > 0 && ` and ${length} others`,
+      ' created new threads in ',
+      m('span.commented-obj', community_name)
+    ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ` and ${length} others mentioned you in `, m('span.commented-obj', community_name) ])
-      : m('span', [ actorName, ` and ${length} others mentioned you in `, m('span.commented-obj', decoded_title || community_name) ]);
+      ? m('span', [
+        actorName,
+        length > 0 && ` and ${length} others`,
+        ' mentioned you in ',
+        m('span.commented-obj', community_name)
+      ])
+      : m('span', [
+        actorName,
+        length > 0 && ` and ${length} others`,
+        ' mentioned you in ',
+        m('span.commented-obj', decoded_title || community_name)
+      ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ` and ${length} others reacted 👍 to your post `, m('span.commented-obj', decoded_title) ])
-      : m('span', [ actorName, ` and ${length} others reacted 👍 to your comment in `, m('span.commented-obj', decoded_title || community_name) ]);
+      ? m('span', [
+        actorName,
+        length > 0 && ` and ${length} others`,
+        ' liked your post ',
+        m('span.commented-obj', decoded_title)
+      ])
+      : m('span', [
+        actorName,
+        length > 0 && ` and ${length} others`,
+        ' liked your comment in ',
+        m('span.commented-obj', decoded_title || community_name)
+      ]);
   }
   const pseudoProposal = {
     id: root_id,
@@ -140,9 +175,15 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     chain: chain_id,
     community: community_id,
   };
-  const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = (category === NotificationCategories.NewThread) ? (getCommunityUrl as any)(community_id || chain_id) : (getProposalUrl as any)(...args);
-  const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
+  const args = comment_id
+    ? [root_type, pseudoProposal, { id: comment_id }]
+    : [root_type, pseudoProposal];
+  const path = category === NotificationCategories.NewThread
+    ? (getCommunityUrl as any)(community_id || chain_id)
+    : (getProposalUrl as any)(...args);
+  const pageJump = comment_id
+    ? () => jumpHighlightComment(comment_id)
+    : () => jumpHighlightComment('parent');
 
   return ({
     authorInfo,
@@ -169,7 +210,7 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
         throw new Error('chain event notification does not have expected data');
       }
       const chainId = notification.chainEvent.type.chain;
-      const chainName = app.config.chains.getById(chainId).name;
+      const chainName = app.config.chains.getById(chainId)?.name;
       let label: IEventLabel;
       if (SubstrateTypes.EventChains.includes(chainId)) {
         label = SubstrateEvents.Label(
@@ -238,7 +279,12 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       }, [
         authorInfo.length === 1
           ? m(User, {
-            user: new AddressInfo(null, (authorInfo[0] as [string, string])[1], (authorInfo[0] as [string, string])[0], null),
+            user: new AddressInfo(
+              null,
+              (authorInfo[0] as [string, string])[1],
+              (authorInfo[0] as [string, string])[0],
+              null
+            ),
             avatarOnly: true,
             avatarSize: 26,
             tooltip: true,

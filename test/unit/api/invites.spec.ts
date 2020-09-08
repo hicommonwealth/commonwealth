@@ -468,7 +468,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community_id: community,
+          community: community,
           time: 'none',
           uses: 'none',
           jwt: adminJWT,
@@ -485,7 +485,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community_id: community,
+          community: community,
           time: 'none',
           uses: 'none',
           jwt: userJWT,
@@ -515,7 +515,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community_id: community,
+          community: community,
           uses: 'none',
           jwt: userJWT,
         });
@@ -528,7 +528,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community_id: community,
+          community: community,
           time: 'none',
           jwt: userJWT,
         });
@@ -541,7 +541,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community_id: community,
+          community: community,
           time: 'none',
           uses: 'hello',
           jwt: userJWT,
@@ -555,7 +555,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community_id: community,
+          community: community,
           time: 'none',
           uses: 'none',
           jwt: userJWT,
@@ -565,7 +565,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community_id: community,
+          community: community,
           time: 'none',
           uses: 'none',
           jwt: userJWT,

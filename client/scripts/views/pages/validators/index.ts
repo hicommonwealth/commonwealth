@@ -50,7 +50,7 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr }> = 
   view: (vnode) => {
     return m('.ViewNominatorsModal', [
       m('.compact-modal-title', [
-        m('h3', `Nominators for ${formatAddressShort(vnode.attrs.validatorAddr)}`),
+        m('h3', `Nominators for ${formatAddressShort(vnode.attrs.validatorAddr, null)}`), // TODO: provide chain
       ]),
       m('.compact-modal-body', [
         m('table', [

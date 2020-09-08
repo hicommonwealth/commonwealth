@@ -4,11 +4,12 @@ import 'pages/settings/github_well.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
+import { Button, Colors, Input, Icons, Icon, Tooltip, Classes } from 'construct-ui';
 
+import { SocialAccount } from 'models';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
-import { SocialAccount } from 'models';
-import { Button, Colors, Input, Icons, Icon, Tooltip, Classes } from 'construct-ui';
 
 interface IState {
   email: string;
@@ -54,6 +55,10 @@ const EmailWell: m.Component<IAttrs, IState> = {
           disabled: (!emailInputUpdated && emailVerified) || verificationSent,
           onclick: async () => {
             vnode.state.errorMessage = null;
+            const confirmed = await confirmationModalWithText(
+              'You will be required to confirm your new email address. Continue?'
+            )();
+            if (!confirmed) return;
             try {
               const response = await $.post(`${app.serverUrl()}/updateEmail`, {
                 'email': vnode.state.email,

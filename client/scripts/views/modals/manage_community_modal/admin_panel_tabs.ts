@@ -4,7 +4,7 @@ import $ from 'jquery';
 import { Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, RadioGroup, Form } from 'construct-ui';
 import app from 'state';
 import { RolePermission } from 'models';
-
+import { notifySuccess, notifyError } from 'controllers/app/notifications';
 
 interface IWebhookData {
   url: string;
@@ -16,10 +16,8 @@ interface IWebhooksFormAttrs {
 
 interface IWebhooksFormState {
   success: boolean;
-  successMsg: string;
   failure: boolean;
   disabled: boolean;
-  error: string;
 }
 
 const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
@@ -47,20 +45,20 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         vnode.state.disabled = false;
         if (result.status === 'Success') {
           vnode.state.success = true;
-          vnode.state.successMsg = 'Success! Webhook created';
+          notifySuccess('Success! Webhook created');
           vnode.attrs.webhooks.push({
             url: `${webhookUrl}`
           });
           $webhookInput.val('');
         } else {
           vnode.state.failure = true;
-          vnode.state.error = result.message;
+          notifyError(result.message);
         }
         m.redraw();
       }, (err) => {
         vnode.state.failure = true;
         vnode.state.disabled = false;
-        if (err.responseJSON) vnode.state.error = err.responseJSON.error;
+        notifyError(err?.responseJSON?.error || 'Unknown error');
         m.redraw();
       });
     };
@@ -70,7 +68,6 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
       class: 'WebhooksForm',
     }, [
       m(FormGroup, [
-        m('h3', 'Active webhooks:'),
         m(List, {
           interactive: false,
           class: 'active-webhooks'
@@ -98,16 +95,16 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                       const idx = vnode.attrs.webhooks.findIndex((w) => w.url === webhook.url);
                       if (idx !== -1) vnode.attrs.webhooks.splice(idx, 1);
                       vnode.state.success = true;
-                      vnode.state.successMsg = 'Webhook deleted!';
+                      notifySuccess('Success! Webhook deleted');
                     } else {
                       vnode.state.failure = true;
-                      vnode.state.error = result.message;
+                      notifyError(result.message);
                     }
                     m.redraw();
                   }, (err) => {
                     vnode.state.failure = true;
                     vnode.state.disabled = false;
-                    if (err.responseJSON) vnode.state.error = err.responseJSON.error;
+                    notifyError(err?.responseJSON?.error || 'Unknown error');
                     m.redraw();
                   });
                 }
@@ -120,7 +117,6 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         ]),
       ]),
       m(FormGroup, [
-        m('h3', { for: 'webhookUrl', }, 'Add new webhook:'),
         m(Input, {
           name: 'webhookUrl',
           id: 'webhookUrl',
@@ -131,12 +127,9 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
           class: 'admin-panel-tab-button',
           intent: 'none',
           label: 'Add webhook',
+          style: 'margin: 10px 0',
           onclick: createWebhook,
         }),
-        vnode.state.success && m('h3.success-message', vnode.state.successMsg),
-        vnode.state.failure && m('h3.error-message', [
-          vnode.state.error || 'An error occurred'
-        ]),
       ]),
     ]);
   }
@@ -168,7 +161,6 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
       ? { community: app.activeCommunityId() }
       : { chain: app.activeChainId() };
     return m('.UpgradeRolesForm', [
-      m('h3', 'Select Member:'),
       m(RadioGroup, {
         name: 'members/mods',
         class: 'members-list',
@@ -176,32 +168,33 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
         value: vnode.state.user,
         onchange: (e: Event) => { vnode.state.user = (e.currentTarget as HTMLInputElement).value; },
       }),
-      m('h3', 'Role Type:'),
       m(RadioGroup, {
         name: 'roles',
         options: ['Admin', 'Moderator'],
         value: vnode.state.role,
         onchange: (e: Event) => { vnode.state.role = (e.currentTarget as HTMLInputElement).value; },
       }),
-      m(Button, {
-        class: 'admin-panel-tab-button',
-        label: 'Upgrade Member',
-        onclick: () => {
-          const indexOfName = names.indexOf(vnode.state.user);
-          const user = noAdmins[indexOfName];
-          const newRole = (vnode.state.role === 'Admin') ? 'admin'
-            : (vnode.state.role === 'Moderator') ? 'moderator' : '';
-          if (!user) return;
-          $.post(`${app.serverUrl()}/upgradeMember`, {
-            new_role: newRole,
-            address: user.Address.address,
-            ...chainOrCommObj,
-            jwt: app.user.jwt,
-          }).then((r) => {
-            onRoleUpgrade(user, r.result);
-          });
-        },
-      }),
+      m('.button-container', [
+        m(Button, {
+          class: 'admin-panel-tab-button',
+          label: 'Upgrade Member',
+          onclick: () => {
+            const indexOfName = names.indexOf(vnode.state.user);
+            const user = noAdmins[indexOfName];
+            const newRole = (vnode.state.role === 'Admin') ? 'admin'
+              : (vnode.state.role === 'Moderator') ? 'moderator' : '';
+            if (!user) return;
+            $.post(`${app.serverUrl()}/upgradeMember`, {
+              new_role: newRole,
+              address: user.Address.address,
+              ...chainOrCommObj,
+              jwt: app.user.jwt,
+            }).then((r) => {
+              onRoleUpgrade(user, r.result);
+            });
+          },
+        }),
+      ]),
     ]);
   }
 };

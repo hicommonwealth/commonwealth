@@ -330,7 +330,7 @@ export const ProposalBodySaveEdit: m.Component<{
             : JSON.stringify(parentState.quillEditorState.editor.getContents());
           parentState.saving = true;
           if (item instanceof OffchainThread) {
-            app.threads.edit(item, itemText).then(() => {
+            app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {
               m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;

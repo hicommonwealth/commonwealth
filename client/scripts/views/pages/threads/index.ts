@@ -6,6 +6,7 @@ import app from 'state';
 import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { re_weburl } from '../../../lib/url-validation';
 import { updateLastVisited } from '../../../controllers/app/login';
+import { notifyError } from '../../../controllers/app/notifications';
 
 enum NewThreadErrors {
   NoBody = 'Thread body cannot be blank',
@@ -88,6 +89,7 @@ export const saveDraft = async (
         attachments
       );
     } catch (err) {
+      notifyError(err);
       throw new Error(err);
     }
     mixpanel.track('Save discussion draft', {
@@ -141,14 +143,6 @@ export const newThread = async (
   const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
-  // const $textarea = $(vnode.dom).find('.DropzoneTextarea textarea');
-  // const unescapedText = '' + $textarea.val();
-  // const attachments = vnode.state.files ?
-  //   vnode.state.files.map((f) => f.uploadURL && f.uploadURL.replace(/\?.*/, '')) : [];
-  // if (!unescapedText.trim() && !attachments) {
-  //   return vnode.state.error = 'Description or attachments are required.';
-  //   throw new Error();
-  // }
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
 

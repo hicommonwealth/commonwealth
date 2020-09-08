@@ -9,7 +9,7 @@ import AvatarUpload from 'views/components/avatar_upload';
 
 const EditProfileModal = {
   view: (vnode) => {
-    const { account } = vnode.attrs;
+    const { account, refreshCallback } = vnode.attrs;
 
     return m('.EditProfileModal', [
       m('.compact-modal-title', [
@@ -84,6 +84,7 @@ const EditProfileModal = {
                 app.profiles.updateProfileForAccount(account, data).then((result) => {
                   vnode.state.saving = false;
                   m.redraw();
+                  refreshCallback();
                   $(vnode.dom).trigger('modalexit');
                 }).catch((error: any) => {
                   vnode.state.saving = false;

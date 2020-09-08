@@ -9,14 +9,13 @@ import Sublayout from 'views/sublayout';
 import NewProposalForm from './new_proposal_form';
 
 const NewProposalPage = {
-  oncreate: (vnode) => {
-  },
   view: (vnode) => {
     vnode.state.typeEnum = vnode.attrs.type;
-    vnode.state.titlePre = 'Create';
+    vnode.state.titlePre = 'New';
     return m(Sublayout, {
       class: 'NewProposalPage',
       title: `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`,
+      showNewProposalButton: true,
     }, [
       m('.forum-container', [
         m(NewProposalForm, {
@@ -25,7 +24,7 @@ const NewProposalPage = {
             if (value !== 'proposal') {
               vnode.state.titlePre = 'Note';
             } else {
-              vnode.state.titlePre = 'Create';
+              vnode.state.titlePre = 'New';
             }
             vnode.state.typeEnum = `democracy${value}`;
             m.redraw();

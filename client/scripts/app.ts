@@ -106,6 +106,7 @@ export function handleInviteLinkRedirect() {
       const message = m.route.param('message');
       notifyError(message);
     } else if (m.route.param('invitemessage') === 'success') {
+      if (app.config.invites.length === 0) return;
       app.modals.create({ modal: ConfirmInviteModal });
     } else {
       notifyError('Hmmmm... URL not constructed properly');
@@ -193,6 +194,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
       './controllers/chain/polkadot/main'
     )).default;
     app.chain = new Polkadot(n, app);
+  } else if (n.chain.network === ChainNetwork.Kulupu) {
+    const Kulupu = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "kulupu-main" */
+      './controllers/chain/kulupu/main'
+    )).default;
+    app.chain = new Kulupu(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */
@@ -214,6 +222,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
       './controllers/chain/near/main'
     )).default;
     app.chain = new Near(n, app);
+    app.chain.initApi(); // required for loading NearAccounts
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
@@ -516,32 +525,15 @@ $(() => {
         app.user.discussionDrafts.refreshAll().then(() => m.redraw());
       }
 
-      let wsUrl = app.serverUrl();
-      if (app.serverUrl().indexOf('https')) {
-        wsUrl = wsUrl.replace('https', 'ws');
-      }
-
-      if (app.serverUrl().indexOf('http') !== -1) {
-        wsUrl = wsUrl.replace('http', 'ws');
-      }
-
-      if (app.serverUrl().indexOf('/api') !== -1) {
-        wsUrl = wsUrl.replace('/api', '');
-      }
-
-      if (app.serverUrl().indexOf('://') === -1) {
-        if (wsUrl.length === 0) {
-          wsUrl = 'ws://localhost:8080';
-        } else {
-          wsUrl = `ws://${app.serverUrl()}`;
-        }
-      }
-
       handleInviteLinkRedirect();
 
       // If the user updates their email
       handleUpdateEmailConfirmation();
 
+      // subscribe to notifications
+      const wsUrl = document.location.origin
+        .replace('http://', 'ws://')
+        .replace('https://', 'wss://');
       app.socket = new WebsocketController(wsUrl, jwt, null);
       if (app.loginState === LoginState.LoggedIn) {
         app.socket.addListener(

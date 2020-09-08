@@ -1,4 +1,5 @@
 import { Notification, NotificationSubscription } from 'models';
+import { NotificationCategories } from 'types';
 
 export const batchNotifications = (n: Notification[], prop: string, prop2: string) => {
   return Object.values(n.reduce((acc, obj) => {
@@ -13,7 +14,10 @@ export const sortNotifications = (n: Notification[]) => {
   const batched =  batchNotifications(n, 'subscription', 'objectId');
   const unbatchChainEvents = [];
   batched.forEach((a: Notification[]) => {
-    if (a[0].chainEvent) {
+    if (a[0].chainEvent
+      || a[0].subscription.category === NotificationCategories.NewComment
+      || a[0].subscription.category === NotificationCategories.NewMention
+    ) {
       a.forEach((n2) => unbatchChainEvents.push([n2]));
     } else {
       unbatchChainEvents.push(a);

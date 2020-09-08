@@ -34,7 +34,8 @@ import PageNotFound from 'views/pages/404';
 import {
   ProposalHeaderExternalLink, ProposalHeaderTopics, ProposalHeaderTitle,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
-  ProposalHeaderPrivacyButtons
+  ProposalHeaderPrivacyButtons,
+  ProposalTitleEditor,
 } from './header';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
@@ -57,6 +58,7 @@ interface IProposalHeaderState {
   saving: boolean;
   quillEditorState: any;
   currentText: any;
+  updatedTitle: string;
   topicEditorIsOpen: boolean;
 }
 
@@ -98,34 +100,16 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
     }, [
       m('.proposal-top', [
         m('.proposal-top-left', [
-          m('.proposal-title', m(ProposalHeaderTitle, { proposal })),
+          !vnode.state.editing
+            && m('.proposal-title', m(ProposalHeaderTitle, { proposal })),
+          vnode.state.editing
+            && m(ProposalTitleEditor, { item: proposal, parentState: vnode.state }),
           m('.proposal-body-meta', proposal instanceof OffchainThread ? [
             m(ProposalHeaderTopics, { proposal }),
             m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
-            m(ProposalHeaderViewCount, { viewCount }),
-          ] : [
-            m(ProposalHeaderOnchainId, { proposal }),
-            m(ProposalHeaderOnchainStatus, { proposal }),
-            m(ProposalBodyAuthor, { item: proposal }),
-            m(ProposalHeaderViewCount, { viewCount }),
-            m(ProposalBodyReaction, { item: proposal }),
-          ]),
-          proposal instanceof OffchainThread
-            && proposal.kind === OffchainThreadKind.Link
-            && m('.proposal-body-link', m(ProposalHeaderExternalLink, { proposal })),
-        ]),
-      ]),
-      proposal instanceof OffchainThread && m('.proposal-content', [
-        (commentCount > 0 || app.user.activeAccount) && m('.thread-connector'),
-        m('.proposal-content-left', [
-          m(ProposalBodyAvatar, { item: proposal }),
-        ]),
-        m('.proposal-content-right', [
-          m('.proposal-content-meta', [
-            m(ProposalBodyAuthor, { item: proposal }),
-            m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
             m(ProposalBodyLastEdited, { item: proposal }),
+            m(ProposalHeaderViewCount, { viewCount }),
             app.isLoggedIn() && !getSetGlobalEditingStatus(GlobalStatus.Get) && m(PopoverMenu, {
               transitionDuration: 0,
               closeOnOutsideClick: true,
@@ -154,8 +138,24 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
               onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
               openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
             })
+          ] : [
+            m(ProposalHeaderOnchainId, { proposal }),
+            m(ProposalHeaderOnchainStatus, { proposal }),
+            m(ProposalBodyAuthor, { item: proposal }),
+            m(ProposalHeaderViewCount, { viewCount }),
+            m(ProposalBodyReaction, { item: proposal }),
           ]),
-
+          proposal instanceof OffchainThread
+            && proposal.kind === OffchainThreadKind.Link
+            && m('.proposal-body-link', m(ProposalHeaderExternalLink, { proposal })),
+        ]),
+      ]),
+      proposal instanceof OffchainThread && m('.proposal-content', [
+        (commentCount > 0 || app.user.activeAccount) && m('.thread-connector'),
+        m('.proposal-content-left', [
+          m(ProposalBodyAvatar, { item: proposal }),
+        ]),
+        m('.proposal-content-right', [
           !vnode.state.editing
             && m(ProposalBodyText, { item: proposal }),
 

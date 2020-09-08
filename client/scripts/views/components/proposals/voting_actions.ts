@@ -2,6 +2,8 @@ import 'components/proposals/voting_actions.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { hexToUtf8 } from 'web3-utils';
+import { Button } from 'construct-ui';
 
 import app from 'state';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
@@ -23,7 +25,6 @@ import Edgeware from 'controllers/chain/edgeware/main';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
-import { hexToUtf8 } from 'web3-utils';
 import MolochProposal, {
   MolochProposalVote,
   MolochVote,
@@ -32,12 +33,16 @@ import MolochProposal, {
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 
-const CannotVote: m.Component<{ text?, action? }> = {
+const CannotVote: m.Component<{ action }> = {
   view: (vnode) => {
     return m('.CannotVote', [
-      vnode.attrs.text && m('.proposal-voting-box-text', vnode.attrs.text),
-      vnode.attrs.action && m('.proposal-voting-box-action', [
-        m('button.formular-button-positive.disabled', vnode.attrs.action),
+      m('.proposal-voting-box-action', [
+        m(Button, {
+          intent: 'primary',
+          disabled: true,
+          fluid: true,
+          label: vnode.attrs.action,
+        }),
       ]),
     ]);
   }
@@ -74,24 +79,20 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
         ],
         proposal.stage === SignalingProposalStage.Completed
           && 'Signaling proposal complete.',
-        (proposal.data.author === user.address) && [
-          m('button.formular-button-positive', {
-            class: proposal.stage === SignalingProposalStage.PreVoting ? '' : 'disabled',
+        (proposal.data.author === user.address)
+          && m(Button, {
+            intent: 'positive',
+            disabled: (proposal.stage !== SignalingProposalStage.PreVoting),
             onclick: advanceSignalingProposal,
-          }, proposalStageMsg)
-        ]
+            label: proposalStageMsg,
+          }),
       ]);
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyReferendum) {
       if (!vnode.attrs.setConviction) throw new Error('Misconfigured');
       return m('.ProposalExtensions', [
-        m('h4', 'Quadratically weighted conviction voting'),
-        m('p', [
-          'If the proposal passes, yes-voters\' coins will be timelocked ',
-          'according to the weight they have chosen.',
-        ]),
-        m('p', [
-          'Timelocked coins can still participate in staking or nominating.',
-        ]),
+        m('strong', 'Conviction voting'),
+        m('p', 'The winning side\'s coins will be timelocked according to their chosen weight.'),
+        m('p', 'Timelocked coins can still participate in staking and governance.'),
         m(ConvictionsChooser, { callback: vnode.attrs.setConviction }),
       ]);
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyProposal) {
@@ -116,13 +117,13 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (proposal instanceof SubstrateTreasuryProposal) {
-      return m(CannotVote, { text: 'Treasury proposals are processed by council motion or democracy proposal' });
+      return m(CannotVote, { action: 'Send to council or democracy' });
     } else if (!app.isLoggedIn()) {
       return m(CannotVote, { action: 'Log in to vote' });
     } else if (!app.user.activeAccount) {
-      return m(CannotVote, { action: 'Create a Web3 address' });
+      return m(CannotVote, { action: 'Connect an address to vote' });
     } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
-      return m(CannotVote, { text: 'Cannot vote from this account' });
+      return m(CannotVote, { action: 'Cannot vote from this address' });
     }
 
     let user;
@@ -137,7 +138,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     } else if (proposal instanceof MolochProposal) {
       user = app.user.activeAccount as EthereumAccount;
     } else {
-      return m(CannotVote, { text: 'Unrecognized proposal type' });
+      return m(CannotVote, { action: 'Unrecognized proposal type' });
     }
 
     const voteYes = (e) => {
@@ -387,78 +388,95 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       buttons = choices.map((c, inx) => {
         let cl;
         if (choices.length > 2) {
-          cl = ['.yes-button', 'button.formular-button-positive'];
+          cl = ['.yes-button', 'positive'];
         } else if (inx === 1) {
-          cl = ['.no-button', 'button.formular-button-negative'];
+          cl = ['.no-button', 'negative'];
         } else {
-          cl = ['.yes-button', 'button.formular-button-positive'];
+          cl = ['.yes-button', 'positive'];
         }
 
         return m(`${cl[0]}`, [
-          m(`${cl[1]}`, {
-            class: canVote && !hasVotedForChoice[c.toHex()] ? '' : 'disabled',
+          m(Button, {
+            intent: cl[1],
+            disabled: !canVote || hasVotedForChoice[c.toHex()],
             onclick: (e) => voteForChoice(e, c),
-          }, hasVotedForChoice[c.toHex()]
-            ? `Voted ${hexToUtf8(c.toHex())}`
-            : `Vote ${hexToUtf8(c.toHex())}`),
+            label: hasVotedForChoice[c.toHex()]
+              ? `Voted ${hexToUtf8(c.toHex())}`
+              : `Vote ${hexToUtf8(c.toHex())}`
+          }),
         ]);
       });
     }
     const yesButton = m('.yes-button', [
-      m('button.formular-button-positive', {
-        class: canVote && !hasVotedYes ? '' : 'disabled',
+      m(Button, {
+        intent: 'positive',
+        disabled: !canVote || hasVotedYes,
         onclick: voteYes,
-      }, hasVotedYes ? 'Voted yes' : 'Vote yes')
+        label: hasVotedYes ? 'Voted yes' : 'Vote yes'
+      }),
     ]);
     const noButton = m('.no-button', [
-      m('button.formular-button-negative', {
-        class: canVote && !hasVotedNo ? '' : 'disabled',
+      m(Button, {
+        intent: 'negative',
+        disabled: !canVote || hasVotedNo,
         onclick: voteNo,
-      }, hasVotedNo ? 'Voted no' : 'Vote no')
+        label: hasVotedNo ? 'Voted no' : 'Vote no'
+      })
     ]);
     // substrate: multi-deposit approve
     const multiDepositApproveButton = m('.approve-button', [
-      m('button.formular-button-positive', {
-        class: canVote ? '' : 'disabled',
+      m(Button, {
+        intent: 'positive',
+        disabled: !canVote,
         onclick: voteYes,
-      }, (hasVotedYes && !canVote) ? 'Already approved' : 'Second')
+        label: (hasVotedYes && !canVote) ? 'Already approved' : 'Second'
+      }),
     ]);
     // cosmos: abstain
     const abstainButton = m('.abstain-button', [
-      m('button.formular-button-tertiary', {
-        class: canVote && !hasVotedAbstain ? '' : 'disabled',
+      m(Button, {
+        intent: 'none',
+        disabled: !canVote || hasVotedAbstain,
         onclick: voteAbstain,
-      }, hasVotedAbstain ? 'Voted abstain' : 'Vote abstain')
+        label: hasVotedAbstain ? 'Voted abstain' : 'Vote abstain'
+      }),
     ]);
     // cosmos: abstain
     const noWithVetoButton = m('.veto-button', [
-      m('button.formular-button-negative', {
-        class: canVote && !hasVotedVeto ? '' : 'disabled',
+      m(Button, {
+        intent: 'negative',
+        disabled: !canVote || hasVotedVeto,
         onclick: voteVeto,
-      }, hasVotedVeto ? 'Vetoed' : 'Veto')
+        label: hasVotedVeto ? 'Vetoed' : 'Veto'
+      }),
     ]);
     // moloch: cancel
     const cancelButton = (proposal.votingType === VotingType.MolochYesNo) && m('.veto-button', [
-      m('button.formular-button-negative', {
-        class: (proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed ? '' : 'disabled',
+      m(Button, {
+        intent: 'negative',
+        disabled: !((proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed),
         onclick: cancelProposal,
-      }, (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel')
+        label: (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel'
+      }),
     ]);
     // V2 only: moloch: sponsor
     // const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
-    //  m('button.formular-button-positive', {
-    //    class: !(proposal as MolochProposal).state.sponsored &&
-    //    !(proposal as MolochProposal).state.processed
-    //      ? '' : 'disabled',
+    //  m(Button, {
+    //    intent: 'positive',
+    //    disabled: (proposal as MolochProposal).state.sponsored ||
+    //    (proposal as MolochProposal).state.processed,
     //    onclick: sponsorProposal,
-    //  }, (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor')
+    //    label: (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor',
+    //  }),
     // ]);
     // moloch: process
     const processButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
-      m('button.formular-button-tertiary', {
-        class: (proposal as MolochProposal).state === MolochProposalState.ReadyToProcess ? '' : 'disabled',
+      m(Button, {
+        intent: 'none',
+        disabled: (proposal as MolochProposal).state !== MolochProposalState.ReadyToProcess,
         onclick: processProposal,
-      }, (proposal as MolochProposal).data.processed ? 'Processed' : 'Process')
+        label: (proposal as MolochProposal).data.processed ? 'Processed' : 'Process'
+      })
     ]);
 
     let votingActionObj;
@@ -503,11 +521,11 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
           m(ProposalExtensions, { proposal }) ]
       ];
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
-      votingActionObj = m(CannotVote, { text: '(TODO) Ranked choice voting unimplemented' });
+      votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else if (proposal.votingType === VotingType.None) {
-      votingActionObj = m(CannotVote, { text: 'Cannot be voted on directly' });
+      votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else {
-      votingActionObj = m(CannotVote, { text: 'Unrecognized proposal type' });
+      votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     }
 
     return m('.VotingActions', [votingActionObj]);

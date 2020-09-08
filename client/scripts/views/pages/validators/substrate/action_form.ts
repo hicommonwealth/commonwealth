@@ -1,7 +1,9 @@
 import m from 'mithril';
 import app from 'state';
-import { TextInputFormField, DropdownFormField } from 'views/components/forms';
+import { Button, FormLabel, FormGroup, Input } from 'construct-ui';
+
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { DropdownFormField } from 'views/components/forms';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 
 interface IActionFormAttrs {
@@ -26,13 +28,16 @@ interface IActionFormState {
 const ActionForm: m.Component<IActionFormAttrs, IActionFormState> = {
   view: (vnode) => {
     const inputComponent = (vnode.attrs.isTextInput)
-      ? m(TextInputFormField, {
-        title: vnode.attrs.titleMsg,
-        options: {
+      ? m(FormGroup, [
+        m(FormLabel, vnode.attrs.titleMsg),
+        m(Input, {
           placeholder: vnode.attrs.placeholder,
-          callback: (result) => { vnode.state.data = vnode.attrs.onChangeHandler(result); },
-        },
-      })
+          onchange: (e) => {
+            const result= (e.target as any).value;
+            vnode.state.data = vnode.attrs.onChangeHandler(result);
+          },
+        }),
+      ])
       : m(DropdownFormField, {
         title: vnode.attrs.titleMsg,
         options: vnode.attrs.options,
@@ -42,8 +47,9 @@ const ActionForm: m.Component<IActionFormAttrs, IActionFormState> = {
 
     return m('.NewStashForm', [
       (vnode.attrs.onChangeHandler) ? inputComponent : m('h4', vnode.attrs.titleMsg),
-      (vnode.attrs.actionHandler) && m('button.formular-button-primary', {
-        class: app.user.activeAccount ? '' : 'disabled',
+      (vnode.attrs.actionHandler) && m(Button, {
+        class: 'formular-button-primary',
+        disabled: !app.user.activeAccount,
         onclick: (e) => {
           e.preventDefault();
           const value = vnode.state.data || vnode.attrs.defaultValue;
@@ -57,20 +63,21 @@ const ActionForm: m.Component<IActionFormAttrs, IActionFormState> = {
                   vnode.state.sending = false;
                   m.redraw();
                 })
-                .catch(e => {
+                .catch((err) => {
                   vnode.state.sending = false;
                   m.redraw();
                 });
             } else {
               throw new Error(vnode.attrs.errorMsg);
             }
-          } catch (e) {
-            vnode.state.error = e.message;
+          } catch (err) {
+            vnode.state.error = err.message;
             vnode.state.sending = false;
             m.redraw();
           }
         },
-      }, vnode.attrs.actionName),
+        label: vnode.attrs.actionName
+      }),
     ]);
   },
 };

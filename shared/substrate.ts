@@ -1,7 +1,5 @@
-export function constructSubstrateUrl(
-  url: string,
-  secureNodes = [ 'kusama-rpc.polkadot.io', 'rpc.polkadot.io' ],
-): string {
+export function constructSubstrateUrl(url: string): string {
+  const secureNodes = [ 'edgewa.re', 'kusama-rpc.polkadot.io', 'rpc.polkadot.io', 'rpc.kulupu.corepaper.org' ];
   const hasProtocol = url.indexOf('wss://') !== -1 || url.indexOf('ws://') !== -1;
   url = hasProtocol ? url.split('://')[1] : url;
   const isInsecureProtocol = !secureNodes.find((path) => url.indexOf(path) !== -1);

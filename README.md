@@ -107,6 +107,12 @@ Environment variables used for external services include:
 - JWT_SECRET
 - SESSION_SECRET
 
+We also use certain environment variables to configure the application itself:
+
+- CHAIN_EVENTS: select chains for event listening. Must be "all", "none", or a comma-separated list of chains (e.g. "edgeware,edgeware-local")
+- NO_EVENTS: disable chain-event functionality entirely
+- NO_CLIENT: set to true to disable the front-end build
+
 ## Migrations
 
 If you are making changes to the database models, you must also write

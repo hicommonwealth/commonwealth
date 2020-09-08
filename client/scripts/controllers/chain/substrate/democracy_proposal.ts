@@ -117,7 +117,7 @@ class SubstrateDemocracyProposal extends Proposal<
     if (preimage) {
       this._method = preimage.method;
       this._section = preimage.section;
-      this._title = `${this._section}.${this.method}(${preimage.args.join(', ')})`;
+      this._title = formatCall(preimage);
     } else {
       this._title = eventData.proposalHash;
     }
@@ -214,9 +214,18 @@ class SubstrateDemocracyProposal extends Proposal<
   // TRANSACTIONS
   public submitVoteTx(vote: DepositVote<SubstrateCoin>) {
     // deposit parameter is ignored
+
+    // handle differing versions of substrate API
+    const txFunc = (api: ApiRx) => {
+      if ((api.tx.democracy.second as any).meta.args.length === 2) {
+        return api.tx.democracy.second(this.data.index, this.getVoters().length);
+      } else {
+        return (api.tx.democracy.second as any)(this.data.index);
+      }
+    };
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
-      (api: ApiRx) => (api.tx.democracy.second as any)(this.data.index),
+      txFunc,
       'secondDemocracyProposal',
       this.title
     );

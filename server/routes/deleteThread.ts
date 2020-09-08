@@ -20,30 +20,44 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
   }
 
   try {
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
-    const thread = await models.OffchainThread.findOne({
+    const userOwnedAddressIds = await req.user.getAddresses()
+      .filter((addr) => !!addr.verified).map((addr) => addr.id);
+
+    // allow either the author or admin/mods to delete threads
+    const myThread = await models.OffchainThread.findOne({
       where: {
         id: req.body.thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
       include: [ models.Chain, models.OffchainCommunity ]
     });
+
+    const thread = myThread || await models.OffchainThread.findOne({
+      where: {
+        id: req.body.thread_id,
+      },
+      include: [ models.Chain, models.OffchainCommunity ]
+    });
+
     if (!thread) {
-      return next(new Error(DeleteThreadErrors.NoPermission));
+      return next(new Error(DeleteThreadErrors.NoThread));
     }
 
     const userRole = await models.Role.findOne({
       where: thread.Chain ? {
         address_id: userOwnedAddressIds,
         chain_id: thread.Chain.id,
+        permission: ['admin', 'moderator'],
       } : {
         address_id: userOwnedAddressIds,
         offchain_community_id: thread.OffchainCommunity.id,
+        permission: ['admin', 'moderator'],
       },
     });
 
     const isAdminOrMod = userRole?.permission === 'admin' || userRole?.permission === 'moderator';
-    if (!isAdminOrMod) {
+
+    if (!myThread && !isAdminOrMod) {
       return next(new Error(DeleteThreadErrors.NoPermission));
     }
 

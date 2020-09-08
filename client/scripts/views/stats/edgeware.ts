@@ -7,8 +7,9 @@ import _ from 'lodash';
 import moment from 'moment-twitter';
 import Chart from 'chart.js';
 import mixpanel from 'mixpanel-browser';
-import app from 'state';
+import { Button, Input } from 'construct-ui';
 
+import app from 'state';
 import { pluralize } from 'helpers';
 import Tabs from 'views/components/widgets/tabs';
 import {
@@ -522,8 +523,10 @@ const EdgewareStatsPage = {
                 m('.caption', [
                   'Select lockdrop contract'
                 ]),
-                m('input#LOCKDROP_CONTRACT_ADDRESS', {
+                m(Input, {
+                  id: 'LOCKDROP_CONTRACT_ADDRESS',
                   type: 'text',
+                  fluid: true,
                   value: state.network === 'mainnet'
                     ? MAINNET_LOCKDROP
                     : ROPSTEN_LOCKDROP,
@@ -545,7 +548,7 @@ const EdgewareStatsPage = {
                       },
                       oncreate: (vvnode) => {
                         // tslint:disable-next-line:no-string-literal
-                        vnode.dom['checked'] = true;
+                        vvnode.dom['checked'] = true;
                       },
                     }),
                     'Mainnet'
@@ -582,16 +585,20 @@ const EdgewareStatsPage = {
             m('.form-field', [
               m('.form-left', [
                 m('.caption', 'Look up participant by address(es)'),
-                m('input#LOCKDROP_PARTICIPANT_ADDRESS', {
+                m(Input, {
+                  id: 'LOCKDROP_PARTICIPANT_ADDRESS',
                   type: 'text',
+                  fluid: true,
                   placeholder: 'Enter an ETH address: 0x1234...'
                 })
               ]),
               m('.explanation', 'This will fetch all locks and signal actions from the input address'),
             ]),
             m('.buttons', [
-              m('button#LOCK_LOOKUP_BTN', {
-                class: vnode.state.lookupLoading ? 'disabled' : '',
+              m(Button, {
+                id: 'LOCK_LOOKUP_BTN',
+                intent: 'primary',
+                disabled: vnode.state.lookupLoading,
                 onclick: async (e) => {
                   e.preventDefault();
                   const addrText = `${$('#LOCKDROP_PARTICIPANT_ADDRESS').val()}`;
@@ -623,10 +630,11 @@ const EdgewareStatsPage = {
                   state.addressSummary = { events: resultEvents };
                   vnode.state.lookupLoading = false;
                   m.redraw();
-                }
-              }, vnode.state.lookupLoading
-                ? `Looking up ${pluralize(vnode.state.lookupCount, 'address')}...`
-                : 'Lookup'),
+                },
+                label: vnode.state.lookupLoading
+                  ? `Looking up ${pluralize(vnode.state.lookupCount, 'address')}...`
+                  : 'Lookup'
+              }),
             ]),
             state.addressSummary && m('.lock-lookup-results', [
               m('h3', `Found ${pluralize(state.addressSummary.events.length, 'participation event')}`),

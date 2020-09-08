@@ -12,27 +12,31 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
-    const notificationSubscription = app.user.notifications.subscriptions
-      .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
+
+    const commentSubscription = app.user.notifications.subscriptions
+      .find((v) => v.objectId === proposal.uniqueIdentifier && v.category === NotificationCategories.NewComment);
+
+    const reactionSubscription = app.user.notifications.subscriptions
+      .find((v) => v.objectId === proposal.uniqueIdentifier && v.category === NotificationCategories.NewReaction);
+
+    const bothActive = (commentSubscription?.isActive && reactionSubscription?.isActive);
 
     return m(MenuItem, {
-      onclick: (e) => {
+      onclick: async (e) => {
         e.preventDefault();
-        if (notificationSubscription && notificationSubscription.isActive) {
-          app.user.notifications.disableSubscriptions([notificationSubscription]).then(() => {
-            m.redraw();
-          });
-        } else if (notificationSubscription) { // subscription, but not active
-          app.user.notifications.enableSubscriptions([notificationSubscription]).then(() => {
-            m.redraw();
-          });
+        if (!commentSubscription || !reactionSubscription) {
+          await Promise.all([
+            app.user.notifications.subscribe(NotificationCategories.NewReaction, proposal.uniqueIdentifier),
+            app.user.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier),
+          ]);
+        } else if (bothActive) {
+          await app.user.notifications.disableSubscriptions([commentSubscription, reactionSubscription]);
         } else {
-          app.user.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier).then(() => {
-            m.redraw();
-          });
+          await app.user.notifications.enableSubscriptions([commentSubscription, reactionSubscription]);
         }
+        m.redraw();
       },
-      label: notificationSubscription?.isActive ? 'Turn off notifications' : 'Turn on notifications',
+      label: (bothActive) ? 'Turn off notifications' : 'Turn on notifications',
     });
   },
 };
@@ -62,7 +66,7 @@ export const TopicEditorButton: m.Component<{ openTopicEditor: Function }, { isO
     return m('.TopicEditorButton', [
       m(MenuItem, {
         fluid: true,
-        label: 'Move to another topic',
+        label: 'Edit topic',
         onclick: (e) => {
           e.preventDefault();
           openTopicEditor();
@@ -105,6 +109,9 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
         closeOnContentClick: true,
         menuAttrs: {},
         content: [
+          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
+          m(ThreadSubscriptionButton, { proposal }),
+          hasAdminPermissions && m(MenuDivider),
           hasAdminPermissions && m(MenuItem, {
             class: 'pin-thread-toggle',
             onclick: (e) => {
@@ -128,9 +135,6 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
           hasAdminPermissions && m(TopicEditorButton, {
             openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; }
           }),
-          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
-          (isAuthor || hasAdminPermissions) && m(MenuDivider),
-          m(ThreadSubscriptionButton, { proposal }),
         ],
         inline: true,
         trigger: m(Icon, {

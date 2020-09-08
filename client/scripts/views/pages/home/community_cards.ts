@@ -9,9 +9,7 @@ import { NodeInfo, CommunityInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
 const getNewTag = (labelCount = null) => {
-  const label = labelCount === null
-    ? 'New'
-    : pluralize(labelCount, 'new thread');
+  const label = labelCount === null ? 'New' : labelCount;
   return m('.chain-new', [
     m(Tag, {
       label,
@@ -147,7 +145,7 @@ const NewCommunityCard: m.Component<{}> = {
       m('.card-right', [
         m('h3', 'Create a new community'),
         m('p.action', 'Launch and grow your decentralized community on Commonwealth'),
-        link('a.learn-more', 'https://hicommonwealth.typeform.com/to/cRP27Rp5', m.trust('Learn more &raquo;')),
+        m('a.learn-more', { href: '#' }, m.trust('Learn more &raquo;')),
       ]),
     ]);
   }

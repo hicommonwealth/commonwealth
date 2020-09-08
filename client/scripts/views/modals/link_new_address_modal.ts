@@ -7,7 +7,7 @@ import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
-import { Button, Callout, Input, TextArea, Icon, Icons, Spinner } from 'construct-ui';
+import { Button, Callout, Input, TextArea, Icon, Icons, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { formatAddressShort, isSameAccount } from 'helpers';
@@ -25,7 +25,6 @@ import EthereumAccount from 'controllers/chain/ethereum/account';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { ChainIcon } from 'views/components/chain_icon';
 import CodeBlock from 'views/components/widgets/code_block';
-import { CheckboxFormField } from 'views/components/forms';
 import HedgehogLoginForm from 'views/components/hedgehog_login_form';
 import User, { UserBlock } from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
@@ -163,10 +162,10 @@ const EthereumLinkAccountItem: m.Component<{
           .catch(errorCallback);
       },
     }, [
-      // m('.account-item-left', [
-      //   m('.account-item-name', account.meta.name),
-      //   m('.account-item-address', account.meta.name),
-      // ]),
+      m('.account-item-left', [
+        m('.account-item-name', 'Ethereum account'),
+        m('.account-item-address', `${address.slice(0, 16)}...`),
+      ]),
       m('.account-item-right', [
         vnode.state.linking
           ? m('.account-waiting', [
@@ -187,16 +186,18 @@ const SubstrateLinkAccountItem: m.Component<{
 }, { linking }> = {
   view: (vnode) => {
     const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode } = vnode.attrs;
+    const address = AddressSwapper({
+      address: account.address,
+      currentPrefix: (app.chain as Substrate).chain.ss58Format,
+    });
+
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
 
         try {
-          const signerAccount = await createUserWithAddress(AddressSwapper({
-            address: account.address,
-            currentPrefix: (app.chain as Substrate).chain.ss58Format,
-          })) as SubstrateAccount;
-          const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
+          const signerAccount = await createUserWithAddress(address) as SubstrateAccount;
+          const signer = await (app.chain as Substrate).webWallet.getSigner(address);
           vnode.state.linking = true;
           m.redraw();
 
@@ -236,11 +237,7 @@ const SubstrateLinkAccountItem: m.Component<{
     }, [
       m('.account-item-left', [
         m('.account-item-name', account.meta.name),
-        // TODO: format this address correctly
-        m('.account-item-address', formatAddressShort(AddressSwapper({
-          address: account.address,
-          currentPrefix: (app.chain as Substrate).chain.ss58Format,
-        }))),
+        m('.account-item-address', formatAddressShort(address, account.chain)),
       ]),
       m('.account-item-right', [
         vnode.state.linking
@@ -248,14 +245,14 @@ const SubstrateLinkAccountItem: m.Component<{
             // TODO: show a (?) icon with a tooltip explaining to check your wallet
             m(Spinner, { size: 'xs', active: true })
           ])
-          : m('.account-user', m(User, { user: app.chain.accounts.get(account.address) })),
+          : m('.account-user', m(User, { user: app.chain.accounts.get(address) })),
       ]),
     ]);
   }
 };
 
 const LinkNewAddressModal: m.Component<{
-  loggingInWithAddress?: boolean; // determines whether the header says "Link new address" or "Login with address"
+  loggingInWithAddress?: boolean; // determines whether the header says "Connect a new address" or "Login with address"
   joiningCommunity: string,       // join community after verification
   joiningChain: string,           // join chain after verification
   alreadyInitializedAccount?: Account<any>; // skip verification, go straight to profile creation (only used for NEAR)
@@ -326,7 +323,7 @@ const LinkNewAddressModal: m.Component<{
     }
 
     const linkAddressHeader = m('.compact-modal-title', [
-      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Link new address'),
+      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
     ]);
 
     const isMobile = $(window).width() <= 440;
@@ -433,7 +430,7 @@ const LinkNewAddressModal: m.Component<{
           // cli -- cosmos-sdk and substrate chains supported
           [ChainBase.CosmosSDK, ChainBase.Substrate].indexOf(app.chain.base) !== -1 && m('.link-address-option', {
             class: (vnode.state.selectedWallet === LinkNewAddressWallets.CLIWallet ? 'selected' : '')
-              + isMobile ? ' mobile-disabled' : '',
+              + (isMobile ? ' mobile-disabled' : ''),
             onclick: (e) => {
               vnode.state.selectedWallet = LinkNewAddressWallets.CLIWallet;
               setTimeout(() => {
@@ -595,15 +592,15 @@ const LinkNewAddressModal: m.Component<{
                 m.redraw();
               },
               label: vnode.state.initializingWallet !== false
-                ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ]
+                ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 30s)...' ]
                 : (app.chain as Substrate || app.chain as Ethereum).webWallet.available
                   ? 'Connect to wallet' : 'No wallet detected',
             }),
           (app.chain as Substrate || app.chain as Ethereum).webWallet
             && (app.chain as Substrate || app.chain as Ethereum).webWallet.enabled && m('.accounts-caption', [
             (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length ? [
-              m('p', 'Select an account to link.'),
-              m('p.small-text', 'If a popup does not appear, click your browser extension.'),
+              m('p', 'Select an address:'),
+              m('p.small-text', 'If a popup does not appear, check your wallet/browser extension.'),
             ] : [
               m('p', 'Wallet connected, but no accounts were found.'),
             ],
@@ -660,10 +657,11 @@ const LinkNewAddressModal: m.Component<{
               m('span.no-select', '<name>'),
             ]),
           ],
-          app.chain.base === ChainBase.Substrate && m(CheckboxFormField, {
+          app.chain.base === ChainBase.Substrate && m(Checkbox, {
             name: 'is-ed25519',
             label: 'Key is ed25519 format',
-            callback: async (result) => {
+            onchange: async (e) => {
+              const result = (e.target as any).checked;
               vnode.state.isEd25519 = !!result;
 
               // resubmit creation if they check box after pasting address
@@ -684,8 +682,9 @@ const LinkNewAddressModal: m.Component<{
           }),
           m(Input, {
             name: 'Address',
-            placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here: 5Dvq...'
-              : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here: cosmos123...'
+            fluid: true,
+            placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
+              : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here (e.g. cosmos123...)'
                 : 'Paste the address here',
             onchange: async (e) => {
               const address = (e.target as any).value;
@@ -751,6 +750,7 @@ const LinkNewAddressModal: m.Component<{
             ]),
             m(Input, {
               name: 'Signature',
+              fluid: true,
               placeholder: (app.chain.base === ChainBase.CosmosSDK)
                 ? 'Paste the entire output'
                 : 'Paste the signature here',
@@ -772,37 +772,32 @@ const LinkNewAddressModal: m.Component<{
               },
             }),
             vnode.state.error && vnode.state.newAddress && m('.error-message', vnode.state.error),
-            app.chain.base === ChainBase.Substrate && m(CheckboxFormField, {
+            app.chain.base === ChainBase.Substrate && m(Checkbox, {
               name: 'secret-phrase-saved',
               label: 'My secret phrase is saved somewhere safe',
-              callback: (result) => {
+              onchange: async (e) => {
+                const result = (e.target as any).checked;
                 vnode.state.secretPhraseSaved = result;
               },
             }),
-            (vnode.state.validSig
-             && (app.chain.base !== ChainBase.Substrate || vnode.state.secretPhraseSaved)
-            ) ? [
-                m('button.formular-button-primary', {
-                  onclick: async (e) => {
-                    e.preventDefault();
-                    const unverifiedAcct: Account<any> = vnode.state.newAddress;
-                    unverifiedAcct.validate(vnode.state.validSig).then(() => {
-                    // if no exception was raised, account must be valid
-                      accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address), vnode);
-                    }, (err) => {
-                      vnode.state.error = 'Verification failed. There was an inconsistency error; '
-                      + 'please report this to the developers.';
-                      m.redraw();
-                    });
-                  }
-                }, 'Continue'),
-              ] : [
-                m('button.disabled', {
-                  onclick: (e) => {
-                    e.preventDefault();
-                  }
-                }, 'Continue'),
-              ],
+            m(Button, {
+              intent: 'primary',
+              onclick: async (e) => {
+                e.preventDefault();
+                const unverifiedAcct: Account<any> = vnode.state.newAddress;
+                unverifiedAcct.validate(vnode.state.validSig).then(() => {
+                  // if no exception was raised, account must be valid
+                  accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address), vnode);
+                }, (err) => {
+                  vnode.state.error = 'Verification failed. There was an inconsistency error; '
+                    + 'please report this to the developers.';
+                  m.redraw();
+                });
+              },
+              label: 'Continue',
+              disabled: !(vnode.state.validSig
+                          && (app.chain.base !== ChainBase.Substrate || vnode.state.secretPhraseSaved))
+            }),
           ]),
         ]),
       ]) : vnode.state.step === LinkNewAddressSteps.Step2VerifyWithHedgehog ? m('.link-address-step', [
@@ -944,7 +939,7 @@ const LinkNewAddressModal: m.Component<{
 
 // inject confirmExit property
 LinkNewAddressModal['confirmExit'] = confirmationModalWithText(
-  app.isLoggedIn() ? 'Cancel out of linking address?' : 'Cancel out of logging in?'
+  app.isLoggedIn() ? 'Cancel connecting new address?' : 'Cancel out of logging in?'
 );
 
 export default LinkNewAddressModal;
