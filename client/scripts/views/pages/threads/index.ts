@@ -107,6 +107,10 @@ export const newThread = async (
   privacy?: boolean,
   readOnly?: boolean
 ) => {
+  const topics = app.chain
+    ? app.chain.meta.chain.topics
+    : app.community.meta.topics;
+
   if (kind === OffchainThreadKind.Forum) {
     if (!form.threadTitle) {
       throw new Error(NewThreadErrors.NoTitle);
@@ -120,7 +124,7 @@ export const newThread = async (
       throw new Error(NewThreadErrors.NoUrl);
     }
   }
-  if (!form.topicName) {
+  if (!form.topicName && topics.length) {
     throw new Error(NewThreadErrors.NoTopic);
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
@@ -175,15 +179,17 @@ export const newThread = async (
   await app.user.notifications.refresh();
   m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
 
-  try {
-    const topicNames = Array.isArray(activeEntity?.meta?.topics)
-      ? activeEntity.meta.topics.map((t) => t.name)
-      : [];
-    if (!topicNames.includes(result.topic.name)) {
-      activeEntity.meta.topics.push(result.topic);
+  if (result.topic.name) {
+    try {
+      const topicNames = Array.isArray(activeEntity?.meta?.topics)
+        ? activeEntity.meta.topics.map((t) => t.name)
+        : [];
+      if (!topicNames.includes(result.topic.name)) {
+        activeEntity.meta.topics.push(result.topic);
+      }
+    } catch (e) {
+      console.log(`Error adding new topic to ${activeEntity}.`);
     }
-  } catch (e) {
-    console.log(`Error adding new topic to ${activeEntity}.`);
   }
 
   mixpanel.track('Create Thread', {
