@@ -22,8 +22,7 @@ const slashQuery = async (models, req: Request, res: Response, next: NextFunctio
   }
 
   const where: any = {
-    '$ChainEventType.chain$': chain,
-    '$ChainEventType.event_name$': 'slash',
+    '$ChainEvent.chain_event_type_id$': `${chain}-slash`,
   };
 
   if (stash) where['$ChainEvent.event_data.validator$'] = stash;
@@ -39,7 +38,6 @@ const slashQuery = async (models, req: Request, res: Response, next: NextFunctio
     order: [
       ['created_at', 'ASC']
     ],
-    include: [ { model: models.ChainEventType } ]
   });
   return slashes;
 };
