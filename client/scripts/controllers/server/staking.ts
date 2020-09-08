@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 /* eslint-disable no-restricted-syntax */
 import app from 'state';
-import { get, post } from 'lib/util';
+import { get } from 'lib/util';
 
 class StakingController {
     public constructor() {

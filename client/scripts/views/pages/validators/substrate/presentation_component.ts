@@ -68,7 +68,7 @@ const model = {
         console.log(model.waitingStashes, "waitingStashes");
         model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
       }
-      model.refresh();
+      model.onChange();
       model.searchIsOn = false;
       m.redraw();
     }
@@ -114,11 +114,12 @@ const model = {
       }
       console.log("fetched")
       result.validators = validators;
+
       m.redraw()
       return;
     }
   },
-  async refresh() {
+  async onChange() {
     let validatorStashes: any = model.activeStashes;
     if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
     let { prevIndex, nextIndex, pageSize } = model;
@@ -130,9 +131,27 @@ const model = {
       model.prevIndex = prevIndex;
       model.nextIndex = nextIndex;
     }
+    console.log(validators.validators, "validators------------------")
     result.validators = [...result.validators, ...validators.validators];
     result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
     m.redraw();
+  },
+  async refresh() {
+    let validatorStashes: any = model.activeStashes;
+    if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
+    let { prevIndex, nextIndex, pageSize } = model;
+    // let validators: any = [];
+    if (validatorStashes.length >= prevIndex) {
+      result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
+      prevIndex = nextIndex;
+      nextIndex = nextIndex + pageSize;
+      model.prevIndex = prevIndex;
+      model.nextIndex = nextIndex;
+      m.redraw();
+    }
+    // result.validators = [...result.validators, ...validators.validators];
+    // result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+
   },
   sortIcon(key: string) {
     return model.sortKey === key
@@ -152,6 +171,8 @@ const model = {
       model.prevIndex = 0;
       model.nextIndex = model.prevIndex + model.pageSize;
       console.log("state ", model.state);
+      model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
+
       model.refresh();
     }
     if (index === 1) {
@@ -161,6 +182,7 @@ const model = {
       model.prevIndex = 0;
       model.nextIndex = model.prevIndex + model.pageSize;
       console.log("state ", model.state);
+      model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
       model.refresh();
     }
     if (index > 1) {
@@ -200,6 +222,17 @@ export const PresentationComponent_ = {
         size: 'xl',
         style: 'visibility: visible; opacity: 1;'
       });
+
+    // if (model.searchValue) {
+    //   let valueExist = true;
+    //   result.validators?.forEach(ele => {
+    //     valueExist = true;
+    //     if (!ele.stash_id.includes(model.searchValue) && !ele.name.includes(model.searchValue)) {
+    //       valueExist = false;
+    //     }
+    //   });
+    //   if (!valueExist) console.log("not found");
+    // }
     const chain = app.chain as Substrate;
     console.log("validators ", result.validators);
 
@@ -222,7 +255,7 @@ export const PresentationComponent_ = {
         if ($(document).height() - $(this).height() - 100 < $(this).scrollTop()) {
           // alert('Just 100 pixels above to Bottom');
           model.scroll = true;
-          model.refresh()
+          model.onChange();
         }
       }
     });
@@ -248,6 +281,7 @@ export const PresentationComponent_ = {
                 onkeyup: (e) => {
                   { onSearchHandler(e.target.value) }
                 },
+
               })),
             m('tr.validators-heading', [
               m('th.val-stash', 'Stash'),
@@ -335,6 +369,7 @@ export const PresentationComponent_ = {
                 onkeyup: (e) => {
                   { onSearchHandler(e.target.value) }
                 },
+
               })),
             m('tr.validators-heading', [
               m('th.val-stash-waiting', 'Stash'),

@@ -10,8 +10,22 @@ const getValidatorDetail = async (models, req: Request, res: Response, next: Nex
     let validators: any = [];
     let where: any = { state: req.query?.state ? req.query?.state : 'Active' };
 
+    //serarch by name or address
     if (req.query?.validatorStashes?.length) {
-        where.stash_id = { [Op.in]: req?.query?.validatorStashes };
+        // where.stash_id = { [Op.in]: req?.query?.validatorStashes };
+        where = {
+            [Op.or]: [
+                {
+                    stash_id:
+                        { [Op.in]: req?.query?.validatorStashes }
+                },
+                {
+                    name:
+                        { [Op.in]: req?.query?.validatorStashes }
+                }
+            ],
+            ...where
+        }
     }
     console.log("where ======== ", where)
     validators = await models.Validators.findAll({
