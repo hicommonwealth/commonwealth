@@ -63,9 +63,9 @@ const User: m.Component<{
       account = vnode.attrs.user;
       // TODO: we should remove this, since account should always be of type Account,
       // but we currently inject objects of type 'any' on the profile page
-      // const chainId = typeof account.chain === 'string' ? account.chain : account.chain.id;
+      const chainId = typeof account.chain === 'string' ? account.chain : account.chain.id;
       profile = account.profile;
-      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === account.chain.id);
+      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === chainId);
     }
     const roleTag = role ? m(Tag, {
       class: 'role-tag',
