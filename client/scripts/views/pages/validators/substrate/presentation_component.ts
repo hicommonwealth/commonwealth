@@ -1,9 +1,7 @@
 import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
-import mithrilSelect from "mithril-select"
 import { get } from 'lodash';
-import { DropdownFormField, TextareaFormField } from 'views/components/forms';
 import Substrate from 'controllers/chain/substrate/main';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
