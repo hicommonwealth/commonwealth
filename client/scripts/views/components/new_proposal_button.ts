@@ -8,9 +8,10 @@ import app from 'state';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
+import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
 import { CandidacyButton, CollectiveVotingButton } from '../pages/council';
 
-const getNewProposalMenu = (candidates?) => {
+const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
   const activeAccount = app.user.activeAccount;
   return [
     m(MenuItem, {
@@ -81,7 +82,7 @@ export const MobileNewProposalButton: m.Component<{}> = {
   }
 };
 
-const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean, councilCandidates? }> = {
+const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean, councilCandidates?: Array<[SubstrateAccount, number]> }> = {
   view: (vnode) => {
     const { fluid, threadOnly, councilCandidates } = vnode.attrs;
 

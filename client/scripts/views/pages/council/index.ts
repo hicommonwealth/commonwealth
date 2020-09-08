@@ -71,7 +71,7 @@ const CouncilElectionVoter: m.Component<ICouncilElectionVoterAttrs> = {
 };
 
 export const CollectiveVotingButton: m.Component<{
-  candidates: any[],
+  candidates: Array<[SubstrateAccount, number]>,
   menuStyle?: boolean,
   buttonStyle?: boolean
 }> = {
@@ -83,9 +83,6 @@ export const CollectiveVotingButton: m.Component<{
         label: 'Set council vote',
         onclick: (e) => {
           e.preventDefault();
-          if (!m.route.get().includes(`${app.activeId()}/council`)) {
-            m.route.set(`${app.activeId()}/council`);
-          }
           app.modals.create({
             modal: CouncilVotingModal,
             data: { candidates },
@@ -119,7 +116,7 @@ export const CollectiveVotingButton: m.Component<{
 };
 
 export const CandidacyButton: m.Component<{
-  candidates: any[],
+  candidates: Array<[SubstrateAccount, number]>,
   buttonStyle?: boolean,
   menuStyle?: boolean
 }> = {
