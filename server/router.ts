@@ -51,6 +51,7 @@ import createInvite from './routes/createInvite';
 import getInvites from './routes/getInvites';
 import getOffences from './routes/getOffences';
 import getRewards from './routes/getRewards';
+import getUSDvalue from './routes/getUSDvalue';
 import getOwnStakeOverTime from './routes/getOwnStakeOverTime';
 import getOtherStakeOverTime from './routes/getOtherStakeOverTime';
 import getTotalStakeOverTime from './routes/getTotalStakeOverTime';
@@ -213,6 +214,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/getInvites', passport.authenticate('jwt', { session: false }), getInvites.bind(this, models));
   router.get('/getOffences', getOffences.bind(this, models));
   router.get('/getRewards', getRewards.bind(this, models));
+  router.get('/getUSDvalue', getUSDvalue.bind(this, models));
   router.get('/getOwnStakeOverTime', getOwnStakeOverTime.bind(this, models));
   router.get('/getTotalStakeOverTime', getTotalStakeOverTime.bind(this, models));
   router.get('/getOtherStakeOverTime', getOtherStakeOverTime.bind(this, models));
