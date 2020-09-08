@@ -770,7 +770,6 @@ interface IQuillEditorAttrs {
   theme?: string;
   onkeyboardSubmit?;
   editorNamespace: string;
-  onkeyup?;
 }
 
 interface IQuillEditorState {
@@ -797,14 +796,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     }
   },
   onremove: (vnode) => {
-    const { editor, markdownMode } = vnode.state;
-    const { editorNamespace } = vnode.attrs;
-    const body = markdownMode
-      ? editor?.getText()
-      : JSON.stringify(editor?.getContents());
-    if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
-      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
-    }
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
     }
@@ -816,7 +807,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
-
     if (!contentsDoc
       && !vnode.state.markdownMode
       && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {

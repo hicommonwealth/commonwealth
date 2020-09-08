@@ -54,6 +54,8 @@ interface IProposalHeaderAttrs {
 }
 
 interface IProposalHeaderState {
+  canEdit: boolean;
+  savedEdit: string;
   editing: boolean;
   saving: boolean;
   quillEditorState: any;
@@ -63,28 +65,10 @@ interface IProposalHeaderState {
 }
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
-  view: (vnode) => {
-    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
-    const isThread = proposal instanceof OffchainThread;
-    const description = isThread ? false : (proposal as AnyProposal).description;
-    const body = isThread ? (proposal as OffchainThread).body : false;
-    const attachments = isThread ? (proposal as OffchainThread).attachments : false;
-    const versionHistory = (proposal as OffchainThread).versionHistory;
-    const lastEdit = versionHistory?.length > 1 ? JSON.parse(versionHistory[0]) : null;
-    const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
-      + `${slugify(proposal.title)}`;
-    const author : Account<any> = proposal instanceof OffchainThread
-      ? (!app.community
-        ? app.chain.accounts.get(proposal.author)
-        : app.community.accounts.get(proposal.author, proposal.authorChain))
-      : proposal.author;
-
-    const notificationSubscription = app.user.notifications.subscriptions
-      .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
-
-    const canEdit = (proposal instanceof OffchainThread
-                     && app.user.activeAccount?.address === proposal.author
-                     && app.user.activeAccount?.chain.id === proposal.authorChain)
+  oninit: (vnode) => {
+    const { proposal } = vnode.attrs;
+    vnode.state.canEdit = (app.user.activeAccount?.address === proposal.author
+          && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain)
       || (app.user.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
@@ -94,6 +78,23 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         chain: app.activeChainId(),
         community: app.activeCommunityId()
       }));
+  },
+  view: (vnode) => {
+    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
+    const { canEdit } = vnode.state;
+    const isThread = proposal instanceof OffchainThread;
+    const attachments = isThread ? (proposal as OffchainThread).attachments : false;
+    const versionHistory = (proposal as OffchainThread).versionHistory;
+    const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
+      + `${slugify(proposal.title)}`;
+    const description = isThread ? false : (proposal as AnyProposal).description;
+    const body = isThread ? (proposal as OffchainThread).body : false;
+    const lastEdit = versionHistory?.length > 1 ? JSON.parse(versionHistory[0]) : null;
+    const author : Account<any> = proposal instanceof OffchainThread
+      ? (!app.community
+        ? app.chain.accounts.get(proposal.author)
+        : app.community.accounts.get(proposal.author, proposal.authorChain))
+      : proposal.author;
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
@@ -170,7 +171,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           vnode.state.editing
             && m('.proposal-body-button-group', [
               m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
-              m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+              m(ProposalBodyCancelEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
             ]),
 
           !vnode.state.editing
@@ -302,7 +303,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
             m(ProposalBodyReaction, { item: comment }),
           ]),
           vnode.state.editing && m('.comment-body-bottom-right', [
-            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+            m(ProposalBodyCancelEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
             m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
           ]),
         ]),
