@@ -292,7 +292,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
         m(".returns_content_div.col-lg-4", [m("strong", "1 Year @ "+vnode.state.rewardValue.toFixed()+"%"), m("p", (vnode.state.rewardEdgPerDay  * 365) .toFixed(3)+" EDG"), m("span", "($"+ ((vnode.state.rewardEdgPerDay * 365 ) *vnode.state.selected_asset.usd_value).toFixed(3)  +")")])
       ])
         ,
-      m(".row", m(".col-xs-12", m(Button, { align: 'center', compact: true, label: 'Reset values to default' ,
+      m(".row.button-row", m(".col-xs-12", m(Button, { align: 'center', compact: true, label: 'Reset values to default' ,
       onclick: (e)=>{
         resetValues(vnode);
         
