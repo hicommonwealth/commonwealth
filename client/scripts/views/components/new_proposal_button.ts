@@ -10,6 +10,7 @@ import { ChainClass, ChainBase } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
 import { CandidacyButton, CollectiveVotingButton } from '../pages/council';
+import Substrate from 'client/scripts/controllers/chain/substrate/main';
 
 const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
   const activeAccount = app.user.activeAccount;
@@ -58,7 +59,22 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
   ];
 };
 
-export const MobileNewProposalButton: m.Component<{}> = {
+export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
+  oninit: (vnode) => {
+    console.log('eh?')
+    if (app.chain && m.route.get().includes('council')) {
+      console.log('eh')
+      vnode.state.councilCandidates = app.chain
+        && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || [])
+          .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ])
+          .sort((a, b) => {
+            const va = (app.chain as Substrate).phragmenElections.backing(a[0]);
+            const vb = (app.chain as Substrate).phragmenElections.backing(b[0]);
+            if (va === undefined || vb === undefined) return 0;
+            return vb.cmp(va);
+          });
+    }
+  },
   view: (vnode) => {
     return m('.MobileNewProposalButton', [
       m(PopoverMenu, {
@@ -76,13 +92,17 @@ export const MobileNewProposalButton: m.Component<{}> = {
         menuAttrs: {
           align: 'left',
         },
-        content: getNewProposalMenu(),
+        content: getNewProposalMenu(vnode.state.councilCandidates),
       }),
     ]);
   }
 };
 
-const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean, councilCandidates?: Array<[SubstrateAccount, number]> }> = {
+const NewProposalButton: m.Component<{
+  fluid: boolean,
+  threadOnly?: boolean,
+  councilCandidates?: Array<[SubstrateAccount, number]>
+}> = {
   view: (vnode) => {
     const { fluid, threadOnly, councilCandidates } = vnode.attrs;
 
