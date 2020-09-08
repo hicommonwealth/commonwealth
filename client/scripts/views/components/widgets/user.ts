@@ -63,9 +63,9 @@ const User: m.Component<{
       account = vnode.attrs.user;
       // TODO: we should remove this, since account should always be of type Account,
       // but we currently inject objects of type 'any' on the profile page
-      const chainId = typeof account.chain === 'string' ? account.chain : account.chain.id;
-      profile = app.profiles.getProfile(chainId, account.address);
-      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === chainId);
+      // const chainId = typeof account.chain === 'string' ? account.chain : account.chain.id;
+      profile = account.profile;
+      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === account.chain.id);
     }
     const roleTag = role ? m(Tag, {
       class: 'role-tag',
@@ -101,8 +101,8 @@ const User: m.Component<{
                 profile
                   ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:',
-                profile ? profile.displayName : '--',)
-              : m('a.user-display-name.username', profile ? profile.displayName : '--')
+                profile ? profile.name : '--',)
+              : m('a.user-display-name.username', profile ? profile.name : '--')
           ],
         showRole && roleTag,
       ]);
@@ -122,11 +122,11 @@ const User: m.Component<{
         (app.chain && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
           ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
-            (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
+            (profile && profile.name !== 'Anonymous') ? '.username' : '.anonymous'}`,
           profile
             ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
             : 'javascript:',
-          profile ? profile.displayName : '--',)
+          profile ? profile.name : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address, profile.chain)),
       showRole && roleTag,
