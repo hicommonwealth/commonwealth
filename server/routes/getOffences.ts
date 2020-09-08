@@ -11,7 +11,8 @@ export const Errors = {
 };
 
 const getOffences = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { chain, startDate, endDate, stash } = req.query;
+  const { chain, stash } = req.query;
+  let { startDate, endDate } = req.query;
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
 
@@ -20,6 +21,15 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
   });
   if (!chainInfo) {
     return next(new Error(Errors.InvalidChain));
+  }
+
+  // if start and end date isn't given, we set it for 30 days for now
+  if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
+    endDate = new Date();
+    startDate = new Date();
+    endDate = endDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // today's date
+    startDate.setDate(startDate.getDate() - 30);
+    startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
 
   const where: any = {
@@ -37,11 +47,8 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
       { model: models.ChainEventType }
     ]
   });
-  // No Offences
-  if (offences) { if (!offences.length) return []; } else { return []; }
 
-
-  return res.json({ status: 'Success', result: offences });
+  return res.json({ status: 'Success', result: { validatorOffences: offences || [] } });
 };
 
 export default getOffences;
