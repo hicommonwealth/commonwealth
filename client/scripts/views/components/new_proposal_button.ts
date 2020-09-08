@@ -61,9 +61,7 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
 
 export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
   oninit: (vnode) => {
-    console.log('eh?')
     if (app.chain && m.route.get().includes('council')) {
-      console.log('eh')
       vnode.state.councilCandidates = app.chain
         && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || [])
           .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ])
