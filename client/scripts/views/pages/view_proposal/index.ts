@@ -300,7 +300,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         ]),
         m('.comment-body-bottom', [
           m('.comment-body-bottom-left', [
-            m(ProposalBodyReaction, { item: comment }),
+            !vnode.state.editing && m(ProposalBodyReaction, { item: comment }),
           ]),
           vnode.state.editing && m('.comment-body-bottom-right', [
             m(ProposalBodyCancelEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
