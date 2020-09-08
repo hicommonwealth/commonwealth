@@ -796,15 +796,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     }
   },
   onremove: (vnode) => {
-    const { editor, markdownMode } = vnode.state;
-    const { editorNamespace } = vnode.attrs;
-    const body = markdownMode
-      ? editor?.getText()
-      : JSON.stringify(editor?.getContents());
-    console.log(body);
-    // if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
-    //   localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
-    // }
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
     }
