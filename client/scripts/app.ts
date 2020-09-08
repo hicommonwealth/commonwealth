@@ -525,32 +525,15 @@ $(() => {
         app.user.discussionDrafts.refreshAll().then(() => m.redraw());
       }
 
-      let wsUrl = app.serverUrl();
-      if (app.serverUrl().indexOf('https')) {
-        wsUrl = wsUrl.replace('https', 'ws');
-      }
-
-      if (app.serverUrl().indexOf('http') !== -1) {
-        wsUrl = wsUrl.replace('http', 'ws');
-      }
-
-      if (app.serverUrl().indexOf('/api') !== -1) {
-        wsUrl = wsUrl.replace('/api', '');
-      }
-
-      if (app.serverUrl().indexOf('://') === -1) {
-        if (wsUrl.length === 0) {
-          wsUrl = 'ws://localhost:8080';
-        } else {
-          wsUrl = `ws://${app.serverUrl()}`;
-        }
-      }
-
       handleInviteLinkRedirect();
 
       // If the user updates their email
       handleUpdateEmailConfirmation();
 
+      // subscribe to notifications
+      const wsUrl = document.location.origin
+        .replace('http://', 'ws://')
+        .replace('https://', 'wss://');
       app.socket = new WebsocketController(wsUrl, jwt, null);
       if (app.loginState === LoginState.LoggedIn) {
         app.socket.addListener(
