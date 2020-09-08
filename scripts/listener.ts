@@ -1,8 +1,16 @@
-import { Mainnet, Beresheet } from '@edgeware/node-types';
-import { IEventHandler, CWEvent, SubstrateEvents, MolochEvents } from '../dist/index';
+import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
+import {
+  IEventHandler, CWEvent, SubstrateEvents, MolochEvents, EventSupportingChainT, EventSupportingChains
+} from '../dist/index';
 
 const args = process.argv.slice(2);
-const chain = args[0] || 'edgeware';
+const chain: EventSupportingChainT = EventSupportingChains.find((s) => {
+  const argChain = args[0] || 'edgeware';
+  return s === argChain;
+});
+if (!chain) {
+  throw new Error(`invalid chain: ${args[0]}`);
+}
 console.log(`Listening to events on ${chain}.`);
 
 const networks = {
@@ -33,16 +41,20 @@ const skipCatchup = false;
 const url = networks[chain];
 
 if (!url) throw new Error(`no url for chain ${chain}`);
-if (SubstrateEvents.Types.EventChains.includes(chain)) {
+if (SubstrateEvents.Types.EventChains.some((c) => c === chain)) {
   // TODO: update this for Beresheet
   SubstrateEvents.createApi(
     url,
-    (chain === 'edgeware-testnet' || chain === 'edgeware=local')
-      ? Beresheet.types
-      : chain.includes('edgeware') ? Mainnet.types : {},
-    (chain === 'edgeware-testnet' || chain === 'edgeware=local')
-      ? Beresheet.typesAlias : chain.includes('edgeware')
-      ? Mainnet.typesAlias : {},
+    chain === 'edgeware-local'
+      ? dev.types
+      : chain === 'edgeware-testnet'
+        ? Beresheet.types
+        : chain === 'edgeware' ? Mainnet.types : {},
+    chain === 'edgeware-local'
+        ? dev.typesAlias
+        : chain === 'edgeware-testnet'
+          ? Beresheet.typesAlias
+          : chain === 'edgeware' ? Mainnet.typesAlias : {},
   )
   .then(async (api) => {
     const fetcher = new SubstrateEvents.StorageFetcher(api);
@@ -55,7 +67,7 @@ if (SubstrateEvents.Types.EventChains.includes(chain)) {
       verbose: true,
     });
   });
-} else if (MolochEvents.Types.EventChains.includes(chain)) {
+} else if (MolochEvents.Types.EventChains.some((c) => c === chain)) {
   const contract = contracts[chain];
   const contractVersion = 1;
   if (!contract) throw new Error(`no contract address for chain ${chain}`);
