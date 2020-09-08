@@ -31,9 +31,7 @@ const getStakeOverTime = async (models, req: Request, res: Response, next: NextF
     startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
 
-  const where: any = {
-    '$ChainEventType.chain$': chain,
-  };
+  const where: any = {};
 
   // if stash is given
   if (stash) where['$HistoricalValidatorStatistic.stash$'] = stash;
@@ -50,7 +48,6 @@ const getStakeOverTime = async (models, req: Request, res: Response, next: NextF
       ['created_at', 'ASC']
     ],
     attributes: ['stash', 'exposure', 'block'],
-    include: [ { model: models.ChainEventType } ]
   });
   return stakeOverTime;
 };
@@ -58,8 +55,6 @@ const getStakeOverTime = async (models, req: Request, res: Response, next: NextF
 const getTotalStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const stakeOverTime = await getStakeOverTime(models, req, res, next);
   validators = {};
-
-  if (stakeOverTime) { if (!stakeOverTime.length) return []; } else { return []; }
 
   stakeOverTime.forEach((stake) => {
     const event_data: IEventData = stake.dataValues.event_data;
@@ -72,15 +67,12 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
       validators[key] = [event_data.block_number, event_data.exposure.total];
     }
   });
-
-  return res.json({ status: 'Success', result: { validators } });
+  return res.json({ status: 'Success', result: { validators: validators || [] } });
 };
 
 const getOwnStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const stakeOverTime = await getStakeOverTime(models, req, res, next);
   validators = {};
-
-  if (stakeOverTime) { if (!stakeOverTime.length) return []; } else { return []; }
 
   stakeOverTime.forEach((stake) => {
     const event_data: IEventData = stake.dataValues.event_data;
@@ -94,14 +86,12 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
     }
   });
 
-  return res.json({ status: 'Success', result: { validators } });
+  return res.json({ status: 'Success', result: { validators: validators || [] } });
 };
 
 const getOtherStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const stakeOverTime = await getStakeOverTime(models, req, res, next);
   validators = {};
-
-  if (stakeOverTime) { if (!stakeOverTime.length) return []; } else { return []; }
 
   stakeOverTime.forEach((stake) => {
     const event_data: IEventData = stake.dataValues.event_data;
@@ -115,14 +105,12 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
     }
   });
 
-  return res.json({ status: 'Success', result: { validators } });
+  return res.json({ status: 'Success', result: { validators: validators || [] } });
 };
 
 const getNominatorsOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const stakeOverTime = await getStakeOverTime(models, req, res, next);
   validators = {};
-
-  if (stakeOverTime) { if (!stakeOverTime.length) return []; } else { return []; }
 
   stakeOverTime.forEach((stake) => {
     const event_data: IEventData = stake.dataValues.event_data;
@@ -140,7 +128,7 @@ const getNominatorsOverTime = async (models, req: Request, res: Response, next: 
     }
   });
   const nominators = validators;
-  return res.json({ status: 'Success', result: { nominators } });
+  return res.json({ status: 'Success', result: { nominators: nominators || [] } });
 };
 
 export { getTotalStakeOverTime, getOwnStakeOverTime, getOtherStakeOverTime, getNominatorsOverTime };

@@ -18,7 +18,7 @@ interface IEventData {
 }
 
 const getRewards = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { chain, stash_id } = req.query;
+  const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
@@ -76,8 +76,8 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     }
   });
 
-  if (stash_id)
-    return res.json({ status: 'Success', result: { validator: validators[stash_id] || [] } });
+  if (stash)
+    return res.json({ status: 'Success', result: { validator: validators[stash] || [] } });
   return res.json({ status: 'Success', result: { validators: validators || [] } });
 };
 
