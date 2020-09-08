@@ -70,26 +70,6 @@ describe('Thread Tests', () => {
   describe('/createThread', () => {
     const readOnly = true;
 
-    it('should create a discussion thread', async () => {
-      const res = await modelUtils.createThread({
-        address: userAddress,
-        kind,
-        chainId: chain,
-        communityId: community,
-        title,
-        topicName,
-        topicId,
-        body,
-        jwt: userJWT,
-      });
-      expect(res.status).to.equal('Success');
-      expect(res.result).to.not.be.null;
-      expect(res.result.title).to.equal(encodeURIComponent(title));
-      expect(res.result.body).to.equal(encodeURIComponent(body));
-      expect(res.result.Address).to.not.be.null;
-      expect(res.result.Address.address).to.equal(userAddress);
-    });
-
     it('should fail to create a thread without a kind', async () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
@@ -194,22 +174,6 @@ describe('Thread Tests', () => {
       expect(tRes.error).to.be.equal(ThreadErrors.LinkMissingTitleOrUrl);
     });
 
-    it('should fail to create a thread without a topic name', async () => {
-      const tRes = await modelUtils.createThread({
-        address: userAddress,
-        kind,
-        chainId: chain,
-        communityId: community,
-        title,
-        topicName: undefined,
-        topicId,
-        body,
-        jwt: userJWT,
-      });
-      expect(tRes).to.not.be.null;
-      expect(tRes.error).to.not.be.null;
-    });
-
     it('should fail to create a comment on a readOnly thread', async () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
@@ -235,6 +199,54 @@ describe('Thread Tests', () => {
       });
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
+    });
+
+    it('should successfully create a thread without a topic name (if the community lacks topics)', async () => {
+      const tRes = await modelUtils.createThread({
+        address: userAddress,
+        kind,
+        chainId: chain,
+        communityId: community,
+        title,
+        body,
+        jwt: userJWT,
+      });
+      expect(tRes.status).to.equal('Success');
+      expect(tRes.result).to.not.be.null;
+    });
+
+    it('should create a discussion thread', async () => {
+      const res = await modelUtils.createThread({
+        address: userAddress,
+        kind,
+        chainId: chain,
+        communityId: community,
+        title,
+        topicName,
+        topicId,
+        body,
+        jwt: userJWT,
+      });
+      expect(res.status).to.equal('Success');
+      expect(res.result).to.not.be.null;
+      expect(res.result.title).to.equal(encodeURIComponent(title));
+      expect(res.result.body).to.equal(encodeURIComponent(body));
+      expect(res.result.Address).to.not.be.null;
+      expect(res.result.Address.address).to.equal(userAddress);
+    });
+
+    it('should fail to create a thread without a topic name (if the community has topics)', async () => {
+      const tRes = await modelUtils.createThread({
+        address: userAddress,
+        kind,
+        chainId: chain,
+        communityId: community,
+        title,
+        body,
+        jwt: userJWT,
+      });
+      expect(tRes).to.not.be.null;
+      expect(tRes.error).to.not.be.null;
     });
 
     it('should create a thread with mentions to non-existent addresses', async () => {
