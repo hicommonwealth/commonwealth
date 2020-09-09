@@ -172,12 +172,12 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
-        || p.startsWith(`/${app.activeChainId()}/treasury`)
         || p.startsWith(`/${app.activeChainId()}/proposal/referendum`)
         || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
         || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`)
         || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`)
         || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`));
+    const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`);
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
@@ -212,6 +212,15 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           //   }),
           // ],
         }),
+        // treasury (substrate only)
+        !app.community && app.chain?.base === ChainBase.Substrate
+          && m(ListItem, {
+            active: onTreasuryPage(m.route.get()),
+            label: 'Treasury',
+            contentLeft: m(Icon, { name: Icons.TRUCK }),
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/treasury`),
+            contentRight: [], // TODO
+          }),
         // council (substrate only)
         !app.community && app.chain?.base === ChainBase.Substrate
           && m(ListItem, {

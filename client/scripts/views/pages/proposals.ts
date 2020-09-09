@@ -56,24 +56,6 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
           ' days'
         ]),
       ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Next treasury spend'),
-          (app.chain as Substrate).treasury.nextSpendBlock
-            ? m(CountdownUntilBlock, {
-              block: (app.chain as Substrate).treasury.nextSpendBlock,
-              includeSeconds: false
-            })
-            : '--',
-        ]),
-      ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        // TODO: Pot is under construction
-        m('.stats-tile', [
-          m('.stats-heading', 'Treasury balance'),
-          app.chain && formatCoin((app.chain as Substrate).treasury.pot),
-        ]),
-      ]),
     ]);
     // onMoloch && m('.stats-tile', [
     //   m('.stats-tile-label', 'DAO Basics'),
@@ -126,8 +108,6 @@ const ProposalsPage: m.Component<{}> = {
     const activeSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
       && (app.chain as Edgeware).signaling.store.getAll()
         .filter((p) => !p.completed).sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
-    const activeTreasuryProposals = onSubstrate
-      && (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed);
     const activeCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
       && (app.chain as Cosmos).governance.store.getAll()
         .filter((p) => !p.completed).sort((a, b) => +b.identifier - +a.identifier);
@@ -149,10 +129,6 @@ const ProposalsPage: m.Component<{}> = {
         .concat((activeCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
 
-    const activeTreasuryContent = activeTreasuryProposals.length
-      ? activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
-      : [ m('.no-proposals', 'None') ];
-
     // inactive proposals
     const inactiveDemocracyReferenda = onSubstrate
       && (app.chain as Substrate).democracy.store.getAll().filter((p) => p.completed);
@@ -163,8 +139,6 @@ const ProposalsPage: m.Component<{}> = {
     const inactiveSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
       && (app.chain as Edgeware).signaling.store.getAll()
         .filter((p) => p.completed).sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
-    const inactiveTreasuryProposals = onSubstrate
-      && (app.chain as Substrate).treasury.store.getAll().filter((p) => p.completed);
     const inactiveCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
       && (app.chain as Cosmos).governance.store.getAll()
         .filter((p) => p.completed).sort((a, b) => +b.identifier - +a.identifier);
@@ -185,10 +159,6 @@ const ProposalsPage: m.Component<{}> = {
         .concat((inactiveSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
-
-    const inactiveTreasuryContent = inactiveTreasuryProposals.length
-      ? inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
-      : [ m('.no-proposals', 'None') ];
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
@@ -226,20 +196,10 @@ const ProposalsPage: m.Component<{}> = {
         rightColSpacing: [4, 4, 4]
       }),
       m(Listing, {
-        content: activeTreasuryContent,
-        columnHeaders: ['Active Treasury Proposals'],
-        rightColSpacing: [0]
-      }),
-      m(Listing, {
         content: inactiveProposalContent,
         columnHeaders: ['Inactive Proposals', 'Replies', 'Likes', 'Updated'],
         rightColSpacing: [4, 4, 4]
       }),
-      m(Listing, {
-        content: inactiveTreasuryContent,
-        columnHeaders: ['Inactive Treasury Proposals'],
-        rightColSpacing: [0]
-      })
     ]);
   }
 };
