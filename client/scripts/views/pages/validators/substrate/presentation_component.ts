@@ -52,26 +52,13 @@ const model = {
   sortKey: 'exposure.total',
   sortAsc: true,
   extraOp: [],
+  constValidators: [],
+  async onSearchHandler(value?: string) {
 
-  onSearchHandler(value?: string) {
-    console.log("valueee ", value)
-    model.searchIsOn = true;
-    // if search box is empty then refresh
-    if (!value) {
-      if (model.state === 'Active') {
-        console.log(model.profile, "model.profile")
-        model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
-      }
-      else {
-        console.log(model.waitingStashes, "waitingStashes");
-        model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
-      }
-      model.onChange();
-      model.searchIsOn = false;
-      m.redraw();
-    }
+    console.log("valueee ", value);
     // if search option is provided
     if (value) {
+      model.searchIsOn = true;
       model.searchValue = value;
       model.searchCriteria = { value };
       let mapNamesAddress = [];
@@ -89,12 +76,13 @@ const model = {
       value = value.toLowerCase();
 
       //fetch from already fetched list
-      result.validators.forEach((ele => {
-
-        if (ele.name?.toLowerCase().includes(value) || ele.stash_id.toLowerCase().includes(value)) {
+      console.log(" model.constValidators ", model.constValidators)
+      model.constValidators.forEach((ele => {
+        if ((ele.name?.toLowerCase().includes(value) || ele.stash_id.toLowerCase().includes(value)) && ele.state === model.state) {
           validators.push(ele);
         }
       }));
+      console.log("fetch from already fetched list", validators);
 
       if (!validators.length) {
         console.log("fetching from outside")
@@ -104,15 +92,21 @@ const model = {
             obj = [...obj, ele];
           }
         });
-        model.state === 'Active' ? model.activeStashes = obj : model.waitingStashes = obj;
-        console.log(obj, "obj");
-        model.refresh();
-        m.redraw()
+        if (obj.length) {
+          model.state === 'Active' ? model.activeStashes = obj : model.waitingStashes = obj;
+          console.log(obj, "obj");
+          model.prevIndex = 0;
+          model.onSearch();
+          m.redraw();
+        } else {
+          result.validators = [];
+          m.redraw();
+          return;
+        }
         return;
       }
       console.log("fetched")
       result.validators = validators;
-
       m.redraw()
       return;
     }
@@ -123,33 +117,43 @@ const model = {
     let { prevIndex, nextIndex, pageSize } = model;
     let validators: any = [];
     if (validatorStashes.length >= prevIndex) {
-      validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
       prevIndex = nextIndex;
       nextIndex = nextIndex + pageSize;
       model.prevIndex = prevIndex;
       model.nextIndex = nextIndex;
+      validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex));
     }
-    console.log(validators.validators, "validators------------------")
-    result.validators = [...result.validators, ...validators.validators];
+    console.log(validators?.validators, "--------onChange---------");
+    result.validators = [...result.validators, ...validators?.validators];
     result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+    model.constValidators = [...result.validators, ...model.constValidators];
+    model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
     m.redraw();
+  },
+  async onSearch() {
+    let validatorStashes: any = model.activeStashes;
+    if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
+    let { prevIndex, nextIndex, pageSize } = model;
+    let validators: any = [];
+    if (validatorStashes.length >= prevIndex) {
+      validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
+      result.validators = [...result.validators, ...validators?.validators];
+      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+      model.constValidators = [...result.validators, ...model.constValidators];
+      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+      m.redraw();
+    }
   },
   async refresh() {
     let validatorStashes: any = model.activeStashes;
     if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
     let { prevIndex, nextIndex, pageSize } = model;
-    // let validators: any = [];
     if (validatorStashes.length >= prevIndex) {
       result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
-      prevIndex = nextIndex;
-      nextIndex = nextIndex + pageSize;
-      model.prevIndex = prevIndex;
-      model.nextIndex = nextIndex;
+      model.constValidators = [...result.validators, ...model.constValidators];
+      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
       m.redraw();
     }
-    // result.validators = [...result.validators, ...validators.validators];
-    // result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
-
   },
   sortIcon(key: string) {
     return model.sortKey === key
@@ -193,7 +197,28 @@ const model = {
     if (model.searchValue)
       model.onSearchHandler(model.searchValue);
   },
-
+  async onReverseSearch(value?) {
+    console.log("calling reverse");
+    if (value && value.trim()) {
+      model.onSearchHandler(value);
+      return;
+    }
+    model.searchValue = value;
+    console.log("if no value");
+    value = undefined;
+    if (model.state === 'Active') {
+      console.log(model.profile, "model.profile")
+      model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
+    }
+    else {
+      console.log(model.waitingStashes, "waitingStashes");
+      model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
+    }
+    model.prevIndex = 0;
+    model.searchIsOn = false;
+    m.redraw();
+    model.refresh();
+  },
   changeSort(key: string) {
     if (key === model.sortKey)
       model.sortAsc = !model.sortAsc;
@@ -206,7 +231,7 @@ export const PresentationComponent_ = {
   oninit: async () => {
     model.validatorNamesAddrss = await app.staking.validatorNamesAddress();
     model.profile = (model.validatorNamesAddrss as any).profileData;
-    console.log("profile ======", model.profile);
+    // console.log("profile ======", model.profile);
 
     model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address);
     model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
@@ -216,7 +241,7 @@ export const PresentationComponent_ = {
   view: () => {
     let { changeSort, reset, sortAsc, sortIcon, sortKey, onSearchHandler } = model;
 
-    if (!result?.validators?.length)
+    if (!result?.validators?.length && !model.searchIsOn)
       return m(Spinner, {
         fill: true,
         message: 'Loading Validators...',
@@ -235,7 +260,6 @@ export const PresentationComponent_ = {
     //   if (!valueExist) console.log("not found");
     // }
     const chain = app.chain as Substrate;
-    console.log("validators ", result.validators);
 
     const lastHeaders = (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.lastHeaders
@@ -250,16 +274,40 @@ export const PresentationComponent_ = {
 
 
     //onscroll fetch next N record
-    $(window).scroll(function () {
-      if (!model.scroll) {
-        // End of the document reached?
-        if ($(document).height() - $(this).height() - 100 < $(this).scrollTop()) {
-          // alert('Just 100 pixels above to Bottom');
+
+    // let cont: any = $("table.validators-table");
+    if (!model.scroll) {
+      $("table.validators-table").on('scroll', function () {
+        // console.log("$(this).scrollTop()", $(this).scrollTop())
+        // console.log("$(this).innerHeight()", $(this).innerHeight())
+        // console.log("$(this).scrollHeight()", $(this)[0].scrollHeight)
+        if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+          // alert('end reached');
           model.scroll = true;
-          model.onChange();
+          if (!model.searchValue && !model.searchValue.trim())
+            model.onChange();
         }
-      }
-    });
+      });
+    }
+
+    // console.log("cont.scrollHeight ", cont.scrollHeight)
+    // $(window).scroll(function () {
+    // if (!model.scroll) {
+    //   // End of the document reached?
+    //   // if ($(document).height() - $(this).height() - 100 < $(this).scrollTop()) {
+    //   //   // alert('Just 100 pixels above to Bottom');
+    //   //   model.scroll = true;
+    //   //   model.searchIsOn = true;
+    //   //   model.onChange();
+    //   // }
+    //   // .scrollHeight - e.target.offsetHeight === 0
+    //   if (cont.scrollHeight - cont.offsetHeight === 0) {
+    //     model.scroll = true;
+    //     model.searchIsOn = true;
+    //     model.onChange();
+    //   }
+    // }
+    // });
 
     // const filtered = Object.keys(annualPercentRate)
     //   .map((elt) => annualPercentRate[elt])
@@ -282,7 +330,14 @@ export const PresentationComponent_ = {
                 onkeyup: (e) => {
                   { onSearchHandler(e.target.value) }
                 },
-
+                onkeydown: (e) => {
+                  { model.onReverseSearch(e.target.value) }
+                },
+                onkeypress: (e) => {
+                  if (!e.target.value || !e.target.value.trim()) {
+                    model.searchIsOn = false;
+                  }
+                },
               })),
             m('tr.validators-heading', [
               m('th.val-stash', 'Stash'),
@@ -370,7 +425,15 @@ export const PresentationComponent_ = {
                 onkeyup: (e) => {
                   { onSearchHandler(e.target.value) }
                 },
-
+                onkeydown: (e) => {
+                  { model.onReverseSearch(e.target.value) }
+                },
+                onkeypress: (e) => {
+                  if (!e.target.value || !e.target.value.trim()) {
+                    model.searchIsOn = false;
+                    m.redraw();
+                  }
+                },
               })),
             m('tr.validators-heading', [
               m('th.val-stash-waiting', 'Stash'),

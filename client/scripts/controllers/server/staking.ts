@@ -18,7 +18,8 @@ class StakingController {
             return get('/getValidatorNamesAndAddresses', {}, resolve);
         });
     }
-    public validatorDetail(state?: string, stashes?: any) {
+    public validatorDetail(state: string, stashes: any) {
+        console.log("stashes ", stashes)
         return new Promise((resolve) => {
             return get('/getValidatorDetail', {
                 state,
