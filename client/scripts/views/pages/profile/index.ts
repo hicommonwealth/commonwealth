@@ -6,15 +6,18 @@ import _ from 'lodash';
 import Chart from 'chart.js';
 import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
+import { get } from 'lib/util';
+
 
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
-import { Card, Icons, Icon, Select, TextArea } from 'construct-ui';
+import { Card, Icons, Icon, Select, TextArea, Spinner } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
+import { async } from 'rxjs';
 import { ValidatorStats } from './validator_profile_stats';
 import graphs from './graphs';
 import chartComponent from '../../components/chart';
@@ -96,21 +99,61 @@ export enum UserContent {
   Graphs = 'graphs'
 }
 
+interface IGraphData {
+  blocks: any[], // x axis
+  values: any[] // y axis
+}
+
 interface IProfilePageState {
   account;
   threads: OffchainThread[];
   comments: OffchainComment<any>[];
   loaded: boolean;
   loading: boolean;
+  rewardsGraph: IGraphData;
+  slashesGraph: IGraphData;
+  totalStakeGraph: IGraphData;
+  imOnlineGraph: IGraphData;
+  offenceGraph: IGraphData;
+  nominatorGraph: IGraphData;
 }
+
+const dataGetter = async (vnode) => {
+  // request for total stake over time
+  m.request({
+    method: 'GET',
+    url: '/api/getTotalStakeOverTime',
+    params: { chain:'edgeware', stash_id: vnode.state.account.address }
+  })
+    .then((response:any) => {
+      vnode.state.totalStakeGraph = { blocks:[], values:[] };
+      vnode.state.totalStakeGraph.blocks  = (Object.keys(response.result.validators[vnode.state.account.address]));
+      vnode.state.totalStakeGraph.values  = (Object.values(response.result.validators[vnode.state.account.address]));
+    });
+  // request for own stake over time
+  m.request({
+    method: 'GET',
+    url: '/api/getTotalStakeOverTime',
+    params: { chain:'edgeware', stash_id: vnode.state.account.address }
+  })
+    .then((response:any) => {
+      vnode.state.totalStakeGraph = { blocks:[], values:[] };
+      vnode.state.totalStakeGraph.blocks  = (Object.keys(response.result.validators[vnode.state.account.address]));
+      vnode.state.totalStakeGraph.values  = (Object.values(response.result.validators[vnode.state.account.address]));
+    });
+};
 
 const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
-    vnode.state.loaded = false;
-    vnode.state.loading = true;
     vnode.state.threads = [];
     vnode.state.comments = [];
+    vnode.state.totalStakeGraph = undefined;
+    vnode.state.rewardsGraph = undefined;
+    vnode.state.slashesGraph = undefined;
+    vnode.state.imOnlineGraph = undefined;
+    vnode.state.offenceGraph = undefined;
+    vnode.state.nominatorGraph = undefined;
   },
   oncreate: async (vnode) => {
     const loadProfile = async () => {
@@ -149,6 +192,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           vnode.state.account = account;
           vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
           vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
+          dataGetter(vnode);
           m.redraw();
         },
         error: (err) => {
@@ -166,8 +210,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     loadProfile();
   },
   view: (vnode) => {
-    const { account, loaded, loading } = vnode.state;
-    if (loading) return m(PageLoading);
+    const { account, totalStakeGraph } = vnode.state;
     if (!account) {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
@@ -179,7 +222,12 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     // const signaling = (app.chain as Edgeware).signaling.store.getAll()
     //   .filter((p) => p instanceof EdgewareSignalingProposal && p.data.author === account.address);
     // return [].concat(signaling, discussions);
-
+    // get('/getTotalStakeOverTime', { chain:app.chain.class, stash_id: account.address }, (result) => {
+    //   vnode.state.graph1_x  = (Object.keys(result.validators[account.address]));
+    //   vnode.state.graph1_y  = (Object.values(result.validators[account.address]));
+    //   m.redraw();
+    // });
+    // m.redraw();
     return m(Sublayout, {
       class: 'ProfilePage',
     }, [
@@ -212,17 +260,22 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
             addColorStop1: 'rgba(53, 212, 19, 0)',
             color:'green'
           }),
-          m(chartComponent, {
-            title: 'XXXXX',
+          totalStakeGraph ? m(chartComponent, {
+            title: 'TOTAL STAKE OVER TIME', // Title
             model: lineModel,
-            xvalues:[1500, 325, 600, 350, 400, 380, 690, 800, 403, 406, 409, 412, 415, 418, 430],
-            yvalues:[433, 436, 439, 452, 455, 458, 461, 471, 500, 325, 600, 350, 400, 380, 690, 800],
-            xLabelString:'XXXXX',
-            yLabelString:'XXXXX',
+            xvalues:totalStakeGraph.blocks,
+            yvalues:totalStakeGraph.values,
             addColorStop0: 'rgba(53, 212, 19, 0.23)',
             addColorStop1: 'rgba(53, 212, 19, 0)',
             color:'green'
-          }),
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+              fill: false,
+              message:' Loading',
+              size: 'xl',
+              style: 'visibility: visible; opacity: 1;'
+            })))]),
           m(chartComponent, {
             title: 'IMONLINE EVENTS OVER TIME',
             model: lineModel,
@@ -241,17 +294,6 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
             yvalues:[23, 861, 71, 152, 956],
             xLabelString:'SESSION',
             yLabelString:'OFFENCE',
-            addColorStop0: 'rgba(53, 212, 19, 0.23)',
-            addColorStop1: 'rgba(53, 212, 19, 0)',
-            color:'green'
-          }),
-          m(chartComponent, {
-            title: 'NOMINATORS OVER TIME',
-            model: lineModel,
-            xvalues:[12, 89, 12, 850, 97],
-            yvalues:[213, 861, 712, 152, 956],
-            xLabelString:'BLOCK',
-            yLabelString:'yaixs',
             addColorStop0: 'rgba(53, 212, 19, 0.23)',
             addColorStop1: 'rgba(53, 212, 19, 0)',
             color:'green'
