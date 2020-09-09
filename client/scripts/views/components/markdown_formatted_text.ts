@@ -142,6 +142,11 @@ function applyBlockFormatters(parentText, hideFormatting) {
       formatOne: (text, match) => hideFormatting
         ? [] : m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
+      pattern: /^ {5,}(- |\* |• |· )/,
+      formatMany: (text) => m(hideFormatting ? 'div' : 'ul', m('ul', m('ul', m('ul', (text))))),
+      formatOne: (text, match) => hideFormatting
+        ? [] : m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+    }, {
       pattern: /^\[([ x])\] /,
       formatMany: (text) => m(hideFormatting ? 'div' : 'ul.checklist', text),
       formatOne: (text, match) => hideFormatting

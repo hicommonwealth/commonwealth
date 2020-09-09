@@ -67,9 +67,16 @@
 
     // list styles
     ul, ol {
+        margin: 10px 0;
         li {
             margin: 2px 0;
         }
+    }
+    ul + ol,
+    ul + ul,
+    ol + ol,
+    ol + ul {
+        margin-top: -10px;
     }
     ul.checklist {
         padding-left: 1em;
