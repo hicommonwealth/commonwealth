@@ -245,9 +245,9 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
             yvalues:[500, 325, 600, 350, 400, 380, 690, 800, 1000, 1600, 1200, 1150, 1300, 1400, 1400],
             xLabelString:'SESSION',
             yLabelString:'REWARD',
-            addColorStop0: 'rgba(53, 212, 19, 0.23)',
-            addColorStop1: 'rgba(53, 212, 19, 0)',
-            color:'green'
+            addColorStop0: 'rgba(99, 113, 209, 0.23)',
+            addColorStop1: 'rgba(99, 113, 209, 0)',
+            color:'blue'
           }),
           m(chartComponent, {
             title: 'SLASHES OVER TIME',
@@ -256,18 +256,18 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
             yvalues:[403, 406, 409, 412, 415, 418, 430, 433, 436, 439, 452, 455, 458, 461, 471],
             xLabelString:'SESSION',
             yLabelString:'SLASH',
-            addColorStop0: 'rgba(53, 212, 19, 0.23)',
-            addColorStop1: 'rgba(53, 212, 19, 0)',
-            color:'green'
+            addColorStop0: 'rgba(83, 110, 124, 0.23)',
+            addColorStop1: 'rgba(83, 110, 124, 0)',
+            color:'black'
           }),
           totalStakeGraph ? m(chartComponent, {
             title: 'TOTAL STAKE OVER TIME', // Title
             model: lineModel,
             xvalues:totalStakeGraph.blocks,
             yvalues:totalStakeGraph.values,
-            addColorStop0: 'rgba(53, 212, 19, 0.23)',
-            addColorStop1: 'rgba(53, 212, 19, 0)',
-            color:'green'
+            addColorStop0: 'rgba(237, 146, 61, 0.23)',
+            addColorStop1: 'rgba(237, 146, 61, 0)',
+            color:'black'
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
@@ -294,9 +294,9 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
             yvalues:[23, 861, 71, 152, 956],
             xLabelString:'SESSION',
             yLabelString:'OFFENCE',
-            addColorStop0: 'rgba(53, 212, 19, 0.23)',
-            addColorStop1: 'rgba(53, 212, 19, 0)',
-            color:'green'
+            addColorStop0: 'rgba(99, 113, 209, 0.23)',
+            addColorStop1: 'rgba(99, 113, 209, 0)',
+            color:'blue'
           }),
           m(chartComponent, {
             title: 'NOMINATORS OVER TIME',
@@ -305,9 +305,9 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
             yvalues:[213, 861, 712, 152, 956],
             xLabelString:'BLOCK',
             yLabelString:'yaixs',
-            addColorStop0: 'rgba(53, 212, 19, 0.23)',
-            addColorStop1: 'rgba(53, 212, 19, 0)',
-            color:'green'
+            addColorStop0: 'rgba(0, 0, 0, 0.23)',
+            addColorStop1: 'rgba(0, 0, 0, 0)',
+            color:'black'
           }),
         ])
         // ]),
