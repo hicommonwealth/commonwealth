@@ -111,7 +111,7 @@ export const CollectiveVotingButton: m.Component<{
               data: { candidates },
             });
           }
-        }, 'Vote');
+        }, 'Set council vote');
   }
 };
 
@@ -133,7 +133,7 @@ export const CandidacyButton: m.Component<{
       ? m(MenuItem, {
         disabled: (!app.user.activeAccount || activeAccountIsCandidate
           || app.chain.networkStatus !== ApiStatus.Connected),
-        label: activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy',
+        label: activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council',
         onclick: (e) => {
           e.preventDefault();
           if (app.modals.getList().length > 0) return;
@@ -146,7 +146,7 @@ export const CandidacyButton: m.Component<{
           disabled: (!app.user.activeAccount || activeAccountIsCandidate
                     || app.chain.networkStatus !== ApiStatus.Connected),
           intent: 'primary',
-          label: activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy',
+          label: activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council',
           onclick: (e) => {
             e.preventDefault();
             if (app.modals.getList().length > 0) return;
@@ -161,7 +161,7 @@ export const CandidacyButton: m.Component<{
             if (app.modals.getList().length > 0) return;
             m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
           },
-        }, activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy');
+        }, activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council');
   }
 };
 

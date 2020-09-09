@@ -147,6 +147,9 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
   }
 
+
+  console.log(proposal);
+
   if (!proposal) {
     await finalComment.destroy();
     return next(new Error(Errors.ThreadNotFound));

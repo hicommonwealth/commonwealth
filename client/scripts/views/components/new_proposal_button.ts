@@ -53,8 +53,8 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
     candidates
       && [
         m(MenuDivider),
+        m(CollectiveVotingButton, { candidates, menuStyle: true }),
         m(CandidacyButton, { candidates, menuStyle: true }),
-        m(CollectiveVotingButton, { candidates, menuStyle: true })
       ]
   ];
 };
