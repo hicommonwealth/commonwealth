@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
-  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents
+  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
 import { Mainnet } from '@edgeware/node-types';
 
@@ -74,7 +74,7 @@ const setupChainEventListeners = async (
     const identityHandler = new IdentityHandler(models, node.chain);
     const handlers: IEventHandler[] = [ storageHandler, notificationHandler, entityArchivalHandler ];
     let subscriber: IEventSubscriber<any, any>;
-    if (SubstrateTypes.EventChains.includes(node.chain)) {
+    if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
       // only handle identities on substrate chains
       handlers.push(identityHandler);
 
@@ -91,7 +91,7 @@ const setupChainEventListeners = async (
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
       });
-    } else if (MolochTypes.EventChains.includes(node.chain)) {
+    } else if (chainSupportedBy(node.chain, MolochTypes.EventChains)) {
       const contractVersion = 1;
       const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
       subscriber = await MolochEvents.subscribeEvents({
