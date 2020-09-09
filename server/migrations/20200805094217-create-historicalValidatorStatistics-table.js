@@ -1,9 +1,10 @@
 'use strict';
+
 module.exports = {
   up: (queryInterface, DataTypes) => {
-    return queryInterface.createTable('HistoricalValidatorStats', {
-      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true }, //primary-key
-      stash_id: { type: DataTypes.STRING, allowNull: false, references: { model: 'Validators', key: 'stash' } },
+    return queryInterface.createTable('HistoricalValidatorStatistic', {
+      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true }, // primary-key
+      stash: { type: DataTypes.STRING, allowNull: false, references: { model: 'Validator', key: 'stash' } },
       name: { type: DataTypes.STRING },
       block: { type: DataTypes.STRING, allowNull: false }, // blocknumber
       exposure: { type: DataTypes.JSON, allowNull: false },
@@ -11,7 +12,6 @@ module.exports = {
       apr: { type: DataTypes.FLOAT, allowNull: false },
       uptime: { type: DataTypes.STRING, allowNull: false },
       movingAverages: { type: DataTypes.INTEGER, allowNull: false },
-      isLatest: { type: DataTypes.BOOLEAN, allowNull: false },
       hasMessage: { type: DataTypes.BOOLEAN, allowNull: false },
       isOnline: { type: DataTypes.BOOLEAN, allowNull: false },
       isElected: { type: DataTypes.BOOLEAN, allowNull: false },
@@ -25,10 +25,9 @@ module.exports = {
       timestamps: true,
       underscored: true
     });
-
   },
 
   down: (queryInterface, DataTypes) => {
-    return queryInterface.dropTable('HistoricalValidatorStats');
+    return queryInterface.dropTable('HistoricalValidatorStatistic');
   }
 };
