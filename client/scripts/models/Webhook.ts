@@ -19,8 +19,9 @@ class Webhook {
     this.OffchainCommunity = offchainCommunity
   }
 
-  public source() {
-    return 'hi';
+  public label() {
+    const hi = this.url.match(/.*([^\.]+)(com|net|org|info|coop|int|co\.uk|org\.uk|ac\.uk|uk|__and so on__)$/);
+    console.log(hi);
   }
 
   public static fromJSON(json) {
