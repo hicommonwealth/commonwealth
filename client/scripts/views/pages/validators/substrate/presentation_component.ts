@@ -161,9 +161,15 @@ const model = {
   async refresh() {
     let validatorStashes: any = model.activeStashes;
     if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
-    let { prevIndex, nextIndex } = model;
-    if (validatorStashes.length && validatorStashes.length >= prevIndex) {
-      result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex));
+
+    model.prevIndex = 0;
+    model.nextIndex = pageSize;
+
+    // console.log("prevIndex", model.prevIndex);
+    // console.log("nextIndex", model.nextIndex);
+    if (validatorStashes.length && (validatorStashes.length - 1) >= model.prevIndex) {
+      // console.log("validatorstashes ", validatorStashes)
+      result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(model.prevIndex, model.nextIndex));
       model.constValidators = [...result.validators, ...model.constValidators];
       model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
       m.redraw();
@@ -185,24 +191,20 @@ const model = {
       model.state = 'Active';
       window.scrollTo(0, 0);
       model.scroll = false;
-      model.prevIndex = 0;
-      model.nextIndex = 0;
       console.log("state ", model.state);
       model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
-      m.redraw();
       model.refresh();
+      m.redraw();
     }
     if (index === 1) {
       model.currentTab = 'waiting';
       model.state = 'Waiting';
       window.scrollTo(0, 0);
-      model.prevIndex = 0;
-      model.nextIndex = 0;
       model.scroll = false;
       console.log("state ", model.state);
       model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
-      m.redraw();
       model.refresh();
+      m.redraw();
     }
     if (index > 1) {
       model.show = false;
@@ -221,11 +223,11 @@ const model = {
     console.log("if no value");
     value = undefined;
     if (model.state === 'Active') {
-      console.log(model.profile, "model.profile")
+      // console.log(model.profile, "model.profile")
       model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
     }
     else {
-      console.log(model.waitingStashes, "waitingStashes");
+      // console.log(model.waitingStashes, "waitingStashes");
       model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
     }
     model.prevIndex = 0;
@@ -246,11 +248,11 @@ export const PresentationComponent_ = {
     model.validatorNamesAddrss = await app.staking.validatorNamesAddress();
     model.profile = (model.validatorNamesAddrss as any).profileData;
     // console.log("profile ======", model.profile);
-
+    // console.log("prevIndex", model.prevIndex);
+    // console.log("nextIndex", model.nextIndex);
     model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address);
     model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
     model.refresh();
-    // console.log("validators ", result);
   },
   view: () => {
     let { changeSort, reset, sortAsc, sortIcon, sortKey, onSearchHandler } = model;
@@ -262,17 +264,6 @@ export const PresentationComponent_ = {
         size: 'xl',
         style: 'visibility: visible; opacity: 1;'
       });
-
-    // if (model.searchValue) {
-    //   let valueExist = true;
-    //   result.validators?.forEach(ele => {
-    //     valueExist = true;
-    //     if (!ele.stash_id.includes(model.searchValue) && !ele.name.includes(model.searchValue)) {
-    //       valueExist = false;
-    //     }
-    //   });
-    //   if (!valueExist) console.log("not found");
-    // }
     const chain = app.chain as Substrate;
 
     const lastHeaders = (app.chain.base === ChainBase.Substrate)
@@ -293,9 +284,9 @@ export const PresentationComponent_ = {
     model.scroll = false;
     $("table.validators-table").on('scroll', function () {
       if (!model.scroll) {
-        console.log("$(this).scrollTop()", $(this).scrollTop())
-        console.log("$(this).innerHeight()", $(this).innerHeight())
-        console.log("$(this).scrollHeight()", $(this)[0].scrollHeight)
+        // console.log("$(this).scrollTop()", $(this).scrollTop())
+        // console.log("$(this).innerHeight()", $(this).innerHeight())
+        // console.log("$(this).scrollHeight()", $(this)[0].scrollHeight)
         if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
           // alert('end reached');
           model.scroll = true;
