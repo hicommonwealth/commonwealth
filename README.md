@@ -26,24 +26,50 @@ nvm install
 
 - Use the configured version of node: `nvm use`
 - Install packages: `yarn`
+    - This is equivalent to `yarn update`
+    - Do not run `yarn upgrade` unless you are explicitly trying to upgrade packages
 - Run the development server in one terminal: `yarn start`
 - Reset the dev DB (this will wipe all data): `yarn reset-server`
 - Connect to the dev DB: `yarn psql` (or use Postico on Mac)
 - Lint your code: `npm install -g eslint`, then `eslint [files]`
 - Lint your styles: `yarn stylelint` or `stylelint client/styles/*`
 
-Now, download a copy of the production database if necessary, and
-set up any environment variables.
+Now, you should set up environment variables, following the instructions in
+the section below.
 
-## Development Style Guide
+If you are not using backend storage of chain events, we recommend
+running with NO_EVENTS=true to reduce load on your dev computer, and reduce
+the number of possible errors you might run into.
 
-You should set up global linters (e.g. eslint and stylelint) to make sure your code is formatted properly.
+You should also download a copy of the production database if possible.
+following the Production Database instructions afterwards.
 
-Components should be namespaced by class name, e.g. a component called MembersBox should be:
+## Environment Variables
 
-- placed in client/scripts/views/components/members_box.ts, as a default export
-- styled in client/styles/components/members_box.scss
-- exported as a Mithril component with parent class .MembersBox
+You should create a `.env` file in the root of the repository
+to store environment variables like session secrets.
+
+Environment variables used for external services include:
+
+- AWS_ACCESS_KEY_ID: for uploading images to Amazon S3
+- AWS_SECRET_ACCESS_KEY: for uploading images to Amazon S3
+- AWS_REGION: for uploading images to Amazon S3 (conventionally 'us-east-2')
+- GITHUB_CLIENT_ID: for Github OAuth login
+- GITHUB_CLIENT_SECRET: for Github OAuth login
+- INFURA_API_KEY: for lockdrop lookups (requires archive node access, may be deprecated soon)
+- MIXPANEL_TOKEN: for analytics
+- ROLLBAR_SERVER_TOKEN: for error reporting
+- SENDGRID_API_KEY: for sending emails, email login, etc.
+- NODE_URL: for server-side proposal archiving (usually ws://testnet2.edgewa.re:9944, may be deprecated soon)
+- DATABASE_URL (set by Heroku)
+- JWT_SECRET
+- SESSION_SECRET
+
+We also use certain environment variables to configure the application itself:
+
+- CHAIN_EVENTS: select chains for event listening. Must be "all", "none", or a comma-separated list of chains (e.g. "edgeware,edgeware-local")
+- NO_EVENTS: disable chain-event functionality entirely
+- NO_CLIENT: set to true to disable the front-end build
 
 ## Production Database
 
@@ -86,32 +112,15 @@ heroku pg:copy <PRODUCTION_APP>::<PRODUCTION_DB_URL> <STAGING_DB_URL> -a <STAGIN
 heroku maintenance:off -a <STAGING_APP>
 ```
 
-## Environment Variables
+## Frontend Code Style
 
-You should create a `.env` file in the root of the repository
-to store environment variables like session secrets.
+Set up global linters (e.g. eslint and stylelint) to make sure your code is formatted properly.
 
-Environment variables used for external services include:
+Components should be namespaced by class name, e.g. a component called MembersBox should be:
 
-- AWS_ACCESS_KEY_ID: for uploading images to Amazon S3
-- AWS_SECRET_ACCESS_KEY: for uploading images to Amazon S3
-- AWS_REGION: for uploading images to Amazon S3 (conventionally 'us-east-2')
-- GITHUB_CLIENT_ID: for Github OAuth login
-- GITHUB_CLIENT_SECRET: for Github OAuth login
-- INFURA_API_KEY: for lockdrop lookups (requires archive node access, may be deprecated soon)
-- MIXPANEL_TOKEN: for analytics
-- ROLLBAR_SERVER_TOKEN: for error reporting
-- SENDGRID_API_KEY: for sending emails, email login, etc.
-- NODE_URL: for server-side proposal archiving (usually ws://testnet2.edgewa.re:9944, may be deprecated soon)
-- DATABASE_URL (set by Heroku)
-- JWT_SECRET
-- SESSION_SECRET
-
-We also use certain environment variables to configure the application itself:
-
-- CHAIN_EVENTS: select chains for event listening. Must be "all", "none", or a comma-separated list of chains (e.g. "edgeware,edgeware-local")
-- NO_EVENTS: disable chain-event functionality entirely
-- NO_CLIENT: set to true to disable the front-end build
+- placed in client/scripts/views/components/members_box.ts, as a default export
+- styled in client/styles/components/members_box.scss
+- exported as a Mithril component with parent class .MembersBox
 
 ## Migrations
 
@@ -125,7 +134,7 @@ To run any pending migrations: `npx sequelize db:migrate`
 
 To roll back the last migration: `npx sequelize db:migrate:undo`
 
-## Setting up a new Production Environment
+## Deploying to Production / Setting up a new Production Environment
 
 Deploying to production bundles and minifies all JavaScript assets.
 This takes a while, usually about 15 minutes.

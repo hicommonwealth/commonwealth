@@ -95,13 +95,14 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
   // first, concatenate parent nodes for <ul> and <ol> into groups
   const groups = [];
   preprocessQuillDeltaForRendering(delta.ops).forEach((parent) => {
-    // if the last parent was a <ul> or <ol> with the same attributes.list,
+    // if the last parent was a <ul> or <ol> with the same attributes.list and indentation,
     // concatenate the current parent's children onto the last instead
     if (groups.length !== 0
         && groups[groups.length - 1].parents[0].attributes
         && parent.attributes?.list
         && groups[groups.length - 1].parents[0].attributes.list
-        && parent.attributes.list === groups[groups.length - 1].parents[0].attributes.list) {
+        && parent.attributes.list === groups[groups.length - 1].parents[0].attributes.list
+        && parent.attributes.indent === groups[groups.length - 1].parents[0].attributes.indent) {
       groups[groups.length - 1].parents.push(parent);
     } else if (parent.attributes && parent.attributes.list) {
       groups.push({ listtype: parent.attributes.list, parents: [parent] });
@@ -111,9 +112,8 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
   });
 
   // then, render each group
-
   const getGroupTag = (group) => group.listtype === 'bullet' ? 'ul'
-    : group.listtype === 'ordered'      ? 'ol'
+    : group.listtype === 'ordered' ? 'ol'
       : (group.listtype === 'checked' || group.listtype === 'unchecked') ? 'ul.checklist'
         : 'div';
   const getParentTag = (parent) => parent.attributes && parent.attributes.list === 'bullet' ? 'li'
@@ -123,7 +123,10 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
           : 'div';
   return hideFormatting
     ? groups.map((group) => {
-      return m(`${getGroupTag(group)}.hidden-formatting`, group.parents.map((parent) => {
+      const wrapGroup = (content) => {
+        return m(`${getGroupTag(group)}.hidden-formatting`, content);
+      };
+      return wrapGroup(group.parents.map((parent) => {
         return m(`${getParentTag(parent)}.hidden-formatting-inner`, [
           parent.children.map((child) => {
             if (child.insert?.mention)
@@ -144,7 +147,20 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
     })
     : groups.map((group) => {
       const groupTag = getGroupTag(group);
-      return m(groupTag, group.parents.map((parent) => {
+      const wrapGroup = (content) => {
+        const additionalIndentLevels = group.listtype && group.parents && group.parents[0]
+          && group.parents[0].attributes.indent;
+        if (!additionalIndentLevels) return m(groupTag, content);
+
+        switch (additionalIndentLevels) {
+          case 1: return m(groupTag, m(groupTag, content));
+          case 2: return m(groupTag, m(groupTag, m(groupTag, content)));
+          case 3: return m(groupTag, m(groupTag, m(groupTag, m(groupTag, content))));
+          case 4: return m(groupTag, m(groupTag, m(groupTag, m(groupTag, m(groupTag, content)))));
+          default: return m(groupTag, m(groupTag, m(groupTag, m(groupTag, m(groupTag, content)))));
+        }
+      };
+      return wrapGroup(group.parents.map((parent) => {
         // render empty parent nodes as .between-paragraphs
         if (!parent.attributes && parent.children.length === 1 && parent.children[0].insert === '\n') {
           return m('.between-paragraphs');

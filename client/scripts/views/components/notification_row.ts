@@ -137,7 +137,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     notificationHeader = m('span', [
       actorName,
       length > 0 && ` and ${length} others`,
-      'created new threads in ',
+      ' created new threads in ',
       m('span.commented-obj', community_name)
     ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
