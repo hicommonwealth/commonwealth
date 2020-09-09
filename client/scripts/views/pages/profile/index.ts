@@ -193,8 +193,8 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           m(chartComponent, {
             title: 'REWARDS OVER TIME',
             model: lineModel,
-            xvalues:[5, 159, 285, 1040, 71],
-            yvalues:[213, 261, 212, 252, 256],
+            xvalues:[403, 406, 409, 412, 415, 418, 430, 433, 436, 439, 452, 455, 458, 461, 471],
+            yvalues:[500, 325, 600, 350, 400, 380, 690, 800, 1000, 1600, 1200, 1150, 1300, 1400, 1400],
             xLabelString:'SESSION',
             yLabelString:'REWARD',
             addColorStop0: 'rgba(53, 212, 19, 0.23)',
@@ -204,8 +204,8 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           m(chartComponent, {
             title: 'SLASHES OVER TIME',
             model: lineModel,
-            xvalues:[815, 859, 985, 40, 971],
-            yvalues:[213, 461, 712, 352, 956],
+            xvalues:[500, 325, 600, 350, 400, 380, 690, 800, 1000, 1600, 1200, 1150, 1300, 1400, 1400],
+            yvalues:[403, 406, 409, 412, 415, 418, 430, 433, 436, 439, 452, 455, 458, 461, 471],
             xLabelString:'SESSION',
             yLabelString:'SLASH',
             addColorStop0: 'rgba(53, 212, 19, 0.23)',
@@ -215,8 +215,8 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           m(chartComponent, {
             title: 'XXXXX',
             model: lineModel,
-            xvalues:[1, 89, 120, 850, 971],
-            yvalues:[213, 86, 712, 15, 96],
+            xvalues:[1500, 325, 600, 350, 400, 380, 690, 800, 403, 406, 409, 412, 415, 418, 430],
+            yvalues:[433, 436, 439, 452, 455, 458, 461, 471, 500, 325, 600, 350, 400, 380, 690, 800],
             xLabelString:'XXXXX',
             yLabelString:'XXXXX',
             addColorStop0: 'rgba(53, 212, 19, 0.23)',
@@ -226,8 +226,8 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           m(chartComponent, {
             title: 'IMONLINE EVENTS OVER TIME',
             model: lineModel,
-            xvalues:[12, 82139, 1240, 8505, 9741],
-            yvalues:[213, 861, 72, 152, 56],
+            xvalues:[1800, 403, 406, 409, 412, 415, 418, 430, 800, 403, 406, 409, 412, 415, 418, 430],
+            yvalues:[600, 350, 400, 380, 690, 800, 600, 350, 400, 380, 690, 800, 600, 350, 400, 380, 690, 800],
             xLabelString:'BLOCK',
             yLabelString:'HEARTBEAT',
             addColorStop0: 'rgba(53, 212, 19, 0.23)',

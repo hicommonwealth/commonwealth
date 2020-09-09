@@ -1,5 +1,6 @@
 @import "client/styles/shared";
 
+
 .ProfileHeader{
     margin-bottom: 32px !important;
     border: 1px solid rgba(231, 231, 231, 0.5) !important;
@@ -7,9 +8,54 @@
     border-radius: 3px !important;
 }
 
+.ProfileHeader .bio-left .avatar {
+    border-radius: 0px !important;
+}
+// Icons
+.row-validator{
+    margin-left: 9em;
+    padding-top: 4em;
+}
+
+.validator-profile-imonline-icons{
+    margin-right: 32px;
+}
+
+.validator-profile-identity-icons{
+    margin-right: 24px;
+}
+
+.im-online-icons .cui-icon{
+    padding-right: 8px;
+    color: #FFFFFF;
+}
+
+.validator-profile-identity-icons .cui-icon{
+    padding-right: 8px;
+    color: #FFFFFF;
+}
+
+.validator-profile-identity-icons label a{
+    font-family: 'Inter', sans-serif;    
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #FFFFFF;
+
+    &:hover{
+        text-decoration: none;
+    }
+}
 
 .data-row{
     margin-top: 26px;
+}
+
+.ProfileHeader .bio-right {
+    flex: 0.85 !important;
+    margin: 6px 0 0 !important;
 }
 
 .profile-header{
@@ -20,22 +66,19 @@
     line-height: 120%;
     color: #999999;
     text-align: left;
-    padding-left: 15px;
+    padding-left: 20px;
 }
 
 .profile-data{
     font-family: 'Inter', sans-serif;    
     padding-top: 8px;
-    padding-left: 15px;
+    padding-left: 20px;
     font-style: normal;
     font-weight: normal;
     font-size: 12px;
     letter-spacing: -0.2px;
     color: #000000;
 }
-
-
-
 // Middle Component
 
 .profile-header-block{
@@ -51,7 +94,7 @@
 
 .profile-data-block{
     font-family: 'Inter', sans-serif;    
-    padding-top: 8px;
+    // padding-top: 8px;
     padding-left: 15px;
     font-style: normal;
     font-weight: normal;
@@ -73,22 +116,32 @@
 }
 
 .total-apr,.own-total-offences,.other-total-slashes,.total-rewards{
-    padding-right: 4.3em !important;
+    padding-right: 3.6em !important;
 }
 
 .imonline,.offences-days,.slashes-days,.rewards-days{
-    padding-right: 3em !important;
+    padding-right: 2.23em !important;
 }
 
+.bio-actions-edit-profile{
+    padding-left: 9em;
+}
 
-.bio-actions button{
-    font-family: 'Inter', sans-serif;    
-    font-style: normal;
-    font-weight: 500;
-    font-size: 15px;
-    line-height: 120%;
-    width: auto;
-    height: 40px;
+.bio-actions-edit-identity{
+    padding-left: 1.1em;
+}
+
+.cui-button{
+    background: linear-gradient(180deg, #FEFFFF 0%, #F6FAFB 100%) !important;
+    border: 1px solid #DEDFE1 !important;
+    // box-sizing: border-box !important;
+    border-radius: 4px !important;
+    font-family: 'Inter', sans-serif !important;    
+    font-style: normal !important;
+    font-weight: 500 !important;
+    font-size: 15px !important;
+    line-height: 120% !important;
+    color: #536E7C !important;
 }
 
 // Graph
@@ -104,11 +157,13 @@
     border: 1px solid rgba(231, 231, 231, 0.5);
     box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
     border-radius: 3px;
-    margin-top: 22px;
+    margin-top: 32px;
+    padding-bottom: 20px;
 }
 
 .graph-title{
     padding-left: 25px;
+    padding-bottom: 20px;
 }
 
 .graph-title p{

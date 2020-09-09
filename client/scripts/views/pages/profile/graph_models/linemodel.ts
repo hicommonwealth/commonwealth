@@ -23,13 +23,13 @@ export default {
         fill: true,
         pointBackgroundColor: '#fff',
         borderColor: chartColors.red,
-        pointRadius: 5, // size of points
-        borderWidth: 3, // line width
+        pointRadius: 3, // size of points
+        borderWidth: 2, // line width
         lineTension: 0,
         data:[],
         /* point options */
 
-        pointBorderWidth: 3, // size of outer circle
+        pointBorderWidth: 2, // size of outer circle
       }, ]
     },
     options: {
@@ -49,18 +49,17 @@ export default {
         xAxes: [{
           offset: true,
           display: true,
-          scaleLabel: {
-            display: true,
-            labelString: ''
-          },
           ticks: {
             fontFamily: 'Inter',
             fontColor: '#B0BAC9',
             fontSize: 12,
-            padding: 20,
+            padding: 10,
             maxRotation: 0,
             minRotation: 0,
             stepSize: 500,
+            min: -1,
+            max: 100,
+            fixedStepSize: 100,
           },
           gridLines: {
             display: false
@@ -68,10 +67,7 @@ export default {
         }],
         yAxes: [{
           display: true,
-          scaleLabel: {
-            display: true,
-            labelString: ''
-          },
+
           ticks: {
             fontFamily: 'Inter',
             fontColor: '#B0BAC9',
@@ -82,7 +78,7 @@ export default {
             beginAtZero: true,  // minimum value will be 0.
             maxTicksLimit: 2000,
             stepSize: 500,
-            padding: 5,
+            padding: 1,
           },
           gridLines: {
             display: false

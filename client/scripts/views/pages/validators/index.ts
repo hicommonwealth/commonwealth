@@ -60,17 +60,17 @@ export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiti
         m('h3', `Nominators for ${formatAddressShort(vnode.attrs.validatorAddr)}`),
       ]),
       m('.compact-modal-body', [
-        m('table', [
-          m('tr', [
-            m('th', 'Nominator'),
-            m(`th${vnode.attrs.waiting
-              ? '.priority'
-              : '.amount'}`, vnode.attrs.waiting
-              ? 'Priority'
-              : 'Amount'),
-          ]),
+        m('table.modal-table', [
+          // m('tr', [
+          //   m('th', 'Nominator'),
+          //   m(`th${vnode.attrs.waiting
+          //     ? '.priority'
+          //     : '.amount'}`, vnode.attrs.waiting
+          //     ? 'Priority'
+          //     : 'Amount'),
+          // ]),
           vnode.attrs.nominators.map((n) => {
-            return m('tr', [
+            return m('tr.modal-table-row', [
               m('td', m(User, {
                 user: app.chain.accounts.get(n.stash),
                 linkify: true,
