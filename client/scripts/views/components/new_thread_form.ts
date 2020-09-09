@@ -166,8 +166,8 @@ export const NewThreadForm: m.Component<{
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
     vnode.state.overwriteConfirmationModal = false;
-    if (app.community?.meta.topics.length || app.chain.meta.topics.length) {
-      console.log(app.community?.meta.topics.length || app.chain.meta.topics)
+    console.log(app.community?.meta.topics.length || app.chain?.meta.topics);
+    if (app.community?.meta.topics.length || app.chain?.meta.topics.length) {
       vnode.state.hasTopics = true;
     }
     try {
@@ -433,18 +433,19 @@ export const NewThreadForm: m.Component<{
               })
             ])
             : null,
-          m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 2, sm: 2 } }, [
-            m(TopicSelector, {
-              defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
-                ? vnode.state.activeTopic
-                : localStorage.getItem(`${app.activeId()}-active-tag`),
-              topics: app.topics.getByCommunity(app.activeId()),
-              featuredTopics: app.topics.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
-              updateFormData: updateTopicState,
-              tabindex: 1,
-            }),
-          ]),
+          vnode.state.hasTopics
+            && m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 2, sm: 2 } }, [
+              m(TopicSelector, {
+                defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
+                  ? vnode.state.activeTopic
+                  : localStorage.getItem(`${app.activeId()}-active-tag`),
+                topics: app.topics.getByCommunity(app.activeId()),
+                featuredTopics: app.topics.getByCommunity(app.activeId())
+                  .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+                updateFormData: updateTopicState,
+                tabindex: 1,
+              }),
+            ]),
           m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 3 }, [
             m(Input, {
               name: 'new-thread-title',
