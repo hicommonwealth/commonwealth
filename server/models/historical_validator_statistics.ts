@@ -58,7 +58,7 @@ export default (
     underscored: true
   });
   HistoricalValidatorStatistics.associate = (models) => {
-    models.HistoricalValidatorStatistics.belongsTo(models.Validator, { foreignKey: 'stash' });
+    models.HistoricalValidatorStatistic.belongsTo(models.Validator, { foreignKey: 'stash' });
   };
   return HistoricalValidatorStatistics;
 };

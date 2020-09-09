@@ -35,7 +35,7 @@ export default (
   });
 
   Validators.associate = (models) => {
-    models.Validators.hasMany(models.HistoricalValidatorStatistic, { foreignKey: 'stash' });
+    models.Validator.hasMany(models.HistoricalValidatorStatistic, { foreignKey: 'stash' });
   };
   return Validators;
 };
