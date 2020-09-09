@@ -169,7 +169,7 @@ export interface IOffence extends IEvent {
   offenceKind: string;
   opaqueTimeSlot: string;
   applied: boolean;
-  offenders: Array<ValidatorId>
+  offenders: Array<string>
 }
 
 /**
