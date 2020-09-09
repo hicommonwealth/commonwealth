@@ -5,6 +5,7 @@ import { Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, R
 import app from 'state';
 import { RolePermission, Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import WebhookSettingsModal from '../webhook_settings_modal';
 
 interface IWebhooksFormAttrs {
   webhooks: Webhook[];
@@ -72,13 +73,14 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                 m('.top', { style: `display: 'block';`}, webhook.url),
                 m('.bottom', [
                   m(Tag, {
-                    label: webhook.url.slice(0,5), // TODO: Make source property
+                    label: 'hi', // TODO: Make source property
                   }),
                   m(Button, {
                     label: m(Icon, { name: Icons.SETTINGS }),
                     onclick: (e) => {
                       e.preventDefault();
-                      console.log('open settings modal');
+                      console.log(webhook);
+                      app.modals.create({ modal: WebhookSettingsModal, data: { webhook } });
                       return;
                     }
                   })
