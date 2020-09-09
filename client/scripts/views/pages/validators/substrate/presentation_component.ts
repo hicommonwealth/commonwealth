@@ -11,13 +11,13 @@ import ValidatorRow from './validator_row';
 import ValidatorRowWaiting from './validator_row_waiting';
 import RecentBlock from './recent_block';
 
+const pageSize = 5;
 let result = { validators: [] };
 const model = {
   scroll: false,
   state: 'Active',
   prevIndex: 0,
-  nextIndex: 0,
-  pageSize: 5,
+  nextIndex: pageSize,
   // scroll: 1,
   searchValue: '',
   searchBy: '',
@@ -111,31 +111,45 @@ const model = {
       return;
     }
   },
+  // model.currentPage < Math.ceil(model.total[model.currentTab] / model.perPage
+
   async onChange() {
     let validatorStashes: any = model.activeStashes;
     if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
-    let { prevIndex, nextIndex, pageSize } = model;
+    let { prevIndex, nextIndex } = model;
     let validators: any = [];
-    if (validatorStashes.length >= prevIndex) {
-      prevIndex = nextIndex;
-      nextIndex = nextIndex + pageSize;
-      model.prevIndex = prevIndex;
-      model.nextIndex = nextIndex;
-      validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex));
+
+    prevIndex = nextIndex;
+    nextIndex = nextIndex + pageSize;
+
+    model.prevIndex = prevIndex;
+    model.nextIndex = nextIndex;
+
+    validatorStashes = validatorStashes.slice(prevIndex, nextIndex);
+
+    // 0console.log(validatorStashes.slice(prevIndex, nextIndex), "new fetched")
+    if (validatorStashes.length && validatorStashes.length >= prevIndex) {
+      console.log("prevIndex", prevIndex)
+      console.log("nextIndex", nextIndex);
+      // console.log("validatorStashes", validatorStashes);
+      // console.log("model.activeStashes", model.activeStashes);
+      validators = await (app.staking as any).validatorDetail(model.state, validatorStashes);
+
+      console.log(validators?.validators, "--------onChange---------");
+      result.validators = [...result.validators, ...validators?.validators];
+      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+      model.constValidators = [...result.validators, ...model.constValidators];
+      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+      m.redraw();
     }
-    console.log(validators?.validators, "--------onChange---------");
-    result.validators = [...result.validators, ...validators?.validators];
-    result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
-    model.constValidators = [...result.validators, ...model.constValidators];
-    model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
-    m.redraw();
+
   },
   async onSearch() {
     let validatorStashes: any = model.activeStashes;
     if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
-    let { prevIndex, nextIndex, pageSize } = model;
+    let { prevIndex, nextIndex } = model;
     let validators: any = [];
-    if (validatorStashes.length >= prevIndex) {
+    if (validatorStashes.length && validatorStashes.length >= prevIndex) {
       validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
       result.validators = [...result.validators, ...validators?.validators];
       result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
@@ -147,9 +161,9 @@ const model = {
   async refresh() {
     let validatorStashes: any = model.activeStashes;
     if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
-    let { prevIndex, nextIndex, pageSize } = model;
-    if (validatorStashes.length >= prevIndex) {
-      result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
+    let { prevIndex, nextIndex } = model;
+    if (validatorStashes.length && validatorStashes.length >= prevIndex) {
+      result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex));
       model.constValidators = [...result.validators, ...model.constValidators];
       model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
       m.redraw();
@@ -276,19 +290,21 @@ export const PresentationComponent_ = {
     //onscroll fetch next N record
 
     // let cont: any = $("table.validators-table");
-    if (!model.scroll) {
-      $("table.validators-table").on('scroll', function () {
-        // console.log("$(this).scrollTop()", $(this).scrollTop())
-        // console.log("$(this).innerHeight()", $(this).innerHeight())
-        // console.log("$(this).scrollHeight()", $(this)[0].scrollHeight)
+    model.scroll = false;
+    $("table.validators-table").on('scroll', function () {
+      if (!model.scroll) {
+        console.log("$(this).scrollTop()", $(this).scrollTop())
+        console.log("$(this).innerHeight()", $(this).innerHeight())
+        console.log("$(this).scrollHeight()", $(this)[0].scrollHeight)
         if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
           // alert('end reached');
           model.scroll = true;
           if (!model.searchValue && !model.searchValue.trim())
             model.onChange();
         }
-      });
-    }
+      }
+    });
+
 
     // console.log("cont.scrollHeight ", cont.scrollHeight)
     // $(window).scroll(function () {
@@ -321,94 +337,94 @@ export const PresentationComponent_ = {
           callback: reset,
           name: 'Current Validators',
           content: m('div.row-input',
-          m('input', {
-            type: 'text',
-            name: 'searchCurrent',
-            autofocus: true,
-            placeholder: 'Search for a name, address or index...',
-            onkeyup: (e) => {
-              { onSearchHandler(e.target.value) }
-            },
-            onkeydown: (e) => {
-              { model.onReverseSearch(e.target.value) }
-            },
-            onkeypress: (e) => {
-              if (!e.target.value || !e.target.value.trim()) {
-                model.searchIsOn = false;
-              }
-            },
-          }), m('tr.validators-heading', [
-            m('th.val-stash', 'Stash'),
-            m('th.val-total', 'Total Stake',
-              m('div.sort-icon', m(Icon, {
-                name: sortIcon('exposure.total'),
-                size: 'lg',
-                onclick: () => changeSort('exposure.total')
-              }))),
-            // m('th.val-own', 'Own Stake',
-            //   m(Icon, { name: sortIcon('exposure.own'),
-            //     size: 'lg',
-            //     onclick: () => changeSort('exposure.own') })),
-            m('th.val-other', 'Other Stake',
-              m('div.sort-icon', m(Icon, {
-                name: sortIcon('otherTotal'),
-                size: 'lg',
-                onclick: () => changeSort('otherTotal')
-              }))),
-            m('th.val-commission', 'Commission',
-            m('div.sort-icon', m(Icon, {
-                name: sortIcon('commissionPer'),
-                size: 'lg',
-                onclick: () => changeSort('commissionPer')
-              }))),
-            m('th.val-points', 'Points',
-            m('div.sort-icon', m(Icon, {
-                name: sortIcon('eraPoints'),
-                size: 'lg',
-                onclick: () => changeSort('eraPoints')
-              }))),
-            m('th.val-apr', 'Est. APR'),
-            // m('th.val-last-hash', 'last #'),
-            m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses')
-          ]), m('table.validators-table', [
-            result.validators.map((validator) => {
-              // console.log("validator.exposure ===== ", validator.exposure, validator.stash_id)
-              // total stake
-              const total = chain.chain.coins(+validator.exposure?.total);
-              // own stake
-              const bonded = chain.chain.coins(+validator.exposure?.own);
-              const nominators = validator.exposure?.others.map(({ who, value }) => ({
-                stash: who.toString(),
-                balance: chain.chain.coins(+value),
-              }));
-              const stash = validator.stash_id;
-              const controller = validator.controller;
-              const eraPoints = validator.eraPoints;
-              const blockCount = validator.blockCount;
-              const hasMessage = validator?.hasMessage;
-              const isOnline = validator?.isOnline;
-              const otherTotal = validator?.otherTotal;
-              const commission = validator?.commissionPer;
-              const apr = validator?.apr;
-              const name = validator?.name;
-              // let apr = annualPercentRate[validator];
-              // apr = (apr === -1.0 || typeof apr === 'undefined') ? aprAvg : apr;
-              return m(ValidatorRow, {
-                stash,
-                total,
-                bonded,
-                commission,
-                otherTotal,
-                controller,
-                nominators,
-                eraPoints,
-                blockCount,
-                hasMessage,
-                isOnline,
-                apr,
-              });
-            }),
-          ])) 
+            m('input', {
+              type: 'text',
+              name: 'searchCurrent',
+              autofocus: true,
+              placeholder: 'Search for a name, address or index...',
+              onkeyup: (e) => {
+                { onSearchHandler(e.target.value) }
+              },
+              onkeydown: (e) => {
+                { model.onReverseSearch(e.target.value) }
+              },
+              onkeypress: (e) => {
+                if (!e.target.value || !e.target.value.trim()) {
+                  model.searchIsOn = false;
+                }
+              },
+            }), m('tr.validators-heading', [
+              m('th.val-stash', 'Stash'),
+              m('th.val-total', 'Total Stake',
+                m('div.sort-icon', m(Icon, {
+                  name: sortIcon('exposure.total'),
+                  size: 'lg',
+                  onclick: () => changeSort('exposure.total')
+                }))),
+              // m('th.val-own', 'Own Stake',
+              //   m(Icon, { name: sortIcon('exposure.own'),
+              //     size: 'lg',
+              //     onclick: () => changeSort('exposure.own') })),
+              m('th.val-other', 'Other Stake',
+                m('div.sort-icon', m(Icon, {
+                  name: sortIcon('otherTotal'),
+                  size: 'lg',
+                  onclick: () => changeSort('otherTotal')
+                }))),
+              m('th.val-commission', 'Commission',
+                m('div.sort-icon', m(Icon, {
+                  name: sortIcon('commissionPer'),
+                  size: 'lg',
+                  onclick: () => changeSort('commissionPer')
+                }))),
+              m('th.val-points', 'Points',
+                m('div.sort-icon', m(Icon, {
+                  name: sortIcon('eraPoints'),
+                  size: 'lg',
+                  onclick: () => changeSort('eraPoints')
+                }))),
+              m('th.val-apr', 'Est. APR'),
+              // m('th.val-last-hash', 'last #'),
+              m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses')
+            ]), m('table.validators-table', [
+              result.validators.map((validator) => {
+                // console.log("validator.exposure ===== ", validator.exposure, validator.stash_id)
+                // total stake
+                const total = chain.chain.coins(+validator.exposure?.total);
+                // own stake
+                const bonded = chain.chain.coins(+validator.exposure?.own);
+                const nominators = validator.exposure?.others.map(({ who, value }) => ({
+                  stash: who.toString(),
+                  balance: chain.chain.coins(+value),
+                }));
+                const stash = validator.stash_id;
+                const controller = validator.controller;
+                const eraPoints = validator.eraPoints;
+                const blockCount = validator.blockCount;
+                const hasMessage = validator?.hasMessage;
+                const isOnline = validator?.isOnline;
+                const otherTotal = validator?.otherTotal;
+                const commission = validator?.commissionPer;
+                const apr = validator?.apr;
+                const name = validator?.name;
+                // let apr = annualPercentRate[validator];
+                // apr = (apr === -1.0 || typeof apr === 'undefined') ? aprAvg : apr;
+                return m(ValidatorRow, {
+                  stash,
+                  total,
+                  bonded,
+                  commission,
+                  otherTotal,
+                  controller,
+                  nominators,
+                  eraPoints,
+                  blockCount,
+                  hasMessage,
+                  isOnline,
+                  apr,
+                });
+              }),
+            ]))
         }, {
           callback: reset,
           name: 'Waiting Validators',
