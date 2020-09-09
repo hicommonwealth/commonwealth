@@ -1,4 +1,3 @@
-import { getCurrentTimestamp } from './../../client/scripts/views/stats/stats_helpers';
 import * as Sequelize from 'sequelize';
 
 export interface ValidatorAttributes {
@@ -32,7 +31,7 @@ export default (
     });
 
     Validators.associate = models => {
-        models.Validators.hasMany(models.HistoricalValidatorStats, { foreignKey: 'stash_id' });
+        models.Validators.hasMany(models.HistoricalValidatorStatistics, { foreignKey: 'stash_id' });
     }
     return Validators;
 };
