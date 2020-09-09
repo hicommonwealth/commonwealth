@@ -1,14 +1,11 @@
 import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
 import {
-  IEventHandler, CWEvent, SubstrateEvents, MolochEvents, EventSupportingChainT, EventSupportingChains
+  chainSupportedBy, IEventHandler, CWEvent, SubstrateEvents, MolochEvents, EventSupportingChains
 } from '../dist/index';
 
 const args = process.argv.slice(2);
-const chain: EventSupportingChainT = EventSupportingChains.find((s) => {
-  const argChain = args[0] || 'edgeware';
-  return s === argChain;
-});
-if (!chain) {
+const chain = args[0] || 'edgeware';
+if (!chainSupportedBy(chain, EventSupportingChains)) {
   throw new Error(`invalid chain: ${args[0]}`);
 }
 console.log(`Listening to events on ${chain}.`);
@@ -41,7 +38,7 @@ const skipCatchup = false;
 const url = networks[chain];
 
 if (!url) throw new Error(`no url for chain ${chain}`);
-if (SubstrateEvents.Types.EventChains.some((c) => c === chain)) {
+if (chainSupportedBy(chain, SubstrateEvents.Types.EventChains)) {
   // TODO: update this for Beresheet
   SubstrateEvents.createApi(
     url,
@@ -67,7 +64,7 @@ if (SubstrateEvents.Types.EventChains.some((c) => c === chain)) {
       verbose: true,
     });
   });
-} else if (MolochEvents.Types.EventChains.some((c) => c === chain)) {
+} else if (chainSupportedBy(chain, SubstrateEvents.Types.EventChains)) {
   const contract = contracts[chain];
   const contractVersion = 1;
   if (!contract) throw new Error(`no contract address for chain ${chain}`);

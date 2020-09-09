@@ -12,6 +12,15 @@ export type IChainEventKind = SubstrateTypes.EventKind | MolochTypes.EventKind;
 export const ChainEventKinds = [...SubstrateTypes.EventKinds, ...MolochTypes.EventKinds];
 export const EventSupportingChains = [...SubstrateTypes.EventChains, ...MolochTypes.EventChains] as const;
 export type EventSupportingChainT = typeof EventSupportingChains[number];
+
+export function chainSupportedBy<T extends readonly string[]>(c: string, eventChains: T): c is T[number] {
+  return eventChains.some((s) => s === c);
+}
+
+export function isSupportedChain(chain: string): chain is EventSupportingChainT {
+  return chainSupportedBy(chain, EventSupportingChains);
+}
+
 export enum EntityEventKind {
   Create = 0,
   Update,
