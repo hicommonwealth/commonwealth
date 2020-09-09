@@ -320,60 +320,58 @@ export const PresentationComponent_ = {
         {
           callback: reset,
           name: 'Current Validators',
-          content: m('table.validators-table', [
-            m('div.row-input',
-              m('input', {
-                type: 'text',
-                name: 'searchCurrent',
-                autofocus: true,
-                placeholder: 'Search for a name, address or index...',
-                onkeyup: (e) => {
-                  { onSearchHandler(e.target.value) }
-                },
-                onkeydown: (e) => {
-                  { model.onReverseSearch(e.target.value) }
-                },
-                onkeypress: (e) => {
-                  if (!e.target.value || !e.target.value.trim()) {
-                    model.searchIsOn = false;
-                  }
-                },
+          content: m('div.row-input',
+          m('input', {
+            type: 'text',
+            name: 'searchCurrent',
+            autofocus: true,
+            placeholder: 'Search for a name, address or index...',
+            onkeyup: (e) => {
+              { onSearchHandler(e.target.value) }
+            },
+            onkeydown: (e) => {
+              { model.onReverseSearch(e.target.value) }
+            },
+            onkeypress: (e) => {
+              if (!e.target.value || !e.target.value.trim()) {
+                model.searchIsOn = false;
+              }
+            },
+          }), m('tr.validators-heading', [
+            m('th.val-stash', 'Stash'),
+            m('th.val-action', ''),
+            m('th.val-total', 'Total Stake',
+              m(Icon, {
+                name: sortIcon('exposure.total'),
+                size: 'lg',
+                onclick: () => changeSort('exposure.total')
               })),
-            m('tr.validators-heading', [
-              m('th.val-stash', 'Stash'),
-              m('th.val-action', ''),
-              m('th.val-total', 'Total Stake',
-                m(Icon, {
-                  name: sortIcon('exposure.total'),
-                  size: 'lg',
-                  onclick: () => changeSort('exposure.total')
-                })),
-              // m('th.val-own', 'Own Stake',
-              //   m(Icon, { name: sortIcon('exposure.own'),
-              //     size: 'lg',
-              //     onclick: () => changeSort('exposure.own') })),
-              m('th.val-other', 'Other Stake',
-                m(Icon, {
-                  name: sortIcon('otherTotal'),
-                  size: 'lg',
-                  onclick: () => changeSort('otherTotal')
-                })),
-              m('th.val-commission', 'Commission',
-                m(Icon, {
-                  name: sortIcon('commissionPer'),
-                  size: 'lg',
-                  onclick: () => changeSort('commissionPer')
-                })),
-              m('th.val-points', 'Points',
-                m(Icon, {
-                  name: sortIcon('eraPoints'),
-                  size: 'lg',
-                  onclick: () => changeSort('eraPoints')
-                })),
-              m('th.val-apr', 'Est. APR'),
-              // m('th.val-last-hash', 'last #'),
-              m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses')
-            ]),
+            // m('th.val-own', 'Own Stake',
+            //   m(Icon, { name: sortIcon('exposure.own'),
+            //     size: 'lg',
+            //     onclick: () => changeSort('exposure.own') })),
+            m('th.val-other', 'Other Stake',
+              m(Icon, {
+                name: sortIcon('otherTotal'),
+                size: 'lg',
+                onclick: () => changeSort('otherTotal')
+              })),
+            m('th.val-commission', 'Commission',
+              m(Icon, {
+                name: sortIcon('commissionPer'),
+                size: 'lg',
+                onclick: () => changeSort('commissionPer')
+              })),
+            m('th.val-points', 'Points',
+              m(Icon, {
+                name: sortIcon('eraPoints'),
+                size: 'lg',
+                onclick: () => changeSort('eraPoints')
+              })),
+            m('th.val-apr', 'Est. APR'),
+            // m('th.val-last-hash', 'last #'),
+            m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses')
+          ]), m('table.validators-table', [
             result.validators.map((validator) => {
               // console.log("validator.exposure ===== ", validator.exposure, validator.stash_id)
               // total stake
@@ -411,7 +409,7 @@ export const PresentationComponent_ = {
                 apr,
               });
             }),
-          ])
+          ])) 
         }, {
           callback: reset,
           name: 'Waiting Validators',
