@@ -339,35 +339,34 @@ export const PresentationComponent_ = {
             },
           }), m('tr.validators-heading', [
             m('th.val-stash', 'Stash'),
-            m('th.val-action', ''),
             m('th.val-total', 'Total Stake',
-              m(Icon, {
+              m('div.sort-icon', m(Icon, {
                 name: sortIcon('exposure.total'),
                 size: 'lg',
                 onclick: () => changeSort('exposure.total')
-              })),
+              }))),
             // m('th.val-own', 'Own Stake',
             //   m(Icon, { name: sortIcon('exposure.own'),
             //     size: 'lg',
             //     onclick: () => changeSort('exposure.own') })),
             m('th.val-other', 'Other Stake',
-              m(Icon, {
+              m('div.sort-icon', m(Icon, {
                 name: sortIcon('otherTotal'),
                 size: 'lg',
                 onclick: () => changeSort('otherTotal')
-              })),
+              }))),
             m('th.val-commission', 'Commission',
-              m(Icon, {
+            m('div.sort-icon', m(Icon, {
                 name: sortIcon('commissionPer'),
                 size: 'lg',
                 onclick: () => changeSort('commissionPer')
-              })),
+              }))),
             m('th.val-points', 'Points',
-              m(Icon, {
+            m('div.sort-icon', m(Icon, {
                 name: sortIcon('eraPoints'),
                 size: 'lg',
                 onclick: () => changeSort('eraPoints')
-              })),
+              }))),
             m('th.val-apr', 'Est. APR'),
             // m('th.val-last-hash', 'last #'),
             m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses')

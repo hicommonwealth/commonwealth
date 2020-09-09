@@ -1,7 +1,11 @@
 @import "client/styles/shared";
 
+*{
+    font-family: "Inter", sans-serif !important;
+}
+
 @mixin small-gray {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     text-transform: uppercase;
     color: #999;
@@ -92,7 +96,14 @@
 .Tabs{
     padding: 20px;
 }
-
+.validators-table{
+    height: 200px;
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+        width: 0px;  /* Remove scrollbar space */
+        background: transparent;  /* Optional: just make scrollbar invisible */
+    }
+}
 .tab-bar{
     margin-bottom: 16px !important;
 }
@@ -194,6 +205,9 @@
         flex-flow: column nowrap;
         flex: 1 1 auto;
     }
+    .ValidatorRow{
+        border-bottom: 1px solid #E4E4E4 !important;
+    }
     th {
         @include small-gray;
         text-align: left;
@@ -224,12 +238,14 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-size: 15px;
-        border-bottom: 1;
+        font-size: 16px;
         padding-top: 15px;
         padding-bottom: 14px;
         overflow-wrap: break-word;
         min-width: 0px;
+        letter-spacing: -0.2px;
+        line-height: 120%;
+
     }
 
     .cut-text {
@@ -250,25 +266,38 @@
         flex: 0 0 10% !important;
     }
 
-    .val-total {
-        flex: 0.35 0 10% !important;
-        padding-left: 0.3vw !important;
-    }
-    .val-stash {
-        padding-left: 0.3vw !important;
-    }
+    .val-other{
+        flex: 0.35 0 5% !important;
 
+    }
+    .val-total {
+        flex: 0.35 0 5% !important;
+        // padding-left: 0.3vw !important;
+        margin-right: 17px;
+
+    }
+    
     .val-controller,
     .val-stash {
         flex: 0.5 0 10% !important;
     }
 
     .val-points {
-        flex: 0 0 7% !important;
+        flex: 0 0 8% !important;
+        margin-right: 17px;
+    }
+    .val-stash-td{
+        flex: 0.5 0 10% !important; 
+    }
+    .val-apr{
+        flex: 0 0 8% !important;
     }
 
     .val-commission {
+        flex: 0.35 0 5% !important;
         padding-left: 0.5vw !important;
+        margin-right: 17px;
+
     }
 
     .val-name {
@@ -281,6 +310,45 @@
     .cui-icon svg {
         width: 0.938vw !important;
         height: 0.938vw !important;
+    }
+    .User {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 115px !important;
+        text-overflow: ellipsis;
+    }
+
+    .sort-icon .cui-icon.cui-lg svg, .cui-lg .cui-icon svg{
+        min-width: 10px !important;
+        min-height: 10px !important;
+    }
+
+    .sort-icon .cui-icon svg{
+        position: relative;
+        display: inline-flex;
+        vertical-align: middle;
+        stroke: #536E7C !important;
+        margin-left: 4px!important;
+        margin-bottom: 4px!important;
+        min-width: 10px !important;
+        min-height: 10px !important;
+    }
+    .validators-heading{
+        padding-top: 24px;
+        padding-bottom: 24px;
+    }
+    .val-other a{
+        color: #000000 !important;
+        text-decoration: none !important;
+        &:hover{
+            color: #5F7DEF !important;
+            text-decoration: underline !important;
+        }
+        &:visited{
+            color: #5F7DEF !important;
+            text-decoration: underline !important;
+        }
     }
 
     @media only screen and (max-width: 1300px) {
@@ -462,7 +530,7 @@
 // Name Tooltip
 
 .legal {
-    font-family: Inter !important;
+    font-family: "Inter",sans-serif !important;
     font-style: normal !important;
     font-weight: 500 !important;
     font-size: 12px !important;
@@ -473,16 +541,6 @@
     margin-bottom: 15px !important;
 }
 
-.identity a {
-    text-decoration: none !important;
-    font-family: Inter !important;
-    font-style: normal !important;
-    font-weight: normal !important;
-    font-size: 16px !important;
-    line-height: 120% !important;
-    letter-spacing: -0.2px !important;
-    color: #000000 !important;
-}
 
 .identity hr {
     margin: 0px !important;
@@ -490,16 +548,18 @@
     border: 0.2px solid #e4e4e4 !important;
 }
 
-.identity .user-display-name {
-    font-family: Inter !important;
+
+.linkified a{
+    font-family: "Inter", sans-serif !important;
     font-style: normal !important;
-    font-weight: bold !important;
+    font-weight: normal !important;
     font-size: 16px !important;
     line-height: 120% !important;
-    letter-spacing: -0.2px !important;
+    letter-spacing: -1.2px !important; 
     color: #000000 !important;
+    text-decoration: underline !important;
+    padding-right: 4px;
 }
-
 .left-5 {
     padding-left: 8px !important;
 }
@@ -539,4 +599,24 @@
 .cui-icon svg {
     stroke: #252525 !important;
     margin-left: 5px !important;
+}
+
+.preheader-item-text .cui-button{
+    background: linear-gradient(180deg, #79C081 0%, #60A167 100%) !important;
+    border-radius: 4px !important;
+    color: #FFFFFF !important;
+}
+
+.dropDown-name a{
+    font-family: "Inter",sans-serif !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    line-height: 120% !important;
+    text-decoration: none !important;;
+    letter-spacing: -0.2px !important;
+
+    /* Black */
+
+    color: #000000 !important;
 }

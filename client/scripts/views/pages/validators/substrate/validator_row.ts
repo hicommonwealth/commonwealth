@@ -11,6 +11,7 @@ import { makeDynamicComponent } from 'models/mithril';
 import { DeriveStakingQuery } from '@polkadot/api-derive/types';
 import { IValidatorAttrs, ViewNominatorsModal } from '..';
 import ImOnline from './im_online';
+import ValidatorRowImOnline from './validator_row_im_online';
 import Identity from './identity';
 
 const PERBILL_PERCENT = 10_000_000;
@@ -75,24 +76,24 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
     const apr = vnode.attrs?.apr || 0;
 
     return m('tr.ValidatorRow', [
-      m('td.val-stash', m(Popover, {
+      m('td.val-stash-td', m(Popover, {
         interactionType: 'hover',
         content: m(Identity, { stash: vnode.attrs.stash }),
         trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
-      })),
-      m(ImOnline, {
+      }), m(ValidatorRowImOnline, {
         toBeElected: vnode.attrs.toBeElected,
         isOnline: vnode.attrs.isOnline,
         hasMessage: vnode.attrs.hasMessage,
         blockCount: vnode.attrs.blockCount
-      }),
+      })),
+      
       m('td.val-total', [
         // formatCoin(app.chain.chain.coins(vnode.attrs.total), true), ' '
-        formatCoin(app.chain.chain.coins(+vnode.attrs.otherTotal), true), ' ',
+        vnode.attrs.total.format(true)
       ]),
       // m('td.val-own', formatCoin(app.chain.chain.coins(vnode.attrs.bonded), true)),
       m('td.val-other', [
-        formatCoin(app.chain.chain.coins(+vnode.attrs.otherTotal), true),
+        // formatCoin(app.chain.chain.coins(+vnode.attrs.otherTotal), true),
         nominatorsList?.length > 0 && [
           m('a.val-nominators.padding-left-2', {
             href: '#',
@@ -103,13 +104,13 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
                 data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash }
               });
             }
-          }, `(${nominatorsList.length})`)],
+          }, `${formatCoin(app.chain.chain.coins(+vnode.attrs.otherTotal), true)}   (${nominatorsList.length})`)],
       ]),
       m('td.val-commission', `${commission.toFixed(2)}%`),
       m('td.val-points', vnode.attrs.eraPoints || '0'),
       m('td.val-apr', `${apr.toFixed(2)}%`),
       // m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
-      m('th.val-rewards-slashes-offenses', false /* TODOO: integrate count for the heading herer */ || '11/10/12'),
+      m('td.val-rewards-slashes-offenses', false /* TODOO: integrate count for the heading herer */ || '11/10/12'),
     ]);
   }
 });

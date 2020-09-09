@@ -82,7 +82,8 @@ export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiti
                 ? '.priority'
                 : '.amount'}`, vnode.attrs.waiting
                 ? n.balance
-                : formatCoin(n.balance, true)),
+                // : formatCoin(n.balance, true)),
+                : n.balance.format(true)),
             ]);
           }),
         ])

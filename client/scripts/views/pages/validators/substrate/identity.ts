@@ -55,7 +55,7 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
 
     return m('div.identity',
       m('div', [
-        m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }),
+        m('.dropDown-name', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
         m('p.legal', info.legal),
         m('hr'),
         info.email

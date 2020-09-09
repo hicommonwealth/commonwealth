@@ -11,7 +11,7 @@ import { formatNumber } from '@polkadot/util';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
 import CardSummary from './card_summary';
-import { Icon, Icons, Spinner, TextArea, Select } from 'construct-ui';
+import { Icon, Icons, Spinner, TextArea, Select, Button } from 'construct-ui';
 interface IPreHeaderState {
   dynamic: {
     sessionInfo: DeriveSessionProgress;
@@ -161,7 +161,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         m('.validators-preheader-item', [
           m('h3', 'Manage Staking'),
           m('.preheader-item-text', [
-            m('a.btn.formular-button-primary', {
+            m(Button, {
+              label: 'Manage',
               class: app.user.activeAccount ? '' : 'disabled',
               href: '#',
               onclick: (e) => {
@@ -171,13 +172,14 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                   data: { account: sender }
                 });
               }
-            }, 'Manage'),
+            })
           ]),
         ]),
         hasClaimablePayouts && m('.validators-preheader-item', [
           m('h3', 'Claim Payout'),
           m('.preheader-item-text', [
-            m('a.btn.formular-button-primary', {
+            m(Button, {
+              label: 'Claim',
               class: app.user.activeAccount ? '' : 'disabled',
               href: '#',
               onclick: (e) => {
@@ -187,13 +189,14 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                   data: { account: sender }
                 });
               }
-            }, 'Claim'),
+            })
           ]),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Update nominations'),
           m('.preheader-item-text', [
-            m('a.btn.formular-button-primary', {
+            m(Button, {
+              label: 'Update',
               class: app.user.activeAccount ? '' : 'disabled',
               href: '#',
               onclick: (e) => {
@@ -208,7 +211,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                     m.redraw();
                   });
               }
-            }, 'Update'),
+            })
           ]),
         ]),
       ])
