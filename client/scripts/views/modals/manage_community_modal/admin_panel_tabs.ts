@@ -1,13 +1,14 @@
 import m from 'mithril';
 import $ from 'jquery';
 
-import { Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, RadioGroup, Form } from 'construct-ui';
+import { Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, RadioGroup, Form, Tag } from 'construct-ui';
 import app from 'state';
 import { RolePermission } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 
 interface IWebhookData {
   url: string;
+  sourceSlug?: string;
 }
 
 interface IWebhooksFormAttrs {
@@ -47,7 +48,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
           vnode.state.success = true;
           notifySuccess('Success! Webhook created');
           vnode.attrs.webhooks.push({
-            url: `${webhookUrl}`
+            url: `${webhookUrl}`,
           });
           $webhookInput.val('');
         } else {
@@ -74,7 +75,21 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         }, [
           webhooks.map((webhook) => {
             return m(ListItem, {
-              contentLeft: webhook.url,
+              contentLeft: [
+                m('.top', { style: `display: 'block';`}, webhook.url),
+                m('.bottom', [
+                  m(Tag, {
+                    label: webhook.url.slice(0,5), // TODO: Make source property
+                  }),
+                  m(Button, {
+                    label: m(Icon, { name: Icons.SETTINGS }),
+                    onclick: (e) => {
+                      e.preventDefault();
+                      console.log('open settings modal');
+                      return;
+                    }
+                  })
+                ])],
               contentRight: m(Icon, {
                 name: Icons.X,
                 class: vnode.state.disabled ? 'disabled' : '',
