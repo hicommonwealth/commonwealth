@@ -2,16 +2,17 @@ import 'layout.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { EmptyState, Icons } from 'construct-ui';
+import { Icons } from 'construct-ui';
 
 import { initChain, initCommunity, deinitChainOrCommunity, selectNode } from 'app';
 import app from 'state';
+
 import { notifyError } from 'controllers/app/notifications';
-import PageNotFound from 'views/pages/404';
-import Sidebar from 'views/components/sidebar';
+import { featherIcon } from 'helpers';
+
+import Sublayout from 'views/sublayout';
 import { AppModals } from 'views/modal';
 import AppToasts from 'views/toast';
-import { featherIcon } from 'helpers';
 
 const CHAIN_LOADING_TIMEOUT = 3000;
 
@@ -22,10 +23,7 @@ export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
       class: hideSidebar ? 'hidden-sidebar' : ''
     }, [
       hideSidebar && m('.home-gradient'),
-      m(Sidebar),
-      m('.layout-container', [
-        m('.LoadingLayout'),
-      ]),
+      m(Sublayout, { loadingLayout: true }),
       m(AppModals),
       m(AppToasts),
     ]);
@@ -50,18 +48,10 @@ export const Layout: m.Component<{
         class: hideSidebar ? 'hidden-sidebar' : ''
       }, [
         hideSidebar && m('.home-gradient'),
-        m(Sidebar),
-        m('.layout-container', [
-          m(EmptyState, {
-            fill: true,
-            icon: Icons.ALERT_TRIANGLE,
-            content: [
-              m('p', `Application error: ${app.loadingError}`),
-              m('p', 'Please try again at another time'),
-            ],
-            style: 'color: #546e7b;'
-          }),
-        ]),
+        m(Sublayout, { errorLayout: [
+          m('p', `Application error: ${app.loadingError}`),
+          m('p', 'Please try again at another time'),
+        ] }),
         m(AppModals),
         m(AppToasts),
       ]);
@@ -75,10 +65,7 @@ export const Layout: m.Component<{
         class: hideSidebar ? 'hidden-sidebar' : ''
       }, [
         hideSidebar && m('.home-gradient'),
-        m(Sidebar),
-        m('.layout-container', [
-          m(PageNotFound)
-        ]),
+        m(Sublayout, { pageNotFoundLayout: true }),
         m(AppModals),
         m(AppToasts),
       ]);
@@ -116,10 +103,7 @@ export const Layout: m.Component<{
       class: hideSidebar ? 'hidden-sidebar' : ''
     }, [
       hideSidebar && m('.home-gradient'),
-      m(Sidebar),
-      m('.layout-container', [
-        vnode.children
-      ]),
+      vnode.children,
       m(AppModals),
       m(AppToasts),
     ]);
