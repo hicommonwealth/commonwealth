@@ -8,6 +8,7 @@ export interface WebhookAttributes {
   url: string;
   chain_id?: string;
   offchain_community_id?: string;
+  categories: string[];
   created_at?: Date;
   updated_at?: Date;
   Chain?: ChainAttributes;
@@ -31,6 +32,7 @@ export default (
     url: { type: dataTypes.STRING, allowNull: false },
     chain_id: { type: dataTypes.STRING, allowNull: true },
     offchain_community_id: { type: dataTypes.STRING, allowNull: true },
+    categories: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
   }, {
     underscored: true,
     indexes: [

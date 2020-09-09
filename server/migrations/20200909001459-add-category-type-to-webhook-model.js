@@ -1,23 +1,27 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    /*
-      Add altering commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.createTable('users', { id: Sequelize.INTEGER });
-    */
+  up: async (queryInterface, DataTypes) => {
+    await queryInterface.addColumn(
+      'Webhooks',
+      'categories',
+      {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: []
+      }
+    );
   },
 
-  down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.dropTable('users');
-    */
+  down: async (queryInterface, DataTypes) => {
+    await queryInterface.removeColumn(
+      'Webhooks',
+      'categories',
+      {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: []
+      }
+    );
   }
 };
