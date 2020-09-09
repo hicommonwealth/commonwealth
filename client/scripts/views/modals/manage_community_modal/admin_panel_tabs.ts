@@ -3,16 +3,11 @@ import $ from 'jquery';
 
 import { Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, RadioGroup, Form, Tag } from 'construct-ui';
 import app from 'state';
-import { RolePermission } from 'models';
+import { RolePermission, Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 
-interface IWebhookData {
-  url: string;
-  sourceSlug?: string;
-}
-
 interface IWebhooksFormAttrs {
-  webhooks: IWebhookData[];
+  webhooks: Webhook[];
 }
 
 interface IWebhooksFormState {
@@ -47,9 +42,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         if (result.status === 'Success') {
           vnode.state.success = true;
           notifySuccess('Success! Webhook created');
-          vnode.attrs.webhooks.push({
-            url: `${webhookUrl}`,
-          });
+          vnode.attrs.webhooks.push(Webhook.fromJSON(result.result));
           $webhookInput.val('');
         } else {
           vnode.state.failure = true;
@@ -228,7 +221,7 @@ interface IAdminPanelTabsAttrs {
   defaultTab: number;
   roleData: any[];
   onRoleUpgrade: Function;
-  webhooks;
+  webhooks: Webhook[];
 }
 
 const AdminPanelTabs: m.Component<IAdminPanelTabsAttrs, {index: number, }> = {
