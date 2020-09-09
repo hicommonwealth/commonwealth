@@ -31,15 +31,15 @@ const getValidatorDetail = async (models, req: Request, res: Response, next: Nex
     validators = await models.Validators.findAll({
         where: where,
         include: {
-            model: models.HistoricalValidatorStats,
-            order: [['createdAt', 'DESC']],
+            model: models.HistoricalValidatorStatistics,
+            order: [['created_at', 'DESC']],
         }
     });
 
     validators = JSON.parse(JSON.stringify(validators));
     validators = validators.map(row => {
-        row = { ...row.HistoricalValidatorStats?.[0], ...row };
-        delete row.HistoricalValidatorStats;
+        row = { ...row.HistoricalValidatorStatistics?.[0], ...row };
+        delete row.HistoricalValidatorStatistics;
         return row;
     });
 

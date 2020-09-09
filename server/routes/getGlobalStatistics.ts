@@ -6,10 +6,10 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
     let result: any = [];
     result = await models.Validators.findAndCountAll({
         include: {
-            model: models.HistoricalValidatorStats,
+            model: models.HistoricalValidatorStatistics,
             required: true,
             limit: 1,
-            order: [['createdAt', 'DESC']],
+            order: [['created_at', 'DESC']],
         }
     });
     return res.json({
