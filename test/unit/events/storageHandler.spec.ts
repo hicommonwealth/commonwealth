@@ -117,4 +117,28 @@ describe('Event Storage Handler Tests', () => {
     });
     assert.lengthOf(chainEvents, 0);
   });
+
+  it('should not create chain event for excluded event type', async () => {
+    const event: CWEvent = {
+      blockNumber: 13,
+      data: {
+        kind: SubstrateTypes.EventKind.Reward,
+        amount: '10000',
+      }
+    };
+    const eventHandler = new StorageHandler(models, 'edgeware', [ SubstrateTypes.EventKind.Reward ]);
+
+    // process event
+    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
+
+    // confirm no event emitted
+    assert.isUndefined(dbEvent);
+    const chainEvents = await models['ChainEvent'].findAll({
+      where: {
+        chain_event_type_id: 'edgeware-reward',
+        block_number: 13,
+      }
+    });
+    assert.lengthOf(chainEvents, 0);
+  });
 });
