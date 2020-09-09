@@ -172,12 +172,13 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/referendum`)
         || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
         || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`));
-    const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`);
+        || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`));
+    const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
+    const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
@@ -190,6 +191,15 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'On-chain Governance',
           class: 'section-header',
         }),
+        // referenda (substrate only)
+        !app.community && app.chain?.base === ChainBase.Substrate
+          && m(ListItem, {
+            active: onReferendaPage(m.route.get()),
+            label: 'Referenda',
+            contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/referenda`),
+            contentRight: [], // TODO
+          }),
         // proposals (substrate, cosmos, moloch only)
         m(ListItem, {
           active: onProposalPage(m.route.get()),

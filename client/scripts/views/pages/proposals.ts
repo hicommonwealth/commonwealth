@@ -99,8 +99,6 @@ const ProposalsPage: m.Component<{}> = {
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 
     // active proposals
-    const activeDemocracyReferenda = onSubstrate
-      && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed);
     const activeDemocracyProposals = onSubstrate
       && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed);
     const activeCouncilProposals = onSubstrate
@@ -115,23 +113,19 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
-    const activeProposalContent = !activeDemocracyReferenda?.length
-      && !activeDemocracyProposals?.length
+    const activeProposalContent = !activeDemocracyProposals?.length
       && !activeCouncilProposals?.length
       && !activeSignalingProposals?.length
       && !activeCosmosProposals?.length
       && !activeMolochProposals?.length
       ? [ m('.no-proposals', 'None') ]
-      : (activeDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }))
-        .concat((activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+      : (activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
 
     // inactive proposals
-    const inactiveDemocracyReferenda = onSubstrate
-      && (app.chain as Substrate).democracy.store.getAll().filter((p) => p.completed);
     const inactiveDemocracyProposals = onSubstrate
       && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => p.completed);
     const inactiveCouncilProposals = onSubstrate
@@ -146,15 +140,13 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Moloch).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
-    const inactiveProposalContent = !inactiveDemocracyReferenda?.length
-      && !inactiveDemocracyProposals?.length
+    const inactiveProposalContent = !inactiveDemocracyProposals?.length
       && !inactiveCouncilProposals?.length
       && !inactiveSignalingProposals?.length
       && !inactiveCosmosProposals?.length
       && !inactiveMolochProposals?.length
       ? [ m('.no-proposals', 'None') ]
-      : (inactiveDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }))
-        .concat((inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+      : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
@@ -164,25 +156,6 @@ const ProposalsPage: m.Component<{}> = {
     const visibleTechnicalCommitteeProposals = app.chain
       && (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot)
       && (app.chain as Substrate).technicalCommittee.store.getAll();
-
-    // let nextReferendum;
-    // let nextReferendumDetail;
-    // if (!onSubstrate) {
-    //   // do nothing
-    // } else if ((app.chain as Substrate).democracyProposals.lastTabledWasExternal) {
-    //   if (visibleDemocracyProposals)
-    //     [nextReferendum, nextReferendumDetail] = ['Democracy', ''];
-    //   else
-    //     [nextReferendum, nextReferendumDetail] = ['Council',
-    //       'Last was council, but no democracy proposal was found'];
-    // } else if ((app.chain as Substrate).democracyProposals.nextExternal)
-    //   [nextReferendum, nextReferendumDetail] = ['Council', ''];
-    // else
-    //   [nextReferendum, nextReferendumDetail] = ['Democracy',
-    //     'Last was democracy, but no council proposal was found'];
-
-    const maxConvictionWeight = Math.max.apply(this, convictions().map((c) => convictionToWeight(c)));
-    const maxConvictionLocktime = Math.max.apply(this, convictions().map((c) => convictionToLocktime(c)));
 
     return m(Sublayout, {
       class: 'ProposalsPage',
