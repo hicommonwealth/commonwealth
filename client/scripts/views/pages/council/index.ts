@@ -166,6 +166,9 @@ export const CandidacyButton: m.Component<{
 };
 
 export const getCouncillors = () => {
+  if (app.chain.base !== ChainBase.Substrate) {
+    return null;
+  }
   const councillors: SubstrateAccount[] = app.chain
     && ((app.chain as Substrate).phragmenElections.members || [])
       .map((a) => app.chain.accounts.get(a))
@@ -179,6 +182,9 @@ export const getCouncillors = () => {
 };
 
 export const getCouncilCandidates = () => {
+  if (app.chain.base !== ChainBase.Substrate) {
+    return null;
+  }
   const candidates: Array<[SubstrateAccount, number]> = app.chain
     && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || [])
       .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ])
@@ -199,10 +205,13 @@ const CouncilPage: m.Component<{}> = {
     });
   },
   view: (vnode) => {
-    if (!app.chain) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
-
+    if (!app.chain) {
+      return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
+    }
     const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
-    if (!initialized) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
+    if (!initialized) {
+      return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
+    }
 
     const candidates = getCouncilCandidates();
     const councillors = getCouncillors();

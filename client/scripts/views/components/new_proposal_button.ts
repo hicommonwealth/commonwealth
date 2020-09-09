@@ -50,7 +50,8 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
       }),
       label: 'New council motion'
     }),
-    candidates
+    app.chain?.base === ChainBase.Substrate
+      && candidates
       && [
         m(MenuDivider),
         m(CollectiveVotingButton, { candidates, menuStyle: true }),
