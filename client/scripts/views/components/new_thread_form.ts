@@ -152,6 +152,7 @@ export const NewThreadForm: m.Component<{
   autoTitleOverride,
   form: IThreadForm,
   fromDraft?: number,
+  hasTopics: boolean,
   postType: string,
   quillEditorState,
   overwriteConfirmationModal: boolean,
@@ -165,12 +166,16 @@ export const NewThreadForm: m.Component<{
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
     vnode.state.overwriteConfirmationModal = false;
+    if (app.community?.meta.topics.length || app.chain.meta.topics.length) {
+      console.log(app.community?.meta.topics.length || app.chain.meta.topics)
+      vnode.state.hasTopics = true;
+    }
     try {
       vnode.state.activeTopic = isModal
         ? m.route.param('topic')
         : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
           ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions') + 1]
-            : undefined;
+          : undefined;
     } catch (e) {
       // couldn't extract activeTopic
     }
@@ -328,16 +333,17 @@ export const NewThreadForm: m.Component<{
           ]),
         ]),
         postType === PostType.Link && m(Form, [
-          m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
-            m(TopicSelector, {
-              defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
-              topics: app.topics.getByCommunity(app.activeId()),
-              featuredTopics: app.topics.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
-              updateFormData: updateTopicState,
-              tabindex: 1,
-            }),
-          ]),
+          vnode.state.hasTopics
+            && m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
+              m(TopicSelector, {
+                defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
+                topics: app.topics.getByCommunity(app.activeId()),
+                featuredTopics: app.topics.getByCommunity(app.activeId())
+                  .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+                updateFormData: updateTopicState,
+                tabindex: 1,
+              }),
+            ]),
           m(FormGroup, { span: { xs: 12, sm: 8 }, order: 2 }, [
             m(Input, {
               placeholder: 'https://',
