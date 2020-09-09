@@ -165,6 +165,32 @@ export const CandidacyButton: m.Component<{
   }
 };
 
+export const getCouncillors = () => {
+  const councillors: SubstrateAccount[] = app.chain
+    && ((app.chain as Substrate).phragmenElections.members || [])
+      .map((a) => app.chain.accounts.get(a))
+      .sort((a, b) => {
+        const va = (app.chain as Substrate).phragmenElections.backing(a);
+        const vb = (app.chain as Substrate).phragmenElections.backing(b);
+        if (va === undefined || vb === undefined) return 0;
+        return vb.cmp(va);
+      });
+  return councillors;
+};
+
+export const getCouncilCandidates = () => {
+  const candidates: Array<[SubstrateAccount, number]> = app.chain
+    && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || [])
+      .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ])
+      .sort((a, b) => {
+        const va = (app.chain as Substrate).phragmenElections.backing(a[0]);
+        const vb = (app.chain as Substrate).phragmenElections.backing(b[0]);
+        if (va === undefined || vb === undefined) return 0;
+        return vb.cmp(va);
+      });
+  return candidates;
+};
+
 const CouncilPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
@@ -176,27 +202,10 @@ const CouncilPage: m.Component<{}> = {
     if (!app.chain) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
 
     const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
-
     if (!initialized) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
 
-    const councillors: SubstrateAccount[] = app.chain
-      && ((app.chain as Substrate).phragmenElections.members || [])
-        .map((a) => app.chain.accounts.get(a))
-        .sort((a, b) => {
-          const va = (app.chain as Substrate).phragmenElections.backing(a);
-          const vb = (app.chain as Substrate).phragmenElections.backing(b);
-          if (va === undefined || vb === undefined) return 0;
-          return vb.cmp(va);
-        });
-    const candidates: Array<[SubstrateAccount, number]> = app.chain
-      && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || [])
-        .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ])
-        .sort((a, b) => {
-          const va = (app.chain as Substrate).phragmenElections.backing(a[0]);
-          const vb = (app.chain as Substrate).phragmenElections.backing(b[0]);
-          if (va === undefined || vb === undefined) return 0;
-          return vb.cmp(va);
-        });
+    const candidates = getCouncilCandidates();
+    const councillors = getCouncillors();
 
     const nSeats = (app.chain as Substrate).phragmenElections.desiredMembers;
     const nRunnersUpSeats = (app.chain as Substrate).phragmenElections.desiredRunnersUp;

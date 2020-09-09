@@ -8,7 +8,7 @@ import NewProposalButton from 'views/components/new_proposal_button';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
-import { CollectiveVotingButton, CandidacyButton } from './pages/council/index';
+import { CollectiveVotingButton, CandidacyButton, getCouncilCandidates } from './pages/council/index';
 import { SubstrateAccount } from '../controllers/chain/substrate/account';
 import Substrate from '../controllers/chain/substrate/main';
 
@@ -31,15 +31,7 @@ const Sublayout: m.Component<{
 
     let councilCandidates: Array<[SubstrateAccount, number]>;
     if (app.chain && showCouncilMenu) {
-      councilCandidates = app.chain
-        && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || [])
-          .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ])
-          .sort((a, b) => {
-            const va = (app.chain as Substrate).phragmenElections.backing(a[0]);
-            const vb = (app.chain as Substrate).phragmenElections.backing(b[0]);
-            if (va === undefined || vb === undefined) return 0;
-            return vb.cmp(va);
-          });
+      councilCandidates = getCouncilCandidates();
     }
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [
