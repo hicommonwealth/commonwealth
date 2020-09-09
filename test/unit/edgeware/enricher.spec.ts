@@ -786,10 +786,10 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   /** offences events */
-  it.only('should enrich new offence event', async () => {
+  it('should enrich new offence event', async () => {
     const kind = EventKind.Offence;
     const event = constructEvent([ 'offline', '10000', constructBool(true), offenceDetails ],
-      'offences', [ 'Kind', 'OpaqueTimeSlot', 'boolean', 'Option<OffenceDetails>[]' ]);
+      'offences', [ 'Kind', 'OpaqueTimeSlot', 'bool', 'Option<OffenceDetails>[]' ]);
     const result = await Enrich(api, blockNumber, kind, event);
 
     assert.deepEqual(result, {
