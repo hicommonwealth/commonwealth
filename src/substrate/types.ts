@@ -1,5 +1,5 @@
 import {
-  Header, EventRecord, Extrinsic, ValidatorId, Event, IdentityJudgement as SubstrateJudgement,
+  Header, EventRecord, Extrinsic, Event, IdentityJudgement as SubstrateJudgement,
 } from '@polkadot/types/interfaces';
 import { Offender } from '@polkadot/types/interfaces/offences';
 
