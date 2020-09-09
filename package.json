@@ -154,7 +154,6 @@
     "quill-2.0-dev": "^2.0.0-dev.3",
     "quill-image-drop-and-paste": "^1.0.4",
     "quill-image-uploader": "^1.0.2",
-    "quill-markdown-shortcuts": "^0.0.10",
     "quill-mention": "^2.2.7",
     "randomcolor": "^0.5.4",
     "react": "^16.7.0",
