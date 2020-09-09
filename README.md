@@ -26,6 +26,8 @@ nvm install
 
 - Use the configured version of node: `nvm use`
 - Install packages: `yarn`
+    - This is equivalent to `yarn update`
+    - Do not run `yarn upgrade` unless you are explicitly trying to upgrade packages
 - Run the development server in one terminal: `yarn start`
 - Reset the dev DB (this will wipe all data): `yarn reset-server`
 - Connect to the dev DB: `yarn psql` (or use Postico on Mac)
