@@ -19,12 +19,11 @@ module.exports = {
       eraPoints: { type: DataTypes.INTEGER, allowNull: false },
       blockCount: { type: DataTypes.INTEGER, allowNull: false },
       otherTotal: { type: DataTypes.STRING, allowNull: false },
-      createdAt: {
-        type: DataTypes.DATE
-      },
-      updatedAt: {
-        type: DataTypes.DATE
-      }
+      created_at: { type: DataTypes.DATE, allowNull: false },
+      updated_at: { type: DataTypes.DATE, allowNull: false },
+    }, {
+      timestamps: true,
+      underscored: true
     });
 
   },

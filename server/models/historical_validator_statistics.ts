@@ -1,7 +1,7 @@
-import { Validators } from './../../client/scripts/views/pages/validators/index';
+import { Validators } from '../../client/scripts/views/pages/validators/index';
 import * as Sequelize from 'sequelize';
 
-export interface HistoricalValidatorStatsAttributes {
+export interface HistoricalValidatorStatisticsAttributes {
     id: number,
     stash_id: string;
     block: string;
@@ -18,22 +18,24 @@ export interface HistoricalValidatorStatsAttributes {
     toBeElected: boolean,
     blockCount: number,
     otherTotal: string,
-    name: string
+    name: string,
+    created_at?: Date;
+    updated_at?: Date;
 }
 
-export interface HistoricalValidatorStatsInstance extends Sequelize.Instance<HistoricalValidatorStatsAttributes>, HistoricalValidatorStatsAttributes {
+export interface HistoricalValidatorStatisticsInstance extends Sequelize.Instance<HistoricalValidatorStatisticsAttributes>, HistoricalValidatorStatisticsAttributes {
 
 }
 
-export interface HistoricalValidatorStatsModel extends Sequelize.Model<HistoricalValidatorStatsInstance, HistoricalValidatorStatsAttributes> {
+export interface HistoricalValidatorStatisticsModel extends Sequelize.Model<HistoricalValidatorStatisticsInstance, HistoricalValidatorStatisticsAttributes> {
 
 }
 
 export default (
     sequelize: Sequelize.Sequelize,
     dataTypes: Sequelize.DataTypes,
-): HistoricalValidatorStatsModel => {
-    const HistoricalValidatorStats = sequelize.define<HistoricalValidatorStatsInstance, HistoricalValidatorStatsAttributes>('HistoricalValidatorStats', {
+): HistoricalValidatorStatisticsModel => {
+    const HistoricalValidatorStatistics = sequelize.define<HistoricalValidatorStatisticsInstance, HistoricalValidatorStatisticsAttributes>('HistoricalValidatorStatistics', {
         id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true }, //primary-key
         stash_id: { type: dataTypes.STRING, allowNull: false },
         name: { type: dataTypes.STRING, allowNull: true },
@@ -51,11 +53,15 @@ export default (
         toBeElected: { type: dataTypes.BOOLEAN, allowNull: false },
         blockCount: { type: dataTypes.INTEGER, allowNull: false },
         otherTotal: { type: dataTypes.STRING, allowNull: false },
-
+        created_at: { type: dataTypes.DATE, allowNull: false },
+        updated_at: { type: dataTypes.DATE, allowNull: false },
+    }, {
+        timestamps: true,
+        underscored: true
     });
-    HistoricalValidatorStats.associate = (models) => {
-        models.HistoricalValidatorStats.belongsTo(models.Validators, { foreignKey: 'stash_id' });
+    HistoricalValidatorStatistics.associate = (models) => {
+        models.HistoricalValidatorStatistics.belongsTo(models.Validators, { foreignKey: 'stash_id' });
 
     };
-    return HistoricalValidatorStats;
+    return HistoricalValidatorStatistics;
 };

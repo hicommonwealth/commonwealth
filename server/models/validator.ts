@@ -29,7 +29,6 @@ export default (
         sessionKeys: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false }, //AccountID[]
         state: { type: dataTypes.STRING, allowNull: false }, //Active/waiting/inactive
         lastUpdate: { type: dataTypes.BIGINT, allowNull: false },//blocknumber,
-
     });
 
     Validators.associate = models => {
