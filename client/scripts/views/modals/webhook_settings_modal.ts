@@ -31,8 +31,6 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
   },
   view: (vnode) => {
     const { webhook } = vnode.attrs;
-    console.log('webhook', webhook);
-    console.log('selectedCategories', vnode.state.selectedCategories);
     // const community = webhook.
     const isChain = webhook.chain_id ? true : false;
     const chainNotifications = webhook.chain_id === 'edgeware' ? EdgewareChainNotificationTypes 
@@ -101,12 +99,6 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
           const chainOrCommObj = webhook.chain_id
             ? { chain: webhook.chain_id }
             : { community: webhook.offchain_community_id };
-          console.log({
-            webhookId: webhook.id,
-            categories: vnode.state.selectedCategories,
-            ...chainOrCommObj,
-            jwt: app.user.jwt,
-          })
           $.ajax({
             url: `${app.serverUrl()}/updateWebhook`,
             data: {
