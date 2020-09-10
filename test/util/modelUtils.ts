@@ -114,9 +114,6 @@ export const createThread = async (args: ThreadArgs) => {
       'readOnly': readOnly || false,
       'jwt': jwt,
     });
-  if (res.body.status !== 'Success') {
-    console.log(res.body);
-  }
   return res.body;
 };
 

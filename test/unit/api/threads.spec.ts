@@ -204,26 +204,25 @@ describe('Thread Tests', () => {
     it('should successfully create a thread without a topic name (if the community lacks topics)', async () => {
       const communityArgs: modelUtils.CommunityArgs = {
         jwt: adminJWT,
-        isAuthenticatedForum: 'false',
-        privacyEnabled: 'true',
-        invitesEnabled: 'true',
         id: 'test',
         name: 'test',
         creator_address: adminAddress,
         creator_chain: chain,
         description: 'test enabled community',
         default_chain: chain,
+        isAuthenticatedForum: 'false',
+        invitesEnabled: 'false',
+        privacyEnabled: 'false',
       };
-
       const c = await modelUtils.createCommunity(communityArgs);
       const tRes = await modelUtils.createThread({
-        address: userAddress,
+        address: adminAddress,
         kind,
-        chainId: null,
-        communityId: c,
+        chainId: chain,
+        communityId: c.id,
         title,
         body,
-        jwt: userJWT,
+        jwt: adminJWT,
       });
       expect(tRes.status).to.equal('Success');
       expect(tRes.result).to.not.be.null;
