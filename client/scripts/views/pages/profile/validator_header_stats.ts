@@ -32,24 +32,40 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity) => {
 };
 
 export interface IValidatorPageState {
-    dynamic: {
-        validators: any,
-        lastHeader:any
-    };
-    results: any[];
-    identity: SubstrateIdentity | null;
+  dynamic: {
+    validators: any,
+    lastHeader: any
+  };
+  results: any[];
+  identity: SubstrateIdentity | null;
 }
 export interface IValidatorAttrs {
-    address: string;
-    total?: Coin;
-    otherTotal?: Coin;
-    bonded?: Coin;
-    commission?: number;
-    toBeElected?: boolean;
-    isOnline?: boolean;
-    hasMessage?: boolean;
-    blockCount?: u32;
-    account:any
+  address: string;
+  total?: Coin;
+  otherTotal?: Coin;
+  bonded?: Coin;
+  commission?: number;
+  toBeElected?: boolean;
+  isOnline?: boolean;
+  hasMessage?: boolean;
+  blockCount?: u32;
+  account: any
+}
+
+interface IValidatorStatsInfo {
+  total: number
+  own: number
+  otherTotal: number
+  commission: number
+  points: number
+}
+
+const emptyValidatorStatsInfo: IValidatorStatsInfo = {
+  total: undefined,
+  own: undefined,
+  otherTotal: undefined,
+  commission: undefined,
+  points: undefined,
 }
 
 export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValidatorPageState>({
@@ -62,10 +78,17 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
   }),
   view: (vnode) => {
     const { account } = vnode.attrs;
-    let validators;
-    if (vnode.state.dynamic.validators !== undefined) {
-      validators = vnode.state.dynamic.validators;
-    }
+    let validators = (vnode.state.dynamic && vnode.state.dynamic.validators !== undefined) ? vnode.state.dynamic.validators : undefined;
+    let validatorStatInfo: IValidatorStatsInfo = validators ? (validators[vnode.attrs.address] ? {
+      total: validators[vnode.attrs.address].exposure ? validators[vnode.attrs.address].exposure.total : undefined,
+      own: validators[vnode.attrs.address].exposure ? validators[vnode.attrs.address].exposure.own : undefined,
+      otherTotal: validators[vnode.attrs.address].otherTotal,
+      commission: validators[vnode.attrs.address].commissionPer,
+      points: validators[vnode.attrs.address].eraPoints,
+    } : emptyValidatorStatsInfo) : emptyValidatorStatsInfo;
+
+    //console.log(formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].exposure.total), true))
+
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
       && account.address === app.user.activeAccount?.address;
     // SPINNER
@@ -79,46 +102,41 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
     //   size: 'xs',
     //   style: 'visibility: visible; opacity: 1;'
     // })));
-    return [ m('.total-stake',
+    return [m('.total-stake',
       m('.data-row',
         m('.profile-header',
           'TOTAL STAKE')),
       m('.info-row',
         m('.profile-data',
-          //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].exposure.total), true)),
-          '5.53m EDG'))),
+                 validators && formatCoin(app.chain.chain.coins(validatorStatInfo.total), true)))),
     m('.own-stake',
       m('.data-row',
         m('.profile-header',
           'OWN STAKE')),
       m('.info-row',
         m('.profile-data',
-        //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].exposure.own), true)),
-          '2.40m EDG'))),
+        validators && formatCoin(app.chain.chain.coins(validatorStatInfo.own), true)))),
     m('.other-stake',
       m('.data-row',
         m('.profile-header',
           'OTHER STAKE')), // TODOO: ADD A MODAL ON CLICK  by adding ViewNominatorsModal
       m('.info-row',
         m('.profile-data',
-        //       validators && formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].otherTotal), true)),
-          '3.13m EDG'))),
+        validators && formatCoin(app.chain.chain.coins(validatorStatInfo.otherTotal), true)))),
     m('.commision',
       m('.data-row',
         m('.profile-header',
           'COMMISION')),
       m('.info-row',
         m('.profile-data',
-        //       validators && validators[vnode.attrs.address].commissionPer),
-          '100%'))),
+        validators && validatorStatInfo.commission ))),
     m('.era-points',
       m('.data-row',
         m('.profile-header',
           'POINTS')),
       m('.info-row',
         m('.profile-data',
-        //       validators && validators[vnode.attrs.address].eraPoints)
-          '220')))];
+        validators && validatorStatInfo.points)))];
   }
 });
 
