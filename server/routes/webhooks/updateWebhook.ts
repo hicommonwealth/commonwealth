@@ -30,7 +30,8 @@ const updateWebhook = async (models, req: Request, res: Response, next: NextFunc
     },
   });
   if (!existingWebhook) return next(new Error(Errors.NoWebhookFound));
-  existingWebhook.categories = req.body['categories[]'];
+  
+  existingWebhook.categories = typeof req.body['categories[]'] === "string" ? [req.body['categories[]']] : req.body['categories[]'];
   console.log(existingWebhook);
   await existingWebhook.save();
   console.log(existingWebhook);

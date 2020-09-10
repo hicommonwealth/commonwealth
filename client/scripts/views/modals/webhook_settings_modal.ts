@@ -7,6 +7,7 @@ import { Button, List, ListItem, Checkbox } from 'construct-ui';
 import { Webhook } from 'models';
 import { NotificationCategories } from 'types';
 import { EdgewareChainNotificationTypes } from 'helpers/chain_notification_types';
+import { CompactModalExitButton } from '../modal';
 
 interface IAttrs {
     webhook: Webhook;
@@ -60,6 +61,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
         });
     }
     return m('.WebhookSettingsModal.compact-modal-body-max', [
+        m(CompactModalExitButton),
         m('.title-section', [
             m('h4', 'Webhook options'),
             m('p', 'Which events should trigger a notification?'),
@@ -113,6 +115,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
               success: (result) => {
                 const updatedWebhook = Webhook.fromJSON(result.result);
                 vnode.attrs.updateSuccessCallback(updatedWebhook);
+                $(vnode).trigger('modalexit');
               },
               error: (err) => {
                 console.dir(err);
