@@ -203,8 +203,8 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         // proposals (substrate, cosmos, moloch only)
         m(ListItem, {
           active: onProposalPage(m.route.get()),
-          label: 'Proposals',
-          contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
+          label: 'Proposals & Motions',
+          contentLeft: m(Icon, { name: Icons.SEND }),
           onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
           // contentRight: [
           //   (app.chain?.base === ChainBase.Substrate)
