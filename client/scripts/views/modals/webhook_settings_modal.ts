@@ -59,7 +59,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
             }),
         });
     }
-    return m('.WebhookSettingsModal', [
+    return m('.WebhookSettingsModal.compact-modal-body-max', [
         m('.title-section', [
             m('h4', 'Webhook options'),
             m('p', 'Which events should trigger a notification?'),
