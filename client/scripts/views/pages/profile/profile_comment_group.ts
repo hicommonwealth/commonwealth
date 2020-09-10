@@ -2,11 +2,12 @@ import m from 'mithril';
 import _ from 'lodash';
 
 import app from 'state';
+import { link, slugify } from 'helpers';
 import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
-import User from '../../components/widgets/user';
-import { link, slugify } from '../../../helpers';
-import QuillFormattedText from '../../components/quill_formatted_text';
-import MarkdownFormattedText from '../../components/markdown_formatted_text';
+
+import User from 'views/components/widgets/user';
+import QuillFormattedText from 'views/components/quill_formatted_text';
+import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 
 interface IProfileCommentGroupAttrs {
   proposal: OffchainThread;
@@ -28,7 +29,8 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           hideAvatar: true,
           tooltip: true
         }),
-        ' commented in a thread',
+        ' commented in a ',
+        link('a', `/${proposal.chain || proposal.community || app.activeId()}/proposal/${slug}/${identifier}`, 'thread')
       ]),
       m('.activity', [
         comments.map((comment) => m('.proposal-comment', [
