@@ -126,10 +126,14 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     where: {
       [Op.or]: [
         {
-          chain: chains.map((c) => c.id),
+          chain: {
+            [Op.in]: chains.map((c) => c.id),
+          }
         },
         {
-          community: allCommunities.map((c) => (c as any).id),
+          community: {
+            [Op.in]: allCommunities.map((c) => (c as any).id),
+          }
         }
       ],
       created_at: {
