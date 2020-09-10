@@ -78,7 +78,7 @@ const model = {
       //fetch from already fetched list
       // console.log(" model.constValidators ", model.constValidators)
       model.constValidators.forEach((ele => {
-        if ((ele.name?.toLowerCase().includes(value) || ele.stash_id.toLowerCase().includes(value)) && ele.state === model.state) {
+        if ((ele.name?.toLowerCase().includes(value) || ele.stash.toLowerCase().includes(value)) && ele.state === model.state) {
           validators.push(ele);
         }
       }));
@@ -137,9 +137,9 @@ const model = {
 
       console.log(validators?.validators, "--------onChange---------");
       result.validators = [...result.validators, ...validators?.validators];
-      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
       model.constValidators = [...result.validators, ...model.constValidators];
-      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
       m.redraw();
     }
 
@@ -152,9 +152,9 @@ const model = {
     if (validatorStashes.length && validatorStashes.length >= prevIndex) {
       validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
       result.validators = [...result.validators, ...validators?.validators];
-      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
       model.constValidators = [...result.validators, ...model.constValidators];
-      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
       m.redraw();
     }
   },
@@ -171,7 +171,7 @@ const model = {
       // console.log("validatorstashes ", validatorStashes)
       result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(model.prevIndex, model.nextIndex));
       model.constValidators = [...result.validators, ...model.constValidators];
-      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash_id === v.stash_id)) === i);
+      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
       m.redraw();
     }
   },
@@ -378,7 +378,7 @@ export const PresentationComponent_ = {
               m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses')
             ]), m('table.validators-table', [
               result.validators.map((validator) => {
-                // console.log("validator.exposure ===== ", validator.exposure, validator.stash_id)
+                // console.log("validator.exposure ===== ", validator.exposure, validator.stash)
                 // total stake
                 const total = chain.chain.coins(+validator.exposure?.total);
                 // own stake
@@ -387,7 +387,7 @@ export const PresentationComponent_ = {
                   stash: who.toString(),
                   balance: chain.chain.coins(+value),
                 }));
-                const stash = validator.stash_id;
+                const stash = validator.stash;
                 const controller = validator.controller;
                 const eraPoints = validator.eraPoints;
                 const blockCount = validator.blockCount;
@@ -445,7 +445,7 @@ export const PresentationComponent_ = {
               m('th.val-action', ''),
             ]),
             result.validators.map((validator) => {
-              const stash = validator.stash_id;
+              const stash = validator.stash;
               const controller = validator.controller;
               const eraPoints = validator.eraPoints;
               const toBeElected = validator.toBeElected;
