@@ -44,8 +44,9 @@ export default async function (models, chain?: string): Promise<void> {
     log.info('Fetching chain events...');
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     const events = await fetcher.fetch();
+
     log.info(`Writing chain events to db... (count: ${events.length})`);
-    await Promise.all(events.map(async (event) => {
+    for (const event of events) {
       try {
         // eslint-disable-next-line no-await-in-loop
         const dbEvent = await migrationHandler.handle(event);
@@ -53,6 +54,6 @@ export default async function (models, chain?: string): Promise<void> {
       } catch (e) {
         log.error(`Event handle failure: ${e.message}`);
       }
-    }));
+    }
   }
 }
