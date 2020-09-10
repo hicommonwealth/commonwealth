@@ -68,7 +68,12 @@ const setupChainEventListeners = async (
 
   log.info('Setting up event listeners...');
   const subscribers = await Promise.all(nodes.map(async (node) => {
-    const storageHandler = new EventStorageHandler(models, node.chain);
+    const excludedEvents = [
+      SubstrateTypes.EventKind.Reward,
+      SubstrateTypes.EventKind.TreasuryRewardMinting,
+      SubstrateTypes.EventKind.TreasuryRewardMintingV2,
+    ];
+    const storageHandler = new EventStorageHandler(models, node.chain, excludedEvents);
     const notificationHandler = new EventNotificationHandler(models, wss);
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
     const identityHandler = new IdentityHandler(models, node.chain);
