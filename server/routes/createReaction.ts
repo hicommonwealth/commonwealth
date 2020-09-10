@@ -56,7 +56,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
       default: options,
       include: [ models.Address]
     });
-    if (created) finalReaction = await models.OffchainReaction.find({
+    if (created) finalReaction = await models.OffchainReaction.findOne({
       where: options,
       include: [ models.Address]
     });
