@@ -22,6 +22,8 @@ import DiscussionRow from 'views/pages/discussions/discussion_row';
 import { getLastUpdate } from './weekly_listing';
 import Listing from '../listing';
 import PinnedListing from './pinned_listing';
+import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
+import Substrate from 'client/scripts/controllers/chain/substrate/main';
 
 interface IDiscussionPageState {
   lookback?: number;
