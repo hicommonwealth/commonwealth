@@ -18,6 +18,7 @@ export interface ISubstrateIdentityAttrs {
   linkify: boolean;
   profile: Profile;
   hideIdentityIcon: boolean; // only applies to substrate identities
+  addrShort: string;
 }
 
 export interface ISubstrateIdentityState {
@@ -34,10 +35,7 @@ const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAtt
       : null,
   }),
   view: (vnode) => {
-    const { profile, linkify, account } = vnode.attrs;
-    const addrShort = formatAddressShort(
-      account.address, typeof account.chain === 'string' ? account.chain : account.chain.id
-    );
+    const { profile, linkify, account, addrShort } = vnode.attrs;
 
     // return polkadot identity if possible
     let displayName: string;
@@ -79,10 +77,7 @@ const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAtt
 
 const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
   view: (vnode) => {
-    const { profile, linkify, account } = vnode.attrs;
-    const addrShort = formatAddressShort(
-      account.address, typeof account.chain === 'string' ? account.chain : account.chain.id
-    );
+    const { profile, linkify, account, addrShort } = vnode.attrs;
 
     const quality = profile?.isOnchain && profile?.name && getIdentityQuality(Object.values(profile.judgements));
 

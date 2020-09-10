@@ -97,7 +97,7 @@ const User: m.Component<{
         }, profile && profile.getAvatar(avatarSize)),
         (app.chain && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
           // substrate name
-          ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
+          ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon, addrShort }) : [
             // non-substrate name
             linkify
               ? link('a.user-display-name.username',
@@ -123,7 +123,7 @@ const User: m.Component<{
       ]),
       m('.user-name', [
         (app.chain && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
-          ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
+          ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort })
           : link(`a.user-display-name${
             (profile && profile.name !== 'Anonymous') ? '.username' : '.anonymous'}`,
           profile
