@@ -33,6 +33,9 @@ const User: m.Component<{
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
+
+    const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id);
+
     const adminsAndMods = app.chain
       ? app.chain.meta.chain.adminsAndMods
       : app.community ? app.community.meta.adminsAndMods : [];
@@ -101,8 +104,8 @@ const User: m.Component<{
                 profile
                   ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:',
-                profile ? profile.name : '--',)
-              : m('a.user-display-name.username', profile ? profile.name : '--')
+                profile ? profile.name : addrShort)
+              : m('a.user-display-name.username', profile ? profile.name : addrShort)
           ],
         showRole && roleTag,
       ]);
@@ -126,9 +129,9 @@ const User: m.Component<{
           profile
             ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
             : 'javascript:',
-          profile ? profile.name : '--',)
+          profile ? profile.name : addrShort)
       ]),
-      m('.user-address', formatAddressShort(profile.address, profile.chain)),
+      profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
       showRole && roleTag,
     ]);
 
