@@ -86,7 +86,7 @@ interface IPreHeaderState {
   rewardValue: number;
   networkValue: number;
   adjustedReward: number;
-  reward_rate: number;
+  rewardRate: number;
 }
 
 interface IPreHeaderAttrs {
@@ -114,76 +114,76 @@ const unique = (value, index, self) => {
 function resetValues(vnode) {
   vnode.state.selected_rate = vnode.state.staked;
   vnode.state.switch_mode = false;
-  vnode.state.stakingAmount = 1000;
+  vnode.state.stakingAmount = 10000;
   vnode.state.rewardValue = 0;
   vnode.state.networkValue = 0;
   vnode.state.adjustedReward = 0;
   vnode.state.rewardEdgPerDay = 0;
   vnode.state.reward_rate = 0;
-  vnode.state.stakingLength = 150;
+  vnode.state.stakingLength = 250;
   calculateInterest(vnode)
-  calculateNetworkValue(vnode);
+  //calculateNetworkValue(vnode);
 }
 
 function calculateRewardValue(vnode) {
   const astinf = (vnode.state.selected_asset as AssetInfo);
   const d = calcRewards(astinf, vnode.state.switch_mode, vnode.state.stakingAmount, vnode.state.stakingLength, vnode.state.totalbalance.inDollars, vnode.state.staked)
   vnode.state.rewardValue = d.earnings;
-  vnode.state.reward_rate = d.rewardRate
+  vnode.state.rewardRate = d.rewardRate;
+  vnode.state.networkValue = d.networkValue;
+  vnode.state.adjustedReward = d.adjustedReward;
+  
 }
 
 function calcRewards(astinf: AssetInfo, compound: boolean, stakingAmount: number, stakingLength: number, totalSupply: number, stakedSupply: number) {
-  const interestPerDay = ((astinf.calculatedInterestRate / 365));
-  let earnings = 0;
-
+  
   // hardcoded constants
-  astinf.calculatedInterestRate = 0.0431
+  
+  /* test constants 
+  let currentStakedPercent = 0.6533;
+  astinf.calculatedInterestRate = 0.052;
   astinf.rewardFrequencyHours = 24;
   totalSupply = 8102224;
-  stakedSupply = 5637527
+  stakedSupply = currentStakedPercent * totalSupply; 
+  */
 
-  if (compound) {
-    // compound mode
-    // P * ((1 + interestPerEra) ^ (sessionsPerDay * n ))
-    //earnings = (stakingAmount * (Math.pow((1 + interestPerEpoch), ((stakingLength * (24 / astinf.rewardFrequencyHours)))))) - stakingAmount
-
-    const sessions_per_day = (24 / astinf.rewardFrequencyHours);
-    const q = (1 + astinf.calculatedInterestRate);
-    const w = 1 / (365 * sessions_per_day);
-    const interest_per_era = (Math.pow(q, w)) - 1;
-    earnings = stakingAmount * Math.pow((1 + interest_per_era), (sessions_per_day * stakingLength));
-
-  } else {
-    // no compound
-    // i * P * n 
-    earnings = interestPerDay * stakingAmount * stakingLength
-  }
-
-  // Adjust Reward Calc
-  const share = (stakingAmount / totalSupply);
+  // for non compounding simple version
+  let earningsAtEnd = stakingAmount + (stakingAmount * astinf.calculatedInterestRate * (stakingLength/365));
+  let endTotalSupply = totalSupply + (stakedSupply * astinf.calculatedInterestRate * (365/365));
+  let currentNetworkShare = stakingAmount/totalSupply;  
+  let endNetworkShare = earningsAtEnd/endTotalSupply;
+  let diffNetworkShare = endNetworkShare - currentNetworkShare;
+  let adjustedReward = diffNetworkShare*(endTotalSupply/stakingAmount) * 100;
   
-  const supplyAtEnding =
-  compound ? ( (stakedSupply * Math.pow((1+ astinf.calculatedInterestRate ),(stakingLength / 365)) ) - stakedSupply + totalSupply) :
-  (totalSupply + ((astinf.calculatedInterestRate * stakedSupply))) // after year staked days
-  const myCoinsAtExit = stakingAmount + (stakingAmount * astinf.calculatedInterestRate * (stakingLength / 365))
-  const networkShareAtExit = myCoinsAtExit / supplyAtEnding
-  const diffInShare =  networkShareAtExit - share;
-  const adjustReward = diffInShare * (supplyAtEnding / stakingAmount)
-
-  console.log('share ', share)
-  console.log('totalSupply ', totalSupply)
-  console.log('stakedSupply ', stakedSupply)
-  console.log('stakingLength ', stakingLength)
-  console.log('supplyAtEnding ', supplyAtEnding)
-  console.log('myCoinsAtExit ', myCoinsAtExit)
-  console.log('calculatedInterestRate', astinf.calculatedInterestRate)
-  console.log('networkShareAtExit', networkShareAtExit)
-console.log('adjustReward', adjustReward * 100
-)
+  if (compound) {
+    console.log("running compound!")
+    // compound mode
+    let compoundInterestRate = Math.pow(1+astinf.calculatedInterestRate/365,365)-1;
+    let compoundEndEarnings = stakingAmount*Math.pow((1+compoundInterestRate),(stakingLength/365));
+    let compoundEndSupply = endTotalSupply - earningsAtEnd + compoundEndEarnings;
+    endNetworkShare = compoundEndEarnings/compoundEndSupply;
+    diffNetworkShare = endNetworkShare - currentNetworkShare;
+    adjustedReward = diffNetworkShare*(compoundEndSupply/stakingAmount) * 100;
+    earningsAtEnd = compoundEndEarnings;
+  }
+  let earnings = earningsAtEnd - stakingAmount
+  let rewardRate = (earnings / stakingAmount) * 100;
   earnings = (earnings - (earnings * astinf.commission));
+
+  currentNetworkShare = currentNetworkShare * 100;
+  if(currentNetworkShare > 100){
+    currentNetworkShare = 100;
+  }
+  console.log('networkValue: ', currentNetworkShare);
+  console.log('adjustedReward: ', adjustedReward);
+  console.log('earnings: ', earnings);
+  console.log('rewardRate: ', rewardRate);
+
   return {
     earnings: earnings,
-    rewardRate: earnings / stakingAmount
+    rewardRate: rewardRate,
+    networkValue: currentNetworkShare*100,
+    adjustedReward: adjustedReward
   }
 }
 
@@ -397,7 +397,7 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
       }, [
         m(".titlewithnumber_div", [m("span", "CURRENT HOLDING VALUE"), m("label", formatNumberShort(vnode.state.stakingAmount) + ' ' + vnode.state.selected_asset.sym.toUpperCase()), m("span"), m("label.bracket", "(" + formatNumberShort(vnode.state.stakingAmount * vnode.state.selected_asset.usd_value) + " USD)")]),
         m(".titlewithnumber_div", [m("span", "REWARD VALUE"), m("label", formatNumberShort(vnode.state.rewardValue) + ' ' + vnode.state.selected_asset.sym.toUpperCase()), m("span"), m("label.bracket", "(" + formatNumberShort(vnode.state.rewardValue * vnode.state.selected_asset.usd_value) + " USD)")]),
-        m(".titlewithnumber_div", [m("span.column-below", "REWARD RATE"), m("label", formatNumberShort(vnode.state.reward_rate * 100) + '%')]),
+        m(".titlewithnumber_div", [m("span.column-below", "REWARD RATE"), m("label", formatNumberShort(vnode.state.rewardRate) + '%')]),
         m(".titlewithnumber_div", [m("span.column-below", "REWARD FREQUENCY"), m("label", formatDuration(moment.duration(moment().add(vnode.state.selected_asset.rewardFrequencyHours, 'hours').diff(moment())), false))]),
         m(".titlewithnumber_div", [m("span.column-below", "NETWORK VALUE"), m("label", ((vnode.state.networkValue > 0 && vnode.state.networkValue < 100.0) ? vnode.state.networkValue.toFixed(6) : vnode.state.networkValue) + '%')]),
         m(".titlewithnumber_div", [m("span.column-below", "ADJUSTED REWARD"), m("label", formatNumberShort(vnode.state.adjustedReward) + '%')])
@@ -407,36 +407,36 @@ const StakingCalculatorPage = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderSt
         class: 'staking_calc_wrpr'
       }, [m(".row.title-row", [m(".title-div.col-xs-12", m("h5", "Returns"))]),
       m(".row.content-row", [
-        // m(CalculatorReturnsContent, {
-        //   rateInHour: 24, // 1 day = 24 hours
-        //   astinf: vnode.state.selected_asset,
-        //   switch_mode: vnode.state.switch_mode,
-        //   stakingAmount: vnode.state.stakingAmount,
-        //   stakingLength: 1, // 1 Day
-        //   class_val: '',
-        //   inventory_coins: vnode.state.totalbalance.inDollars,
-        //   staked_supply: vnode.state.staked
-        // }),
-        // m(CalculatorReturnsContent, {
-        //   rateInHour: 744, // 24 * 31 (hour * days)
-        //   astinf: vnode.state.selected_asset,
-        //   switch_mode: vnode.state.switch_mode,
-        //   stakingAmount: vnode.state.stakingAmount,
-        //   stakingLength: 30, // 1 Month
-        //   class_val: '.borderleft_right',
-        //   inventory_coins: vnode.state.totalbalance.inDollars,
-        //   staked_supply: vnode.state.staked
-        // }),
-        // m(CalculatorReturnsContent, {
-        //   rateInHour: 8928, // 24 * 31 * 12 (hour * days * years)
-        //   astinf: vnode.state.selected_asset,
-        //   switch_mode: vnode.state.switch_mode,
-        //   stakingAmount: vnode.state.stakingAmount,
-        //   stakingLength: 365, // 1 Year
-        //   class_val: '',
-        //   inventory_coins: vnode.state.totalbalance.inDollars,
-        //   staked_supply: vnode.state.staked
-        // })
+        m(CalculatorReturnsContent, {
+          rateInHour: 24, // 1 day = 24 hours
+          astinf: vnode.state.selected_asset,
+          switch_mode: vnode.state.switch_mode,
+          stakingAmount: vnode.state.stakingAmount,
+          stakingLength: 1, // 1 Day
+          class_val: '',
+          inventory_coins: vnode.state.totalbalance.inDollars,
+          staked_supply: vnode.state.staked
+        }),
+        m(CalculatorReturnsContent, {
+          rateInHour: 744, // 24 * 31 (hour * days)
+          astinf: vnode.state.selected_asset,
+          switch_mode: vnode.state.switch_mode,
+          stakingAmount: vnode.state.stakingAmount,
+          stakingLength: 30, // 1 Month
+          class_val: '.borderleft_right',
+          inventory_coins: vnode.state.totalbalance.inDollars,
+          staked_supply: vnode.state.staked
+        }),
+        m(CalculatorReturnsContent, {
+          rateInHour: 8928, // 24 * 31 * 12 (hour * days * years)
+          astinf: vnode.state.selected_asset,
+          switch_mode: vnode.state.switch_mode,
+          stakingAmount: vnode.state.stakingAmount,
+          stakingLength: 365, // 1 Year
+          class_val: '',
+          inventory_coins: vnode.state.totalbalance.inDollars,
+          staked_supply: vnode.state.staked
+        })
       ]),
 
       m(".row.button-row", m(".col-xs-12", m(Button, {
@@ -468,7 +468,7 @@ const CalculatorReturnsContent: m.Component<{
     const duration = (formatDuration(moment.duration(moment().add(vnode.attrs.rateInHour, 'hours').diff(moment())), false));
     const d = calcRewards(vnode.attrs.astinf, vnode.attrs.switch_mode, vnode.attrs.stakingAmount, vnode.attrs.stakingLength, vnode.attrs.inventory_coins, vnode.attrs.staked_supply)
     return m(`.returns_content_div.col-lg-4${vnode.attrs.class_val}`, [
-      m("strong", `${duration} @ ${formatNumberShort(d.rewardRate * 100)} %`),
+      m("strong", `${duration} @ ${formatNumberShort(d.rewardRate)} %`),
       m("p", `${formatNumberShort(d.earnings)} EDG`),
       m("span", `($ ${vnode.attrs.astinf.usd_value ? formatNumberShort(d.earnings * vnode.attrs.astinf.usd_value) : '--'})`)])
   }
