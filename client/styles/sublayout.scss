@@ -13,16 +13,6 @@
         margin: 0 auto;
         max-width: $layout-max-width;
     }
-    .sublayout-grid-col {
-        &.sublayout-grid-col-narrow {
-            padding-right: 30px;
-            @include sm-max {
-                padding-right: 0;
-            }
-        }
-        &.sublayout-grid-col-wide {
-        }
-    }
 
     .sublayout-header {
         display: flex;
@@ -31,6 +21,9 @@
         }
         margin-top: 28px;
         margin-bottom: 8px;
+        &.no-title {
+            margin-bottom: -60px;
+        }
         .sublayout-header-left {
             flex: 3;
             h4.sublayout-header-heading {

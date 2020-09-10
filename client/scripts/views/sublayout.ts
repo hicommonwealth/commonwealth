@@ -93,7 +93,9 @@ const Sublayout: m.Component<{
               span: 12,
               class: 'sublayout-grid-col sublayout-grid-col-wide'
             }, [
-              m('.sublayout-header', [
+              m('.sublayout-header', {
+                class: (!title && !description) ? 'no-title' : '',
+              }, [
                 m('.sublayout-header-left', [
                   title && m('h4.sublayout-header-heading', title),
                   description && m('.sublayout-header-description', description),
