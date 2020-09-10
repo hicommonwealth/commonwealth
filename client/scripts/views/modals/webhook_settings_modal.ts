@@ -5,6 +5,8 @@ import $ from 'jquery';
 import app from 'state';
 import { Button, List, ListItem, Checkbox } from 'construct-ui';
 import { Webhook } from 'models';
+import { NotificationCategories } from 'types';
+import { EdgewareChainNotificationTypes } from 'helpers/chain_notification_types';
 
 interface IAttrs {
     webhook: Webhook;
@@ -12,18 +14,50 @@ interface IAttrs {
 
 interface IState {
     selectedCategories: string[];
+    // webhook: Webhook;
 }
+const forumNotificationTypes = [
+    NotificationCategories.NewThread,
+    NotificationCategories.NewComment,
+    NotificationCategories.NewReaction,
+]
 
 const WebhookSettingsModal: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
-    vnode.state.selectedCategories = vnode.attrs.webhook.categories;
+    vnode.state.selectedCategories = [];
+    vnode.attrs.webhook.categories.forEach((v) => vnode.state.selectedCategories.push(v));
   },
   view: (vnode) => {
-      console.log('data', vnode.attrs);
     const { webhook } = vnode.attrs;
     console.log('webhook', webhook);
+    console.log('selectedCategories', vnode.state.selectedCategories);
     // const community = webhook.
     const isChain = webhook.chain_id ? true : false;
+    const row = (label: string, values: string[]) => {
+        const allValuesPresent = values.every((v) => vnode.state.selectedCategories.includes(v));
+        const someValuesPresent = values.length > 1 && values.some((v) => vnode.state.selectedCategories.includes(v));
+        return m(ListItem, {
+            contentLeft: label,
+            contentRight: m(Checkbox, {
+                checked: allValuesPresent,
+                indeterminate: someValuesPresent && !allValuesPresent,
+                onchange: (e) => {
+                    if (allValuesPresent) {
+                        vnode.state.selectedCategories = vnode.state.selectedCategories
+                            .filter((v) => !values.includes(v));
+                        m.redraw();
+                    } else {
+                        values.forEach((v) => {
+                            if (!vnode.state.selectedCategories.includes(v)) {
+                                vnode.state.selectedCategories.push(v);
+                            }
+                        });
+                        m.redraw();
+                    }
+                },
+            }),
+        });
+    }
     return m('.WebhookSettingsModal', [
         m('.title-section', [
             m('h4', 'Webhook options'),
@@ -31,31 +65,53 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
         ]),
         m('.forum-events', [
             m('h4', 'Off-chain events'),
-            // for community, iterate through options.
             m(List, {
                 interactive: false,
                 size: 'sm',
             }, [
-                m(ListItem, {
-                    contentLeft: 'New Thread',
-                    contentRight: m(Checkbox, {})
-                })
+                row('New Thread', [NotificationCategories.NewThread]),
+                row('New Comment', [NotificationCategories.NewComment]),
+                row('New Reaction', [NotificationCategories.NewReaction]),
             ])
         ]),
-        // isChain && 
-        m('.chain-events', [
-            m('h4', 'On-chain events'),
-            m(List, {
-                interactive: false,
-                size: 'sm',
-            }, [
-                // iterate chain events
-                m(ListItem, {
-                    contentLeft: 'Democracy',
-                    contentRight: m(Checkbox, {})
-                })
-            ])
-        ])
+        isChain && m('.chain-events', [
+          m('h4', 'On-chain events'),
+          m(List, {
+            interactive: false,
+            size: 'sm',
+          }, [
+            // iterate chain events
+            m(ListItem, {
+              contentLeft: 'Democracy',
+              contentRight: m(Checkbox, {})
+            })
+          ])
+        ]),
+        m(Button, {
+          label: 'Save Events',
+          onclick: (e) => {
+            const chainOrCommObj = webhook.chain_id
+              ? { chain: webhook.chain_id }
+              : { community: webhook.offchain_community_id };
+            $.ajax({
+              url: `${app.serverUrl()}/updateWebhook`,
+              data: {
+                webhookId: webhook.id,
+                categories: vnode.state.selectedCategories,
+                ...chainOrCommObj,
+                jwt: app.user.jwt,
+              },
+              type: 'POST',
+              success: (result) => {
+
+              },
+              error: (err) => {
+                console.dir(err);
+                m.redraw();
+              }
+            });
+          }
+        })
     ]);
   }
 };
