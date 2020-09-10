@@ -61,69 +61,69 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
         });
     }
     return m('.WebhookSettingsModal.compact-modal-body-max', [
-        m(CompactModalExitButton),
-        m('.title-section', [
-            m('h4', 'Webhook options'),
-            m('p', 'Which events should trigger a notification?'),
-        ]),
-        m('.forum-events', [
-            m('h4', 'Off-chain events'),
-            m(List, {
-                interactive: false,
-                size: 'sm',
-            }, [
-                row('New Thread', [NotificationCategories.NewThread]),
-                row('New Comment', [NotificationCategories.NewComment]),
-                row('New Reaction', [NotificationCategories.NewReaction]),
-            ])
-        ]),
-        isChain && m('.chain-events', [
-          m('h4', 'On-chain events'),
+      m(CompactModalExitButton),
+      m('.title-section', [
+          m('h4', 'Webhook options'),
+          m('p', 'Which events should trigger a notification?'),
+      ]),
+      m('.forum-events', [
+          m('h4', 'Off-chain events'),
           m(List, {
-            interactive: false,
-            size: 'sm',
+              interactive: false,
+              size: 'sm',
           }, [
-            // iterate chain events
-            m(ListItem, {
-              contentLeft: 'Democracy',
-              contentRight: m(Checkbox, {})
-            })
+              row('New Thread', [NotificationCategories.NewThread]),
+              row('New Comment', [NotificationCategories.NewComment]),
+              row('New Reaction', [NotificationCategories.NewReaction]),
           ])
-        ]),
-        m(Button, {
-          label: 'Save webhook settings',
-          onclick: (e) => {
-            e.preventDefault();
-            const chainOrCommObj = webhook.chain_id
-              ? { chain: webhook.chain_id }
-              : { community: webhook.offchain_community_id };
-            console.log({
+      ]),
+      isChain && m('.chain-events', [
+        m('h4', 'On-chain events'),
+        m(List, {
+          interactive: false,
+          size: 'sm',
+        }, [
+          // iterate chain events
+          m(ListItem, {
+            contentLeft: 'Democracy',
+            contentRight: m(Checkbox, {})
+          })
+        ])
+      ]),
+      m(Button, {
+        label: 'Save webhook settings',
+        onclick: (e) => {
+          e.preventDefault();
+          const chainOrCommObj = webhook.chain_id
+            ? { chain: webhook.chain_id }
+            : { community: webhook.offchain_community_id };
+          console.log({
+            webhookId: webhook.id,
+            categories: vnode.state.selectedCategories,
+            ...chainOrCommObj,
+            jwt: app.user.jwt,
+          })
+          $.ajax({
+            url: `${app.serverUrl()}/updateWebhook`,
+            data: {
               webhookId: webhook.id,
               categories: vnode.state.selectedCategories,
               ...chainOrCommObj,
               jwt: app.user.jwt,
-            })
-            $.ajax({
-              url: `${app.serverUrl()}/updateWebhook`,
-              data: {
-                webhookId: webhook.id,
-                categories: vnode.state.selectedCategories,
-                ...chainOrCommObj,
-                jwt: app.user.jwt,
-              },
-              type: 'POST',
-              success: (result) => {
-                const updatedWebhook = Webhook.fromJSON(result.result);
-                vnode.attrs.updateSuccessCallback(updatedWebhook);
-                $(vnode).trigger('modalexit');
-              },
-              error: (err) => {
-                console.dir(err);
-                m.redraw();
-              }
-            });
-          }
-        })
+            },
+            type: 'POST',
+            success: (result) => {
+              const updatedWebhook = Webhook.fromJSON(result.result);
+              vnode.attrs.updateSuccessCallback(updatedWebhook);
+              $(vnode).trigger('modalexit');
+            },
+            error: (err) => {
+              console.dir(err);
+              m.redraw();
+            }
+          });
+        }
+      })
     ]);
   }
 };
