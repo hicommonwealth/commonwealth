@@ -1,5 +1,6 @@
 import request from 'superagent';
 import { NotificationCategories } from '../shared/types';
+import { Op } from 'sequelize';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -12,7 +13,7 @@ export interface WebhookContent {
 }
 
 // do not send webhook notifications for noisy reaction types
-const SUPPRESSED_NOTIFICATION_TYPES = [NotificationCategories.NewReaction];
+// const SUPPRESSED_NOTIFICATION_TYPES = [NotificationCategories.NewReaction];
 
 const validURL = (str) => {
   const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
@@ -38,8 +39,8 @@ const getFilteredContent = (content, address) => {
 };
 
 const send = async (models, content: WebhookContent) => {
-  if (SUPPRESSED_NOTIFICATION_TYPES.indexOf(content.notificationCategory) !== -1) return;
-
+  // if (SUPPRESSED_NOTIFICATION_TYPES.indexOf(content.notificationCategory) !== -1) return;
+  console.log('webhook content', content);
   let address;
   try {
     address = await models.Address.findOne({ where: { address: content.user, chain: content.chain } });
@@ -56,7 +57,14 @@ const send = async (models, content: WebhookContent) => {
     ? { offchain_community_id: content.community }
     : { chain_id: content.chain };
   // grab all webhooks for specific community
-  const chainOrCommWebhooks = await models.Webhook.findAll({ where: chainOrCommObj });
+  const chainOrCommWebhooks = await models.Webhook.findAll({
+    where: {
+      ...chainOrCommObj,
+      categories: {
+        [Op.contains]: [content.notificationCategory],
+      },
+    },
+  });
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
     // We currently only support slack webhooks
