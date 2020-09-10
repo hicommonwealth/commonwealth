@@ -43,7 +43,18 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         if (result.status === 'Success') {
           vnode.state.success = true;
           notifySuccess('Success! Webhook created');
-          vnode.attrs.webhooks.push(Webhook.fromJSON(result.result));
+          const newWebhook = Webhook.fromJSON(result.result)
+          vnode.attrs.webhooks.push(newWebhook);
+          app.modals.create({
+            modal: WebhookSettingsModal,
+            data: {
+              webhook: newWebhook,
+              updateSuccessCallback: (webhook) => {
+                const idx = vnode.attrs.webhooks.findIndex((wh) => wh.id === webhook.id);
+                vnode.attrs.webhooks[idx].categories = webhook.categories;
+              }
+            }
+          });
           $webhookInput.val('');
         } else {
           vnode.state.failure = true;
