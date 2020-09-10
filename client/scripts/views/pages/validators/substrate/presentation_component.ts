@@ -76,7 +76,7 @@ const model = {
       value = value.toLowerCase();
 
       //fetch from already fetched list
-      console.log(" model.constValidators ", model.constValidators)
+      // console.log(" model.constValidators ", model.constValidators)
       model.constValidators.forEach((ele => {
         if ((ele.name?.toLowerCase().includes(value) || ele.stash_id.toLowerCase().includes(value)) && ele.state === model.state) {
           validators.push(ele);
@@ -94,7 +94,7 @@ const model = {
         });
         if (obj.length) {
           model.state === 'Active' ? model.activeStashes = obj : model.waitingStashes = obj;
-          console.log(obj, "obj");
+          // console.log(obj, "obj");
           model.prevIndex = 0;
           model.onSearch();
           m.redraw();
@@ -105,7 +105,7 @@ const model = {
         }
         return;
       }
-      console.log("fetched")
+      // console.log("fetched")
       result.validators = validators;
       m.redraw()
       return;
@@ -129,8 +129,8 @@ const model = {
 
     // 0console.log(validatorStashes.slice(prevIndex, nextIndex), "new fetched")
     if (validatorStashes.length && validatorStashes.length >= prevIndex) {
-      console.log("prevIndex", prevIndex)
-      console.log("nextIndex", nextIndex);
+      // console.log("prevIndex", prevIndex)
+      // console.log("nextIndex", nextIndex);
       // console.log("validatorStashes", validatorStashes);
       // console.log("model.activeStashes", model.activeStashes);
       validators = await (app.staking as any).validatorDetail(model.state, validatorStashes);
@@ -221,7 +221,6 @@ const model = {
     }
     model.searchValue = value;
     console.log("if no value");
-    value = undefined;
     if (model.state === 'Active') {
       // console.log(model.profile, "model.profile")
       model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
