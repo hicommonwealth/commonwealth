@@ -89,11 +89,18 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
           ])
         ]),
         m(Button, {
-          label: 'Save Events',
+          label: 'Save webhook settings',
           onclick: (e) => {
+            e.preventDefault();
             const chainOrCommObj = webhook.chain_id
               ? { chain: webhook.chain_id }
               : { community: webhook.offchain_community_id };
+            console.log({
+              webhookId: webhook.id,
+              categories: vnode.state.selectedCategories,
+              ...chainOrCommObj,
+              jwt: app.user.jwt,
+            })
             $.ajax({
               url: `${app.serverUrl()}/updateWebhook`,
               data: {
@@ -104,7 +111,8 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
               },
               type: 'POST',
               success: (result) => {
-
+                const updatedWebhook = Webhook.fromJSON(result.result);
+                vnode.attrs.updateSuccessCallback(updatedWebhook);
               },
               error: (err) => {
                 console.dir(err);

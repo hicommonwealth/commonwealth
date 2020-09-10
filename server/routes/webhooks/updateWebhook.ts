@@ -9,7 +9,7 @@ const updateWebhook = async (models, req: Request, res: Response, next: NextFunc
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
-
+  console.log('body', req.body);
   // only admins should be able to update webhooks
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const addresses = await req.user.getAddresses();
@@ -31,7 +31,7 @@ const updateWebhook = async (models, req: Request, res: Response, next: NextFunc
   });
   if (!existingWebhook) return next(new Error(Errors.NoWebhookFound));
 
-  await existingWebhook.update({ categories: req.body.categories, });
+  await existingWebhook.update({ categories: req.body['categories[]'], });
 
   return res.json({ status: 'Success', result: existingWebhook.toJSON() });
 };
