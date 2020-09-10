@@ -2,7 +2,7 @@ import 'sublayout.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { Button, Icons, Grid, Col } from 'construct-ui';
+import { EmptyState, Button, Icons, Grid, Col } from 'construct-ui';
 
 import NewProposalButton from 'views/components/new_proposal_button';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
@@ -12,8 +12,18 @@ import { CollectiveVotingButton, CandidacyButton, getCouncilCandidates } from '.
 import { SubstrateAccount } from '../controllers/chain/substrate/account';
 import Substrate from '../controllers/chain/substrate/main';
 
+import PageNotFound from 'views/pages/404';
+import Sidebar from 'views/components/sidebar';
+import RightSidebar from 'views/components/right_sidebar';
+
 const Sublayout: m.Component<{
-  class: string,
+  // overrides
+  loadingLayout?: boolean,
+  pageNotFoundLayout?: boolean,
+  errorLayout?,
+
+  // content
+  class?: string,
   title?: string,
   description?: string,
   showNewProposalButton?: boolean,
@@ -45,55 +55,60 @@ const Sublayout: m.Component<{
       showNewProposalButton && m(NewProposalButton, { fluid: false, councilCandidates }),
     ]);
 
-    return m('.Sublayout', { class: vnode.attrs.class }, [
-      m(Grid, { class: 'sublayout-grid' }, [
-        rightSidebar ? [
-          m(Col, {
-            span: { xs: 12, md: 3 },
-            order: { xs: 1, md: 2 },
-            class: 'sublayout-right-sidebar'
-          }, [
-            m('.sublayout-header', [
-              sublayoutHeaderRight,
-            ]),
-            m('.sublayout-sidebar', [
-              rightSidebar,
-            ]),
-          ]),
-          m(Col, {
-            span: { xs: 12, md: 9 },
-            order: { xs: 2, md: 1 },
-            class: 'sublayout-grid-col sublayout-grid-col-narrow'
-          }, [
-            (title || description) && m('.sublayout-header', [
-              m('.sublayout-header-left', [
-                title && m('h4.sublayout-header-heading', title),
-                description && m('.sublayout-header-description', description),
-              ]),
-            ]),
-            m('.sublayout-body', [
-              vnode.children,
-            ]),
-          ]),
-        ] : [
-          m(Col, {
-            span: 12,
-            class: 'sublayout-grid-col sublayout-grid-col-wide'
-          }, [
-            m('.sublayout-header', [
-              m('.sublayout-header-left', [
-                title && m('h4.sublayout-header-heading', title),
-                description && m('.sublayout-header-description', description),
-              ]),
-              sublayoutHeaderRight,
-            ]),
-            m('.sublayout-body', [
-              vnode.children,
-            ]),
-          ]),
-        ],
+    if (vnode.attrs.loadingLayout) return [
+      m(Sidebar),
+      m('.layout-container', [
+        m('.LoadingLayout'),
       ]),
-    ]);
+      m(RightSidebar, { rightSidebar }),
+    ];
+
+    if (vnode.attrs.errorLayout) return [
+      m(Sidebar),
+      m('.layout-container', [
+        m(EmptyState, {
+          fill: true,
+          icon: Icons.ALERT_TRIANGLE,
+          content: vnode.attrs.errorLayout,
+          style: 'color: #546e7b;'
+        }),
+      ]),
+      m(RightSidebar, { rightSidebar }),
+    ];
+
+    if (vnode.attrs.pageNotFoundLayout) return [
+      m(Sidebar),
+      m('.layout-container', [
+        m(PageNotFound)
+      ]),
+      m(RightSidebar, { rightSidebar }),
+    ];
+
+    return [
+      m(Sidebar),
+      m('.layout-container', [
+        m('.Sublayout', { class: vnode.attrs.class }, [
+          m(Grid, { class: 'sublayout-grid' }, [
+            m(Col, {
+              span: 12,
+              class: 'sublayout-grid-col sublayout-grid-col-wide'
+            }, [
+              m('.sublayout-header', [
+                m('.sublayout-header-left', [
+                  title && m('h4.sublayout-header-heading', title),
+                  description && m('.sublayout-header-description', description),
+                ]),
+                sublayoutHeaderRight,
+              ]),
+              m('.sublayout-body', [
+                vnode.children,
+              ]),
+            ]),
+          ]),
+        ]),
+      ]),
+      m(RightSidebar, { rightSidebar }),
+    ];
   }
 };
 

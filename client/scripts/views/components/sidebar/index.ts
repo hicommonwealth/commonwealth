@@ -17,7 +17,6 @@ import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import CommunitySelector, { CommunityLabel } from './community_selector';
-import CommunityInfoModule from './community_info_module';
 
 const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
   view: (vnode) => {
@@ -341,7 +340,6 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
         m('.SidebarHeader', m(CommunitySelector)),
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
-        (app.chain || app.community) && m(CommunityInfoModule),
         app.chain && m(ChainStatusModule),
       ])
     ];

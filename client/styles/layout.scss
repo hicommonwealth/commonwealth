@@ -111,18 +111,26 @@ pre {
     left: 0;
     width: $sidebar-width;
     height: 100%;
+    scroll-y: auto;
     background: $background-color-light;
 }
 
 .layout-container {
     padding-left: $sidebar-width;
+    padding-right: $sidebar-width;
 }
 .hidden-sidebar {
     .layout-container {
         padding-left: 0;
+        padding-right: 0;
     }
     .Sidebar {
         display: none;
+    }
+}
+@include md-max {
+    .layout-container {
+        padding-right: 0;
     }
 }
 @include sm-max {
@@ -153,5 +161,6 @@ pre {
         padding-top: $mobile-sidebar-height;
         width: 100%;
         padding-left: 0;
+        padding-right: 0;
     }
 }
