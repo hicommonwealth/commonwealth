@@ -6,7 +6,7 @@ import app from 'state';
 import { Button, List, ListItem, Checkbox } from 'construct-ui';
 import { Webhook } from 'models';
 import { NotificationCategories } from 'types';
-import { EdgewareChainNotificationTypes } from 'helpers/chain_notification_types';
+import { EdgewareChainNotificationTypes, KusamaChainNotificationTypes, KulupuChainNotificationTypes, PolkdotChainNotificationTypes } from 'helpers/chain_notification_types';
 import { CompactModalExitButton } from '../modal';
 
 interface IAttrs {
@@ -35,6 +35,11 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
     console.log('selectedCategories', vnode.state.selectedCategories);
     // const community = webhook.
     const isChain = webhook.chain_id ? true : false;
+    const chainNotifications = webhook.chain_id === 'edgeware' ? EdgewareChainNotificationTypes 
+      : webhook.chain_id === 'kusama' ? KusamaChainNotificationTypes
+        : webhook.chain_id === 'kulupu' ? KulupuChainNotificationTypes
+          : webhook.chain_id === 'polkadot' ? PolkdotChainNotificationTypes
+            : {};
     const row = (label: string, values: string[]) => {
         const allValuesPresent = values.every((v) => vnode.state.selectedCategories.includes(v));
         const someValuesPresent = values.length > 1 && values.some((v) => vnode.state.selectedCategories.includes(v));
@@ -84,10 +89,9 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
           size: 'sm',
         }, [
           // iterate chain events
-          m(ListItem, {
-            contentLeft: 'Democracy',
-            contentRight: m(Checkbox, {})
-          })
+          Object.keys(chainNotifications).map((k) => {
+            return row(k.toString(), chainNotifications[k]);
+          }),
         ])
       ]),
       m(Button, {
