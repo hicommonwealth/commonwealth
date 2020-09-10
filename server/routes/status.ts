@@ -46,6 +46,25 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
+
+  const recentThreads = await models.OffchainThread.findAll({
+    where: {
+      [Op.or]: [
+        {
+          chain: chains.map((c) => c.id),
+        },
+        {
+          community: publicCommunities.map((c) => c.id),
+        }
+      ],
+      created_at: {
+        [Op.gt]: moment().subtract(30, 'days')
+      }
+    }
+  });
+
+  console.log(recentThreads);
+
   const { user } = req;
 
   if (!user) {
@@ -103,14 +122,14 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   });
   const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
-  const recentThreads = await models.OffchainThread.findAll({
+  const recentThreads_ = await models.OffchainThread.findAll({
     where: {
       [Op.or]: [
         {
-          chain: chains,
+          chain: chains.map((c) => c.id),
         },
         {
-          community: allCommunities
+          community: allCommunities.map((c) => (c as any).id),
         }
       ],
       created_at: {
@@ -118,7 +137,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       }
     }
   });
-  console.log(recentThreads);
+  console.log(recentThreads_);
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
