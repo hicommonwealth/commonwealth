@@ -3,7 +3,7 @@ import { ChainInfo, CommunityInfo } from ".";
 class Webhook {
   public readonly id: number;
   public readonly url: string;
-  public readonly categories: string[];
+  public categories: string[];
   public readonly chain_id?: string;
   public readonly offchain_community_id?: string;
   public readonly Chain?: ChainInfo;
@@ -17,11 +17,6 @@ class Webhook {
     this.offchain_community_id = offchain_community_id;
     this.Chain = chain;
     this.OffchainCommunity = offchainCommunity
-  }
-
-  public label() {
-    const hi = this.url.match(/.*([^\.]+)(com|net|org|info|coop|int|co\.uk|org\.uk|ac\.uk|uk|__and so on__)$/);
-    console.log(hi);
   }
 
   public static fromJSON(json) {

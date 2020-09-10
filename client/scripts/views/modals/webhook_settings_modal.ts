@@ -10,6 +10,7 @@ import { EdgewareChainNotificationTypes } from 'helpers/chain_notification_types
 
 interface IAttrs {
     webhook: Webhook;
+    updateSuccessCallback: Function;
 }
 
 interface IState {

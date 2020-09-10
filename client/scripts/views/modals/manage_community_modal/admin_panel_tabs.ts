@@ -80,7 +80,16 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                     onclick: (e) => {
                       e.preventDefault();
                       console.log(webhook);
-                      app.modals.create({ modal: WebhookSettingsModal, data: { webhook } });
+                      app.modals.create({
+                        modal: WebhookSettingsModal,
+                        data: {
+                          webhook,
+                          updateSuccessCallback: (webhook) => {
+                            const idx = vnode.attrs.webhooks.findIndex((wh) => wh.id === webhook.id);
+                            vnode.attrs.webhooks[idx].categories = webhook.categories;
+                          }
+                        }
+                      });
                       return;
                     }
                   })
