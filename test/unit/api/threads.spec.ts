@@ -23,7 +23,10 @@ const markdownComment = require('../../util/fixtures/markdownComment');
 describe('Thread Tests', () => {
   const community = 'staking';
   const chain = 'ethereum';
-
+  // The createThread util uses the chainId parameter to determine
+  // author_chain, which is required for authorship lookup.
+  // Therefore, a valid chain MUST be included alongside
+  // communityId, unlike in non-test thread creation
   const title = 'test title';
   const body = 'test body';
   const topicName = 'test topic';
