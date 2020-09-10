@@ -13,6 +13,7 @@ import { SubstrateAccount } from '../controllers/chain/substrate/account';
 
 import PageNotFound from 'views/pages/404';
 import Sidebar from 'views/components/sidebar';
+import RightSidebar from 'views/components/right_sidebar';
 
 const Sublayout: m.Component<{
   // overrides
@@ -59,6 +60,7 @@ const Sublayout: m.Component<{
       m('.layout-container', [
         m('.LoadingLayout'),
       ]),
+      m(RightSidebar, { rightSidebar }),
     ];
 
     if (vnode.attrs.errorLayout) return [
@@ -71,6 +73,7 @@ const Sublayout: m.Component<{
           style: 'color: #546e7b;'
         }),
       ]),
+      m(RightSidebar, { rightSidebar }),
     ];
 
     if (vnode.attrs.pageNotFoundLayout) return [
@@ -78,6 +81,7 @@ const Sublayout: m.Component<{
       m('.layout-container', [
         m(PageNotFound)
       ]),
+      m(RightSidebar, { rightSidebar }),
     ];
 
     return [
@@ -85,54 +89,25 @@ const Sublayout: m.Component<{
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
           m(Grid, { class: 'sublayout-grid' }, [
-            rightSidebar ? [
-              m(Col, {
-                span: { xs: 12, md: 3 },
-                order: { xs: 1, md: 2 },
-                class: 'sublayout-right-sidebar'
-              }, [
-                m('.sublayout-header', [
-                  sublayoutHeaderRight,
+            m(Col, {
+              span: 12,
+              class: 'sublayout-grid-col sublayout-grid-col-wide'
+            }, [
+              m('.sublayout-header', [
+                m('.sublayout-header-left', [
+                  title && m('h4.sublayout-header-heading', title),
+                  description && m('.sublayout-header-description', description),
                 ]),
-                m('.sublayout-sidebar', [
-                  rightSidebar,
-                ]),
+                sublayoutHeaderRight,
               ]),
-              m(Col, {
-                span: { xs: 12, md: 9 },
-                order: { xs: 2, md: 1 },
-                class: 'sublayout-grid-col sublayout-grid-col-narrow'
-              }, [
-                (title || description) && m('.sublayout-header', [
-                  m('.sublayout-header-left', [
-                    title && m('h4.sublayout-header-heading', title),
-                    description && m('.sublayout-header-description', description),
-                  ]),
-                ]),
-                m('.sublayout-body', [
-                  vnode.children,
-                ]),
+              m('.sublayout-body', [
+                vnode.children,
               ]),
-            ] : [
-              m(Col, {
-                span: 12,
-                class: 'sublayout-grid-col sublayout-grid-col-wide'
-              }, [
-                m('.sublayout-header', [
-                  m('.sublayout-header-left', [
-                    title && m('h4.sublayout-header-heading', title),
-                    description && m('.sublayout-header-description', description),
-                  ]),
-                  sublayoutHeaderRight,
-                ]),
-                m('.sublayout-body', [
-                  vnode.children,
-                ]),
-              ]),
-            ],
+            ]),
           ]),
         ]),
       ]),
+      m(RightSidebar, { rightSidebar }),
     ];
   }
 };

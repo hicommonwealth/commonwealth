@@ -116,10 +116,12 @@ pre {
 
 .layout-container {
     padding-left: $sidebar-width;
+    padding-right: $sidebar-width;
 }
 .hidden-sidebar {
     .layout-container {
         padding-left: 0;
+        padding-right: 0;
     }
     .Sidebar {
         display: none;
@@ -153,5 +155,6 @@ pre {
         padding-top: $mobile-sidebar-height;
         width: 100%;
         padding-left: 0;
+        padding-right: 0;
     }
 }
