@@ -166,7 +166,6 @@ export const NewThreadForm: m.Component<{
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
     vnode.state.overwriteConfirmationModal = false;
-    console.log(app.community?.meta.topics.length || app.chain?.meta.topics);
     if (app.community?.meta.topics.length || app.chain?.meta.topics.length) {
       vnode.state.hasTopics = true;
     }
