@@ -61,14 +61,15 @@ const initChainEventTypes = (queryInterface, Sequelize, t) => {
     event_name,
   });
   const edgewareObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'edgeware'));
-
+  console.log('edgewareObjs');
+  console.log(edgewareObjs);
   // TODO: somehow switch this on for testing purposes?
-  // const edgewareLocalObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'edgeware-local'));
+  const edgewareLocalObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'edgeware-local'));
   return queryInterface.bulkInsert(
     'ChainEventTypes',
     [
       ...edgewareObjs,
-    //  ...edgewareLocalObjs
+      ...edgewareLocalObjs
     ],
     { transaction: t }
   );
@@ -133,15 +134,15 @@ module.exports = {
       }], { transaction: t });
 
       // TODO: TESTING ONLY
-      // await queryInterface.bulkInsert('Chains', [{
-      //   id: 'edgeware-local',
-      //   network: 'edgeware',
-      //   symbol: 'EDG',
-      //   name: 'Edgeware Local',
-      //   icon_url: '/static/img/protocols/edg.png',
-      //   active: true,
-      //   type: 'chain',
-      // }], { transaction: t });
+      await queryInterface.bulkInsert('Chains', [{
+        id: 'edgeware',
+        network: 'edgeware',
+        symbol: 'EDG',
+        name: 'Edgeware Local',
+        icon_url: '/static/img/protocols/edg.png',
+        active: true,
+        type: 'chain',
+      }], { transaction: t });
       // await queryInterface.bulkInsert('ChainNodes', [{
       //   chain: 'edgeware-local',
       //   url: 'localhost:9944',

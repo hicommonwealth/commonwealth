@@ -55,6 +55,16 @@ module.exports = {
       });
       const kusamaObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'kusama'));
 
+      await queryInterface.bulkInsert('Chains', [{
+        id: 'kusama',
+        network: 'kusama',
+        symbol: 'EDG',
+        name: 'Kusama',
+        icon_url: '/static/img/protocols/edg.png',
+        active: true,
+        type: 'chain',
+      }], { transaction: t });
+
       // TODO: somehow switch this on for testing purposes?
       return queryInterface.bulkInsert(
         'ChainEventTypes',

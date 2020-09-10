@@ -3,7 +3,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-
       const userChainAssociations = await queryInterface.sequelize.query(`
 SELECT DISTINCT user_id, chain FROM (
   SELECT DISTINCT u.id as user_id, o.chain FROM "OffchainThreads" o
@@ -57,12 +56,18 @@ UNION ALL
           created_at: new Date(),
           updated_at: new Date(),
         }));
-      }
+      };
 
       return Promise.all([
-        queryInterface.bulkInsert('Memberships', update(userChainAssociations[0]), { transaction: t }),
-        queryInterface.bulkInsert('Memberships', update(userPublicCommunityAssociations[0]), { transaction: t }),
-        queryInterface.bulkInsert('Memberships', update(userPrivateCommunityAssociations[0]), { transaction: t }),
+        update(userChainAssociations[0]).length
+          ? queryInterface.bulkInsert('Memberships', update(userChainAssociations[0]), { transaction: t })
+          : Promise.resolve(),
+        update(userPublicCommunityAssociations[0]).length
+          ? queryInterface.bulkInsert('Memberships', update(userPublicCommunityAssociations[0]), { transaction: t })
+          : Promise.resolve(),
+        update(userPrivateCommunityAssociations[0]).length
+          ? queryInterface.bulkInsert('Memberships', update(userPrivateCommunityAssociations[0]), { transaction: t })
+          : Promise.resolve(),
       ]);
     });
   },

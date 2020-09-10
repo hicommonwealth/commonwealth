@@ -41,11 +41,15 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date(),
         }));
-      }
+      };
 
       await Promise.all([
-        queryInterface.bulkInsert('Roles', update(addressChainAssociations[0]), { transaction: t }),
-        queryInterface.bulkInsert('Roles', update(addressPublicCommunityAssociations[0]), { transaction: t }),
+        update(addressChainAssociations[0]).length
+          ? queryInterface.bulkInsert('Roles', update(addressChainAssociations[0]), { transaction: t })
+          : Promise.resolve(),
+        update(addressPublicCommunityAssociations[0]).length
+          ? queryInterface.bulkInsert('Roles', update(addressPublicCommunityAssociations[0]), { transaction: t })
+          : Promise.resolve(),
       ]);
 
       // we can drop the memberships table now
@@ -119,7 +123,7 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date(),
         }));
-      }
+      };
 
       return Promise.all([
         queryInterface.bulkInsert('Memberships', update(userChainAssociations[0]), { transaction: t }),
