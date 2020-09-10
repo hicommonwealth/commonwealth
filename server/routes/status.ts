@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import '../types';
+import moment from 'moment';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -101,6 +102,23 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     }],
   });
   const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
+
+  const recentThreads = await models.OffchainThread.findAll({
+    where: {
+      [Op.or]: [
+        {
+          chain: chains,
+        },
+        {
+          community: allCommunities
+        }
+      ],
+      created_at: {
+        [Op.gt]: moment().subtract(30, 'days')
+      }
+    }
+  });
+  console.log(recentThreads);
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
