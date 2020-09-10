@@ -66,7 +66,7 @@ const emptyValidatorStatsInfo: IValidatorStatsInfo = {
   otherTotal: undefined,
   commission: undefined,
   points: undefined,
-}
+};
 
 export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValidatorPageState>({
   getObservables: (attrs) => ({
@@ -78,65 +78,68 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
   }),
   view: (vnode) => {
     const { account } = vnode.attrs;
-    let validators = (vnode.state.dynamic && vnode.state.dynamic.validators !== undefined) ? vnode.state.dynamic.validators : undefined;
-    let validatorStatInfo: IValidatorStatsInfo = validators ? (validators[vnode.attrs.address] ? {
+    const validators = (vnode.state.dynamic && vnode.state.dynamic.validators !== undefined) ? vnode.state.dynamic.validators : undefined;
+    const validatorStatInfo: IValidatorStatsInfo = validators ? (validators[vnode.attrs.address] ? {
       total: validators[vnode.attrs.address].exposure ? validators[vnode.attrs.address].exposure.total : undefined,
       own: validators[vnode.attrs.address].exposure ? validators[vnode.attrs.address].exposure.own : undefined,
       otherTotal: validators[vnode.attrs.address].otherTotal,
       commission: validators[vnode.attrs.address].commissionPer,
       points: validators[vnode.attrs.address].eraPoints,
     } : emptyValidatorStatsInfo) : emptyValidatorStatsInfo;
-
-    //console.log(formatCoin(app.chain.chain.coins(validators[vnode.attrs.address].exposure.total), true))
+    let nominators;
 
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
       && account.address === app.user.activeAccount?.address;
-    // SPINNER
-    // if (!validators) return m('div', m(Card, {
-    //   elevation: 1,
-    //   class: 'home-card',
-    //   fluid: true
-    // }, m(Spinner, {
-    //   fill: true,
-    //   message: 'Loading Stats...',
-    //   size: 'xs',
-    //   style: 'visibility: visible; opacity: 1;'
-    // })));
+    nominators =  (validators) ? validators[vnode.attrs.address].exposure.others.map(({ who, value }) => ({
+      stash: who.toString(),
+      balance: app.chain.chain.coins(value),
+    })) : [];
     return [m('.total-stake',
       m('.data-row',
         m('.profile-header',
           'TOTAL STAKE')),
       m('.info-row',
         m('.profile-data',
-                 validators && formatCoin(app.chain.chain.coins(validatorStatInfo.total), true)))),
+          validators && formatCoin(app.chain.chain.coins(validatorStatInfo.total), true)))),
     m('.own-stake',
       m('.data-row',
         m('.profile-header',
           'OWN STAKE')),
       m('.info-row',
         m('.profile-data',
-        validators && formatCoin(app.chain.chain.coins(validatorStatInfo.own), true)))),
+          validators && formatCoin(app.chain.chain.coins(validatorStatInfo.own), true)))),
     m('.other-stake',
       m('.data-row',
         m('.profile-header',
           'OTHER STAKE')), // TODOO: ADD A MODAL ON CLICK  by adding ViewNominatorsModal
       m('.info-row',
         m('.profile-data',
-        validators && formatCoin(app.chain.chain.coins(validatorStatInfo.otherTotal), true)))),
+          validators && nominators.length === 0 && formatCoin(app.chain.chain.coins(validatorStatInfo.otherTotal), true),
+          validators && nominators.length > 0 && [
+            m('a.val-nominators.padding-left-2', {
+              href: '#',
+              onclick: (e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: ViewNominatorsModal,
+                  data: { nominators, validatorAddr: vnode.attrs.address }
+                });
+              }
+            }, `${formatCoin(app.chain.chain.coins(validatorStatInfo.otherTotal), true)} (${nominators.length})`)]))),
     m('.commision',
       m('.data-row',
         m('.profile-header',
           'COMMISION')),
       m('.info-row',
         m('.profile-data',
-        validators && validatorStatInfo.commission ))),
+          validators && validatorStatInfo.commission))),
     m('.era-points',
       m('.data-row',
         m('.profile-header',
           'POINTS')),
       m('.info-row',
         m('.profile-data',
-        validators && validatorStatInfo.points)))];
+          validators && validatorStatInfo.points)))];
   }
 });
 
