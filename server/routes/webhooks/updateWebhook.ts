@@ -28,8 +28,7 @@ const updateWebhook = async (models, req: Request, res: Response, next: NextFunc
     },
   });
   if (!existingWebhook) return next(new Error(Errors.NoWebhookFound));
-  
-  existingWebhook.categories = typeof req.body['categories[]'] === "string" ? [req.body['categories[]']] : req.body['categories[]'];
+  existingWebhook.categories = typeof req.body['categories[]'] === "string" ? [req.body['categories[]']] : req.body['categories[]'] || [];
   await existingWebhook.save();
   return res.json({ status: 'Success', result: existingWebhook.toJSON() });
 };
