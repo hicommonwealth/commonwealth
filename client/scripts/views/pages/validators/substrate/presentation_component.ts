@@ -55,7 +55,7 @@ const model = {
   constValidators: [],
   async onSearchHandler(value?: string) {
 
-    console.log("valueee ", value);
+    console.log("value ", value);
     // if search option is provided
     if (value) {
       model.searchIsOn = true;
@@ -82,10 +82,10 @@ const model = {
           validators.push(ele);
         }
       }));
-      console.log("fetch from already fetched list", validators);
+      // console.log("fetch from already fetched list", validators);
 
       if (!validators.length) {
-        console.log("fetching from outside")
+        // console.log("fetching from outside")
         let obj = [];
         model.extraOp.forEach((ele) => {
           if (ele.toLowerCase().includes(value)) {
@@ -145,10 +145,24 @@ const model = {
 
   },
   async onSearch() {
-    let validatorStashes: any = model.activeStashes;
-    if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
-    let { prevIndex, nextIndex } = model;
+    let validatorStashes: any = [];
     let validators: any = [];
+    let { prevIndex, nextIndex } = model;
+
+    if (model.state === 'Active') {
+      if (!model.activeStashes?.length) {
+        result.validators = [];
+        model.searchIsOn = true;
+      } else validatorStashes = model.activeStashes;
+    }
+    else {
+      if (!model.waitingStashes?.length) {
+        result.validators = [];
+        model.searchIsOn = true;
+      } else validatorStashes = model.waitingStashes;
+    }
+
+
     if (validatorStashes.length && validatorStashes.length >= prevIndex) {
       validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
       result.validators = [...result.validators, ...validators?.validators];
@@ -159,8 +173,20 @@ const model = {
     }
   },
   async refresh() {
-    let validatorStashes: any = model.activeStashes;
-    if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
+    let validatorStashes: any = [];
+
+    if (model.state === 'Active') {
+      if (!model.activeStashes?.length) {
+        result.validators = [];
+        model.searchIsOn = true;
+      } else validatorStashes = model.activeStashes;
+    }
+    else {
+      if (!model.waitingStashes?.length) {
+        result.validators = [];
+        model.searchIsOn = true;
+      } else validatorStashes = model.waitingStashes;
+    }
 
     model.prevIndex = 0;
     model.nextIndex = pageSize;
@@ -214,13 +240,13 @@ const model = {
       model.onSearchHandler(model.searchValue);
   },
   async onReverseSearch(value?) {
-    console.log("calling reverse");
+    // console.log("calling reverse");
     if (value && value.trim()) {
       model.onSearchHandler(value);
       return;
     }
     model.searchValue = value;
-    console.log("if no value");
+    // console.log("if no value");
     if (model.state === 'Active') {
       // console.log(model.profile, "model.profile")
       model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
