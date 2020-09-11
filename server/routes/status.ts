@@ -104,11 +104,15 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       }
     }
   });
-  console.log({ recentThreads, recentComments, recentReactions });
 
   const { user } = req;
 
   if (!user) {
+    const activeAddresses = _.uniq(recentThreads.map((t) => t.address_id).concat(
+      recentComments.map((c) => c.address_id).concat(
+        recentReactions.map((r) => r.address_id)
+      )
+    ));
     return res.json({
       chains,
       nodes,
@@ -116,6 +120,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       contractCategories,
       communities: publicCommunities,
       notificationCategories,
+      activeAddresses,
       loggedIn: false,
     });
   }
@@ -182,7 +187,12 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       }
     }
   });
-  console.log(recentThreads_);
+
+  const activeAddresses = _.uniq(recentThreads_.map((t) => t.address_id).concat(
+    recentComments.map((c) => c.address_id).concat(
+      recentReactions.map((r) => r.address_id)
+    )
+  ));
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
@@ -250,6 +260,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     offchainTopics,
     contractCategories,
     notificationCategories,
+    activeAddresses,
     roles,
     invites,
     loggedIn: true,
