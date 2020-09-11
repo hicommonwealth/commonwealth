@@ -45,9 +45,50 @@ const matrixFormat = (content, address) => {
   };
 }
 
+const telegramFormat = (content, address) => {
+  return {
+
+  }
+}
+
 const discordFormat = (content, address?) => {
   return {
-    'content': `${getFilteredContent(content, address).join('\n')}`,
+    'username': 'Commonwealth',
+    'avatar_url': 'https://commonwealth.im/static/img/logo.png',
+    // 'content': ``,
+    "embeds": [
+      {
+        "author": {
+          "name": `${address ? address.name : content.user}`,
+          "url": `${content.url}`,
+          "icon_url": "https://commonwealth.im/static/img/logo.png"
+        },
+        "title": `${decodeURIComponent(content.title)}`,
+        "url": `${content.url}`,
+        "description": `Type: ${content.notificationCategory}`,
+        "color": 15258703,
+        "fields": [
+          {
+            "name": "Text",
+            "value": "More text",
+            "inline": true
+          },
+          {
+            "name": "Even more text",
+            "value": "Yup",
+            "inline": true
+          },
+          {
+            "name": "Thanks!",
+            "value": "You're welcome :wink:"
+          }
+        ],
+        "footer": {
+          "text": "–Commonwealth Labs :star:",
+          "icon_url": "https://commonwealth.im/static/img/logo.png"
+        }
+      }
+    ]
   }
 }
 
