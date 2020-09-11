@@ -20,4 +20,13 @@ describe('Event Tests', () => {
     expect(res.body.status).to.be.equal('Success');
     expect(res.body.validators).to.not.be.null;
   });
+
+  it('should grab all imonline events for Edgeware', async () => {
+    const res = await chai.request(app)
+      .get('/api/getImOnline')
+      .set('Accept', 'application/json')
+      .query({ chain });
+    expect(res.body.status).to.be.equal('Success');
+    expect(res.body.slashes).to.not.be.null;
+  });
 });
