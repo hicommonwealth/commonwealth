@@ -108,11 +108,16 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   const { user } = req;
 
   if (!user) {
-    const activeAddresses = _.uniq(recentThreads.map((t) => t.address_id).concat(
-      recentComments.map((c) => c.address_id).concat(
-        recentReactions.map((r) => r.address_id)
-      )
-    ));
+    const activeAddresses = {};
+    const allContent = recentThreads.concat(recentComments).concat(recentReactions);
+    allContent.forEach((item) => {
+      const entity = item.community || item.chain;
+      if (activeAddresses[entity] && activeAddresses[entity].includes(item.address) === -1) {
+        activeAddresses[entity].push(item.address);
+      } else if (!activeAddresses[entity]) {
+        activeAddresses[entity] = [item.address];
+      }
+    });
     return res.json({
       chains,
       nodes,
@@ -188,11 +193,17 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     }
   });
 
-  const activeAddresses = _.uniq(recentThreads_.map((t) => t.address_id).concat(
-    recentComments.map((c) => c.address_id).concat(
-      recentReactions.map((r) => r.address_id)
-    )
-  ));
+  const activeAddresses = {};
+  const allContent = recentThreads.concat(recentComments).concat(recentReactions);
+  allContent.forEach((item) => {
+    const entity = item.community || item.chain;
+    if (activeAddresses[entity] && activeAddresses[entity].includes(item.address) === -1) {
+      activeAddresses[entity].push(item.address);
+    } else if (!activeAddresses[entity]) {
+      activeAddresses[entity] = [item.address];
+    }
+  });
+  console.log(activeAddresses);
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
