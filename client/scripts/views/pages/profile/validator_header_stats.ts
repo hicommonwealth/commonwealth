@@ -90,9 +90,9 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
 
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
       && account.address === app.user.activeAccount?.address;
-    nominators =  (validators) ? validators[vnode.attrs.address].exposure.others.map(({ who, value }) => ({
+    nominators = (validators) ? validators[vnode.attrs.address]?.exposure.others.map(({ who, value }) => ({
       stash: who.toString(),
-      balance: app.chain.chain.coins(value),
+      balance: app.chain.chain.coins(value)
     })) : [];
     return [m('.total-stake',
       m('.data-row',
@@ -114,8 +114,8 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
           'OTHER STAKE')), // TODOO: ADD A MODAL ON CLICK  by adding ViewNominatorsModal
       m('.info-row',
         m('.profile-data',
-          validators && nominators.length === 0 && formatCoin(app.chain.chain.coins(validatorStatInfo.otherTotal), true),
-          validators && nominators.length > 0 && [
+          validators && nominators?.length === 0 && formatCoin(app.chain.chain.coins(validatorStatInfo.otherTotal), true),
+          validators && nominators?.length > 0 && [
             m('a.val-nominators.padding-left-2', {
               href: '#',
               onclick: (e) => {
