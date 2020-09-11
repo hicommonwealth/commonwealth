@@ -109,13 +109,22 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
 
   if (!user) {
     const activeAddresses = {};
+    const activeThreadCount = {};
     const allContent = recentThreads.concat(recentComments).concat(recentReactions);
     allContent.forEach((item) => {
       const entity = item.community || item.chain;
-      if (activeAddresses[entity] && activeAddresses[entity].includes(item.address) === -1) {
-        activeAddresses[entity].push(item.address);
+      if (activeAddresses[entity] && !activeAddresses[entity].includes(item.address_id)) {
+        activeAddresses[entity].push(item.address_id);
       } else if (!activeAddresses[entity]) {
-        activeAddresses[entity] = [item.address];
+        activeAddresses[entity] = [item.address_id];
+      }
+    });
+    recentThreads.forEach((thread) => {
+      const entity = thread.community || thread.chain;
+      if (activeThreadCount[entity]) {
+        activeThreadCount[entity].push(thread.address_id);
+      } else if (!activeThreadCount[entity]) {
+        activeThreadCount[entity] = [thread.address_id];
       }
     });
     return res.json({
@@ -126,6 +135,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       communities: publicCommunities,
       notificationCategories,
       activeAddresses,
+      activeThreadCount,
       loggedIn: false,
     });
   }
@@ -194,6 +204,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   });
 
   const activeAddresses = {};
+  const activeThreadCount = {};
   const allContent = recentThreads_.concat(recentComments).concat(recentReactions);
   allContent.forEach((item) => {
     const entity = item.community || item.chain;
@@ -201,6 +212,14 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       activeAddresses[entity].push(item.address_id);
     } else if (!activeAddresses[entity]) {
       activeAddresses[entity] = [item.address_id];
+    }
+  });
+  recentThreads_.forEach((thread) => {
+    const entity = thread.community || thread.chain;
+    if (activeThreadCount[entity]) {
+      activeThreadCount[entity].push(thread.address_id);
+    } else if (!activeThreadCount[entity]) {
+      activeThreadCount[entity] = [thread.address_id];
     }
   });
 
