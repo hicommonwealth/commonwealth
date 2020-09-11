@@ -2,24 +2,24 @@ import * as Sequelize from 'sequelize';
 import { Validators } from '../../client/scripts/views/pages/validators/index';
 
 export interface HistoricalValidatorStatisticsAttributes {
-    id: number,
-    stash: string;
-    block: string;
-    exposure: string[];
-    commissionPer?: number;
-    apr?: number;
-    uptime?: string;
-    movingAverages?: number;
-    hasMessage: boolean;
-    isOnline: boolean,
-    eraPoints: number,
-    isElected: boolean,
-    toBeElected: boolean,
-    blockCount: number,
-    otherTotal: string,
-    name: string,
-    created_at?: Date;
-    updated_at?: Date;
+  id: number,
+  stash: string;
+  block: string;
+  exposure: string[];
+  commissionPer?: number;
+  apr?: number;
+  uptime?: string;
+  movingAverages?: number;
+  hasMessage: boolean;
+  isOnline: boolean,
+  eraPoints: number,
+  isElected: boolean,
+  toBeElected: boolean,
+  blockCount: number,
+  otherTotal: string,
+  name: string,
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface HistoricalValidatorStatisticsInstance extends Sequelize.Instance<HistoricalValidatorStatisticsAttributes>, HistoricalValidatorStatisticsAttributes {
@@ -55,7 +55,8 @@ export default (
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
     timestamps: true,
-    underscored: true
+    underscored: true,
+    freezeTableName: true,
   });
   HistoricalValidatorStatistics.associate = (models) => {
     models.HistoricalValidatorStatistic.belongsTo(models.Validator, { foreignKey: 'stash' });

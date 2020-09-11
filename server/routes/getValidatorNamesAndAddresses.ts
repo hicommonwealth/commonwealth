@@ -12,7 +12,7 @@ const getValidatorNamesAndAddresses = async (models, req: Request, res: Response
 
     const validatorAddresses = validators.map((obj) => {
       return {
-        stash_id: obj.stash,
+        stash: obj.stash,
         state: obj.state
       };
     });
@@ -34,7 +34,7 @@ const getValidatorNamesAndAddresses = async (models, req: Request, res: Response
 
     const profileData = profile?.map((element) => {
       element.data = JSON.parse(element.data);
-      const { state } = validatorAddresses.find((obj) => obj.stash_id === element.Address?.address);
+      const { state } = validatorAddresses.find((obj) => obj.stash === element.Address?.address);
       const setProfile = {
         name: element.data.name,
         address: element.Address?.address,
@@ -47,14 +47,14 @@ const getValidatorNamesAndAddresses = async (models, req: Request, res: Response
     for (const profile of profileData) {
       for (const address of validatorAddresses) {
         // console.log("profile ", profile)
-        if (profile.address === address.stash_id) {
+        if (profile.address === address.stash) {
           await models.Validator.update(
             {
               name: profile.name
             },
             {
               where: {
-                stash: address.stash_id
+                stash: address.stash
               },
             }
           );

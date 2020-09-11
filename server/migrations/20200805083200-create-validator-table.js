@@ -9,10 +9,10 @@ module.exports = {
       sessionKeys: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false }, // AccountID[]
       state: { type: DataTypes.STRING, allowNull: false }, // Active/waiting/inactive
       lastUpdate: { type: DataTypes.BIGINT, allowNull: false }, // blocknumber
-      createdAt: {
+      created_at: {
         type: DataTypes.DATE
       },
-      updatedAt: {
+      updated_at: {
         type: DataTypes.DATE
       }
     });
