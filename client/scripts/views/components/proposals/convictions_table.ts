@@ -13,7 +13,7 @@ import SubstrateChain from 'client/scripts/controllers/chain/substrate/shared';
 
 export const ConvictionsChooser = {
   view: (vnode) => {
-    if (!vnode.attrs.callback) throw new Error('Misconfigured');
+    if (!vnode.attrs.callback) return;
 
     return m('.ConvictionsChooser', {
       oncreate: () => {
@@ -23,7 +23,8 @@ export const ConvictionsChooser = {
       }
     }, [
       convictions().map((c) => m(Button, {
-        intent: 'primary',
+        size: 'sm',
+        intent: vnode.state.selectedConviction === c.toString() ? 'primary' : 'none',
         active: vnode.state.selectedConviction === c.toString(),
         onclick: ((e) => {
           e.preventDefault();

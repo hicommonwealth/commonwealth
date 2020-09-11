@@ -99,7 +99,7 @@ const applyInlineFormatters = (text, hideFormatting) => {
   return result;
 };
 
-function applyBlockFormatters(parentText, hideFormatting) {
+function applyBlockFormatters(parentText, hideFormatting, collapse) {
   const sections = parentText.split('\n\n');
   return sections.map((section) => {
     const lines = section.split('\n')
@@ -108,47 +108,47 @@ function applyBlockFormatters(parentText, hideFormatting) {
 
     const blockFormatters = [{
       pattern: /^# /,
-      formatMany: (text) => m(hideFormatting ? 'div' : 'h1', text),
+      formatMany: (text) => m(collapse ? 'span' : hideFormatting ? 'div' : 'h1', text),
       formatOne: (text, match) => hideFormatting
         ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^## /,
-      formatMany: (text) => m(hideFormatting ? 'div' : 'h2', text),
+      formatMany: (text) => m(collapse ? 'span' : hideFormatting ? 'div' : 'h2', text),
       formatOne: (text, match) => hideFormatting
         ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^### /,
-      formatMany: (text) => m(hideFormatting ? 'div' : 'h3', text),
+      formatMany: (text) => m(collapse ? 'span' : hideFormatting ? 'div' : 'h3', text),
       formatOne: (text, match) => hideFormatting
         ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^> /,
-      formatMany: (text) => m(hideFormatting ? 'div' : 'blockquote', text),
+      formatMany: (text) => m(collapse ? 'span' : hideFormatting ? 'div' : 'blockquote', text),
       formatOne: (text, match) => hideFormatting
         ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^(- |\* |• |· )/,
-      formatMany: (text) => m(hideFormatting ? 'div' : 'ul', text),
+      formatMany: (text) => m(collapse ? 'span' : hideFormatting ? 'div' : 'ul', text),
       formatOne: (text, match) => hideFormatting
         ? [] : m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^ {1,2}(- |\* |• |· )/,
-      formatMany: (text) => m(hideFormatting ? 'div' : 'ul', m('ul', text)),
+      formatMany: (text) => m(collapse ? 'span' : hideFormatting ? 'div' : 'ul', m('ul', text)),
       formatOne: (text, match) => hideFormatting
         ? [] : m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^ {3,4}(- |\* |• |· )/,
-      formatMany: (text) => m(hideFormatting ? 'div' : 'ul', m('ul', m('ul', text))),
+      formatMany: (text) => m(collapse ? 'span' : hideFormatting ? 'div' : 'ul', m('ul', m('ul', text))),
       formatOne: (text, match) => hideFormatting
         ? [] : m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^ {5,}(- |\* |• |· )/,
-      formatMany: (text) => m(hideFormatting ? 'div' : 'ul', m('ul', m('ul', m('ul', (text))))),
+      formatMany: (text) => m(collapse ? 'span' : hideFormatting ? 'div' : 'ul', m('ul', m('ul', m('ul', (text))))),
       formatOne: (text, match) => hideFormatting
         ? [] : m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^\[([ x])\] /,
-      formatMany: (text) => m(hideFormatting ? 'div' : 'ul.checklist', text),
+      formatMany: (text) => m(collapse ? 'span' : hideFormatting ? 'div' : 'ul.checklist', text),
       formatOne: (text, match) => hideFormatting
         ? []
         : m(`li${match.includes('x') ? '.checked' : '.unchecked'}`, [
@@ -161,8 +161,8 @@ function applyBlockFormatters(parentText, hideFormatting) {
     // and will be formatted using `defaultGroup`. See the
     // special-casing code further down.
     const defaultGroup = (children) => {
-      return m('div', children.map((text) => {
-        return m('div', applyInlineFormatters(text, hideFormatting));
+      return m(collapse ? 'span' : 'div', children.map((text) => {
+        return m(collapse ? 'span' : 'div', applyInlineFormatters(text, hideFormatting));
       }));
     };
 
@@ -231,15 +231,17 @@ const MarkdownFormattedText : m.Component<{ doc: string, hideFormatting?: boolea
       if (match.index > lastMatchEndingIndex) {
         results.push(
           applyBlockFormatters(
-            doc.slice(lastMatchEndingIndex, match.index), hideFormatting
+            doc.slice(lastMatchEndingIndex, match.index), hideFormatting, collapse
           )
         );
       }
       if (!hideFormatting) results.push(m('pre', matchContent.replace(/^\s+|\s+$/g, '')));
       lastMatchEndingIndex = match.index + match[0].length;
     }
-    results.push(applyBlockFormatters(doc.slice(lastMatchEndingIndex), hideFormatting));
-    return m('.MarkdownFormattedText', results);
+    results.push(applyBlockFormatters(doc.slice(lastMatchEndingIndex), hideFormatting, collapse));
+    return m('.MarkdownFormattedText', {
+      class: collapse ? 'collapsed' : '',
+    }, results);
   }
 };
 

@@ -158,4 +158,31 @@ describe('Edgeware Archival Event Handler Tests', () => {
     assert.deepEqual(dbEvent, handledDbEvent);
     assert.isNull(dbEvent.entity_id);
   });
+
+  it('should ignore duplicate entities', async () => {
+    const event: CWEvent<SubstrateTypes.IEventData> = {
+      blockNumber: 10,
+      data: {
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
+        referendumIndex: 3,
+        endBlock: 100,
+        proposalHash: 'hash',
+        voteThreshold: 'Supermajorityapproval',
+      }
+    };
+
+    const dbEvent = await setupDbEvent(event);
+    const eventHandler = new EntityArchivalHandler(models, 'edgeware');
+
+    // process event twice
+    const handledDbEvent = await eventHandler.handle(event, dbEvent);
+    const duplicateEvent = await eventHandler.handle(event, dbEvent);
+
+    // verify outputs
+    assert.deepEqual(handledDbEvent, duplicateEvent);
+    const chainEntities = await models['ChainEntity'].findAll();
+    assert.lengthOf(chainEntities, 1);
+    const entity = await handledDbEvent.getChainEntity();
+    assert.deepEqual(entity.toJSON(), chainEntities[0].toJSON());
+  });
 });

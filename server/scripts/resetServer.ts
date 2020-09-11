@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { EventSupportingChains, SubstrateTypes, MolochTypes } from '@commonwealth/chain-events';
+import { EventSupportingChains, SubstrateTypes, MolochTypes, chainSupportedBy } from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
@@ -440,8 +440,8 @@ const resetServer = (models, closeMiddleware) => {
     await Promise.all(nodes.map(([ url, chain, address ]) => (models.ChainNode.create({ chain, url, address }))));
 
     // initialize chain event types
-    const initChainEventTypes = (chain) => {
-      if (SubstrateTypes.EventChains.includes(chain)) {
+    const initChainEventTypes = (chain: string) => {
+      if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
         return Promise.all(
           SubstrateTypes.EventKinds.map((event_name) => {
             return models.ChainEventType.create({
@@ -451,7 +451,7 @@ const resetServer = (models, closeMiddleware) => {
             });
           })
         );
-      } else if (MolochTypes.EventChains.includes(chain)) {
+      } else if (chainSupportedBy(chain, MolochTypes.EventChains)) {
         return Promise.all(
           MolochTypes.EventKinds.map((event_name) => {
             return models.ChainEventType.create({

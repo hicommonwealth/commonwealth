@@ -112,6 +112,10 @@ heroku pg:copy <PRODUCTION_APP>::<PRODUCTION_DB_URL> <STAGING_DB_URL> -a <STAGIN
 heroku maintenance:off -a <STAGING_APP>
 ```
 
+## Production Logs
+
+To view production logs: `heroku addons:open timber-logging`
+
 ## Frontend Code Style
 
 Set up global linters (e.g. eslint and stylelint) to make sure your code is formatted properly.
@@ -147,13 +151,20 @@ brew cask install now
 brew tap heroku/brew && brew install heroku
 ```
 
-Setting up a server environment:
+To set up a server environment:
 
 ```
 heroku git:remote --app <PRODUCTION_APP>
 heroku config:set [Set up session secrets, API keys, OAuth tokens, etc.]
 yarn deploy
 ```
+
+You should now set up any databases and services needed. In particular:
+
+- Heroku Postgres for databases
+- Scheduler for sending emails
+- Timber.io for logging
+
 
 ## Chat Server
 

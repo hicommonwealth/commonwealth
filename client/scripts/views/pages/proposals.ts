@@ -56,24 +56,6 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
           ' days'
         ]),
       ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Next treasury spend'),
-          (app.chain as Substrate).treasury.nextSpendBlock
-            ? m(CountdownUntilBlock, {
-              block: (app.chain as Substrate).treasury.nextSpendBlock,
-              includeSeconds: false
-            })
-            : '--',
-        ]),
-      ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        // TODO: Pot is under construction
-        m('.stats-tile', [
-          m('.stats-heading', 'Treasury balance'),
-          app.chain && formatCoin((app.chain as Substrate).treasury.pot),
-        ]),
-      ]),
     ]);
     // onMoloch && m('.stats-tile', [
     //   m('.stats-tile-label', 'DAO Basics'),
@@ -117,8 +99,6 @@ const ProposalsPage: m.Component<{}> = {
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 
     // active proposals
-    const activeDemocracyReferenda = onSubstrate
-      && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed);
     const activeDemocracyProposals = onSubstrate
       && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed);
     const activeCouncilProposals = onSubstrate
@@ -126,8 +106,6 @@ const ProposalsPage: m.Component<{}> = {
     const activeSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
       && (app.chain as Edgeware).signaling.store.getAll()
         .filter((p) => !p.completed).sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
-    const activeTreasuryProposals = onSubstrate
-      && (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed);
     const activeCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
       && (app.chain as Cosmos).governance.store.getAll()
         .filter((p) => !p.completed).sort((a, b) => +b.identifier - +a.identifier);
@@ -135,27 +113,19 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
-    const activeProposalContent = !activeDemocracyReferenda?.length
-      && !activeDemocracyProposals?.length
+    const activeProposalContent = !activeDemocracyProposals?.length
       && !activeCouncilProposals?.length
       && !activeSignalingProposals?.length
       && !activeCosmosProposals?.length
       && !activeMolochProposals?.length
       ? [ m('.no-proposals', 'None') ]
-      : (activeDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }))
-        .concat((activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+      : (activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
 
-    const activeTreasuryContent = activeTreasuryProposals.length
-      ? activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
-      : [ m('.no-proposals', 'None') ];
-
     // inactive proposals
-    const inactiveDemocracyReferenda = onSubstrate
-      && (app.chain as Substrate).democracy.store.getAll().filter((p) => p.completed);
     const inactiveDemocracyProposals = onSubstrate
       && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => p.completed);
     const inactiveCouncilProposals = onSubstrate
@@ -163,8 +133,6 @@ const ProposalsPage: m.Component<{}> = {
     const inactiveSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
       && (app.chain as Edgeware).signaling.store.getAll()
         .filter((p) => p.completed).sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
-    const inactiveTreasuryProposals = onSubstrate
-      && (app.chain as Substrate).treasury.store.getAll().filter((p) => p.completed);
     const inactiveCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
       && (app.chain as Cosmos).governance.store.getAll()
         .filter((p) => p.completed).sort((a, b) => +b.identifier - +a.identifier);
@@ -172,47 +140,22 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Moloch).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
-    const inactiveProposalContent = !inactiveDemocracyReferenda?.length
-      && !inactiveDemocracyProposals?.length
+    const inactiveProposalContent = !inactiveDemocracyProposals?.length
       && !inactiveCouncilProposals?.length
       && !inactiveSignalingProposals?.length
       && !inactiveCosmosProposals?.length
       && !inactiveMolochProposals?.length
       ? [ m('.no-proposals', 'None') ]
-      : (inactiveDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }))
-        .concat((inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+      : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
 
-    const inactiveTreasuryContent = inactiveTreasuryProposals.length
-      ? inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
-      : [ m('.no-proposals', 'None') ];
-
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
       && (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot)
       && (app.chain as Substrate).technicalCommittee.store.getAll();
-
-    // let nextReferendum;
-    // let nextReferendumDetail;
-    // if (!onSubstrate) {
-    //   // do nothing
-    // } else if ((app.chain as Substrate).democracyProposals.lastTabledWasExternal) {
-    //   if (visibleDemocracyProposals)
-    //     [nextReferendum, nextReferendumDetail] = ['Democracy', ''];
-    //   else
-    //     [nextReferendum, nextReferendumDetail] = ['Council',
-    //       'Last was council, but no democracy proposal was found'];
-    // } else if ((app.chain as Substrate).democracyProposals.nextExternal)
-    //   [nextReferendum, nextReferendumDetail] = ['Council', ''];
-    // else
-    //   [nextReferendum, nextReferendumDetail] = ['Democracy',
-    //     'Last was democracy, but no council proposal was found'];
-
-    const maxConvictionWeight = Math.max.apply(this, convictions().map((c) => convictionToWeight(c)));
-    const maxConvictionLocktime = Math.max.apply(this, convictions().map((c) => convictionToLocktime(c)));
 
     return m(Sublayout, {
       class: 'ProposalsPage',
@@ -226,20 +169,10 @@ const ProposalsPage: m.Component<{}> = {
         rightColSpacing: [4, 4, 4]
       }),
       m(Listing, {
-        content: activeTreasuryContent,
-        columnHeaders: ['Active Treasury Proposals'],
-        rightColSpacing: [0]
-      }),
-      m(Listing, {
         content: inactiveProposalContent,
         columnHeaders: ['Inactive Proposals', 'Replies', 'Likes', 'Updated'],
         rightColSpacing: [4, 4, 4]
       }),
-      m(Listing, {
-        content: inactiveTreasuryContent,
-        columnHeaders: ['Inactive Treasury Proposals'],
-        rightColSpacing: [0]
-      })
     ]);
   }
 };

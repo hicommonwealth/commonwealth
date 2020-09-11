@@ -8,8 +8,11 @@ import app from 'state';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
+import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
+import Substrate from 'client/scripts/controllers/chain/substrate/main';
+import { CandidacyButton, CollectiveVotingButton, getCouncilCandidates } from '../pages/council';
 
-const getNewProposalMenu = () => {
+const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
   const activeAccount = app.user.activeAccount;
   return [
     m(MenuItem, {
@@ -47,10 +50,22 @@ const getNewProposalMenu = () => {
       }),
       label: 'New council motion'
     }),
+    app.chain?.base === ChainBase.Substrate
+      && candidates
+      && [
+        m(MenuDivider),
+        m(CollectiveVotingButton, { candidates, menuStyle: true }),
+        m(CandidacyButton, { candidates, menuStyle: true }),
+      ]
   ];
 };
 
-export const MobileNewProposalButton: m.Component<{}> = {
+export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
+  oninit: (vnode) => {
+    if (app.chain && m.route.get().includes('council')) {
+      vnode.state.councilCandidates = getCouncilCandidates();
+    }
+  },
   view: (vnode) => {
     return m('.MobileNewProposalButton', [
       m(PopoverMenu, {
@@ -68,15 +83,19 @@ export const MobileNewProposalButton: m.Component<{}> = {
         menuAttrs: {
           align: 'left',
         },
-        content: getNewProposalMenu(),
+        content: getNewProposalMenu(vnode.state.councilCandidates),
       }),
     ]);
   }
 };
 
-const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean }> = {
+const NewProposalButton: m.Component<{
+  fluid: boolean,
+  threadOnly?: boolean,
+  councilCandidates?: Array<[SubstrateAccount, number]>
+}> = {
   view: (vnode) => {
-    const { fluid, threadOnly } = vnode.attrs;
+    const { fluid, threadOnly, councilCandidates } = vnode.attrs;
 
     if (!app.isLoggedIn()) return;
     if (!app.chain && !app.community) return;
@@ -117,7 +136,7 @@ const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean }> =
         menuAttrs: {
           align: 'left',
         },
-        content: getNewProposalMenu(),
+        content: getNewProposalMenu(councilCandidates),
       }),
     ]);
 
