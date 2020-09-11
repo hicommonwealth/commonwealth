@@ -7,7 +7,7 @@ export interface WebhookContent {
   notificationCategory: string;
   chain?: string;
   community?: string;
-  userChain?: string;
+  author_chain?: string;
   title: string;
   bodyUrl?: string;
   url?: string;
