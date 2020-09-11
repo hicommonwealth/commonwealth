@@ -16,6 +16,8 @@ import {
 } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
 
+import QuillFormattedText from 'views/components/quill_formatted_text';
+import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
 import User from 'views/components/widgets/user';
@@ -216,8 +218,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
     const proposal = vnode.attrs.proposal;
     const { author, createdAt, slug, identifier, title } = proposal;
     const nComments = app.comments.nComments(proposal);
-    const authorComment = author ? app.comments.getByProposal(proposal).sort(byAscendingCreationDate)
-      .find((comment) => comment.author === author.address) : null;
+    const firstComment = app.comments.getByProposal(proposal).sort(byAscendingCreationDate)[0];
 
     // TODO XXX: Show requirement for referenda
     const hasRequirement = false;
@@ -266,6 +267,23 @@ const ProposalRow: m.Component<IRowAttrs> = {
           ])
           : null;
 
+    const rowComments = firstComment && m('.proposal-row-comments', [
+      m(User, {
+        hideIdentityIcon: true,
+        user: new AddressInfo(null, firstComment.author, firstComment.authorChain, null)
+      }),
+      ':',
+      (() => {
+        try {
+          const doc = JSON.parse(firstComment.text);
+          if (!doc.ops) throw new Error();
+          return m(QuillFormattedText, { doc, collapse: true, hideFormatting: true });
+        } catch (e) {
+          return m(MarkdownFormattedText, { doc: firstComment.text, collapse: true, hideFormatting: true });
+        }
+      })(),
+    ]);
+
     const rowMetadata = [
       m(UserGallery, {
         tooltip: true,
@@ -289,7 +307,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         class: 'ProposalRow',
         contentLeft: {
           header: rowHeader,
-          subheader: rowSubheader,
+          subheader: m('.proposal-row-sub', [rowSubheader, rowComments]),
         },
         contentRight: rowMetadata,
         rightColSpacing: [4, 4, 4],
