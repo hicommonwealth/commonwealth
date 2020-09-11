@@ -88,7 +88,8 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                 m('.bottom', [
                   label && m(Tag, { label }),
                   m(Button, {
-                    label: m(Icon, { name: Icons.SETTINGS }),
+                    class: 'settings-button',
+                    label: m(Icon, { name: Icons.SETTINGS, size: 'xs' }),
                     onclick: (e) => {
                       e.preventDefault();
                       console.log(webhook);
