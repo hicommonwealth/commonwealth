@@ -7,6 +7,7 @@ export interface WebhookContent {
   notificationCategory: string;
   chain?: string;
   community?: string;
+  userChain?: string;
   title: string;
   bodyUrl?: string;
   url?: string;
@@ -60,22 +61,11 @@ const send = async (models, content: WebhookContent) => {
   console.log('webhook content', content);
   let address;
   try {
-    address = await models.Address.findOne({ where: { address: content.user, chain: content.chain } });
+    address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
   } catch (e) {
     // pass nothing if no matching address is found
   }
 
-  // create data for sending
-  // const data = JSON.stringify({
-  //   "text": `basic text not empty \`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``,
-  //   "content": `basic text not empty \`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``,
-  //   "format": "plain",
-  //   "displayName": "Commonwealth Webhook",
-  //   "avatarUrl": "http://i.imgur.com/IDOBtEJ.png"
-  // });
-  // const data = {
-  //   'content': 'contentful',
-  // };
   // if a community is passed with the content, we know that it is from an offchain community
   const chainOrCommObj = (content.community) ? { offchain_community_id: content.community }
     : (content.chain) ? { chain_id: content.chain }
@@ -106,6 +96,7 @@ const send = async (models, content: WebhookContent) => {
     .filter((url) => !!url)
     .map(async (url) => {
       console.log(url);
+      // format data for sending
       const data = (url.indexOf('slack') !== -1) ? slackFormat(content, address)
         : (url.indexOf('discord') !== -1) ? discordFormat(content, address)
           : null;

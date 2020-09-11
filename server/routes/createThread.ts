@@ -191,6 +191,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     },
     {
       user: finalThread.Address.address,
+      author_chain: finalThread.Address.chain,
       url: getProposalUrl('discussion', finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,

@@ -117,6 +117,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
     notification_data,
     {
       user: finalReaction.Address.address,
+      author_chain: finalReaction.Address.chain,
       url: cwUrl,
       title: proposal.title || '',
       chain: finalReaction.chain,
