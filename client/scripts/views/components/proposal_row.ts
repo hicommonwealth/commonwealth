@@ -267,7 +267,9 @@ const ProposalRow: m.Component<IRowAttrs> = {
           ])
           : null;
 
-    const rowComments = firstComment && m('.proposal-row-comments', [
+    const rowComments = m('.proposal-row-comments', !firstComment ? [
+      'No replies yet'
+    ] : [
       m(User, {
         hideIdentityIcon: true,
         user: new AddressInfo(null, firstComment.author, firstComment.authorChain, null)
