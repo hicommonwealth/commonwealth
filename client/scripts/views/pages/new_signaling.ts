@@ -174,7 +174,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                   }),
                 ]),
                 vnode.state.voteOutcomes.map((outcome, index) => m(FormGroup, [ m(Input, {
-                  value: outcome,
+                  defaultValue: outcome,
                   disabled: !app.user.activeAccount || vnode.state.voteType === 'binary',
                   contentLeft: m(Tag, { label: `Option ${index + 1}` })
                 }) ])),

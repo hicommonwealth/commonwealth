@@ -1,4 +1,4 @@
-import { SubstrateEvents, SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateEvents, SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -208,7 +208,7 @@ async function main() {
         // construct storageFetchers needed for the identity cache
         const fetchers = {};
         for (const [ chain, subscriber ] of Object.entries(subscribers)) {
-          if (SubstrateTypes.EventChains.includes(chain)) {
+          if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
             fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
           }
         }

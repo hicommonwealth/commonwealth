@@ -175,6 +175,12 @@
 
 // mixin for collapsing large text blocks to <200px in height
 @mixin collapsible {
+    &.collapsed {
+        white-space: nowrap;
+        overflow: hidden;
+        display: block;
+        text-overflow: ellipsis;
+    }
 }
 
 @mixin hidden-formatting {
