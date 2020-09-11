@@ -46,7 +46,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
-  const thirtyDaysAgo = new Date((new Date() as any) - 24 * 60 * 60 * 30);
+  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
   const recentThreads = await models.OffchainThread.findAll({
     where: {
       [Op.or]: [
@@ -188,22 +188,21 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
         }
       ],
       created_at: {
-        [Op.gt]: new Date((new Date() as any) - 24 * 60 * 60 * 30)
+        [Op.gt]: thirtyDaysAgo
       }
     }
   });
 
   const activeAddresses = {};
-  const allContent = recentThreads.concat(recentComments).concat(recentReactions);
+  const allContent = recentThreads_.concat(recentComments).concat(recentReactions);
   allContent.forEach((item) => {
     const entity = item.community || item.chain;
-    if (activeAddresses[entity] && activeAddresses[entity].includes(item.address) === -1) {
-      activeAddresses[entity].push(item.address);
+    if (activeAddresses[entity] && !activeAddresses[entity].includes(item.address_id)) {
+      activeAddresses[entity].push(item.address_id);
     } else if (!activeAddresses[entity]) {
-      activeAddresses[entity] = [item.address];
+      activeAddresses[entity] = [item.address_id];
     }
   });
-  console.log(activeAddresses);
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
