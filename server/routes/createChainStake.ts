@@ -4,7 +4,8 @@ import { Errors as AddressErrors } from './createAddress';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  Stash: 'Must provide stash'
+  Stash: 'Must provide stash',
+  ChainStake: 'Stake already exists'
 };
 
 const createChainStake = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -30,7 +31,7 @@ const createChainStake = async (models, req: Request, res: Response, next: NextF
   });
 
   if (chainStake)
-    return res.json({ status: 'Success', result: chainStake.toJSON() });
+    return next(new Error(Errors.ChainStake));
 
   try {
     const newObj = await models.ChainStake.create(query);

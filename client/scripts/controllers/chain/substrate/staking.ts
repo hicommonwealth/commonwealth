@@ -236,6 +236,7 @@ class SubstrateStaking implements StorageModule {
   public get validatorCount(): Observable<SessionIndex> {
     return this._Chain.query((api: ApiRx) => api.query.staking.validatorCount());
   }
+  // TODO update this function with database call, when database api is integrated.
   public get validatorsAddress(): Observable<string[]> {
     return this._Chain.query(
       (api: ApiRx) => api.derive.staking.validators()
