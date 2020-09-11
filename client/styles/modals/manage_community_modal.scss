@@ -110,10 +110,19 @@
                 max-height: 300px;
                 overflow-y: scroll;
             }
+            .bottom {
+                padding: 8px 0;
+            }
+            .settings-button {
+                height: 26px;
+                min-height: 26px;
+                padding: 0 8px;
+            }
             .cui-list-item {
                 overflow-wrap: anywhere;
                 padding: 0;
                 margin-bottom: 6px;
+                border-bottom: none;
             }
         }
     }
