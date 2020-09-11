@@ -217,6 +217,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     },
     {
       user: finalComment.Address.address,
+      author_chain: finalComment.Address.chain,
       url: cwUrl,
       title: proposal.title || '',
       chain: finalComment.chain,

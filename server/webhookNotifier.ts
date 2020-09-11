@@ -2,6 +2,7 @@ import request from 'superagent';
 import { NotificationCategories } from '../shared/types';
 import { Op } from 'sequelize';
 import e from 'express';
+import { capitalize } from 'lodash';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -28,14 +29,21 @@ const validURL = (str) => {
   return !!pattern.test(str);
 };
 
-const slackFormat = (content, address?) => {
+const slackFormat = (content, address) => {
   return JSON.stringify({
     "text": `\`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``,
     "format": "plain",
-    "displayName": "Commonwealth Webhook",
-    "avatarUrl": "http://i.imgur.com/IDOBtEJ.png"
   });
 };
+
+const matrixFormat = (content, address) => {
+  return {
+    "text": `${getFilteredContent(content, address).join('\n')}`,
+    "format": 'plain',
+    "displayName": "Commonwealth Webhook",
+    "avatarUrl": "http://commonwealthLogoGoesHere" // TODO
+  };
+}
 
 const discordFormat = (content, address?) => {
   return {
@@ -50,6 +58,7 @@ const getFilteredContent = (content, address) => {
     (!content.community && content.chain) ? `Chain: ${content.chain}` : null,
     content.community ? `Community: ${content.community}` : null,
     content.notificationCategory ? `Type: ${content.notificationCategory}` : null,
+    content.chainEventType ? `${capitalize(content.chainEventType.event_name)} event on ${capitalize(content.chainEventType.chain)}` : null,
     content.title ? `Title: ${decodeURIComponent(content.title)}` : null,
     content.bodyUrl ? `External Link: ${content.bodyUrl}` : null,
     content.url ? `Link: ${content.url}` : null,
@@ -57,7 +66,6 @@ const getFilteredContent = (content, address) => {
 };
 
 const send = async (models, content: WebhookContent) => {
-  // if (SUPPRESSED_NOTIFICATION_TYPES.indexOf(content.notificationCategory) !== -1) return;
   console.log('webhook content', content);
   let address;
   try {
@@ -86,9 +94,7 @@ const send = async (models, content: WebhookContent) => {
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
     // We currently only support slack webhooks
-    if (validURL(wh.url)
-      // && wh.url.indexOf('https://hooks.slack.com/services/') !== -1
-    ) {
+    if (validURL(wh.url)) {
       chainOrCommwebhookUrls.push(wh.url);
     }
   });
@@ -101,9 +107,9 @@ const send = async (models, content: WebhookContent) => {
         : (url.indexOf('discord') !== -1) ? discordFormat(content, address)
           : null;
       if (!data) { console.error('webhook not supported'); return; };
-      // eslint-disable-next-line no-return-await
+
       try {
-        return await request.post(url).send(data); // .set('Accept', 'application/json');
+        return await request.post(url).send(data);
       } catch (e) {
         console.error(e)
         return;
