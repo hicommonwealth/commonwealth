@@ -46,24 +46,65 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
-
+  const thirtyDaysAgo = new Date((new Date() as any) - 24 * 60 * 60 * 30);
   const recentThreads = await models.OffchainThread.findAll({
     where: {
       [Op.or]: [
         {
-          chain: chains.map((c) => c.id),
+          chain: {
+            [Op.in]: chains.map((c) => c.id),
+          }
         },
         {
-          community: publicCommunities.map((c) => c.id),
+          community: {
+            [Op.in]: publicCommunities.map((c) => c.id),
+          }
         }
       ],
       created_at: {
-        [Op.gt]: moment().subtract(30, 'days')
+        [Op.gt]: thirtyDaysAgo
       }
     }
   });
-
-  console.log(recentThreads);
+  const recentComments = await models.OffchainComment.findAll({
+    where: {
+      [Op.or]: [
+        {
+          chain: {
+            [Op.in]: chains.map((c) => c.id),
+          }
+        },
+        {
+          community: {
+            [Op.in]: publicCommunities.map((c) => c.id),
+          }
+        }
+      ],
+      created_at: {
+        [Op.gt]: thirtyDaysAgo
+      }
+    }
+  });
+  const recentReactions = await models.OffchainReaction.findAll({
+    where: {
+      [Op.or]: [
+        {
+          chain: {
+            [Op.in]: chains.map((c) => c.id),
+          }
+        },
+        {
+          community: {
+            [Op.in]: publicCommunities.map((c) => c.id),
+          }
+        }
+      ],
+      created_at: {
+        [Op.gt]: thirtyDaysAgo
+      }
+    }
+  });
+  console.log({ recentThreads, recentComments, recentReactions });
 
   const { user } = req;
 
@@ -137,7 +178,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
         }
       ],
       created_at: {
-        [Op.gt]: moment().subtract(30, 'days')
+        [Op.gt]: new Date((new Date() as any) - 24 * 60 * 60 * 30)
       }
     }
   });
