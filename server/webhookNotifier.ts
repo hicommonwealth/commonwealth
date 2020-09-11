@@ -84,7 +84,7 @@ const discordFormat = (content, address?) => {
           }
         ],
         "footer": {
-          "text": "–Commonwealth Labs :star:",
+          "text": "–Commonwealth Labs :dove:",
           "icon_url": "https://commonwealth.im/static/img/logo.png"
         }
       }
