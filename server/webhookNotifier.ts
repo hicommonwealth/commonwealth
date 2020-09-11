@@ -1,6 +1,7 @@
 import request from 'superagent';
 import { NotificationCategories } from '../shared/types';
 import { Op } from 'sequelize';
+import e from 'express';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -10,6 +11,7 @@ export interface WebhookContent {
   bodyUrl?: string;
   url?: string;
   user: any;
+  chainEvent?: any;
 }
 
 // do not send webhook notifications for noisy reaction types
@@ -24,6 +26,21 @@ const validURL = (str) => {
     + '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
   return !!pattern.test(str);
 };
+
+const slackFormat = (content, address?) => {
+  return JSON.stringify({
+    "text": `\`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``,
+    "format": "plain",
+    "displayName": "Commonwealth Webhook",
+    "avatarUrl": "http://i.imgur.com/IDOBtEJ.png"
+  });
+};
+
+const discordFormat = (content, address?) => {
+  return {
+    'content': `${getFilteredContent(content, address).join('\n')}`,
+  }
+}
 
 const getFilteredContent = (content, address) => {
   return [
@@ -49,36 +66,60 @@ const send = async (models, content: WebhookContent) => {
   }
 
   // create data for sending
-  const data = JSON.stringify({
-    text: `\`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``
-  });
+  // const data = JSON.stringify({
+  //   "text": `basic text not empty \`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``,
+  //   "content": `basic text not empty \`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``,
+  //   "format": "plain",
+  //   "displayName": "Commonwealth Webhook",
+  //   "avatarUrl": "http://i.imgur.com/IDOBtEJ.png"
+  // });
+  // const data = {
+  //   'content': 'contentful',
+  // };
   // if a community is passed with the content, we know that it is from an offchain community
-  const chainOrCommObj = (content.community)
-    ? { offchain_community_id: content.community }
-    : { chain_id: content.chain };
+  const chainOrCommObj = (content.community) ? { offchain_community_id: content.community }
+    : (content.chain) ? { chain_id: content.chain }
+    : null;
+  console.log('chainOrCommObj', chainOrCommObj);
+  const notificationCategory = (content.chainEvent) ? content.chainEvent.chain_event_type_id : content.notificationCategory;
+  console.log('notificationCategory', notificationCategory);
   // grab all webhooks for specific community
   const chainOrCommWebhooks = await models.Webhook.findAll({
     where: {
       ...chainOrCommObj,
       categories: {
-        [Op.contains]: [content.notificationCategory],
+        [Op.contains]: [notificationCategory],
       },
     },
   });
+  console.log('all webhooks', chainOrCommWebhooks);
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
     // We currently only support slack webhooks
-    if (validURL(wh.url) && wh.url.indexOf('https://hooks.slack.com/services/') !== -1) {
+    if (validURL(wh.url)
+      // && wh.url.indexOf('https://hooks.slack.com/services/') !== -1
+    ) {
       chainOrCommwebhookUrls.push(wh.url);
     }
   });
-
   await Promise.all(chainOrCommwebhookUrls
     .filter((url) => !!url)
     .map(async (url) => {
+      console.log(url);
+      const data = (url.indexOf('slack') !== -1) ? slackFormat(content, address)
+        : (url.indexOf('discord') !== -1) ? discordFormat(content, address)
+          : null;
+      if (!data) { console.error('webhook not supported'); return; };
       // eslint-disable-next-line no-return-await
-      return await request.post(url).send(data);
+      try {
+        return await request.post(url).send(data); // .set('Accept', 'application/json');
+      } catch (e) {
+        console.error(e)
+        return;
+      }
     }));
+
+
 };
 
 export default send;
