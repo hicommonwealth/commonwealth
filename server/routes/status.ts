@@ -122,9 +122,9 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     recentThreads.forEach((thread) => {
       const entity = thread.community || thread.chain;
       if (activeThreadCount[entity]) {
-        activeThreadCount[entity].push(thread.address_id);
+        activeThreadCount[entity] += 1;
       } else if (!activeThreadCount[entity]) {
-        activeThreadCount[entity] = [thread.address_id];
+        activeThreadCount[entity] = 1;
       }
     });
     return res.json({
@@ -217,12 +217,11 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   recentThreads_.forEach((thread) => {
     const entity = thread.community || thread.chain;
     if (activeThreadCount[entity]) {
-      activeThreadCount[entity].push(thread.address_id);
+      activeThreadCount[entity] += 1;
     } else if (!activeThreadCount[entity]) {
-      activeThreadCount[entity] = [thread.address_id];
+      activeThreadCount[entity] = 1;
     }
   });
-
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
     where: { user_id: user.id }
@@ -290,6 +289,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     contractCategories,
     notificationCategories,
     activeAddresses,
+    activeThreadCount,
     roles,
     invites,
     loggedIn: true,
