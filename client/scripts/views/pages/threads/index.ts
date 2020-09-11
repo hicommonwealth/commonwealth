@@ -29,7 +29,7 @@ export const parseMentionsForServer = (text, isMarkdown) => {
   const regexp = RegExp('\\[\\@.+?\\]\\(.+?\\)', 'g');
   if (isMarkdown) {
     const matches = text.match(regexp);
-    if (matches && matches.length) {
+    if (matches && matches.length > 0) {
       return matches.map((match) => {
         const chunks = match.slice(0, match.length - 1).split('/');
         const refIdx = chunks.indexOf('account');
@@ -38,7 +38,7 @@ export const parseMentionsForServer = (text, isMarkdown) => {
     }
   } else {
     return text.ops
-      .filter((op) => op.attributes?.link?.length && op.insert?.slice(0, 1) === '@')
+      .filter((op) => op.attributes?.link?.length > 0 && op.insert?.slice(0, 1) === '@')
       .map((op) => {
         const chunks = op.attributes.link.split('/');
         const refIdx = chunks.indexOf('account');
@@ -124,7 +124,7 @@ export const newThread = async (
       throw new Error(NewThreadErrors.NoUrl);
     }
   }
-  if (!form.topicName && topics.length) {
+  if (!form.topicName && topics.length > 0) {
     throw new Error(NewThreadErrors.NoTopic);
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
