@@ -79,13 +79,14 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
           class: 'active-webhooks'
         }, [
           webhooks.map((webhook) => {
+            const label = (webhook.url.indexOf('discord') !== -1) ? 'Discord'
+              : (webhook.url.indexOf('slack') !== -1) ? 'Slack'
+                : null;
             return m(ListItem, {
               contentLeft: [
                 m('.top', { style: `display: 'block';`}, webhook.url),
                 m('.bottom', [
-                  m(Tag, {
-                    label: 'hi', // TODO: Make source property
-                  }),
+                  label && m(Tag, { label }),
                   m(Button, {
                     label: m(Icon, { name: Icons.SETTINGS }),
                     onclick: (e) => {
