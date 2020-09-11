@@ -29,7 +29,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
     vnode.state.selectedCategories = [];
     vnode.attrs.webhook.categories.forEach((v) => vnode.state.selectedCategories.push(v));
   },
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     const { webhook } = vnode.attrs;
     // const community = webhook.
     const isChain = webhook.chain_id ? true : false;
@@ -111,7 +111,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
             success: (result) => {
               const updatedWebhook = Webhook.fromJSON(result.result);
               vnode.attrs.updateSuccessCallback(updatedWebhook);
-              $(vnode).trigger('modalexit');
+              $(vnode.dom).trigger('modalexit');
             },
             error: (err) => {
               console.dir(err);
