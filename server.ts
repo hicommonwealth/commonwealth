@@ -176,9 +176,6 @@ async function main() {
     if (NO_EVENTS) {
       setupServer(app, wss, sessionParser);
     } else {
-      setTimeout(() => {
-        setupServer(app, wss, sessionParser);
-      }, 10);
       // handle various chain-event cases
       if (ENTITY_MIGRATION) {
         // "all" means run for all supported chains, otherwise we pass in the name of
@@ -218,7 +215,7 @@ async function main() {
         process.exit(exitCode);
       }
 
-      //setupServer(app, wss, sessionParser);
+      setupServer(app, wss, sessionParser);
     }
   }
 }
