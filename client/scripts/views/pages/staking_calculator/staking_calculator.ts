@@ -154,7 +154,6 @@ const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStak
       resetValues(vnode)
     }
 
-
     if (vnode.state.staked === -1)
       return m(PageLoading, { message: 'Calculating Current Staked Value...' })
 
