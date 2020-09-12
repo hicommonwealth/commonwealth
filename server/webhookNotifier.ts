@@ -33,8 +33,11 @@ const validURL = (str) => {
 
 const slackFormat = (content, address) => {
   return JSON.stringify({
-    "text": `\`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``,
-    "format": "plain",
+    "type": 'section',
+    // "text": `\`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``,
+    // "format": "plain",
+    "text": `${getFilteredContentMarkdown(content, address).join('\n')}`,
+    "format": "mrkdwn",
   });
 };
 
@@ -49,7 +52,6 @@ const matrixFormat = (content, address) => {
 
 const telegramFormat = (content, address) => {
   return {
-
   }
 }
 
@@ -118,6 +120,21 @@ const discordFormat = (content, address?) => {
     ]
   };
 }
+
+const getFilteredContentMarkdown = (content, address) => {
+  return [
+    address ? `*Name:* ${address.name}` : null,
+    content.user ? `*Address:* _${content.user}_` : null,
+    (!content.community && content.chain) ? `*Chain:* ${content.chain}` : null,
+    content.community ? `*Community:* ${content.community}` : null,
+    content.notificationCategory ? `*Type:* ${content.notificationCategory}` : null,
+    content.chainEventType ? `*${capitalize(content.chainEventType.event_name)}* event on _${capitalize(content.chainEventType.chain)}_` : null,
+    content.chainEvent && content.chainEventType ? `${SubstrateEvents.Label(content.chainEvent.block_number, content.chainEventType.chain, content.chainEvent.event_data)}` : null,
+    content.title ? `*Title:* ${decodeURIComponent(content.title)}` : null,
+    content.bodyUrl ? `*External Link:* ${content.bodyUrl}` : null,
+    content.url ? `*Link:* ${content.url}` : null,
+  ].filter((elt) => !!elt);
+};
 
 const getFilteredContent = (content, address) => {
   return [
