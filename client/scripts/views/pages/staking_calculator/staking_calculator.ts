@@ -25,11 +25,10 @@ interface IStakingCalculatorState {
     sessionInfo: DeriveSessionProgress
   }
   selected_asset: AssetInfo
-  selected_rate: number
-  switch_mode: boolean
+  selectedRate: number
+  isCompound: boolean
   usd_price: string
   totalStaked: SubstrateCoin
-  totalbalance: SubstrateCoin
   stakingAmount: number
   stakingLength: number
   staked: number
@@ -47,8 +46,8 @@ const unique = (value, index, self) => { return self.map((s) => s.name).indexOf(
 
 //default on page load values
 function resetValues(vnode) {
-  vnode.state.selected_rate = vnode.state.staked
-  vnode.state.switch_mode = false
+  vnode.state.selectedRate = vnode.state.staked
+  vnode.state.isCompound = false
   vnode.state.stakingAmount = 10000
   vnode.state.rewardValue = 0
   vnode.state.networkValue = 0
@@ -63,7 +62,7 @@ function resetValues(vnode) {
 
 function calculateRewardValue(vnode) {
   const astinf = vnode.state.selected_asset as AssetInfo
-  const d = calcRewards(astinf, vnode.state.switch_mode, vnode.state.stakingAmount, vnode.state.stakingLength, vnode.state.totalbalance.inDollars, vnode.state.totalStaked.inDollars)
+  const d = calcRewards(astinf, vnode.state.isCompound, vnode.state.stakingAmount, vnode.state.stakingLength, vnode.state.selectedRate)
   vnode.state.rewardValue = d.earnings
   vnode.state.rewardRate = d.rewardRate
   vnode.state.networkValue = d.networkValue
@@ -73,20 +72,20 @@ function calculateRewardValue(vnode) {
 // get interest = (i) => min of iLeft and iRight 
 function calculateInterest(vnode) {
   const astinf = vnode.state.selected_asset as AssetInfo
-  const res = calculateInterestLeftRight(astinf, vnode.state.selected_rate)
+  const res = calculateInterestLeftRight(astinf, vnode.state.selectedRate)
   astinf.calculatedInterestRate = Math.min(res.left, res.right)
   calculateRewardValue(vnode)
 }
 
 function calculateNetworkValue(vnode) {
-  vnode.state.networkValue = (vnode.state.stakingAmount / vnode.state.totalbalance.inDollars) * 100
+  vnode.state.networkValue = (vnode.state.stakingAmount / vnode.state.selected_asset.totalSupply) * 100
   vnode.state.networkValue = vnode.state.networkValue > 100 ? 100 : vnode.state.networkValue
 }
 
 const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStakingCalculatorState>({
   oncreate: async (vnode) => {
     vnode.state.totalStaked = undefined
-    vnode.state.totalbalance = undefined
+    //vnode.state.totalbalance = undefined
     vnode.state.staked = -1
     mixpanel.track('PageVisit', { 'Page Name': 'StakingCalculatorPage' })
   }, getObservables: (attrs) => ({
@@ -111,8 +110,9 @@ const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStak
           usd_value: NaN,
           consts: cc ? cc.const : undefined, calculatedInterestRate: 0,
           commission: 0.0,
+          totalSupply: undefined,
           //TODO: add API to getFrequencyHours for asset
-          rewardFrequencyHours: n.chain.symbol.toUpperCase() == 'KSM' ? 24 : 6
+          rewardFrequencyMinutes: n.chain.symbol.toUpperCase() == 'KSM' ? 1440 : 360
         }
       }).filter(unique)
 
@@ -147,10 +147,10 @@ const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStak
         const valStake = (app.chain as Substrate).chain.coins(exposure?.total.toBn()) || (app.chain as Substrate).chain.coins(0)
         vnode.state.totalStaked = (app.chain as Substrate).chain.coins(vnode.state.totalStaked.asBN.add(valStake.asBN),)
       })
-      vnode.state.totalbalance = (app.chain as Substrate).chain.totalbalance
-      vnode.state.staked = vnode.state.totalStaked.muln(10000).div(vnode.state.totalbalance).toNumber() / 100
-      vnode.state.selected_rate = vnode.state.staked
-      console.log('staked: ', vnode.state.staked)
+      
+      vnode.state.selected_asset.totalSupply = (app.chain as Substrate).chain.totalbalance.inDollars;
+      vnode.state.staked = vnode.state.totalStaked.muln(10000).div((app.chain as Substrate).chain.totalbalance).toNumber() / 100
+      vnode.state.selectedRate = vnode.state.staked
       resetValues(vnode)
     }
 
@@ -233,18 +233,18 @@ const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStak
           contentRight: m(Tag, { "label": "Days" })
         })
         ]),
-        m(".select-asset .col", [m("span.thead", "STAKING RATE: ", [m("span#rate-val", (vnode.state.selected_rate ? +vnode.state.selected_rate : 0) + '%')]), m(Input, {
+        m(".select-asset .col", [m("span.thead", "STAKING RATE: ", [m("span#rate-val", (vnode.state.selectedRate ? +vnode.state.selectedRate : 0) + '%')]), m(Input, {
           fluid: true,
           name: 'stake_rate',
           type: 'range',
           min: "0.01",
           max: "100",
           step: "0.01",
-          value: vnode.state.selected_rate,
+          value: vnode.state.selectedRate,
           id: 'stake_rate-range-selector',
           defaultValue: (vnode.state.staked ? vnode.state.staked : 0).toString(),
           oninput: (e) => {
-            vnode.state.selected_rate = e.target.value;
+            vnode.state.selectedRate = e.target.value;
             calculateInterest(vnode);
           }
         })
@@ -252,10 +252,10 @@ const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStak
 
         m(".select-asset-switch .col", [m("span.thead_switch", "REINVEST?"), m(Switch, {
           fluid: true,
-          label: vnode.state.switch_mode ? "YES" : "NO",
-          checked: vnode.state.switch_mode,
+          label: vnode.state.isCompound ? "YES" : "NO",
+          checked: vnode.state.isCompound,
           onchange: (e) => {
-            vnode.state.switch_mode = !vnode.state.switch_mode
+            vnode.state.isCompound = !vnode.state.isCompound
             calculateInterest(vnode);
           }
         })
@@ -271,7 +271,7 @@ const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStak
         m(".titlewithnumber_div", [m("span", "CURRENT HOLDING VALUE"), m("label", formatNumberShort(vnode.state.stakingAmount) + ' ' + vnode.state.selected_asset.sym.toUpperCase()), m("span"), m("label.bracket", "(" + formatNumberShort(vnode.state.stakingAmount * vnode.state.selected_asset.usd_value) + " USD)")]),
         m(".titlewithnumber_div", [m("span", "REWARD VALUE"), m("label", formatNumberShort(vnode.state.rewardValue) + ' ' + vnode.state.selected_asset.sym.toUpperCase()), m("span"), m("label.bracket", "(" + formatNumberShort(vnode.state.rewardValue * vnode.state.selected_asset.usd_value) + " USD)")]),
         m(".titlewithnumber_div", [m("span.column-below", "REWARD RATE"), m("label", formatNumberShort(vnode.state.rewardRate) + '%')]),
-        m(".titlewithnumber_div", [m("span.column-below", "REWARD FREQUENCY"), m("label", formatDuration(moment.duration(moment().add(vnode.state.selected_asset.rewardFrequencyHours, 'hours').diff(moment())), false))]),
+        m(".titlewithnumber_div", [m("span.column-below", "REWARD FREQUENCY"), m("label", formatDuration(moment.duration(moment().add(vnode.state.selected_asset.rewardFrequencyMinutes, 'hours').diff(moment())), false))]),
         m(".titlewithnumber_div", [m("span.column-below", "NETWORK VALUE"), m("label", ((vnode.state.networkValue > 0 && vnode.state.networkValue < 100.0) ? vnode.state.networkValue.toFixed(6) : vnode.state.networkValue) + '%')]),
         m(".titlewithnumber_div", [m("span.column-below", "ADJUSTED REWARD"), m("label", formatNumberShort(vnode.state.adjustedReward) + '%')])
       ]),
@@ -283,35 +283,31 @@ const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStak
         m(CalculatorReturnsContent, {
           rateInHour: 24, // 1 day = 24 hours
           astinf: vnode.state.selected_asset,
-          switch_mode: vnode.state.switch_mode,
+          isCompound: vnode.state.isCompound,
           stakingAmount: vnode.state.stakingAmount,
           stakingLength: 1, // 1 Day
-          class_val: '',
-          inventory_coins: vnode.state.totalbalance.inDollars,
-          staked_supply: vnode.state.totalStaked.inDollars
+          classVal: '',
+          selectedRate: vnode.state.selectedRate
         }),
         m(CalculatorReturnsContent, {
           rateInHour: 744, // 24 * 31 (hour * days)
           astinf: vnode.state.selected_asset,
-          switch_mode: vnode.state.switch_mode,
+          isCompound: vnode.state.isCompound,
           stakingAmount: vnode.state.stakingAmount,
           stakingLength: 30, // 1 Month
-          class_val: '.borderleft_right',
-          inventory_coins: vnode.state.totalbalance.inDollars,
-          staked_supply: vnode.state.totalStaked.inDollars
+          classVal: '.borderleft_right',
+          selectedRate: vnode.state.selectedRate
         }),
         m(CalculatorReturnsContent, {
           rateInHour: 8928, // 24 * 31 * 12 (hour * days * years)
           astinf: vnode.state.selected_asset,
-          switch_mode: vnode.state.switch_mode,
+          isCompound: vnode.state.isCompound,
           stakingAmount: vnode.state.stakingAmount,
           stakingLength: 365, // 1 Year
-          class_val: '',
-          inventory_coins: vnode.state.totalbalance.inDollars,
-          staked_supply: vnode.state.staked
+          classVal: '',
+          selectedRate: vnode.state.selectedRate
         })
       ]),
-
       m(".row.button-row", m(".col-xs-12", m(Button, {
         align: 'center', compact: true, label: 'Reset values to default',
         onclick: (e) => {

@@ -66,59 +66,58 @@ export function calcRewards(
     compound: boolean,
     stakingAmount: number,
     stakingLength: number,
-    totalSupply: number,
-    stakedSupply: number,
+    stakedSupplyPercentage: number,
   ) {
-    /* test constants 
-    let currentStakedPercent = 0.6533;
-    astinf.calculatedInterestRate = 0.052;
-    astinf.rewardFrequencyHours = 24;
-    totalSupply = 8102224;
-    stakedSupply = currentStakedPercent * totalSupply; 
-    */
-  
+
+    // For calculation formulas, kindly refer: https://docs.google.com/spreadsheets/d/1VoQbTfEZK8fPtwfhEIPYnPvw16iMI4A2y_VCuQKt2RQ/edit?usp=sharing
+            
+    // computations
+    const stakedSupply = astinf.totalSupply * stakedSupplyPercentage/100;
+    const periodsPerYear = (365 * 24 * 60) / astinf.rewardFrequencyMinutes;
+    const periodsOverCompounding = periodsPerYear/365 * stakingLength;
+    const ratePerPeriod = astinf.calculatedInterestRate/periodsPerYear;
+    const stakedSupplyAtYearEnd = stakedSupply*ratePerPeriod*365
+    let curNetworkShare = stakingAmount/astinf.totalSupply;
+
+    // variables to be computed 
+    let endNetworkShare = null;
+    let adjustedReward = null;
+    let diffNetworkShare = null;
+    let earnings = null;
+    let rewardRate = null;
+    
     // for non compounding simple version
-    let earningsAtEnd =
-      stakingAmount +
-      stakingAmount * astinf.calculatedInterestRate * (stakingLength / 365)
-    let endTotalSupply =
-      totalSupply + stakedSupply * astinf.calculatedInterestRate * (365 / 365)
-    let currentNetworkShare = stakingAmount / totalSupply
-    let endNetworkShare = earningsAtEnd / endTotalSupply
-    let diffNetworkShare = endNetworkShare - currentNetworkShare
-    let adjustedReward = diffNetworkShare * (endTotalSupply / stakingAmount) * 100
-  
-    if (compound) {
-      console.log('running compound!')
-      // compound mode
-      let compoundInterestRate =
-        Math.pow(1 + astinf.calculatedInterestRate / 365, 365) - 1
-      let compoundEndEarnings =
-        stakingAmount * Math.pow(1 + compoundInterestRate, stakingLength / 365)
-      let compoundEndSupply = endTotalSupply - earningsAtEnd + compoundEndEarnings
-      endNetworkShare = compoundEndEarnings / compoundEndSupply
-      diffNetworkShare = endNetworkShare - currentNetworkShare
-      adjustedReward =
-        diffNetworkShare * (compoundEndSupply / stakingAmount) * 100
-      earningsAtEnd = compoundEndEarnings
+    const endCoinsNoCompound = stakingAmount + (stakingAmount * ratePerPeriod * periodsOverCompounding);
+    const endSupplyNoCompound = astinf.totalSupply + stakedSupplyAtYearEnd;
+
+    if (!compound){
+      // simple no compounding
+      endNetworkShare = endCoinsNoCompound/endSupplyNoCompound;
+      diffNetworkShare = endNetworkShare - curNetworkShare;
+      adjustedReward = diffNetworkShare * endSupplyNoCompound/stakingAmount;
+      earnings = endCoinsNoCompound - stakingAmount
+    } else{
+      // for compounding
+      const endCoinsCompound = stakingAmount * Math.pow((1+ astinf.calculatedInterestRate/periodsPerYear),periodsOverCompounding);
+      const endSupplyCompound = endSupplyNoCompound - endCoinsNoCompound + endCoinsCompound;
+      endNetworkShare = endCoinsCompound/endSupplyCompound;
+      diffNetworkShare = endNetworkShare - curNetworkShare;
+      adjustedReward = diffNetworkShare * endSupplyNoCompound/stakingAmount;
+      earnings = endCoinsCompound - stakingAmount;
     }
-    let earnings = earningsAtEnd - stakingAmount
-    let rewardRate = (earnings / stakingAmount) * 100
-    earnings = earnings - earnings * astinf.commission
+
+    rewardRate = (earnings / stakingAmount) * 100
+    earnings = earnings - earnings * astinf.commission 
   
-    currentNetworkShare = currentNetworkShare * 100
-    if (currentNetworkShare > 100) {
-      currentNetworkShare = 100
+    curNetworkShare = curNetworkShare * 100
+    if (curNetworkShare > 100) {
+      curNetworkShare = 100
     }
-    console.log('networkValue: ', currentNetworkShare)
-    console.log('adjustedReward: ', adjustedReward)
-    console.log('earnings: ', earnings)
-    console.log('rewardRate: ', rewardRate)
   
     return {
       earnings: earnings,
       rewardRate: rewardRate,
-      networkValue: currentNetworkShare * 100,
+      networkValue: curNetworkShare,
       adjustedReward: adjustedReward,
     }
   }

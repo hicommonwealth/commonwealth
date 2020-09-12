@@ -6,12 +6,11 @@ import { AssetInfo } from '../../models/AssetInfo'
 export const CalculatorReturnsContent: m.Component<{
     rateInHour: number
     astinf: AssetInfo
-    switch_mode: boolean
+    isCompound: boolean
     stakingAmount: number
     stakingLength: number
-    class_val: string
-    inventory_coins: number
-    staked_supply: number
+    classVal: string
+    selectedRate: number
 }, {}> = {
     view: (vnode) => {
         const duration = formatDuration(
@@ -22,13 +21,12 @@ export const CalculatorReturnsContent: m.Component<{
         )
         const d = calcRewards(
             vnode.attrs.astinf,
-            vnode.attrs.switch_mode,
+            vnode.attrs.isCompound,
             vnode.attrs.stakingAmount,
             vnode.attrs.stakingLength,
-            vnode.attrs.inventory_coins,
-            vnode.attrs.staked_supply,
+            vnode.attrs.selectedRate,
         )
-        return m(`.returns_content_div.col-lg-4${vnode.attrs.class_val}`, [
+        return m(`.returns_content_div.col-lg-4${vnode.attrs.classVal}`, [
             m('strong', `${duration} @ ${formatNumberShort(d.rewardRate)} %`),
             m('p', `${formatNumberShort(d.earnings)} EDG`),
             m(

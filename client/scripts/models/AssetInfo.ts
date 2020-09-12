@@ -8,8 +8,8 @@ export class AssetInfo {
     consts: ChainConstant
     calculatedInterestRate: number
     commission: number
-    rewardFrequencyHours: number
+    rewardFrequencyMinutes: number
+    totalSupply: number
     //staked : number
     //totalStaked: number
-    //totalBalance: number
   }
