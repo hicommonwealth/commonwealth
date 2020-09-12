@@ -101,14 +101,14 @@ const discordFormat = (content, address?) => {
         //   "url": `${content.url}`,
         //   "icon_url": "https://commonwealth.im/static/img/logo.png"
         // },
-        "title": `${capitalize(content.ChainEventType.chain)}`,
-        "url": `${SERVER_URL}/${content.ChainEventType.chain}`,
+        "title": `${capitalize(content.chainEventType.chain)}`,
+        "url": `${SERVER_URL}/${content.chainEventType.chain}`,
         "color": 15258703,
         "description": `${
           SubstrateEvents.Label(
-            content.ChainEvent.block_number,
-            content.ChainEventType.chain,
-            content.ChainEvent.event_data
+            content.chainEvent.block_number,
+            content.chainEventType.chain,
+            content.chainEvent.event_data
         )}`,
         "footer": {
           "text": "–Commonwealth Labs :dove:",
@@ -127,6 +127,7 @@ const getFilteredContent = (content, address) => {
     content.community ? `Community: ${content.community}` : null,
     content.notificationCategory ? `Type: ${content.notificationCategory}` : null,
     content.chainEventType ? `${capitalize(content.chainEventType.event_name)} event on ${capitalize(content.chainEventType.chain)}` : null,
+    content.chainEvent && content.chainEventType ? `${SubstrateEvents.Label(content.chainEvent.block_number, content.chainEventType.chain, content.chainEvent.event_data)}` : null,
     content.title ? `Title: ${decodeURIComponent(content.title)}` : null,
     content.bodyUrl ? `External Link: ${content.bodyUrl}` : null,
     content.url ? `Link: ${content.url}` : null,
