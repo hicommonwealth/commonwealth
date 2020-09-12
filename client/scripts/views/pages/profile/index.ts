@@ -1,19 +1,24 @@
 import 'pages/profile.scss';
-
+import 'pages/validatorprofile.scss';
 import m from 'mithril';
 import moment from 'moment';
 import _ from 'lodash';
+import Chart from 'chart.js';
 import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
-
+import { Card, Icons, Icon, Select, TextArea } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
+import { ValidatorStats } from './validator_profile_stats';
+import graphs from './graphs';
+import chartComponent from '../../components/chart';
+import lineModel from './graph_models/linemodel';
 
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
@@ -87,7 +92,8 @@ const threadModelFromServer = (thread) => {
 export enum UserContent {
   All = 'all',
   Threads = 'threads',
-  Comments = 'comments'
+  Comments = 'comments',
+  Graphs = 'graphs'
 }
 
 interface IProfilePageState {
@@ -174,51 +180,98 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     //   .filter((p) => p instanceof EdgewareSignalingProposal && p.data.author === account.address);
     // return [].concat(signaling, discussions);
 
-    const comments = vnode.state.comments;
-    const proposals = vnode.state.threads;
-    const allContent = [].concat(proposals || []).concat(comments || [])
-      .sort((a, b) => +b.createdAt - +a.createdAt);
-
-    const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
-    const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
-    const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
-
     return m(Sublayout, {
       class: 'ProfilePage',
     }, [
       m('.forum-container-alt', [
         m(ProfileHeader, { account }),
-        m('.row.row-narrow.forum-row', [
-          m('.col-xs-8', [
-            m(Tabs, [{
-              name: allTabTitle,
-              content: m(ProfileContent, {
-                account,
-                type: UserContent.All,
-                content: { allContent }
-              })
-            }, {
-              name: threadsTabTitle,
-              content: m(ProfileContent, {
-                account,
-                type: UserContent.Threads,
-                content: { proposals }
-              }),
-            }, {
-              name: commentsTabTitle,
-              content: m(ProfileContent, {
-                account,
-                type: UserContent.Comments,
-                content: { comments }
-              }),
-            }]),
-          ]),
-          m('.col-xs-4', [
-            m(ProfileBio, { account }),
-          ]),
-        ]),
+        // Quick stats for a validator section
+        m(ValidatorStats, { address: account.address, account }),
+        // m('.row.row-narrow.forum-row', [
+        // m('.col-xs-12', [
+        m('.row', [
+          m(chartComponent, {
+            title: 'REWARDS OVER TIME',
+            model: lineModel,
+            xvalues:[403, 406, 409, 412, 415, 418, 430, 433, 436, 439, 452, 455, 458, 461, 471],
+            yvalues:[500, 325, 600, 350, 400, 380, 690, 800, 1000, 1600, 1200, 1150, 1300, 1400, 1400],
+            xLabelString:'SESSION',
+            yLabelString:'REWARD',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
+          }),
+          m(chartComponent, {
+            title: 'SLASHES OVER TIME',
+            model: lineModel,
+            xvalues:[500, 325, 600, 350, 400, 380, 690, 800, 1000, 1600, 1200, 1150, 1300, 1400, 1400],
+            yvalues:[403, 406, 409, 412, 415, 418, 430, 433, 436, 439, 452, 455, 458, 461, 471],
+            xLabelString:'SESSION',
+            yLabelString:'SLASH',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
+          }),
+          m(chartComponent, {
+            title: 'XXXXX',
+            model: lineModel,
+            xvalues:[1500, 325, 600, 350, 400, 380, 690, 800, 403, 406, 409, 412, 415, 418, 430],
+            yvalues:[433, 436, 439, 452, 455, 458, 461, 471, 500, 325, 600, 350, 400, 380, 690, 800],
+            xLabelString:'XXXXX',
+            yLabelString:'XXXXX',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
+          }),
+          m(chartComponent, {
+            title: 'IMONLINE EVENTS OVER TIME',
+            model: lineModel,
+            xvalues:[1800, 403, 406, 409, 412, 415, 418, 430, 800, 403, 406, 409, 412, 415, 418, 430],
+            yvalues:[600, 350, 400, 380, 690, 800, 600, 350, 400, 380, 690, 800, 600, 350, 400, 380, 690, 800],
+            xLabelString:'BLOCK',
+            yLabelString:'HEARTBEAT',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
+          }),
+          m(chartComponent, {
+            title: 'OFFENCES OVER TIME',
+            model: lineModel,
+            xvalues:[1, 89, 120, 850, 971],
+            yvalues:[23, 861, 71, 152, 956],
+            xLabelString:'SESSION',
+            yLabelString:'OFFENCE',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
+          }),
+          m(chartComponent, {
+            title: 'NOMINATORS OVER TIME',
+            model: lineModel,
+            xvalues:[12, 89, 12, 850, 97],
+            yvalues:[213, 861, 712, 152, 956],
+            xLabelString:'BLOCK',
+            yLabelString:'yaixs',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
+          }),
+          m(chartComponent, {
+            title: 'NOMINATORS OVER TIME',
+            model: lineModel,
+            xvalues:[12, 89, 12, 850, 97],
+            yvalues:[213, 861, 712, 152, 956],
+            xLabelString:'BLOCK',
+            yLabelString:'yaixs',
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color:'green'
+          }),
+        ])
+        // ]),
+        // ]),
       ]),
-    ]);
+    ],);
   },
 };
 

@@ -60,7 +60,6 @@ class ChainEventsController {
       }, resolve);
     });
   }
-
 }
 
 export default ChainEventsController;

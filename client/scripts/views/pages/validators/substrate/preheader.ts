@@ -11,11 +11,12 @@ import { formatNumber } from '@polkadot/util';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
 import CardSummary from './card_summary';
-
+import { Icon, Icons, Spinner, TextArea, Select, Button } from 'construct-ui';
 interface IPreHeaderState {
   dynamic: {
-    validators: IValidators;
     sessionInfo: DeriveSessionProgress;
+    globalStatistics: any,
+    sender: SubstrateAccount
   },
 }
 
@@ -32,34 +33,28 @@ const offence = {
 };
 
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
-  oncreate: async () => {
+  oncreate: async (vnode) => {
+    vnode.state.dynamic.globalStatistics = await app.staking.globalStatistics();
+    vnode.state.dynamic.sender = app.user.activeAccount as SubstrateAccount;
     const offences = await app.chainEvents.offences();
     offence.setCount(offences);
   },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
     sessionInfo: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.sessionInfo
       : null
   }),
-  view: (vnode) => {
-    const { validators, sessionInfo } = vnode.state.dynamic;
-
-    const { sender, annualPercentRate } = vnode.attrs;
-    if (!validators && !sessionInfo) return;
-
-    let totalPercentage = 0.0;
-    if (annualPercentRate) {
-      Object.entries(annualPercentRate).forEach(([key, value]) => {
-        totalPercentage += Number(value);
-      });
-    }
-
-    const denominator = Object.keys(annualPercentRate || {}).length || 1;
-    const apr = (totalPercentage / denominator).toFixed(2);
-    const { validatorCount, currentEra,
+  view: vnode => {
+    let { sessionInfo, globalStatistics, sender } = vnode.state.dynamic;
+    // console.log('globalStatistics ====', globalStatistics);
+    // console.log("sessionInfo ", sessionInfo)
+    if (!sessionInfo && !globalStatistics) return;
+    // console.log("globalStatistics ", JSON.stringify(globalStatistics));
+    let { count = 0, rows = [] } = globalStatistics;
+    let apr = 0.0;
+    const { currentEra,
       currentIndex, sessionLength,
       sessionProgress, eraLength,
       eraProgress, isEpoch } = sessionInfo;
@@ -79,34 +74,41 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         });
     }
 
-    Object.entries(validators).forEach(([_stash, { exposure, isElected }]) => {
-      const valStake = (app.chain as Substrate).chain.coins(exposure?.total.toBn())
-      || (app.chain as Substrate).chain.coins(0);
+    rows.forEach((stats) => {
+      let { exposure = {}, state = '' } = stats;
+      const valStake = (app.chain as Substrate).chain.coins(+exposure?.total)
+        || (app.chain as Substrate).chain.coins(0);
       totalStaked = (app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));
 
       // count total nominators
       const others = exposure?.others || [];
-      others.forEach((indv) => {
-        const nominator = indv.who.toString();
+      others.forEach((obj) => {
+        const nominator = obj.who.toString();
         if (!nominators.includes(nominator)) {
           nominators.push(nominator);
         }
       });
+      // console.log("state ===== ", state);
       // count elected and waiting validators
-      if (isElected) {
+      if (state === 'Active') {
         elected++;
-      } else {
+      } else if (state === 'Waiting') {
         waiting++;
       }
+      // calculate est. apr
+
+      // console.log("stats ====== ", stats)
+      apr += stats?.apr ? stats.apr : 0;
     });
+    apr = apr / count;
     const totalbalance = (app.chain as Substrate).chain.totalbalance;
     const staked = `${(totalStaked.muln(10000).div(totalbalance).toNumber() / 100).toFixed(2)}%`;
 
-    return [
+    return m('div.validator-preheader-container', [
       m('.validators-preheader', [
         m('.validators-preheader-item', [
           m('h3', 'Validators'),
-          m('.preheader-item-text', `${elected}/${validatorCount.toHuman()}`),
+          m('.preheader-item-text', `${elected}/${count}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Waiting'),
@@ -126,20 +128,20 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           m('h3', 'Last Block'),
           m('.preheader-item-text', formatNumber((app.chain as Substrate).block.height)),
         ]),
-        (isEpoch
-          && sessionProgress && m(CardSummary, {
-          title: 'Epoch',
-          total: sessionLength,
-          value: sessionProgress,
-          currentBlock: formatNumber(currentIndex)
-        })),
-        eraProgress
-          && m(CardSummary, {
-            title: 'Era',
-            total: eraLength,
-            value: eraProgress,
-            currentBlock: formatNumber(currentEra)
-          }),
+        (!isEpoch // TODOO: remove !
+          && !sessionProgress && m(CardSummary, {
+            title: 'Epoch',
+            total: sessionLength,
+            value: sessionProgress,
+            currentBlock: formatNumber(currentIndex)
+          })),
+        !eraProgress // TODOO: remove !
+        && m(CardSummary, {
+          title: 'Era',
+          total: eraLength,
+          value: eraProgress,
+          currentBlock: formatNumber(currentEra)
+        }),
         m('.validators-preheader-item', [
           m('h3', 'Est. APR'),
           m('.preheader-item-text', `${apr}%`),
@@ -159,7 +161,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         m('.validators-preheader-item', [
           m('h3', 'Manage Staking'),
           m('.preheader-item-text', [
-            m('a.btn.formular-button-primary', {
+            m(Button, {
+              label: 'Manage',
               class: app.user.activeAccount ? '' : 'disabled',
               href: '#',
               onclick: (e) => {
@@ -169,13 +172,14 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                   data: { account: sender }
                 });
               }
-            }, 'Manage'),
+            })
           ]),
         ]),
         hasClaimablePayouts && m('.validators-preheader-item', [
           m('h3', 'Claim Payout'),
           m('.preheader-item-text', [
-            m('a.btn.formular-button-primary', {
+            m(Button, {
+              label: 'Claim',
               class: app.user.activeAccount ? '' : 'disabled',
               href: '#',
               onclick: (e) => {
@@ -185,13 +189,14 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                   data: { account: sender }
                 });
               }
-            }, 'Claim'),
+            })
           ]),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Update nominations'),
           m('.preheader-item-text', [
-            m('a.btn.formular-button-primary', {
+            m(Button, {
+              label: 'Update',
               class: app.user.activeAccount ? '' : 'disabled',
               href: '#',
               onclick: (e) => {
@@ -199,18 +204,18 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                 createTXModal((nominators.length === 0)
                   ? sender.chillTx()
                   : sender.nominateTx(nominators)).then(() => {
-                  // vnode.attrs.sending = false;
-                  m.redraw();
-                }, () => {
-                  // vnode.attrs.sending = false;
-                  m.redraw();
-                });
+                    // vnode.attrs.sending = false;
+                    m.redraw();
+                  }, () => {
+                    // vnode.attrs.sending = false;
+                    m.redraw();
+                  });
               }
-            }, 'Update'),
+            })
           ]),
         ]),
       ])
-    ];
+    ]);
   }
 });
 
