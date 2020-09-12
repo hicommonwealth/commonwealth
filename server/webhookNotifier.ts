@@ -56,6 +56,8 @@ const telegramFormat = (content, address) => {
 }
 
 const discordFormat = (content, address?) => {
+  let event;
+  if (content.chainEvent && content.chainEventType) event = SubstrateEvents.Label(content.chainEvent.block_number, content.chainEventType.chain, content.chainEvent.event_data);
   return (content.notificationCategory !== 'chain-event') ? { // Forum Event Discord JSON
     'username': 'Commonwealth',
     'avatar_url': 'https://commonwealth.im/static/img/logo.png',
@@ -106,12 +108,7 @@ const discordFormat = (content, address?) => {
         "title": `${capitalize(content.chainEventType.chain)}`,
         "url": `${SERVER_URL}/${content.chainEventType.chain}`,
         "color": 15258703,
-        "description": `${
-          SubstrateEvents.Label(
-            content.chainEvent.block_number,
-            content.chainEventType.chain,
-            content.chainEvent.event_data
-        ).toString()}`,
+        "description": `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}`,
         "footer": {
           "text": "–Commonwealth Labs :dove:",
           "icon_url": "https://commonwealth.im/static/img/logo.png"
@@ -139,6 +136,8 @@ const getFilteredContentMarkdown = (content, address) => {
 };
 
 const getFilteredContent = (content, address) => {
+  let event;
+  if (content.chainEvent && content.chainEventType) event = SubstrateEvents.Label(content.chainEvent.block_number, content.chainEventType.chain, content.chainEvent.event_data);
   return [
     address ? `Name: ${address.name}` : null,
     content.user ? `Address: ${content.user}` : null,
@@ -146,7 +145,7 @@ const getFilteredContent = (content, address) => {
     content.community ? `Community: ${content.community}` : null,
     content.notificationCategory ? `Type: ${content.notificationCategory}` : null,
     content.chainEventType ? `${capitalize(content.chainEventType.event_name)} event on ${capitalize(content.chainEventType.chain)}` : null,
-    content.chainEvent && content.chainEventType ? `${SubstrateEvents.Label(content.chainEvent.block_number, content.chainEventType.chain, content.chainEvent.event_data).toString()}` : null,
+    content.chainEvent && content.chainEventType ? `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}` : null,
     content.title ? `Title: ${decodeURIComponent(content.title)}` : null,
     content.bodyUrl ? `External Link: ${content.bodyUrl}` : null,
     content.url ? `Link: ${content.url}` : null,
