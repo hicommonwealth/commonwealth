@@ -3,6 +3,8 @@ import { NotificationCategories } from '../shared/types';
 import { Op } from 'sequelize';
 import e from 'express';
 import { capitalize } from 'lodash';
+import { SERVER_URL } from './config';
+import { SubstrateEvents } from '@commonwealth/chain-events';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -52,7 +54,7 @@ const telegramFormat = (content, address) => {
 }
 
 const discordFormat = (content, address?) => {
-  return {
+  return (content.notificationCategory !== 'chain-event') ? { // Forum Event Discord JSON
     'username': 'Commonwealth',
     'avatar_url': 'https://commonwealth.im/static/img/logo.png',
     // 'content': ``,
@@ -89,7 +91,32 @@ const discordFormat = (content, address?) => {
         }
       }
     ]
-  }
+  } : { // Chain Event Discord JSON
+    'username': 'Commonwealth',
+    'avatar_url': 'https://commonwealth.im/static/img/logo.png',
+    "embeds": [
+      {
+        // "author": {
+        //   "name": `Chain Event`,
+        //   "url": `${content.url}`,
+        //   "icon_url": "https://commonwealth.im/static/img/logo.png"
+        // },
+        "title": `${capitalize(content.ChainEventType.chain)}`,
+        "url": `${SERVER_URL}/${content.ChainEventType.chain}`,
+        "color": 15258703,
+        "description": `${
+          SubstrateEvents.Label(
+            content.ChainEvent.block_number,
+            content.ChainEventType.chain,
+            content.ChainEvent.event_data
+        )}`,
+        "footer": {
+          "text": "–Commonwealth Labs :dove:",
+          "icon_url": "https://commonwealth.im/static/img/logo.png"
+        }
+      }
+    ]
+  };
 }
 
 const getFilteredContent = (content, address) => {
