@@ -55,7 +55,7 @@ class Controller {
     if (!this.selectedItem)
       return null;
     return m('span', [
-      m('span.strong', truncate(this.selectedItem.profile.displayName, { length: 20 })),
+      m('span.padding-r7', truncate(this.selectedItem.profile.displayName, { length: 20 })),
       truncate(this.selectedItem.profile.address, { length: 25 }),
     ]);
   }
@@ -226,7 +226,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
               align: 'left',
               compact: true,
               iconRight: Icons.CHEVRON_DOWN,
-              sublabel: 'Account:',
+              sublabel: stashModel.label() ? '' : 'Select Stash',
               label: stashModel.label(),
               style: 'min-width: 100%'
             })
@@ -238,7 +238,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
             position: 'top',
             hasArrow: true,
             size: 'sm',
-            trigger: m('span.pointer', m(Icon, { name: Icons.HELP_CIRCLE, size: 'sm' }))
+            trigger: m('span.help-pointer', m(Icon, { name: Icons.HELP_CIRCLE, size: 'sm' }))
           })),
           m(SelectList, {
             emptyContent: 'No accounts available',
@@ -253,7 +253,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
               align: 'left',
               compact: true,
               iconRight: Icons.CHEVRON_DOWN,
-              sublabel: 'Account:',
+              sublabel: ctlModel.label() ? '' : 'Select Controller',
               label: ctlModel.label(),
               style: 'min-width: 100%'
             })
@@ -271,7 +271,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
             position: 'top',
             hasArrow: true,
             size: 'sm',
-            trigger: m('span.pointer', m(Icon, { name: Icons.HELP_CIRCLE, size: 'sm' }))
+            trigger: m('span.help-pointer', m(Icon, { name: Icons.HELP_CIRCLE, size: 'sm' }))
           })),
           m('span.bonded-value', [
             m(Input, {
@@ -315,7 +315,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
             position: 'top',
             hasArrow: true,
             size: 'sm',
-            trigger: m('span.pointer', m(Icon, { name: Icons.HELP_CIRCLE, size: 'sm' }))
+            trigger: m('span.help-pointer', m(Icon, { name: Icons.HELP_CIRCLE, size: 'sm' }))
           })),
           m('span.pointer',
             m(SelectList, {

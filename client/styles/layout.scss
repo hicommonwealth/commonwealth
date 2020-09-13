@@ -80,6 +80,12 @@ pre {
 .right{
     float: right;
 }
+.right-sub{
+    .cui-icon{
+        position: absolute;
+        right: 0;
+    }
+}
 .clear {
     clear: both;
 }
@@ -304,4 +310,19 @@ pre {
 }
 .border-r-1{
     border-right: 1px solid #d4d4d4;
+}
+.padding-r7{
+    padding-right: 7px;
+}
+.help-pointer{
+    cursor: help;
+}
+button:disabled{
+    cursor: not-allowed;
+}
+.min-h-200{
+    min-height: 200px !important;
+}
+.padding-top-15{
+    padding-top: 15px;
 }

@@ -80,6 +80,26 @@ class ChainEventsController {
       }, resolve);
     });
   }
+
+  public createValidatorGroups(payload: {stashes: string[], name: string}) {
+    return new Promise((resolve) => {
+      return post('/createValidatorGroup', {
+        chain: app.chain.id,
+        jwt: app.user.jwt,
+        ...payload
+      }, resolve);
+    });
+  }
+
+  public getValidatorGroups(payload) {
+    return new Promise((resolve) => {
+      return get('/getValidatorGroup', {
+        chain: app.chain.id,
+        jwt: app.user.jwt,
+        ...payload
+      }, resolve);
+    });
+  }
 }
 
 export default ChainEventsController;

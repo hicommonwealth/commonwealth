@@ -1,6 +1,7 @@
 import m from 'mithril';
 import app from 'state';
 import { ChainBase } from 'models';
+import Spinner from 'views/pages/spinner';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
 import { Col, Grid } from 'construct-ui';
@@ -62,7 +63,7 @@ const Nominate = makeDynamicComponent<NominateAttrs, NominateState>({
     const { validators } = vnode.state.dynamic;
 
     if (!validators)
-      return m('p', 'Loading ...');
+      return m(Spinner);
 
     return m('.Nominate', [
       m('h5', 'Candidate Accounts'),

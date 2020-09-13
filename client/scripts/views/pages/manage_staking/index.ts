@@ -43,15 +43,8 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     let vComponents = [];
     switch (app.chain.class) {
       case ChainClass.Edgeware:
-        vComponents = [
-          m(SubstratePreHeader, {
-            sender: app.user.activeAccount as SubstrateAccount,
-            bondedTotal
-          }),
-          SubstratePresentationComponent(vnode.state, app.chain as Substrate),
-        ];
-        break;
       case ChainClass.Kusama:
+      case ChainClass.Polkadot:
         vComponents = [
           m(SubstratePreHeader, {
             sender: app.user.activeAccount as SubstrateAccount,

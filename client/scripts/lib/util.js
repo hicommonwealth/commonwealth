@@ -26,5 +26,9 @@ export const post = (route, args, callback) => {
       } else {
         console.error(resp);
       }
-    }).catch((e) => console.error(e));
+    }).catch((e) => {
+      const message = e.responseJSON.error || 'Something has went wrong, try again later.';
+      app.toasts.createError(message);
+      callback(null);
+    });
 };

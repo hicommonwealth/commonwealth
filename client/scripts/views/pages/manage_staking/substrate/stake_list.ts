@@ -2,13 +2,13 @@ import m from 'mithril';
 import app from 'state';
 import { makeDynamicComponent } from 'models/mithril';
 import { StakerState, sortStashes } from 'controllers/chain/substrate/staking';
-import AccountActionsRow from 'views/pages/manage_staking/substrate/account_actions_row';
+import StakeRow from 'views/pages/manage_staking/substrate/stake_row';
 
-export interface IAccountActionsState {
+export interface IStakeListState {
   dynamic: { }
 }
 
-export interface AccountActionsAttrs {
+export interface StakeListAttrs {
   ownStashInfos?: StakerState[]
 }
 
@@ -20,7 +20,7 @@ const model: IModel = {
   foundStashes: []
 };
 
-const AccountActions = makeDynamicComponent<AccountActionsAttrs, IAccountActionsState>({
+const StakeList = makeDynamicComponent<StakeListAttrs, IStakeListState>({
   oncreate: (vnode) => {
     const { ownStashInfos } = vnode.attrs;
     model.foundStashes = ownStashInfos.sort(sortStashes);
@@ -41,7 +41,7 @@ const AccountActions = makeDynamicComponent<AccountActionsAttrs, IAccountActions
           m('th.val-settings', '')
         ]),
         model.foundStashes.map((info) => {
-          return m(AccountActionsRow, { info });
+          return m(StakeRow, { info });
         }),
         !model.foundStashes.length && m('tr.ManageStakingRow', [
           m('td', { colspan: '7' }, 'No funds staked yet. Bond funds to validate or nominate a validator')
@@ -50,4 +50,4 @@ const AccountActions = makeDynamicComponent<AccountActionsAttrs, IAccountActions
   }
 });
 
-export default AccountActions;
+export default StakeList;

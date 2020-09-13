@@ -17,14 +17,14 @@ import SetValidator from './set_validator';
 import SetNominators from './set_nominators';
 import { openTXModal } from './new_nominator';
 
-export interface IAccountActionsState {
+export interface IStakeRowState {
   dynamic: {
     balancesAll: DeriveBalancesAll,
     stakingAccount: DeriveStakingAccount
   }
 }
 
-export interface AccountActionsAttrs {
+export interface StakeRowAttrs {
   info: StakerState
 }
 
@@ -64,7 +64,7 @@ const model: IModel = {
   }
 };
 
-const AccountActionsRow = makeDynamicComponent<AccountActionsAttrs, IAccountActionsState>({
+const StakeRow = makeDynamicComponent<StakeRowAttrs, IStakeRowState>({
   getObservables: (attrs) => ({
     groupKey: attrs.info.stashId,
     balancesAll: (app.chain.base === ChainBase.Substrate)
@@ -117,6 +117,7 @@ const AccountActionsRow = makeDynamicComponent<AccountActionsAttrs, IAccountActi
       !isLoading && m('td.val-btns', (isStashNominating || isStashValidating)
         ? m('span.icon-text.pointer', m(Tooltip, {
           content: 'Stop',
+          position: 'top',
           trigger: m(Icon, {
             name: Icons.STOP_CIRCLE,
             size: 'lg',
@@ -127,6 +128,7 @@ const AccountActionsRow = makeDynamicComponent<AccountActionsAttrs, IAccountActi
           (!sessionIds.length || hexSessionIdNext === '0x')
             ? m('span.icon-text.pointer', m(Tooltip, {
               content: 'Session Key',
+              position: 'top',
               trigger: m(Icon, {
                 name: Icons.KEY,
                 size: 'lg',
@@ -134,6 +136,7 @@ const AccountActionsRow = makeDynamicComponent<AccountActionsAttrs, IAccountActi
               })
             })) : m('span.icon-text.pointer', m(Tooltip, {
               content: 'Validate',
+              position: 'top',
               trigger: m(Icon, {
                 name: Icons.STAR,
                 size: 'lg',
@@ -141,6 +144,7 @@ const AccountActionsRow = makeDynamicComponent<AccountActionsAttrs, IAccountActi
               })
             })),
           m('span.icon-text.pointer', m(Tooltip, {
+            position: 'top',
             content: 'Nominate',
             trigger: m(Icon, {
               name: Icons.THUMBS_UP,
@@ -172,4 +176,4 @@ const AccountActionsRow = makeDynamicComponent<AccountActionsAttrs, IAccountActi
   }
 });
 
-export default AccountActionsRow;
+export default StakeRow;
