@@ -97,11 +97,6 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
 
-    // getCurrentValidators: from(app.staking.currentValidators({}, {})),
-    // getWaitingValidators: from(app.staking.waitingValidators({}, {})),
-    // globalStats: from(app.staking.globalStatistics()), // convert promise into observable
-
-    // validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
     currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
     currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
     activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,
@@ -134,10 +129,10 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
       case ChainClass.Kusama:
       case ChainClass.Polkadot: {
         vComponents = [
-          // m(SubstratePreHeader, {
-          //   sender: app.user.activeAccount as SubstrateAccount,
-          //   annualPercentRate: vnode.state.dynamic.annualPercentRate
-          // }),
+          m(SubstratePreHeader, {
+            sender: app.user.activeAccount as SubstrateAccount,
+            annualPercentRate: vnode.state.dynamic.annualPercentRate
+          }),
           m(SubstratePresentationComponent)
 
         ];
