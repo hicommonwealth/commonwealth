@@ -16,7 +16,7 @@ const createValidatorGroup = async (models, req: Request, res: Response, next: N
     ? req.body[STASHES_KEY]
     : [req.body[STASHES_KEY]];
 
-  if (!stashes.length) {
+  if (!req.body[STASHES_KEY] || !stashes.length) {
     return next(new Error(Errors.Stashes));
   }
   if (!req.body.name) {
