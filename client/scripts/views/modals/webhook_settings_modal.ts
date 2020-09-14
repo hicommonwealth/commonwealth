@@ -6,7 +6,7 @@ import app from 'state';
 import { Button, List, ListItem, Checkbox } from 'construct-ui';
 import { Webhook } from 'models';
 import { NotificationCategories } from 'types';
-import { EdgewareChainNotificationTypes, KusamaChainNotificationTypes, KulupuChainNotificationTypes, PolkdotChainNotificationTypes } from 'helpers/chain_notification_types';
+import { EdgewareChainNotificationTypes, KusamaChainNotificationTypes, KulupuChainNotificationTypes, PolkadotChainNotificationTypes } from 'helpers/chain_notification_types';
 import { symbols } from 'helpers';
 
 interface IAttrs {
@@ -36,7 +36,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
     const chainNotifications = webhook.chain_id === 'edgeware' ? EdgewareChainNotificationTypes 
       : webhook.chain_id === 'kusama' ? KusamaChainNotificationTypes
         : webhook.chain_id === 'kulupu' ? KulupuChainNotificationTypes
-          : webhook.chain_id === 'polkadot' ? PolkdotChainNotificationTypes
+          : webhook.chain_id === 'polkadot' ? PolkadotChainNotificationTypes
             : {};
     const row = (label: string, values: string[]) => {
         const allValuesPresent = values.every((v) => vnode.state.selectedCategories.includes(v));
