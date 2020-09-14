@@ -159,11 +159,11 @@ export const ProposalBodyReplyMenuItem: m.Component<{
     if (!item) return;
 
     return m(MenuItem, {
-      label: 'Reply',
+      label: 'Comment',
       onclick: async (e) => {
         e.preventDefault();
         if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
-          const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
+          const confirmed = await confirmationModalWithText('Unsent comments will be lost. Continue?')();
           if (!confirmed) return;
         }
         getSetGlobalReplyStatus(GlobalStatus.Set, item.id);

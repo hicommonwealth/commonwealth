@@ -150,7 +150,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     return next(err);
   }
 
-  // auto-subscribe thread creator to replies & reactions
+  // auto-subscribe thread creator to comments & reactions
   try {
     await models.Subscription.create({
       subscriber_id: req.user.id,
