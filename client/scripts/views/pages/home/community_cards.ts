@@ -7,6 +7,7 @@ import app from 'state';
 import { link, pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import UserGallery from '../../components/widgets/user_gallery';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : labelCount;
@@ -27,6 +28,8 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
     const chainInfo = app.config.chains.getById(chain);
     const visitedChain = !!app.user.unseenPosts[chain];
     const updatedThreads = app.user.unseenPosts[chain]?.activePosts || 0;
+    const monthlyThreads = app.recentActivity.activeThreadCount[chain];
+
 
     return m(Card, {
       elevation: 1,
@@ -52,6 +55,10 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
           ],
         ]),
         m('p.card-description', chainInfo.description),
+        m('.recent-activity', [
+          !!monthlyThreads
+            && m('.recent-threads', `${monthlyThreads} threads this month.`),
+        ])
       ]),
     ]);
   }
@@ -62,6 +69,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
     const { justJoinedCommunities, community } = vnode.attrs;
     const visitedCommunity = !!app.user.unseenPosts[community.id];
     const updatedThreads = app.user.unseenPosts[community.id]?.activePosts || 0;
+    const monthlyThreads = app.recentActivity.activeThreadCount[community.id];
 
     return m(Card, {
       elevation: 1,
@@ -89,6 +97,10 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
             ],
         ]),
         m('p.card-description', community.description),
+        m('.recent-activity', [
+          !!monthlyThreads
+            && m('.recent-threads', `${monthlyThreads} threads this month.`),
+        ])
       ]),
     ]);
   }
