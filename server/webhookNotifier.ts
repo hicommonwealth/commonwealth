@@ -153,7 +153,6 @@ const getFilteredContent = (content, address) => {
 };
 
 const send = async (models, content: WebhookContent) => {
-  console.log('webhook content', content);
   let address;
   try {
     address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
@@ -165,9 +164,7 @@ const send = async (models, content: WebhookContent) => {
   const chainOrCommObj = (content.community) ? { offchain_community_id: content.community }
     : (content.chain) ? { chain_id: content.chain }
     : null;
-  console.log('chainOrCommObj', chainOrCommObj);
   const notificationCategory = (content.chainEvent) ? content.chainEvent.chain_event_type_id : content.notificationCategory;
-  console.log('notificationCategory', notificationCategory);
   // grab all webhooks for specific community
   const chainOrCommWebhooks = await models.Webhook.findAll({
     where: {
@@ -177,7 +174,6 @@ const send = async (models, content: WebhookContent) => {
       },
     },
   });
-  console.log('all webhooks', chainOrCommWebhooks);
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
     // We currently only support slack webhooks
@@ -188,7 +184,6 @@ const send = async (models, content: WebhookContent) => {
   await Promise.all(chainOrCommwebhookUrls
     .filter((url) => !!url)
     .map(async (url) => {
-      console.log(url);
       // format data for sending
       const data = (url.indexOf('slack') !== -1) ? slackFormat(content, address)
         : (url.indexOf('discord') !== -1) ? discordFormat(content, address)
