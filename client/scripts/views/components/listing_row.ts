@@ -1,6 +1,6 @@
 import 'components/listing_row.scss';
 
-import m, { VnodeDOM, Vnode } from 'mithril';
+import m, { Vnode } from 'mithril';
 import Chart from 'chart.js';
 import moment from 'moment-twitter';
 
@@ -10,6 +10,7 @@ import { Grid, Col, Icon, Icons } from 'construct-ui';
 interface IContentLeft {
   header: Vnode | Vnode[];
   subheader: Vnode | Vnode[];
+  subheader2?: Vnode | Vnode[];
   pinned?: boolean;
 }
 
@@ -36,6 +37,7 @@ const ListingRow: m.Component<{
         m('.title-container', [
           m('.row-header', contentLeft.header),
           m('.row-subheader', contentLeft.subheader),
+          contentLeft.subheader2 && m('.row-subheader', contentLeft.subheader2),
         ]),
       ]),
       m('.row-right', [
