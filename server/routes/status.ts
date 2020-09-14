@@ -64,8 +64,13 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       created_at: {
         [Op.gt]: thirtyDaysAgo
       }
+    },
+    include: {
+      model: models.Address,
     }
   });
+
+  console.log(recentThreads[0].Address);
   const recentComments = await models.OffchainComment.findAll({
     where: {
       [Op.or]: [
@@ -83,6 +88,9 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       created_at: {
         [Op.gt]: thirtyDaysAgo
       }
+    },
+    include: {
+      model: models.Address,
     }
   });
   const recentReactions = await models.OffchainReaction.findAll({
@@ -101,6 +109,10 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       ],
       created_at: {
         [Op.gt]: thirtyDaysAgo
+      },
+      include: {
+        model: models.Address,
+
       }
     }
   });
@@ -113,11 +125,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     const allContent = recentThreads.concat(recentComments).concat(recentReactions);
     allContent.forEach((item) => {
       const entity = item.community || item.chain;
-      if (activeAddresses[entity] && !activeAddresses[entity].includes(item.address_id)) {
-        activeAddresses[entity].push(item.address_id);
-      } else if (!activeAddresses[entity]) {
-        activeAddresses[entity] = [item.address_id];
-      }
+      console.log(item.Address);
+      activeAddresses[entity][item.address_id] = { address: item.Address.address, chain: item.Address.chain };
     });
     recentThreads.forEach((thread) => {
       const entity = thread.community || thread.chain;
@@ -200,19 +209,19 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       created_at: {
         [Op.gt]: thirtyDaysAgo
       }
+    },
+    include: {
+      model: models.Address,
     }
   });
 
   const activeAddresses = {};
   const activeThreadCount = {};
   const allContent = recentThreads_.concat(recentComments).concat(recentReactions);
+
   allContent.forEach((item) => {
     const entity = item.community || item.chain;
-    if (activeAddresses[entity] && !activeAddresses[entity].includes(item.address_id)) {
-      activeAddresses[entity].push(item.address_id);
-    } else if (!activeAddresses[entity]) {
-      activeAddresses[entity] = [item.address_id];
-    }
+    activeAddresses[entity][item.address_id] = { address: item.Address.address, chain: item.Address.chain };
   });
   recentThreads_.forEach((thread) => {
     const entity = thread.community || thread.chain;
