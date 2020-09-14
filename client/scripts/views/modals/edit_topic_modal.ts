@@ -94,9 +94,12 @@ const EditTopicModal : m.Component<{
               style: 'margin-right: 8px',
               onclick: async (e) => {
                 e.preventDefault();
-                await updateTopic(vnode.state.form);
-                if (!vnode.state.error) $(e.target).trigger('modalexit');
-                vnode.state.saving = false;
+                updateTopic(vnode.state.form).then(() => {
+                  $(e.target).trigger('modalexit');
+                }).catch((err) => {
+                  vnode.state.saving = false;
+                  m.redraw();
+                });
               },
               label: 'Save changes',
             }),
@@ -107,10 +110,13 @@ const EditTopicModal : m.Component<{
                 e.preventDefault();
                 const confirmed = await confirmationModalWithText('Delete this topic?')();
                 if (!confirmed) return;
-                await deleteTopic(id);
-                if (!vnode.state.error) $(e.target).trigger('modalexit');
-                vnode.state.saving = false;
-                m.redraw();
+                deleteTopic(id).then(() => {
+                  $(e.target).trigger('modalexit');
+                  m.route.set(`/${app.activeId()}/`);
+                }).catch((err) => {
+                  vnode.state.saving = false;
+                  m.redraw();
+                });
               },
               label: 'Delete topic',
             }),
