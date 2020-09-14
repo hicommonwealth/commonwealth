@@ -92,7 +92,6 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                     label: m(Icon, { name: Icons.SETTINGS, size: 'xs' }),
                     onclick: (e) => {
                       e.preventDefault();
-                      console.log(webhook);
                       app.modals.create({
                         modal: WebhookSettingsModal,
                         data: {
