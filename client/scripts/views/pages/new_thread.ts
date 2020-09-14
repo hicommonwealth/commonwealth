@@ -24,13 +24,16 @@ const NewThreadPage: m.Component = {
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading);
 
+    const hasTopics = !!(app.community?.meta.topics.length || app.chain?.meta.topics.length);
+
     return m(Sublayout, {
       class: 'NewThreadPage',
       title: 'New Thread',
     }, [
       m('.forum-container', [
         m(NewThreadForm, {
-          isModal: false
+          isModal: false,
+          hasTopics
         }),
       ]),
     ]);

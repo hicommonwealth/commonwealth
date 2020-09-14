@@ -147,12 +147,12 @@ export const loadDraft = async (dom, state, draft) => {
 
 export const NewThreadForm: m.Component<{
   isModal: boolean
+  hasTopics: boolean,
 }, {
   activeTopic: OffchainTopic | string | boolean,
   autoTitleOverride,
   form: IThreadForm,
   fromDraft?: number,
-  hasTopics: boolean,
   postType: string,
   quillEditorState,
   overwriteConfirmationModal: boolean,
@@ -166,9 +166,6 @@ export const NewThreadForm: m.Component<{
     vnode.state.recentlyDeletedDrafts = [];
     vnode.state.uploadsInProgress = 0;
     vnode.state.overwriteConfirmationModal = false;
-    if (app.community?.meta.topics.length || app.chain?.meta.topics.length) {
-      vnode.state.hasTopics = true;
-    }
     try {
       vnode.state.activeTopic = isModal
         ? m.route.param('topic')
@@ -216,7 +213,7 @@ export const NewThreadForm: m.Component<{
     if (!app.community && !app.chain) return;
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
-    const { isModal } = vnode.attrs;
+    const { isModal, hasTopics } = vnode.attrs;
     if (vnode.state.quillEditorState?.container) {
       vnode.state.quillEditorState.container.tabIndex = 8;
     }
@@ -332,7 +329,7 @@ export const NewThreadForm: m.Component<{
           ]),
         ]),
         postType === PostType.Link && m(Form, [
-          vnode.state.hasTopics
+          hasTopics
             && m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
               m(TopicSelector, {
                 defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
@@ -432,7 +429,7 @@ export const NewThreadForm: m.Component<{
               })
             ])
             : null,
-          vnode.state.hasTopics
+          hasTopics
             && m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 2, sm: 2 } }, [
               m(TopicSelector, {
                 defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
