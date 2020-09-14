@@ -30,18 +30,19 @@ export default {
         /* point options */
 
         pointBorderWidth: 2, // size of outer circle
-      }, ]
+      } ]
     },
     options: {
       responsive: true,
       tooltips: {
         mode: 'point',
         intersect: true,
+        // enabled: false
       },
-      hover: {
-        mode: 'point',
-        intersect: true
-      },
+      // hover: {
+      //   mode: 'point',
+      //   intersect: false,
+      // },
       legend: {
         display: false
       },
@@ -52,14 +53,15 @@ export default {
           ticks: {
             fontFamily: 'Inter',
             fontColor: '#B0BAC9',
+            beginAtZero: false,
             fontSize: 12,
             padding: 10,
             maxRotation: 0,
             minRotation: 0,
-            stepSize: 500,
-            min: -1,
-            max: 100,
-            fixedStepSize: 100,
+            // stepSize: 1000000,
+            min: 0,
+            // max: 100,
+            // fixedStepSize: 100,
           },
           gridLines: {
             display: false
@@ -67,17 +69,17 @@ export default {
         }],
         yAxes: [{
           display: true,
-
           ticks: {
             fontFamily: 'Inter',
             fontColor: '#B0BAC9',
             fontSize: 12,
-
-            suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+            beginAtZero: false,
+            // stepSize: 1000000,
+            // suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
             // OR //
-            beginAtZero: true,  // minimum value will be 0.
-            maxTicksLimit: 2000,
-            stepSize: 500,
+            // beginAtZero: true,  // minimum value will be 0.
+            // maxTicksLimit: 2000,
+            // stepSize: 500,
             padding: 1,
           },
           gridLines: {

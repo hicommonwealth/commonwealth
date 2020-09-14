@@ -14,6 +14,7 @@ import { ValidatorStats } from './validator_profile_stats';
 import chartComponent from '../../components/chart';
 import lineModel from './graph_models/linemodel';
 
+
 import ProfileHeader from './profile_header';
 
 const commentModelFromServer = (comment) => {
@@ -110,7 +111,7 @@ interface IProfilePageState {
 }
 
 const dataGetter = async (vnode) => {
-  // request for total stake OVER BLOCKS
+  // request for total stake OVER TIME
   m.request({
     method: 'GET',
     url: '/api/getTotalStakeOverTime',
@@ -120,13 +121,15 @@ const dataGetter = async (vnode) => {
       vnode.state.totalStakeGraph = { blocks: [], values: [] };
       if (response) {
         vnode.state.totalStakeGraph.blocks = (Object.keys(response.result.validators[vnode.state.account.address]));
-        vnode.state.totalStakeGraph.values = (Object.values(response.result.validators[vnode.state.account.address]));
+        vnode.state.totalStakeGraph.values = (Object.values(response.result.validators[vnode.state.account.address]).map((x) => {
+          return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0); // 1EDG = 10^18
+        }));
       }
     }).catch((e: any) => {
       vnode.state.totalStakeGraph = { blocks: [], values: [] };
     });
 
-  // request for own stake OVER BLOCKS
+  // request for own stake OVER TIME
   m.request({
     method: 'GET',
     url: '/api/getOwnStakeOverTime',
@@ -136,13 +139,15 @@ const dataGetter = async (vnode) => {
       vnode.state.ownStakeGraph = { blocks: [], values: [] };
       if (response) {
         vnode.state.ownStakeGraph.blocks = (Object.keys(response.result.validators[vnode.state.account.address]));
-        vnode.state.ownStakeGraph.values = (Object.values(response.result.validators[vnode.state.account.address]));
+        vnode.state.ownStakeGraph.values = (Object.values(response.result.validators[vnode.state.account.address]).map((x) => {
+          return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0);
+        }));
       }
     }).catch((e: any) => {
       vnode.state.ownStakeGraph = { blocks: [], values: [] };
     });
 
-  // request for other stake OVER BLOCKS
+  // request for other stake OVER TIME
   m.request({
     method: 'GET',
     url: '/api/getOtherStakeOverTime',
@@ -152,13 +157,15 @@ const dataGetter = async (vnode) => {
       vnode.state.otherStakeGraph = { blocks: [], values: [] };
       if (response) {
         vnode.state.otherStakeGraph.blocks = (Object.keys(response.result.validators[vnode.state.account.address]));
-        vnode.state.otherStakeGraph.values = (Object.values(response.result.validators[vnode.state.account.address]));
+        vnode.state.otherStakeGraph.values = (Object.values(response.result.validators[vnode.state.account.address]).map((x) => {
+          return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0);
+        }));
       }
     }).catch((e: any) => {
       vnode.state.otherStakeGraph = { blocks: [], values: [] };
     });
 
-  // request for nominators OVER BLOCKS
+  // request for nominators OVER TIME
   m.request({
     method: 'GET',
     url: '/api/getNominatorsOverTime',
@@ -167,14 +174,14 @@ const dataGetter = async (vnode) => {
     .then((response: any) => {
       vnode.state.nominatorGraph = { blocks: [], values: [] };
       if (response) {
-        vnode.state.nominatorGraph.blocks = (Object.keys(response.result.validators[vnode.state.account.address]));
-        vnode.state.nominatorGraph.values = (Object.values(response.result.validators[vnode.state.account.address]));
+        vnode.state.nominatorGraph.blocks = (Object.keys(response.result.nominators[vnode.state.account.address]));
+        vnode.state.nominatorGraph.values = (Object.values(response.result.nominators[vnode.state.account.address]));
       }
     }).catch((e: any) => {
       vnode.state.nominatorGraph = { blocks: [], values: [] };
     });
 
-  // request for slashes OVER BLOCKS
+  // request for slashes OVER TIME
   m.request({
     method: 'GET',
     url: '/api/getSlashes',
@@ -190,7 +197,7 @@ const dataGetter = async (vnode) => {
       vnode.state.slashesGraph = { blocks: [], values: [] };
     });
 
-  // request for ImOnline OVER BLOCKS
+  // request for ImOnline OVER TIME
   m.request({
     method: 'GET',
     url: '/api/getImOnline',
@@ -206,7 +213,7 @@ const dataGetter = async (vnode) => {
       vnode.state.imOnlineGraph = { blocks: [], values: [] };
     });
 
-  // request for REWARDS OVER BLOCKS
+  // request for REWARDS OVER TIME
   m.request({
     method: 'GET',
     url: '/api/getRewards',
@@ -222,7 +229,7 @@ const dataGetter = async (vnode) => {
       vnode.state.rewardsGraph = { blocks: [], values: [] };
     });
 
-  // request for OFFENCES OVER BLOCKS
+  // request for OFFENCES OVER TIME
   m.request({
     method: 'GET',
     url: '/api/getOffences',
@@ -322,95 +329,95 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
         // m('.row.row-narrow.forum-row', [
         // m('.col-xs-12', [
         m('.row', [
-          // TOTAL STAKE OVER BLOCKS
+          // TOTAL STAKE OVER TIME
           totalStakeGraph ? (totalStakeGraph.blocks.length ? m(chartComponent, {
-            title: 'TOTAL STAKE OVER BLOCKS', // Title
+            title: 'TOTAL STAKE OVER TIME', // Title
             model: lineModel,
             xvalues: totalStakeGraph.blocks,
             yvalues: totalStakeGraph.values,
-            addColorStop0: 'rgba(0, 0, 0, 0.23)',
-            addColorStop1: 'rgba(0, 0, 0, 0)',
-            color: 'black'
+            addColorStop0: 'rgba(99, 113, 209, 0.23)',
+            addColorStop1: 'rgba(99, 113, 209, 0)',
+            color: 'rgb(99, 113, 209)'
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'TOTAL STAKE OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'TOTAL STAKE OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
               message: ' Loading',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
-          // OWN STAKE OVER BLOCKS
+          // OWN STAKE OVER TIME
           ownStakeGraph ? (ownStakeGraph.blocks.length ? m(chartComponent, {
-            title: 'OWN STAKE OVER BLOCKS', // Title
+            title: 'OWN STAKE OVER TIME', // Title
             model: lineModel,
             xvalues: ownStakeGraph.blocks,
             yvalues: ownStakeGraph.values,
-            addColorStop0: 'rgba(0, 0, 0, 0.23)',
-            addColorStop1: 'rgba(0, 0, 0, 0)',
-            color: 'black'
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color: 'rgb(53, 212, 19)'
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OWN STAKE OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'OWN STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OWN STAKE OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'OWN STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
               message: ' Loading',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
-          // OTHER STAKE OVER BLOCKS
+          // OTHER STAKE OVER TIME
           otherStakeGraph ? (otherStakeGraph.blocks.length ? m(chartComponent, {
-            title: 'OTHER STAKE OVER BLOCKS', // Title
+            title: 'OTHER STAKE OVER TIME', // Title
             model: lineModel,
             xvalues: otherStakeGraph.blocks,
             yvalues: otherStakeGraph.values,
-            addColorStop0: 'rgba(0, 0, 0, 0.23)',
-            addColorStop1: 'rgba(0, 0, 0, 0)',
-            color: 'black'
+            addColorStop0: 'rgba(83, 110, 124, 0.23)',
+            addColorStop1: 'rgba(83, 110, 124, 0)',
+            color: 'rgb(83, 110, 124)'
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OTHER STAKE OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'OTHER STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OTHER STAKE OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'OTHER STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
               message: ' Loading',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
-          // NOMINATORS OVER BLOCKS
+          // NOMINATORS OVER TIME
           nominatorGraph ? (nominatorGraph.blocks.length ? m(chartComponent, {
-            title: 'NOMINATORS OVER BLOCKS', // Title
+            title: 'NOMINATORS OVER TIME', // Title
             model: lineModel,
             xvalues: nominatorGraph.blocks,
             yvalues: nominatorGraph.values,
-            addColorStop0: 'rgba(0, 0, 0, 0.23)',
-            addColorStop1: 'rgba(0, 0, 0, 0)',
-            color: 'black'
+            addColorStop0: 'rgba(237, 146, 61, 0.23)',
+            addColorStop1: 'rgba(237, 146, 61, 0)',
+            color: 'rgb(237, 146, 61)'
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'NOMINATORS OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'NOMINATORS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'NOMINATORS OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'NOMINATORS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
               message: ' Loading',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
-          // SLASHES OVER BLOCKS
+          // SLASHES OVER TIME
           slashesGraph ? (slashesGraph.blocks.length ? m(chartComponent, {
-            title: 'SLASHES OVER BLOCKS', // Title
+            title: 'SLASHES OVER TIME', // Title
             model: lineModel,
             xvalues: slashesGraph.blocks,
             yvalues: slashesGraph.values,
-            addColorStop0: 'rgba(0, 0, 0, 0.23)',
-            addColorStop1: 'rgba(0, 0, 0, 0)',
-            color: 'black'
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color: 'rgb(53, 212, 19)'
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'SLASHES OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'SLASHES OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'SLASHES OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'SLASHES OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
               message: ' Loading',
@@ -418,17 +425,17 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
               style: 'visibility: visible; opacity: 1;'
             })))]),
           imOnlineGraph ? (imOnlineGraph.blocks.length ? m(chartComponent, {
-            title: 'IMONLINE OVER BLOCKS', // Title
+            title: 'IMONLINE OVER TIME', // Title
             model: lineModel,
             xvalues: imOnlineGraph.blocks,
             yvalues: imOnlineGraph.values,
-            addColorStop0: 'rgba(0, 0, 0, 0.23)',
-            addColorStop1: 'rgba(0, 0, 0, 0)',
-            color: 'black'
+            addColorStop0: 'rgba(99, 113, 209, 0.23)',
+            addColorStop1: 'rgba(99, 113, 209, 0)',
+            color: 'rgb(99, 113, 209)'
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'IMONLINE OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'IMONLINE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'IMONLINE OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'IMONLINE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
               message: ' Loading',
@@ -436,17 +443,17 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
               style: 'visibility: visible; opacity: 1;'
             })))]),
           rewardsGraph ? (rewardsGraph.blocks.length ? m(chartComponent, {
-            title: 'REWARDS OVER BLOCKS', // Title
+            title: 'REWARDS OVER TIME', // Title
             model: lineModel,
             xvalues: rewardsGraph.blocks,
             yvalues: rewardsGraph.values,
             addColorStop0: 'rgba(0, 0, 0, 0.23)',
             addColorStop1: 'rgba(0, 0, 0, 0)',
-            color: 'black'
+            color: 'rgb(0, 0, 0)'
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'REWARDS OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'REWARDS OVER BLOCKS')), // Give same Title here
+            m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
               message: ' Loading',

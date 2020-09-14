@@ -3,26 +3,6 @@ import m from 'mithril';
 import Chart from 'chart.js';
 import 'pages/validatorprofile.scss';
 
-export const chartColors = {
-  red: 'rgb(255, 99, 132)',
-  orange: 'rgb(255, 159, 64)',
-  yellow: 'rgb(255, 205, 86)',
-  green: 'rgb(75, 192, 192)',
-  blue: 'rgb(54, 162, 235)',
-  purple: 'rgb(153, 102, 255)',
-  grey: 'rgb(201, 203, 207)'
-};
-export const chartbackColors = { // colors with lowered opacity for shadow effect
-  red: 'rgb(255, 99, 132,0.1)',
-  orange: 'rgb(255, 159, 64,0.1)',
-  yellow: 'rgb(255, 205, 86,0.1)',
-  green: 'rgb(75, 192, 192,0.1)',
-  blue: 'rgb(54, 162, 235,0.1)',
-  purple: 'rgb(153, 102, 255,0.1)',
-  grey: 'rgb(201, 203, 207,0.1)'
-};
-
-
 export default {
   view(vnode) {
     const model = vnode.attrs.model;
@@ -46,7 +26,7 @@ export default {
             const gradient = ctx.createLinearGradient(0, 0, 0, 160);
             gradient.addColorStop(0, addColorStop0);
             gradient.addColorStop(1, addColorStop1);
-            model.config.data.datasets[0].borderColor = chartColors[color];
+            model.config.data.datasets[0].borderColor = color;
             model.config.data.datasets[0].backgroundColor = gradient;
             model.config.data.labels = xvalues;
             model.config.data.datasets[0].data = yvalues;
