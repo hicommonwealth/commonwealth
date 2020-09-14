@@ -22,9 +22,6 @@
     "migrate-server": "heroku run npx sequelize db:migrate --debug",
     "migrate-identities": "NO_CLIENT=true NO_PRERENDER=true IDENTITY_MIGRATION=true ts-node --project tsconfig.node.json server.ts",
     "reset-server": "NO_CLIENT=true NO_PRERENDER=true RESET_DB=true ts-node --project tsconfig.node.json server.ts",
-    "update-events": "NO_CLIENT=true NO_PRERENDER=true UPDATE_EVENTS=true ts-node --project tsconfig.node.json server.ts",
-    "update-balances": "NO_CLIENT=true NO_PRERENDER=true UPDATE_BALANCES=true ts-node --project tsconfig.node.json server.ts",
-    "update-edgeware-lockdrop": "NO_CLIENT=true NO_PRERENDER=true UPDATE_EDGEWARE_LOCKDROP_STATS=true ts-node --project tsconfig.node.json server.ts",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.node.json server.ts",
     "psql": "psql -h localhost commonwealth -U commonwealth"
   },
