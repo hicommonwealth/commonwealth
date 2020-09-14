@@ -147,6 +147,7 @@ export const loadDraft = async (dom, state, draft) => {
 
 export const NewThreadForm: m.Component<{
   isModal: boolean
+  hasTopics: boolean,
 }, {
   activeTopic: OffchainTopic | string | boolean,
   autoTitleOverride,
@@ -170,7 +171,7 @@ export const NewThreadForm: m.Component<{
         ? m.route.param('topic')
         : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
           ? app.lastNavigatedFrom().split('/')[app.lastNavigatedFrom().split('/').indexOf('discussions') + 1]
-            : undefined;
+          : undefined;
     } catch (e) {
       // couldn't extract activeTopic
     }
@@ -212,7 +213,7 @@ export const NewThreadForm: m.Component<{
     if (!app.community && !app.chain) return;
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
-    const { isModal } = vnode.attrs;
+    const { isModal, hasTopics } = vnode.attrs;
     if (vnode.state.quillEditorState?.container) {
       vnode.state.quillEditorState.container.tabIndex = 8;
     }
@@ -328,16 +329,17 @@ export const NewThreadForm: m.Component<{
           ]),
         ]),
         postType === PostType.Link && m(Form, [
-          m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
-            m(TopicSelector, {
-              defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
-              topics: app.topics.getByCommunity(app.activeId()),
-              featuredTopics: app.topics.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
-              updateFormData: updateTopicState,
-              tabindex: 1,
-            }),
-          ]),
+          hasTopics
+            && m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
+              m(TopicSelector, {
+                defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
+                topics: app.topics.getByCommunity(app.activeId()),
+                featuredTopics: app.topics.getByCommunity(app.activeId())
+                  .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+                updateFormData: updateTopicState,
+                tabindex: 1,
+              }),
+            ]),
           m(FormGroup, { span: { xs: 12, sm: 8 }, order: 2 }, [
             m(Input, {
               placeholder: 'https://',
@@ -427,18 +429,19 @@ export const NewThreadForm: m.Component<{
               })
             ])
             : null,
-          m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 2, sm: 2 } }, [
-            m(TopicSelector, {
-              defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
-                ? vnode.state.activeTopic
-                : localStorage.getItem(`${app.activeId()}-active-tag`),
-              topics: app.topics.getByCommunity(app.activeId()),
-              featuredTopics: app.topics.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
-              updateFormData: updateTopicState,
-              tabindex: 1,
-            }),
-          ]),
+          hasTopics
+            && m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 2, sm: 2 } }, [
+              m(TopicSelector, {
+                defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
+                  ? vnode.state.activeTopic
+                  : localStorage.getItem(`${app.activeId()}-active-tag`),
+                topics: app.topics.getByCommunity(app.activeId()),
+                featuredTopics: app.topics.getByCommunity(app.activeId())
+                  .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+                updateFormData: updateTopicState,
+                tabindex: 1,
+              }),
+            ]),
           m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 3 }, [
             m(Input, {
               name: 'new-thread-title',

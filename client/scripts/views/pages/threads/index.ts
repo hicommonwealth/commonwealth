@@ -29,7 +29,7 @@ export const parseMentionsForServer = (text, isMarkdown) => {
   const regexp = RegExp('\\[\\@.+?\\]\\(.+?\\)', 'g');
   if (isMarkdown) {
     const matches = text.match(regexp);
-    if (matches && matches.length) {
+    if (matches && matches.length > 0) {
       return matches.map((match) => {
         const chunks = match.slice(0, match.length - 1).split('/');
         const refIdx = chunks.indexOf('account');
@@ -38,7 +38,7 @@ export const parseMentionsForServer = (text, isMarkdown) => {
     }
   } else {
     return text.ops
-      .filter((op) => op.attributes?.link?.length && op.insert?.slice(0, 1) === '@')
+      .filter((op) => op.attributes?.link?.length > 0 && op.insert?.slice(0, 1) === '@')
       .map((op) => {
         const chunks = op.attributes.link.split('/');
         const refIdx = chunks.indexOf('account');
@@ -107,6 +107,10 @@ export const newThread = async (
   privacy?: boolean,
   readOnly?: boolean
 ) => {
+  const topics = app.chain
+    ? app.chain.meta.chain.topics
+    : app.community.meta.topics;
+
   if (kind === OffchainThreadKind.Forum) {
     if (!form.threadTitle) {
       throw new Error(NewThreadErrors.NoTitle);
@@ -120,7 +124,7 @@ export const newThread = async (
       throw new Error(NewThreadErrors.NoUrl);
     }
   }
-  if (!form.topicName) {
+  if (!form.topicName && topics.length > 0) {
     throw new Error(NewThreadErrors.NoTopic);
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
@@ -175,15 +179,17 @@ export const newThread = async (
   await app.user.notifications.refresh();
   m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
 
-  try {
-    const topicNames = Array.isArray(activeEntity?.meta?.topics)
-      ? activeEntity.meta.topics.map((t) => t.name)
-      : [];
-    if (!topicNames.includes(result.topic.name)) {
-      activeEntity.meta.topics.push(result.topic);
+  if (result.topic) {
+    try {
+      const topicNames = Array.isArray(activeEntity?.meta?.topics)
+        ? activeEntity.meta.topics.map((t) => t.name)
+        : [];
+      if (!topicNames.includes(result.topic.name)) {
+        activeEntity.meta.topics.push(result.topic);
+      }
+    } catch (e) {
+      console.log(`Error adding new topic to ${activeEntity}.`);
     }
-  } catch (e) {
-    console.log(`Error adding new topic to ${activeEntity}.`);
   }
 
   mixpanel.track('Create Thread', {
