@@ -30,7 +30,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
     vnode.state.selectedCategories = [];
     vnode.attrs.webhook.categories.forEach((v) => vnode.state.selectedCategories.push(v));
   },
-  view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+  view: (vnode) => {
     const { webhook } = vnode.attrs;
     const isChain = webhook.chain_id ? true : false;
     const chainNotifications = webhook.chain_id === 'edgeware' ? EdgewareChainNotificationTypes 
@@ -67,7 +67,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
       m('.CompactModalExitButton.dark', {
         onclick: (e) => {
           e.preventDefault();
-          $(vnode.dom).trigger('modalexit');
+          $(e.target).trigger('modalexit');
         }
       }, symbols.times),
       m('.title-section', [
@@ -118,10 +118,10 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
             success: (result) => {
               const updatedWebhook = Webhook.fromJSON(result.result);
               vnode.attrs.updateSuccessCallback(updatedWebhook);
-              $(vnode.dom).trigger('modalexit');
+              $(e.target).trigger('modalexit');
             },
             error: (err) => {
-              notifyError(err);
+              notifyError(err.statusText);
               m.redraw();
             }
           });
