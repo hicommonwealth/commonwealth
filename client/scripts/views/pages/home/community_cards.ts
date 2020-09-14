@@ -5,7 +5,7 @@ import { Button, Icon, Icons, Card, Tag } from 'construct-ui';
 
 import app from 'state';
 import { link, pluralize } from 'helpers';
-import { NodeInfo, CommunityInfo } from 'models';
+import { NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import UserGallery from '../../components/widgets/user_gallery';
 
@@ -29,7 +29,8 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
     const visitedChain = !!app.user.unseenPosts[chain];
     const updatedThreads = app.user.unseenPosts[chain]?.activePosts || 0;
     const monthlyThreads = app.recentActivity.activeThreadCount[chain];
-
+    const monthlyUsers = Object.values(app.recentActivity.activeAddresses[community.id]);
+    console.log(monthlyUsers);
 
     return m(Card, {
       elevation: 1,
@@ -58,6 +59,8 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
         m('.recent-activity', [
           !!monthlyThreads
             && m('.recent-threads', `${monthlyThreads} threads this month.`),
+          !!monthlyUsers.length
+            && m(UserGallery, { users: (monthlyUsers as AddressInfo[]) })
         ])
       ]),
     ]);
@@ -70,7 +73,8 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
     const visitedCommunity = !!app.user.unseenPosts[community.id];
     const updatedThreads = app.user.unseenPosts[community.id]?.activePosts || 0;
     const monthlyThreads = app.recentActivity.activeThreadCount[community.id];
-
+    const monthlyUsers = Object.values(app.recentActivity.activeAddresses[community.id]);
+    console.log(monthlyUsers);
     return m(Card, {
       elevation: 1,
       interactive: true,
@@ -100,6 +104,8 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
         m('.recent-activity', [
           !!monthlyThreads
             && m('.recent-threads', `${monthlyThreads} threads this month.`),
+          !!monthlyUsers.length
+            && m(UserGallery, { users: (monthlyUsers as AddressInfo[]) })
         ])
       ]),
     ]);

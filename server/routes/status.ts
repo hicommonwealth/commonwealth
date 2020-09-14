@@ -123,14 +123,13 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     allContent.forEach((item) => {
       const entity = item.community || item.chain;
       if (activeAddresses[entity]) {
-        activeAddresses[entity][item.address_id] = { address: item.Address.address, chain: item.Address.chain };
+        activeAddresses[entity][item.address_id] = [item.Address.chain, item.Address.address];
       } else {
         const addr = {};
-        addr[item.address_id] = { address: item.Address.address, chain: item.Address.chain };
+        addr[item.address_id] = [item.Address.chain, item.Address.address];
         activeAddresses[entity] = addr;
       }
     });
-    console.log(activeAddresses);
     recentThreads.forEach((thread) => {
       const entity = thread.community || thread.chain;
       if (activeThreadCount[entity]) {
@@ -224,10 +223,10 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   allContent.forEach((item) => {
     const entity = item.community || item.chain;
     if (activeAddresses[entity]) {
-      activeAddresses[entity][item.address_id] = { address: item.Address.address, chain: item.Address.chain };
+      activeAddresses[entity][item.address_id] = [item.Address.chain, item.Address.address];
     } else {
       const addr = {};
-      addr[item.address_id] = { address: item.Address.address, chain: item.Address.chain };
+      addr[item.address_id] = [item.Address.chain, item.Address.address];
       activeAddresses[entity] = addr;
     }
   });
