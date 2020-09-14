@@ -137,9 +137,9 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
           parent.children.map((child) => {
             if (child.insert?.mention)
               return m('span.mention', child.insert.mention.denotationChar + child.insert.mention.value);
-            if (child.insert?.image) return m(Icon, { name: Icons.IMAGE });
-            if (child.insert?.twitter) return m(Icon, { name: Icons.IMAGE });
-            if (child.insert?.video) return m(Icon, { name: Icons.IMAGE });
+            if (child.insert?.image) return;
+            if (child.insert?.twitter) return;
+            if (child.insert?.video) return;
             if (child.attributes?.link) return m('a', {
               href: child.attributes.link,
               target: '_blank',
