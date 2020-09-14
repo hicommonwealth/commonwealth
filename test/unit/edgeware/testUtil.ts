@@ -121,6 +121,12 @@ export function constructFakeApi(
       voting: {
         voteRecords: callOverrides['voteRecords'],
       },
+      offences: {
+        concurrentReportsIndex: callOverrides['concurrentReportsIndex'],
+        reports: {
+          multi: callOverrides['reports.multi'],
+        }
+      },
       identity: {
         identityOf,
         registrars: callOverrides['registrars'],

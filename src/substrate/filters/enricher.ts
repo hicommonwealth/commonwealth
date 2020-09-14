@@ -7,6 +7,8 @@ import {
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
+import { filter } from 'lodash';
+import { Kind, OpaqueTimeSlot, OffenceDetails } from '@polkadot/types/interfaces/offences';
 import { CWEvent } from '../../interfaces';
 import { EventKind, IEventData, isEvent, parseJudgement, IdentityJudgement } from '../types';
 
@@ -66,6 +68,33 @@ export async function Enrich(
         }
       }
 
+      /**
+       * Offences Events
+       */
+      case EventKind.Offence: {
+        const [ offenceKind, opaqueTimeSlot, applied ] = event.data as unknown as [ Kind, OpaqueTimeSlot, bool ];
+        const offenceApplied = applied.isTrue;
+        const reportIds = await api.query.offences.concurrentReportsIndex(offenceKind, opaqueTimeSlot);
+        const offenceDetails: Option<OffenceDetails>[] = await api.query.offences.reports
+          .multi(reportIds);
+
+        const allOffenders: Array<ValidatorId> = offenceDetails.map((offence) => {
+          if(offence.isSome)
+            return offence.unwrap().offender[0];
+          return null;
+        });
+        const offenders: Array<ValidatorId> = filter(allOffenders, null);
+
+        return {
+          data: {
+            kind,
+            offenceKind: offenceKind.toString(),
+            opaqueTimeSlot: opaqueTimeSlot.toString(),
+            applied: offenceApplied,
+            offenders: offenders.map((offender => offender.toString()))
+          }
+        };
+      }
       /**
        * Session Events
        */

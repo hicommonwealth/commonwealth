@@ -119,6 +119,20 @@ export const Label: LabelerFilter = (
         // TODO: get link to validator page
       };
     }
+    
+    /**
+     * Offences Events
+     */
+    case EventKind.Offence: {
+      const { offenceKind, opaqueTimeSlot, applied } = data;
+      return {
+        heading: 'Offence',
+        label: `An offence of type ${offenceKind} is reported and ${applied ? 'applied' : 'queued'} at time ${opaqueTimeSlot}.`,
+        linkUrl: chainId
+          ? `/${chainId}/validators`
+          : null,
+      };
+    }
 
     /**
      * Staking Events

@@ -1,22 +1,33 @@
 import chai from 'chai';
+import BN from 'bn.js';
 import {
   AccountId, PropIndex, Hash, ReferendumInfoTo239, ReferendumInfo,
   Proposal, TreasuryProposal, Votes, Event, Extrinsic, Registration,
   RegistrarInfo
 } from '@polkadot/types/interfaces';
 import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types';
-import { Vec, bool, Data, TypeRegistry } from '@polkadot/types';
+import { Vec, bool, Data, TypeRegistry, Option } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
+import { ValidatorId } from '@polkadot/types/interfaces';
+import { OffenceDetails, ReportIdOf } from '@polkadot/types/interfaces/offences';
 import { Enrich } from '../../../src/substrate/filters/enricher';
 import { constructFakeApi, constructOption, constructIdentityJudgement } from './testUtil';
 import { EventKind, IdentityJudgement } from '../../../src/substrate/types';
 
 const { assert } = chai;
-
+const offenceDetails = [ 
+  constructOption({
+    offender: ['charlie', { total: 0, own: 0, others: 0 }],
+    reporters: ['alice', 'dave']
+  } as unknown as Option<OffenceDetails>)
+];
 const blockNumber = 10;
 const api = constructFakeApi({
+  currentIndex: async () => new BN(12),
+  concurrentReportsIndex: async () => [ '0x00' ] as unknown as Vec<ReportIdOf>,
+  'reports.multi': async () => offenceDetails as unknown as Option<OffenceDetails>[],
   bonded: async (stash) => stash !== 'alice-stash'
     ? constructOption()
     : constructOption('alice' as unknown as AccountId),
@@ -774,7 +785,24 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       }
     });
   });
+  /** offences events */
+  it('should enrich new offence event', async () => {
+    const kind = EventKind.Offence;
+    const event = constructEvent([ 'offline', '10000', constructBool(true), offenceDetails ],
+      'offences', [ 'Kind', 'OpaqueTimeSlot', 'bool', 'Option<OffenceDetails>[]' ]);
+    const result = await Enrich(api, blockNumber, kind, event);
 
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        offenceKind: 'offline',
+        opaqueTimeSlot: '10000',
+        applied: constructBool(true).isTrue,
+        offenders: [ 'charlie' ]
+      }
+    });
+  });
   /** other */
   it('should not enrich invalid event', (done) => {
     const kind = 'invalid-event' as EventKind;
