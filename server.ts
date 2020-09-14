@@ -150,7 +150,7 @@ const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 if (DEV) {
   if (process.env.WITH_PRERENDER) setupPrerenderServer();
 } else {
-  setupPrerenderServer();
+  if (!process.env.NO_PRERENDER) setupPrerenderServer();
 }
 
 setupMiddleware();
