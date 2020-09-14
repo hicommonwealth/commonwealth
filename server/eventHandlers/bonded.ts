@@ -58,12 +58,3 @@ export default class extends IEventHandler {
     }
 }
 
-
-
-// export interface IUnbonded extends IEvent {
-//     kind: EventKind.Unbonded;
-//     stash: AccountId;
-//     amount: BalanceString;
-//     controller: AccountId;
-// }
-
