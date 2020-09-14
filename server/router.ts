@@ -56,6 +56,9 @@ import getOwnStakeOverTime from './routes/getOwnStakeOverTime';
 import getOtherStakeOverTime from './routes/getOtherStakeOverTime';
 import getTotalStakeOverTime from './routes/getTotalStakeOverTime';
 import getNominatorsOverTime from './routes/getNominatorsOverTime';
+import { getTotalStakeOverTime, getOwnStakeOverTime, getOtherStakeOverTime, getNominatorsOverTime }
+  from './routes/getExposureOverTime';
+import getImOnline from './routes/getImOnline'
 import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
@@ -216,9 +219,10 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/getRewards', getRewards.bind(this, models));
   router.get('/getUSDvalue', getUSDvalue.bind(this, models));
   router.get('/getOwnStakeOverTime', getOwnStakeOverTime.bind(this, models));
-  router.get('/getTotalStakeOverTime', getTotalStakeOverTime.bind(this, models));
   router.get('/getOtherStakeOverTime', getOtherStakeOverTime.bind(this, models));
+  router.get('/getTotalStakeOverTime', getTotalStakeOverTime.bind(this, models));
   router.get('/getNominatorsOverTime', getNominatorsOverTime.bind(this, models));
+  router.get('/getImOnline', getImOnline.bind(this, models));
   // TODO: Change to PUT /invite
   router.post('/acceptInvite', passport.authenticate('jwt', { session: false }), acceptInvite.bind(this, models));
   // TODO: Change to POST /member
@@ -304,7 +308,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // settings
   // TODO: Change to POST /userSetting
   router.post('/writeUserSetting', passport.authenticate('jwt', { session: false }),
-              writeUserSetting.bind(this, models));
+    writeUserSetting.bind(this, models));
 
   // send feedback button
   // TODO: Change to POST /feedback
