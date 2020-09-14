@@ -146,10 +146,7 @@
                         line-height: 1.25;
                         opacity: 0.4;
                     }
-                    display: -webkit-box;
-                    -webkit-box-orient: vertical;
-                    -webkit-line-clamp: 2;
-                    overflow: hidden;
+                    max-width: 150px;
                 }
                 .discussion-draft-actions {
                     margin-top: 7px;

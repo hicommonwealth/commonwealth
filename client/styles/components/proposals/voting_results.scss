@@ -1,6 +1,7 @@
 @import 'client/styles/shared';
 
 .ProposalVotingResults {
+    margin: 0 24px;
     .vote {
         display: flex;
         margin: 4px 0;
@@ -18,6 +19,7 @@
             margin-left: 4px;
         }
         .vote-deposit {
+            text-align: right;
             margin-left: 4px;
         }
     }

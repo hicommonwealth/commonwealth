@@ -3,7 +3,7 @@ import 'components/widgets/user.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { link } from 'helpers';
+import { formatAddressShort, link } from 'helpers';
 
 import app from 'state';
 import { Account, Profile } from 'models';
@@ -18,6 +18,7 @@ export interface ISubstrateIdentityAttrs {
   linkify: boolean;
   profile: Profile;
   hideIdentityIcon: boolean; // only applies to substrate identities
+  addrShort: string;
 }
 
 export interface ISubstrateIdentityState {
@@ -34,7 +35,8 @@ const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAtt
       : null,
   }),
   view: (vnode) => {
-    const { profile, linkify, account } = vnode.attrs;
+    const { profile, linkify, account, addrShort, hideIdentityIcon } = vnode.attrs;
+
     // return polkadot identity if possible
     let displayName: string;
     let quality: IdentityQuality;
@@ -48,7 +50,7 @@ const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAtt
       quality = vnode.state.dynamic.identity.quality;
     }
 
-    if (displayName && quality) {
+    if (displayName && quality && !hideIdentityIcon) {
       const name = [ displayName, m(`span.identity-icon${
         quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
       }${quality === IdentityQuality.Good
@@ -68,18 +70,18 @@ const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAtt
     return linkify
       ? link('a.user-display-name.username',
         profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-        profile ? profile.displayName : '--',)
-      : m('a.user-display-name.username', profile ? profile.displayName : '--');
+        profile ? profile.displayName : addrShort)
+      : m('a.user-display-name.username', profile ? profile.displayName : addrShort);
   }
 });
 
 const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
   view: (vnode) => {
-    const { profile, linkify } = vnode.attrs;
+    const { profile, linkify, account, addrShort } = vnode.attrs;
 
-    const quality = getIdentityQuality(Object.values(profile.judgements));
+    const quality = profile?.isOnchain && profile?.name && getIdentityQuality(Object.values(profile.judgements));
 
-    if (profile.isOnchain && profile.name && quality) {
+    if (profile?.isOnchain && profile?.name && quality) {
       const name = [ profile.name, m(`span.identity-icon${
         quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
       }${quality === IdentityQuality.Good
@@ -99,8 +101,8 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
     return linkify
       ? link('a.user-display-name.username',
         profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-        profile ? profile.displayName : '--',)
-      : m('a.user-display-name.username', profile ? profile.displayName : '--');
+        profile ? profile.displayName : addrShort)
+      : m('a.user-display-name.username', profile ? profile.displayName : addrShort);
   }
 };
 

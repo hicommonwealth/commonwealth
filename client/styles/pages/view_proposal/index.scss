@@ -108,15 +108,30 @@ $discussion-title-font-size: 1.45rem;
             }
         }
         .ProposalHeaderExternalLink {
-            margin-top: 5px;
+            margin-top: 18px;
             font-weight: 500;
             a:link,
             a:visited {
+                display: block;
+                padding: 10px 15px;
+                border-radius: 6px;
+                background: $background-color-light;
                 color: $theme-base-color;
-                text-decoration: none;
+                text-decoration: none !important;
+            }
+            svg {
+                stroke: $theme-base-color;
+                position: relative;
+                top: -1px;
+                margin-left: 5px;
+                $size: 14px;
+                height: $size;
+                width: $size;
+                min-height: $size;
+                min-width: $size;
             }
             a:hover {
-                text-decoration: underline;
+                background: darken($background-color-light, 1%);
             }
         }
     }

@@ -390,7 +390,7 @@ const NewProposalForm = {
               }),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Amount (EDG)'),
+              m(FormLabel, `Amount (${app.chain.chain.denom})`),
               m(Input, {
                 name: 'amount',
                 autofocus: true,

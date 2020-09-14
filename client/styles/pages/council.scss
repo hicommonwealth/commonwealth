@@ -35,6 +35,9 @@
             font-weight: 500;
         }
     }
+    .button-wrap > :first-child {
+        margin-right: 5px;
+    }
     .council-section-header {
         font-size: 0.94rem;
         font-weight: 400;

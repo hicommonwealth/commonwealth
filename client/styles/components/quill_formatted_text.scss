@@ -43,7 +43,7 @@
         max-width: 100%;
         margin: 8px 0;
         min-height: 40px;
-        background-color: #f2f2f2;
+        background-color: $background-color-light;
         box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
     }
     pre, code {
@@ -56,7 +56,7 @@
         white-space: pre-wrap;
         margin: 22px 0;
         padding: 12px 16px;
-        background: $background-color-white-hover;
+        background: $background-color-light;
         border-radius: 3px;
     }
     blockquote {
@@ -67,9 +67,16 @@
 
     // list styles
     ul, ol {
+        margin: 10px 0;
         li {
             margin: 2px 0;
         }
+    }
+    ul + ol,
+    ul + ul,
+    ol + ol,
+    ol + ul {
+        margin-top: -10px;
     }
     ul.checklist {
         padding-left: 1em;
@@ -168,6 +175,12 @@
 
 // mixin for collapsing large text blocks to <200px in height
 @mixin collapsible {
+    &.collapsed {
+        white-space: nowrap;
+        overflow: hidden;
+        display: block;
+        text-overflow: ellipsis;
+    }
 }
 
 @mixin hidden-formatting {

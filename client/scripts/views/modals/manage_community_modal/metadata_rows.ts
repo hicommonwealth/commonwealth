@@ -4,6 +4,7 @@ import { Input, TextArea, Icon, Icons, Switch } from 'construct-ui';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
+import { AddressInfo } from 'models';
 
 export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {
@@ -14,12 +15,15 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
 
     return m('.ManageRoleRow', [
       vnode.attrs.roledata?.map((role) => {
+        const addr = role.Address;
         const isSelf = role.Address.address === app.user.activeAccount?.address
           && role.Address.chain === app.user.activeAccount?.chain.id;
         return m('.RoleChild', [
           m(User, {
-            user: role.Address,
+            user: new AddressInfo(addr.id, addr.address, addr.chain, null), //role.Address, // make AddressInfo?
             tooltip: true,
+            linkify: false,
+            hideAvatar: false,
           }),
           !isSelf && m(Icon, {
             name: Icons.X,

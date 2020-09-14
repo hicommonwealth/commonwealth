@@ -49,6 +49,16 @@ $discussion-meta-padding: 18px;
                     color: $theme-base-color;
                 }
             }
+            .row-excerpt {
+                color: $text-color-light;
+                max-width: calc(44vw - 220px);
+                @include sm-max {
+                    max-width: calc(44vw);
+                }
+                @include xs-max {
+                    max-width: calc(100vw - 120px);
+                }
+            }
         }
     }
     .row-right {
