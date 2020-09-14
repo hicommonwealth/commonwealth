@@ -8,6 +8,7 @@ import { Webhook } from 'models';
 import { NotificationCategories } from 'types';
 import { EdgewareChainNotificationTypes, KusamaChainNotificationTypes, KulupuChainNotificationTypes, PolkadotChainNotificationTypes } from 'helpers/chain_notification_types';
 import { symbols } from 'helpers';
+import { notifyError } from 'controllers/app/notifications';
 
 interface IAttrs {
     webhook: Webhook;
@@ -31,7 +32,6 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
   },
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     const { webhook } = vnode.attrs;
-    // const community = webhook.
     const isChain = webhook.chain_id ? true : false;
     const chainNotifications = webhook.chain_id === 'edgeware' ? EdgewareChainNotificationTypes 
       : webhook.chain_id === 'kusama' ? KusamaChainNotificationTypes
@@ -121,7 +121,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
               $(vnode.dom).trigger('modalexit');
             },
             error: (err) => {
-              console.dir(err);
+              notifyError(err);
               m.redraw();
             }
           });
