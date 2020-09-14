@@ -45,8 +45,11 @@ const NewTopicModal: m.Component<{
               class: 'topic-form-name',
               tabindex: 1,
               defaultValue: vnode.state?.form?.name,
-              autofocus: true,
               autocomplete: 'off',
+              oncreate: (vvnode) => {
+                // use oncreate to focus because autofocus: true fails when component is recycled in a modal
+                setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
+              },
               onchange: (e) => {
                 vnode.state.form.name = (e.target as any).value;
               },

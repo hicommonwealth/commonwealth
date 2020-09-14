@@ -63,8 +63,10 @@ const EditTopicModal : m.Component<{
             m(Input, {
               title: 'Name',
               name: 'name',
+              autocomplete: 'off',
               oncreate: (vvnode) => {
-                $(vvnode.dom).focus().select();
+                // use oncreate to focus because autofocus: true fails when component is recycled in a modal
+                setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
               },
               class: 'topic-form-name',
               tabindex: 1,
