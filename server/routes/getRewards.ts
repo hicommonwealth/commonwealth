@@ -18,7 +18,7 @@ interface IEventData {
 }
 
 const getRewards = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { chain, stash_id } = req.query;
+  const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
@@ -37,11 +37,13 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     return next(new Error(Errors.InvalidChain));
   }
 
+  // if start and end date isn't given, we set it for 30 days for now
   if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
-    startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 1);
-    startDate = new Date(startDate);
     endDate = new Date();
+    startDate = new Date();
+    endDate = endDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // today's date
+    startDate.setDate(startDate.getDate() - 30);
+    startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
 
   const rewards = await models.ChainEvent.findAll({
@@ -61,14 +63,6 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   });
 
   const validators: { [key: string]: any[] } = {};
-  // No rewards
-  if (!rewards.length)
-    return res.json({
-      status: 'Success',
-      result: {
-        validators
-      }
-    });
 
   rewards.forEach((reward) => {
     const event_data: IEventData = reward.dataValues.event_data;
@@ -82,12 +76,9 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     }
   });
 
-  return res.json({
-    status: 'Success',
-    result: {
-      validators
-    }
-  });
+  if (stash)
+    return res.json({ status: 'Success', result: { validator: validators[stash] || [] } });
+  return res.json({ status: 'Success', result: { validators: validators || [] } });
 };
 
 export default getRewards;
