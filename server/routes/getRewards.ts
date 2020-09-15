@@ -40,6 +40,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     return next(new Error(Errors.InvalidChain));
   }
 
+  // if start and end date isn't given, we set it for 30 days for now
   if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
     endDate = new Date();
     startDate = new Date();
@@ -138,7 +139,6 @@ if(stash_id){
 } 
 
 return res.json({status: 'Success',result: {validators: validators || []}});
-
 };
 
 export default getRewards;
