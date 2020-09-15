@@ -76,10 +76,6 @@ export default class extends IEventHandler {
       validator.commissionPer = activeValidatorsInfo.commissionPer;
       validator.eraPoints = activeValidatorsInfo.eraPoints;
       validator.apr = 123; // To be computed over here.
-      validator.movingAverages = 0;
-      validator.hasMessage = false;
-      validator.isElected = true;
-      validator.toBeElected = false;
       validator.created_at = new Date().toISOString();
       validator.updated_at = new Date().toISOString();
       delete validator.id;
