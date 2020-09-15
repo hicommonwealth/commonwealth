@@ -13,7 +13,7 @@ import PageNotFound from 'views/pages/404';
 import { makeDynamicComponent } from 'models/mithril';
 import Substrate from 'controllers/chain/substrate/main';
 import { ApiRx } from '@polkadot/api';
-// import { ValidatorStats } from './validator_profile_stats';
+import { ValidatorStats } from './validator_profile_stats';
 import chartComponent from '../../components/chart';
 import lineModel from './graph_models/linemodel';
 
@@ -421,7 +421,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
       m('.forum-container-alt', [
         m(ProfileHeader, { account }),
         // Quick stats for a validator section
-       // m(ValidatorStats, { address: account.address, account }),
+        m(ValidatorStats, { address: account.address, account }),
         // m('.row.row-narrow.forum-row', [
         // m('.col-xs-12', [
         m('.row', [
