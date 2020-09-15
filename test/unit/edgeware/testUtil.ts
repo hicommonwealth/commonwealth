@@ -97,8 +97,13 @@ export function constructFakeApi(
           at: callOverrides['events.at'],
         }
       },
+      session: {
+        nextKeys: callOverrides['nextKeys']
+      },
       staking: {
         bonded: callOverrides['bonded'],
+        currentPoints: callOverrides['currentPoints'],
+        currentEra: callOverrides['currentEra']
       },
       democracy: {
         referendumInfoOf: callOverrides['referendumInfoOf'],
@@ -135,6 +140,10 @@ export function constructFakeApi(
     derive: {
       chain: {
         bestNumber: callOverrides['bestNumber'],
+      },
+      staking: {
+        validators: callOverrides['validators'],
+        electedInfo: callOverrides['electedInfo'],
       },
       democracy: {
         dispatchQueue: callOverrides['dispatchQueue'],

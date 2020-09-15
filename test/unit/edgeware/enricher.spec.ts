@@ -25,6 +25,45 @@ const offenceDetails = [
 ];
 const blockNumber = 10;
 const api = constructFakeApi({
+  validators: async () => {
+    return [
+      'EXkCSUQ6Z1hKvGWMNkUDKrTMVHRduQHWc8G6vgo4NccUmhU',
+      'FnWdLnFhRuphztWJJLoNV4zc18dBsjpaAMboPLhLdL7zZp3',
+      'EZ7uBY7ZLohavWAugjTSUVVSABLfad77S6RQf4pDe3cV9q4',
+      'GweeXog8vdnDhjiBCLVvbE4NA4CPTFS3pdFFAFwgZzpUzKu',
+      'DbuPiksDXhFFEWgjsEghUypTJjQKyULiNESYji3Gaose2NV',
+      'Gt6HqWBhdu4Sy1u8ASTbS1qf2Ac5gwdegwr8tWN8saMxPt5',
+      'JKmFAAo9QbR9w3cfSYxk7zdpNEXaN1XbX4NcMU1okAdpwYx'
+    ]
+  },
+  electedInfo: async () => {
+    return {
+      'info': {
+        'accountId': 'GweeXog8vdnDhjiBCLVvbE4NA4CPTFS3pdFFAFwgZzpUzKu',
+        'controller': 'JKmFAAo9QbR9w3cfSYxk7zdpNEXaN1XbX4NcMU1okAdpwYx',
+        'validatorPrefs': {
+          'commission': 100000000
+        }
+      }
+    }
+  },
+  nextKeys: async () => {
+    return[
+      'iViUBJg1zFkVqEcNs5AHEmwDxK8LTBgx8LzZpGDrucKsMS3',
+      'krYNTkaCusVm4zeq89kkUFSqz7gsna8gzBTAbJzqcm2yDMW',
+      'iEd4cXXQizYFjE6bCPiXWkvt7KZ7gGTL9AdKfTdd6VDcKvS',
+      'jERvY3Km1t31oJQa1rZZEpGr186KK2ZrNqJFeRTWxXEtnow'
+    ]
+  },
+  currentPoints: async () => {
+    return {
+      "total":92600,
+      "individual": {
+        'GweeXog8vdnDhjiBCLVvbE4NA4CPTFS3pdFFAFwgZzpUzKu': '140'
+      }
+    }
+  },
+  currentEra: async () => new BN(12),
   currentIndex: async () => new BN(12),
   concurrentReportsIndex: async () => [ '0x00' ] as unknown as Vec<ReportIdOf>,
   'reports.multi': async () => offenceDetails as unknown as Option<OffenceDetails>[],
@@ -164,6 +203,98 @@ const constructBool = (b: boolean): bool => {
 
 /* eslint-disable: dot-notation */
 describe('Edgeware Event Enricher Filter Tests', () => {
+  it('should enrich new-session event', async () => {
+    const kind = EventKind.NewSession;
+    let activeExposures: { [key: string]: any } = {
+      "DbuPiksDXhFFEWgjsEghUypTJjQKyULiNESYji3Gaose2NV": {
+        "others": [
+          {
+            "value": "0x0000000000000005a405328cbfd77c63",
+            "who": "mmhaivFqq2gPP6nMpbVoMtxz1H85FVTfn879X5kforz32CL"
+          },
+          {
+            "value": "0x000000000000001e9e67108749f21184",
+            "who": "iUgUgeVx9WJBea7h8Mm1KGXxurf4UqQfjGVggJ9LfbsMHGy"
+          },
+          {
+            "value": "0x000000000000000d6d6ad68a401e50e9",
+            "who": "oGmCzvaoZgxV5eMbgVnu6KQACC9snRKttAp3V3obHH7Dc9r"
+          },
+          {
+            "value": "0x000000000000000014d14b817a75054c",
+            "who": "ks9is3t3uLnSHByPV6idmGVh74aeeABv9VS7g1hSYQBjZFt"
+          },
+          {
+            "value": "0x0000000000000096c96fada32bab79ca",
+            "who": "nGTjLceLvggC9rZw8mJ3AXSE19o7i7zsLEJkCz3TLNjXfAb"
+          },
+          {
+            "value": "0x0000000000000001ae015c352661f300",
+            "who": "mxZrFA4exCbd3gX77fMYT88L5S2buvcnne4CrQmjT5b3yDs"
+          }
+        ],
+        "own": "0x0000000000000000002386f262982729",
+        "total": "0x0000000000181394a59fde1e31dea1c4"
+      },
+      "EXkCSUQ6Z1hKvGWMNkUDKrTMVHRduQHWc8G6vgo4NccUmhU": {
+        "others": [
+          {
+            "value": "0x0000000000000005a405328cbfd77c63",
+            "who": "mmhaivFqq2gPP6nMpbVoMtxz1H85FVTfn879X5kforz32CL"
+          },
+          {
+            "value": "0x000000000000001e9e67108749f21184",
+            "who": "iUgUgeVx9WJBea7h8Mm1KGXxurf4UqQfjGVggJ9LfbsMHGy"
+          },
+          {
+            "value": "0x000000000000000d6d6ad68a401e50e9",
+            "who": "oGmCzvaoZgxV5eMbgVnu6KQACC9snRKttAp3V3obHH7Dc9r"
+          },
+          {
+            "value": "0x000000000000000014d14b817a75054c",
+            "who": "ks9is3t3uLnSHByPV6idmGVh74aeeABv9VS7g1hSYQBjZFt"
+          },
+          {
+            "value": "0x0000000000000096c96fada32bab79ca",
+            "who": "nGTjLceLvggC9rZw8mJ3AXSE19o7i7zsLEJkCz3TLNjXfAb"
+          },
+          {
+            "value": "0x0000000000000001ae015c352661f300",
+            "who": "mxZrFA4exCbd3gX77fMYT88L5S2buvcnne4CrQmjT5b3yDs"
+          }
+        ],
+        "own": "0x0000000000000000002386f262982729",
+        "total": "0x0000000000181394a59fde1e31dea1c4"
+      }
+    }
+    let waiting: Array<ValidatorId> = [
+      'JCghFN7mD4ETKzMbvSVmMMPwWutJGk6Bm1yKWk8Z9KhPGeZ',
+      'EDy8hbM5LATNV7P8pPdefEeEs4uptVC1UiVepYNBMhs9Hfj',
+      'Hn8ELsyUL9UgDZpPX6bE464o4sbi7gqgYEKjntK7xuVzGXH',
+      'FkUYJFQt9asnxvgjKt6s1yXjQr3MHDJBTsgfikq4n8qJg4E',
+      'GXTJJh2kQJoS9amET2WmZ82uFkm7HYCScoP9bEDV5JyKsWE',
+      'EDEVriQd4TpEHHyWnLbQHDYjY9avxxkWhNmBou4SHKixgt1',
+      'FhbVbN8VqQLnLkNX76nHAoBBDsC3Jych3k14WbUoJUBbGHr'
+    ] as unknown as Array<ValidatorId>;
+    const currentEra = 12;
+    const sessionIndex = 1;
+    const event = constructEvent(['1']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    console.log('result', result)
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        activeExposures,
+        active: Object.keys(activeExposures),
+        waiting: waiting?.map((validator) => validator.toString()),
+        sessionIndex,
+        currentEra,
+        validatorInfo: {},
+        eraPointsIndividual: {}
+      }
+    })
+  });
   /** staking events */
   it('should enrich edgeware/old reward event', async () => {
     const kind = EventKind.Reward;

@@ -2,8 +2,11 @@ import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
-  ReferendumInfo, SessionIndex, ValidatorId, Exposure, EraIndex, AuthorityId, IdentificationTuple
+  ReferendumInfo, SessionIndex, ValidatorId, Exposure, EraIndex, AuthorityId, IdentificationTuple,
+  EraRewardPoints
 } from '@polkadot/types/interfaces';
+import { DeriveStakingElected } from '@polkadot/api-derive/types';
+import BN from 'bn.js';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
@@ -101,9 +104,20 @@ export async function Enrich(
       case EventKind.NewSession: {
         const [ sessionIndex ] = event.data as unknown as [ SessionIndex ] & Codec
         const validators = await api.derive.staking.validators();
+        const electedInfo: DeriveStakingElected = await api.derive.staking.electedInfo() as any; // validator preferences for getting commision
+        const eraPoints : EraRewardPoints = await api.query.staking.currentPoints() as EraRewardPoints;
         const currentEra = (await api.query.staking.currentEra<Option<EraIndex>>()).unwrap();
+        const eraPointsIndividual = eraPoints.individual.toJSON();
         let active : Array<ValidatorId>
         let waiting : Array<ValidatorId>
+        const validatorInfo = {};
+        electedInfo.info.forEach(async ({ accountId, controllerId, validatorPrefs }) => {
+          const commissionPer = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
+          const key = accountId.toString();
+          validatorInfo[key] = {}
+          validatorInfo[key] = {commissionPer, controllerId};
+          validatorInfo[key]['nextSessionIds'] = await api.query.session.nextKeys(key);
+        });
         // erasStakers(EraIndex, AccountId): Exposure -> api.query.staking.erasStakers // KUSAMA
         // stakers(AccountId): Exposure -> api.query.staking.stakers // EDGEWARE
         const stakersCall = (api.query.staking.stakers)
@@ -133,7 +147,9 @@ export async function Enrich(
             active: active?.map((v) => v.toString()),
             waiting: waiting?.map((v) => v.toString()),
             sessionIndex: +sessionIndex,
-            currentEra: +currentEra
+            currentEra: +currentEra,
+            validatorInfo,
+            eraPointsIndividual
           }
         }
       }

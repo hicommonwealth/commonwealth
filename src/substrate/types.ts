@@ -181,6 +181,8 @@ export interface INewSession extends IEvent {
   waiting: Array<AccountId>;
   sessionIndex: number;
   currentEra?: number;
+  validatorInfo : {},
+  eraPointsIndividual : {}
 }
 
 
