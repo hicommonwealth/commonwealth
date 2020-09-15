@@ -24,7 +24,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   let validators = {};
 
 
-  if (!chain) return next(new Error(Errors.ChainIdNotFound));
+  if (!chain) { return next(new Error(Errors.ChainIdNotFound)); }
 
   let eraLengthInHours;
   if (chain === 'edgeware') {
@@ -36,11 +36,9 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   const chainInfo = await models.Chain.findOne({
     where: { id: chain }
   });
-  if (!chainInfo) {
-    return next(new Error(Errors.InvalidChain));
-  }
 
-  // if start and end date isn't given, we set it for 30 days for now
+  if (!chainInfo) { return next(new Error(Errors.InvalidChain)); }
+
   if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
     endDate = new Date();
     startDate = new Date();
@@ -68,7 +66,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
 
 
 // there was no reward found in db
-if (!rewards.length) return res.json({status: 'Success',result: {validators: validators || []}});
+if (!rewards.length) { return res.json({ status: 'Success', result: {validators: validators || [] } }); }
 
 if (chain === 'edgeware') {
   // there is no validator identifier in reward event in chain-event, 
@@ -93,7 +91,7 @@ if (chain === 'edgeware') {
   });
 
   // there was no session or reward found in db
-  if (!sessions.length) return res.json({status: 'Success',result: {validators: validators || []}});
+  if (!sessions.length) { return res.json({ status: 'Success', result: {validators: validators || []} }); }
 
 
   // if number of sessions are more then number of rewards drop last session as the reward for that session is not yet issued.
@@ -132,13 +130,16 @@ else if (chain === 'kusama') {
    });
  }
 
-
+// if a stash id is provided
 if(stash_id){
-  if(validators.hasOwnProperty(stash_id)){validators = {stash_id: validators[stash_id]};}
-  else{validators = {};}
+  // if we have the stash id then return its reward
+  if(validators.hasOwnProperty(stash_id)) { validators = {stash_id: validators[stash_id]}; }
+  // return nothing
+  else{ validators = {}; }
 } 
 
-return res.json({status: 'Success',result: {validators: validators || []}});
+return res.json({ status: 'Success', result: {validators: validators || [] } });
+
 };
 
 export default getRewards;
