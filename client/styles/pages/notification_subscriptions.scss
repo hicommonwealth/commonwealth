@@ -1,6 +1,20 @@
-.CommunityNotificationSelectList, .BatchedNotificationSelectList, .ChainNotificationSelectList, .EventSubscriptionTypeSelectList {
-  .cui-popover-content {
-    padding: 0;
-    min-width: 125px;
-  }
+.CommunityNotificationSelectList,
+.BatchedNotificationSelectList,
+.ChainNotificationSelectList,
+.EventSubscriptionTypeSelectList {
+    .cui-popover-content {
+        padding: 0;
+        min-width: 125px;
+    }
+}
+
+.NotificationsTable {
+    th {
+        font-weight: 500;
+        padding: 6px 0 12px;
+    }
+    td {
+        border: none;
+        padding: 6px 0;
+    }
 }

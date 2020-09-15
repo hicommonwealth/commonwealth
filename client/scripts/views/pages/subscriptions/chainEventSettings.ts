@@ -282,7 +282,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
   }
 };
 
-const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { selectedChain: ChainInfo }> = {
+export const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { selectedChain: ChainInfo }> = {
   oninit: (vnode) => {
     const { chains } = vnode.attrs;
     const scope = m.route.param('scope');
@@ -329,28 +329,3 @@ const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { se
     ]);
   },
 };
-
-const ChainEventSettingsPage: m.Component<{}> = {
-  view: (vnode) => {
-    const chains = _.uniq(
-      app.config.chains.getAll()
-    );
-    if (!app.loginStatusLoaded()) return m(PageLoading);
-    if (!app.isLoggedIn()) return m(PageError, {
-      message: 'This page requires you to be logged in.'
-    });
-
-    return m(Sublayout, {
-      class: 'SubscriptionsPage',
-      title: 'Chain Notifications',
-    }, [
-      m('.forum-container', [
-        m(ChainNotificationManagementPage, {
-          chains,
-        }),
-      ]),
-    ]);
-  },
-};
-
-export default ChainEventSettingsPage;

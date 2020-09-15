@@ -13,6 +13,24 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import PageError from 'views/pages/error';
 import { sortSubscriptions } from 'helpers/notifications';
+import { ChainNotificationManagementPage } from './chainEventSettings';
+
+const NOTIFICATION_TABLE_PRE_COPY = 'Notify me when...';
+const COMMENT_NUM_PREFIX = 'Comment #';
+const ALL_COMMUNITIES = 'All communities';
+
+const NEW_COMMENTS_LABEL_PREFIX = 'New comments on ';
+const NEW_REACTIONS_LABEL_PREFIX = 'New reactions on ';
+
+const NEW_MENTIONS_LABEL = 'When someone mentions me';
+const NEW_THREADS_INDIVIDUAL_COMMUNITY_LABEL = 'When a thread is created';
+const NEW_THREADS_ALL_COMMUNITIES_LABEL = 'When a thread is created';
+const NEW_ACTIVITY_LABEL = 'When there is new activity on';
+
+const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'Immediately by email';
+const NOTIFICATION_ON_OPTION = 'On';
+const NOTIFICATION_ON_SOMETIMES_OPTION = '--';
+const NOTIFICATION_OFF_OPTION = 'Off';
 
 const singleLabel = (subscription: NotificationSubscription) => {
   const chainOrCommunityId = subscription.Chain
@@ -28,14 +46,14 @@ const singleLabel = (subscription: NotificationSubscription) => {
           ? decodeURIComponent(subscription.OffchainComment.id)
           : subscription.objectId;
       return subscription.OffchainThread
-        ? [ 'New comments on ', m('a', {
+        ? [ NEW_COMMENTS_LABEL_PREFIX, m('a', {
           href: '#',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
           }
         }, threadOrComment.toString()) ]
-        : `New comments on '${String(threadOrComment)}'`;
+        : NEW_COMMENTS_LABEL_PREFIX + threadOrComment.toString();
     }
     case (NotificationCategories.NewReaction): {
       const threadOrComment = subscription.OffchainThread
@@ -44,14 +62,14 @@ const singleLabel = (subscription: NotificationSubscription) => {
           ? decodeURIComponent(subscription.OffchainComment.id)
           : subscription.objectId;
       return subscription.OffchainThread
-        ? [ 'New reactions on ', m('a', {
+        ? [ NEW_REACTIONS_LABEL_PREFIX, m('a', {
           href: '#',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
           }
         }, threadOrComment.toString()) ]
-        : `New reactions on '${String(threadOrComment)}'`;
+        : NEW_REACTIONS_LABEL_PREFIX + threadOrComment.toString();
     }
     default:
       break;
@@ -72,14 +90,14 @@ const batchLabel = (subscriptions: NotificationSubscription[]) => {
       : subscriptions[0].objectId;
 
   return subscriptions[0].OffchainThread
-    ? [ 'New comments and reactions on ', m('a', {
+    ? [ m('a', {
       href: '#',
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscriptions[0].OffchainThread.id}`);
       }
     }, threadOrComment.toString()) ]
-    : `New comments and reactions on 'Comment ${String(threadOrComment)}'`;
+    : COMMENT_NUM_PREFIX + threadOrComment.toString();
 };
 
 interface IBatchedSubscriptionRowAttrs {
@@ -100,13 +118,13 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
     const someEmail = subscriptions.some((s) => s.immediateEmail);
     const everyEmail = subscriptions.some((s) => s.immediateEmail);
     if (everyActive && everyEmail) {
-      vnode.state.option = 'Notifications on (app + email)';
+      vnode.state.option = NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION;
     } else if (everyActive && !someEmail) {
-      vnode.state.option = 'Notifications on (app only)';
+      vnode.state.option = NOTIFICATION_ON_OPTION;
     } else if (someActive) {
-      vnode.state.option = 'Some notifications on';
+      vnode.state.option = NOTIFICATION_ON_OPTION;
     } else {
-      vnode.state.option = 'Notifications off';
+      vnode.state.option = NOTIFICATION_OFF_OPTION;
     }
     if (!subscriptions) return;
     return m('tr.BatchedSubscriptionRow', [
@@ -132,7 +150,7 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
               selected: (vnode.state.option === option),
             });
           },
-          items: ['Notifications off', 'Notifications on (app only)', 'Notifications on (app + email)', ],
+          items: [NOTIFICATION_OFF_OPTION, NOTIFICATION_ON_OPTION, NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION],
           trigger: m(Button, {
             align: 'left',
             compact: true,
@@ -141,13 +159,13 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
           }),
           onSelect: async (option: string) => {
             vnode.state.option = option;
-            if (option === 'Notifications off') {
+            if (option === NOTIFICATION_OFF_OPTION) {
               if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
               if (someActive) await app.user.notifications.disableSubscriptions(subscriptions);
-            } else if (option === 'Notifications on (app only)') {
+            } else if (option === NOTIFICATION_ON_OPTION) {
               await app.user.notifications.enableSubscriptions(subscriptions);
               if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
-            } else if (option === 'Notifications on (app + email)') {
+            } else if (option === NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION) {
               if (!everyActive) await app.user.notifications.enableSubscriptions(subscriptions);
               await app.user.notifications.enableImmediateEmails(subscriptions);
             }
@@ -167,10 +185,19 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
     );
     return subscription && m(BatchedSubscriptionRow, {
       subscriptions: [subscription],
-      label: 'New threads',
+      label: NEW_THREADS_INDIVIDUAL_COMMUNITY_LABEL,
       bold: true,
     });
   },
+};
+
+const NewActivityRow: m.Component = {
+  view: (vnode) => {
+    return m('tr.NewActivityRow', [
+      m('td', NEW_ACTIVITY_LABEL),
+      m('td'),
+    ]);
+  }
 };
 
 interface ICommunitySpecificNotificationsAttrs {
@@ -191,16 +218,10 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
     const newThreads = subscriptions.find(
       (s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id)
     );
-    const onComments = subscriptions.filter((s) => {
-      return (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id) && s.OffchainComment;
-    });
     const batchedSubscriptions = sortSubscriptions(filteredSubscriptions, 'objectId');
     return [
       newThreads && m(NewThreadRow, { community, subscriptions }),
-      onComments.length > 0 && m(BatchedSubscriptionRow, {
-        label: 'Notifications on Comments',
-        subscriptions: onComments,
-      }),
+      batchedSubscriptions.length > 0 && m(NewActivityRow),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
       batchedSubscriptions.length > 0 && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, {
@@ -238,7 +259,7 @@ const GeneralNewThreadsAndComments:
       const threadSubs = subscriptions.filter((s) => communityIds.includes(s.objectId));
       return m(BatchedSubscriptionRow, {
         subscriptions: threadSubs,
-        label: 'New threads (all communities)',
+        label: NEW_THREADS_ALL_COMMUNITIES_LABEL,
       });
     },
   };
@@ -263,7 +284,7 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
     return [
       mentionsSubscription && m(BatchedSubscriptionRow, {
         subscriptions: [mentionsSubscription],
-        label: 'New mentions'
+        label: NEW_MENTIONS_LABEL,
       }),
       m(GeneralNewThreadsAndComments, { communities, subscriptions }),
       batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
@@ -288,14 +309,14 @@ interface ICommunityNotificationsState {
 
 const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommunityNotificationsState> = {
   oninit: (vnode) => {
-    vnode.state.communityIds = ['All communities'];
+    vnode.state.communityIds = [ALL_COMMUNITIES];
     vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
     const roleChains = app.user.roles.map((r) => r.chain_id);
     vnode.attrs.chains.forEach((c) => {
       if (roleChains.includes(c.id)) vnode.state.communityIds.push(c.name);
     });
     vnode.state.communityIds.sort();
-    vnode.state.selectedCommunityId = 'All communities';
+    vnode.state.selectedCommunityId = ALL_COMMUNITIES;
     vnode.state.selectedCommunity = null;
   },
   view: (vnode) => {
@@ -325,12 +346,12 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.selectedCommunity
               ? vnode.state.selectedCommunityId
-              : 'All communities',
+              : ALL_COMMUNITIES,
           }),
           onSelect: (community: string) => {
             vnode.state.selectedCommunity = communities.find((c) => c.name === community)
               || chains.find((c) => c.name === community);
-            vnode.state.selectedCommunityId = vnode.state.selectedCommunity?.name || 'All communities';
+            vnode.state.selectedCommunityId = vnode.state.selectedCommunity?.name || ALL_COMMUNITIES;
             m.redraw();
           }
         }),
@@ -339,10 +360,10 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
         class: 'NotificationsTable',
       }, [
         m('tr', [
-          m('th', null),
-          m('th', 'Settings'),
+          m('th', NOTIFICATION_TABLE_PRE_COPY),
+          m('th', ''),
         ]),
-        (selectedCommunityId === 'All communities') && [
+        (selectedCommunityId === ALL_COMMUNITIES) && [
           m(GeneralCommunityNotifications, { communities, subscriptions }),
         ],
         (!!selectedCommunity)
@@ -398,6 +419,9 @@ const NotificationSettingsPage: m.Component<{}, {
       m('.forum-container', [
         m(CommunityNotifications, { subscriptions, communities, chains, }),
       ]),
+      m(ChainNotificationManagementPage, {
+        chains,
+      }),
     ]);
   },
 };
