@@ -45,7 +45,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
-  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30 * 5);
+  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
   const recentThreads = await models.OffchainThread.findAll({
     where: {
       [Op.or]: [
