@@ -31,7 +31,7 @@ export const enum LoginState {
 
 interface IRecentActivity {
   activeAddresses;
-  activeThreadCount;
+  activeThreads;
 }
 
 export interface IApp {
@@ -99,7 +99,7 @@ const app: IApp = {
   communities: new CommunitiesController(),
   user: new UserController(),
 
-  recentActivity: { activeThreadCount: null, activeAddresses: null },
+  recentActivity: { activeThreads: null, activeAddresses: null },
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,

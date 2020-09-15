@@ -118,7 +118,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
 
   if (!user) {
     const activeAddresses = {};
-    const activeThreadCount = {};
+    const activeThreads = {};
     const allContent = recentThreads.concat(recentComments).concat(recentReactions)
       .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at));
     allContent.forEach((item) => {
@@ -133,10 +133,10 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     });
     recentThreads.forEach((thread) => {
       const entity = thread.community || thread.chain;
-      if (activeThreadCount[entity]) {
-        activeThreadCount[entity] += 1;
-      } else if (!activeThreadCount[entity]) {
-        activeThreadCount[entity] = 1;
+      if (activeThreads[entity]) {
+        activeThreads[entity] += 1;
+      } else if (!activeThreads[entity]) {
+        activeThreads[entity] = 1;
       }
     });
     return res.json({
@@ -147,7 +147,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       communities: publicCommunities,
       notificationCategories,
       activeAddresses,
-      activeThreadCount,
+      activeThreads,
       loggedIn: false,
     });
   }
@@ -219,7 +219,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   });
 
   const activeAddresses = {};
-  const activeThreadCount = {};
+  const activeThreads = {};
   const allContent = recentThreads_.concat(recentComments).concat(recentReactions)
     .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at));
 
@@ -235,10 +235,10 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   });
   recentThreads_.forEach((thread) => {
     const entity = thread.community || thread.chain;
-    if (activeThreadCount[entity]) {
-      activeThreadCount[entity] += 1;
-    } else if (!activeThreadCount[entity]) {
-      activeThreadCount[entity] = 1;
+    if (activeThreads[entity]) {
+      activeThreads[entity] += 1;
+    } else if (!activeThreads[entity]) {
+      activeThreads[entity] = 1;
     }
   });
   // get starred communities for user
@@ -308,7 +308,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     contractCategories,
     notificationCategories,
     activeAddresses,
-    activeThreadCount,
+    activeThreads,
     roles,
     invites,
     loggedIn: true,

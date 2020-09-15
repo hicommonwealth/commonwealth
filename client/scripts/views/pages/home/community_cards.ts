@@ -28,7 +28,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
     const chainInfo = app.config.chains.getById(chain);
     const visitedChain = !!app.user.unseenPosts[chain];
     const updatedThreads = app.user.unseenPosts[chain]?.activePosts || 0;
-    const monthlyThreads = app.recentActivity?.activeThreadCount[chain];
+    const monthlyThreads = app.recentActivity?.activeThreads[chain];
     const monthlyUsers = app.recentActivity?.activeAddresses[chain]
       ? Object.values(app.recentActivity.activeAddresses[chain]).map((auth, idx) => {
         const id = Number(Object.keys(app.recentActivity.activeAddresses[chain])[idx]);
@@ -79,7 +79,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
     const { justJoinedCommunities, community } = vnode.attrs;
     const visitedCommunity = !!app.user.unseenPosts[community.id];
     const updatedThreads = app.user.unseenPosts[community.id]?.activePosts || 0;
-    const monthlyThreads = app.recentActivity.activeThreadCount[community.id];
+    const monthlyThreads = app.recentActivity.activeThreads[community.id];
     const monthlyUsers = app.recentActivity?.activeAddresses[community.id]
       ? Object.values(app.recentActivity.activeAddresses[community.id]).map((auth, idx) => {
         const id = Number(Object.keys(app.recentActivity.activeAddresses[community.id])[idx]);
