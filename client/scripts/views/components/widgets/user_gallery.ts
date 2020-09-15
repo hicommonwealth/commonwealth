@@ -32,7 +32,6 @@ const UserGallery: m.Component<{
           avatarSize,
         });
       });
-
     const overflowUsers = userCount < 10 ? 0 : userCount - 10;
     if (overflowUsers) displayedUsers.push(
       m('.overflow-users-wrap', {
