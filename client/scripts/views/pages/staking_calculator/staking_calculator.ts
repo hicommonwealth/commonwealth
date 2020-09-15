@@ -85,10 +85,10 @@ function calculateNetworkValue(vnode) {
 const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStakingCalculatorState>({
   oncreate: async (vnode) => {
     vnode.state.totalStaked = undefined
-    //vnode.state.totalbalance = undefined
     vnode.state.staked = -1
     mixpanel.track('PageVisit', { 'Page Name': 'StakingCalculatorPage' })
-  }, getObservables: (attrs) => ({
+  },
+  getObservables: (attrs) => ({
     groupKey: app.chain && app.chain.apiInitialized ? app.chain.class.toString() : null,
     validators: app.chain && app.chain.apiInitialized ? app.chain.base === ChainBase.Substrate ? (app.chain as Substrate).staking.validators : null : null,
     sessionInfo: app.chain && app.chain.apiInitialized ? app.chain.base === ChainBase.Substrate ? (app.chain as Substrate).staking.sessionInfo : null : null,
@@ -147,7 +147,7 @@ const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStak
         const valStake = (app.chain as Substrate).chain.coins(exposure?.total.toBn()) || (app.chain as Substrate).chain.coins(0)
         vnode.state.totalStaked = (app.chain as Substrate).chain.coins(vnode.state.totalStaked.asBN.add(valStake.asBN),)
       })
-      
+
       vnode.state.selected_asset.totalSupply = (app.chain as Substrate).chain.totalbalance.inDollars;
       vnode.state.staked = vnode.state.totalStaked.muln(10000).div((app.chain as Substrate).chain.totalbalance).toNumber() / 100
       vnode.state.selectedRate = vnode.state.staked
@@ -314,7 +314,7 @@ const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStak
           resetValues(vnode);
 
         }
-      })))]) ]);
+      })))])]);
   },
 })
 export default StakingCalculatorPage
