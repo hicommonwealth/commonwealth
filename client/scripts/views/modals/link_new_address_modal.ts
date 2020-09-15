@@ -278,6 +278,7 @@ const LinkNewAddressModal: m.Component<{
   enteredAddress?: string;
   cosmosStdTx?: object;
   initializingWallet: boolean;
+  initializeFailed: boolean;
   onpopstate;
 }> = {
   // close the modal if the user moves away from the page
@@ -585,14 +586,20 @@ const LinkNewAddressModal: m.Component<{
               },
               onclick: async (vvnode) => {
                 // initialize API if needed before starting webwallet
-                vnode.state.initializingWallet = true;
-                await app.chain.initApi();
-                await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
-                vnode.state.initializingWallet = false;
+                try {
+                  vnode.state.initializingWallet = true;
+                  await app.chain.initApi();
+                  await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
+                  vnode.state.initializingWallet = false;
+                } catch (e) {
+                  vnode.state.initializeFailed = true;
+                  console.log('failed to initialize chain/wallet');
+                }
                 m.redraw();
               },
               label: vnode.state.initializingWallet !== false
                 ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 30s)...' ]
+                : vnode.state.initializeFailed === true ?  'Could not connect to chain'
                 : (app.chain as Substrate || app.chain as Ethereum).webWallet.available
                   ? 'Connect to wallet' : 'No wallet detected',
             }),
