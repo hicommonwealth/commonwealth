@@ -75,6 +75,10 @@
                 -webkit-line-clamp: 3;
                 -webkit-box-orient: vertical;
             }
+            .recent-activity {
+                margin-top: 12px;
+                color: $text-color-lighter;
+            }
         }
 
         p.action {

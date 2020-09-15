@@ -63,7 +63,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.invites = data.invites;
       app.recentActivity.activeAddresses = data.activeAddresses;
       app.recentActivity.activeThreadCount = data.activeThreadCount;
-      console.log(app.recentActivity);
+
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;

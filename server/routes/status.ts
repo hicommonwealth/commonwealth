@@ -45,7 +45,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
-  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
+  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30 * 5);
   const recentThreads = await models.OffchainThread.findAll({
     where: {
       [Op.or]: [
@@ -119,7 +119,9 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   if (!user) {
     const activeAddresses = {};
     const activeThreadCount = {};
-    const allContent = recentThreads.concat(recentComments).concat(recentReactions);
+    const allContent = recentThreads.concat(recentComments).concat(recentReactions)
+      .sort((a, b) => b.created_at - a.created_at);
+    console.log(allContent);
     allContent.forEach((item) => {
       const entity = item.community || item.chain;
       if (activeAddresses[entity]) {
@@ -219,7 +221,9 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
 
   const activeAddresses = {};
   const activeThreadCount = {};
-  const allContent = recentThreads_.concat(recentComments).concat(recentReactions);
+  const allContent = recentThreads_.concat(recentComments).concat(recentReactions)
+    .sort((a, b) => b.created_at - a.created_at);
+  console.log(allContent);
   allContent.forEach((item) => {
     const entity = item.community || item.chain;
     if (activeAddresses[entity]) {

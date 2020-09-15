@@ -67,7 +67,8 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
-              tooltip: true
+              tooltip: true,
+              maxUsers: 18,
             })
         ])
       ]),
@@ -121,7 +122,8 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
-              tooltip: true
+              tooltip: true,
+              maxUsers: 18,
             })
         ])
       ]),
