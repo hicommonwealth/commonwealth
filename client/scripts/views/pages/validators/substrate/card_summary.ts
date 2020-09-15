@@ -9,12 +9,11 @@ interface IValidatorAttrs {
   value: BlockNumber;
   currentBlock?: string;
 }
-// TODOO: CHNAGE THESES VALUES TO ACTUAL
+
 const CardSummary: m.Component<IValidatorAttrs, {}> = {
   view: (vnode) => {
     const { total, value, title, currentBlock } = vnode.attrs;
-    // const percentage: number = (value.muln(10000).div(total).toNumber() / 100);
-    const percentage: number = 85;
+    const percentage: number = (value.muln(10000).div(total).toNumber() / 100);
     const percentageText: number = percentage < 0 || percentage > 100
       ? null
       : percentage;
@@ -24,7 +23,7 @@ const CardSummary: m.Component<IValidatorAttrs, {}> = {
         : ''}`, [
         m('h3', title),
         currentBlock !== undefined && m('span.preheader-item-text.bold-text', `#${currentBlock}`),
-        m('span.preheader-item-text.gray-text', `${formatNumber(85)}/${formatNumber(100)}`),
+        m('span.preheader-item-text.gray-text', `${formatNumber(value)}/${formatNumber(total)}`),
         m(`.bar-outer${title.toLowerCase() === 'era'
           ? '-era'
           : '-epoch'}`,
