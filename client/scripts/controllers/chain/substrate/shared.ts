@@ -6,7 +6,7 @@ import { of, combineLatest, Observable, Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
 
 import { ApiRx, WsProvider, SubmittableResult, Keyring, ApiPromise } from '@polkadot/api';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHex, formatBalance } from '@polkadot/util';
 import {
   Moment,
   Balance,
@@ -406,6 +406,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           this._ss58Format = +ss58Format.unwrapOr(42);
           this._tokenDecimals = +tokenDecimals.unwrapOr(12);
           this._tokenSymbol = tokenSymbol.unwrapOr(this.app.chain.currency).toString();
+
+          const DEFAULT_DECIMALS = this.registry.createType('u32', 15);
+
+          formatBalance.setDefaults({
+            decimals: tokenDecimals.unwrapOr(DEFAULT_DECIMALS).toNumber(),
+            unit: tokenSymbol.unwrapOr(undefined)?.toString()
+          });
         }
 
         this._totalbalance = this.coins(totalbalance);

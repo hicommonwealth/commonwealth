@@ -17,3 +17,18 @@ export const get = (route, args, callback) => {
     }
   }).catch((e) => console.error(e));
 };
+
+export const post = (route, args, callback) => {
+  return $.post(app.serverUrl() + route, args)
+    .then((resp) => {
+      if (resp.status === 'Success') {
+        callback(resp.result);
+      } else {
+        console.error(resp);
+      }
+    }).catch((e) => {
+      const message = e.responseJSON.error || 'Something has went wrong, try again later.';
+      app.toasts.createError(message);
+      callback(null);
+    });
+};

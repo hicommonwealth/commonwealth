@@ -156,22 +156,6 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           m('h3', 'Staked'),
           m('.preheader-item-text', staked),
         ]),
-        m('.validators-preheader-item', [
-          m('h3', 'Manage Staking'),
-          m('.preheader-item-text', [
-            m('a.btn.formular-button-primary', {
-              class: app.user.activeAccount ? '' : 'disabled',
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: ManageStakingModal,
-                  data: { account: sender }
-                });
-              }
-            }, 'Manage'),
-          ]),
-        ]),
         hasClaimablePayouts && m('.validators-preheader-item', [
           m('h3', 'Claim Payout'),
           m('.preheader-item-text', [
@@ -187,28 +171,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
               }
             }, 'Claim'),
           ]),
-        ]),
-        m('.validators-preheader-item', [
-          m('h3', 'Update nominations'),
-          m('.preheader-item-text', [
-            m('a.btn.formular-button-primary', {
-              class: app.user.activeAccount ? '' : 'disabled',
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                createTXModal((nominators.length === 0)
-                  ? sender.chillTx()
-                  : sender.nominateTx(nominators)).then(() => {
-                  // vnode.attrs.sending = false;
-                  m.redraw();
-                }, () => {
-                  // vnode.attrs.sending = false;
-                  m.redraw();
-                });
-              }
-            }, 'Update'),
-          ]),
-        ]),
+        ])
       ])
     ];
   }

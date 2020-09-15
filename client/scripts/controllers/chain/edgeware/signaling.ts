@@ -37,8 +37,8 @@ class EdgewareSignaling extends ProposalModule<
     return new Promise((resolve, reject) => {
       this._Chain.api.pipe(
         switchMap((api: ApiRx) => api.queryMulti([
-          api.query.signaling.proposalCreationBond,
-          api.query.signaling.votingLength,
+          api.query.signaling?.proposalCreationBond,
+          api.query.signaling?.votingLength,
         ])),
         first(),
       ).subscribe(([proposalcreationbond, votinglength]: [BalanceOf, BlockNumber]) => {

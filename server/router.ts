@@ -29,6 +29,10 @@ import viewReactions from './routes/viewReactions';
 import bulkReactions from './routes/bulkReactions';
 import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
+import createChainStake from './routes/createChainStake';
+import createValidatorGroup from './routes/createValidatorGroup';
+import getValidatorGroup from './routes/getValidatorGroup';
+import getChainStake from './routes/getChainStake';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import viewCount from './routes/viewCount';
@@ -325,6 +329,16 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
+
+  // chain_stake
+  router.post('/createChainStake', passport.authenticate('jwt', { session: false }),
+    createChainStake.bind(this, models));
+  // validator_group
+  router.post('/createValidatorGroup', passport.authenticate('jwt', { session: false }),
+    createValidatorGroup.bind(this, models));
+  router.get('/getValidatorGroup', passport.authenticate('jwt', { session: false }),
+    getValidatorGroup.bind(this, models));
+  router.get('/getChainStake', getChainStake.bind(this, models));
 
   app.use('/api', router);
 }

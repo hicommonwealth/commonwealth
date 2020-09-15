@@ -77,6 +77,18 @@ code {
 pre {
     padding: 10px 12px;
 }
+.right{
+    float: right;
+}
+.right-sub{
+    .cui-icon{
+        position: absolute;
+        right: 0;
+    }
+}
+.clear {
+    clear: both;
+}
 ::selection {
     color: #fff;
     background: #444;
@@ -142,4 +154,175 @@ pre {
         width: 100%;
         padding-left: 0;
     }
+}
+
+//
+// construct-ui overrides
+// TODO: move to construct.scss
+//
+
+// Small changes to input styles
+.cui-input input,
+.cui-input textarea {
+    font-size: 15px;
+    &::placeholder {
+        color: #aaa;
+    }
+    &:focus::placeholder {
+        color: #999;
+    }
+}
+
+// The declarative construct-ui toaster doesn't allow
+// position to be set by default, so we just override it here
+.cui-toaster.cui-toaster-top {
+    top: auto;
+    bottom: 0;
+    z-index: 99999;
+}
+
+.cui-tag.cui-none.cui-xs {
+    border-color: #f1f3f5;
+    padding-top: 0;
+    padding-bottom: 0;
+    cursor: pointer;
+    position: relative;
+    top: -1px;
+    &:hover {
+        border-color: darken(#f1f3f5, 2%);
+        background: darken(#f1f3f5, 2%);
+    }
+}
+
+// reduce padding on menus
+.cui-menu {
+    padding: 2px 0;
+}
+.cui-menu > .cui-menu-divider {
+    margin: 2px 0;
+}
+
+// darken color on menus
+.cui-menu > .cui-button.cui-basic {
+    color: #546e7c;
+}
+
+// allow menus to be wider by default
+.cui-menu {
+    max-width: 240px;
+}
+
+// align text in menus to the left by default
+.cui-menu.cui-align-left > .cui-list.cui-align-left > .cui-button-label {
+    text-align: left;
+}
+
+// adjust dialog headers
+.cui-dialog-header {
+    padding: 15px 15px 15px 25px;
+}
+.cui-dialog-header h3 {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+.cui-dialog-header > button.cui-dialog-close-button {
+    position: relative;
+    top: 1px;
+}
+
+// fix .cui-switch styling
+.cui-switch .cui-control-indicator {
+    height: 18px;
+    width: 34px;
+}
+
+// button styles
+.cui-button {
+    font-weight: 600 !important;
+}
+.cui-button.cui-menu-item {
+    font-weight: 400 !important;
+}
+
+// menu styles
+.cui-menu {
+    > .cui-button.cui-basic {
+        color: #333;
+        .cui-icon svg {
+            stroke: #333;
+        }
+    }
+}
+
+// icon styles
+.cui-icon.filled-icon svg {
+    fill: currentColor;
+}
+
+// select list styles
+.cui-popover.cui-select-list .cui-popover-content {
+    padding: 10px;
+}
+
+// empty state override
+.cui-empty-state.cui-empty-state-fill {
+    z-index: initial;
+}
+.cui-spinner.cui-spinner-fill {
+    z-index: initial;
+}
+.gray-txt{
+    color: rgba(86, 84, 84, 0.66);
+    font-size: 1rem;
+    font-weight: 400;
+}
+.padding-b-15{
+    padding-bottom: 15px;
+}
+.pointer{
+    cursor: pointer;
+}
+.font-s-13{
+    font-size: 13px
+}
+.balance{
+    font-weight: 500;
+    font-size: 25px;
+    margin: 0px;
+}
+.padding-l-r-12{
+    padding: 0px 12px 0px 12px;
+}
+.bonded-value {
+    button{
+        height: 100% !important;
+        margin-right: 0px !important;
+        border-left: 0px;
+    }
+}
+.manage-staking-presentation{
+    .tab-bar{
+        margin-bottom: 0px !important;
+    }
+}
+.min-height-200{
+    min-height: 200px;
+}
+.border-r-1{
+    border-right: 1px solid #d4d4d4;
+}
+.padding-r7{
+    padding-right: 7px;
+}
+.help-pointer{
+    cursor: help;
+}
+button:disabled{
+    cursor: not-allowed;
+}
+.min-h-200{
+    min-height: 200px !important;
+}
+.padding-top-15{
+    padding-top: 15px;
 }
