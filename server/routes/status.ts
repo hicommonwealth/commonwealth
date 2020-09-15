@@ -123,20 +123,31 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at));
     allContent.forEach((item) => {
       const entity = item.community || item.chain;
-      if (activeAddresses[entity] && !activeAddresses[entity][item.address_id]) {
-        activeAddresses[entity][item.address_id] = [item.Address.chain, item.Address.address];
+      if (activeAddresses[entity]) {
+        if (activeAddresses[entity][item.address_id]) {
+          activeAddresses[entity][item.address_id]['postCount'] += 1;
+        } else {
+          activeAddresses[entity][item.address_id] = {
+            'postCount': 1,
+            'addressInfo': [item.Address.chain, item.Address.address]
+          };
+        }
       } else if (!activeAddresses[entity]) {
-        const addr = {};
-        addr[item.address_id] = [item.Address.chain, item.Address.address];
-        activeAddresses[entity] = addr;
+        activeAddresses[entity] = {};
+        activeAddresses[entity][item.address_id] = {
+          'postCount': 1,
+          'addressInfo': [item.Address.chain, item.Address.address]
+        };
       }
     });
     recentThreads.forEach((thread) => {
       const entity = thread.community || thread.chain;
       if (activeThreads[entity]) {
-        activeThreads[entity] += 1;
+        activeThreads[entity][thread.id] = thread;
       } else if (!activeThreads[entity]) {
-        activeThreads[entity] = 1;
+        const addr = {};
+        addr[thread.id] = thread;
+        activeThreads[entity] = addr;
       }
     });
     return res.json({
@@ -225,20 +236,31 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
 
   allContent.forEach((item) => {
     const entity = item.community || item.chain;
-    if (activeAddresses[entity] && !activeAddresses[entity][item.address_id]) {
-      activeAddresses[entity][item.address_id] = [item.Address.chain, item.Address.address];
+    if (activeAddresses[entity]) {
+      if (activeAddresses[entity][item.address_id]) {
+        activeAddresses[entity][item.address_id]['postCount'] += 1;
+      } else {
+        activeAddresses[entity][item.address_id] = {
+          'postCount': 1,
+          'addressInfo': [item.Address.chain, item.Address.address]
+        };
+      }
     } else if (!activeAddresses[entity]) {
-      const addr = {};
-      addr[item.address_id] = [item.Address.chain, item.Address.address];
-      activeAddresses[entity] = addr;
+      activeAddresses[entity] = {};
+      activeAddresses[entity][item.address_id] = {
+        'postCount': 1,
+        'addressInfo': [item.Address.chain, item.Address.address]
+      };
     }
   });
   recentThreads_.forEach((thread) => {
     const entity = thread.community || thread.chain;
     if (activeThreads[entity]) {
-      activeThreads[entity] += 1;
+      activeThreads[entity][thread.id] = thread;
     } else if (!activeThreads[entity]) {
-      activeThreads[entity] = 1;
+      const addr = {};
+      addr[thread.id] = thread;
+      activeThreads[entity] = addr;
     }
   });
   // get starred communities for user
