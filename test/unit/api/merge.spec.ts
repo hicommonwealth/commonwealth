@@ -103,8 +103,8 @@ describe('Merge Account tests', () => {
         jwt: userJWT,
         title: 'hello',
         body: 'world',
-        tagName: 'test tag',
-        tagId: undefined,
+        topicName: 'test tag',
+        topicId: undefined,
         kind: 'forum',
       });
       const thread2 = await modelUtils.createThread({
@@ -114,8 +114,8 @@ describe('Merge Account tests', () => {
         jwt: userJWT,
         title: 'hello 2',
         body: 'world 2',
-        tagName: 'test tag',
-        tagId: undefined,
+        topicName: 'test tag',
+        topicId: undefined,
         kind: 'forum',
       });
 
