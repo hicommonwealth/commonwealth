@@ -19,6 +19,7 @@ export default class extends IEventHandler {
     }
     const bondEventData = event.data;
 
+    // 2) check for the latest historical validator data from db
     const latestValidators = await this._models.HistoricalValidatorStatistic.findOne({
       where: {
         stash: bondEventData.stash

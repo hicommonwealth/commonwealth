@@ -75,7 +75,7 @@ export default class extends IEventHandler {
       validator.eventType = newRewardEventData.kind;
       validator.commissionPer = activeValidatorsInfo.commissionPer;
       validator.eraPoints = activeValidatorsInfo.eraPoints;
-      validator.apr = 123; // To be computed over here.
+      validator.apr = 0; // APR to be computed over here
       validator.created_at = new Date().toISOString();
       validator.updated_at = new Date().toISOString();
       delete validator.id;

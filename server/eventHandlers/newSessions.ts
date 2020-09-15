@@ -89,7 +89,7 @@ export default class extends IEventHandler {
         commissionPer: newSessionEventData.validatorInfo[validator].commissionPer,
         eraPoints: newSessionEventData.validatorInfo[validator].eraPoints,
         eventType: newSessionEventData.kind,
-        apr: 0, // to be computed later on.
+        apr: 0, // This is for first time validator
         uptime: 0,
         isElected: true,
         hasMessage: false,
