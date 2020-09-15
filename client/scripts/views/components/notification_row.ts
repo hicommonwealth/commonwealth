@@ -22,7 +22,7 @@ const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
-    decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true });
+    decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
   } catch (e) {
     let doc = decodeURIComponent(comment_text);
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
@@ -30,7 +30,7 @@ const getCommentPreview = (comment_text) => {
     Array.from(matches).forEach((match) => {
       doc = doc.replace(match[0], match[1]);
     });
-    decoded_comment_text = m(MarkdownFormattedText, { doc: doc.slice(0, 140), hideFormatting: true });
+    decoded_comment_text = m(MarkdownFormattedText, { doc: doc.slice(0, 140), hideFormatting: true, collapse: true });
   }
   return decoded_comment_text;
 };

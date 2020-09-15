@@ -152,7 +152,7 @@ const CreateComment: m.Component<{
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
                   ? 'Uploading...'
-                  : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
+                  : parentType === CommentParent.Proposal ? 'Post comment' : 'Reply to comment'
               }),
               cancellable
                 && m(Button, {

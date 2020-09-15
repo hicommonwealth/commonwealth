@@ -101,12 +101,12 @@ const ReferendaPage: m.Component<{}> = {
       onSubstrate && m(SubstrateProposalStats),
       m(Listing, {
         content: activeProposalContent,
-        columnHeaders: ['Active Referenda', 'Replies', 'Likes', 'Updated'],
+        columnHeaders: ['Active Referenda', 'Comments', 'Likes', 'Updated'],
         rightColSpacing: [4, 4, 4]
       }),
       m(Listing, {
         content: inactiveProposalContent,
-        columnHeaders: ['Inactive Referenda', 'Replies', 'Likes', 'Updated'],
+        columnHeaders: ['Inactive Referenda', 'Comments', 'Likes', 'Updated'],
         rightColSpacing: [4, 4, 4]
       }),
     ]);

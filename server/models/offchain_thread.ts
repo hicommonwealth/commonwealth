@@ -13,7 +13,7 @@ export interface OffchainThreadAttributes {
   body?: string;
   kind: string;
   url?: string;
-  topic_id: number;
+  topic_id?: number;
   pinned?: boolean;
   chain?: string;
   community?: string;
@@ -50,7 +50,7 @@ export default (
     body: { type: dataTypes.TEXT, allowNull: true },
     kind: { type: dataTypes.TEXT, allowNull: false },
     url: { type: dataTypes.TEXT, allowNull: true },
-    topic_id: { type: dataTypes.INTEGER, allowNull: false },
+    topic_id: { type: dataTypes.INTEGER, allowNull: true },
     pinned: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     chain: { type: dataTypes.STRING, allowNull: true },
     community: { type: dataTypes.STRING, allowNull: true },

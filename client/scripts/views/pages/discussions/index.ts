@@ -199,7 +199,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
                 rightColSpacing: [4, 4, 4],
                 columnHeaders: [
                   'Title',
-                  'Replies',
+                  'Comments',
                   'Likes',
                   'Updated'
                 ],

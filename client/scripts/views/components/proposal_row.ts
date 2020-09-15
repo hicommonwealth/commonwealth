@@ -268,7 +268,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
           : null;
 
     const rowComments = m('.proposal-row-comments', !firstComment ? [
-      'No replies yet'
+      'No comments yet'
     ] : [
       m(User, {
         hideIdentityIcon: true,
