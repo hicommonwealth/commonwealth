@@ -2,16 +2,17 @@ import Sequelize from 'sequelize';
 import { Exposure, BlockNumber, AccountId, IndividualExposure } from '@polkadot/types/interfaces';
 import { Request, Response, NextFunction } from 'express';
 import { Errors } from './getOffences';
+import { type } from 'jquery';
 const Op = Sequelize.Op;
 
 interface IEventData {
-    stash: AccountId;
-    exposure: Exposure;
-    block: BlockNumber;
+  stash: AccountId;
+  exposure: Exposure;
+  block: BlockNumber;
 }
 
 // eslint-disable-next-line prefer-const
-let validators: { [key: string]: {[block: string]: any} } = {};
+let validators: { [key: string]: { [block: string]: any } } = {};
 
 // COMMON
 const getStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -64,10 +65,10 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
 
     // eslint-disable-next-line no-prototype-builtins
     if (validators.hasOwnProperty(key)) {
-      validators[key][event_data.block.toString()] = event_data.exposure.total;
+      validators[key][event_data.block.toString()] = Number(event_data.exposure.total);
     } else {
       validators[key] = {};
-      validators[key][event_data.block.toString()] = event_data.exposure.total;
+      validators[key][event_data.block.toString()] = Number(event_data.exposure.total);
     }
   });
   return res.json({ status: 'Success', result: { validators: validators || [] } });
@@ -83,10 +84,10 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
 
     // eslint-disable-next-line no-prototype-builtins
     if (validators.hasOwnProperty(key)) {
-      validators[key][event_data.block.toString()] = event_data.exposure.own;
+      validators[key][event_data.block.toString()] = Number(event_data.exposure.own);
     } else {
       validators[key] = {};
-      validators[key][event_data.block.toString()] = event_data.exposure.own;
+      validators[key][event_data.block.toString()] = Number(event_data.exposure.own);
     }
   });
 
@@ -106,20 +107,15 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
     if (validators.hasOwnProperty(key)) {
       let nominatorValue: any = event_data.exposure.others;
       // eslint-disable-next-line max-len
-      if (onlyValue) nominatorValue = event_data.exposure.others
-        .map((nominators) => Object.values(nominators)[0])
-        .reduce((nominator, value) => Number(nominator) + Number(value))
-        .toString();
-
+      if (onlyValue) nominatorValue = event_data.exposure.others.map((q) => typeof (q.value) === 'string' ? parseInt(q.value, 16) : Number(q.value))
+        .reduce((a: number, b: number) => a + b);
       validators[key][event_data.block.toString()] = nominatorValue;
     } else {
       validators[key] = {};
       let nominatorValue: any = event_data.exposure.others;
       // eslint-disable-next-line max-len
-      if (onlyValue) nominatorValue = event_data.exposure.others
-        .map((nominators) => Object.values(nominators)[0])
-        .reduce((nominator, value) => Number(nominator) + Number(value))
-        .toString();
+      if (onlyValue) nominatorValue = event_data.exposure.others.map((q) => typeof (q.value) === 'string' ? parseInt(q.value, 16) : Number(q.value))
+        .reduce((a: number, b: number) => a + b);
       validators[key][event_data.block.toString()] = nominatorValue;
     }
   });
