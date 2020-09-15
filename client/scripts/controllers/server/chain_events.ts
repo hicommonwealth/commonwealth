@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import app from 'state';
-import { get } from 'lib/util';
+import { get, post } from 'lib/util';
 
 class ChainEventsController {
   public constructor() {
@@ -61,7 +61,56 @@ class ChainEventsController {
     });
   }
 
-  public getSlases(stash?: string) {
+  public createChainStake(payload) {
+    return new Promise((resolve) => {
+      return post('/createChainStake', {
+        chain: app.chain.id,
+        jwt: app.user.jwt,
+        ...payload
+      }, resolve);
+    });
+  }
+
+  public getChainStake(payload) {
+    return new Promise((resolve) => {
+      return get('/getChainStake', {
+        chain: app.chain.id,
+        jwt: app.user.jwt,
+        ...payload
+      }, resolve);
+    });
+  }
+
+  public createValidatorGroups(payload: {stashes: string[], name: string}) {
+    return new Promise((resolve) => {
+      return post('/createValidatorGroup', {
+        chain: app.chain.id,
+        jwt: app.user.jwt,
+        ...payload
+      }, resolve);
+    });
+  }
+
+  public getValidatorGroups(payload) {
+    return new Promise((resolve) => {
+      return get('/getValidatorGroup', {
+        chain: app.chain.id,
+        jwt: app.user.jwt,
+        ...payload
+      }, resolve);
+    });
+  }
+
+  public getImOnline(stash?: string) {
+    return new Promise((resolve) => {
+      return get('/getImOnline', {
+        chain: app.chain.id,
+        stash
+      }, resolve);
+    });
+  }
+
+  public getSlashes(stash?: string) {
     return new Promise((resolve) => {
       return get('/getSlashes', {
         chain: app.chain.id,

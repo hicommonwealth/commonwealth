@@ -12,7 +12,7 @@ import {
 } from '@polkadot/types/interfaces';
 import { Vec, u32 } from '@polkadot/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
-import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
+import { stringToU8a, u8aToHex, hexToU8a, isFunction } from '@polkadot/util';
 import { IApp } from 'state';
 import { formatCoin } from 'adapters/currency';
 import { Account, IAccountsModule, ChainClass } from 'models';
@@ -20,6 +20,7 @@ import { AccountsStore } from 'stores';
 import { Codec } from '@polkadot/types/types';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
+import { SubmittableExtrinsic } from '@polkadot/api/types';
 import SubstrateChain from './shared';
 
 function addressFromSeed(seed: string, chain: SubstrateChain): string {
@@ -474,6 +475,19 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       ),
       'bond',
       `${this.address} bonds ${amount.toString()} to controller ${controller.address}`,
+    );
+  }
+
+  public batchTx(params: SubmittableExtrinsic<'rxjs'>[]) {
+    const payload = isFunction(params)
+      ? params()
+      : (params || []);
+    return this._Chain.createTXModalData(
+      this,
+      (api: ApiRx) => api.tx.utility.batch(payload),
+      'batch',
+      'utility',
+      (status) => { console.log('status', status); }
     );
   }
 
