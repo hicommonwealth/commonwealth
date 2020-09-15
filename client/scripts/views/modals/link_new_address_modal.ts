@@ -131,6 +131,7 @@ const accountVerifiedCallback = async (account: Account<any>, vnode) => {
     vnode.state.error = null;
     m.redraw();
   }
+  m.redraw();
 };
 
 const EthereumLinkAccountItem: m.Component<{
