@@ -6,6 +6,7 @@ import app from 'state';
 import { RolePermission, Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import WebhookSettingsModal from '../webhook_settings_modal';
+import { pluralize } from 'helpers';
 
 interface IWebhooksFormAttrs {
   webhooks: Webhook[];
@@ -104,7 +105,8 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                       });
                       return;
                     }
-                  })
+                  }),
+                  m(Tag, { label: pluralize(webhook.categories.length, 'event') }),
                 ])],
               contentRight: m(Icon, {
                 name: Icons.X,
