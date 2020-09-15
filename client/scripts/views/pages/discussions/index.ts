@@ -42,9 +42,10 @@ const ListingSidebar: m.Component<{ entity: string }> = {
     let { activeThreads, activeAddresses } = app.recentActivity;
     activeThreads = activeThreads[entity];
     activeAddresses = activeAddresses[entity];
-    debugger
     const activeMembers = Object.entries(activeAddresses).length
-      ? Object.entries(activeAddresses).map((member) => {
+      ? Object.entries(activeAddresses).sort((a, b) => {
+        return b[1]['postCount'] - a[1]['postCount']
+      }).map((member) => {
         const id = member[0];
         const [chain, address] = member[1]['addressInfo'];
         const addressInfo = new AddressInfo(id, address, chain, null);
@@ -52,8 +53,11 @@ const ListingSidebar: m.Component<{ entity: string }> = {
           user: addressInfo,
           avatarSize: 24
         })
-      })
+      }).slice(0, 5)
       : []; 
+    const recentlyUpdatedThreads = Object.values(activeThreads[entity])
+      .sort((a, b) => a['created_at'] - b['created_at'])
+      .slice(0, 5)
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
       m('.active-members', activeMembers)
     ])
@@ -210,7 +214,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       title: topic || 'Discussions',
       description: topicDescription,
       showNewProposalButton: true,
-      rightSidebar: ListingSidebar
+      rightSidebar: m(ListingSidebar, { entity: app.activeId() })
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
