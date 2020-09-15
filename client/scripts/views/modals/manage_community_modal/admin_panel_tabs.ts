@@ -259,14 +259,14 @@ const AdminPanelTabs: m.Component<IAdminPanelTabsAttrs, {index: number, }> = {
         fluid: true,
       }, [
         m(TabItem, {
-          label: 'Promote Admins',
-          active: vnode.state.index === 1,
-          onclick: () => { vnode.state.index = 1; },
-        }),
-        m(TabItem, {
           label: 'Webhooks',
           active: vnode.state.index === 2,
           onclick: () => { vnode.state.index = 2; },
+        }),
+        m(TabItem, {
+          label: 'Admins',
+          active: vnode.state.index === 1,
+          onclick: () => { vnode.state.index = 1; },
         }),
       ]),
       (vnode.state.index === 1)

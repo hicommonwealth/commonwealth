@@ -17,7 +17,6 @@ interface IAttrs {
 
 interface IState {
     selectedCategories: string[];
-    // webhook: Webhook;
 }
 const forumNotificationTypes = [
     NotificationCategories.NewThread,
@@ -33,7 +32,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
   view: (vnode) => {
     const { webhook } = vnode.attrs;
     const isChain = webhook.chain_id ? true : false;
-    const chainNotifications = webhook.chain_id === 'edgeware' ? EdgewareChainNotificationTypes 
+    const chainNotifications = webhook.chain_id === 'edgeware' ? EdgewareChainNotificationTypes
       : webhook.chain_id === 'kusama' ? KusamaChainNotificationTypes
         : webhook.chain_id === 'kulupu' ? KulupuChainNotificationTypes
           : webhook.chain_id === 'polkadot' ? PolkadotChainNotificationTypes
@@ -71,18 +70,18 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
         }
       }, symbols.times),
       m('.title-section', [
-          m('h4', 'Webhook options'),
-          m('p', 'Which events should trigger a notification?'),
+          m('h4', 'Webhook Settings'),
+          m('p', 'Which events should trigger this webhook?'),
       ]),
       m('.forum-events', [
-          m('h4', 'Off-chain events'),
+          m('h4', 'Off-chain discussions'),
           m(List, {
               interactive: false,
               size: 'sm',
           }, [
-              row('New Thread', [NotificationCategories.NewThread]),
-              row('New Comment', [NotificationCategories.NewComment]),
-              row('New Reaction', [NotificationCategories.NewReaction]),
+              row('New thread', [NotificationCategories.NewThread]),
+              row('New comment', [NotificationCategories.NewComment]),
+              row('New reaction', [NotificationCategories.NewReaction]),
           ])
       ]),
       isChain && m('.chain-events', [
@@ -91,10 +90,8 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
           interactive: false,
           size: 'sm',
         }, [
-          // iterate chain events
-          Object.keys(chainNotifications).map((k) => {
-            return row(k.toString(), chainNotifications[k]);
-          }),
+          // iterate over chain events
+          Object.keys(chainNotifications).map((k) => row(`${k} event`, chainNotifications[k])),
         ])
       ]),
       m(Button, {
