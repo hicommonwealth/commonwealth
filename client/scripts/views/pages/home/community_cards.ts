@@ -28,14 +28,12 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
     const chainInfo = app.config.chains.getById(chain);
     const visitedChain = !!app.user.unseenPosts[chain];
     const updatedThreads = app.user.unseenPosts[chain]?.activePosts || 0;
-    const monthlyThreads = app.recentActivity.activeThreadCount[chain];
-    let monthlyUsers = app.recentActivity.activeAddresses[chain];
-    if (monthlyUsers) {
-      monthlyUsers = Object.values(monthlyUsers).map((auth, idx) => {
-        return new AddressInfo(Number(Object.keys(monthlyUsers)[idx]), auth[1], auth[0], null)
-      });
-    }
-    console.log(monthlyUsers);
+    const monthlyThreads = app.recentActivity?.activeThreadCount[chain];
+    const monthlyUsers = app.recentActivity?.activeAddresses[chain]
+      ? Object.values(app.recentActivity.activeAddresses[chain]).map((auth, idx) => {
+        const id = Number(Object.keys(app.recentActivity.activeAddresses[chain])[idx]);
+        return new AddressInfo(id, auth[1], auth[0], null);
+      }) : null;
 
     return m(Card, {
       elevation: 1,
@@ -82,14 +80,12 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
     const visitedCommunity = !!app.user.unseenPosts[community.id];
     const updatedThreads = app.user.unseenPosts[community.id]?.activePosts || 0;
     const monthlyThreads = app.recentActivity.activeThreadCount[community.id];
-    let monthlyUsers = app.recentActivity.activeAddresses[community.id];
-    if (monthlyUsers) {
-      monthlyUsers = Object.values(monthlyUsers).map((auth, idx) => {
-        return new AddressInfo(Number(Object.keys(monthlyUsers)[idx]), auth[1], auth[0], null)
-      });
-    }
+    const monthlyUsers = app.recentActivity?.activeAddresses[community.id]
+      ? Object.values(app.recentActivity.activeAddresses[community.id]).map((auth, idx) => {
+        const id = Number(Object.keys(app.recentActivity.activeAddresses[community.id])[idx]);
+        return new AddressInfo(id, auth[1], auth[0], null);
+      }) : null;
 
-    console.log(monthlyUsers);
     return m(Card, {
       elevation: 1,
       interactive: true,

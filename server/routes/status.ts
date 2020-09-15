@@ -121,12 +121,11 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     const activeThreadCount = {};
     const allContent = recentThreads.concat(recentComments).concat(recentReactions)
       .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at));
-    console.log(allContent.slice(0, 3));
     allContent.forEach((item) => {
       const entity = item.community || item.chain;
-      if (activeAddresses[entity]) {
+      if (activeAddresses[entity] && !activeAddresses[entity][item.address_id]) {
         activeAddresses[entity][item.address_id] = [item.Address.chain, item.Address.address];
-      } else {
+      } else if (!activeAddresses[entity]) {
         const addr = {};
         addr[item.address_id] = [item.Address.chain, item.Address.address];
         activeAddresses[entity] = addr;
@@ -223,12 +222,12 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   const activeThreadCount = {};
   const allContent = recentThreads_.concat(recentComments).concat(recentReactions)
     .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at));
-  console.log(allContent.slice(0, 3));
+
   allContent.forEach((item) => {
     const entity = item.community || item.chain;
-    if (activeAddresses[entity]) {
+    if (activeAddresses[entity] && !activeAddresses[entity][item.address_id]) {
       activeAddresses[entity][item.address_id] = [item.Address.chain, item.Address.address];
-    } else {
+    } else if (!activeAddresses[entity]) {
       const addr = {};
       addr[item.address_id] = [item.Address.chain, item.Address.address];
       activeAddresses[entity] = addr;

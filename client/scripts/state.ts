@@ -29,6 +29,11 @@ export const enum LoginState {
   LoggedIn = 'logged_in',
 }
 
+interface IRecentActivity {
+  activeAddresses;
+  activeThreadCount;
+}
+
 export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
@@ -45,7 +50,7 @@ export interface IApp {
   communities: CommunitiesController;
   user: UserController;
 
-  recentActivity: any;
+  recentActivity: IRecentActivity;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
