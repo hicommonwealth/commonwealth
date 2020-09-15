@@ -11,17 +11,17 @@ import { symbols } from 'helpers';
 import { notifyError } from 'controllers/app/notifications';
 
 interface IAttrs {
-    webhook: Webhook;
-    updateSuccessCallback: Function;
+  webhook: Webhook;
+  updateSuccessCallback: Function;
 }
 
 interface IState {
-    selectedCategories: string[];
+  selectedCategories: string[];
 }
 const forumNotificationTypes = [
-    NotificationCategories.NewThread,
-    NotificationCategories.NewComment,
-    NotificationCategories.NewReaction,
+  NotificationCategories.NewThread,
+  NotificationCategories.NewComment,
+  NotificationCategories.NewReaction,
 ]
 
 const WebhookSettingsModal: m.Component<IAttrs, IState> = {
@@ -38,29 +38,29 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
           : webhook.chain_id === 'polkadot' ? PolkadotChainNotificationTypes
             : {};
     const row = (label: string, values: string[]) => {
-        const allValuesPresent = values.every((v) => vnode.state.selectedCategories.includes(v));
-        const someValuesPresent = values.length > 1 && values.some((v) => vnode.state.selectedCategories.includes(v));
-        return m(ListItem, {
-            contentLeft: label,
-            contentRight: m(Checkbox, {
-                checked: allValuesPresent,
-                indeterminate: someValuesPresent && !allValuesPresent,
-                onchange: (e) => {
-                    if (allValuesPresent) {
-                        vnode.state.selectedCategories = vnode.state.selectedCategories
-                            .filter((v) => !values.includes(v));
-                        m.redraw();
-                    } else {
-                        values.forEach((v) => {
-                            if (!vnode.state.selectedCategories.includes(v)) {
-                                vnode.state.selectedCategories.push(v);
-                            }
-                        });
-                        m.redraw();
-                    }
-                },
-            }),
-        });
+      const allValuesPresent = values.every((v) => vnode.state.selectedCategories.includes(v));
+      const someValuesPresent = values.length > 1 && values.some((v) => vnode.state.selectedCategories.includes(v));
+      return m(ListItem, {
+        contentLeft: label,
+        contentRight: m(Checkbox, {
+          checked: allValuesPresent,
+          indeterminate: someValuesPresent && !allValuesPresent,
+          onchange: (e) => {
+            if (allValuesPresent) {
+              vnode.state.selectedCategories = vnode.state.selectedCategories
+                .filter((v) => !values.includes(v));
+              m.redraw();
+            } else {
+              values.forEach((v) => {
+                if (!vnode.state.selectedCategories.includes(v)) {
+                    vnode.state.selectedCategories.push(v);
+                }
+              });
+              m.redraw();
+            }
+          },
+        }),
+      });
     }
     return m('.WebhookSettingsModal.compact-modal-body-max', [
       m('.CompactModalExitButton.dark', {
@@ -123,7 +123,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
             }
           });
         }
-      })
+      }),
     ]);
   }
 };
