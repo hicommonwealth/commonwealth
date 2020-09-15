@@ -55,6 +55,7 @@ import createInvite from './routes/createInvite';
 import getInvites from './routes/getInvites';
 import getOffences from './routes/getOffences';
 import getRewards from './routes/getRewards';
+import getSlashes from './routes/getSlashes';
 import { getTotalStakeOverTime, getOwnStakeOverTime, getOtherStakeOverTime, getNominatorsOverTime }
   from './routes/getExposureOverTime';
 import getImOnline from './routes/getImOnline'
@@ -216,6 +217,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/getInvites', passport.authenticate('jwt', { session: false }), getInvites.bind(this, models));
   router.get('/getOffences', getOffences.bind(this, models));
   router.get('/getRewards', getRewards.bind(this, models));
+  router.get('/getSlashes', getSlashes.bind(this, models));
   router.get('/getOwnStakeOverTime', getOwnStakeOverTime.bind(this, models));
   router.get('/getOtherStakeOverTime', getOtherStakeOverTime.bind(this, models));
   router.get('/getTotalStakeOverTime', getTotalStakeOverTime.bind(this, models));

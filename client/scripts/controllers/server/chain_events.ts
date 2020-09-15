@@ -109,6 +109,15 @@ class ChainEventsController {
       }, resolve);
     });
   }
+
+  public getSlashes(stash?: string) {
+    return new Promise((resolve) => {
+      return get('/getSlashes', {
+        chain: app.chain.id,
+        stash
+      }, resolve);
+    });
+  }
 }
 
 export default ChainEventsController;

@@ -2,7 +2,6 @@ import Sequelize from 'sequelize';
 import { Exposure, BlockNumber, AccountId, IndividualExposure } from '@polkadot/types/interfaces';
 import { Request, Response, NextFunction } from 'express';
 import { Errors } from './getOffences';
-import { type } from 'jquery';
 const Op = Sequelize.Op;
 
 interface IEventData {
