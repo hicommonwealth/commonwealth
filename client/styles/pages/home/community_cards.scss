@@ -77,7 +77,11 @@
             }
             .recent-activity {
                 margin-top: 12px;
-                color: $text-color-lighter;
+                color: $text-color-light;
+                height: 52px;
+                .recent-threads {
+                    margin-bottom: 4px;
+                }
             }
         }
 

@@ -59,14 +59,14 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
           ],
         ]),
         m('p.card-description', chainInfo.description),
-        m('.recent-activity', [
-          !!monthlyThreads
-            && m('.recent-threads', `${monthlyThreads} threads this month.`),
+        // if no recently active threads, hide this module altogether
+        m('.recent-activity', monthlyThreads && [
+          m('.recent-threads', pluralize(monthlyThreads, 'active thread')),
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
-              tooltip: true,
               maxUsers: 12,
+              avatarSize: 20,
             })
         ])
       ]),
@@ -112,14 +112,14 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
             ],
         ]),
         m('p.card-description', community.description),
-        m('.recent-activity', [
-          !!monthlyThreads
-            && m('.recent-threads', `${monthlyThreads} threads this month.`),
+        // if no recently active threads, hide this module altogether
+        m('.recent-activity', monthlyThreads && [
+          m('.recent-threads', pluralize(monthlyThreads, 'active thread')),
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
-              tooltip: true,
               maxUsers: 12,
+              avatarSize: 20,
             })
         ])
       ]),
