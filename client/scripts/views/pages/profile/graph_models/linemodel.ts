@@ -23,22 +23,21 @@ export default {
         fill: true,
         pointBackgroundColor: '#fff',
         borderColor: chartColors.red,
-        pointRadius: 3, // size of points
+        pointRadius: 0, // size of points
         borderWidth: 2, // line width
-        lineTension: 0,
-        data:[],
+        lineTension: 0.2,
+        data: [],
         /* point options */
 
         pointBorderWidth: 2, // size of outer circle
-      } ]
+      }]
     },
     options: {
       responsive: true,
       tooltips: {
-        mode: 'point',
-        intersect: true,
-        // enabled: false
+        enabled: false
       },
+      bezierCurve : true,
       // hover: {
       //   mode: 'point',
       //   intersect: false,
@@ -53,15 +52,20 @@ export default {
           ticks: {
             fontFamily: 'Inter',
             fontColor: '#B0BAC9',
-            beginAtZero: false,
+            beginAtZero: true,
             fontSize: 12,
             padding: 10,
             maxRotation: 0,
             minRotation: 0,
-            // stepSize: 1000000,
-            min: 0,
+            // stepSize: 1,
+            // min: 0,
             // max: 100,
-            // fixedStepSize: 100,
+            fixedStepSize: 1,
+            callback: (tick, index, ticks) => {
+              if (index % 2 === 0)
+                return tick.toLocaleString();
+              return null;
+            }
           },
           gridLines: {
             display: false
