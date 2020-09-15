@@ -439,30 +439,6 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ListingSidebar: m.Component<{ entity: string }> = {
-  view: (vnode) => {
-    const { entity } = vnode.attrs;
-    let { activeThreads, activeAddresses } = app.recentActivity;
-    activeThreads = activeThreads[entity];
-    activeAddresses = activeAddresses[entity];
-    debugger
-    const activeMembers = Object.entries(activeAddresses).length
-      ? Object.entries(activeAddresses).map((member) => {
-        const id = member[0];
-        const [chain, address] = member[1].addressInfo;
-        const addressInfo = new AddressInfo(id, address, chain, null);
-        return m(User, {
-          user: addressInfo,
-          size: 24
-        })
-      }
-      : []; 
-    return m('.ListingSidebar.forum-container.proposal-sidebar', [
-      m('.active-members')
-    ])
-  }
-}
-
 const ViewProposalPage: m.Component<{
   identifier: string,
   type: string
@@ -670,8 +646,8 @@ const ViewProposalPage: m.Component<{
     return m(Sublayout, {
       class: 'ViewProposalPage',
       rightSidebar: proposal instanceof OffchainThread
-      ? m(ListingSidebar, { entity: app.activeId() })
-      : m(ProposalSidebar, { proposal }),
+        ? []
+        : m(ProposalSidebar, { proposal }),
     }, [
       m(ProposalHeader, {
         proposal,

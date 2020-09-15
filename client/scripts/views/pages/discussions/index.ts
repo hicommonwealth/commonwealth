@@ -1,3 +1,5 @@
+import User from 'views/components/widgets/user';
+import { AddressInfo } from 'models';
 /* eslint-disable no-unused-expressions */
 import 'pages/discussions/index.scss';
 
@@ -33,6 +35,30 @@ interface IDiscussionPageState {
 }
 
 const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last visit'), m('hr') ]);
+
+const ListingSidebar: m.Component<{ entity: string }> = {
+  view: (vnode) => {
+    const { entity } = vnode.attrs;
+    let { activeThreads, activeAddresses } = app.recentActivity;
+    activeThreads = activeThreads[entity];
+    activeAddresses = activeAddresses[entity];
+    debugger
+    const activeMembers = Object.entries(activeAddresses).length
+      ? Object.entries(activeAddresses).map((member) => {
+        const id = member[0];
+        const [chain, address] = member[1]['addressInfo'];
+        const addressInfo = new AddressInfo(id, address, chain, null);
+        return m(User, {
+          user: addressInfo,
+          avatarSize: 24
+        })
+      })
+      : []; 
+    return m('.ListingSidebar.forum-container.proposal-sidebar', [
+      m('.active-members', activeMembers)
+    ])
+  }
+}
 
 const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   oncreate: (vnode) => {
@@ -184,6 +210,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       title: topic || 'Discussions',
       description: topicDescription,
       showNewProposalButton: true,
+      rightSidebar: ListingSidebar
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
