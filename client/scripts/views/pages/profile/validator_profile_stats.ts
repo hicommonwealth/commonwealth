@@ -62,7 +62,7 @@ export interface IValidatorAttrs {
 let startDate = new Date();
 startDate.setFullYear(startDate.getFullYear() - 1);
 startDate = new Date(startDate);
-let endDate = new Date();
+const endDate = new Date();
 export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPageState>({
   getObservables: (attrs) => ({
     groupKey: app.chain.class.toString(),
@@ -70,7 +70,7 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
     lastHeader: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.lastHeader
       : null,
-      annualPercentRate: (app.chain.base === ChainBase.Substrate)
+    annualPercentRate: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.annualPercentRate
       : null
   }),
@@ -80,36 +80,36 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
       url: '/api/getSlashes',
       params: { stash: vnode.attrs.address, startDate, endDate } // for getting data of 1 year
     }).then((response: any) => {
-      vnode.state.fullYearSlashes = []
+      vnode.state.fullYearSlashes = [];
       if (response) {
-        vnode.state.fullYearSlashes = response.result.slashes
+        vnode.state.fullYearSlashes = response.result.slashes;
       }
     }).catch((e: any) => {
-      vnode.state.fullYearSlashes = []
+      vnode.state.fullYearSlashes = [];
     });
     m.request({
       method: 'GET',
       url: '/api/getSlashes',
       params: { stash: vnode.attrs.address } // for getting data for last 30 days
     }).then((response: any) => {
-      vnode.state.slashes = []
+      vnode.state.slashes = [];
       if (response) {
-        vnode.state.slashes = response.result.slashes
+        vnode.state.slashes = response.result.slashes;
       }
     }).catch((e: any) => {
-      vnode.state.slashes = []
+      vnode.state.slashes = [];
     });
     m.request({
       method: 'GET',
       url: '/api/getImOnline',
       params: { stash: vnode.attrs.address }
     }).then((response: any) => {
-      vnode.state.imOnlinePerCent = 0
+      vnode.state.imOnlinePerCent = 0;
       if (response) {
-        vnode.state.imOnlinePerCent = Object.values(response.result.validators[vnode.attrs.address])[0]
+        vnode.state.imOnlinePerCent = Object.values(response.result.validators[vnode.attrs.address])[0];
       }
     }).catch((e: any) => {
-      vnode.state.imOnlinePerCent = 0
+      vnode.state.imOnlinePerCent = 0;
     });
   },
   view: (vnode) => {
@@ -132,11 +132,11 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
     //   size: 'xs',
     //   style: 'visibility: visible; opacity: 1;'
     // })));
-    let sumOfSlashes = slashes.reduce((a, b) => {
-      return a + b
+    const sumOfSlashes = slashes.reduce((a, b) => {
+      return a + b;
     }, 0);
-    let sumOfFullYearSlashes = fullYearSlashes.reduce((a, b) => {
-      return a + b
+    const sumOfFullYearSlashes = fullYearSlashes.reduce((a, b) => {
+      return a + b;
     }, 0);
     return m('div.validator-profile-stats',
       m(Card, {
@@ -148,19 +148,17 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
           m('.total-apr', // TODOO: Integrate real data here.
             m('.data-row-block',
               m('.profile-header-block',
-                'APR'
-                )),
+                'APR')),
             m('.info-row-block',
               m('.profile-data-block',
-              `${vnode.state.dynamic.annualPercentRate[vnode.attrs.address]}%`)),
-              ), // STAKING.TS
+                `${vnode.state.dynamic.annualPercentRate[vnode.attrs.address]}%`)),), // STAKING.TS
           m('.own-total-offences',
             m('.data-row-block',
               m('.profile-header-block',
                 'TOTAL OFFENCES')),
             m('.info-row-block',
               m('.profile-data-block',
-                '0'))), //MIR ROUTE
+                '0'))), // MIR ROUTE
           m('.other-total-slashes',
             m('.data-row-block',
               m('.profile-header-block',
@@ -174,12 +172,12 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                 'TOTAL REWARDS')),
             m('.info-row-block',
               m('.profile-data-block',
-                '30 (3.29m EDG)'))), //MIR ROUTE
+                '30 (3.29m EDG)'))), // MIR ROUTE
           m('.button-set-identity',
             m('.data-row-block',
               m('.profile-header-block',
                 m('.bio-actions-edit-profile', [
-                  !onOwnProfile ? [
+                  onOwnProfile ? [
                     m(Button, {
                       intent: 'primary',
                       onclick: () => {
@@ -191,8 +189,8 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                       label: 'Edit profile'
                     }),
                   ] : [
-                      // TODO: actions for others' accounts
-                    ]
+                    // TODO: actions for others' accounts
+                  ]
                 ])))),
         ]),
         m('div.profile-stats-row2.row', [
@@ -216,23 +214,23 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                 'SLASHES (30 DAYS)')),
             m('.info-row-block',
               m('.profile-data-block',
-              `${slashes.length} (${formatNumberShort(sumOfSlashes / 1_000_000_000_000_000_000)} EDG)`))),
+                `${slashes.length} (${formatNumberShort(sumOfSlashes / 1_000_000_000_000_000_000)} EDG)`))),
           m('.rewards-days',
             m('.data-row-block',
               m('.profile-header-block',
                 'REWARDS (30 DAYS)')),
             m('.info-row-block',
               m('.profile-data-block',
-                '11 (1.52m EDG)'))),// MIR ROUTE
+                '11 (1.52m EDG)'))), // MIR ROUTE
           m('.button-set-identity',
             m('.info-row-block',
               m('.profile-data-block',
                 m('.bio-actions-edit-identity', [
-                  !onOwnProfile ? [
+                  onOwnProfile ? [
                     editIdentityAction(account, vnode.state.identity)
                   ] : [
-                      // TODO: actions for others' accounts
-                    ]
+                    // TODO: actions for others' accounts
+                  ]
                 ])))),
         ])
       ]));
