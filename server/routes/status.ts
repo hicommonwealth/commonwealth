@@ -60,7 +60,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           }
         }
       ],
-      created_at: {
+      updated_at: {
         [Op.gt]: thirtyDaysAgo
       }
     },
@@ -83,7 +83,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           }
         }
       ],
-      created_at: {
+      updated_at: {
         [Op.gt]: thirtyDaysAgo
       }
     },
@@ -120,8 +120,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     const activeAddresses = {};
     const activeThreadCount = {};
     const allContent = recentThreads.concat(recentComments).concat(recentReactions)
-      .sort((a, b) => b.created_at - a.created_at);
-    console.log(allContent);
+      .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at));
+    console.log(allContent.slice(0, 3));
     allContent.forEach((item) => {
       const entity = item.community || item.chain;
       if (activeAddresses[entity]) {
@@ -210,7 +210,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           }
         }
       ],
-      created_at: {
+      updated_at: {
         [Op.gt]: thirtyDaysAgo
       }
     },
@@ -222,8 +222,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   const activeAddresses = {};
   const activeThreadCount = {};
   const allContent = recentThreads_.concat(recentComments).concat(recentReactions)
-    .sort((a, b) => b.created_at - a.created_at);
-  console.log(allContent);
+    .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at));
+  console.log(allContent.slice(0, 3));
   allContent.forEach((item) => {
     const entity = item.community || item.chain;
     if (activeAddresses[entity]) {
