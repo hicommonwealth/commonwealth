@@ -37,7 +37,7 @@ export default class extends IEventHandler {
       case SubstrateTypes.EventKind.Bonded: {
         validator.exposure.own = (Number(validator.exposure.own) + Number(bondEventData.amount)).toString();
         validator.exposure.total = (Number(validator.exposure.total) + Number(bondEventData.amount)).toString();
-        validator.block = event.blockNumber;
+        validator.block = event.blockNumber.toString();
         validator.eventType = bondEventData.kind;
         validator.created_at = new Date().toISOString();
         validator.updated_at = new Date().toISOString();
@@ -47,7 +47,7 @@ export default class extends IEventHandler {
       case SubstrateTypes.EventKind.Unbonded: {
         validator.exposure.own = (Number(validator.exposure.own) - Number(bondEventData.amount)).toString();
         validator.exposure.total = (Number(validator.exposure.total) - Number(bondEventData.amount)).toString();
-        validator.block = event.blockNumber;
+        validator.block = event.blockNumber.toString();
         validator.eventType = bondEventData.kind;
         validator.created_at = new Date().toISOString();
         validator.updated_at = new Date().toISOString();
@@ -65,3 +65,4 @@ export default class extends IEventHandler {
     return dbEvent;
   }
 }
+

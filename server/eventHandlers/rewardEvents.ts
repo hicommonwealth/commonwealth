@@ -71,7 +71,7 @@ export default class extends IEventHandler {
       }
 
       validator.exposure = newExposure;
-      validator.block = event.blockNumber;
+      validator.block = event.blockNumber.toString();
       validator.eventType = newRewardEventData.kind;
       validator.commissionPer = activeValidatorsInfo.commissionPer;
       validator.eraPoints = activeValidatorsInfo.eraPoints;
@@ -91,3 +91,4 @@ export default class extends IEventHandler {
     return dbEvent;
   }
 }
+
