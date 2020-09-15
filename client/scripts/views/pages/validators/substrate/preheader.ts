@@ -128,20 +128,20 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           m('h3', 'Last Block'),
           m('.preheader-item-text', formatNumber((app.chain as Substrate).block.height)),
         ]),
-        (!isEpoch // TODOO: remove !
-          && !sessionProgress && m(CardSummary, {
-            title: 'Epoch',
-            total: sessionLength,
-            value: sessionProgress,
-            currentBlock: formatNumber(currentIndex)
-          })),
-        !eraProgress // TODOO: remove !
-        && m(CardSummary, {
-          title: 'Era',
-          total: eraLength,
-          value: eraProgress,
-          currentBlock: formatNumber(currentEra)
-        }),
+        (isEpoch
+          && sessionProgress && m(CardSummary, {
+          title: 'Epoch',
+          total: sessionLength,
+          value: sessionProgress,
+          currentBlock: formatNumber(currentIndex)
+        })),
+        eraProgress
+          && m(CardSummary, {
+            title: 'Era',
+            total: eraLength,
+            value: eraProgress,
+            currentBlock: formatNumber(currentEra)
+          }),
         m('.validators-preheader-item', [
           m('h3', 'Est. APR'),
           m('.preheader-item-text', `${apr}%`),
