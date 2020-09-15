@@ -12,14 +12,16 @@ import { formatLastUpdated, slugify, link, externalLink, extractDomain } from 'h
 import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
+import QuillFormattedText from 'views/components/quill_formatted_text';
+import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 
 import DiscussionRowMenu from './discussion_row_menu';
 import UserGallery from '../../components/widgets/user_gallery';
 import ListingRow from '../../components/listing_row';
 
-const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boolean }> = {
+const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boolean }, { expanded: boolean }> = {
   view: (vnode) => {
-    const proposal: OffchainThread = vnode.attrs.proposal;
+    const { proposal, showExcerpt } = vnode.attrs;
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
     const lastUpdated = app.comments.lastCommented(proposal) || proposal.createdAt;
@@ -59,6 +61,21 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       }),
     ];
 
+    const rowExcerpt = showExcerpt
+      && proposal instanceof OffchainThread
+      && proposal.body
+      && m('.row-excerpt', [
+        (() => {
+          try {
+            const doc = JSON.parse(proposal.body);
+            if (!doc.ops) throw new Error();
+            return m(QuillFormattedText, { doc, collapse: true, hideFormatting: true });
+          } catch (e) {
+            return m(MarkdownFormattedText, { doc: proposal.body, collapse: true, hideFormatting: true });
+          }
+        })(),
+      ]);
+
     const rowMetadata = [
       m(UserGallery, {
         avatarSize: 24,
@@ -82,7 +99,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       app.isLoggedIn() && m('.discussion-row-menu', [
         m(DiscussionRowMenu, { proposal }),
       ]),
-
     ];
 
     return m(ListingRow, {
@@ -90,6 +106,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       contentLeft: {
         header: rowHeader,
         subheader: rowSubheader,
+        subheader2: rowExcerpt,
         pinned,
       },
       key: proposal.id,

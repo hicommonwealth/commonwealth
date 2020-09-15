@@ -17,7 +17,6 @@ import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import CommunitySelector, { CommunityLabel } from './community_selector';
-import CommunityInfoModule from './community_info_module';
 
 const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
   view: (vnode) => {
@@ -108,22 +107,11 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
         }),
       ]),
       m(List, [
-        featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && [
-          app.threads.initialized
-            ? m(ListItem, {
-              class: 'section-callout',
-              label: m(Callout, {
-                size: 'sm',
-                intent: 'primary',
-                icon: Icons.ALERT_TRIANGLE,
-                content: 'The admin has not configured this community with topics yet',
-              }),
-            })
-            : m(ListItem, {
-              class: 'section-callout',
-              label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
-            }),
-        ]
+        !app.threads.initialized &&
+          m(ListItem, {
+            class: 'section-callout',
+            label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
+          }),
       ]),
       m(List, {
         onupdate: (vvnode) => {
@@ -172,12 +160,13 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
-        || p.startsWith(`/${app.activeChainId()}/treasury`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/referendum`)
         || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
         || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`));
+        || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`));
+    const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
+    const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
@@ -190,11 +179,20 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'On-chain Governance',
           class: 'section-header',
         }),
+        // referenda (substrate only)
+        !app.community && app.chain?.base === ChainBase.Substrate
+          && m(ListItem, {
+            active: onReferendaPage(m.route.get()),
+            label: 'Referenda',
+            contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/referenda`),
+            contentRight: [], // TODO
+          }),
         // proposals (substrate, cosmos, moloch only)
         m(ListItem, {
           active: onProposalPage(m.route.get()),
-          label: 'Proposals',
-          contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
+          label: 'Proposals & Motions',
+          contentLeft: m(Icon, { name: Icons.SEND }),
           onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
           // contentRight: [
           //   (app.chain?.base === ChainBase.Substrate)
@@ -212,6 +210,15 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           //   }),
           // ],
         }),
+        // treasury (substrate only)
+        !app.community && app.chain?.base === ChainBase.Substrate
+          && m(ListItem, {
+            active: onTreasuryPage(m.route.get()),
+            label: 'Treasury',
+            contentLeft: m(Icon, { name: Icons.TRUCK }),
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/treasury`),
+            contentRight: [], // TODO
+          }),
         // council (substrate only)
         !app.community && app.chain?.base === ChainBase.Substrate
           && m(ListItem, {
@@ -322,7 +329,6 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
         m('.SidebarHeader', m(CommunitySelector)),
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
-        (app.chain || app.community) && m(CommunityInfoModule),
         app.chain && m(ChainStatusModule),
       ])
     ];

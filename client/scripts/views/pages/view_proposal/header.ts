@@ -32,7 +32,10 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
     if (!(proposal instanceof OffchainThread)) return;
     if (proposal.kind !== OffchainThreadKind.Link) return;
     return m('.ProposalHeaderExternalLink', [
-      externalLink('a.external-link', proposal.url, [ extractDomain(proposal.url), m.trust(' &rarr;') ]),
+      externalLink('a.external-link', proposal.url, [
+        extractDomain(proposal.url),
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
     ]);
   }
 };

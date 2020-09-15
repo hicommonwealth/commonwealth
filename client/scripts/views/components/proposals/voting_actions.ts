@@ -88,11 +88,12 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
           }),
       ]);
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyReferendum) {
-      if (!vnode.attrs.setConviction) throw new Error('Misconfigured');
+      if (!vnode.attrs.setConviction) return;
       return m('.ProposalExtensions', [
         m('strong', 'Conviction voting'),
-        m('p', 'The winning side\'s coins will be timelocked according to their chosen weight.'),
-        m('p', 'Timelocked coins can still participate in staking and governance.'),
+        m('div', { style: 'margin-top: 6px' }, [
+          'The winning side\'s coins will be timelocked according to the weight of their vote:'
+        ]),
         m(ConvictionsChooser, { callback: vnode.attrs.setConviction }),
       ]);
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyProposal) {

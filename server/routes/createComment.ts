@@ -7,6 +7,10 @@ import { getProposalUrl } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import { factory, formatFilename } from '../../shared/logging';
 
+import { SENDGRID_API_KEY } from '../config';
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(SENDGRID_API_KEY);
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -14,7 +18,7 @@ export const Errors = {
   InvalidParent: 'Invalid parent',
   MissingTextOrAttachment: 'Must provide text or attachment',
   ThreadNotFound: 'Cannot comment; thread not found',
-  ChainEntityNotFound: 'Cannot comment; chain entity not found',
+  // ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
 };
 
@@ -139,8 +143,20 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
     const chainEntity = await proposalIdToEntity(models, chain.id, finalComment.root_id);
     if (!chainEntity) {
-      await finalComment.destroy();
-      return next(new Error(Errors.ChainEntityNotFound));
+      // send a notification email if commenting on an invalid ChainEntity
+      const msg = {
+        to: 'founders@commonwealth.im',
+        from: 'Commonwealth <no-reply@commonwealth.im>',
+        subject: 'Missing ChainEntity',
+        text: `Comment created on a missing ChainEntity ${finalComment.root_id} on ${chain.id}`,
+      };
+      sgMail.send(msg).then((result) => {
+        log.error(`Sent notification: missing ChainEntity ${finalComment.root_id} on ${chain.id}`);
+      }).catch((e) => {
+        log.error(`Could not send notification: missing chainEntity ${finalComment.root_id} on ${chain.id}`);
+      });
+      // await finalComment.destroy();
+      // return next(new Error(Errors.ChainEntityNotFound));
     }
     proposal = await models.Proposal.findOne({ id });
   } else {

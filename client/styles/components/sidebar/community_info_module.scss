@@ -1,24 +1,7 @@
 @import 'client/styles/shared';
 
 .CommunityInfoModule {
-    @include sm-max {
-        display: none;
-    }
-    // position at bottom of sidebar
-    position: absolute;
-    bottom: 96px;
-    margin-bottom: 0 !important;
-    width: calc(100% - 34px);
-    max-width: calc(100% - 34px);
-    user-select: none;
-
-    // background
-    background: $background-color-light-hover;
-    padding: 16px 18px;
-    border-radius: 4px;
-    line-height: 1.2;
-    font-size: 0.94rem;
-
+    margin: 34px 24px;
     .community-config {
         position: absolute;
         top: 20px;
@@ -34,7 +17,7 @@
             color: $text-color-medium;
             font-size: 0.9rem;
             font-weight: 500;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
         .community-info-action {
             position: relative;
@@ -48,7 +31,12 @@
             }
         }
     }
+    .community-description {
+        margin-bottom: 16px;
+        line-height: 1.25;
+    }
     .community-info {
+        font-size: 0.9rem;
         display: flex;
         margin: 3px 0;
         .community-info-text {

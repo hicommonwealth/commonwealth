@@ -14,7 +14,7 @@ import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel } from '@commonwealth/chain-events';
+import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy } from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import UserGallery from './widgets/user_gallery';
 
@@ -22,7 +22,7 @@ const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
-    decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true });
+    decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
   } catch (e) {
     let doc = decodeURIComponent(comment_text);
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
@@ -30,7 +30,7 @@ const getCommentPreview = (comment_text) => {
     Array.from(matches).forEach((match) => {
       doc = doc.replace(match[0], match[1]);
     });
-    decoded_comment_text = m(MarkdownFormattedText, { doc: doc.slice(0, 140), hideFormatting: true });
+    decoded_comment_text = m(MarkdownFormattedText, { doc: doc.slice(0, 140), hideFormatting: true, collapse: true });
   }
   return decoded_comment_text;
 };
@@ -212,13 +212,13 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       const chainId = notification.chainEvent.type.chain;
       const chainName = app.config.chains.getById(chainId)?.name;
       let label: IEventLabel;
-      if (SubstrateTypes.EventChains.includes(chainId)) {
+      if (chainSupportedBy(chainId, SubstrateTypes.EventChains)) {
         label = SubstrateEvents.Label(
           notification.chainEvent.blockNumber,
           chainId,
           notification.chainEvent.data,
         );
-      } else if (MolochTypes.EventChains.includes(chainId)) {
+      } else if (chainSupportedBy(chainId, MolochTypes.EventChains)) {
         label = MolochEvents.Label(
           notification.chainEvent.blockNumber,
           chainId,

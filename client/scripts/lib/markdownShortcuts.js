@@ -79,15 +79,18 @@ export class MarkdownShortcuts {
       {
         // bolditalic now handles bold, italic, and bold italic
         name: 'bolditalic',
-        pattern: /((?:\*|_){1,3})(.+?)((?:\*|_){1,3})/g,
+        pattern: /\b((?:\*|_){1,3})(.+?)((?:\*|_){1,3})\b/g,
         action: (text, selection, pattern, lineStart) => {
           let match = pattern.exec(text)
-
           const annotatedText = match[0]
           const openingDelimiter = match[1]
           const matchedText = match[2]
           const closingDelimiter = match[3]
           const startIndex = lineStart + match.index
+
+          // bolditalic must be prefixed with whitespace
+          if (startIndex > 0 && this.quill.getText()[startIndex - 1]
+              && this.quill.getText()[startIndex - 1].match(/[*_ \n]/) === null) return
 
           if (text.match(/^([*_ \n]+)$/g)) return
           if (matchedText[0] === ' ' || matchedText[matchedText.length - 1] === ' ') return
@@ -129,7 +132,7 @@ export class MarkdownShortcuts {
       },
       {
         name: 'code',
-        pattern: /(?:`)(.+?)(?:`)/g,
+        pattern: /\b(?:`)(.+?)(?:`)\b/g,
         action: (text, selection, pattern, lineStart) => {
           let match = pattern.exec(text)
 
