@@ -10,8 +10,7 @@ import { Card, Spinner, Button } from 'construct-ui';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
-import { response } from 'express';
-import { formatNumberShort } from 'shared/adapters/currency.ts';
+import { formatNumberShort } from 'shared/adapters/currency';
 import { ICommissionInfo } from 'controllers/chain/substrate/staking';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity) => {
@@ -151,7 +150,7 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                 'APR')),
             m('.info-row-block',
               m('.profile-data-block',
-                `${vnode.state.dynamic.annualPercentRate[vnode.attrs.address]}%`)),), // STAKING.TS
+                `${vnode.state.dynamic.annualPercentRate[vnode.attrs.address]}%`))), // STAKING.TS
           m('.own-total-offences',
             m('.data-row-block',
               m('.profile-header-block',
@@ -189,8 +188,8 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                       label: 'Edit profile'
                     }),
                   ] : [
-                    // TODO: actions for others' accounts
-                  ]
+                      // TODO: actions for others' accounts
+                    ]
                 ])))),
         ]),
         m('div.profile-stats-row2.row', [
@@ -229,8 +228,8 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                   onOwnProfile ? [
                     editIdentityAction(account, vnode.state.identity)
                   ] : [
-                    // TODO: actions for others' accounts
-                  ]
+                      // TODO: actions for others' accounts
+                    ]
                 ])))),
         ])
       ]));
