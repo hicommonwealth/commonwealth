@@ -25,14 +25,17 @@ const getNewTag = (labelCount = null) => {
 const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedChains: string[] }> = {
   view: (vnode) => {
     const { chain, nodeList, justJoinedChains } = vnode.attrs;
+    const { unseenPosts } = app.user;
+    const { activeAddresses, activeThreads } = app.recentActivity;
     const chainInfo = app.config.chains.getById(chain);
-    const visitedChain = !!app.user.unseenPosts[chain];
-    const updatedThreads = app.user.unseenPosts[chain]?.activePosts || 0;
-    const monthlyThreads = app.recentActivity?.activeThreads[chain];
-    const monthlyUsers = app.recentActivity?.activeAddresses[chain]
-      ? Object.values(app.recentActivity.activeAddresses[chain]).map((auth, idx) => {
-        const id = Number(Object.keys(app.recentActivity.activeAddresses[chain])[idx]);
-        return new AddressInfo(id, auth[1], auth[0], null);
+    const visitedChain = !!unseenPosts[chain];
+    const updatedThreads = unseenPosts[chain]?.activePosts || 0;
+    const monthlyThreads = Object.keys(activeThreads[chain] || {}).length;
+    const monthlyUsers = activeAddresses[chain]
+      ? Object.values(activeAddresses[chain]).map((auth, idx) => {
+        const { addressInfo } = (auth as any);
+        const id = Number(Object.keys(activeAddresses[chain])[idx]);
+        return new AddressInfo(id, addressInfo[1], addressInfo[0], null);
       }) : null;
 
     return m(Card, {
@@ -77,13 +80,16 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
 const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunities: string[] }> = {
   view: (vnode) => {
     const { justJoinedCommunities, community } = vnode.attrs;
-    const visitedCommunity = !!app.user.unseenPosts[community.id];
-    const updatedThreads = app.user.unseenPosts[community.id]?.activePosts || 0;
-    const monthlyThreads = app.recentActivity.activeThreads[community.id];
-    const monthlyUsers = app.recentActivity?.activeAddresses[community.id]
-      ? Object.values(app.recentActivity.activeAddresses[community.id]).map((auth, idx) => {
-        const id = Number(Object.keys(app.recentActivity.activeAddresses[community.id])[idx]);
-        return new AddressInfo(id, auth[1], auth[0], null);
+    const { unseenPosts } = app.user;
+    const { activeAddresses, activeThreads } = app.recentActivity;
+    const visitedCommunity = !!unseenPosts[community.id];
+    const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
+    const monthlyThreads = Object.keys(activeThreads[community.id] || {}).length;
+    const monthlyUsers = activeAddresses[community.id]
+      ? Object.values(activeAddresses[community.id]).map((auth, idx) => {
+        const { addressInfo } = (auth as any);
+        const id = Number(Object.keys(activeAddresses[community.id])[idx]);
+        return new AddressInfo(id, addressInfo[1], addressInfo[0], null);
       }) : null;
 
     return m(Card, {
