@@ -11,7 +11,6 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
     const proposal = vnode.attrs.proposal;
     const { slug, identifier } = proposal;
     const { attachments, author, body, title, createdAt, chain, community } = proposal;
-    if (![OffchainThreadKind.Question, OffchainThreadKind.Request, OffchainThreadKind.Forum].includes(proposal.kind)) console.log(proposal)
     return m('.ProfileProposal', [
       m('.summary', [
         m(User, { user: new AddressInfo(null, author, proposal.authorChain, null), linkify: true, hideAvatar: true }),

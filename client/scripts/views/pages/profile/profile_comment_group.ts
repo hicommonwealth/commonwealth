@@ -10,7 +10,7 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 
 interface IProfileCommentGroupAttrs {
-  proposal: OffchainThread;
+  proposal: OffchainThread | any;
   comments: Array<OffchainComment<any>>;
   account: Account<any>;
 }
@@ -19,7 +19,8 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
   view: (vnode) => {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;
-    const { slug, identifier, title, } = proposal;
+
+    const { slug, identifier, } = proposal;
 
     return m('.ProfileCommentGroup', [
       m('.summary', [
@@ -32,7 +33,8 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
         ' commented',
         (proposal.chain || proposal.community) && [
           ' in a ',
-          link('a', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`, 'thread')
+          link('a', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`, 
+            (proposal instanceof OffchainThread) ? 'thread' : 'proposal')
         ]
       ]),
       m('.activity', [
