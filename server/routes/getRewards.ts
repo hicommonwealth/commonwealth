@@ -41,10 +41,11 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   }
 
   if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
-    startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 1);
-    startDate = new Date(startDate);
     endDate = new Date();
+    startDate = new Date();
+    endDate = endDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // today's date
+    startDate.setDate(startDate.getDate() - 30);
+    startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
 
   // get rewards of last N days in descending order
@@ -66,12 +67,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
 
 
 // there was no reward found in db
-if (!rewards.length)
-  return res.json({
-    status: 'Success',
-    result: validators
-});
-
+if (!rewards.length) return res.json({status: 'Success',result: {validators: validators || []}});
 
 if (chain === 'edgeware') {
   // there is no validator identifier in reward event in chain-event, 
@@ -96,11 +92,8 @@ if (chain === 'edgeware') {
   });
 
   // there was no session or reward found in db
-  if (!sessions.length)
-  return res.json({
-    status: 'Success',
-    result: validators
-  });
+  if (!sessions.length) return res.json({status: 'Success',result: {validators: validators || []}});
+
 
   // if number of sessions are more then number of rewards drop last session as the reward for that session is not yet issued.
   if(sessions.length > rewards.length){ sessions.splice(0,1);}
@@ -142,12 +135,10 @@ else if (chain === 'kusama') {
 if(stash_id){
   if(validators.hasOwnProperty(stash_id)){validators = {stash_id: validators[stash_id]};}
   else{validators = {};}
-}
+} 
 
-return res.json({
-  status: 'Success',
-  result: validators
-});
+return res.json({status: 'Success',result: {validators: validators || []}});
+
 };
 
 export default getRewards;
