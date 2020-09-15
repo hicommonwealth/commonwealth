@@ -100,6 +100,15 @@ class ChainEventsController {
       }, resolve);
     });
   }
+
+  public getImOnline(stash?: string) {
+    return new Promise((resolve) => {
+      return get('/getImOnline', {
+        chain: app.chain.id,
+        stash
+      }, resolve);
+    });
+  }
 }
 
 export default ChainEventsController;
