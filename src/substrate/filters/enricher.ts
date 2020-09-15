@@ -105,18 +105,23 @@ export async function Enrich(
         const [ sessionIndex ] = event.data as unknown as [ SessionIndex ] & Codec
         const validators = await api.derive.staking.validators();
         const electedInfo: DeriveStakingElected = await api.derive.staking.electedInfo() as any; // validator preferences for getting commision
-        const eraPoints : EraRewardPoints = await api.query.staking.currentPoints() as EraRewardPoints;
+        const validatorEraPoints : EraRewardPoints = await api.query.staking.currentPoints() as EraRewardPoints;
         const currentEra = (await api.query.staking.currentEra<Option<EraIndex>>()).unwrap();
-        const eraPointsIndividual = eraPoints.individual.toJSON();
+        const eraPointsIndividual = validatorEraPoints.individual.toJSON();
         let active : Array<ValidatorId>
         let waiting : Array<ValidatorId>
         const validatorInfo = {};
-        electedInfo.info.forEach(async ({ accountId, controllerId, validatorPrefs }) => {
+        electedInfo.info.forEach(async ({ accountId, controllerId, validatorPrefs, rewardDestination }) => {
           const commissionPer = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
           const key = accountId.toString();
           validatorInfo[key] = {}
-          validatorInfo[key] = {commissionPer, controllerId};
-          validatorInfo[key]['nextSessionIds'] = await api.query.session.nextKeys(key);
+          validatorInfo[key] = {
+            commissionPer, 
+            controllerId, 
+            rewardDestination,
+            nextSessionIds: await api.query.session.nextKeys(key),
+            eraPoints: eraPointsIndividual[key]
+          };
         });
         // erasStakers(EraIndex, AccountId): Exposure -> api.query.staking.erasStakers // KUSAMA
         // stakers(AccountId): Exposure -> api.query.staking.stakers // EDGEWARE
@@ -149,7 +154,6 @@ export async function Enrich(
             sessionIndex: +sessionIndex,
             currentEra: +currentEra,
             validatorInfo,
-            eraPointsIndividual
           }
         }
       }

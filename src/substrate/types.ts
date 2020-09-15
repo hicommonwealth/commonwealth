@@ -182,7 +182,6 @@ export interface INewSession extends IEvent {
   sessionIndex: number;
   currentEra?: number;
   validatorInfo : {},
-  eraPointsIndividual : {}
 }
 
 
