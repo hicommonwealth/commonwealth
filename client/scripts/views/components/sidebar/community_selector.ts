@@ -5,7 +5,6 @@ import { Button, Icon, Icons, List, ListItem, SelectList } from 'construct-ui';
 
 import app from 'state';
 import { ChainInfo, CommunityInfo } from 'models';
-import { SwitchIcon } from 'helpers';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
