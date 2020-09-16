@@ -183,7 +183,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           vnode.state.loaded = true;
           vnode.state.loading = false;
           m.redraw();
-          throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          if (!vnode.state.account) throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
             : 'Failed to find profile');
         }
       });
