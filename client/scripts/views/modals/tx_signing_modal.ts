@@ -243,7 +243,7 @@ const TXSigningWebWalletOption = {
           : !isWebWalletEnabled
             ? 'Connect to extension'
             : !isAuthorInWebWallet
-              ? 'Signer not in web wallet'
+              ? 'Current address not in wallet'
               : 'Sign and send transaction'
       }),
     ]);
