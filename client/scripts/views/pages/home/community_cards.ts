@@ -7,7 +7,7 @@ import app from 'state';
 import { link, pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
-import UserGallery from '../../components/widgets/user_gallery';
+import UserGallery from 'views/components/widgets/user_gallery';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : labelCount;
