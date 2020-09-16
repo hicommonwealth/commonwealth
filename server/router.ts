@@ -92,6 +92,7 @@ import pinThread from './routes/pinThread';
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
 import createWebhook from './routes/webhooks/createWebhook';
+import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
@@ -225,6 +226,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // third-party webhooks
   // TODO: Change to POST /webhook
   router.post('/createWebhook', passport.authenticate('jwt', { session: false }), createWebhook.bind(this, models));
+  router.post('/updateWebhook', passport.authenticate('jwt', { session: false }), updateWebhook.bind(this, models));
   // TODO: Change to DELETE /webhook
   router.post('/deleteWebhook', passport.authenticate('jwt', { session: false }), deleteWebhook.bind(this, models));
   // TODO: Change to GET /webhooks

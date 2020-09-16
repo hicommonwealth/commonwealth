@@ -591,8 +591,9 @@ const LinkNewAddressModal: m.Component<{
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },
-              label: vnode.state.initializingWallet !== false
+              label: vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected
                 ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 30s)...' ]
+                : app.chain.networkStatus === ApiStatus.Disconnected ?  'Could not connect to chain'
                 : (app.chain as Substrate || app.chain as Ethereum).webWallet.available
                   ? 'Connect to wallet' : 'No wallet detected',
             }),

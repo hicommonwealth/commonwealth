@@ -17,7 +17,6 @@ import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import { CompactModalExitButton } from 'views/modal';
-import SubkeyInstructions from 'views/components/subkey_instructions';
 
 const createProposalTransactionLabels = {
   // substrate: accounts
@@ -152,9 +151,7 @@ const TXSigningCLIOption = {
     } else if (vnode.state.calldata && app.chain && app.chain.base === ChainBase.Substrate) {
       const calldata = vnode.state.calldata as ISubstrateTXData;
       instructions = m('.instructions', [
-        'Use ',
-        m(SubkeyInstructions, { text: 'subkey' }),
-        ' to sign this transaction:'
+        'Use subkey to sign this transaction:'
       ]);
       signBlock = m(CodeBlock, { clickToSelect: true }, [
         `subkey ${calldata.isEd25519 ? '-e ' : ''}sign-transaction \\
