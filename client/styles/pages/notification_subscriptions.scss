@@ -1,5 +1,44 @@
 @import 'client/styles/shared';
 
+.NotificationSettingsPage {
+    .NotificationsTable {
+        margin-top: 30px;
+        margin-bottom: 40px;
+        th {
+            font-weight: 500;
+            padding: 6px 0 12px;
+            border-bottom-color: $form-border-color-light;
+        }
+        td {
+            border: none;
+            padding: 6px 0;
+            height: 43px;
+            &.subscription-label a {
+                margin-left: 20px;
+            }
+        }
+        tr:nth-child(2) td {
+            padding-top: 12px;
+        }
+        tr.on-chain-events-header + tr {
+            td {
+                padding-top: 12px;
+            }
+        }
+        tr.on-chain-events-header th {
+            padding-top: 36px;
+        }
+        th.subscription-setting,
+        td.subscription-setting {
+            text-align: right;
+            button {
+                width: 120px;
+            }
+        }
+    }
+}
+
+// popovers
 .CommunityNotificationSelectList,
 .BatchedNotificationSelectList,
 .ChainNotificationSelectList,
@@ -7,80 +46,6 @@
     .cui-popover-content {
         padding: 0;
         min-width: 125px;
-    }
-}
-
-.NotificationsTable {
-    th {
-        font-weight: 500;
-        padding: 6px 0 12px;
-    }
-    td {
-        border: none;
-        padding: 6px 0;
-    }
-}
-
-.SubscriptionsPage {
-    .user-feedback {
-        margin-left: 12px;
-        color: #444;
-    }
-
-    .SubscriptionRow {
-        border: solid 1px $background-color-light;
-        border-radius: 3px;
-        margin: 40px 0;
-        padding: 10px 20px 20px;
-        box-shadow: 0px 2px 4px -2px rgba(67, 90, 111, 0.3);
-
-        td:nth-child(1) {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-
-            a {
-                white-space: nowrap;
-            }
-        }
-
-        h4 {
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
-
-        button {
-            margin: 0 8px 0 0;
-        }
-    }
-
-    .NotificationButtons {
-        button {
-            margin: 8px 8px 0 0;
-        }
-    }
-
-    .PauseButtons {
-        .PauseToggle {
-            margin: 8px 8px 0 0;
-        }
-    }
-
-    tr {
-        th {
-            text-align: center;
-        }
-        td {
-            a, a:visited {
-                color: black;
-            }
-        }
-        td:nth-child(2), td:nth-child(3)  {
-            text-align: center;
-            label {
-                margin: 0;
-                padding: 9px;
-            }
-        }
+        overflow: scroll;
     }
 }
