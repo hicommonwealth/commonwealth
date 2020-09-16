@@ -61,6 +61,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
+      app.recentActivity.activeAddresses = data.activeAddresses;
+      app.recentActivity.activeThreads = data.activeThreads;
 
       // update the login status
       updateActiveUser(data.user);

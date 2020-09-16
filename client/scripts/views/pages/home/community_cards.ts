@@ -5,8 +5,9 @@ import { Button, Icon, Icons, Card, Tag } from 'construct-ui';
 
 import app from 'state';
 import { link, pluralize } from 'helpers';
-import { NodeInfo, CommunityInfo } from 'models';
+import { NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import UserGallery from 'views/components/widgets/user_gallery';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : labelCount;
@@ -27,6 +28,12 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
     const chainInfo = app.config.chains.getById(chain);
     const visitedChain = !!app.user.unseenPosts[chain];
     const updatedThreads = app.user.unseenPosts[chain]?.activePosts || 0;
+    const monthlyThreads = app.recentActivity?.activeThreads[chain];
+    const monthlyUsers = app.recentActivity?.activeAddresses[chain]
+      ? Object.values(app.recentActivity.activeAddresses[chain]).map((auth, idx) => {
+        const id = Number(Object.keys(app.recentActivity.activeAddresses[chain])[idx]);
+        return new AddressInfo(id, auth[1], auth[0], null);
+      }) : null;
 
     return m(Card, {
       elevation: 1,
@@ -52,6 +59,16 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
           ],
         ]),
         m('p.card-description', chainInfo.description),
+        // if no recently active threads, hide this module altogether
+        m('.recent-activity', monthlyThreads && [
+          m('.recent-threads', pluralize(monthlyThreads, 'active thread')),
+          !!monthlyUsers
+            && m(UserGallery, {
+              users: (monthlyUsers as AddressInfo[]),
+              maxUsers: 12,
+              avatarSize: 20,
+            })
+        ])
       ]),
     ]);
   }
@@ -62,6 +79,12 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
     const { justJoinedCommunities, community } = vnode.attrs;
     const visitedCommunity = !!app.user.unseenPosts[community.id];
     const updatedThreads = app.user.unseenPosts[community.id]?.activePosts || 0;
+    const monthlyThreads = app.recentActivity.activeThreads[community.id];
+    const monthlyUsers = app.recentActivity?.activeAddresses[community.id]
+      ? Object.values(app.recentActivity.activeAddresses[community.id]).map((auth, idx) => {
+        const id = Number(Object.keys(app.recentActivity.activeAddresses[community.id])[idx]);
+        return new AddressInfo(id, auth[1], auth[0], null);
+      }) : null;
 
     return m(Card, {
       elevation: 1,
@@ -89,6 +112,16 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
             ],
         ]),
         m('p.card-description', community.description),
+        // if no recently active threads, hide this module altogether
+        m('.recent-activity', monthlyThreads && [
+          m('.recent-threads', pluralize(monthlyThreads, 'active thread')),
+          !!monthlyUsers
+            && m(UserGallery, {
+              users: (monthlyUsers as AddressInfo[]),
+              maxUsers: 12,
+              avatarSize: 20,
+            })
+        ])
       ]),
     ]);
   }
@@ -195,13 +228,38 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
             || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
       });
     }
+    
+    const { activeThreads } = app.recentActivity;
+    const sortedMemberChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
+      const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
+      const threadCountB = Array.isArray(b) ? activeThreads[b[0]] : activeThreads[b.id];
+      return ((threadCountB || 0) - (threadCountA || 0));
+    }).map((entity) => {
+      if (Array.isArray(entity)) {
+        const [chain, nodeList]: [string, any] = entity as any;
+        return  m(ChainCard, { chain, nodeList, justJoinedChains });
+      } else if (entity.id) {
+        return m(CommunityCard, { community: entity, justJoinedCommunities });
+      }
+    });
+
+    const sortedOtherChainsAndCommunities = otherChains.concat(otherCommunities).sort((a, b) => {
+      const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
+      const threadCountB = Array.isArray(b) ? activeThreads[b[0]] : activeThreads[b.id];
+      return ((threadCountB || 0) - (threadCountA || 0));
+    }).map((entity) => {
+      if (Array.isArray(entity)) {
+        const [chain, nodeList]: [string, any] = entity as any;
+        return  m(ChainCard, { chain, nodeList, justJoinedChains });
+      } else if (entity.id) {
+        return m(CommunityCard, { community: entity, justJoinedCommunities });
+      }
+    });
 
     return m('.HomepageCommunityCards', [
       m('.communities-list', [
-        myChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
-        myCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
-        otherChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
-        otherCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
+        sortedMemberChainsAndCommunities,
+        sortedOtherChainsAndCommunities,
         m('.clear'),
       ]),
       m('.other-list', [
