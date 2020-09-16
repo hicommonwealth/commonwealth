@@ -217,7 +217,7 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
             onclick: () => (app.activeChainId() || app.activeCommunityId())
               ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationSettings`)
               : m.route.set('/notificationSettings'),
-            label: 'Notification Settings'
+            label: 'Notification settings'
           }),
           m(MenuDivider),
           m(MenuItem, {

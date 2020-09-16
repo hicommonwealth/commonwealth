@@ -4,12 +4,10 @@ import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
 import { Checkbox, Button, Icons, ListItem, Table, SelectList } from 'construct-ui';
-import {
-  SubstrateEvents, SubstrateTypes, IChainEventKind, TitlerFilter
-} from '@commonwealth/chain-events';
+import { SubstrateEvents, SubstrateTypes, IChainEventKind, TitlerFilter } from '@commonwealth/chain-events';
 
-import { NotificationSubscription, ChainInfo, CommunityInfo, ChainNetwork } from 'models';
 import app from 'state';
+import { NotificationSubscription, ChainInfo, CommunityInfo, ChainNetwork } from 'models';
 import { NotificationCategories } from 'types';
 
 import Sublayout from 'views/sublayout';
@@ -20,100 +18,33 @@ import {
   EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkdotChainNotificationTypes, KulupuChainNotificationTypes
 } from 'helpers/chain_notification_types';
 
-const NOTIFICATION_TABLE_PRE_COPY = 'Notify me when...';
+const NOTIFICATION_TABLE_PRE_COPY = 'Off-chain discussions';
+const CHAIN_NOTIFICATION_TABLE_PRE_COPY = 'On-chain events';
+
 const COMMENT_NUM_PREFIX = 'Comment #';
 const ALL_COMMUNITIES = 'All communities';
 
+// left column - for identifying the notification type
+const NEW_MENTIONS_LABEL = 'When someone mentions me';
+const NEW_THREADS_LABEL = 'When a thread is created';
+const NEW_ACTIVITY_LABEL = 'When there is new activity on';
 const NEW_COMMENTS_LABEL_PREFIX = 'New comments on ';
 const NEW_REACTIONS_LABEL_PREFIX = 'New reactions on ';
 
-const NEW_MENTIONS_LABEL = 'When someone mentions me';
-const NEW_THREADS_INDIVIDUAL_COMMUNITY_LABEL = 'When a thread is created';
-const NEW_THREADS_ALL_COMMUNITIES_LABEL = 'When a thread is created';
-const NEW_ACTIVITY_LABEL = 'When there is new activity on';
-
+// right column - for selecting the notification frequency
 const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'Immediately by email';
 const NOTIFICATION_ON_OPTION = 'On';
 const NOTIFICATION_ON_SOMETIMES_OPTION = '--';
 const NOTIFICATION_OFF_OPTION = 'Off';
 
-const singleLabel = (subscription: NotificationSubscription) => {
-  const chainOrCommunityId = subscription.Chain
-    ? subscription.Chain.id
-    : subscription.OffchainCommunity
-      ? subscription.OffchainCommunity.id
-      : null;
-  switch (subscription.category) {
-    case (NotificationCategories.NewComment): {
-      const threadOrComment = subscription.OffchainThread
-        ? decodeURIComponent(subscription.OffchainThread.title)
-        : subscription.OffchainComment
-          ? decodeURIComponent(subscription.OffchainComment.id)
-          : subscription.objectId;
-      return subscription.OffchainThread
-        ? [ NEW_COMMENTS_LABEL_PREFIX, m('a', {
-          href: '#',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
-          }
-        }, threadOrComment.toString()) ]
-        : NEW_COMMENTS_LABEL_PREFIX + threadOrComment.toString();
-    }
-    case (NotificationCategories.NewReaction): {
-      const threadOrComment = subscription.OffchainThread
-        ? decodeURIComponent(subscription.OffchainThread.title)
-        : subscription.OffchainComment
-          ? decodeURIComponent(subscription.OffchainComment.id)
-          : subscription.objectId;
-      return subscription.OffchainThread
-        ? [ NEW_REACTIONS_LABEL_PREFIX, m('a', {
-          href: '#',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
-          }
-        }, threadOrComment.toString()) ]
-        : NEW_REACTIONS_LABEL_PREFIX + threadOrComment.toString();
-    }
-    default:
-      break;
-  }
-};
-
-const batchLabel = (subscriptions: NotificationSubscription[]) => {
-  const chainOrCommunityId = subscriptions[0].Chain
-    ? subscriptions[0].Chain.id
-    : subscriptions[0].OffchainCommunity
-      ? subscriptions[0].OffchainCommunity.id
-      : null;
-
-  const threadOrComment = subscriptions[0].OffchainThread
-    ? decodeURIComponent(subscriptions[0].OffchainThread.title)
-    : subscriptions[0].OffchainComment
-      ? decodeURIComponent(subscriptions[0].OffchainComment.id)
-      : subscriptions[0].objectId;
-
-  return subscriptions[0].OffchainThread
-    ? [ m('a', {
-      href: '#',
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscriptions[0].OffchainThread.id}`);
-      }
-    }, threadOrComment.toString()) ]
-    : COMMENT_NUM_PREFIX + threadOrComment.toString();
-};
-
 const BatchedSubscriptionRow: m.Component<{
   subscriptions: NotificationSubscription[];
   label?: string;
-  bold?: boolean;
 }, {
   option: string;
 }> = {
   view: (vnode) => {
-    const { label, bold, subscriptions } = vnode.attrs;
+    const { label, subscriptions } = vnode.attrs;
     const someActive = subscriptions.some((s) => s.isActive);
     const everyActive = subscriptions.every((s) => s.isActive);
     const someEmail = subscriptions.some((s) => s.immediateEmail);
@@ -128,15 +59,82 @@ const BatchedSubscriptionRow: m.Component<{
       vnode.state.option = NOTIFICATION_OFF_OPTION;
     }
     if (!subscriptions) return;
+
+    const singleLabel = (subscription: NotificationSubscription) => {
+      const chainOrCommunityId = subscription.Chain
+        ? subscription.Chain.id
+        : subscription.OffchainCommunity
+          ? subscription.OffchainCommunity.id
+          : null;
+      switch (subscription.category) {
+        case (NotificationCategories.NewComment): {
+          const threadOrComment = subscription.OffchainThread
+            ? decodeURIComponent(subscription.OffchainThread.title)
+            : subscription.OffchainComment
+              ? decodeURIComponent(subscription.OffchainComment.id)
+              : subscription.objectId;
+          return subscription.OffchainThread
+            ? [ NEW_COMMENTS_LABEL_PREFIX, m('a', {
+              href: '#',
+              onclick: (e) => {
+                e.preventDefault();
+                m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
+              }
+            }, threadOrComment.toString()) ]
+            : NEW_COMMENTS_LABEL_PREFIX + threadOrComment.toString();
+        }
+        case (NotificationCategories.NewReaction): {
+          const threadOrComment = subscription.OffchainThread
+            ? decodeURIComponent(subscription.OffchainThread.title)
+            : subscription.OffchainComment
+              ? decodeURIComponent(subscription.OffchainComment.id)
+              : subscription.objectId;
+          return subscription.OffchainThread
+            ? [ NEW_REACTIONS_LABEL_PREFIX, m('a', {
+              href: '#',
+              onclick: (e) => {
+                e.preventDefault();
+                m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
+              }
+            }, threadOrComment.toString()) ]
+            : NEW_REACTIONS_LABEL_PREFIX + threadOrComment.toString();
+        }
+        default:
+          break;
+      }
+    };
+
+    const batchLabel = (subscriptions: NotificationSubscription[]) => {
+      const chainOrCommunityId = subscriptions[0].Chain
+        ? subscriptions[0].Chain.id
+        : subscriptions[0].OffchainCommunity
+          ? subscriptions[0].OffchainCommunity.id
+          : null;
+
+      const threadOrComment = subscriptions[0].OffchainThread
+        ? decodeURIComponent(subscriptions[0].OffchainThread.title)
+        : subscriptions[0].OffchainComment
+          ? decodeURIComponent(subscriptions[0].OffchainComment.id)
+          : subscriptions[0].objectId;
+
+      return subscriptions[0].OffchainThread
+        ? [ m('a', {
+          href: '#',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscriptions[0].OffchainThread.id}`);
+          }
+        }, threadOrComment.toString()) ]
+        : COMMENT_NUM_PREFIX + threadOrComment.toString();
+    };
+
     return m('tr.BatchedSubscriptionRow', [
-      m('td', {
-        class: bold ? 'bold' : null,
-      }, [
+      m('td.subscription-label', [
         label || ((subscriptions?.length > 1)
           ? batchLabel(subscriptions)
           : singleLabel(subscriptions[0])),
       ]),
-      m('td', [
+      m('td.subscription-setting', [
         m(SelectList, {
           class: 'BatchedNotificationSelectList',
           filterable: false,
@@ -144,6 +142,9 @@ const BatchedSubscriptionRow: m.Component<{
           emptyContent: null,
           inputAttrs: {
             class: 'BatchedNotificationSelectRow',
+          },
+          popoverAttrs: {
+            transitionDuration: 0,
           },
           itemRender: (option: string) => {
             return m(ListItem, {
@@ -157,6 +158,7 @@ const BatchedSubscriptionRow: m.Component<{
             compact: true,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
+            size: 'sm',
           }),
           onSelect: async (option: string) => {
             vnode.state.option = option;
@@ -186,19 +188,9 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
     );
     return subscription && m(BatchedSubscriptionRow, {
       subscriptions: [subscription],
-      label: NEW_THREADS_INDIVIDUAL_COMMUNITY_LABEL,
-      bold: true,
+      label: NEW_THREADS_LABEL,
     });
   },
-};
-
-const NewActivityRow: m.Component = {
-  view: (vnode) => {
-    return m('tr.NewActivityRow', [
-      m('td', NEW_ACTIVITY_LABEL),
-      m('td'),
-    ]);
-  }
 };
 
 const EventSubscriptionRow: m.Component<{
@@ -315,21 +307,24 @@ const EventSubscriptionTypeRow: m.Component<{
     const allSubscriptionsCreated = subscriptions.length === notificationTypeArray.length;
 
     if (allSubscriptionsCreated && everySubscriptionActive && everySubscriptionEmail) {
-      vnode.state.option = 'Notifications on (app + email)';
+      vnode.state.option = NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION;
     } else if (allSubscriptionsCreated && everySubscriptionActive) {
-      vnode.state.option = 'Notifications on (app only)';
+      vnode.state.option = NOTIFICATION_ON_OPTION;
     } else {
-      vnode.state.option = 'Notifications off';
+      vnode.state.option = NOTIFICATION_OFF_OPTION;
     }
 
     return m('tr.EventSubscriptionTypeRow', [
-      m('td', { class: 'bold' }, title),
+      m('td', title),
       m('td', [
         m(SelectList, {
           class: 'EventSubscriptionTypeSelectList',
           filterable: false,
           checkmark: false,
           emptyContent: null,
+          popoverAttrs: {
+            transitionDuration: 0,
+          },
           inputAttrs: {
             class: 'EventSubscriptionTypeSelectRow',
           },
@@ -339,19 +334,20 @@ const EventSubscriptionTypeRow: m.Component<{
               selected: (vnode.state.option === option),
             });
           },
-          items: ['Notifications off', 'Notifications on (app only)', 'Notifications on (app + email)', ],
+          items: [NOTIFICATION_OFF_OPTION, NOTIFICATION_ON_OPTION, NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION],
           trigger: m(Button, {
             align: 'left',
             compact: true,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
+            size: 'sm',
           }),
           onSelect: async (option: string) => {
             vnode.state.option = option;
-            if (option === 'Notifications off') {
+            if (option === NOTIFICATION_OFF_OPTION) {
               await app.user.notifications.disableImmediateEmails(subscriptions);
               await app.user.notifications.disableSubscriptions(subscriptions);
-            } else if (option === 'Notifications on (app only)') {
+            } else if (option === NOTIFICATION_ON_OPTION) {
               if (!allSubscriptionsCreated) {
                 await Promise.all(
                   notificationTypeArray.map((obj) => {
@@ -362,7 +358,7 @@ const EventSubscriptionTypeRow: m.Component<{
                 if (!everySubscriptionActive) await app.user.notifications.enableSubscriptions(subscriptions);
               }
               if (someSubscriptionsEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
-            } else if (option === 'Notifications on (app + email)') {
+            } else if (option === NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION) {
               if (!allSubscriptionsCreated) {
                 await Promise.all(
                   notificationTypeArray.map((obj) => {
@@ -444,25 +440,7 @@ const KulupuChainEvents: m.Component = {
   }
 };
 
-const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
-  view: (vnode) => {
-    const { chain } = vnode.attrs;
-    return m('.EventSubscriptions', [
-      m(Table, {}, [
-        m('tr', [
-          m('th', null),
-          m('th', 'Settings'),
-        ]),
-        (chain.network === ChainNetwork.Edgeware) && m(EdgewareChainEvents),
-        (chain.network === ChainNetwork.Kulupu) && m(KulupuChainEvents),
-        (chain.network === ChainNetwork.Kusama) && m(KusamaChainEvents),
-        (chain.network === ChainNetwork.Polkadot) && m(PolkadotChainEvents),
-      ]),
-    ]);
-  }
-};
-
-const CommunitySpecificNotifications: m.Component<{
+const IndividualCommunityNotifications: m.Component<{
   community: CommunityInfo | ChainInfo;
   subscriptions: NotificationSubscription[];
 }, {}> = {
@@ -481,7 +459,10 @@ const CommunitySpecificNotifications: m.Component<{
     const batchedSubscriptions = sortSubscriptions(filteredSubscriptions, 'objectId');
     return [
       newThreads && m(NewThreadRow, { community, subscriptions }),
-      batchedSubscriptions.length > 0 && m(NewActivityRow),
+      batchedSubscriptions.length > 0 && m('tr.NewActivityRow', [
+        m('td', NEW_ACTIVITY_LABEL),
+        m('td'),
+      ]),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
       batchedSubscriptions.length > 0 && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, {
@@ -493,34 +474,7 @@ const CommunitySpecificNotifications: m.Component<{
   },
 };
 
-const GeneralNewThreadsAndComments:
-  m.Component<{
-  communities: CommunityInfo[];
-  subscriptions: NotificationSubscription[];
-}, {
-  generalStatus: boolean;
-  emailStatus: boolean;
-  generalOpen: boolean;
-  emailOpen: boolean;
-}> = {
-  oninit: (vnode) => {
-    vnode.state.generalStatus = null;
-    vnode.state.emailStatus = null;
-    vnode.state.generalOpen = false;
-    vnode.state.emailStatus = false;
-  },
-  view: (vnode) => {
-    const { communities, subscriptions } = vnode.attrs;
-    const communityIds = communities.map((c) => c.id);
-    const threadSubs = subscriptions.filter((s) => communityIds.includes(s.objectId));
-    return m(BatchedSubscriptionRow, {
-      subscriptions: threadSubs,
-      label: NEW_THREADS_ALL_COMMUNITIES_LABEL,
-    });
-  },
-};
-
-const GeneralCommunityNotifications: m.Component<{
+const AllCommunitiesNotifications: m.Component<{
   subscriptions: NotificationSubscription[];
   communities: CommunityInfo[];
 }> = {
@@ -528,6 +482,7 @@ const GeneralCommunityNotifications: m.Component<{
     const { subscriptions, communities } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
     const chainIds = app.config.chains.getAll().map((c) => c.id);
+    const communityIds = communities.map((c) => c.id);
     const batchedSubscriptions = sortSubscriptions(subscriptions.filter((s) => {
       return !chainIds.includes(s.objectId)
         && s.category !== NotificationCategories.NewMention
@@ -540,7 +495,10 @@ const GeneralCommunityNotifications: m.Component<{
         subscriptions: [mentionsSubscription],
         label: NEW_MENTIONS_LABEL,
       }),
-      m(GeneralNewThreadsAndComments, { communities, subscriptions }),
+      m(BatchedSubscriptionRow, {
+        subscriptions: subscriptions.filter((s) => communityIds.includes(s.objectId)),
+        label: NEW_THREADS_LABEL,
+      }),
       batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, { subscriptions: subscriptions2 });
       })
@@ -548,139 +506,19 @@ const GeneralCommunityNotifications: m.Component<{
   },
 };
 
-const CommunityNotifications: m.Component<{
-  subscriptions: NotificationSubscription[];
+const NotificationSettingsPage: m.Component<{}, {
   communities: CommunityInfo[];
-  chains: ChainInfo[];
-}, {
+  subscriptions: NotificationSubscription[];
   selectedCommunity: CommunityInfo | ChainInfo;
   selectedCommunityId: string;
-  communityIds: string[];
-}> = {
-  oninit: (vnode) => {
-    vnode.state.communityIds = [ALL_COMMUNITIES];
-    vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
-    const roleChains = app.user.roles.map((r) => r.chain_id);
-    vnode.attrs.chains.forEach((c) => {
-      if (roleChains.includes(c.id)) vnode.state.communityIds.push(c.name);
-    });
-    vnode.state.communityIds.sort();
-    vnode.state.selectedCommunityId = ALL_COMMUNITIES;
-    vnode.state.selectedCommunity = null;
-  },
-  view: (vnode) => {
-    const { subscriptions, communities, chains } = vnode.attrs;
-    const { selectedCommunity, selectedCommunityId, communityIds } = vnode.state;
-    if (!communities || !subscriptions) return;
-    return m('.CommunityNotifications', [
-      m('.header', [
-        m(SelectList, {
-          class: 'CommunityNotificationSelectList',
-          filterable: false,
-          checkmark: false,
-          emptyContent: null,
-          // inputAttrs: {
-          //   class: 'CommunitySelectRow',
-          // },
-          itemRender: (community: string) => {
-            return m(ListItem, {
-              label: community,
-              selected: (vnode.state.selectedCommunityId === community),
-            });
-          },
-          items: communityIds,
-          trigger: m(Button, {
-            align: 'left',
-            compact: true,
-            iconRight: Icons.CHEVRON_DOWN,
-            label: vnode.state.selectedCommunity
-              ? vnode.state.selectedCommunityId
-              : ALL_COMMUNITIES,
-          }),
-          onSelect: (community: string) => {
-            vnode.state.selectedCommunity = communities.find((c) => c.name === community)
-              || chains.find((c) => c.name === community);
-            vnode.state.selectedCommunityId = vnode.state.selectedCommunity?.name || ALL_COMMUNITIES;
-            m.redraw();
-          }
-        }),
-      ]),
-      m(Table, {
-        class: 'NotificationsTable',
-      }, [
-        m('tr', [
-          m('th', NOTIFICATION_TABLE_PRE_COPY),
-          m('th', ''),
-        ]),
-        (selectedCommunityId === ALL_COMMUNITIES) && [
-          m(GeneralCommunityNotifications, { communities, subscriptions }),
-        ],
-        (!!selectedCommunity)
-          && m(CommunitySpecificNotifications, { subscriptions, community: selectedCommunity }),
-      ]),
-    ]);
-  }
-};
-
-export const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { selectedChain: ChainInfo }> = {
-  oninit: (vnode) => {
-    const { chains } = vnode.attrs;
-    const scope = m.route.param('scope');
-    vnode.state.selectedChain = chains.find((c) => c.id === scope)
-      || chains.find((c) => c.id === 'edgeware');
-  },
-  view: (vnode) => {
-    const { chains } = vnode.attrs;
-    if (chains.length < 1) return;
-    const validChains = [ChainNetwork.Edgeware, ChainNetwork.Polkadot, ChainNetwork.Kusama, ChainNetwork.Kulupu];
-    const filteredChains = chains.filter((c) => validChains.includes(c.network)).sort((a, b) => (a.id > b.id) ? 1 : -1);
-    return m('ChainNotificationManagementPage', [
-      m(SelectList, {
-        class: 'ChainNotificationSelectList',
-        filterable: false,
-        checkmark: false,
-        emptyContent: null,
-        inputAttrs: {
-          class: 'CommunitySelectRow',
-        },
-        itemRender: (chain: ChainInfo) => {
-          return m(ListItem, {
-            label: chain.name,
-            selected: (vnode.state.selectedChain === chain),
-          });
-        },
-        items: filteredChains,
-        trigger: m(Button, {
-          align: 'left',
-          compact: true,
-          iconRight: Icons.CHEVRON_DOWN,
-          label: vnode.state.selectedChain
-            ? vnode.state.selectedChain.name
-            : 'Select Chain',
-        }),
-        onSelect: (chain: ChainInfo) => {
-          vnode.state.selectedChain = chain;
-          m.redraw();
-        }
-      }),
-      m(EventSubscriptions, {
-        chain: vnode.state.selectedChain,
-      }),
-    ]);
-  },
-};
-
-const NotificationSettingsPage: m.Component<{}, {
-  selectedFilter: string;
-  communities: CommunityInfo[];
-  subscriptions: NotificationSubscription[];
+  selectableCommunityIds: string[];
 }> = {
   oninit: async (vnode) => {
     if (!app.isLoggedIn) m.route.set('/');
     vnode.state.subscriptions = [];
     vnode.state.communities = [];
-    vnode.state.selectedFilter = 'Community Notifications';
 
+    // initialize vnode.state.subscriptions
     $.get(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.user.jwt,
     }).then((result) => {
@@ -692,16 +530,34 @@ const NotificationSettingsPage: m.Component<{}, {
     }, (error) => {
       m.route.set('/');
     });
-    const communityIds = app.user.roles
+
+    // initialize vnode.state.communities
+    const selectableCommunityIds = app.user.roles
       .filter((role) => role.offchain_community_id)
       .map((r) => r.offchain_community_id);
     vnode.state.communities = _.uniq(
       app.config.communities.getAll()
-        .filter((c) => communityIds.includes(c.id))
+        .filter((c) => selectableCommunityIds.includes(c.id))
     );
+
+    // initialize selectableCommunityIds
+    vnode.state.selectableCommunityIds = [ALL_COMMUNITIES];
+    vnode.state.communities.forEach((c) => vnode.state.selectableCommunityIds.push(c.name));
+    const chains = _.uniq(app.config.chains.getAll());
+    const chainsWithRole = app.user.roles.map((r) => r.chain_id);
+    chains.forEach((c) => {
+      if (chainsWithRole.includes(c.id)) vnode.state.selectableCommunityIds.push(c.name);
+    });
+    vnode.state.selectableCommunityIds.sort();
+
+    // initialize vnode.state.selectedCommunity, vnode.state.selectedCommunityId
+    vnode.state.selectedCommunityId = ALL_COMMUNITIES;
+    vnode.state.selectedCommunity = null;
   },
   view: (vnode) => {
     const { communities, subscriptions } = vnode.state;
+    const { selectedCommunity, selectedCommunityId, selectableCommunityIds } = vnode.state;
+
     const chains = _.uniq(app.config.chains.getAll());
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
@@ -711,14 +567,66 @@ const NotificationSettingsPage: m.Component<{}, {
 
     return m(Sublayout, {
       class: 'NotificationSettingsPage',
-      title: 'Notifications',
+      title: 'Notification Settings',
     }, [
       m('.forum-container', [
-        m(CommunityNotifications, { subscriptions, communities, chains, }),
+        communities && subscriptions && m('.CommunityNotifications', [
+          m('.header', [
+            m(SelectList, {
+              class: 'CommunityNotificationSelectList',
+              filterable: false,
+              checkmark: false,
+              emptyContent: null,
+              popoverAttrs: {
+                transitionDuration: 0,
+              },
+              itemRender: (community: string) => {
+                return m(ListItem, {
+                  label: community,
+                  selected: (vnode.state.selectedCommunityId === community),
+                });
+              },
+              items: selectableCommunityIds,
+              trigger: m(Button, {
+                align: 'left',
+                compact: true,
+                iconRight: Icons.CHEVRON_DOWN,
+                label: vnode.state.selectedCommunity
+                  ? vnode.state.selectedCommunityId
+                  : ALL_COMMUNITIES,
+              }),
+              onSelect: (community: string) => {
+                vnode.state.selectedCommunity = communities.find((c) => c.name === community)
+                  || chains.find((c) => c.name === community);
+                vnode.state.selectedCommunityId = vnode.state.selectedCommunity?.name || ALL_COMMUNITIES;
+                m.redraw();
+              }
+            }),
+          ]),
+          m(Table, { class: 'NotificationsTable' }, [
+            // off-chain discussion notifications
+            m('tr', [
+              m('th', NOTIFICATION_TABLE_PRE_COPY),
+              m('th', ''),
+            ]),
+            selectedCommunityId === ALL_COMMUNITIES
+              && m(AllCommunitiesNotifications, { communities, subscriptions }),
+            selectedCommunity
+              && m(IndividualCommunityNotifications, { subscriptions, community: selectedCommunity }),
+            // on-chain event notifications
+            selectedCommunity instanceof ChainInfo && [
+              m('tr', [
+                m('th', CHAIN_NOTIFICATION_TABLE_PRE_COPY),
+                m('th', ''),
+              ]),
+              selectedCommunity.network === ChainNetwork.Edgeware && m(EdgewareChainEvents),
+              selectedCommunity.network === ChainNetwork.Kulupu && m(KulupuChainEvents),
+              selectedCommunity.network === ChainNetwork.Kusama && m(KusamaChainEvents),
+              selectedCommunity.network === ChainNetwork.Polkadot && m(PolkadotChainEvents),
+            ],
+          ]),
+        ]),
       ]),
-      m(ChainNotificationManagementPage, {
-        chains,
-      }),
     ]);
   },
 };
