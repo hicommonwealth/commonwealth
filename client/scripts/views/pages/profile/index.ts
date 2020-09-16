@@ -27,7 +27,8 @@ const commentModelFromServer = (comment) => {
   let proposal;
   try {
     const proposalSplit = decodeURIComponent(comment.root_id).split(/-|_/);
-    proposal = new OffchainThread(
+    if (proposalSplit[0] === 'discussion') {
+      proposal = new OffchainThread(
       '',
       '',
       null,
@@ -40,7 +41,15 @@ const commentModelFromServer = (comment) => {
       comment.chain,
       null,
       null
-    );
+      );
+    } else {
+      proposal = {
+        chain: comment.chain,
+        community: comment.community,
+        slug: proposalSplit[0],
+        identifier: proposalSplit[1],
+      };
+    }
   } catch (e) {
     proposal = null;
   }
@@ -226,7 +235,6 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
-
     return m(Sublayout, {
       class: 'ProfilePage',
     }, [

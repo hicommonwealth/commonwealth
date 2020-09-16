@@ -14,14 +14,16 @@ import User from './user';
 const UserGallery: m.Component<{
   users: Account<any>[] | AddressInfo[];
   class?: string;
-  avatarSize?: number;
+  avatarSize: number;
   tooltip?: boolean;
+  maxUsers?: number;
 }, {}> = {
   view: (vnode) => {
     const { users, avatarSize, tooltip } = vnode.attrs;
     const userCount = users.length;
+    const maxUsers = vnode.attrs.maxUsers || 10;
     const displayedUsers = (users as any)
-      .slice(0, Math.min(userCount, 10))
+      .slice(0, Math.min(userCount, maxUsers))
       .map((user) => {
         return m(User, {
           user,

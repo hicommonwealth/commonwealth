@@ -1,12 +1,5 @@
 @import 'client/styles/shared';
 
-.topic-selection-drop-menu {
-    @include proposal-topic-inline;
-    .proposal-topic-icon {
-        margin-right: 8px;
-    }
-}
-
 .TopicSelector {
     .no-matching-topics {
         max-width: 190px;
@@ -30,5 +23,12 @@
         .cui-popover-content {
             width: 100%;
         }
+    }
+}
+
+.topic-selection-drop-menu {
+    @include proposal-topic-inline;
+    .proposal-topic-icon {
+        margin-right: 8px;
     }
 }

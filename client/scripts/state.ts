@@ -29,6 +29,11 @@ export const enum LoginState {
   LoggedIn = 'logged_in',
 }
 
+interface IRecentActivity {
+  activeAddresses;
+  activeThreads;
+}
+
 export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
@@ -44,6 +49,9 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
+
+  recentActivity: IRecentActivity;
+
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
   activeCommunityId(): string;
@@ -90,6 +98,8 @@ const app: IApp = {
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
+
+  recentActivity: { activeThreads: null, activeAddresses: null },
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
