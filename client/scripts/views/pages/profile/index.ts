@@ -18,6 +18,7 @@ import Tabs from 'views/components/widgets/tabs';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
+import { decodeAddress } from '@polkadot/keyring';
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -171,12 +172,27 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           m.redraw();
         },
         error: (err) => {
-          console.log('Failed to find profile');
           console.error(err);
+          // decode address properly
+          if (['kulupu', 'edgeware', 'polkadot', 'kusama'].includes(chain)) {
+            try {
+              decodeAddress(address)
+              vnode.state.account = {
+                profile: null,
+                chain,
+                address,
+                id: null,
+                name: null,
+                user_id: null,
+              };
+            } catch (e) {
+              // do nothing if can't decode
+            }
+          }
           vnode.state.loaded = true;
           vnode.state.loading = false;
           m.redraw();
-          throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          if (!vnode.state.account) throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
             : 'Failed to find profile');
         }
       });
@@ -184,8 +200,8 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
 
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
-      loadProfile();
       vnode.state.loading = true;
+      loadProfile();
     }
     if (account && account.address !== vnode.attrs.address) {
       vnode.state.loading = true;
@@ -194,7 +210,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     }
     if (loading || !loaded) return m(PageLoading);
     if (!account) {
-      return m(PageNotFound, { message: 'This address does not have a Commonwealth profile' });
+      return m(PageNotFound, { message: 'Invalid address provided' });
     }
     if (refreshProfile) {
       loadProfile();
