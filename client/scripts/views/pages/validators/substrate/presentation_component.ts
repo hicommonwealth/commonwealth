@@ -5,7 +5,6 @@ import Substrate from 'controllers/chain/substrate/main';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
 import { Icon, Icons, Spinner } from 'construct-ui';
-import PageLoading from 'views/pages/loading';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
 import ValidatorRowWaiting from './validator_row_waiting';

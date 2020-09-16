@@ -423,9 +423,10 @@ $(() => {
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/questions':         importRoute('views/pages/questions', { scoped: true }),
-    // '/:scope/requests':          importRoute('views/pages/requests', { scoped: true }),
+    // '/:scope/questions':         importRoute(import('views/pages/questions'), { scoped: true }),
+    // '/:scope/requests':          importRoute(import('views/pages/requests'), { scoped: true }),
     '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
+    '/:scope/manageStaking':        importRoute('views/pages/manage_staking', { scoped: true }),
 
     // NEAR login
     '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),

@@ -130,7 +130,7 @@ module.exports = {
       //     queryInterface.dropTable('LoginTokens', { transaction: t }),
       //     queryInterface.dropTable('OffchainThreads', { transaction: t }),
       //   ]);
-p      // });
+      // });
     });
   }
 };
