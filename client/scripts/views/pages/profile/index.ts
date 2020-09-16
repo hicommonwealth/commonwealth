@@ -226,7 +226,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
-    console.log('view!')
+
     return m(Sublayout, {
       class: 'ProfilePage',
     }, [
