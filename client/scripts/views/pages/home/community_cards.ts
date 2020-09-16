@@ -229,11 +229,11 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
       });
     }
     
+    const { activeThreads } = app.recentActivity;
     const sortedMemberChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
-      const { activeThreads } = app.recentActivity;
       const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
       const threadCountB = Array.isArray(b) ? activeThreads[b[0]] : activeThreads[b.id];
-      return (threadCountB - threadCountA);
+      return ((threadCountB || 0) - (threadCountA || 0));
     }).map((entity) => {
       if (Array.isArray(entity)) {
         const [chain, nodeList]: [string, any] = entity as any;
@@ -244,12 +244,10 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
     });
 
     const sortedOtherChainsAndCommunities = otherChains.concat(otherCommunities).sort((a, b) => {
-      const { activeThreads } = app.recentActivity;
       const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
       const threadCountB = Array.isArray(b) ? activeThreads[b[0]] : activeThreads[b.id];
-      return (threadCountB - threadCountA);
+      return ((threadCountB || 0) - (threadCountA || 0));
     }).map((entity) => {
-      console.log(entity);
       if (Array.isArray(entity)) {
         const [chain, nodeList]: [string, any] = entity as any;
         return  m(ChainCard, { chain, nodeList, justJoinedChains });
