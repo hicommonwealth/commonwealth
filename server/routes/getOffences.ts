@@ -38,14 +38,13 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     startDate.setDate(startDate.getDate() - 30);
     startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
-  const where: any = {
+  let where: any = {
     chain_event_type_id: `${chain}-offences-offence`
   };
 
   if (stash) {
-    where.event_data = {
-      [Op.like]: `%${stash}%`
-    }
+    const stashCheck = { [Op.and]: Sequelize.literal(`event_data->>'offenders' LIKE '%${stash}%'`) };
+    where = Object.assign(where, stashCheck);
   }
 
   if (startDate && endDate) {
@@ -70,7 +69,7 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
         validators[key] = {};
         validators[key][ofc.block_number.toString()] = event_data.kind;
       }
-    })    
+    })
   });
 
   return res.json({ status: 'Success', result: { validators: validators || [] } });
