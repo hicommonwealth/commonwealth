@@ -39,7 +39,7 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
   const where: any = {
-    chain_event_type_id: `${chain}-some-offline`
+    chain_event_type_id: `${chain}-offences-offence`
   };
 
   if (stash) {
