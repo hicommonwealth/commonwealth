@@ -144,7 +144,6 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     }
 
     const onModalClose = () => {
-      console.log('modal close');
       vnode.state.votingModalOpen = false;
       m.redraw();
     }
