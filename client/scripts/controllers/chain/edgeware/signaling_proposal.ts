@@ -245,12 +245,13 @@ export class EdgewareSignalingProposal
     });
   }
 
-  public submitVoteTx(vote: SignalingVote) {
+  public submitVoteTx(vote: SignalingVote, cb?) {
     return this._Chain.createTXModalData(
       vote.account,
       (api: ApiRx) => api.tx.voting.reveal(this.data.voteIndex, vote.choices, null),
       'submitSignalingVote',
-      this.title
+      this.title,
+      cb
     );
   }
 }
