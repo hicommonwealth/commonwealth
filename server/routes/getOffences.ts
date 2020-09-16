@@ -10,12 +10,12 @@ export const Errors = {
   NoRecordsFound: 'No records found',
 };
 
-interface ISomeOfflineEventData {
+interface IEventData {
   kind: string;
-  sessionIndex: number;
-  validators: Array<string>;
+  opaqueTimeSlot: string;
+  applied: boolean;
+  offenders: Array<string>;
 }
-
 
 const getOffences = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
@@ -57,24 +57,23 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     where
   });
 
-  const validators: { [key: string]: any[] } = {};
+  let validators: { [key: string]: { [block: string]: any } } = {};
 
   offences.forEach((ofc) => {
-    const event_data: ISomeOfflineEventData = ofc.dataValues.event_data;
-
-    const keys = event_data.validators || chain;
-    keys.array.forEach(key => {
-      if (key in validators) {
-        if (validators.hasOwnProperty(key)) {
-          validators[key].push(ofc.block_number);
-        }
+    const event_data: IEventData = ofc.dataValues;
+    validators = {};
+    event_data.offenders.forEach((offender) => {
+      let key = offender;
+      if (validators.hasOwnProperty(key)) {
+        validators[key][ofc.block_number.toString()] = event_data.kind;
       } else {
-        validators[key] = [ofc.block_number];
+        validators[key] = {};
+        validators[key][ofc.block_number.toString()] = event_data.kind;
       }
-    });
+    })    
   });
 
-  return res.json({ status: 'Success', result: { validatorOffences: validators || [] } });
+  return res.json({ status: 'Success', result: { validators: validators || [] } });
 };
 
 export default getOffences;
