@@ -5,7 +5,7 @@ import $ from 'jquery';
 import { Dialog, Icon, Icons, ListItem } from 'construct-ui';
 
 import app from 'state';
-import { RoleInfo, RolePermission } from 'models';
+import { RoleInfo, RolePermission, Webhook } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import CommunityMetadataManagementTable from './community_metadata_management_table';
@@ -14,7 +14,7 @@ import AdminPanelTabs from './admin_panel_tabs';
 
 const ManageCommunityModal: m.Component<{}, {
   roleData: RoleInfo[];
-  webhooks;
+  webhooks: Webhook[];
   loadingFinished: boolean;
   loadingStarted: boolean;
 }> = {
