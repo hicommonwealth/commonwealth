@@ -165,12 +165,12 @@ const ProposalsPage: m.Component<{}> = {
       onSubstrate && m(SubstrateProposalStats),
       m(Listing, {
         content: activeProposalContent,
-        columnHeaders: ['Active Proposals', 'Replies', 'Likes', 'Updated'],
+        columnHeaders: ['Active Proposals', 'Comments', 'Likes', 'Updated'],
         rightColSpacing: [4, 4, 4]
       }),
       m(Listing, {
         content: inactiveProposalContent,
-        columnHeaders: ['Inactive Proposals', 'Replies', 'Likes', 'Updated'],
+        columnHeaders: ['Inactive Proposals', 'Comments', 'Likes', 'Updated'],
         rightColSpacing: [4, 4, 4]
       }),
     ]);

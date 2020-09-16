@@ -61,6 +61,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
+      app.recentActivity.activeAddresses = data.activeAddresses;
+      app.recentActivity.activeThreads = data.activeThreads;
 
       // update the login status
       updateActiveUser(data.user);
@@ -410,9 +412,7 @@ $(() => {
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
     '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
     '/notificationSettings':     redirectRoute(() => '/edgeware/notificationSettings'),
-    '/:scope/notificationSettings': importRoute('views/pages/subscriptions/notificationSettings', { scoped: true }),
-    '/chainEventSettings':        redirectRoute(() => '/edgeware/chainEventSettings'),
-    '/:scope/chainEventSettings': importRoute('views/pages/subscriptions/chainEventSettings', { scoped: true }),
+    '/:scope/notificationSettings': importRoute('views/pages/notification_settings', { scoped: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),

@@ -105,7 +105,9 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       return next(err);
     }
   } else {
-    return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
+    if ((community || chain).topics.length > 0) {
+      return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
+    }
   }
 
   let thread;
@@ -150,7 +152,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     return next(err);
   }
 
-  // auto-subscribe thread creator to replies & reactions
+  // auto-subscribe thread creator to comments & reactions
   try {
     await models.Subscription.create({
       subscriber_id: req.user.id,

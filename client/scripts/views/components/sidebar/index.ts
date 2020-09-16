@@ -107,22 +107,11 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
         }),
       ]),
       m(List, [
-        featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && [
-          app.threads.initialized
-            ? m(ListItem, {
-              class: 'section-callout',
-              label: m(Callout, {
-                size: 'sm',
-                intent: 'primary',
-                icon: Icons.ALERT_TRIANGLE,
-                content: 'The admin has not configured this community with topics yet',
-              }),
-            })
-            : m(ListItem, {
-              class: 'section-callout',
-              label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
-            }),
-        ]
+        !app.threads.initialized &&
+          m(ListItem, {
+            class: 'section-callout',
+            label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
+          }),
       ]),
       m(List, {
         onupdate: (vvnode) => {

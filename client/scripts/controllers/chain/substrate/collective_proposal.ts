@@ -244,13 +244,14 @@ export class SubstrateCollectiveProposal
       },
     ];
   }
-  public submitVoteTx(vote: BinaryVote<SubstrateCoin>) {
+  public submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
     // TODO: check council status
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
       (api: ApiRx) => api.tx.council.vote(this.data.hash, this.data.index, vote.choice),
       'voteCouncilMotions',
-      this.title
+      this.title,
+      cb,
     );
   }
 }
