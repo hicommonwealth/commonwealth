@@ -7,6 +7,8 @@ import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import { Errors } from './getOffences';
 const Sequelize = require('sequelize');
+import {sequelize} from './../database'
+
 
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -19,25 +21,19 @@ interface IEventData {
 }
 
 const getRewards = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { chain, version, stash_id } = req.query;
+  const { chain, stash_id } = req.query;
   let { startDate, endDate } = req.query;
+  let { version } = req.query;
+  
+  // variables
   let validators = {};
-
+  let rewards;
+  let session_rewards;
 
   if (!chain) { return next(new Error(Errors.ChainIdNotFound)); }
 
-  let eraLengthInHours;
-  if (chain === 'edgeware') {
-    eraLengthInHours = 6;
-  } else if (chain === 'kusama') {
-    eraLengthInHours = 6;
-  }
-
-  const chainInfo = await models.Chain.findOne({
-    where: { id: chain }
-  });
-
-  if (!chainInfo) { return next(new Error(Errors.InvalidChain)); }
+   //set default values 
+  if (!version) { version = 33; }
 
   if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
     endDate = new Date();
@@ -47,100 +43,96 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
 
-  // get rewards of last N days in descending order
-  const rewards = await models.ChainEvent.findAll({
-    where: {
+
+  const chainInfo = await models.Chain.findOne({ where: { id: chain } });
+
+
+  // if we are using old version of chain
+  if (chain == 'edgeware' && version < 34){
+
+    // there is no validator identifier in reward event in chain-event for old version,
+    // get the sessions and rewards over specified time from chain-event and 
+    // join session event with rewards
+    // if a stash id is provided then filter out just the session having provided
+    // stash id
+    let rawQuery = `
+      SELECT *
+      FROM(
+        SELECT block_number  as "session_block_number", event_data as "session_event_data", row_number()
+        OVER (ORDER BY created_at DESC) AS "rn"
+        FROM "ChainEvents" ce
+        WHERE chain_event_type_id  = '${chain}-new-session' AND created_at BETWEEN '${startDate}' AND '${endDate}'
+      ) newSession
+      JOIN (
+        SELECT block_number  as "reward_block_number", event_data as "reward_event_data", row_number()
+        OVER (ORDER BY created_at DESC) AS "rn"
+        FROM "ChainEvents" ce
+        WHERE chain_event_type_id  = '${chain}-reward' AND created_at BETWEEN '${startDate}' AND '${endDate}'
+      ) reward
+        ON reward.rn = newSession.rn`
+      
+      if (stash_id){
+        rawQuery += ` where newSession.session_event_data -> 'data' ->> 'active' LIKE '%${stash_id}%'`;
+      }
+
+      session_rewards = await sequelize.query(rawQuery, {});
+      session_rewards = session_rewards[0] //fetch the results
+      
+      // if no session/reward found 
+      if (session_rewards.length == 0) { return res.json({ status: 'Success', result: { validators: validators || [] } }); }
+
+
+      session_rewards.forEach((s_r) => {
+        const reward_event_data: IEventData = s_r.reward_event_data;
+        const block_number = s_r.reward_block_number;
+        const session_validators = s_r.session_event_data.data.active ;
+        session_validators.forEach((validator_id) => {
+          if (!Object.prototype.hasOwnProperty.call(validators, validator_id)){ 
+            validators[validator_id] = {}; 
+          }
+          validators[validator_id][block_number] = reward_event_data['amount'];
+        });
+      });
+
+      if(stash_id){
+        validators = {stash_id:validators[stash_id]}
+      }
+  }
+  else if(chain == 'kusama' || (chain === 'edgeware' && version >= 34)){
+    // if using kusama chain or new version of edgeware
+
+    // basic query to fetch rewards from chain-event
+    let reward_query = {where: {
       '$ChainEventType.chain$': chain,
       '$ChainEventType.event_name$': 'reward',
-      created_at: {
-        [Op.between]: [startDate, endDate]
-      }
+      created_at: { [Op.between]: [startDate, endDate] },
     },
-    order: [
-      ['created_at', 'DESC']
-    ],
-    include: [
-      { model: models.ChainEventType }
-    ]
-  });
+    order: [['created_at', 'DESC']],
+    include: [ { model: models.ChainEventType } ]
+    };
+  
+    if(stash_id) {
+      let qry = { [Op.and]: Sequelize.literal(`event_data->>'validator'='${stash_id}'`) };
+      reward_query['where'] = Object.assign(reward_query['where'],qry);
+    }
+    // get rewards for the user(s)
+    rewards = await models.ChainEvent.findAll(reward_query);
+    if (!rewards.length) { return res.json({ status: 'Success', result: { validators: validators || [] } }); }
 
-
-  // there was no reward found in db
-  if (!rewards.length) { return res.json({ status: 'Success', result: { validators: validators || [] } }); }
-
-  if (chain === 'edgeware') {
-    // there is no validator identifier in reward event in chain-event,
-    // get the sessions from chain-event and link rewards event to session
-    // and assign it to all the validators in the session event.
-
-    // get sessions of last N days in descending order
-    const sessions = await models.ChainEvent.findAll({
-      where: {
-        '$ChainEventType.chain$': chain,
-        '$ChainEventType.event_name$': 'new-session',
-        created_at: {
-          [Op.between]: [startDate, endDate]
-        }
-      },
-      order: [
-        ['created_at', 'DESC']
-      ],
-      include: [
-        { model: models.ChainEventType }
-      ]
-    });
-
-    // there was no session found in db
-    if (!sessions.length) { return res.json({ status: 'Success', result: { validators: validators || [] } }); }
-
-    // if number of sessions are more then number of rewards drop last session
-    // as the reward for that session is not yet issued.
-    if (sessions.length > rewards.length) { sessions.splice(0, 1); }
-
-    // iterate over sessions
-    validators = sessions.map((session, index) => {
-      const response = {};
-
-      const reward = rewards[index];
-      // get reward data
-      const rew_event_data: IEventData = reward.dataValues.event_data;
-
-      // get blockNumber and active validators of the session
-      const blockNumber =  reward.dataValues.block_number;
-      const activeValidators = session.dataValues.event_data.data.active;
-
-      // assign rewards to all the validator of the session
-      activeValidators.forEach((validator_stash_id) => {
-        if (!Object.prototype.hasOwnProperty.call(validators, validator_stash_id)) {
-          response[validator_stash_id] = {};
-        }
-        response[validator_stash_id][blockNumber] = rew_event_data.amount;
-      });
-      return response;
-    });
-    validators = validators[0];
-  } else if (chain === 'kusama') {   // for kusama
     rewards.forEach((reward) => {
       const event_data: IEventData = reward.dataValues.event_data;
-      const key = event_data.validator || chain;
-      if (!Object.prototype.hasOwnProperty.call(validators,key)) { validators[key] = {}; }
-      validators[key][reward['block_number']] = reward['amount'];
-    });
-  }
+      const block_number = reward.dataValues.block_number;
 
-  // if a stash id is provided
-  if (stash_id) {
-    // if we have the stash id then return its reward
-    if (Object.prototype.hasOwnProperty.call(validators, stash_id)) {
-      validators = {
-        stash_id: validators[stash_id]
-      };
-    } else {
-      validators = {};
-    }
+      const validator_id = event_data.validator || chain;
+      if (!Object.prototype.hasOwnProperty.call(validators, validator_id)) { 
+        validators[validator_id] = {}; 
+      }
+      validators[validator_id][block_number] = event_data['amount'];
+    });
   }
 
   return res.json({ status: 'Success', result: { validators: validators || [] } });
+
 };
 
 export default getRewards;
