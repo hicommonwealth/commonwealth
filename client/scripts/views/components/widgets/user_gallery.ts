@@ -14,7 +14,7 @@ import User from './user';
 const UserGallery: m.Component<{
   users: Account<any>[] | AddressInfo[];
   class?: string;
-  avatarSize?: number;
+  avatarSize: number;
   tooltip?: boolean;
   maxUsers?: number;
 }, {}> = {
