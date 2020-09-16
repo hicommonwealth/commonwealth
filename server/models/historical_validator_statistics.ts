@@ -9,15 +9,13 @@ export interface HistoricalValidatorStatisticsAttributes {
   commissionPer?: number;
   apr?: number;
   uptime?: string;
-  movingAverages?: number;
   hasMessage: boolean;
   isOnline: boolean,
   eraPoints: number,
   isElected: boolean,
   toBeElected: boolean,
-  blockCount: number,
-  otherTotal: string,
   name: string,
+  eventType?: string;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -43,14 +41,12 @@ export default (
     commissionPer: { type: dataTypes.FLOAT, allowNull: false },
     apr: { type: dataTypes.FLOAT, allowNull: false },
     uptime: { type: dataTypes.STRING, allowNull: false },
-    movingAverages: { type: dataTypes.INTEGER, allowNull: false },
     hasMessage: { type: dataTypes.BOOLEAN, allowNull: false },
     isOnline: { type: dataTypes.BOOLEAN, allowNull: false },
     eraPoints: { type: dataTypes.INTEGER, allowNull: false },
     isElected: { type: dataTypes.BOOLEAN, allowNull: false },
     toBeElected: { type: dataTypes.BOOLEAN, allowNull: false },
-    blockCount: { type: dataTypes.INTEGER, allowNull: false },
-    otherTotal: { type: dataTypes.STRING, allowNull: false },
+    eventType: { type: dataTypes.STRING, allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
