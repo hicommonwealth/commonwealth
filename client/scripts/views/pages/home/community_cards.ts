@@ -228,13 +228,40 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
             || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
       });
     }
+    
+    const sortedMemberChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
+      const { activeThreads } = app.recentActivity;
+      const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
+      const threadCountB = Array.isArray(b) ? activeThreads[b[0]] : activeThreads[b.id];
+      return (threadCountB - threadCountA);
+    }).map((entity) => {
+      if (Array.isArray(entity)) {
+        const [chain, nodeList]: [string, any] = entity as any;
+        return  m(ChainCard, { chain, nodeList, justJoinedChains });
+      } else if (entity.id) {
+        return m(CommunityCard, { community: entity, justJoinedCommunities });
+      }
+    });
+
+    const sortedOtherChainsAndCommunities = otherChains.concat(otherCommunities).sort((a, b) => {
+      const { activeThreads } = app.recentActivity;
+      const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
+      const threadCountB = Array.isArray(b) ? activeThreads[b[0]] : activeThreads[b.id];
+      return (threadCountB - threadCountA);
+    }).map((entity) => {
+      console.log(entity);
+      if (Array.isArray(entity)) {
+        const [chain, nodeList]: [string, any] = entity as any;
+        return  m(ChainCard, { chain, nodeList, justJoinedChains });
+      } else if (entity.id) {
+        return m(CommunityCard, { community: entity, justJoinedCommunities });
+      }
+    });
 
     return m('.HomepageCommunityCards', [
       m('.communities-list', [
-        myChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
-        myCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
-        otherChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
-        otherCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
+        sortedMemberChainsAndCommunities,
+        sortedOtherChainsAndCommunities,
         m('.clear'),
       ]),
       m('.other-list', [
