@@ -217,13 +217,7 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
             onclick: () => (app.activeChainId() || app.activeCommunityId())
               ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationSettings`)
               : m.route.set('/notificationSettings'),
-            label: 'Email notifications'
-          }),
-          m(MenuItem, {
-            onclick: () => app.activeChainId()
-              ? m.route.set(`/${app.activeChainId()}/chainEventSettings`)
-              : m.route.set('/chainEventSettings'),
-            label: 'Chain notifications'
+            label: 'Notification settings'
           }),
           m(MenuDivider),
           m(MenuItem, {

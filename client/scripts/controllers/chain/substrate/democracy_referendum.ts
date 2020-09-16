@@ -348,7 +348,7 @@ export class SubstrateDemocracyReferendum
 
   // TRANSACTIONS
   // TODO: allow the user to enter how much balance they want to vote with
-  public async submitVoteTx(vote: BinaryVote<SubstrateCoin>) {
+  public async submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
     let srmlVote;
     const conviction = convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index;
     if (this._Democracy.isRedesignLogic) {
@@ -387,7 +387,8 @@ export class SubstrateDemocracyReferendum
       vote.account as SubstrateAccount,
       (api: ApiRx) => api.tx.democracy.vote(this.data.index, srmlVote),
       'submitDemocracyVote',
-      this.title
+      this.title,
+      cb
     );
   }
 

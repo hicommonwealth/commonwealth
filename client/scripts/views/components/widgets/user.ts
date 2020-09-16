@@ -49,6 +49,7 @@ const User: m.Component<{
       ).then((mod) => {
         vnode.state.IdentityWidget = mod.default;
         vnode.state.identityWidgetLoading = false;
+        m.redraw();
       });
     }
 
