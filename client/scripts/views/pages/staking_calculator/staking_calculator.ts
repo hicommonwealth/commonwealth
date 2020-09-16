@@ -13,7 +13,7 @@ import { ChainBase } from 'models'
 import { SubstrateCoin } from 'adapters/chain/substrate/types'
 import { ChainInfo } from 'models'
 import { get } from 'lib/util'
-import { CHAIN_CONST } from './chain_constants'
+import { CHAIN_CONST, supportedChains } from './chain_constants'
 import { CalculatorReturnsContent } from '../../components/staking_calculator_returns'
 import moment from 'moment-twitter'
 import { formatNumberShort, formatDuration, calcRewards, calculateInterestLeftRight } from '../../../helpers/calculator_helper'
@@ -101,7 +101,7 @@ const StakingCalculatorPage = makeDynamicComponent<IStakingCaculatorAttrs, IStak
 
     if (assets_list.length == 0) {
       //populate assets_list
-      assets_list = app.config.nodes.getAll().map((n) => {
+      assets_list = app.config.nodes.getAll().filter((n) => supportedChains.includes(n.chain.network)).map((n) => {
         const cc = CHAIN_CONST.filter((q) => q.symbol.toUpperCase() == n.chain.symbol.toUpperCase(),)[0]
         return {
           name: n.chain.network,
