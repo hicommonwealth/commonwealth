@@ -56,10 +56,6 @@ import getInvites from './routes/getInvites';
 import getOffences from './routes/getOffences';
 import getRewards from './routes/getRewards';
 import getUSDvalue from './routes/getUSDvalue';
-import getOwnStakeOverTime from './routes/getOwnStakeOverTime';
-import getOtherStakeOverTime from './routes/getOtherStakeOverTime';
-import getTotalStakeOverTime from './routes/getTotalStakeOverTime';
-import getNominatorsOverTime from './routes/getNominatorsOverTime';
 import getSlashes from './routes/getSlashes';
 import { getTotalStakeOverTime, getOwnStakeOverTime, getOtherStakeOverTime, getNominatorsOverTime }
   from './routes/getExposureOverTime';
