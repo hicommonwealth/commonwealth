@@ -94,6 +94,9 @@ const TopicSelector: m.Component<{
       items: sortTopics(topics),
       oncreate,
       onSelect,
+      popoverAttrs: {
+        transitionDuration: 0,
+      },
       trigger: m(Button, {
         align: 'left',
         class: 'topic-selection-drop-menu',

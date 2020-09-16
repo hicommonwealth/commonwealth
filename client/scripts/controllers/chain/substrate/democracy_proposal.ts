@@ -212,7 +212,7 @@ class SubstrateDemocracyProposal extends Proposal<
   }
 
   // TRANSACTIONS
-  public submitVoteTx(vote: DepositVote<SubstrateCoin>) {
+  public submitVoteTx(vote: DepositVote<SubstrateCoin>, cb?) {
     // deposit parameter is ignored
 
     // handle differing versions of substrate API
@@ -227,7 +227,8 @@ class SubstrateDemocracyProposal extends Proposal<
       vote.account as SubstrateAccount,
       txFunc,
       'secondDemocracyProposal',
-      this.title
+      this.title,
+      cb
     );
   }
 }

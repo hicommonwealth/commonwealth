@@ -7,7 +7,7 @@ import app from 'state';
 import { link, pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
-import UserGallery from '../../components/widgets/user_gallery';
+import UserGallery from 'views/components/widgets/user_gallery';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : labelCount;
@@ -62,14 +62,14 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
           ],
         ]),
         m('p.card-description', chainInfo.description),
-        m('.recent-activity', [
-          !!monthlyThreads
-            && m('.recent-threads', `${monthlyThreads} threads this month.`),
+        // if no recently active threads, hide this module altogether
+        m('.recent-activity', monthlyThreads && [
+          m('.recent-threads', pluralize(monthlyThreads, 'active thread')),
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
-              tooltip: true,
               maxUsers: 12,
+              avatarSize: 20,
             })
         ])
       ]),
@@ -118,14 +118,14 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
             ],
         ]),
         m('p.card-description', community.description),
-        m('.recent-activity', [
-          !!monthlyThreads
-            && m('.recent-threads', `${monthlyThreads} threads this month.`),
+        // if no recently active threads, hide this module altogether
+        m('.recent-activity', monthlyThreads && [
+          m('.recent-threads', pluralize(monthlyThreads, 'active thread')),
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
-              tooltip: true,
               maxUsers: 12,
+              avatarSize: 20,
             })
         ])
       ]),
@@ -234,13 +234,38 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
             || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
       });
     }
+    
+    const { activeThreads } = app.recentActivity;
+    const sortedMemberChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
+      const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
+      const threadCountB = Array.isArray(b) ? activeThreads[b[0]] : activeThreads[b.id];
+      return ((threadCountB || 0) - (threadCountA || 0));
+    }).map((entity) => {
+      if (Array.isArray(entity)) {
+        const [chain, nodeList]: [string, any] = entity as any;
+        return  m(ChainCard, { chain, nodeList, justJoinedChains });
+      } else if (entity.id) {
+        return m(CommunityCard, { community: entity, justJoinedCommunities });
+      }
+    });
+
+    const sortedOtherChainsAndCommunities = otherChains.concat(otherCommunities).sort((a, b) => {
+      const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
+      const threadCountB = Array.isArray(b) ? activeThreads[b[0]] : activeThreads[b.id];
+      return ((threadCountB || 0) - (threadCountA || 0));
+    }).map((entity) => {
+      if (Array.isArray(entity)) {
+        const [chain, nodeList]: [string, any] = entity as any;
+        return  m(ChainCard, { chain, nodeList, justJoinedChains });
+      } else if (entity.id) {
+        return m(CommunityCard, { community: entity, justJoinedCommunities });
+      }
+    });
 
     return m('.HomepageCommunityCards', [
       m('.communities-list', [
-        myChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
-        myCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
-        otherChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
-        otherCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
+        sortedMemberChainsAndCommunities,
+        sortedOtherChainsAndCommunities,
         m('.clear'),
       ]),
       m('.other-list', [
