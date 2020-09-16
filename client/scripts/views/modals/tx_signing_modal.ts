@@ -537,6 +537,7 @@ export const createTXModal = async (dataP: ITXModalData | Promise<ITXModalData>)
         modal: TXSigningModal,
         completeCallback: () => { complete = true; },
         exitCallback: () => {
+          console.log('onclose creatxmodal')
           if (data.cb) {
             data.cb(complete);
           }

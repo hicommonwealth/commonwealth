@@ -276,7 +276,7 @@ export class CosmosProposal extends Proposal<
     );
   }
 
-  public submitVoteTx(vote: CosmosVote, memo: string = ''): ITXModalData {
+  public submitVoteTx(vote: CosmosVote, memo: string = '', cb?): ITXModalData {
     if (this.status !== CosmosProposalState.VOTING_PERIOD) {
       throw new Error('proposal not in voting period');
     }
@@ -289,6 +289,7 @@ export class CosmosProposal extends Proposal<
       txFn,
       'MsgVote',
       `${vote.account} voted ${vote.choice} on proposal ${this.data.identifier}`,
+      cb
     );
   }
 
