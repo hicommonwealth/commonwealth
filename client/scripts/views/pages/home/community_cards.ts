@@ -61,7 +61,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
         m('p.card-description', chainInfo.description),
         // if no recently active threads, hide this module altogether
         m('.recent-activity', monthlyThreads && [
-          m('.recent-threads', pluralize(monthlyThreads, 'active thread')),
+          m('.recent-threads', [ pluralize(monthlyThreads, 'thread'), '/mo' ]),
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
@@ -114,7 +114,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
         m('p.card-description', community.description),
         // if no recently active threads, hide this module altogether
         m('.recent-activity', monthlyThreads && [
-          m('.recent-threads', pluralize(monthlyThreads, 'active thread')),
+          m('.recent-threads', [ pluralize(monthlyThreads, 'active thread'), '/mo' ]),
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
@@ -228,7 +228,7 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
             || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
       });
     }
-    
+
     const { activeThreads } = app.recentActivity;
     const sortedMemberChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
       const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
