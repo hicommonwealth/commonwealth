@@ -41,22 +41,28 @@ const NOTIFICATION_ON_OPTION = 'On';
 const NOTIFICATION_ON_SOMETIMES_OPTION = '--';
 const NOTIFICATION_OFF_OPTION = 'Off';
 
-const EmailDigestConfiguration: m.Component<{}, { interval: string, saving: boolean }> = {
+const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: boolean }> = {
   view: (vnode) => {
-    return m('.EmailDigestConfiguration', [
+    if (!app.user) return;
+    if (vnode.state.interval === undefined) vnode.state.interval = app.user.emailInterval;
+
+    return m('.EmailIntervalConfiguration', [
+      m('h4', 'Receive digest emails'),
       m(RadioGroup, {
         options: ['daily', 'weekly', 'never'],
         name: 'interval',
         onchange: (e) => {
           vnode.state.saving = true;
+          const value = (e.target as HTMLInputElement).value;
 
           $.post(`${app.serverUrl()}/writeUserSetting`, {
             jwt: app.user.jwt,
-            key: 'updateEmailDigestInterval',
-            value: vnode.state.interval,
+            key: 'updateEmailInterval',
+            value,
           }).then((result) => {
             vnode.state.saving = false;
-            vnode.state.interval = (e.currentTarget as HTMLInputElement).value;
+            vnode.state.interval = value;
+            app.user.setEmailInterval(value);
             m.redraw();
           }).catch((err) => {
             vnode.state.saving = false;
@@ -65,6 +71,11 @@ const EmailDigestConfiguration: m.Component<{}, { interval: string, saving: bool
         },
         value: vnode.state.interval,
       }),
+      vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
+      !app.user.emailVerified && m('p', [
+        link('a', `/${app.activeId()}/settings`, 'Verify your email'),
+        ' to start receiving digests.'
+      ]),
     ]);
   }
 };
@@ -602,7 +613,7 @@ const NotificationSettingsPage: m.Component<{}, {
       title: 'Notification Settings',
     }, [
       m('.forum-container', [
-        m(EmailDigestConfiguration),
+        m(EmailIntervalConfiguration),
         communities && subscriptions && m('.CommunityNotifications', [
           m('.header', [
             m(SelectList, {
