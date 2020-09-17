@@ -116,6 +116,16 @@ const CommunitySelector = {
     const unjoinedCommunities = allCommunities.filter((c) => !isInCommunity(c));
 
     const renderCommunity = (item) => {
+      let roles;
+      if (item instanceof ChainInfo) {
+        roles = app.user.getAllRolesInCommunity({ chain: item.id });
+      } else if (item instanceof CommunityInfo) {
+        roles = app.user.getAllRolesInCommunity({ community: item.id });
+      } else {
+        roles = [];
+      }
+      console.log(item.id, roles, app.user.roles)
+
       return item instanceof ChainInfo
         ? m(ListItem, {
           class: app.communities.isStarred(item.id, null) ? 'starred' : '',
@@ -136,6 +146,7 @@ const CommunitySelector = {
               app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
             }
           }, [
+            m('.', `${roles.length}`),
             m(Icon, { name: Icons.STAR }),
           ]),
         })
@@ -157,6 +168,7 @@ const CommunitySelector = {
                 app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
               },
             }, [
+              m('.', `${roles.length}`),
               m(Icon, { name: Icons.STAR }),
             ]),
           })
