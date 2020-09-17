@@ -1,14 +1,24 @@
 import { AddressInfo, OffchainThread } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
-interface IRecentActivity {
-  postCount: number;
-  addressInfo: AddressInfo;
+interface IAddressCountAndInfo {
+  [addressId: string]: {
+    postCount: number;
+    addressInfo: AddressInfo;
+  }
+}
+
+interface ICommunityAddresses {
+  [parentEntity: string]: IAddressCountAndInfo;
+}
+
+interface ICommunityThreads {
+  [parentEntity: string]: Array<OffchainThread>;
 }
 
 class RecentActivityStore {
-  private _threadsByCommunity: { [identifier: string]: Array<OffchainThread> } = {};
-  private _addressesByCommunity: { [identifier: string]: any } = {};
+  private _threadsByCommunity: ICommunityThreads = {};
+  private _addressesByCommunity: ICommunityAddresses = {};
 
   public addThread(thread: OffchainThread) {
     const parentEntity = thread.community || thread.chain;
@@ -36,7 +46,7 @@ class RecentActivityStore {
     const { id, chain } = address;
     const communityStore = this._addressesByCommunity[parentEntity];
     if (!communityStore) {
-      this._addressesByCommunity[parentEntity] = [];
+      this._addressesByCommunity[parentEntity] = {};
     }
     if (!communityStore[id]) {
       const addressInfo = new AddressInfo(id, address, chain, null);
@@ -45,18 +55,12 @@ class RecentActivityStore {
     } else {
       communityStore[id]['postCount'] += 1;
     }
-    communityStore.sort(byAscendingCreationDate);
     return this;
   }
 
   public removeAddress(address: AddressInfo, parentEntity: string) {
     const communityStore = this._addressesByCommunity[parentEntity];
-    const matchingthread = communityStore.filter((t) => t.id === address.id)[0];
-    const proposalIndex = communityStore.indexOf(matchingthread);
-    if (proposalIndex === -1) {
-      throw new Error('thread not in store');
-    }
-    communityStore.splice(proposalIndex, 1);
+    delete communityStore[address.id];
     return this;
   }
 
@@ -72,8 +76,8 @@ class RecentActivityStore {
     return this._threadsByCommunity[communityId] || [];
   }
 
-  public getAddressesByCommunity(communityId): Array<AddressInfo> {
-    return this._addressesByCommunity[communityId] || [];
+  public getAddressesByCommunity(communityId): IAddressCountAndInfo {
+    return this._addressesByCommunity[communityId] || {};
   }
 }
 

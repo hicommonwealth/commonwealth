@@ -18,20 +18,20 @@ class RecentActivityController {
   }
 
   public addAddressesFromActivity(activity: any[]) {
-    // TODO: Switch over to adding to store, rather than activeAddresses
-    activity.sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at));
-    activity.forEach((item) => {
-      const parentEntity = item.community || item.chain;
-      this._store.addAddress(item.Address, parentEntity);
-    });
+    activity
+      .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at))
+      .forEach((item) => {
+        const parentEntity = item.community || item.chain;
+        this._store.addAddress(item.Address, parentEntity);
+      });
   }
 
   public getThreadsByCommunity(community: string) {
-
+    this._store.getThreadsByCommunity(community);
   }
 
   public getAddressesByCommunity(community: string) {
-    
+    this._store.getAddressesByCommunity(community);
   }
 }
 
