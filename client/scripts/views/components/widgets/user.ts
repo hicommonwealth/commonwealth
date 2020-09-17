@@ -33,7 +33,6 @@ const User: m.Component<{
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
-
     const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id);
 
     const adminsAndMods = app.chain

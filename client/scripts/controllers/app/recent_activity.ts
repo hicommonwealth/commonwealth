@@ -10,7 +10,6 @@ class RecentActivityController {
   public get initialized() { return this._initialized; }
 
   public addThreads(threads: OffchainThread[]) {
-    debugger
     threads.forEach((thread) => this._store.addThread(thread));
   }
 
@@ -19,12 +18,10 @@ class RecentActivityController {
   }
 
   public addAddressesFromActivity(activity: any[]) {
-    debugger
     activity
       .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at))
       .forEach((item) => {
-        const parentEntity = item.community || item.chain;
-        this._store.addAddress(item.Address, parentEntity);
+        this._store.addAddress(item.Address, item.community || item.chain);
       });
   }
 

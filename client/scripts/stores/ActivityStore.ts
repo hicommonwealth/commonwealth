@@ -44,12 +44,12 @@ class RecentActivityStore {
 
   public addAddress(address: any, parentEntity: string) {
     const { id, chain } = address;
-    const communityStore = this._addressesByCommunity[parentEntity];
-    if (!communityStore) {
+    if (!this._addressesByCommunity[parentEntity]) {
       this._addressesByCommunity[parentEntity] = {};
     }
+    const communityStore = this._addressesByCommunity[parentEntity];
     if (!communityStore[id]) {
-      const addressInfo = new AddressInfo(id, address, chain, null);
+      const addressInfo = new AddressInfo(id, address.address, chain, null);
       const postCount = 1;
       communityStore[id] = { addressInfo, postCount };
     } else {
