@@ -156,6 +156,8 @@ To set up a server environment:
 ```
 heroku git:remote --app <PRODUCTION_APP>
 heroku config:set [Set up session secrets, API keys, OAuth tokens, etc.]
+heroku addons:create timber-logging  # Set up a logging service
+heroku features:enable preboot       # Set up preboot (note: this may allow different app versions to be running concurrently)
 yarn deploy
 ```
 
