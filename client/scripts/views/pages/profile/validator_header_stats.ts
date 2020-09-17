@@ -78,14 +78,16 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
   }),
   view: (vnode) => {
     const { account } = vnode.attrs;
-    const validators = (vnode.state.dynamic && vnode.state.dynamic.validators !== undefined) ? vnode.state.dynamic.validators : undefined;
-    const validatorStatInfo: IValidatorStatsInfo = validators ? (validators[vnode.attrs.address] ? {
+    const validators = (vnode.state.dynamic && vnode.state.dynamic.validators !== undefined)
+      ? vnode.state.dynamic.validators
+      : undefined;
+    const validatorStatInfo: IValidatorStatsInfo = validators && validators[vnode.attrs.address] ? {
       total: validators[vnode.attrs.address].exposure ? validators[vnode.attrs.address].exposure.total : undefined,
       own: validators[vnode.attrs.address].exposure ? validators[vnode.attrs.address].exposure.own : undefined,
       otherTotal: validators[vnode.attrs.address].otherTotal,
       commission: validators[vnode.attrs.address].commissionPer,
       points: validators[vnode.attrs.address].eraPoints,
-    } : emptyValidatorStatsInfo) : emptyValidatorStatsInfo;
+    } : emptyValidatorStatsInfo;
     let nominators;
 
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id

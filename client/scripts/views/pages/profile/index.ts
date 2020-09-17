@@ -166,146 +166,122 @@ function generateBuckets(v, bucketCount, jumpIdx, recentBlockNum) {
 
 const dataGetter = async (vnode) => {
   // request for total stake OVER TIME
-  m.request({
-    method: 'GET',
-    url: '/api/getTotalStakeOverTime',
-    params: { chain: app.chain.class, stash: vnode.state.account.address }
-  })
-    .then((response: any) => {
-      vnode.state.totalStakeGraph = { blocks: [], values: [] };
-      if (response) {
-        const v = response.result.validators[vnode.state.account.address];
-        const bucketRes = generateBuckets(v, 10, 43200, vnode.state.latestBlock);
-        vnode.state.totalStakeGraph.blocks = bucketRes.key;
-        vnode.state.totalStakeGraph.values = bucketRes.value.map((x) => {
-          return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0); // 1EDG = 10^18
-        });
-      }
-    }).catch((e: any) => {
-      vnode.state.totalStakeGraph = { blocks: [], values: [] };
+  try {
+    const tsot = await $.get(`${app.serverUrl()}/getTotalStakeOverTime`, { chain: app.chain.class, stash: vnode.state.account.address });
+    vnode.state.totalStakeGraph = { blocks: [], values: [] };
+    const tsot_bucketRes = generateBuckets(tsot.result.validators[vnode.state.account.address],
+      10,
+      43200,
+      vnode.state.latestBlock);
+    vnode.state.totalStakeGraph.blocks = tsot_bucketRes.key;
+    vnode.state.totalStakeGraph.values = tsot_bucketRes.value.map((x) => {
+      return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0); // 1EDG = 10^18
     });
+  } catch (e) {
+    vnode.state.totalStakeGraph = { blocks: [], values: [] };
+  }
+
 
   // request for own stake OVER TIME
-  m.request({
-    method: 'GET',
-    url: '/api/getOwnStakeOverTime',
-    params: { chain: app.chain.class, stash: vnode.state.account.address }
-  })
-    .then((response: any) => {
-      vnode.state.ownStakeGraph = { blocks: [], values: [] };
-      if (response) {
-        const v = response.result.validators[vnode.state.account.address];
-        const bucketRes = generateBuckets(v, 10, 43200, vnode.state.latestBlock);
-        vnode.state.ownStakeGraph.blocks = bucketRes.key;
-        vnode.state.ownStakeGraph.values = bucketRes.value.map((x) => {
-          return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0);
-        });
-      }
-    }).catch((e: any) => {
-      vnode.state.ownStakeGraph = { blocks: [], values: [] };
+  try {
+    const osot = await $.get(`${app.serverUrl()}/getOwnStakeOverTime`, { chain: app.chain.class, stash: vnode.state.account.address });
+    vnode.state.ownStakeGraph = { blocks: [], values: [] };
+    const osot_bucketRes = generateBuckets(osot.result.validators[vnode.state.account.address],
+      10,
+      43200,
+      vnode.state.latestBlock);
+    vnode.state.ownStakeGraph.blocks = osot_bucketRes.key;
+    vnode.state.ownStakeGraph.values = osot_bucketRes.value.map((x) => {
+      return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0); // 1EDG = 10^18
     });
+  } catch (e) {
+    vnode.state.ownStakeGraph = { blocks: [], values: [] };
+  }
 
   // request for other stake OVER TIME
-  m.request({
-    method: 'GET',
-    url: '/api/getOtherStakeOverTime',
-    params: { chain: app.chain.class, stash: vnode.state.account.address, onlyValue: true }
-  })
-    .then((response: any) => {
-      vnode.state.otherStakeGraph = { blocks: [], values: [] };
-      if (response) {
-        const v = response.result.validators[vnode.state.account.address];
-        const bucketRes = generateBuckets(v, 10, 43200, vnode.state.latestBlock);
-        vnode.state.otherStakeGraph.blocks = bucketRes.key;
-        vnode.state.otherStakeGraph.values = bucketRes.value.map((x) => {
-          return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0);
-        });
-      }
-    }).catch((e: any) => {
-      vnode.state.otherStakeGraph = { blocks: [], values: [] };
+  try {
+    const otsot = await $.get(`${app.serverUrl()}/getOtherStakeOverTime`, { chain: app.chain.class, stash: vnode.state.account.address, onlyValue: true });
+    vnode.state.otherStakeGraph = { blocks: [], values: [] };
+    const otsot_bucketRes = generateBuckets(otsot.result.validators[vnode.state.account.address],
+      10,
+      43200,
+      vnode.state.latestBlock);
+    vnode.state.otherStakeGraph.blocks = otsot_bucketRes.key;
+    vnode.state.otherStakeGraph.values = otsot_bucketRes.value.map((x) => {
+      return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0);
     });
+  } catch (e) {
+    vnode.state.otherStakeGraph = { blocks: [], values: [] };
+  }
 
   // request for nominators OVER TIME
-  m.request({
-    method: 'GET',
-    url: '/api/getNominatorsOverTime',
-    params: { chain: app.chain.class, stash: vnode.state.account.address, onlyValue: true }
-  })
-    .then((response: any) => {
-      vnode.state.nominatorGraph = { blocks: [], values: [] };
-      if (response) {
-        const v = response.result.nominators[vnode.state.account.address];
-        const bucketRes = generateBuckets(v, 10, 43200, vnode.state.latestBlock);
-        vnode.state.nominatorGraph.blocks = bucketRes.key;
-        vnode.state.nominatorGraph.values = bucketRes.value;
-      }
-    }).catch((e: any) => {
-      vnode.state.nominatorGraph = { blocks: [], values: [] };
-    });
+  try {
+    const gnot = await $.get(`${app.serverUrl()}/getNominatorsOverTime`, { chain: app.chain.class, stash: vnode.state.account.address, onlyValue: true });
+    vnode.state.nominatorGraph = { blocks: [], values: [] };
+    const gnot_bucketRes = generateBuckets(gnot.result.nominators[vnode.state.account.address],
+      10,
+      43200,
+      vnode.state.latestBlock);
+    vnode.state.nominatorGraph.blocks = gnot_bucketRes.key;
+    vnode.state.nominatorGraph.values = gnot_bucketRes.value;
+  } catch (e) {
+    vnode.state.nominatorGraph = { blocks: [], values: [] };
+  }
 
   // request for slashes OVER TIME
-  m.request({
-    method: 'GET',
-    url: '/api/getSlashes',
-    params: { chain: app.chain.class, stash: vnode.state.account.address }
-  })
-    .then((response: any) => {
-      vnode.state.slashesGraph = { blocks: [], values: [] };
-      if (response) {
-        vnode.state.slashesGraph.blocks = (Object.keys(response.result.validators[vnode.state.account.address]));
-        vnode.state.slashesGraph.values = (Object.values(response.result.validators[vnode.state.account.address]));
-      }
-    }).catch((e: any) => {
-      vnode.state.slashesGraph = { blocks: [], values: [] };
-    });
+  try {
+    const gsr = await $.get(`${app.serverUrl()}/getSlashes`, { chain: app.chain.class, stash: vnode.state.account.address });
+    vnode.state.slashesGraph = { blocks: [], values: [] };
+    const gsr_bucketRes = generateBuckets(gsr.result.slashes[vnode.state.account.address],
+      10,
+      43200,
+      vnode.state.latestBlock);
+    vnode.state.slashesGraph.blocks = gsr_bucketRes.key;
+    vnode.state.slashesGraph.values = gsr_bucketRes.value;
+  } catch (e) {
+    vnode.state.slashesGraph = { blocks: [], values: [] };
+  }
 
   // request for ImOnline OVER TIME
-  m.request({
-    method: 'GET',
-    url: '/api/getImOnline',
-    params: { chain: app.chain.class, stash: vnode.state.account.address }
-  })
-    .then((response: any) => {
-      vnode.state.imOnlineGraph = { blocks: [], values: [] };
-      if (response) {
-        vnode.state.imOnlineGraph.blocks = (Object.keys(response.result.validators[vnode.state.account.address]));
-        vnode.state.imOnlineGraph.values = (Object.values(response.result.validators[vnode.state.account.address]));
-      }
-    }).catch((e: any) => {
-      vnode.state.imOnlineGraph = { blocks: [], values: [] };
-    });
-
+  try {
+    const gim = await $.get(`${app.serverUrl()}/getImOnline`, { chain: app.chain.class, stash: vnode.state.account.address });
+    vnode.state.imOnlineGraph = { blocks: [], values: [] };
+    vnode.state.imOnlineGraph.blocks = (Object.keys(gim.result.validators[vnode.state.account.address]));
+    vnode.state.imOnlineGraph.values = (Object.values(gim.result.validators[vnode.state.account.address]));
+  } catch (e) {
+    vnode.state.imOnlineGraph = { blocks: [], values: [] };
+  }
   // request for REWARDS OVER TIME
-  m.request({
-    method: 'GET',
-    url: '/api/getRewards',
-    params: { chain: app.chain.class, stash: vnode.state.account.address }
-  })
-    .then((response: any) => {
-      vnode.state.rewardsGraph = { blocks: [], values: [] };
-      if (response) {
-        vnode.state.rewardsGraph.blocks = (Object.keys(response.result.validators[vnode.state.account.address]));
-        vnode.state.rewardsGraph.values = (Object.values(response.result.validators[vnode.state.account.address]));
-      }
-    }).catch((e: any) => {
-      vnode.state.rewardsGraph = { blocks: [], values: [] };
+  try {
+    const gr = await $.get(`${app.serverUrl()}/getRewards`, { chain: app.chain.class, stash: vnode.state.account.address });
+    vnode.state.rewardsGraph = { blocks: [], values: [] };
+    const gr_bucketRes = generateBuckets(gr.result.validators[vnode.state.account.address],
+      10,
+      43200,
+      vnode.state.latestBlock);
+    vnode.state.rewardsGraph.blocks = gr_bucketRes.key;
+    vnode.state.rewardsGraph.values = gr_bucketRes.value.map((x) => {
+      return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0); // 1EDG = 10^18
     });
-
+  } catch (e) {
+    vnode.state.rewardsGraph = { blocks: [], values: [] };
+  }
   // request for OFFENCES OVER TIME
-  m.request({
-    method: 'GET',
-    url: '/api/getOffences',
-    params: { chain: app.chain.class, stash: vnode.state.account.address }
-  })
-    .then((response: any) => {
-      vnode.state.offenceGraph = { blocks: [], values: [] };
-      if (response) {
-        vnode.state.offenceGraph.blocks = (Object.keys(response.result.validators[vnode.state.account.address]));
-        vnode.state.offenceGraph.values = (Object.values(response.result.validators[vnode.state.account.address]));
-      }
-    }).catch((e: any) => {
-      vnode.state.offenceGraph = { blocks: [], values: [] };
+  try {
+    const go = await $.get(`${app.serverUrl()}/getOffences`, { chain: app.chain.class, stash: vnode.state.account.address });
+    Object.keys(go.result.validators[vnode.state.account.address]).forEach((key) => {
+      go.result.validators[vnode.state.account.address][key] = 1;
     });
+    vnode.state.offenceGraph = { blocks: [], values: [] };
+    const go_bucketRes = generateBuckets(go.result.validators[vnode.state.account.address],
+      10,
+      43200,
+      vnode.state.latestBlock);
+    vnode.state.offenceGraph.blocks = go_bucketRes.key;
+    vnode.state.offenceGraph.values = go_bucketRes.value;
+  } catch (e) {
+    vnode.state.offenceGraph = { blocks: [], values: [] };
+  }
 };
 
 const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
@@ -411,7 +387,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
       }
     }
 
-    const { account, totalStakeGraph, ownStakeGraph, otherStakeGraph, nominatorGraph, slashesGraph, imOnlineGraph, rewardsGraph } = vnode.state;
+    const { account, totalStakeGraph, offenceGraph, ownStakeGraph, otherStakeGraph, nominatorGraph, slashesGraph, imOnlineGraph, rewardsGraph } = vnode.state;
     if (!account) {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
@@ -440,7 +416,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
             m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
-              message: ' Loading',
+              message: ' Loading...',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
@@ -459,7 +435,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
             m('div.row.graph-title', m('p', 'OWN STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
-              message: ' Loading',
+              message: ' Loading...',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
@@ -478,7 +454,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
             m('div.row.graph-title', m('p', 'OTHER STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
-              message: ' Loading',
+              message: ' Loading...',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
@@ -497,7 +473,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
             m('div.row.graph-title', m('p', 'NOMINATORS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
-              message: ' Loading',
+              message: ' Loading...',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
@@ -516,10 +492,11 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
             m('div.row.graph-title', m('p', 'SLASHES OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
-              message: ' Loading',
+              message: ' Loading...',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
+          // IMONLINE OVER TIME
           imOnlineGraph ? (imOnlineGraph.blocks.length ? m(chartComponent, {
             title: 'IMONLINE OVER TIME', // Title
             model: lineModel,
@@ -534,10 +511,11 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
             m('div.row.graph-title', m('p', 'IMONLINE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
-              message: ' Loading',
+              message: ' Loading...',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
+          // REWARDS OVER TIME
           rewardsGraph ? (rewardsGraph.blocks.length ? m(chartComponent, {
             title: 'REWARDS OVER TIME', // Title
             model: lineModel,
@@ -552,7 +530,26 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
             m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
               fill: false,
-              message: ' Loading',
+              message: ' Loading...',
+              size: 'xl',
+              style: 'visibility: visible; opacity: 1;'
+            })))]),
+          // OFFENCES OVER TIME
+          offenceGraph ? (offenceGraph.blocks.length ? m(chartComponent, {
+            title: 'OFFENCES OVER TIME', // Title
+            model: lineModel,
+            xvalues: offenceGraph.blocks,
+            yvalues: offenceGraph.values,
+            addColorStop0: 'rgba(99, 113, 209 0.23)',
+            addColorStop1: 'rgba(99, 113, 209 0)',
+            color: 'rgb(99, 113, 209)'
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'OFFENCES OVER TIME')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'OFFENCES OVER TIME')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+              fill: false,
+              message: ' Loading...',
               size: 'xl',
               style: 'visibility: visible; opacity: 1;'
             })))]),
