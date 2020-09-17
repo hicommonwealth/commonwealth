@@ -44,7 +44,7 @@ export const createNotificationEmailObject = (
   const { created_at, root_id, root_title, root_type, comment_id, comment_text,
     chain_id, community_id, author_address, author_chain } = (notification_data as IPostNotificationData);
   const decodedTitle = decodeURIComponent(root_title).trim();
-  const subjectLine = (label.heading)
+  const subjectLine = (label?.heading)
     || ((category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
       : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
         : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
@@ -59,7 +59,7 @@ export const createNotificationEmailObject = (
     community: community_id,
   };
   const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = label.linkUrl ? `${SERVER_URL}${label.linkUrl}`
+  const path = label?.linkUrl ? `${SERVER_URL}${label.linkUrl}`
     : label ? `${SERVER_URL}/${chainId}`
       : (getProposalUrl as any)(...args);
   const msg = {
@@ -70,8 +70,8 @@ export const createNotificationEmailObject = (
     dynamic_template_data: {
       notification: {
         subject: subjectLine,
-        title: label.heading || subjectLine,
-        body: label.label || subjectLine,
+        title: label?.heading || subjectLine,
+        body: label?.label || subjectLine,
         path,
       }
     },
