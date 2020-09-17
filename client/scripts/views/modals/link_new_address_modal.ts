@@ -104,6 +104,7 @@ const accountVerifiedCallback = async (account: Account<any>, vnode) => {
     notifySuccess('Success! Logged in');
     $(vnode.dom).trigger('modalforceexit');
     if (vnode.attrs.successCallback) vnode.attrs.successCallback();
+    m.redraw();
   } else {
     // log in as the new user
     await initAppState(false);
@@ -131,7 +132,6 @@ const accountVerifiedCallback = async (account: Account<any>, vnode) => {
     vnode.state.error = null;
     m.redraw();
   }
-  m.redraw();
 };
 
 const EthereumLinkAccountItem: m.Component<{
