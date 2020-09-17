@@ -24,8 +24,6 @@ import DiscussionRow from 'views/pages/discussions/discussion_row';
 import { getLastUpdate } from './weekly_listing';
 import Listing from '../listing';
 import PinnedListing from './pinned_listing';
-import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
-import Substrate from 'client/scripts/controllers/chain/substrate/main';
 
 interface IDiscussionPageState {
   lookback?: number;
@@ -43,14 +41,14 @@ const ListingSidebar: m.Component<{ entity: string }> = {
     const activeAddresses = app.recentActivity.getAddressActivityByCommunity(entity);
     const activeMembers = Object.values(activeAddresses).length
       ? Object.values(activeAddresses).sort((a, b) => {
-        return b['postCount'] - a['postCount']
-        }).map((member) => {
-          return m(User, {
-            user: member.addressInfo,
-            avatarSize: 24
-          })
-        }).slice(0, 5)
-      : []; 
+        return b['postCount'] - a['postCount'];
+      }).map((member) => {
+        return m(User, {
+          user: member.addressInfo,
+          avatarSize: 24
+        });
+      }).slice(0, 5)
+      : [];
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
       m('.active-members', activeMembers),
       m('.active-threads', activeThreads)
