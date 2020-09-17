@@ -70,17 +70,15 @@ export default class extends IEventHandler {
       const newExposure = newSessionEventData.activeExposures[validator.stash];
 
       // Check from the validator preferences whether the reward will be added to the own's exposure or not.
-      if (activeValidatorsInfo.rewardDestination) {
+      if (activeValidatorsInfo.rewardDestination === 'Staked') {
         // Rewards amount calculation for the current validator. Reference: https://github.com/hicommonwealth/commonwealth/blob/staking-ui/client/scripts/controllers/chain/substrate/staking.ts#L468-L472
-        const firstReward = new BN(newRewardEventData.amount.toString())
-                                .muln(Number(activeValidatorsInfo.commissionPer))
-                                .divn(100);
-        const secondReward = newExposure.own.toBn()
-                              .mul( (new BN(newRewardEventData.amount.toString())).sub(firstReward) )
-                              .div(newExposure.total.toBn() || new BN(1));
+        const commission = ( Number(activeValidatorsInfo.commissionPer) / 10_000_000 ) / 100; // Calculate commission percentage value
+        const firstReward = new BN(newRewardEventData.amount.toString()).muln(Number(commission)).divn(100);
+        const secondReward = newExposure.own.toBn().mul( (new BN(newRewardEventData.amount.toString())).sub(firstReward) ).div(newExposure.total.toBn() || new BN(1));
         const totalReward = firstReward.add(secondReward);
 
-        newExposure.own = totalReward.toString();
+        newExposure.own = (newExposure.own + totalReward).toString();
+        newExposure.total = (newExposure.total + totalReward).toString();
       }
 
       validator.exposure = newExposure;
