@@ -1,7 +1,7 @@
 import { AddressInfo, OffchainThread } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
-interface IAddressCountAndInfo {
+export interface IAddressCountAndInfo {
   [addressId: string]: {
     postCount: number;
     addressInfo: AddressInfo;
@@ -72,11 +72,18 @@ class RecentActivityStore {
     this._addressesByCommunity = {};
   }
 
-  public getThreadsByCommunity(communityId): Array<OffchainThread> {
+  public getThreadsByCommunity(communityId: string): Array<OffchainThread> {
     return this._threadsByCommunity[communityId] || [];
   }
 
-  public getAddressesByCommunity(communityId): IAddressCountAndInfo {
+  public getAddressesByCommunity(communityId: string): Array<AddressInfo> {
+    const communityStore = this._addressesByCommunity[communityId];
+    return communityStore
+      ? Object.values(communityStore).map((a) => a.addressInfo)
+      : [];
+  }
+
+  public getAddressActivityByCommunity(communityId: string): IAddressCountAndInfo {
     return this._addressesByCommunity[communityId] || {};
   }
 }

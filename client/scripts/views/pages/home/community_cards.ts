@@ -26,17 +26,11 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
   view: (vnode) => {
     const { chain, nodeList, justJoinedChains } = vnode.attrs;
     const { unseenPosts } = app.user;
-    const { activeAddresses, activeThreads } = app.recentActivity;
     const chainInfo = app.config.chains.getById(chain);
     const visitedChain = !!unseenPosts[chain];
     const updatedThreads = unseenPosts[chain]?.activePosts || 0;
-    const monthlyThreads = Object.keys(activeThreads[chain] || {}).length;
-    const monthlyUsers = activeAddresses[chain]
-      ? Object.values(activeAddresses[chain]).map((auth, idx) => {
-        const { addressInfo } = (auth as any);
-        const id = Number(Object.keys(activeAddresses[chain])[idx]);
-        return new AddressInfo(id, addressInfo[1], addressInfo[0], null);
-      }) : null;
+    const monthlyThreads = app.recentActivity.getThreadsByCommunity(chain);
+    const monthlyUsers = app.recentActivity.getAddressesByCommunity(chain);
 
     return m(Card, {
       elevation: 1,
@@ -81,16 +75,10 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
   view: (vnode) => {
     const { justJoinedCommunities, community } = vnode.attrs;
     const { unseenPosts } = app.user;
-    const { activeAddresses, activeThreads } = app.recentActivity;
     const visitedCommunity = !!unseenPosts[community.id];
     const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
-    const monthlyThreads = Object.keys(activeThreads[community.id] || {}).length;
-    const monthlyUsers = activeAddresses[community.id]
-      ? Object.values(activeAddresses[community.id]).map((auth, idx) => {
-        const { addressInfo } = (auth as any);
-        const id = Number(Object.keys(activeAddresses[community.id])[idx]);
-        return new AddressInfo(id, addressInfo[1], addressInfo[0], null);
-      }) : null;
+    const monthlyThreads = app.recentActivity.getThreadsByCommunity(community.id);
+    const monthlyUsers = app.recentActivity.getAddressesByCommunity(community.id);
 
     return m(Card, {
       elevation: 1,

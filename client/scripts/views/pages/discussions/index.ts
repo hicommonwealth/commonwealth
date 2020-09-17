@@ -39,27 +39,21 @@ const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last visit')
 const ListingSidebar: m.Component<{ entity: string }> = {
   view: (vnode) => {
     const { entity } = vnode.attrs;
-    let { activeThreads, activeAddresses } = app.recentActivity;
-    activeThreads = activeThreads[entity];
-    activeAddresses = activeAddresses[entity];
-    const activeMembers = Object.entries(activeAddresses).length
-      ? Object.entries(activeAddresses).sort((a, b) => {
-        return b[1]['postCount'] - a[1]['postCount']
-      }).map((member) => {
-        const id = member[0];
-        const [chain, address] = member[1]['addressInfo'];
-        const addressInfo = new AddressInfo(id, address, chain, null);
-        return m(User, {
-          user: addressInfo,
-          avatarSize: 24
-        })
-      }).slice(0, 5)
+    const activeThreads = app.recentActivity.getThreadsByCommunity(entity).slice(0, 5);
+    const activeAddresses = app.recentActivity.getAddressActivityByCommunity(entity);
+    const activeMembers = Object.values(activeAddresses).length
+      ? Object.values(activeAddresses).sort((a, b) => {
+        return b['postCount'] - a['postCount']
+        }).map((member) => {
+          return m(User, {
+            user: member.addressInfo,
+            avatarSize: 24
+          })
+        }).slice(0, 5)
       : []; 
-    const recentlyUpdatedThreads = Object.values(activeThreads[entity])
-      .sort((a, b) => a['created_at'] - b['created_at'])
-      .slice(0, 5)
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
-      m('.active-members', activeMembers)
+      m('.active-members', activeMembers),
+      m('.active-threads', activeThreads)
     ])
   }
 }

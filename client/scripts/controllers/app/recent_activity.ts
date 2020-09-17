@@ -1,4 +1,4 @@
-import RecentActivityStore from 'client/scripts/stores/ActivityStore';
+import RecentActivityStore, { IAddressCountAndInfo } from 'client/scripts/stores/ActivityStore';
 import { OffchainThread, AddressInfo } from 'models';
 class RecentActivityController {
   private _store = new RecentActivityStore();
@@ -26,12 +26,16 @@ class RecentActivityController {
       });
   }
 
-  public getThreadsByCommunity(community: string) {
-    this._store.getThreadsByCommunity(community);
+  public getThreadsByCommunity(community: string): Array<OffchainThread> {
+    return this._store.getThreadsByCommunity(community);
   }
 
-  public getAddressesByCommunity(community: string) {
-    this._store.getAddressesByCommunity(community);
+  public getAddressesByCommunity(community: string): Array<AddressInfo> {
+    return this._store.getAddressesByCommunity(community);
+  }
+
+  public getAddressActivityByCommunity(community:string): IAddressCountAndInfo {
+    return this._store.getAddressActivityByCommunity(community);
   }
 }
 
