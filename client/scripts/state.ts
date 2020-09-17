@@ -95,7 +95,7 @@ const app: IApp = {
   communities: new CommunitiesController(),
   user: new UserController(),
 
-  recentActivity: { activeThreads: null, activeAddresses: null },
+  recentActivity: new RecentActivityController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
