@@ -5,9 +5,20 @@
         background: $background-color-light;
         padding: 18px 24px 20px;
         margin-bottom: 40px;
+        display: flex;
+        .email-interval-configuration-left,
+        .email-interval-configuration-right {
+            flex: 1;
+        }
+        .email-interval-configuration-right {
+            padding-left: 20px;
+        }
         h4 {
             margin: 0;
             margin-bottom: 10px;
+        }
+        p {
+            margin-bottom: 0;
         }
     }
     .NotificationsTable {
