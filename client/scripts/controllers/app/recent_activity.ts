@@ -1,3 +1,4 @@
+import RecentActivityStore from 'client/scripts/stores/ActivityStore';
 import { OffchainThread, AddressInfo } from 'models';
 class RecentActivityController {
     private _store = new RecentActivityStore();
