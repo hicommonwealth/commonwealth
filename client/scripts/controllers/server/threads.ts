@@ -11,7 +11,7 @@ import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo } from 'mod
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 
-const modelFromServer = (thread) => {
+export const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];

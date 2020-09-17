@@ -1,3 +1,4 @@
+import { modelFromServer } from '../controllers/server/threads';
 import { AddressInfo, OffchainThread } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
@@ -21,6 +22,7 @@ class RecentActivityStore {
   private _addressesByCommunity: ICommunityAddresses = {};
 
   public addThread(thread: OffchainThread) {
+    thread = modelFromServer(thread);
     const parentEntity = thread.community || thread.chain;
     if (!this._threadsByCommunity[parentEntity]) {
       this._threadsByCommunity[parentEntity] = [];

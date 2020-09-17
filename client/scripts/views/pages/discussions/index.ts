@@ -50,11 +50,13 @@ const ListingSidebar: m.Component<{ entity: string }> = {
       }).slice(0, 5)
       : [];
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
+      m('', 'Active members'),
       m('.active-members', activeMembers),
-      m('.active-threads', activeThreads)
-    ])
+      m('', 'Active threads'),
+      m('.active-threads', activeThreads.map((t) => t.title))
+    ]);
   }
-}
+};
 
 const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   oncreate: (vnode) => {
