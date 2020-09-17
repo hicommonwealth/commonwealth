@@ -32,7 +32,6 @@ import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import viewCount from './routes/viewCount';
-import updateUserEmailInterval from './routes/updateUserEmailInterval';
 import updateEmail from './routes/updateEmail';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
@@ -214,8 +213,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/upgradeMember', passport.authenticate('jwt', { session: false }), upgradeMember.bind(this, models));
 
   // user model update
-  // TODO: Change to PUT /userEmailInterval
-  router.post('/updateUserEmailInterval', passport.authenticate('jwt', { session: false }), updateUserEmailInterval.bind(this, models));
   // TODO: Change to PUT /email
   router.post('/updateEmail', passport.authenticate('jwt', { session: false }), updateEmail.bind(this, models));
 

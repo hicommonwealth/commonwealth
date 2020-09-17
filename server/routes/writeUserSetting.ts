@@ -37,7 +37,7 @@ const writeUserSetting = async (models, req: Request, res: Response, next: NextF
     await req.user.save();
   } else if (key === 'updateEmailDigestInterval' && VALID_DIGEST_INTERVALS.indexOf(value) !== -1) {
     req.user.emailNotificationInterval = value;
-    await user.save();
+    await req.user.save();
   } else {
     return next(new Error(Errors.InvalidSetting));
   }
