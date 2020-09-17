@@ -104,6 +104,7 @@ const accountVerifiedCallback = async (account: Account<any>, vnode) => {
     notifySuccess('Success! Logged in');
     $(vnode.dom).trigger('modalforceexit');
     if (vnode.attrs.successCallback) vnode.attrs.successCallback();
+    m.redraw();
   } else {
     // log in as the new user
     await initAppState(false);
