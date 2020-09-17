@@ -1,11 +1,18 @@
 import Sequelize from 'sequelize';
-import { SENDGRID_API_KEY } from '../config';
+import {
+  SubstrateTypes, MolochTypes,
+  SubstrateEvents, MolochEvents, IEventLabel, IEventTitle, IChainEventData } from '@commonwealth/chain-events';
+import { SENDGRID_API_KEY, SERVER_URL } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getProposalUrl } from '../../shared/utils';
+
 const { Op } = Sequelize;
 const log = factory.getLogger(formatFilename(__filename));
 
-import { IPostNotificationData, NotificationCategories, DynamicTemplate } from '../../shared/types';
+import {
+  IPostNotificationData, NotificationCategories,
+  DynamicTemplate, IChainEventNotificationData } from '../../shared/types';
+
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -13,7 +20,8 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const sendImmediateNotificationEmail = async (subscription, emailObject) => {
   const user = await subscription.getUser();
-  emailObject.to = (process.env.NODE_ENV === 'development') ? 'test@commonwealth.im' : user.email;
+  if (!emailObject) return;
+  emailObject.to = (process.env.NODE_ENV === 'development') ? 'zak@commonwealth.im' : user.email;
 
   try {
     await sgMail.send(emailObject);
@@ -22,16 +30,39 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
   }
 };
 
-export const createNotificationEmailObject = (notification_data: IPostNotificationData, category_id) => {
+export const createNotificationEmailObject = (
+  notification_data: IPostNotificationData | IChainEventNotificationData, category_id, chain_name?
+) => {
+  let label: IEventLabel;
+  const chainId = (notification_data as IChainEventNotificationData).chainEventType?.chain;
+  if ((notification_data as IChainEventNotificationData).chainEvent !== undefined) {
+    const { blockNumber } = (notification_data as IChainEventNotificationData).chainEvent;
+    if (SubstrateTypes.EventChains.includes(chainId)) {
+      if (chainId === 'polkadot') return;
+      label = SubstrateEvents.Label(
+        blockNumber,
+        chainId,
+        (notification_data as IChainEventNotificationData).chainEvent.event_data as IChainEventData
+      );
+    // } else if (MolochTypes.EventChains.includes(chainId)) {
+    //   label = MolochEvents.Label(
+    //     blockNumber,
+    //     chainId,
+    //     (notification_data as IChainEventNotificationData).chainEvent.event_data,
+    //   );
+    }
+  }
+
   const { created_at, root_id, root_title, root_type, comment_id, comment_text,
-    chain_id, community_id, author_address, author_chain } = notification_data;
+    chain_id, community_id, author_address, author_chain } = (notification_data as IPostNotificationData);
   const decodedTitle = decodeURIComponent(root_title).trim();
-  const subjectLine = (category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
-    : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
-      : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
-        : (category_id === NotificationCategories.NewThread) ? `New thread called '${decodedTitle}'`
-          : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
-            : 'New notification on Commonwealth';
+  const subjectLine = (label.heading)
+    || ((category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
+      : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
+        : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
+          : (category_id === NotificationCategories.NewThread) ? `New thread called '${decodedTitle}'`
+            : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
+              : 'New Notification on Commonwealth');
 
   const pseudoProposal = {
     id: root_id,
@@ -40,7 +71,9 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
     community: community_id,
   };
   const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = (getProposalUrl as any)(...args);
+  const path = label.linkUrl ? `${SERVER_URL}${label.linkUrl}`
+    : label ? `${SERVER_URL}/${chainId}`
+      : (getProposalUrl as any)(...args);
   const msg = {
     to: 'zak@commonwealth.im',
     from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -49,7 +82,8 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
     dynamic_template_data: {
       notification: {
         subject: subjectLine,
-        title: decodedTitle,
+        title: label.heading || subjectLine,
+        body: label.label || subjectLine,
         path,
       }
     },

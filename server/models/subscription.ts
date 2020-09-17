@@ -150,10 +150,18 @@ export default (
     }
 
     const subscribers = await models.Subscription.findAll({ where: findOptions });
-
     // create notifications (data should always exist, but we check anyway)
     if (!notification_data) return [];
-    const msg = createNotificationEmailObject((notification_data as IPostNotificationData), category_id);
+    let msg;
+    if (isChainEventData(notification_data)) {
+    //   const chainId = (notification_data as IChainEventNotificationData).chainEvent.type.chain;
+    //   const chain = await models.Chain.findOne({ where: { id: chainId }, });
+    //   msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id, chain.name);
+      msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id);
+      log.info('is chain event!');
+    } else {
+      msg = createNotificationEmailObject((notification_data as IPostNotificationData), category_id);
+    }
     const notifications: any[] = await Promise.all(subscribers.map(async (subscription) => {
       const notificationObj: any = {
         subscription_id: subscription.id,
