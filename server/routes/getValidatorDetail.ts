@@ -4,30 +4,14 @@ import { Op } from 'sequelize';
 
 
 const getValidatorDetail = async (models, req: Request, res: Response, next: NextFunction) => {
-  // console.log("reqqqqqqq ", req.params)
-  console.log('body ', req.query.validatorStashes);
-
+  console.log(req.query, 'query');
   let validators: any = [];
   let where: any = { state: req.query?.state ? req.query?.state : 'Active' };
 
   // serarch by name or address
   if (req.query?.validatorStashes?.length) {
-    // where.stash = { [Op.in]: req?.query?.validatorStashes };
-    where = {
-      [Op.or]: [
-        {
-          stash:
-            { [Op.in]: req?.query?.validatorStashes }
-        },
-        {
-          name:
-            { [Op.in]: req?.query?.validatorStashes }
-        }
-      ],
-      ...where
-    };
+    where.stash = { [Op.in]: req?.query?.validatorStashes };
   }
-  console.log('where ======== ', where);
   validators = await models.Validator.findAll({
     where,
     include: {

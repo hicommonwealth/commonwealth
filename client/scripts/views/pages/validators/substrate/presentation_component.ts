@@ -5,7 +5,7 @@ import { get } from 'lodash';
 import Substrate from 'controllers/chain/substrate/main';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
-import { Icon, Icons, Spinner, ListItem, Select, InputSelect } from 'construct-ui';
+import { Icon, Icons, Spinner } from 'construct-ui';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
 import ValidatorRowWaiting from './validator_row_waiting';
@@ -15,140 +15,22 @@ const pageSize = 5;
 let result = { validators: [] };
 const model = {
   scroll: false,
+  show: true,
+  sortAsc: true,
+  searchIsOn: false,
   state: 'Active',
   prevIndex: 0,
   nextIndex: pageSize,
-  // scroll: 1,
   searchValue: '',
-  searchBy: '',
-  searchIsOn: false,
-  searchCriteria: {},
-  searchByOptions: [{ label: 'Select', value: '' }, { label: 'name', value: 'value' }, { label: 'address', value: 'value' }],
-  validatorNamesAddrss: {},
-  allAddresses: [],
-  setValue(result: string) {
-    model.searchBy = result;
-    model.searchCriteria = {};
-  },
-  pagination: {
-    pageSize: 7,
-    currentPageNo: 1,
-  },
   currentTab: 'current',
-  show: true,
-  addresses: [],
-  recordCount: {
-    waiting: {
-      totalRecords: 0,
-      fetchedRecords: 0
-    },
-    current: {
-      totalRecords: 0,
-      fetchedRecords: 0
-    },
-  },
+  validatorNamesAddress: {},
   activeStashes: [],
   waitingStashes: [],
-  sortKey: 'exposure.total',
-  sortAsc: true,
-  extraOp: [],
   constValidators: [],
-  async onSearchHandler(value?: string) {
-
-    console.log("value ", value);
-    // if search option is provided
-    if (value) {
-      model.searchIsOn = true;
-      model.searchValue = value;
-      model.searchCriteria = { value };
-      let mapNamesAddress = [];
-      const temp = [...model.profile];
-      if (model.state === 'Active') {
-        mapNamesAddress = temp.filter(row => row.state === 'Active')
-      } else {
-        mapNamesAddress = temp.filter(row => row.state === 'Waiting');
-      }
-      mapNamesAddress = mapNamesAddress.map(ele => { return { name: ele.name, address: ele.address } });
-      for (let i of mapNamesAddress) {
-        model.extraOp = [...model.extraOp, i.name, i.address];
-      }
-      let validators = [];
-      value = value.toLowerCase();
-
-      //fetch from already fetched list
-      // console.log(" model.constValidators ", model.constValidators)
-      model.constValidators.forEach((ele => {
-        if ((ele.name?.toLowerCase().includes(value) || ele.stash.toLowerCase().includes(value)) && ele.state === model.state) {
-          validators.push(ele);
-        }
-      }));
-      // console.log("fetch from already fetched list", validators);
-
-      if (!validators.length) {
-        // console.log("fetching from outside")
-        let obj = [];
-        model.extraOp.forEach((ele) => {
-          if (ele.toLowerCase().includes(value)) {
-            obj = [...obj, ele];
-          }
-        });
-        if (obj.length) {
-          model.state === 'Active' ? model.activeStashes = obj : model.waitingStashes = obj;
-          // console.log(obj, "obj");
-          model.prevIndex = 0;
-          model.onSearch();
-          m.redraw();
-        } else {
-          result.validators = [];
-          m.redraw();
-          return;
-        }
-        return;
-      }
-      // console.log("fetched")
-      result.validators = validators;
-      m.redraw()
-      return;
-    }
-  },
-  // model.currentPage < Math.ceil(model.total[model.currentTab] / model.perPage
-
-  async onChange() {
-    let validatorStashes: any = model.activeStashes;
-    if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
-    let { prevIndex, nextIndex } = model;
-    let validators: any = [];
-
-    prevIndex = nextIndex;
-    nextIndex = nextIndex + pageSize;
-
-    model.prevIndex = prevIndex;
-    model.nextIndex = nextIndex;
-
-    validatorStashes = validatorStashes.slice(prevIndex, nextIndex);
-
-    // 0console.log(validatorStashes.slice(prevIndex, nextIndex), "new fetched")
-    if (validatorStashes.length && validatorStashes.length >= prevIndex) {
-      // console.log("prevIndex", prevIndex)
-      // console.log("nextIndex", nextIndex);
-      // console.log("validatorStashes", validatorStashes);
-      // console.log("model.activeStashes", model.activeStashes);
-      validators = await (app.staking as any).validatorDetail(model.state, validatorStashes);
-
-      console.log(validators?.validators, "--------onChange---------");
-      result.validators = [...result.validators, ...validators?.validators];
-      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
-      model.constValidators = [...result.validators, ...model.constValidators];
-      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
-      m.redraw();
-    }
-
-  },
+  profile: [],
+  sortKey: 'exposure.total',
   async onSearch() {
     let validatorStashes: any = [];
-    let validators: any = [];
-    let { prevIndex, nextIndex } = model;
-
     if (model.state === 'Active') {
       if (!model.activeStashes?.length) {
         result.validators = [];
@@ -161,16 +43,71 @@ const model = {
         model.searchIsOn = true;
       } else validatorStashes = model.waitingStashes;
     }
+    await model.setValidators(validatorStashes);
+  },
+  async onSearchHandler(value: string) {
+    // if search option is provided
+    if (value && value.trim()) {
+      model.searchIsOn = true;
+      model.searchValue = value;
+      let validators = [];
+      value = value.toLowerCase();
+      let mapNamesAddress = [];
+      const temp = [...model.profile];
+
+      //filter out names and address to search
+      if (model.state === 'Active') mapNamesAddress = temp.filter(row => row.state === 'Active');
+      else mapNamesAddress = temp.filter(row => row.state === 'Waiting');
+      mapNamesAddress = mapNamesAddress.map(ele => { return { name: ele.name, stash: ele.address } }); //remove state property
 
 
-    if (validatorStashes.length && validatorStashes.length >= prevIndex) {
-      validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
-      result.validators = [...result.validators, ...validators?.validators];
-      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
-      model.constValidators = [...result.validators, ...model.constValidators];
-      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
+      //fetch from already fetched list
+      model.constValidators.forEach((ele => {
+        if ((ele.name?.toLowerCase().includes(value) || ele.stash.toLowerCase().includes(value)) && ele.state === model.state) {
+          validators.push(ele);
+        }
+      }));
+      if (validators.length) {
+        result.validators = validators;
+        m.redraw()
+        return;
+      }
+
+
+      //fetching validators by api call if matching stashes found
+      let matchedStashes = [];
+      mapNamesAddress.forEach((ele) => {
+        if (ele.name?.toLowerCase().includes(value) || ele.stash.toLowerCase().includes(value)) {
+          matchedStashes = [...matchedStashes, ele.stash];
+        }
+      });
+
+      //if matched stashes not found then return
+      if (!matchedStashes.length) {
+        result.validators = [];
+        m.redraw();
+        return;
+      }
+      //else fetch from api
+      model.state === 'Active' ? model.activeStashes = matchedStashes : model.waitingStashes = matchedStashes;
+      model.prevIndex = 0;
+      model.onSearch();
       m.redraw();
+      return;
     }
+  },
+  async onReverseSearch(value) {
+    if (value && value.trim()) {
+      model.onSearchHandler(value);
+      return;
+    }
+    model.searchValue = value;
+    if (model.state === 'Active') model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address);
+    else model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
+    model.prevIndex = 0;
+    model.searchIsOn = false;
+    m.redraw();
+    model.refresh();
   },
   async refresh() {
     let validatorStashes: any = [];
@@ -191,11 +128,32 @@ const model = {
     model.prevIndex = 0;
     model.nextIndex = pageSize;
 
-    // console.log("prevIndex", model.prevIndex);
-    // console.log("nextIndex", model.nextIndex);
     if (validatorStashes.length && (validatorStashes.length - 1) >= model.prevIndex) {
-      // console.log("validatorstashes ", validatorStashes)
       result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(model.prevIndex, model.nextIndex));
+      model.constValidators = [...result.validators, ...model.constValidators];
+      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
+      m.redraw();
+    }
+  },
+  async onChange() {
+    let validatorStashes: any = model.activeStashes;
+    if (model.state === 'Waiting') validatorStashes = model.waitingStashes;
+
+    model.prevIndex = model.nextIndex;
+    model.nextIndex = model.nextIndex + pageSize;
+
+    validatorStashes = validatorStashes.slice(model.prevIndex, model.nextIndex);
+    await model.setValidators(validatorStashes);
+
+  },
+  async setValidators(validatorStashes) {
+    let validators: any = [];
+    if (validatorStashes.length && validatorStashes.length >= model.prevIndex) {
+      validators = await (app.staking as any).validatorDetail(model.state, validatorStashes);
+
+      result.validators = [...result.validators, ...validators?.validators];
+      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
+
       model.constValidators = [...result.validators, ...model.constValidators];
       model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
       m.redraw();
@@ -208,29 +166,13 @@ const model = {
         : Icons.ARROW_DOWN
       : Icons.MINUS;
   },
-  profile: [],
   reset(index) {
-    model.pagination.currentPageNo = 1;
     model.show = true;
     if (index === 0) {
-      model.currentTab = 'current';
-      model.state = 'Active';
-      window.scrollTo(0, 0);
-      model.scroll = false;
-      console.log("state ", model.state);
-      model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
-      model.refresh();
-      m.redraw();
+      model.onTabChange('current', 'Active');
     }
     if (index === 1) {
-      model.currentTab = 'waiting';
-      model.state = 'Waiting';
-      window.scrollTo(0, 0);
-      model.scroll = false;
-      console.log("state ", model.state);
-      model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
-      model.refresh();
-      m.redraw();
+      model.onTabChange('waiting', 'Waiting');
     }
     if (index > 1) {
       model.show = false;
@@ -239,26 +181,16 @@ const model = {
     if (model.searchValue)
       model.onSearchHandler(model.searchValue);
   },
-  async onReverseSearch(value?) {
-    // console.log("calling reverse");
-    if (value && value.trim()) {
-      model.onSearchHandler(value);
-      return;
-    }
-    model.searchValue = value;
-    // console.log("if no value");
-    if (model.state === 'Active') {
-      // console.log(model.profile, "model.profile")
-      model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
-    }
-    else {
-      // console.log(model.waitingStashes, "waitingStashes");
-      model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
-    }
-    model.prevIndex = 0;
-    model.searchIsOn = false;
-    m.redraw();
+  onTabChange(currentTab, state) {
+    model.currentTab = currentTab;
+    model.state = state;
+    window.scrollTo(0, 0);
+    model.scroll = false;
+    console.log("state ", model.state);
+    if (state === 'Active') model.activeStashes = model.profile.filter(row => row.state === state).map((addr) => addr.address);
+    else model.waitingStashes = model.profile.filter(row => row.state === state).map((addr) => addr.address);
     model.refresh();
+    m.redraw();
   },
   changeSort(key: string) {
     if (key === model.sortKey)
@@ -268,13 +200,9 @@ const model = {
 };
 
 export const PresentationComponent_ = {
-
   oninit: async () => {
-    model.validatorNamesAddrss = await app.staking.validatorNamesAddress();
-    model.profile = (model.validatorNamesAddrss as any).profileData;
-    // console.log("profile ======", model.profile);
-    // console.log("prevIndex", model.prevIndex);
-    // console.log("nextIndex", model.nextIndex);
+    model.validatorNamesAddress = await app.staking.validatorNamesAddress();
+    model.profile = (model.validatorNamesAddress as any).profileData;
     model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address);
     model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
     model.refresh();
@@ -300,46 +228,17 @@ export const PresentationComponent_ = {
         return get(val2, sortKey, 0) - get(val1, sortKey, 0);
       return get(val1, sortKey, 0) - get(val2, sortKey, 0);
     })
-    // result.validators = result.validators?.sort((val1, val2) => val2?.exposure - val1?.exposure);
-
-
     //onscroll fetch next N record
-
-    // let cont: any = $("table.validators-table");
     model.scroll = false;
     $("table.validators-table").on('scroll', function () {
       if (!model.scroll) {
-        // console.log("$(this).scrollTop()", $(this).scrollTop())
-        // console.log("$(this).innerHeight()", $(this).innerHeight())
-        // console.log("$(this).scrollHeight()", $(this)[0].scrollHeight)
         if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
-          // alert('end reached');
           model.scroll = true;
           if (!model.searchValue && !model.searchValue.trim())
             model.onChange();
         }
       }
     });
-
-
-    // console.log("cont.scrollHeight ", cont.scrollHeight)
-    // $(window).scroll(function () {
-    // if (!model.scroll) {
-    //   // End of the document reached?
-    //   // if ($(document).height() - $(this).height() - 100 < $(this).scrollTop()) {
-    //   //   // alert('Just 100 pixels above to Bottom');
-    //   //   model.scroll = true;
-    //   //   model.searchIsOn = true;
-    //   //   model.onChange();
-    //   // }
-    //   // .scrollHeight - e.target.offsetHeight === 0
-    //   if (cont.scrollHeight - cont.offsetHeight === 0) {
-    //     model.scroll = true;
-    //     model.searchIsOn = true;
-    //     model.onChange();
-    //   }
-    // }
-    // });
 
     // const filtered = Object.keys(annualPercentRate)
     //   .map((elt) => annualPercentRate[elt])
@@ -404,7 +303,6 @@ export const PresentationComponent_ = {
               m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses')
             ]), m('table.validators-table', [
               result.validators.map((validator) => {
-                // console.log("validator.exposure ===== ", validator.exposure, validator.stash)
                 // total stake
                 const total = chain.chain.coins(+validator.exposure?.total);
                 // own stake

@@ -11,7 +11,7 @@ import { formatNumber } from '@polkadot/util';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
 import CardSummary from './card_summary';
-import { Icon, Icons, Spinner, TextArea, Select, Button } from 'construct-ui';
+import { Button } from 'construct-ui';
 interface IPreHeaderState {
   dynamic: {
     sessionInfo: DeriveSessionProgress;
@@ -48,10 +48,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
   }),
   view: vnode => {
     let { sessionInfo, globalStatistics, sender } = vnode.state.dynamic;
-    // console.log('globalStatistics ====', globalStatistics);
-    // console.log("sessionInfo ", sessionInfo)
     if (!sessionInfo && !globalStatistics) return;
-    // console.log("globalStatistics ", JSON.stringify(globalStatistics));
     let { count = 0, rows = [] } = globalStatistics;
     let apr = 0.0;
     const { currentEra,
@@ -88,16 +85,13 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           nominators.push(nominator);
         }
       });
-      // console.log("state ===== ", state);
       // count elected and waiting validators
       if (state === 'Active') {
         elected++;
-      } else if (state === 'Waiting') {
+      } else {
         waiting++;
       }
       // calculate est. apr
-
-      // console.log("stats ====== ", stats)
       apr += stats?.apr ? stats.apr : 0;
     });
     apr = apr / count;
