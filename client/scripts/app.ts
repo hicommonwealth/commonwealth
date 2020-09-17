@@ -61,6 +61,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
+      app.recentActivity.activeAddresses = data.activeAddresses;
+      app.recentActivity.activeThreads = data.activeThreads;
 
       // add recentActivity
       app.recentActivity.addThreads(data.activeThreads);
@@ -367,7 +369,7 @@ $(() => {
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
-      console.log('onmatch called, for:', path);
+      console.log('onmatch called, for:', path, (+new Date() / 1000));
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -375,6 +377,7 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
+      console.log('render called:', path, (+new Date() / 1000));
       const { scoped, hideSidebar } = attrs;
       let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'

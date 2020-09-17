@@ -1,6 +1,15 @@
 @import 'client/styles/shared';
 
 .NotificationSettingsPage {
+    .EmailIntervalConfiguration {
+        background: $background-color-light;
+        padding: 18px 24px 20px;
+        margin-bottom: 40px;
+        h4 {
+            margin: 0;
+            margin-bottom: 10px;
+        }
+    }
     .NotificationsTable {
         margin-top: 30px;
         margin-bottom: 40px;

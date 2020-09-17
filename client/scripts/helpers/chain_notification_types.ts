@@ -52,7 +52,7 @@ export const EdgewareChainNotificationTypes = {
   ],
 };
 
-export const PolkdotChainNotificationTypes = {
+export const PolkadotChainNotificationTypes = {
   Council: [
     'polkadot-collective-approved',
     'polkadot-collective-disapproved',

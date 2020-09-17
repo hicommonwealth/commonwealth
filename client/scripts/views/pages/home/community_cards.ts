@@ -27,10 +27,21 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
     const { chain, nodeList, justJoinedChains } = vnode.attrs;
     const { unseenPosts } = app.user;
     const chainInfo = app.config.chains.getById(chain);
+<<<<<<< HEAD
     const visitedChain = !!unseenPosts[chain];
     const updatedThreads = unseenPosts[chain]?.activePosts || 0;
     const monthlyThreads = app.recentActivity.getThreadsByCommunity(chain);
     const monthlyUsers = app.recentActivity.getAddressesByCommunity(chain);
+=======
+    const visitedChain = !!app.user.unseenPosts[chain];
+    const updatedThreads = app.user.unseenPosts[chain]?.activePosts || 0;
+    const monthlyThreads = app.recentActivity?.activeThreads[chain];
+    const monthlyUsers = app.recentActivity?.activeAddresses[chain]
+      ? Object.values(app.recentActivity.activeAddresses[chain]).map((auth, idx) => {
+        const id = Number(Object.keys(app.recentActivity.activeAddresses[chain])[idx]);
+        return new AddressInfo(id, auth[1], auth[0], null);
+      }) : null;
+>>>>>>> master
 
     return m(Card, {
       elevation: 1,
@@ -57,8 +68,13 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
         ]),
         m('p.card-description', chainInfo.description),
         // if no recently active threads, hide this module altogether
+<<<<<<< HEAD
         m('.recent-activity', monthlyThreads.length && [
           m('.recent-threads', pluralize(monthlyThreads.length, 'active thread')),
+=======
+        m('.recent-activity', monthlyThreads && [
+          m('.recent-threads', [ pluralize(monthlyThreads, 'thread'), '/mo' ]),
+>>>>>>> master
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
@@ -74,11 +90,22 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
 const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunities: string[] }> = {
   view: (vnode) => {
     const { justJoinedCommunities, community } = vnode.attrs;
+<<<<<<< HEAD
     const { unseenPosts } = app.user;
     const visitedCommunity = !!unseenPosts[community.id];
     const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
     const monthlyThreads = app.recentActivity.getThreadsByCommunity(community.id);
     const monthlyUsers = app.recentActivity.getAddressesByCommunity(community.id);
+=======
+    const visitedCommunity = !!app.user.unseenPosts[community.id];
+    const updatedThreads = app.user.unseenPosts[community.id]?.activePosts || 0;
+    const monthlyThreads = app.recentActivity.activeThreads[community.id];
+    const monthlyUsers = app.recentActivity?.activeAddresses[community.id]
+      ? Object.values(app.recentActivity.activeAddresses[community.id]).map((auth, idx) => {
+        const id = Number(Object.keys(app.recentActivity.activeAddresses[community.id])[idx]);
+        return new AddressInfo(id, auth[1], auth[0], null);
+      }) : null;
+>>>>>>> master
 
     return m(Card, {
       elevation: 1,
@@ -107,8 +134,13 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
         ]),
         m('p.card-description', community.description),
         // if no recently active threads, hide this module altogether
+<<<<<<< HEAD
         m('.recent-activity', monthlyThreads.length && [
           m('.recent-threads', pluralize(monthlyThreads.length, 'active thread')),
+=======
+        m('.recent-activity', monthlyThreads && [
+          m('.recent-threads', [ pluralize(monthlyThreads, 'active thread'), '/mo' ]),
+>>>>>>> master
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
@@ -223,10 +255,18 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
       });
     }
 
+<<<<<<< HEAD
     const sortedMemberChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
       const threadCountA = app.recentActivity.getThreadsByCommunity(Array.isArray(a) ? a[0] : a.id).length;
       const threadCountB = app.recentActivity.getThreadsByCommunity(Array.isArray(b) ? b[0] : b.id).length;
       return (threadCountB - threadCountA);
+=======
+    const { activeThreads } = app.recentActivity;
+    const sortedMemberChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
+      const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
+      const threadCountB = Array.isArray(b) ? activeThreads[b[0]] : activeThreads[b.id];
+      return ((threadCountB || 0) - (threadCountA || 0));
+>>>>>>> master
     }).map((entity) => {
       if (Array.isArray(entity)) {
         const [chain, nodeList]: [string, any] = entity as any;
@@ -234,6 +274,7 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
       } else if (entity.id) {
         return m(CommunityCard, { community: entity, justJoinedCommunities });
       }
+<<<<<<< HEAD
       return null;
     });
 
@@ -241,6 +282,14 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
       const threadCountA = app.recentActivity.getThreadsByCommunity(Array.isArray(a) ? a[0] : a.id).length;
       const threadCountB = app.recentActivity.getThreadsByCommunity(Array.isArray(b) ? b[0] : b.id).length;
       return (threadCountB - threadCountA);
+=======
+    });
+
+    const sortedOtherChainsAndCommunities = otherChains.concat(otherCommunities).sort((a, b) => {
+      const threadCountA = Array.isArray(a) ? activeThreads[a[0]] : activeThreads[a.id];
+      const threadCountB = Array.isArray(b) ? activeThreads[b[0]] : activeThreads[b.id];
+      return ((threadCountB || 0) - (threadCountA || 0));
+>>>>>>> master
     }).map((entity) => {
       if (Array.isArray(entity)) {
         const [chain, nodeList]: [string, any] = entity as any;
@@ -248,7 +297,10 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
       } else if (entity.id) {
         return m(CommunityCard, { community: entity, justJoinedCommunities });
       }
+<<<<<<< HEAD
       return null;
+=======
+>>>>>>> master
     });
 
     return m('.HomepageCommunityCards', [

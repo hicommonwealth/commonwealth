@@ -134,12 +134,18 @@ export function updateActiveAddresses(chain?: ChainInfo) {
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
     app.user.setEmail(null);
+    app.user.setEmailInterval(null);
+    app.user.setEmailVerified(null);
     app.user.setJWT(null);
+
     app.user.setAddresses([]);
     app.user.setSocialAccounts([]);
+
     app.user.setSiteAdmin(false);
+    app.user.setDisableRichText(false);
     app.user.setLastVisited({});
     app.user.setUnseenPosts({});
+
     app.user.setActiveAccounts([]);
     app.user.ephemerallySetActiveAccount(null);
   } else {

@@ -3,7 +3,7 @@ import 'pages/notification_subscriptions.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
-import { Checkbox, Button, Icons, ListItem, Table, SelectList } from 'construct-ui';
+import { Checkbox, Button, Icons, ListItem, Table, SelectList, RadioGroup } from 'construct-ui';
 import { SubstrateEvents, SubstrateTypes, IChainEventKind, TitlerFilter } from '@commonwealth/chain-events';
 
 import app from 'state';
@@ -13,7 +13,8 @@ import { NotificationCategories } from 'types';
 import { link } from 'helpers';
 import { sortSubscriptions } from 'helpers/notifications';
 import {
-  EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkdotChainNotificationTypes, KulupuChainNotificationTypes
+  EdgewareChainNotificationTypes, KusamaChainNotificationTypes,
+  PolkadotChainNotificationTypes, KulupuChainNotificationTypes
 } from 'helpers/chain_notification_types';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -39,6 +40,45 @@ const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (immediately by email)';
 const NOTIFICATION_ON_OPTION = 'On';
 const NOTIFICATION_ON_SOMETIMES_OPTION = '--';
 const NOTIFICATION_OFF_OPTION = 'Off';
+
+const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: boolean }> = {
+  view: (vnode) => {
+    if (!app.user) return;
+    if (vnode.state.interval === undefined) vnode.state.interval = app.user.emailInterval;
+
+    return m('.EmailIntervalConfiguration', [
+      m('h4', 'Receive digest emails'),
+      m(RadioGroup, {
+        options: ['daily', 'weekly', 'never'],
+        name: 'interval',
+        onchange: (e) => {
+          vnode.state.saving = true;
+          const value = (e.target as HTMLInputElement).value;
+
+          $.post(`${app.serverUrl()}/writeUserSetting`, {
+            jwt: app.user.jwt,
+            key: 'updateEmailInterval',
+            value,
+          }).then((result) => {
+            vnode.state.saving = false;
+            vnode.state.interval = value;
+            app.user.setEmailInterval(value);
+            m.redraw();
+          }).catch((err) => {
+            vnode.state.saving = false;
+            m.redraw();
+          });
+        },
+        value: vnode.state.interval,
+      }),
+      vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
+      !app.user.emailVerified && m('p', [
+        link('a', `/${app.activeId()}/settings`, 'Verify your email'),
+        ' to start receiving digests.'
+      ]),
+    ]);
+  }
+};
 
 const BatchedSubscriptionRow: m.Component<{
   subscriptions: NotificationSubscription[];
@@ -412,12 +452,12 @@ const KusamaChainEventNotifications: m.Component = {
 const PolkadotChainEventNotifications: m.Component = {
   view: (vnode) => {
     return [
-      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: PolkdotChainNotificationTypes.Council, }),
-      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: PolkdotChainNotificationTypes.Democracy, }),
-      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: PolkdotChainNotificationTypes.Preimage, }),
-      // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: PolkdotChainNotificationTypes.Treasury, }),
-      m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: PolkdotChainNotificationTypes.Validator, }),
-      m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: PolkdotChainNotificationTypes.Vote, }),
+      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: PolkadotChainNotificationTypes.Council, }),
+      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: PolkadotChainNotificationTypes.Democracy, }),
+      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
+      // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: PolkadotChainNotificationTypes.Treasury, }),
+      m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: PolkadotChainNotificationTypes.Validator, }),
+      m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: PolkadotChainNotificationTypes.Vote, }),
     ];
   }
 };
@@ -428,7 +468,7 @@ const KulupuChainEventNotifications: m.Component = {
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KulupuChainNotificationTypes.Council, }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KulupuChainNotificationTypes.Democracy, }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KulupuChainNotificationTypes.Preimage, }),
-      // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: PolkdotChainNotificationTypes.Treasury, }),
+      // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KulupuChainNotificationTypes.Treasury, }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KulupuChainNotificationTypes.Validator, }),
       m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: KulupuChainNotificationTypes.Vote, }),
     ];
@@ -573,6 +613,7 @@ const NotificationSettingsPage: m.Component<{}, {
       title: 'Notification Settings',
     }, [
       m('.forum-container', [
+        m(EmailIntervalConfiguration),
         communities && subscriptions && m('.CommunityNotifications', [
           m('.header', [
             m(SelectList, {

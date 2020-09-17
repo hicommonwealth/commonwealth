@@ -1,17 +1,15 @@
 import m from 'mithril';
 import $ from 'jquery';
 
-import { Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, RadioGroup, Form } from 'construct-ui';
+import { Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, RadioGroup, Form, Tag } from 'construct-ui';
 import app from 'state';
-import { RolePermission } from 'models';
+import { RolePermission, Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
-
-interface IWebhookData {
-  url: string;
-}
+import WebhookSettingsModal from '../webhook_settings_modal';
+import { pluralize } from 'helpers';
 
 interface IWebhooksFormAttrs {
-  webhooks: IWebhookData[];
+  webhooks: Webhook[];
 }
 
 interface IWebhooksFormState {
@@ -46,8 +44,17 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         if (result.status === 'Success') {
           vnode.state.success = true;
           notifySuccess('Success! Webhook created');
-          vnode.attrs.webhooks.push({
-            url: `${webhookUrl}`
+          const newWebhook = Webhook.fromJSON(result.result)
+          vnode.attrs.webhooks.push(newWebhook);
+          app.modals.create({
+            modal: WebhookSettingsModal,
+            data: {
+              webhook: newWebhook,
+              updateSuccessCallback: (webhook) => {
+                const idx = vnode.attrs.webhooks.findIndex((wh) => wh.id === webhook.id);
+                vnode.attrs.webhooks[idx].categories = webhook.categories;
+              }
+            }
           });
           $webhookInput.val('');
         } else {
@@ -73,8 +80,34 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
           class: 'active-webhooks'
         }, [
           webhooks.map((webhook) => {
+            const label = (webhook.url.indexOf('discord') !== -1) ? 'Discord'
+              : (webhook.url.indexOf('slack') !== -1) ? 'Slack'
+                : null;
             return m(ListItem, {
-              contentLeft: webhook.url,
+              contentLeft: [
+                m('.top', { style: `display: 'block';`}, webhook.url),
+                m('.bottom', [
+                  label && m(Tag, { label }),
+                  m(Button, {
+                    class: 'settings-button',
+                    label: m(Icon, { name: Icons.SETTINGS, size: 'xs' }),
+                    onclick: (e) => {
+                      e.preventDefault();
+                      app.modals.create({
+                        modal: WebhookSettingsModal,
+                        data: {
+                          webhook,
+                          updateSuccessCallback: (webhook) => {
+                            const idx = vnode.attrs.webhooks.findIndex((wh) => wh.id === webhook.id);
+                            vnode.attrs.webhooks[idx].categories = webhook.categories;
+                          }
+                        }
+                      });
+                      return;
+                    }
+                  }),
+                  m(Tag, { label: pluralize(webhook.categories.length, 'event') }),
+                ])],
               contentRight: m(Icon, {
                 name: Icons.X,
                 class: vnode.state.disabled ? 'disabled' : '',
@@ -213,7 +246,7 @@ interface IAdminPanelTabsAttrs {
   defaultTab: number;
   roleData: any[];
   onRoleUpgrade: Function;
-  webhooks;
+  webhooks: Webhook[];
 }
 
 const AdminPanelTabs: m.Component<IAdminPanelTabsAttrs, {index: number, }> = {
@@ -228,14 +261,14 @@ const AdminPanelTabs: m.Component<IAdminPanelTabsAttrs, {index: number, }> = {
         fluid: true,
       }, [
         m(TabItem, {
-          label: 'Promote Admins',
-          active: vnode.state.index === 1,
-          onclick: () => { vnode.state.index = 1; },
-        }),
-        m(TabItem, {
           label: 'Webhooks',
           active: vnode.state.index === 2,
           onclick: () => { vnode.state.index = 2; },
+        }),
+        m(TabItem, {
+          label: 'Admins',
+          active: vnode.state.index === 1,
+          onclick: () => { vnode.state.index = 1; },
         }),
       ]),
       (vnode.state.index === 1)

@@ -3,6 +3,8 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+const VALID_DIGEST_INTERVALS = ['daily', 'weekly', 'monthly', 'never'];
+
 export const Errors = {
   InvalidUser: 'Invalid user',
   NoKeyValue: 'Must provide key and value',
@@ -32,6 +34,9 @@ const writeUserSetting = async (models, req: Request, res: Response, next: NextF
     await req.user.save();
   } else if (key === 'disableRichText' && value === 'false') {
     req.user.disableRichText = false;
+    await req.user.save();
+  } else if (key === 'updateEmailInterval' && VALID_DIGEST_INTERVALS.indexOf(value) !== -1) {
+    req.user.emailNotificationInterval = value;
     await req.user.save();
   } else {
     return next(new Error(Errors.InvalidSetting));

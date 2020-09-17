@@ -7,7 +7,6 @@ import { Button } from 'construct-ui';
 
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
-import SubkeyInstructions from 'views/components/subkey_instructions';
 import { Account, ChainBase } from 'models';
 import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
 
@@ -53,9 +52,7 @@ const MessageSigningCLIOption = {
     const account: Account<any> = vnode.attrs.account;
     return m('.MessageSigningCLIOption', [
       app.chain && app.chain.base === ChainBase.Substrate && m('.instructions', [
-        'Use ',
-        m(SubkeyInstructions, { text: 'subkey' }),
-        ' to sign this message:'
+        'Use subkey to sign this message:'
       ]),
       // TODO: Message signing isn't supported by gaiacli yet. We
       // should change this to a valid gaiacli command when it's available.
