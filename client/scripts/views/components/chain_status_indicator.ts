@@ -26,7 +26,7 @@ const ChainStatusIndicator: m.Component<IAttrs> = {
 
     const blockNum = app.chain?.block?.height ? formatNumberLong(app.chain?.block?.height) : '0';
     const title = !app.chain ? '' : app.chain.networkStatus === ApiStatus.Connected
-      ? `${apiStatusToLabel.get(app.chain.networkStatus)} - Block ${blockNum}`
+      ? `Block ${blockNum}`
       : apiStatusToLabel.get(app.chain.networkStatus);
 
     return m('.ChainStatusIndicator', [
