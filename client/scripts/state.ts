@@ -51,11 +51,7 @@ export interface IApp {
   communities: CommunitiesController;
   user: UserController;
 
-<<<<<<< HEAD
   recentActivity: RecentActivityController;
-=======
-  recentActivity: IRecentActivity;
->>>>>>> master
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -104,11 +100,7 @@ const app: IApp = {
   communities: new CommunitiesController(),
   user: new UserController(),
 
-<<<<<<< HEAD
   recentActivity: new RecentActivityController(),
-=======
-  recentActivity: { activeThreads: null, activeAddresses: null },
->>>>>>> master
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,

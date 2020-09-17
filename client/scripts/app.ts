@@ -61,8 +61,6 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
-      app.recentActivity.activeAddresses = data.activeAddresses;
-      app.recentActivity.activeThreads = data.activeThreads;
 
       // add recentActivity
       app.recentActivity.addThreads(data.activeThreads);
