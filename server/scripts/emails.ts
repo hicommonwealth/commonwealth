@@ -5,31 +5,19 @@ import {
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getProposalUrl } from '../../shared/utils';
+import {
+  IPostNotificationData, NotificationCategories,
+  DynamicTemplate, IChainEventNotificationData
+} from '../../shared/types';
 
 const { Op } = Sequelize;
 const log = factory.getLogger(formatFilename(__filename));
 
-import {
-  IPostNotificationData, NotificationCategories,
-  DynamicTemplate, IChainEventNotificationData } from '../../shared/types';
-
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
-// immediate notification email
-
-export const sendImmediateNotificationEmail = async (subscription, emailObject) => {
-  const user = await subscription.getUser();
-  if (!emailObject) return;
-  emailObject.to = (process.env.NODE_ENV === 'development') ? 'zak@commonwealth.im' : user.email;
-
-  try {
-    await sgMail.send(emailObject);
-  } catch (e) {
-    log.error(e);
-  }
-};
-
+// called when a immediate notification is emitted, to construct an email
+// object that can be sent directly (by sendImmediateNotificationEmail)
 export const createNotificationEmailObject = (
   notification_data: IPostNotificationData | IChainEventNotificationData, category_id, chain_name?
 ) => {
@@ -62,7 +50,7 @@ export const createNotificationEmailObject = (
         : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
           : (category_id === NotificationCategories.NewThread) ? `New thread called '${decodedTitle}'`
             : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
-              : 'New Notification on Commonwealth');
+              : 'New notification');
 
   const pseudoProposal = {
     id: root_id,
@@ -91,9 +79,9 @@ export const createNotificationEmailObject = (
   return msg;
 };
 
-// regular notification email service
-
-export const createRegularNotificationEmailObject = async (user, notifications) => {
+// called when an email digest is generated, to construct an email object that
+// can be sent directly (by sendNotificationEmailDigestForUser)
+const createBatchedNotificationEmailObject = async (user, notifications) => {
   let emailObjArray = [];
   emailObjArray = await Promise.all(notifications.map(async (n) => {
     const { created_at, root_id, root_title, root_type, comment_id, comment_text,
@@ -133,7 +121,19 @@ export const createRegularNotificationEmailObject = async (user, notifications) 
   return msg;
 };
 
-export const sendRegularNotificationEmail = async (models, user) => {
+export const sendImmediateNotificationEmail = async (subscription, emailObject) => {
+  const user = await subscription.getUser();
+  if (!emailObject) return;
+  emailObject.to = (process.env.NODE_ENV === 'development') ? 'zak@commonwealth.im' : user.email;
+
+  try {
+    await sgMail.send(emailObject);
+  } catch (e) {
+    log.error(e);
+  }
+};
+
+export const sendNotificationEmailDigestForUser = async (models, user) => {
   const subscriptions = await models.Subscription.findAll({
     where: {
       subscriber_id: user.id,
@@ -148,11 +148,11 @@ export const sendRegularNotificationEmail = async (models, user) => {
       is_read: false,
     }
   });
-  const msg = await createRegularNotificationEmailObject(user, notifications);
+  const msg = await createBatchedNotificationEmailObject(user, notifications);
   return msg;
 };
 
-export const sendBatchedNotificationEmails = async (models, interval: string) => {
+export const sendNotificationEmailDigest = async (models, interval: string) => {
   log.info(`Sending ${interval} emails now`);
   const users = await models.User.findAll({
     where: {
@@ -161,6 +161,6 @@ export const sendBatchedNotificationEmails = async (models, interval: string) =>
   });
   log.info(`users: ${users.length}`);
   await Promise.all(users.map(async (user) => {
-    await sendRegularNotificationEmail(models, user).then((msg) => { return msg; });
+    await sendNotificationEmailDigestForUser(models, user).then((msg) => { return msg; });
   }));
 };
