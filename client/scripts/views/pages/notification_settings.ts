@@ -50,7 +50,7 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
       m('.email-interval-configuration-left', [
         m('h4', 'Receive notification emails'),
         m(RadioGroup, {
-          options: ['daily', 'weekly', 'never'],
+          options: ['daily', 'never'],
           name: 'interval',
           onchange: (e) => {
             vnode.state.saving = true;
