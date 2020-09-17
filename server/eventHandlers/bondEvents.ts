@@ -9,7 +9,7 @@ export default class extends IEventHandler {
   }
 
   /**
-    * Event handler for boned and unbond information of validators details in DB.
+    Event handler to store boned and unbond information of validators details in DB.
   */
   public async handle(event: CWEvent < IChainEventData >, dbEvent) {
     // 1) if other event type ignore and do nothing.
@@ -19,7 +19,7 @@ export default class extends IEventHandler {
     }
     const bondEventData = event.data;
 
-    // 2) check for the latest historical validator data from db
+    // 2) Get relevant data from DB for processing.
     const latestValidators = await this._models.HistoricalValidatorStatistic.findOne({
       where: {
         stash: bondEventData.stash
@@ -33,7 +33,7 @@ export default class extends IEventHandler {
     }
     let validator = JSON.parse(JSON.stringify(latestValidators));
 
-    // 3) Modify new exposures for validators
+    // 3) Modify exposures for validators.
     switch (bondEventData.kind) {
       case SubstrateTypes.EventKind.Bonded: {
         validator.exposure.own = (Number(validator.exposure.own) + Number(bondEventData.amount)).toString();
@@ -60,8 +60,8 @@ export default class extends IEventHandler {
       }
     }
 
-    // 4) create and update event details in db
-    await this._models.HistoricalValidatorStatistic.create(validator, { ignoreDuplicates: true });
+    // 4) create/update event data in database.
+    await this._models.HistoricalValidatorStatistic.create( validator );
 
     return dbEvent;
   }

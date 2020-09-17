@@ -13,7 +13,7 @@ export default class extends IEventHandler {
   }
 
   /**
-    * Event handler for reward information of validators details in DB.
+    Event handler to store reward information of validators details in DB.
   */
   public async handle(event: CWEvent < IChainEventData >, dbEvent) {
     // 1) if other event type ignore and do nothing.
@@ -21,7 +21,11 @@ export default class extends IEventHandler {
       return dbEvent;
     }
 
-    // 2) check for the new-session event data from chain events db
+    // 2) Get relevant data from DB for processing.
+    /*
+      For rewards calculation of the validators, latest new-session event data needs to be present in the ChainEvents table.
+      This query will return the latest new-session event data, as Rewards event will only be triggered after the new-session event.
+    */
     const chainEventNewSession = await this._models.ChainEvent.findOne({
       include: [
         {
@@ -38,14 +42,16 @@ export default class extends IEventHandler {
       attributes: ['event_data']
     });
 
-    if (!chainEventNewSession) { // Ignore unknown event types, if any.
+    if (!chainEventNewSession) { // if no new-session data, do nothing
       return dbEvent;
     }
 
     const newRewardEventData = event.data;
     const newSessionEventData = chainEventNewSession.event_data.data;
-
-    // WHERE stash IN ('${Object.keys(newSessionEventData.activeExposures).join("','")}') and eventType = '${newRewardEventData.kind}'
+    /*
+      This query will return the last created record for validators in 'HistoricalValidatorStatistic' table and return the data for each validator iff any.
+      since all new and active validators records has been created by new-session event handler, it'll return the the last created records of them.
+    */
     const rawQuery = `
       SELECT * FROM (
         SELECT *, ROW_NUMBER() OVER(PARTITION BY stash ORDER BY created_at DESC) 
@@ -57,16 +63,23 @@ export default class extends IEventHandler {
     const [validators, metadata] = await sequelize.query(rawQuery);
     let validatorsList = JSON.parse(JSON.stringify(validators));
 
-    // 3) Modify new exposures for validators
+    // 3) Modify exposures for validators.
     validatorsList.forEach((validator: any) => {
+      // Getting updated validator info from the new-session event data related to rewards calculation (e.g. exposure(s) for each validator, commissionPer, eraPoints, rewardDestination)
       const activeValidatorsInfo = newSessionEventData.validatorInfo[validator.stash];
       const newExposure = newSessionEventData.activeExposures[validator.stash];
 
-      const firstReward = new BN(newRewardEventData.amount.toString()).muln(Number(activeValidatorsInfo.commissionPer)).divn(100);
-      const secondReward = newExposure.own.toBn().mul((new BN(newRewardEventData.amount.toString())).sub(firstReward)).div(newExposure.total.toBn() || new BN(1));
-      const totalReward = firstReward.add(secondReward);
-
+      // Check from the validator preferences whether the reward will be added to the own's exposure or not.
       if (activeValidatorsInfo.rewardDestination) {
+        // Rewards amount calculation for the current validator. Reference: https://github.com/hicommonwealth/commonwealth/blob/staking-ui/client/scripts/controllers/chain/substrate/staking.ts#L468-L472
+        const firstReward = new BN(newRewardEventData.amount.toString())
+                                .muln(Number(activeValidatorsInfo.commissionPer))
+                                .divn(100);
+        const secondReward = newExposure.own.toBn()
+                              .mul( (new BN(newRewardEventData.amount.toString())).sub(firstReward) )
+                              .div(newExposure.total.toBn() || new BN(1));
+        const totalReward = firstReward.add(secondReward);
+
         newExposure.own = totalReward.toString();
       }
 
@@ -75,17 +88,17 @@ export default class extends IEventHandler {
       validator.eventType = newRewardEventData.kind;
       validator.commissionPer = activeValidatorsInfo.commissionPer;
       validator.eraPoints = activeValidatorsInfo.eraPoints;
-      validator.apr = 0; // APR to be computed over here
+      validator.apr = 0; // TODO: APR to be computed over here
       validator.created_at = new Date().toISOString();
       validator.updated_at = new Date().toISOString();
       delete validator.id;
       delete validator.row_number;
     });
 
-    // 4) create and update event details in db
-    // await models.HistoricalValidatorStatistic.bulkCreate( validatorsList, {ignoreDuplicates: true} );
+    // 4) create/update event data in database.
+    // await this._models.HistoricalValidatorStatistic.bulkCreate( validatorsList, {ignoreDuplicates: true} );
     await Promise.all(validatorsList.map( (row: any) => {
-      return this._models.HistoricalValidatorStatistic.create( row, {ignoreDuplicates: true} );
+      return this._models.HistoricalValidatorStatistic.create( row );
     }));
 
     return dbEvent;
