@@ -5,10 +5,10 @@ import {
   ICommunityAdapter,
   NotificationCategory,
 } from 'models';
+import { ReplaySubject } from 'rxjs';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import RecentActivityController from './controllers/app/recent_activity';
-import { ReplaySubject } from 'rxjs';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';

@@ -1,5 +1,5 @@
-import RecentActivityStore, { IAddressCountAndInfo } from 'client/scripts/stores/ActivityStore';
 import { OffchainThread, AddressInfo } from 'models';
+import RecentActivityStore, { IAddressCountAndInfo } from '../../stores/ActivityStore';
 class RecentActivityController {
   private _store = new RecentActivityStore();
 
@@ -10,14 +10,16 @@ class RecentActivityController {
   public get initialized() { return this._initialized; }
 
   public addThreads(threads: OffchainThread[]) {
+    debugger
     threads.forEach((thread) => this._store.addThread(thread));
   }
 
-  public addAddresses(addresses: AddressInfo) {
-
+  public addAddresses(addresses: AddressInfo[], parentEntity: string) {
+    addresses.forEach((addr) => this._store.addAddress(addr, parentEntity));
   }
 
   public addAddressesFromActivity(activity: any[]) {
+    debugger
     activity
       .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at))
       .forEach((item) => {
