@@ -107,8 +107,8 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
         }),
       ]),
       m(List, [
-        !app.threads.initialized &&
-          m(ListItem, {
+        featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && !app.threads.initialized
+          && m(ListItem, {
             class: 'section-callout',
             label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
           }),
