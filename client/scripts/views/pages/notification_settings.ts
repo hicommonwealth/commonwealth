@@ -3,7 +3,7 @@ import 'pages/notification_subscriptions.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
-import { Checkbox, Button, Icons, ListItem, Table, SelectList } from 'construct-ui';
+import { Checkbox, Button, Icons, ListItem, Table, SelectList, RadioGroup } from 'construct-ui';
 import { SubstrateEvents, SubstrateTypes, IChainEventKind, TitlerFilter } from '@commonwealth/chain-events';
 
 import app from 'state';
@@ -13,7 +13,8 @@ import { NotificationCategories } from 'types';
 import { link } from 'helpers';
 import { sortSubscriptions } from 'helpers/notifications';
 import {
-  EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkadotChainNotificationTypes, KulupuChainNotificationTypes
+  EdgewareChainNotificationTypes, KusamaChainNotificationTypes,
+  PolkadotChainNotificationTypes, KulupuChainNotificationTypes
 } from 'helpers/chain_notification_types';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -39,6 +40,34 @@ const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (immediately by email)';
 const NOTIFICATION_ON_OPTION = 'On';
 const NOTIFICATION_ON_SOMETIMES_OPTION = '--';
 const NOTIFICATION_OFF_OPTION = 'Off';
+
+const EmailDigestConfiguration: m.Component<{}, { interval: string, saving: boolean }> = {
+  view: (vnode) => {
+    return m('.EmailDigestConfiguration', [
+      m(RadioGroup, {
+        options: ['daily', 'weekly', 'never'],
+        name: 'interval',
+        onchange: (e) => {
+          vnode.state.saving = true;
+
+          $.post(`${app.serverUrl()}/writeUserSetting`, {
+            jwt: app.user.jwt,
+            key: 'updateEmailDigestInterval',
+            value: vnode.state.interval,
+          }).then((result) => {
+            vnode.state.saving = false;
+            vnode.state.interval = (e.currentTarget as HTMLInputElement).value;
+            m.redraw();
+          }).catch((err) => {
+            vnode.state.saving = false;
+            m.redraw();
+          });
+        },
+        value: vnode.state.interval,
+      }),
+    ]);
+  }
+};
 
 const BatchedSubscriptionRow: m.Component<{
   subscriptions: NotificationSubscription[];
@@ -573,6 +602,7 @@ const NotificationSettingsPage: m.Component<{}, {
       title: 'Notification Settings',
     }, [
       m('.forum-container', [
+        m(EmailDigestConfiguration),
         communities && subscriptions && m('.CommunityNotifications', [
           m('.header', [
             m(SelectList, {
