@@ -7,6 +7,7 @@ import {
 } from 'models';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
+import RecentActivityController from './controllers/app/recent_activity';
 import { ReplaySubject } from 'rxjs';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
@@ -29,11 +30,6 @@ export const enum LoginState {
   LoggedIn = 'logged_in',
 }
 
-interface IRecentActivity {
-  activeAddresses;
-  activeThreads;
-}
-
 export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
@@ -50,7 +46,7 @@ export interface IApp {
   communities: CommunitiesController;
   user: UserController;
 
-  recentActivity: IRecentActivity;
+  recentActivity: RecentActivityController;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;

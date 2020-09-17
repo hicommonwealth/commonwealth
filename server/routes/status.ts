@@ -117,39 +117,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   const { user } = req;
 
   if (!user) {
-    const activeAddresses = {};
-    const activeThreads = {};
-    const allContent = recentThreads.concat(recentComments).concat(recentReactions)
-      .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at));
-    allContent.forEach((item) => {
-      const entity = item.community || item.chain;
-      if (activeAddresses[entity]) {
-        if (activeAddresses[entity][item.address_id]) {
-          activeAddresses[entity][item.address_id]['postCount'] += 1;
-        } else {
-          activeAddresses[entity][item.address_id] = {
-            'postCount': 1,
-            'addressInfo': [item.Address.chain, item.Address.address]
-          };
-        }
-      } else if (!activeAddresses[entity]) {
-        activeAddresses[entity] = {};
-        activeAddresses[entity][item.address_id] = {
-          'postCount': 1,
-          'addressInfo': [item.Address.chain, item.Address.address]
-        };
-      }
-    });
-    recentThreads.forEach((thread) => {
-      const entity = thread.community || thread.chain;
-      if (activeThreads[entity]) {
-        activeThreads[entity][thread.id] = thread;
-      } else if (!activeThreads[entity]) {
-        const addr = {};
-        addr[thread.id] = thread;
-        activeThreads[entity] = addr;
-      }
-    });
     return res.json({
       chains,
       nodes,
@@ -157,8 +124,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       contractCategories,
       communities: publicCommunities,
       notificationCategories,
-      activeAddresses,
-      activeThreads,
+      activeThreads: recentComments.concat(recentReactions),
+      otherActivity: recentThreads,
       loggedIn: false,
     });
   }
@@ -229,40 +196,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     }
   });
 
-  const activeAddresses = {};
-  const activeThreads = {};
-  const allContent = recentThreads_.concat(recentComments).concat(recentReactions)
-    .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at));
-
-  allContent.forEach((item) => {
-    const entity = item.community || item.chain;
-    if (activeAddresses[entity]) {
-      if (activeAddresses[entity][item.address_id]) {
-        activeAddresses[entity][item.address_id]['postCount'] += 1;
-      } else {
-        activeAddresses[entity][item.address_id] = {
-          'postCount': 1,
-          'addressInfo': [item.Address.chain, item.Address.address]
-        };
-      }
-    } else if (!activeAddresses[entity]) {
-      activeAddresses[entity] = {};
-      activeAddresses[entity][item.address_id] = {
-        'postCount': 1,
-        'addressInfo': [item.Address.chain, item.Address.address]
-      };
-    }
-  });
-  recentThreads_.forEach((thread) => {
-    const entity = thread.community || thread.chain;
-    if (activeThreads[entity]) {
-      activeThreads[entity][thread.id] = thread;
-    } else if (!activeThreads[entity]) {
-      const addr = {};
-      addr[thread.id] = thread;
-      activeThreads[entity] = addr;
-    }
-  });
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
     where: { user_id: user.id }
@@ -329,8 +262,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     offchainTopics,
     contractCategories,
     notificationCategories,
-    activeAddresses,
-    activeThreads,
+    activeThreads: recentThreads_,
+    otherActivity: recentComments.concat(recentReactions),
     roles,
     invites,
     loggedIn: true,
