@@ -14,6 +14,7 @@ import NewSessionHandler from '../eventHandlers/newSessionEvents';
 import RewardHandler from '../eventHandlers/rewardEvents';
 import SlashHandler from '../eventHandlers/slashEvents';
 import BondHandler from '../eventHandlers/bondEvents';
+import ImOnlineHandler from '../eventHandlers/imOnlineEvents';
 import { sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
@@ -60,6 +61,7 @@ const setupChainEventListeners = async (
     const rewardHandler = new RewardHandler(models, node.chain);
     const slashHandler = new SlashHandler(models);
     const bondHandler = new BondHandler(models);
+    const imOnlineHandler = new ImOnlineHandler(models);
     const identityHandler = new IdentityHandler(models, node.chain);
     const handlers: IEventHandler[] = [ storageHandler, 
       notificationHandler,
@@ -67,7 +69,8 @@ const setupChainEventListeners = async (
       newSessionHandler,
       rewardHandler,
       slashHandler,
-      bondHandler
+      bondHandler,
+      imOnlineHandler
     ];
     let subscriber: IEventSubscriber<any, any>;
     if (SubstrateTypes.EventChains.includes(node.chain)) {
