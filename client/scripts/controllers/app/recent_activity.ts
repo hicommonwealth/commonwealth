@@ -1,5 +1,6 @@
+import { IAddressCountAndInfo } from './../../stores/ActivityStore';
 import { OffchainThread, AddressInfo } from 'models';
-import RecentActivityStore, { IAddressCountAndInfo } from '../../stores/ActivityStore';
+import RecentActivityStore, { IKeyedAddressCountAndInfo } from '../../stores/ActivityStore';
 class RecentActivityController {
   private _store = new RecentActivityStore();
 
@@ -18,6 +19,7 @@ class RecentActivityController {
   }
 
   public addAddressesFromActivity(activity: any[]) {
+    console.log(activity);
     activity
       .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at))
       .forEach((item) => {
@@ -33,8 +35,12 @@ class RecentActivityController {
     return this._store.getAddressesByCommunity(community);
   }
 
-  public getAddressActivityByCommunity(community:string): IAddressCountAndInfo {
+  public getAddressActivityByCommunity(community:string): IKeyedAddressCountAndInfo {
     return this._store.getAddressActivityByCommunity(community);
+  }
+
+  public getMostActiveUsers(community: string, userCount): Array<IAddressCountAndInfo> {
+    return this._store.getMostActiveUsers(community, userCount);
   }
 }
 

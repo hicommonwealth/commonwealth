@@ -65,7 +65,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       // add recentActivity
       app.recentActivity.addThreads(data.activeThreads);
       app.recentActivity.addAddressesFromActivity(data.activeThreads.concat(data.otherActivity));
-
+      console.log(app.recentActivity);
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;

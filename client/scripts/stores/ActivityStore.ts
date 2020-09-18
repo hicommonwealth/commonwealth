@@ -3,14 +3,16 @@ import { AddressInfo, OffchainThread } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
 export interface IAddressCountAndInfo {
-  [addressId: string]: {
-    postCount: number;
-    addressInfo: AddressInfo;
-  }
+  postCount: number;
+  addressInfo: AddressInfo;
+}
+
+export interface IKeyedAddressCountAndInfo {
+  [addressId: string]: IAddressCountAndInfo;
 }
 
 interface ICommunityAddresses {
-  [parentEntity: string]: IAddressCountAndInfo;
+  [parentEntity: string]: IKeyedAddressCountAndInfo;
 }
 
 interface ICommunityThreads {
@@ -85,8 +87,17 @@ class RecentActivityStore {
       : [];
   }
 
-  public getAddressActivityByCommunity(communityId: string): IAddressCountAndInfo {
+  public getAddressActivityByCommunity(communityId: string): IKeyedAddressCountAndInfo {
     return this._addressesByCommunity[communityId] || {};
+  }
+
+  public getMostActiveUsers(communityId: string, count: number): Array<IAddressCountAndInfo> {
+    const communityStore = this._addressesByCommunity[communityId];
+    return communityStore
+      ? Object.values(communityStore).sort((a, b) => {
+        return (b.postCount - a.postCount);
+      }).slice(0, count)
+      : [];
   }
 }
 

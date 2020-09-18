@@ -1,6 +1,3 @@
-import { MostActiveThread, MostActiveUser } from './sidebar';
-import User from 'views/components/widgets/user';
-import { AddressInfo } from 'models';
 /* eslint-disable no-unused-expressions */
 import 'pages/discussions/index.scss';
 
@@ -12,7 +9,7 @@ import moment from 'moment-twitter';
 import app from 'state';
 
 import { Spinner } from 'construct-ui';
-import { pluralize, slugify } from 'helpers';
+import { pluralize } from 'helpers';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -21,6 +18,7 @@ import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
+import { ListingSidebar } from './sidebar';
 
 import { getLastUpdate } from './weekly_listing';
 import Listing from '../listing';
@@ -34,36 +32,6 @@ interface IDiscussionPageState {
 }
 
 const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last visit'), m('hr') ]);
-
-const ListingSidebar: m.Component<{ entity: string }> = {
-  view: (vnode) => {
-    const { entity } = vnode.attrs;
-    const activeThreads = app.recentActivity.getThreadsByCommunity(entity).slice(0, 5);
-    const activeAddresses = app.recentActivity.getAddressActivityByCommunity(entity);
-    const activeMembers = Object.values(activeAddresses).length
-      ? Object.values(activeAddresses).sort((a, b) => {
-        return b['postCount'] - a['postCount'];
-      }).slice(0, 5)
-      : [];
-    return m('.ListingSidebar.forum-container.proposal-sidebar', [
-      m('.user-activity', [
-        m('.user-activity-header', 'Active members'),
-        m('.active-members', activeMembers.map((user) => {
-          return m(MostActiveUser, {
-            user: user.addressInfo,
-            activityCount: user.postCount
-          });
-        })),
-      ]),
-      m('.forum-activity', [
-        m('.forum-activity-header', 'Active threads'),
-        m('.active-threads', activeThreads.map((thread) => {
-          return m(MostActiveThread, { thread });
-        }))
-      ])
-    ]);
-  }
-};
 
 const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   oncreate: (vnode) => {

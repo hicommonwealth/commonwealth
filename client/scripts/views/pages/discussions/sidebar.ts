@@ -41,3 +41,29 @@ export const MostActiveThread: m.Component<{ thread: OffchainThread }> = {
     ]);
   }
 };
+
+export const ListingSidebar: m.Component<{ entity: string }> = {
+  view: (vnode) => {
+    const { entity } = vnode.attrs;
+    const activeThreads = app.recentActivity.getThreadsByCommunity(entity).slice(0, 5);
+    const activeAddresses = app.recentActivity.getMostActiveUsers(entity, 5);
+
+    return m('.ListingSidebar.forum-container.proposal-sidebar', [
+      m('.user-activity', [
+        m('.user-activity-header', 'Active members'),
+        m('.active-members', activeAddresses.map((user) => {
+          return m(MostActiveUser, {
+            user: user.addressInfo,
+            activityCount: user.postCount
+          });
+        })),
+      ]),
+      m('.forum-activity', [
+        m('.forum-activity-header', 'Active threads'),
+        m('.active-threads', activeThreads.map((thread) => {
+          return m(MostActiveThread, { thread });
+        }))
+      ])
+    ]);
+  }
+};
