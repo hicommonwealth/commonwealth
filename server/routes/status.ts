@@ -117,28 +117,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   const { user } = req;
 
   if (!user) {
-    const activeAddresses = {};
-    const activeThreads = {};
-    const allContent = recentThreads.concat(recentComments).concat(recentReactions)
-      .sort((a, b) => (b.created_at) - (a.created_at));
-    allContent.forEach((item) => {
-      const entity = item.community || item.chain;
-      if (activeAddresses[entity] && !activeAddresses[entity][item.address_id]) {
-        activeAddresses[entity][item.address_id] = [item.Address.chain, item.Address.address];
-      } else if (!activeAddresses[entity]) {
-        const addr = {};
-        addr[item.address_id] = [item.Address.chain, item.Address.address];
-        activeAddresses[entity] = addr;
-      }
-    });
-    recentThreads.forEach((thread) => {
-      const entity = thread.community || thread.chain;
-      if (activeThreads[entity]) {
-        activeThreads[entity] += 1;
-      } else if (!activeThreads[entity]) {
-        activeThreads[entity] = 1;
-      }
-    });
     return res.json({
       chains,
       nodes,
@@ -146,8 +124,9 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       contractCategories,
       communities: publicCommunities,
       notificationCategories,
-      activeThreads: recentComments.concat(recentReactions),
-      otherActivity: recentThreads,
+      recentThreads,
+      recentComments,
+      recentReactions,
       loggedIn: false,
     });
   }
@@ -218,29 +197,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     }
   });
 
-  const activeAddresses = {};
-  const activeThreads = {};
-  const allContent = recentThreads_.concat(recentComments).concat(recentReactions)
-    .sort((a, b) => (b.created_at) - (a.created_at));
-
-  allContent.forEach((item) => {
-    const entity = item.community || item.chain;
-    if (activeAddresses[entity] && !activeAddresses[entity][item.address_id]) {
-      activeAddresses[entity][item.address_id] = [item.Address.chain, item.Address.address];
-    } else if (!activeAddresses[entity]) {
-      const addr = {};
-      addr[item.address_id] = [item.Address.chain, item.Address.address];
-      activeAddresses[entity] = addr;
-    }
-  });
-  recentThreads_.forEach((thread) => {
-    const entity = thread.community || thread.chain;
-    if (activeThreads[entity]) {
-      activeThreads[entity] += 1;
-    } else if (!activeThreads[entity]) {
-      activeThreads[entity] = 1;
-    }
-  });
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
     where: { user_id: user.id }
@@ -307,8 +263,9 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     offchainTopics,
     contractCategories,
     notificationCategories,
-    activeThreads: recentThreads_,
-    otherActivity: recentComments.concat(recentReactions),
+    recentThreads: recentThreads_,
+    recentComments,
+    recentReactions,
     roles,
     invites,
     loggedIn: true,

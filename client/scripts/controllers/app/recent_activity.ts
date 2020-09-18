@@ -23,6 +23,9 @@ class RecentActivityController {
     activity
       .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at))
       .forEach((item) => {
+        if (item.Address.address === 'jXC7ghviUzVcVySg3eD8prB7C9m6VzK6cw2MTyMTDTUye5q') {
+          console.log(item);
+        }
         this._store.addAddress(item.Address, item.community || item.chain);
       });
   }

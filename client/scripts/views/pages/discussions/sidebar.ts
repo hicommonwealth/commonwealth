@@ -14,7 +14,9 @@ export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: num
     return m('.MostActiveUser', [
       m(User, {
         user,
-        avatarSize: 24
+        avatarSize: 24,
+        linkify: true,
+        tooltip: true,
       }),
       m('.activity-count', activityCount)
     ]);
@@ -36,7 +38,8 @@ export const MostActiveThread: m.Component<{ thread: OffchainThread }> = {
         }, thread.title),
       ]),
       m(User, {
-        user: new AddressInfo(null, thread.author, thread.authorChain, null)
+        user: new AddressInfo(null, thread.author, thread.authorChain, null),
+        linkify: true,
       })
     ]);
   }
