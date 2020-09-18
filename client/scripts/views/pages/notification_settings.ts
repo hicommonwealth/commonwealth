@@ -1,4 +1,4 @@
-import 'pages/notification_subscriptions.scss';
+import 'pages/notification_settings.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -36,7 +36,7 @@ const NEW_COMMENTS_LABEL_PREFIX = 'New comments on ';
 const NEW_REACTIONS_LABEL_PREFIX = 'New reactions on ';
 
 // right column - for selecting the notification frequency
-const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (immediately by email)';
+const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (alert me immediately)';
 const NOTIFICATION_ON_OPTION = 'On';
 const NOTIFICATION_ON_SOMETIMES_OPTION = '--';
 const NOTIFICATION_OFF_OPTION = 'Off';
@@ -47,35 +47,47 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
     if (vnode.state.interval === undefined) vnode.state.interval = app.user.emailInterval;
 
     return m('.EmailIntervalConfiguration', [
-      m('h4', 'Receive digest emails'),
-      m(RadioGroup, {
-        options: ['daily', 'weekly', 'never'],
-        name: 'interval',
-        onchange: (e) => {
-          vnode.state.saving = true;
-          const value = (e.target as HTMLInputElement).value;
+      m('.email-interval-configuration-left', [
+        m('h4', 'Receive notification emails'),
+        m(RadioGroup, {
+          options: ['daily', 'never'],
+          name: 'interval',
+          onchange: (e) => {
+            vnode.state.saving = true;
+            const value = (e.target as HTMLInputElement).value;
 
-          $.post(`${app.serverUrl()}/writeUserSetting`, {
-            jwt: app.user.jwt,
-            key: 'updateEmailInterval',
-            value,
-          }).then((result) => {
-            vnode.state.saving = false;
-            vnode.state.interval = value;
-            app.user.setEmailInterval(value);
-            m.redraw();
-          }).catch((err) => {
-            vnode.state.saving = false;
-            m.redraw();
-          });
-        },
-        value: vnode.state.interval,
-      }),
-      vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
-      !app.user.emailVerified && m('p', [
-        link('a', `/${app.activeId()}/settings`, 'Verify your email'),
-        ' to start receiving digests.'
+            $.post(`${app.serverUrl()}/writeUserSetting`, {
+              jwt: app.user.jwt,
+              key: 'updateEmailInterval',
+              value,
+            }).then((result) => {
+              vnode.state.saving = false;
+              vnode.state.interval = value;
+              app.user.setEmailInterval(value);
+              m.redraw();
+            }).catch((err) => {
+              vnode.state.saving = false;
+              m.redraw();
+            });
+          },
+          value: vnode.state.interval,
+        }),
+        !app.user.email
+          ? m('p', [
+            link('a', `/${app.activeId()}/settings`, 'Set an email'),
+            ' to start receiving notification digests.'
+          ])
+          : !app.user.emailVerified ? m('p', [
+            'Your email has not been verified. ',
+            link('a', `/${app.activeId()}/settings`, 'Finish verification'),
+            ' to continue receiving notification emails.'
+          ]) : '',
+        vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
       ]),
+      // m('.email-interval-configuration-right', [
+      //   m('h4', 'Immediate emails'),
+      //   'You will also be notified immediately when there is activity on:'
+      // ]),
     ]);
   }
 };
@@ -184,7 +196,7 @@ const BatchedSubscriptionRow: m.Component<{
               selected: (vnode.state.option === option),
             });
           },
-          items: [NOTIFICATION_OFF_OPTION, NOTIFICATION_ON_OPTION, NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION],
+          items: [NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION, NOTIFICATION_ON_OPTION, NOTIFICATION_OFF_OPTION],
           trigger: m(Button, {
             align: 'left',
             compact: true,
@@ -369,7 +381,7 @@ const ChainEventSubscriptionRow: m.Component<{
               selected: (vnode.state.option === option),
             });
           },
-          items: [NOTIFICATION_OFF_OPTION, NOTIFICATION_ON_OPTION, NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION],
+          items: [NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION, NOTIFICATION_ON_OPTION, NOTIFICATION_OFF_OPTION],
           trigger: m(Button, {
             align: 'left',
             compact: true,

@@ -10,7 +10,7 @@ import {
   WebsocketMessageType, IWebsocketsPayload,
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData
 } from '../../shared/types';
-import { createNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
+import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
@@ -18,12 +18,10 @@ import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
-const sgMail = require('@sendgrid/mail');
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
-sgMail.setApiKey(SENDGRID_API_KEY);
 
 export interface SubscriptionAttributes {
   id?: number;
@@ -154,13 +152,10 @@ export default (
     if (!notification_data) return [];
     let msg;
     if (isChainEventData(notification_data)) {
-    //   const chainId = (notification_data as IChainEventNotificationData).chainEvent.type.chain;
-    //   const chain = await models.Chain.findOne({ where: { id: chainId }, });
-    //   msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id, chain.name);
-      msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id);
+      msg = createImmediateNotificationEmailObject((notification_data as IChainEventNotificationData), category_id);
       log.info('is chain event!');
     } else {
-      msg = createNotificationEmailObject((notification_data as IPostNotificationData), category_id);
+      msg = createImmediateNotificationEmailObject((notification_data as IPostNotificationData), category_id);
     }
     const notifications: any[] = await Promise.all(subscribers.map(async (subscription) => {
       const notificationObj: any = {

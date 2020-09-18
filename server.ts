@@ -31,7 +31,7 @@ import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
-import { sendNotificationEmailDigest } from './server/scripts/emails';
+import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
@@ -44,18 +44,29 @@ require('express-async-errors');
 
 const DEV = process.env.NODE_ENV !== 'production';
 
+// CLI parameters for which task to run
 const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS;
 const SHOULD_RESET_DB = process.env.RESET_DB === 'true';
 const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
 const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
 const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
 
-const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
+const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true'
+  || SHOULD_SEND_EMAILS
+  || SHOULD_RESET_DB
+  || SHOULD_UPDATE_EVENTS
+  || SHOULD_UPDATE_BALANCES
+  || SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS;
+
+// CLI parameters used to configure specific tasks
 const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
 const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
 const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
 const NO_EVENTS = process.env.NO_EVENTS === 'true';
 const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
+
+const WITH_PRERENDER = process.env.WITH_PRERENDER;
+const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
 const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -63,6 +74,8 @@ const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
   captureUncaught: true,
   captureUnhandledRejections: true,
 });
+
+console.log(+new Date());
 
 const app = express();
 const compiler = DEV ? webpack(devWebpackConfig) : webpack(prodWebpackConfig);
@@ -151,10 +164,12 @@ const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
 // On the other hand, run prerender by default on production.
 if (DEV) {
-  if (process.env.WITH_PRERENDER) setupPrerenderServer();
+  if (WITH_PRERENDER) setupPrerenderServer();
 } else {
-  if (!process.env.NO_PRERENDER) setupPrerenderServer();
+  if (!NO_PRERENDER) setupPrerenderServer();
 }
+
+console.log(+new Date());
 
 setupMiddleware();
 setupPassport(models);
@@ -162,9 +177,11 @@ setupAPI(app, models, viewCountCache, identityFetchCache);
 setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 setupErrorHandlers(app, rollbar);
 
+console.log(+new Date());
+
 async function main() {
   if (SHOULD_SEND_EMAILS) {
-    await sendNotificationEmailDigest(models, SHOULD_SEND_EMAILS);
+    await sendBatchedNotificationEmails(models);
   } else if (SHOULD_RESET_DB) {
     resetServer(models, closeMiddleware);
   } else if (SHOULD_UPDATE_EVENTS) {

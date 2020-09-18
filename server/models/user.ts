@@ -5,7 +5,7 @@ import { ChainAttributes } from './chain';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { SocialAccountInstance, SocialAccountAttributes } from './social_account';
 
-export type EmailNotificationInterval = 'daily' | 'weekly' | 'monthly' | 'never';
+export type EmailNotificationInterval = 'daily' | 'never';
 
 export interface UserAttributes {
   id?: number;
@@ -51,7 +51,7 @@ export default (
     emailVerified: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     emailNotificationInterval: {
       type: dataTypes.ENUM,
-      values: ['daily', 'weekly', 'monthly', 'never'],
+      values: ['daily', 'never'],
       defaultValue: 'never',
       allowNull: false,
     },

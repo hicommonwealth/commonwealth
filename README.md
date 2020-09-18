@@ -78,8 +78,9 @@ To download and restore the production database, and run migrations:
 ```
 heroku pg:backups:capture -a commonwealthapp
 heroku pg:backups:download -a commonwealthapp
-npx sequelize db:drop   # Reset the database
-npx sequelize db:create # Create a new empty database
+brew services restart postgres     # (If on Mac OS X) Restart the database to close any open connections
+npx sequelize db:drop              # Reset the database
+npx sequelize db:create            # Create a new empty database
 pg_restore --verbose --clean --no-acl --no-owner --if-exists -h localhost -U commonwealth -d commonwealth latest.dump
 npx sequelize db:migrate
 ```
@@ -151,22 +152,22 @@ brew cask install now
 brew tap heroku/brew && brew install heroku
 ```
 
-To set up a server environment:
+To set up the production server environment:
 
 ```
 heroku git:remote --app <PRODUCTION_APP>
 heroku config:set [Set up session secrets, API keys, OAuth tokens, etc.]
-heroku addons:create timber-logging  # Set up a logging service
-heroku features:enable preboot       # Set up preboot (note: this may allow different app versions to be running concurrently)
+heroku addons:create timber-logging       # Set up a logging service
+heroku features:enable preboot            # Set up preboot (old deploys will not shut down until the new deploys are receiving requests)
+heroku addons:create scheduler:standard   # Set up schedule
 yarn deploy
 ```
 
 You should now set up any databases and services needed. In particular:
 
-- Heroku Postgres for databases
-- Scheduler for sending emails
-- Timber.io for logging
-
+- Schedule a daily task for sending notification email digests:
+  `SEND_EMAILS=true ts-node --project tsconfig.node.json server.ts`
+  at 1pm UTC / 6am PT / 9am ET / 3pm CEST
 
 ## Chat Server
 
