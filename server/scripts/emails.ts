@@ -20,20 +20,21 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 export const createImmediateNotificationEmailObject = (
   notification_data: IPostNotificationData | IChainEventNotificationData, category_id, chain_name?
 ) => {
-  let label: IEventLabel;
+  let chainEventLabel: IEventLabel;
   const chainId = (notification_data as IChainEventNotificationData).chainEventType?.chain;
 
-  // enrich chain event notifications with additional label
+  // enrich chain event notifications, using labeler from @commonwealth/chain-events
+  // all other notifications just use the thread title
   if ((notification_data as IChainEventNotificationData).chainEvent !== undefined) {
     const { blockNumber } = (notification_data as IChainEventNotificationData).chainEvent;
     if (SubstrateTypes.EventChains.includes(chainId) && chainId !== 'polkadot') {
-      label = SubstrateEvents.Label(
+      chainEventLabel = SubstrateEvents.Label(
         blockNumber,
         chainId,
         (notification_data as IChainEventNotificationData).chainEvent.event_data as IChainEventData
       );
     // } else if (MolochTypes.EventChains.includes(chainId)) {
-    //   label = MolochEvents.Label(
+    //   chainEventLabel = MolochEvents.Label(
     //     blockNumber,
     //     chainId,
     //     (notification_data as IChainEventNotificationData).chainEvent.event_data,
@@ -44,7 +45,7 @@ export const createImmediateNotificationEmailObject = (
   const { created_at, root_id, root_title, root_type, comment_id, comment_text,
     chain_id, community_id, author_address, author_chain } = (notification_data as IPostNotificationData);
   const decodedTitle = decodeURIComponent(root_title).trim();
-  const subjectLine = (label?.heading)
+  const subjectLine = (chainEventLabel?.heading)
     || ((category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
       : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
         : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
@@ -60,8 +61,8 @@ export const createImmediateNotificationEmailObject = (
     community: community_id,
   };
   const proposalUrlArgs = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = label?.linkUrl ? `${SERVER_URL}${label.linkUrl}`
-    : label ? `${SERVER_URL}/${chainId}`
+  const path = chainEventLabel?.linkUrl ? `${SERVER_URL}${chainEventLabel.linkUrl}`
+    : chainEventLabel ? `${SERVER_URL}/${chainId}`
       : (getProposalUrl as any)(...proposalUrlArgs);
 
   // construct email
@@ -74,8 +75,8 @@ export const createImmediateNotificationEmailObject = (
     dynamic_template_data: {
       notification: {
         subject: subjectLine,
-        title: label?.heading || subjectLine,
-        body: label?.label || subjectLine,
+        title: chainEventLabel?.heading || subjectLine,
+        body: chainEventLabel?.label || subjectLine,
         path,
       }
     },
@@ -133,6 +134,7 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
   emailObject.bcc = 'raymond@commonwealth.im';
 
   try {
+    console.log('sending immediate notification email');
     await sgMail.send(emailObject);
   } catch (e) {
     log.error(e);
@@ -160,6 +162,7 @@ export const sendBatchedNotificationEmails = async (models) => {
     emailObject.to = 'raymond@commonwealth.im';
     emailObject.bcc = 'raymond@commonwealth.im';
     try {
+      console.log('sending batch notification email');
       await sgMail.send(emailObject);
     } catch (e) {
       log.error(e);

@@ -80,7 +80,6 @@ export default (
       chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
     }, {
       underscored: true,
-      paranoid: true,
       indexes: [
         { fields: ['subscriber_id'] },
         { fields: ['category_id', 'object_id', 'is_active'] },
@@ -149,31 +148,28 @@ export default (
 
     const subscribers = await models.Subscription.findAll({ where: findOptions });
     // create notifications (data should always exist, but we check anyway)
-    if (!notification_data) return [];
-    let msg;
-    if (isChainEventData(notification_data)) {
-      msg = createImmediateNotificationEmailObject((notification_data as IChainEventNotificationData), category_id);
-      log.info('is chain event!');
-    } else {
-      msg = createImmediateNotificationEmailObject((notification_data as IPostNotificationData), category_id);
+    if (!notification_data) {
+      log.info('Subscription is missing notification data, will not trigger send emails or webhooks');
+      return [];
     }
-    const notifications: any[] = await Promise.all(subscribers.map(async (subscription) => {
-      const notificationObj: any = {
-        subscription_id: subscription.id,
-      };
-      if (isChainEventData(notification_data)) {
-        notificationObj.notification_data = '';
-        notificationObj.chain_event_id = notification_data.chainEvent.id;
-      } else {
-        notificationObj.notification_data = JSON.stringify(notification_data);
-      }
-      const notification = await models.Notification.create(notificationObj);
 
-      // send immediate email to subscriber if turned on
-      if (subscription.immediate_email) {
-        sendImmediateNotificationEmail(subscription, msg);
-      }
-      return notification;
+    // send emails to relevant recipients
+    const msg = isChainEventData(notification_data)
+      ? createImmediateNotificationEmailObject((notification_data as IChainEventNotificationData), category_id)
+      : createImmediateNotificationEmailObject((notification_data as IPostNotificationData), category_id);
+    const notifications = await Promise.all(subscribers.map(async (subscription) => {
+      const notification = await models.Notification.create(
+        isChainEventData(notification_data)
+          ? {
+            subscription_id: subscription.id,
+            notification_data: '',
+            chain_event_id: notification_data.chainEvent.id
+          } : {
+            subscription_id: subscription.id,
+            notification_data: JSON.stringify(notification_data)
+          }
+      );
+      if (subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
     }));
 
     // send data to relevant webhooks
