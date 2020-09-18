@@ -538,13 +538,13 @@ const AllCommunitiesNotifications: m.Component<{
         && !s.OffchainComment;
     }), 'objectId');
     return [
-      mentionsSubscription && m(BatchedSubscriptionRow, {
-        subscriptions: [mentionsSubscription],
-        label: NEW_MENTIONS_LABEL,
-      }),
       m(BatchedSubscriptionRow, {
         subscriptions: subscriptions.filter((s) => communityIds.includes(s.objectId)),
         label: NEW_THREADS_LABEL,
+      }),
+      mentionsSubscription && m(BatchedSubscriptionRow, {
+        subscriptions: [mentionsSubscription],
+        label: NEW_MENTIONS_LABEL,
       }),
       batchedSubscriptions.length > 0 && m('tr.NewActivityRow', [
         m('td', NEW_ACTIVITY_LABEL),

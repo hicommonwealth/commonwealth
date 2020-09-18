@@ -57,7 +57,7 @@
                 padding: 0 12px;
                 .cui-icon {
                     position: relative;
-                    top: 0;
+                    top: -2px;
                 }
             }
             .cui-button.mobile-sidebar-trigger {
@@ -73,8 +73,9 @@
             }
             .LoginSelector {
                 // responsive logged-in state
-                .NotificationsMenuButton {
-                    margin-left: 7px;
+                .User {
+                    position: relative;
+                    top: -1px;
                 }
                 .user-avatar {
                     margin-right: 0;
