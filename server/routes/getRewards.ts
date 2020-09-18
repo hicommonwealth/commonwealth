@@ -96,7 +96,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
       });
 
       if(stash){
-        validators = {stash_id:validators[stash]}
+        validators = { stash_id:validators[stash] }
       }
   }
   else if(chain == 'kusama' || (chain === 'edgeware' && version == 38)){
