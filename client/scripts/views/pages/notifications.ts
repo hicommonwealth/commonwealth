@@ -1,4 +1,4 @@
-import 'pages/notification_settings.scss';
+import 'pages/notifications.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -557,7 +557,7 @@ const AllCommunitiesNotifications: m.Component<{
   },
 };
 
-const NotificationSettingsPage: m.Component<{}, {
+const NotificationsPage: m.Component<{}, {
   communities: CommunityInfo[];
   subscriptions: NotificationSubscription[];
   selectedCommunity: CommunityInfo | ChainInfo;
@@ -621,7 +621,7 @@ const NotificationSettingsPage: m.Component<{}, {
     if (subscriptions.length < 1) return m(PageLoading);
 
     return m(Sublayout, {
-      class: 'NotificationSettingsPage',
+      class: 'NotificationsPage',
       title: 'Notification Settings',
     }, [
       m('.forum-container', [
@@ -687,4 +687,4 @@ const NotificationSettingsPage: m.Component<{}, {
   },
 };
 
-export default NotificationSettingsPage;
+export default NotificationsPage;
