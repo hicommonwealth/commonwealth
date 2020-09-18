@@ -1,5 +1,4 @@
 /* eslint-disable guard-for-in */
-// import Sequelize from 'sequelize';
 import BN from 'bn.js';
 // import _ from 'lodash';
 import moment from 'moment';
@@ -7,7 +6,7 @@ import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import { Errors } from './getOffences';
 const Sequelize = require('sequelize');
-import {sequelize} from './../database'
+import { sequelize } from './../database'
 
 
 
@@ -21,7 +20,7 @@ interface IEventData {
 }
 
 const getRewards = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { chain, stash_id } = req.query;
+  const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
   let { version } = req.query;
   
@@ -32,8 +31,8 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
 
   if (!chain) { return next(new Error(Errors.ChainIdNotFound)); }
 
-   //set default values 
-  if (!version) { version = 33; }
+   //set default version value for edgeware chain 
+  if (chain == 'edgeware' && !version) { version = 31; }
 
   if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
     endDate = new Date();
@@ -48,7 +47,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
 
 
   // if we are using old version of chain
-  if (chain == 'edgeware' && version < 34){
+  if (chain == 'edgeware' && version == 31){
 
     // there is no validator identifier in reward event in chain-event for old version,
     // get the sessions and rewards over specified time from chain-event and 
@@ -71,15 +70,17 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
       ) reward
         ON reward.rn = newSession.rn`
       
-      if (stash_id){
-        rawQuery += ` where newSession.session_event_data -> 'data' ->> 'active' LIKE '%${stash_id}%'`;
+      if (stash){
+        rawQuery += ` where newSession.session_event_data -> 'data' ->> 'active' LIKE '%${stash}%'`;
       }
 
       session_rewards = await sequelize.query(rawQuery, {});
       session_rewards = session_rewards[0] //fetch the results
       
       // if no session/reward found 
-      if (session_rewards.length == 0) { return res.json({ status: 'Success', result: { validators: validators || [] } }); }
+      if (session_rewards.length == 0) { 
+        return res.json({ status: 'Success', result: { validators: validators || [] } }); 
+      }
 
 
       session_rewards.forEach((s_r) => {
@@ -94,11 +95,11 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
         });
       });
 
-      if(stash_id){
-        validators = {stash_id:validators[stash_id]}
+      if(stash){
+        validators = {stash_id:validators[stash]}
       }
   }
-  else if(chain == 'kusama' || (chain === 'edgeware' && version >= 34)){
+  else if(chain == 'kusama' || (chain === 'edgeware' && version == 38)){
     // if using kusama chain or new version of edgeware
 
     // basic query to fetch rewards from chain-event
@@ -111,8 +112,8 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     include: [ { model: models.ChainEventType } ]
     };
   
-    if(stash_id) {
-      let qry = { [Op.and]: Sequelize.literal(`event_data->>'validator'='${stash_id}'`) };
+    if(stash) {
+      let qry = { [Op.and]: Sequelize.literal(`event_data->>'validator'='${stash}'`) };
       reward_query['where'] = Object.assign(reward_query['where'],qry);
     }
     // get rewards for the user(s)
