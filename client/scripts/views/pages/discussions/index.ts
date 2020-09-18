@@ -1,3 +1,4 @@
+import { MostActiveUser } from './sidebar';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
 /* eslint-disable no-unused-expressions */
@@ -11,7 +12,7 @@ import moment from 'moment-twitter';
 import app from 'state';
 
 import { Spinner } from 'construct-ui';
-import { pluralize } from 'helpers';
+import { pluralize, slugify } from 'helpers';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -42,18 +43,31 @@ const ListingSidebar: m.Component<{ entity: string }> = {
     const activeMembers = Object.values(activeAddresses).length
       ? Object.values(activeAddresses).sort((a, b) => {
         return b['postCount'] - a['postCount'];
-      }).map((member) => {
-        return m(User, {
-          user: member.addressInfo,
-          avatarSize: 24
-        });
       }).slice(0, 5)
       : [];
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
-      m('', 'Active members'),
-      m('.active-members', activeMembers),
-      m('', 'Active threads'),
-      m('.active-threads', activeThreads.map((t) => t.title))
+      m('.user-activity', [
+        m('.user-activity-header', 'Active members'),
+        m('.active-members', activeMembers.map((user) => {
+          return m(MostActiveUser, {
+            user: user.addressInfo,
+            activityCount: user.postCount
+          });
+        })),
+      ]),
+      m('.forum-activity', [
+        m('.forum-activity-header', 'Active threads'),
+        m('.active-threads', activeThreads.map((t) => {
+          return m('a.active-thread', {
+            href: '#',
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeId()}/proposal/${t.slug}/${t.identifier}-`
+                + `${slugify(t.title)}`);
+            }
+          }, t.title);
+        }))
+      ])
     ]);
   }
 };

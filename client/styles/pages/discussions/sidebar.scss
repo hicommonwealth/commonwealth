@@ -1,0 +1,30 @@
+@import 'client/styles/shared';
+
+.ListingSidebar {
+    margin: 0 15px;
+    .user-activity {
+        margin-bottom: 20px;
+        .user-activity-header {
+            color: $text-color-light;
+            font-weight: 500;
+            font-size: 15px;
+            padding: 3px 0 6px;
+        }
+        .MostActiveUser {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            .username, .activity-count {
+                font-weight: 500;
+            }
+        }
+    }
+    .forum-activity {
+        .forum-activity-header {
+            color: $text-color-light;
+            font-weight: 500;
+            font-size: 15px;
+            padding: 3px 0 6px;
+        }
+    }
+}
