@@ -211,7 +211,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
       justify: 'center'
     }, [
       m(Col, { span: 12 }, m('.content',
-        m('.nominee-stash',
+        m('.nominee-stash.new-row',
           m('h5', 'stash account'),
           m(SelectList, {
             emptyContent: 'No accounts available',
@@ -231,7 +231,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
               style: 'min-width: 100%'
             })
           })),
-        m('.nominee-controller.padding-t-10',
+        m('.nominee-controller.padding-t-10.new-row',
           m('h5', 'controller account', m(Tooltip, {
             content: `The controller is the account that will be used to control any nominating or validating actions. 
             Should not match another stash or controller.`,
@@ -264,7 +264,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
             controller: ctlModel.selectedItem,
             onError: errors.onController
           }),
-        m('div.padding-t-10',
+        m('div.padding-t-10.new-row',
           m('h5', 'Bond Value', m(Tooltip, {
             content: `The total amount of the stash balance that will be at stake in any 
             forthcoming rounds (should be less than the free amount available)`,
@@ -303,12 +303,12 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
             onError: errors.onBalance
           }),
         stashModel.selectedItem
-          && m('div.padding-t-10.center-lg',
+          && m('div.padding-t-10.center-lg.new-row',
             m('h5', 'Balance'),
             m(FormatBalance, {
               controller: stashModel.selectedItem
             })),
-        m('div.padding-t-10',
+        m('div.padding-t-10.new-row',
           m('h5', 'Payment Destination', m(Tooltip, {
             content: `The destination account for any payments as either 
             a nominator or validator`,

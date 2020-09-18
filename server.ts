@@ -173,6 +173,9 @@ async function main() {
     log.info('Finished adding Lockdrop statistics into the DB');
     process.exit(0);
   } else {
+    setTimeout(() => {
+      setupServer(app, wss, sessionParser);
+    }, 10);
     if (NO_EVENTS) {
       setupServer(app, wss, sessionParser);
     } else {
@@ -215,10 +218,11 @@ async function main() {
         process.exit(exitCode);
       }
 
-      setupServer(app, wss, sessionParser);
+      // setupServer(app, wss, sessionParser);
     }
   }
 }
 
 main();
 export default app;
+
