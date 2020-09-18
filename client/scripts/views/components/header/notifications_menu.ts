@@ -18,7 +18,7 @@ const NotificationButtons: m.Component = {
       basic: true,
     }, [
       m(Button, {
-        label: 'Mark all as read',
+        label: 'Mark all read',
         onclick: (e) => {
           e.preventDefault();
           if (notifications.length < 1) return;
@@ -26,8 +26,10 @@ const NotificationButtons: m.Component = {
         },
       }),
       m(Button, {
-        label: 'See all',
-        onclick: (e) => m.route.set('/notifications'),
+        label: 'Configure notifications',
+        onclick: () => (app.activeChainId() || app.activeCommunityId())
+          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationSettings`)
+          : m.route.set('/notificationSettings'),
       }),
     ]);
   }
