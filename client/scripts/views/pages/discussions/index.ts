@@ -1,4 +1,4 @@
-import { MostActiveUser } from './sidebar';
+import { MostActiveThread, MostActiveUser } from './sidebar';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
 /* eslint-disable no-unused-expressions */
@@ -57,15 +57,8 @@ const ListingSidebar: m.Component<{ entity: string }> = {
       ]),
       m('.forum-activity', [
         m('.forum-activity-header', 'Active threads'),
-        m('.active-threads', activeThreads.map((t) => {
-          return m('a.active-thread', {
-            href: '#',
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeId()}/proposal/${t.slug}/${t.identifier}-`
-                + `${slugify(t.title)}`);
-            }
-          }, t.title);
+        m('.active-threads', activeThreads.map((thread) => {
+          return m(MostActiveThread, { thread });
         }))
       ])
     ]);

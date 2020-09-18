@@ -26,5 +26,15 @@
             font-size: 15px;
             padding: 3px 0 6px;
         }
+        .active-threads {
+            color: black;
+            font-weight: 500;
+            .MostActiveThread {
+                margin: 10px 0;
+                a {
+                    color: inherit;
+                }
+            }
+        }
     }
 }
