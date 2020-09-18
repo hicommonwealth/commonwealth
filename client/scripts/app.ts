@@ -414,6 +414,7 @@ $(() => {
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
+    '/:scope/stakingCalculator': importRoute('views/pages/staking_calculator/staking_calculator', { scoped: true }),
 
     '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
     '/:scope/account':           redirectRoute((attrs) => {

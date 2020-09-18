@@ -1,0 +1,382 @@
+@import 'client/styles/shared';
+
+
+// Range Slider Check
+
+/* Special styling for WebKit/Blink */
+#stake_rate-range-selector:focus {
+    border: none !important;
+}
+
+input[type=range] {
+    -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+    width: 100%; /* Specific width is required for Firefox. */
+    border: none;
+    overflow: hidden;
+}
+input[type=range]::-webkit-slider-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50% !important;
+    border: 1px solid #C7CDD1;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+    -webkit-appearance: none;
+    margin-top: -10px;
+    background-color: #FFF;
+    &:focus{
+        border: none;
+        box-shadow: none;
+    }
+}
+
+input[type=range]::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+    background-color: #FFF;
+    border-radius: 50% !important;
+    border: 1px solid #C7CDD1;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+    -webkit-appearance: none;
+    &:focus{
+        border: none;
+        box-shadow: none;
+    }
+}
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    box-shadow: none;
+    background: #999999;
+}
+
+input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    box-shadow: none;
+    background: #DFE8EE;
+
+}
+
+input[type="range"]::-moz-range-progress {
+    background-color: #999999; 
+}
+
+  
+// Page Styling
+
+.staking-heading{
+    margin-bottom: 14px;
+}
+
+.staking-heading h4{
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 21px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+    margin-bottom: 10px;
+}
+
+.staking_calc_wrpr {
+    background: #FFFFFF;
+    border: 1px solid rgba(231, 231, 231, 0.5);
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
+    border-radius: 3px;
+    width: 100%;
+    margin: 30px 0px 30px 0px;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding-left: 42px;
+    padding-right: 24px;
+}
+
+.select-asset {
+    width: 150px;
+    margin-right: 24px;
+}
+.select-asset-switch{
+    width: 100px;
+}
+.select-asset-edg{
+    width: 130px;
+}
+.select-asset span.thead{
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 10px;
+    line-height: 150%;
+    letter-spacing: -0.2px;
+    color: #999999;
+    padding-bottom: 16px;
+}
+
+.select-asset-edg div{
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 21px;
+    line-height: 120%;
+    align-items: center;
+    letter-spacing: -0.2px;
+    color: #000000;
+}
+
+.select-asset-switch label{
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #999999;
+}
+
+.cui-tag {
+    line-height: 1.2;
+    font-size: 16.8px;
+    padding: 2px 10px;
+    margin-right: 10px;
+    background: #fff;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #999999;
+}
+
+.cui-input input, .cui-input textarea{
+    line-height: 1.2;
+    font-size: 16.8px;
+    padding: 2px 10px;
+    margin-right: 10px;
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #999999 !important;
+}
+.compact-dropdown{
+    background: linear-gradient(180deg, #FEFFFF 0%, #F6FAFB 100%);
+    border: 1px solid #DEDFE1;
+    box-sizing: border-box;
+    border-radius: 4px;
+   
+}
+.compact-dropdown{
+    padding-left: 5px !important;
+    padding-right: 0 !important;
+}
+
+.dropdown-box{
+    padding-left: 10px;
+    padding-right: 10px;
+    border-left: 1px solid #DEDFE1;
+}
+
+.asset-button-label{
+    display: inline-block;
+    padding-left: 7px;
+    padding-right: 9px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+}
+.select-asset-edg span.thead{
+    display: inline-block;
+    padding-bottom: 19px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 10px;
+    line-height: 150%;
+    letter-spacing: -0.2px;
+    color: #999999;
+}
+span.thead_switch{
+    display: inline-block;
+    padding-bottom: 23px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 10px;
+    line-height: 150%;
+    letter-spacing: -0.2px;
+    color: #999999;
+}
+.select-asset-switch label{
+    padding-top: 2px;
+}
+
+.title_div {
+    padding-bottom: 40px;
+}
+span#rate-val{
+    color: #000 !important;
+}
+
+// Second Component
+
+.staking_calc_wrpr_2{
+    padding: 24px 32px;
+    background: #FFFFFF;
+    border: 1px solid rgba(231, 231, 231, 0.5);
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
+    border-radius: 3px;
+    margin-bottom: 30px;
+}
+
+
+.titlewithnumber_div {
+    /* margin: 0 0px 0 10px; */
+    text-align: center;
+    width: 150px;
+}
+
+.titlewithnumber_div span {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 10px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #999999;
+    display: block;
+}
+
+.titlewithnumber_div label{
+    display: inline-block;
+    padding-top: 8px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 21px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+}
+span.column-below{
+    display: block;
+    padding-top: 8px;
+}
+.titlewithnumber_div .bracket{
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+    padding-top: 0;
+}
+
+//  third component
+.staking_calc_wrpr_3{
+    background: #FFFFFF;
+    border: 1px solid rgba(231, 231, 231, 0.5);
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
+    border-radius: 3px;
+    padding: 24px 32px;
+}
+
+.title-row,.content-row,.button-row{
+    width: 100%;
+}
+
+.button-row{
+    text-align: center;
+    padding-bottom: 32px;
+}
+
+.title-div h5{
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 21px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+    margin-bottom: 24px;
+}
+
+.content-row{
+    padding-bottom: 24px;
+}
+
+.returns_content_div {
+    text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.returns_content_div.borderleft_right {
+    border-left: #DDD solid 1px;
+    border-right: #DDD solid 1px;
+}
+
+.returns_content_div p {
+    margin: 16px 0;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 21px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+}
+
+.returns_content_div span {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+}
+
+.returns_content_div strong {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+}
+
+.asset-list-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.select-list-button-image {
+    width: 16px;
+    height: 16px;
+}
+
+
+
+.select-list-button {
+    float: left;
+}
