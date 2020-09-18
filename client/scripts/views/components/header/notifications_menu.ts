@@ -28,8 +28,8 @@ const NotificationButtons: m.Component = {
       m(Button, {
         label: 'Configure notifications',
         onclick: () => (app.activeChainId() || app.activeCommunityId())
-          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationSettings`)
-          : m.route.set('/notificationSettings'),
+          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
+          : m.route.set('/notifications'),
       }),
     ]);
   }
