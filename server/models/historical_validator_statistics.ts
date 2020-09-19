@@ -16,6 +16,9 @@ export interface HistoricalValidatorStatisticsAttributes {
   toBeElected: boolean,
   name: string,
   eventType?: string;
+  rewardsStats: object;
+  slashesStats: object;
+  offencesStats: object;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -47,6 +50,9 @@ export default (
     isElected: { type: dataTypes.BOOLEAN, allowNull: false },
     toBeElected: { type: dataTypes.BOOLEAN, allowNull: false },
     eventType: { type: dataTypes.STRING, allowNull: false },
+    rewardsStats: { type: dataTypes.JSONB, allowNull: false },
+    slashesStats: { type: dataTypes.JSONB, allowNull: false },
+    offencesStats: { type: dataTypes.JSONB, allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
