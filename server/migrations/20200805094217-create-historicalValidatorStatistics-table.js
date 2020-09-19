@@ -17,9 +17,9 @@ module.exports = {
       toBeElected: { type: DataTypes.BOOLEAN, allowNull: false },
       eraPoints: { type: DataTypes.INTEGER, allowNull: false },
       eventType: { type: DataTypes.STRING, allowNull: false },
-      rewardsStats: { type: dataTypes.JSONB, allowNull: false },
-      slashesStats: { type: dataTypes.JSONB, allowNull: false },
-      offencesStats: { type: dataTypes.JSONB, allowNull: false },  
+      rewardsStats: { type: DataTypes.JSONB, allowNull: false },
+      slashesStats: { type: DataTypes.JSONB, allowNull: false },
+      offencesStats: { type: DataTypes.JSONB, allowNull: false },  
       created_at: { type: DataTypes.DATE, allowNull: false },
       updated_at: { type: DataTypes.DATE, allowNull: false },
     }, {
