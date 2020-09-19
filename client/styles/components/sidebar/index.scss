@@ -111,6 +111,8 @@
 .Sidebar {
     z-index: 2;
     @include sm-max {
+        max-height: calc(100vh - 60px); // $mobile-sidebar-height
+        overflow-y: scroll;
         .SidebarHeader {
             display: none;
         }
@@ -256,6 +258,10 @@
         width: calc(100% - 34px);
         max-width: calc(100% - 34px);
         height: 72px;
+        @include sm-max {
+            position: relative;
+            bottom: initial;
+        }
 
         // background
         background: $background-color-light-hover;
