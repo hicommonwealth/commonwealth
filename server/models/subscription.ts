@@ -153,10 +153,16 @@ export default (
       return [];
     }
 
-    // send emails to relevant recipients
-    const msg = isChainEventData(notification_data)
-      ? createImmediateNotificationEmailObject((notification_data as IChainEventNotificationData), category_id)
-      : createImmediateNotificationEmailObject((notification_data as IPostNotificationData), category_id);
+    let msg;
+    try {
+      msg = isChainEventData(notification_data)
+        ? await createImmediateNotificationEmailObject((notification_data as IChainEventNotificationData), category_id, models)
+        : await createImmediateNotificationEmailObject((notification_data as IPostNotificationData), category_id, models);
+    } catch (e) {
+      console.log('Error generating immediate notification email!');
+      console.trace(e);
+    }
+
     const notifications = await Promise.all(subscribers.map(async (subscription) => {
       const notification = await models.Notification.create(
         isChainEventData(notification_data)
@@ -169,7 +175,7 @@ export default (
             notification_data: JSON.stringify(notification_data)
           }
       );
-      if (subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
+      if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
     }));
 
     // send data to relevant webhooks
