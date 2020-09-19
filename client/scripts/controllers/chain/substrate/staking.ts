@@ -41,6 +41,13 @@ export interface ICommissionInfo {
   [key: string]: number | string
 }
 
+export interface GroupValidator {
+  name: string,
+  stashes: string[],
+  id: number,
+  chain?: string
+}
+
 export interface IAccountInfo extends DeriveAccountRegistration{
   name: string;
   isBad: boolean;
@@ -235,6 +242,11 @@ class SubstrateStaking implements StorageModule {
   }
   public get validatorCount(): Observable<SessionIndex> {
     return this._Chain.query((api: ApiRx) => api.query.staking.validatorCount());
+  }
+  public get getValidatorGroups(): Observable<GroupValidator[]> {
+    return this._Chain.query(
+      (api: ApiRx) => from(this._app.chainEvents.getValidatorGroups({}))
+    ).pipe(map((validators: GroupValidator[]) => validators));
   }
   // TODO update this function with database call, when database api is integrated.
   public get validatorsAddress(): Observable<string[]> {

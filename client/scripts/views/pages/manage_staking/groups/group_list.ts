@@ -4,12 +4,12 @@ import { makeDynamicComponent } from 'models/mithril';
 import { ChainBase } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import { IValidators } from 'controllers/chain/substrate/account';
-import { ICommissionInfo } from 'controllers/chain/substrate/staking';
-import { from } from 'rxjs';
+import { ICommissionInfo, GroupValidator } from 'controllers/chain/substrate/staking';
 import Spinner from 'views/pages/spinner';
 import BN from 'bn.js';
-import { Tooltip, Grid, Col, CustomSelect, ListItem, Icon, Icons, IOption } from 'construct-ui';
+import { Tooltip, Grid, Col, CustomSelect, Icon, Icons } from 'construct-ui';
 import User from 'views/components/widgets/user';
+
 import Identity from '../../validators/substrate/identity';
 
 const options = [
@@ -17,23 +17,14 @@ const options = [
     label: 'Options',
     value: '1',
     disabled: true
-  },
-  // {
-  //   label: 'Delete',
-  //   value: '2'
-  // }
+  }
 ];
 
 export interface IStakeListState {
   dynamic: {
     validators: IValidators;
     apr: ICommissionInfo;
-    groups: {
-      name: string,
-      stashes: string[],
-      id: number,
-      chain?: string
-    }[]
+    groups: GroupValidator[]
   }
 }
 
@@ -50,7 +41,7 @@ const StakeList = makeDynamicComponent<StakeListAttrs, IStakeListState>({
       ? (app.chain as Substrate).staking.annualPercentRate
       : null,
     groups:  (app.chain.base === ChainBase.Substrate)
-      ? from((app.chain as Substrate).app.chainEvents.getValidatorGroups({}))
+      ? (app.chain as Substrate).staking.getValidatorGroups
       : null
   }),
   view: (vnode) => {
