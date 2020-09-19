@@ -648,6 +648,7 @@ const ViewProposalPage: m.Component<{
     return m(Sublayout, {
       class: 'ViewProposalPage',
       rightSidebar: proposal instanceof OffchainThread ? [] : m(ProposalSidebar, { proposal }),
+      showNewProposalButton: true,
     }, [
       m(ProposalHeader, {
         proposal,
