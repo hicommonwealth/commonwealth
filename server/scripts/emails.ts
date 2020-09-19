@@ -128,15 +128,18 @@ const createNotificationDigestEmailObject = async (user, notifications) => {
 
 export const sendImmediateNotificationEmail = async (subscription, emailObject) => {
   const user = await subscription.getUser();
-  if (!emailObject) return;
-  // emailObject.to = (process.env.NODE_ENV === 'development') ? 'raymond@commonwealth.im' : user.email;
-  emailObject.to = 'raymond@commonwealth.im';
-  emailObject.bcc = 'raymond@commonwealth.im';
+  if (!emailObject) {
+    console.log('attempted to send empty immediate notification email');
+    return;
+  }
+  emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
+  emailObject.bcc = 'raymond+bcc@commonwealth.im';
 
   try {
     console.log('sending immediate notification email');
     await sgMail.send(emailObject);
   } catch (e) {
+    console.log('Failed to send immediate notification email', e?.response?.body?.errors);
     log.error(e);
   }
 };
@@ -158,13 +161,13 @@ export const sendBatchedNotificationEmails = async (models) => {
       where: { is_read: false }
     });
     const emailObject = await createNotificationDigestEmailObject(user, notifications);
-    // emailObject.to = (process.env.NODE_ENV === 'development') ? 'raymond@commonwealth.im' : user.email;
-    emailObject.to = 'raymond@commonwealth.im';
-    emailObject.bcc = 'raymond@commonwealth.im';
+    emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
+    emailObject.bcc = 'raymond+bcc@commonwealth.im';
     try {
       console.log('sending batch notification email');
       await sgMail.send(emailObject);
     } catch (e) {
+      console.log('Failed to send batch notification email', e?.response?.body?.errors);
       log.error(e);
     }
   }));

@@ -14,10 +14,8 @@
     @include sm-max {
         .cui-button-label {
             overflow: visible;
-        }
-        .notification-count {
             position: relative;
-            top: -3px;
+            top: -2px !important;
         }
     }
     .cui-icon {
