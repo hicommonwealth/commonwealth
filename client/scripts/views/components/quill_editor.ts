@@ -447,19 +447,28 @@ const instantiateEditor = (
     },
     // Don't boldface, italicize, or underline text when hotkeys are pressed in Markdown mode
     'bold': {
-      key: 'B',
+      key: 'b',
       shortKey: true,
-      handler: (range, context) => !isMarkdownMode()
+      handler: (range, context) => {
+        if (!isMarkdownMode()) quill.format('bold', !context.format.bold, Quill.sources.USER);
+        return false;
+      }
     },
     'italic': {
-      key: 'I',
+      key: 'i',
       shortKey: true,
-      handler: (range, context) => !isMarkdownMode()
+      handler: (range, context) => {
+        if (!isMarkdownMode()) quill.format('italic', !context.format.italic, Quill.sources.USER);
+        return false;
+      }
     },
     'underline': {
-      key: 'U',
+      key: 'u',
       shortKey: true,
-      handler: (range, context) => !isMarkdownMode()
+      handler: (range, context) => {
+        if (!isMarkdownMode()) quill.format('underline', !context.format.underline, Quill.sources.USER);
+        return false;
+      }
     }
   };
 
