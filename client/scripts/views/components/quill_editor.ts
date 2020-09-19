@@ -10,6 +10,7 @@ import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import QuillMention from 'quill-mention';
 
 import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PreviewModal from 'views/modals/preview_modal';
 import { detectURL } from 'views/pages/threads/index';
@@ -540,12 +541,20 @@ const instantiateEditor = (
 
   const imageHandler = async (imageDataUrl, type) => {
     if (!type) type = 'image/png';
+
+    // HACK: remove base64 format image, since an uploaded one will be inserted
+    quill.deleteText(quill.getSelection().index - 1, 1);
+
     const file = dataURLtoFile(imageDataUrl, type);
-    const response = await uploadImg(file);
-    if (typeof response === 'string' && detectURL(response)) {
-      const index = (quill.getSelection() || {}).index || quill.getLength();
-      if (index) quill.insertEmbed(index, 'image', response, 'user');
-    }
+    uploadImg(file).then((response) => {
+      if (typeof response === 'string' && detectURL(response)) {
+        const index = (quill.getSelection() || {}).index || quill.getLength();
+        if (index) quill.insertEmbed(index, 'image', response, 'user');
+      }
+    }).catch((err) => {
+      notifyError('Failed to upload image');
+      console.log(err);
+    });
   };
 
   // const searchRoles = async () => {

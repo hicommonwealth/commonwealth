@@ -43,6 +43,7 @@
     .new-thread-form-body {
         padding-bottom: 24px;
         flex: 9;
+        max-width: calc(100% - 150px);
         .cui-tabs {
             margin-top: 4px;
             margin-bottom: 16px;
