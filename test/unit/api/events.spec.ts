@@ -21,7 +21,7 @@ describe('Event Tests', () => {
     expect(res.body.validators).to.not.be.null;
   });
 
-  it('should grab getOwnStakeOverTime for Edgeware', async () => {
+  xit('should grab getOwnStakeOverTime for Edgeware', async () => {
     const res = await chai.request(app)
       .get('/api/getOwnStakeOverTime')
       .set('Accept', 'application/json')
@@ -30,7 +30,7 @@ describe('Event Tests', () => {
     expect(res.body.validators).to.not.be.null;
   });
 
-  it('should grab getOtherStakeOverTime for Edgeware', async () => {
+  xit('should grab getOtherStakeOverTime for Edgeware', async () => {
     const res = await chai.request(app)
       .get('/api/getOtherStakeOverTime')
       .set('Accept', 'application/json')
@@ -39,7 +39,7 @@ describe('Event Tests', () => {
     expect(res.body.validators).to.not.be.null;
   });
 
-  it('should grab getTotalStakeOverTime for Edgeware', async () => {
+  xit('should grab getTotalStakeOverTime for Edgeware', async () => {
     const res = await chai.request(app)
       .get('/api/getTotalStakeOverTime')
       .set('Accept', 'application/json')
@@ -48,7 +48,7 @@ describe('Event Tests', () => {
     expect(res.body.validators).to.not.be.null;
   });
 
-  it('should grab getNominatorsOverTime for Edgeware', async () => {
+  xit('should grab getNominatorsOverTime for Edgeware', async () => {
     const res = await chai.request(app)
       .get('/api/getNominatorsOverTime')
       .set('Accept', 'application/json')
@@ -66,7 +66,7 @@ describe('Event Tests', () => {
     expect(res.body.slashes).to.not.be.null;
   });
 
-  it('should grab all imonline events for Edgeware', async () => {
+  xit('should grab all imonline events for Edgeware', async () => {
     const res = await chai.request(app)
       .get('/api/getImOnline')
       .set('Accept', 'application/json')
