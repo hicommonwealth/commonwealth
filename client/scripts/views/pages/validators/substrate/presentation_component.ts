@@ -5,7 +5,6 @@ import { get } from 'lodash';
 import Substrate from 'controllers/chain/substrate/main';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
-import { Icon, Icons, Spinner } from 'construct-ui';
 import { Icon, Icons, Spinner, ListItem, Select, InputSelect } from 'construct-ui';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
