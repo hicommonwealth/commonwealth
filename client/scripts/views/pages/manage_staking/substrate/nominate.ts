@@ -5,37 +5,31 @@ import Spinner from 'views/pages/spinner';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
 import { GroupValidator } from 'controllers/chain/substrate/staking';
-import { Col, Grid, ListItem, CustomSelect, Icon, Icons, IOption, Option } from 'construct-ui';
+import { Col, Grid, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
 import User from 'views/components/widgets/user';
-import { pull, pullAll } from 'lodash';
-
-const defaultGroup = { label: 'Groups', value: 0, stashes: [] };
+import { pull, pullAll, cloneDeep } from 'lodash';
 
 interface NominateState { dynamic: {
-  validators: string[],
-  groups: GroupValidator[]
+  validators: string[]
 } }
 
 interface NominateAttrs {
   onChange(selected: string[]): void,
 }
-interface GroupOption extends IOption {
-  stashes : string[]
-}
+
 interface IModel {
-  groupOptions: GroupOption[],
+  groups: GroupValidator[],
   selectedGroup: number,
   isLoading: boolean,
   selected: string[],
   not_selected: string[],
   add(address: string): void,
   remove(address: string): void,
-  onGroupSelect(option: GroupOption): void,
-  groupRender(item: Option, isSelected: boolean, index: number): m.Vnode
+  onGroupSelect(group: GroupValidator): void
 }
 
 const model: IModel = {
-  groupOptions:  [],
+  groups: [],
   selectedGroup: null,
   isLoading: true,
   selected: [],
@@ -48,43 +42,31 @@ const model: IModel = {
     pull(model.selected, address);
     model.not_selected.push(address);
   },
-  onGroupSelect: (option) => {
-    model.selectedGroup = +option.value;
+  onGroupSelect: (group) => {
+    model.selectedGroup = group.id;
+    const stashes = cloneDeep(group.stashes);
+
     model.not_selected = model.not_selected.concat(model.selected);
     model.selected = [];
-    pullAll(model.not_selected, option.stashes);
-    model.selected = option.stashes;
-  },
-  groupRender: (item, isSelected) => {
-    const option : IOption = item as unknown as IOption;
-    return m(ListItem, {
-      contentLeft: isSelected && option.value
-        ? m(Icon, { name: Icons.CHECK_SQUARE })
-        : null,
-      label: (item as IOption).label,
-      disabled: !option.value,
-      selected: isSelected
-    });
+    pullAll(model.not_selected, stashes);
+    model.selected = stashes;
   }
 };
 
 const Nominate = makeDynamicComponent<NominateAttrs, NominateState>({
-  oninit: () => {
+  oninit: async () => {
     model.isLoading = true;
     model.not_selected = [];
     model.selected = [];
     model.selectedGroup = null;
+    model.groups = await (app.chain as Substrate).app.chainEvents.getValidatorGroups({});
   },
   onupdate: (vnode) => {
-    model.groupOptions.push(defaultGroup);
-    const { validators, groups } = vnode.state.dynamic;
+    const { validators } = vnode.state.dynamic;
     if (model.isLoading && validators) {
       model.isLoading = false;
       model.not_selected = validators;
       m.redraw();
-    }
-    if (groups) {
-      model.groupOptions = groups.map((group) => ({ label: group.name, value: group.id, stashes: group.stashes }));
     }
     vnode.attrs.onChange(model.selected);
   },
@@ -92,31 +74,30 @@ const Nominate = makeDynamicComponent<NominateAttrs, NominateState>({
     groupKey: app.chain.class.toString(),
     validators: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.validatorsAddress
-      : null,
-    groups:  (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.getValidatorGroups
       : null
   }),
   view: (vnode) => {
-    const { validators, groups } = vnode.state.dynamic;
+    const { validators } = vnode.state.dynamic;
 
-    if (!validators && !groups)
+    if (!validators || model.isLoading)
       return m(Spinner);
 
     return m('.Nominate', [
       m('div.center-lg',
-        m('h5', 'Groups'),
-        m(CustomSelect, {
-          name: 'validator-groups',
-          triggerAttrs: {
-            align: 'left',
-            style: 'width: 200px'
-          },
-          defaultValue: 0,
-          value: model.selectedGroup,
-          options: model.groupOptions,
-          itemRender: model.groupRender,
-          onSelect: model.onGroupSelect
+        m(PopoverMenu, {
+          closeOnContentClick: true,
+          content: model.groups.map((group) => {
+            return m(MenuItem, {
+              label: group.name,
+              active: group.id === model.selectedGroup,
+              onclick: () => model.onGroupSelect(group)
+            });
+          }),
+          menuAttrs: { size: 'sm' },
+          trigger: m('span.pointer', [
+            m('h5.inline', 'Groups'),
+            m(Icon, { name: Icons.USERS, size: 'sm' })
+          ])
         })),
       m('hr'),
       m(Grid, { gutter: { xs: 0, sm: 10, md: 20, lg: 30, xl: 40 } }, [

@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import app from 'state';
 import { get, post } from 'lib/util';
+import { GroupValidator } from 'controllers/chain/substrate/staking';
 
 class ChainEventsController {
   public constructor() {
@@ -91,7 +92,7 @@ class ChainEventsController {
     });
   }
 
-  public getValidatorGroups(payload) {
+  public getValidatorGroups(payload): Promise<GroupValidator[]> {
     return new Promise((resolve) => {
       return get('/getValidatorGroup', {
         chain: app.chain.id,
