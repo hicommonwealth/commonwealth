@@ -8,10 +8,10 @@ import { SubstrateAccount, IValidators } from 'controllers/chain/substrate/accou
 import { ICommissionInfo } from 'controllers/chain/substrate/staking';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
+import { Icon, Icons, Spinner, TextArea, Select, Button } from 'construct-ui';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
 import CardSummary from './card_summary';
-import { Icon, Icons, Spinner, TextArea, Select, Button } from 'construct-ui';
 interface IPreHeaderState {
   dynamic: {
     sessionInfo: DeriveSessionProgress;
@@ -46,13 +46,13 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       ? (app.chain as Substrate).staking.sessionInfo
       : null
   }),
-  view: vnode => {
-    let { sessionInfo, globalStatistics, sender } = vnode.state.dynamic;
+  view: (vnode) => {
+    const { sessionInfo, globalStatistics, sender } = vnode.state.dynamic;
     // console.log('globalStatistics ====', globalStatistics);
     // console.log("sessionInfo ", sessionInfo)
     if (!sessionInfo && !globalStatistics) return;
     // console.log("globalStatistics ", JSON.stringify(globalStatistics));
-    let { count = 0, rows = [] } = globalStatistics;
+    const { count = 0, rows = [] } = globalStatistics;
     let apr = 0.0;
     const { currentEra,
       currentIndex, sessionLength,
@@ -75,7 +75,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     }
 
     rows.forEach((stats) => {
-      let { exposure = {}, state = '' } = stats;
+      const { exposure = {}, state = '' } = stats;
       const valStake = (app.chain as Substrate).chain.coins(+exposure?.total)
         || (app.chain as Substrate).chain.coins(0);
       totalStaked = (app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));
@@ -99,7 +99,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       // console.log("stats ====== ", stats)
       apr += stats?.apr ? stats.apr : 0;
     });
-    apr = apr / count;
+    apr /= count;
     const totalbalance = (app.chain as Substrate).chain.totalbalance;
     const staked = `${(totalStaked.muln(10000).div(totalbalance).toNumber() / 100).toFixed(2)}%`;
 
@@ -191,30 +191,29 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
             })
           ]),
         ])
+      ]),
+      m('.validators-preheader-item', [
+        m('h3', 'Update nominations'),
+        m('.preheader-item-text', [
+          m(Button, {
+            label: 'Update',
+            class: app.user.activeAccount ? '' : 'disabled',
+            href: '#',
+            onclick: (e) => {
+              e.preventDefault();
+              createTXModal((nominators.length === 0)
+                ? sender.chillTx()
+                : sender.nominateTx(nominators)).then(() => {
+                // vnode.attrs.sending = false;
+                m.redraw();
+              }, () => {
+                // vnode.attrs.sending = false;
+                m.redraw();
+              });
+            }
+          })
         ]),
-        m('.validators-preheader-item', [
-          m('h3', 'Update nominations'),
-          m('.preheader-item-text', [
-            m(Button, {
-              label: 'Update',
-              class: app.user.activeAccount ? '' : 'disabled',
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                createTXModal((nominators.length === 0)
-                  ? sender.chillTx()
-                  : sender.nominateTx(nominators)).then(() => {
-                    // vnode.attrs.sending = false;
-                    m.redraw();
-                  }, () => {
-                    // vnode.attrs.sending = false;
-                    m.redraw();
-                  });
-              }
-            })
-          ]),
-        ]),
-      ])
+      ]),
     ]);
   }
 });
