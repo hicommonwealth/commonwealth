@@ -141,7 +141,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
             value: eraProgress,
             currentBlock: formatNumber(currentEra)
           }),
-        m('.validators-preheader-item', [
+        m('.validators-preheader-item', [ 
           m('h3', 'Est. APR'),
           m('.preheader-item-text', `${apr}%`),
         ]),
@@ -190,31 +190,31 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
               }
             })
           ]),
-        ])
-      ]),
-      m('.validators-preheader-item', [
-        m('h3', 'Update nominations'),
-        m('.preheader-item-text', [
-          m(Button, {
-            label: 'Update',
-            class: app.user.activeAccount ? '' : 'disabled',
-            href: '#',
-            onclick: (e) => {
-              e.preventDefault();
-              createTXModal((nominators.length === 0)
-                ? sender.chillTx()
-                : sender.nominateTx(nominators)).then(() => {
-                // vnode.attrs.sending = false;
-                m.redraw();
-              }, () => {
-                // vnode.attrs.sending = false;
-                m.redraw();
-              });
-            }
-          })
         ]),
-      ]),
-    ]);
+        m('.validators-preheader-item', [
+          m('h3', 'Update nominations'),
+          m('.preheader-item-text', [
+            m(Button, {
+              label: 'Update',
+              class: app.user.activeAccount ? '' : 'disabled',
+              href: '#',
+              onclick: (e) => {
+                e.preventDefault();
+                createTXModal((nominators.length === 0)
+                  ? sender.chillTx()
+                  : sender.nominateTx(nominators)).then(() => {
+                    // vnode.attrs.sending = false;
+                    m.redraw();
+                  }, () => {
+                    // vnode.attrs.sending = false;
+                    m.redraw();
+                  });
+              }
+            })
+          ]),
+        ])
+        ]),
+      ])
   }
 });
 
