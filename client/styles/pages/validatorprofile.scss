@@ -1,0 +1,224 @@
+@import "client/styles/shared";
+
+.cover{
+    height: 68px !important;
+}
+
+.ProfileHeader{
+    margin-top: 28.16px !important;
+    margin-bottom: 28.16px !important;
+    border: 1px solid rgba(231, 231, 231, 0.5) !important;
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07) !important;
+    border-radius: 3px !important;
+}
+
+.ProfileHeader .bio-left .avatar {
+    border-radius: 0px !important;
+    border: none !important;
+    padding-top: 2px !important;
+    padding-left: 2px !important;
+    margin-top: -32px !important;
+}
+
+.ProfileHeader .bio-left .avatar svg{
+    transform: scale(1.25);
+}
+// Icons
+.row-validator{
+    margin-left: 9em;
+    padding-top: 2.2em;
+}
+
+.validator-profile-imonline-icons{
+    margin-right: 32px;
+}
+
+.validator-profile-identity-icons{
+    margin-right: 24px;
+}
+
+.im-online-icons .cui-icon{
+    padding-right: 8px;
+    color: #FFFFFF;
+}
+
+.validator-profile-identity-icons .cui-icon{
+    padding-right: 8px;
+    color: #FFFFFF;
+}
+
+.validator-profile-identity-icons label a{
+    font-family: 'Inter', sans-serif;    
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #FFFFFF;
+
+    &:hover{
+        text-decoration: none;
+    }
+}
+.User {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+.data-row{
+    margin-top: 20px;
+}
+
+.ProfileHeader .bio-right {
+    flex: 0.7 !important;
+    margin: 6px 0 0 !important;
+}
+
+.profile-header{
+    font-family: 'Inter', sans-serif;    
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #999999 !important;
+    // margin-right:6em;
+}
+
+.profile-data{
+    font-family: 'Inter', sans-serif;    
+    padding-top: 8px;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 19px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+    
+}
+
+.total-stake,.own-stake,.other-stake,.commision,.era-points{
+    margin-right: 2em;
+}
+
+
+// Middle Component
+
+.profile-header-block{
+    font-family: 'Inter', sans-serif;    
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #999999 !important;
+    padding-bottom: 8px;
+}
+
+.profile-data-block{
+    font-family: 'Inter', sans-serif;    
+    font-style: normal;
+    font-weight: normal;
+    font-size: 19px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+}
+
+.home-card{
+    background: #FFFFFF !important;
+    border: 1px solid rgba(231, 231, 231, 0.5) !important;
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07) !important;
+    border-radius: 3px !important; 
+}
+
+.profile-stats-row1{
+    padding-left: 24px;
+}
+.profile-stats-row2{
+    padding-left: 24px;
+    padding-top: 8px;
+}
+
+.total-apr,.own-total-offences,.other-total-slashes,.total-rewards{
+    padding-right: 4em !important;
+}
+
+.imonline,.rewards-days{
+    padding-right: 3.2em !important;
+}
+.offences-days{
+    padding-right:2.7em !important;
+}
+.slashes-days{
+    padding-right: 4.2em !important;
+}
+.bio-actions-edit-profile{
+    padding-left: 6.8em;
+}
+
+.bio-actions-edit-identity{
+    padding-left: 5.3em;
+}
+
+.cui-button{
+    background: linear-gradient(180deg, #FEFFFF 0%, #F6FAFB 100%) !important;
+    border: 1px solid #DEDFE1 !important;
+    // box-sizing: border-box !important;
+    border-radius: 4px !important;
+    font-family: 'Inter', sans-serif !important;    
+    font-style: normal !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    line-height: 120% !important;
+    color: #536E7C !important;
+    height: 35px !important;
+}
+
+.profile-data-block span{
+    color: #536E7C !important;
+}
+
+.button-set-identity .data-row-block .profile-header-block{
+    padding-bottom: 0 !important;
+    padding-top: 20px !important;
+}
+
+// Graph
+.col-xs-offset-1 {
+    margin-left: 2% !important;
+}
+.col-xs-5 {
+    flex-basis: 47%;
+    max-width: 47%;
+}
+.graph-container{
+    background: #FFFFFF;
+    border: 1px solid rgba(231, 231, 231, 0.5);
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
+    border-radius: 3px;
+    margin-top: 28.16px;
+    padding-bottom: 20px;
+}
+
+.graph-title{
+    padding-left: 24px;
+    padding-bottom: 14px;
+    padding-top: 14px;
+}
+
+.graph-title p{
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #999999;
+}
+
+.graph-spinner{
+    justify-content: center !important;
+    margin-top: 15%;
+}

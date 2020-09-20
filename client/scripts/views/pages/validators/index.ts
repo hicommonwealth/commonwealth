@@ -2,7 +2,7 @@ import 'pages/validators.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-
+import { from } from 'rxjs';
 import app, { ApiStatus } from 'state';
 import { formatAddressShort } from 'helpers/index';
 import { Coin, formatCoin } from 'adapters/currency';
@@ -20,7 +20,7 @@ import Sublayout from 'views/sublayout';
 import { ICommissionInfo } from 'controllers/chain/substrate/staking';
 
 import * as CosmosValidationViews from './cosmos';
-import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
+import { SubstratePresentationComponent, SubstratePreHeader } from './substrate';
 
 export interface IValidatorAttrs {
   stash: string;
@@ -53,24 +53,24 @@ export interface IValidatorPageState {
   };
 }
 
-export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
+export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
   view: (vnode) => {
     return m('.ViewNominatorsModal', [
       m('.compact-modal-title', [
         m('h3', `Nominators for ${formatAddressShort(vnode.attrs.validatorAddr)}`),
       ]),
       m('.compact-modal-body', [
-        m('table', [
-          m('tr', [
-            m('th', 'Nominator'),
-            m(`th${vnode.attrs.waiting
-              ? '.priority'
-              : '.amount'}`, vnode.attrs.waiting
-              ? 'Priority'
-              : 'Amount'),
-          ]),
+        m('table.modal-table', [
+          // m('tr', [
+          //   m('th', 'Nominator'),
+          //   m(`th${vnode.attrs.waiting
+          //     ? '.priority'
+          //     : '.amount'}`, vnode.attrs.waiting
+          //     ? 'Priority'
+          //     : 'Amount'),
+          // ]),
           vnode.attrs.nominators.map((n) => {
-            return m('tr', [
+            return m('tr.modal-table-row', [
               m('td', m(User, {
                 user: app.chain.accounts.get(n.stash),
                 linkify: true,
@@ -82,7 +82,8 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, wait
                 ? '.priority'
                 : '.amount'}`, vnode.attrs.waiting
                 ? n.balance
-                : formatCoin(n.balance, true)),
+                // : formatCoin(n.balance, true)),
+                : n.balance.format(true)),
             ]);
           }),
         ])
@@ -95,7 +96,12 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
+
+    // getCurrentValidators: from(app.staking.currentValidators({}, {})),
+    // getWaitingValidators: from(app.staking.waitingValidators({}, {})),
+    // globalStats: from(app.staking.globalStatistics()), // convert promise into observable
+
+    // validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
     currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
     currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
     activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,
@@ -105,12 +111,12 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     lastHeader: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.lastHeader
       : null,
-    nominatedBy: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.nominatedBy
-      : null,
-    annualPercentRate: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.annualPercentRate
-      : null
+    // nominatedBy: (app.chain.base === ChainBase.Substrate)
+    //   ? (app.chain as Substrate).staking.nominatedBy
+    //   : null,
+    // annualPercentRate: (app.chain.base === ChainBase.Substrate)
+    //   ? (app.chain as Substrate).staking.annualPercentRate
+    //   : null
   }),
   view: (vnode) => {
     let vComponents = [];
@@ -121,17 +127,19 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
             sender: app.user.activeAccount as SubstrateAccount,
             annualPercentRate: vnode.state.dynamic.annualPercentRate
           }),
-          SubstratePresentationComponent(vnode.state, app.chain as Substrate),
+          m(SubstratePresentationComponent)
+
         ];
         break;
       case ChainClass.Kusama:
       case ChainClass.Polkadot: {
         vComponents = [
-          m(SubstratePreHeader, {
-            sender: app.user.activeAccount as SubstrateAccount,
-            annualPercentRate: vnode.state.dynamic.annualPercentRate
-          }),
-          SubstratePresentationComponent(vnode.state, app.chain as Substrate),
+          // m(SubstratePreHeader, {
+          //   sender: app.user.activeAccount as SubstrateAccount,
+          //   annualPercentRate: vnode.state.dynamic.annualPercentRate
+          // }),
+          m(SubstratePresentationComponent)
+
         ];
         break;
       }

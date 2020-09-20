@@ -303,19 +303,19 @@ document.ontouchmove = (event) => {
 // set up moment-twitter
 moment.updateLocale('en', {
   relativeTime: {
-    future : 'just now',
-    past   : '%s ago',
-    s  : (num, withoutSuffix) => withoutSuffix ? 'now' : 'seconds',
-    m  : '1 min',
-    mm : '%d min',
-    h  : '1 hour',
-    hh : '%d hours',
-    d  : '1 day',
-    dd : '%d days',
-    M  : '1 month',
-    MM : '%d months',
-    y  : '1 year',
-    yy : '%d years'
+    future: 'just now',
+    past: '%s ago',
+    s: (num, withoutSuffix) => withoutSuffix ? 'now' : 'seconds',
+    m: '1 min',
+    mm: '%d min',
+    h: '1 hour',
+    hh: '%d hours',
+    d: '1 day',
+    dd: '%d days',
+    M: '1 month',
+    MM: '%d months',
+    y: '1 year',
+    yy: '%d years'
   }
 });
 
@@ -367,55 +367,55 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      return m(Layout, { scope, deferChain }, [ vnode ]);
+      return m(Layout, { scope, deferChain }, [vnode]);
     },
   });
 
   m.route(document.body, '/', {
     // Legacy redirects
-    '/unlock':                   redirectRoute('/edgeware/unlock'),
-    '/stats/edgeware':           redirectRoute('/edgeware/stats'),
-    '/home':                     redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
-    '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
+    '/unlock': redirectRoute('/edgeware/unlock'),
+    '/stats/edgeware': redirectRoute('/edgeware/stats'),
+    '/home': redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
+    '/discussions': redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false }),
-    '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
-    '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
-    '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
+    '/': importRoute('views/pages/home', { scoped: false }),
+    '/about': importRoute('views/pages/landing/about', { scoped: false }),
+    '/terms': importRoute('views/pages/landing/terms', { scoped: false }),
+    '/privacy': importRoute('views/pages/landing/privacy', { scoped: false }),
 
     // Login page
-    '/login':                    importRoute('views/pages/login', { scoped: false }),
-    '/settings':                 importRoute('views/pages/settings', { scoped: false }),
-    '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/notificationSettings':    redirectRoute(() => '/edgeware/notificationSettings'),
+    '/login': importRoute('views/pages/login', { scoped: false }),
+    '/settings': importRoute('views/pages/settings', { scoped: false }),
+    '/notifications': importRoute('views/pages/notifications', { scoped: false }),
+    '/notificationSettings': redirectRoute(() => '/edgeware/notificationSettings'),
     '/:scope/notificationSettings': importRoute('views/pages/subscriptions/notificationSettings', { scoped: true }),
-    '/chainEventSettings':    redirectRoute(() => '/edgeware/chainEventSettings'),
+    '/chainEventSettings': redirectRoute(() => '/edgeware/chainEventSettings'),
     '/:scope/chainEventSettings': importRoute('views/pages/subscriptions/chainEventSettings', { scoped: true }),
 
     // Edgeware lockdrop
-    '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
-    '/edgeware/stats':           importRoute('views/stats/edgeware', { scoped: false }),
+    '/edgeware/unlock': importRoute('views/pages/unlock_lockdrop', { scoped: false }),
+    '/edgeware/stats': importRoute('views/stats/edgeware', { scoped: false }),
 
     // Chain pages
-    '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
-    '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
+    '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
+    '/:scope/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
 
-    '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+    '/:scope': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
-    '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
+    '/:scope/proposals': importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-    '/:scope/council':           importRoute('views/pages/council/index', { scoped: true }),
-    '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
-    '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
-    '/:scope/new/signaling':     importRoute('views/pages/new_signaling', { scoped: true }),
+    '/:scope/council': importRoute('views/pages/council/index', { scoped: true }),
+    '/:scope/login': importRoute('views/pages/login', { scoped: true, deferChain: true }),
+    '/:scope/new/thread': importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+    '/:scope/new/signaling': importRoute('views/pages/new_signaling', { scoped: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
-    '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
-    '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
-    '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
+    '/:scope/admin': importRoute('views/pages/admin', { scoped: true }),
+    '/:scope/settings': importRoute('views/pages/settings', { scoped: true }),
+    '/:scope/web3login': importRoute('views/pages/web3login', { scoped: true }),
 
-    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
+    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true }),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.user.activeAccount)
         ? `/${attrs.scope}/account/${app.user.activeAccount.address}`
@@ -427,8 +427,9 @@ $(() => {
     '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
     '/:scope/manageStaking':        importRoute('views/pages/manage_staking', { scoped: true }),
 
+    '/:scope/validators1': importRoute('views/pages/validators1', { scoped: true }),
     // NEAR login
-    '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),
+    '/:scope/finishNearLogin': importRoute('views/pages/finish_near_login', { scoped: true }),
   });
 
   // initialize construct-ui focus manager
@@ -446,7 +447,7 @@ $(() => {
 
   // handle login redirects
   if (m.route.param('loggedin') && m.route.param('loggedin').toString() === 'true'
-      && m.route.param('path') && !m.route.param('path').startsWith('/login')) {
+    && m.route.param('path') && !m.route.param('path').startsWith('/login')) {
     // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
     // handle param-based redirect after email login
 

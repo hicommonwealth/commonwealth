@@ -108,7 +108,12 @@ import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 
 import bulkEntities from './routes/bulkEntities';
+import addValidator from './routes/addValidator';
+import upsertHistoricalValidatorStats from './routes/upsertHistoricalValidatorStats';
 
+import getGlobalStatistics from './routes/getGlobalStatistics';
+import getValidatorDetail from './routes/getValidatorDetail';
+import getValidatorNamesAndAddresses from './routes/getValidatorNamesAndAddresses'
 function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
@@ -342,6 +347,15 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
     getValidatorGroup.bind(this, models));
   router.get('/getChainStake', getChainStake.bind(this, models));
 
+  router.get('/getValidatorNamesAndAddresses', getValidatorNamesAndAddresses.bind(this, models));
+  router.get('/getValidatorDetail/', getValidatorDetail.bind(this, models));
+  router.get('/getValidatorDetail/:state', getValidatorDetail.bind(this, models));
+  router.get('/getGlobalStatistics', getGlobalStatistics.bind(this, models));
+
+
+
+  router.post('/addValidator', addValidator.bind(this, models));
+  router.post('/upsertHistoricalValidatorStats', upsertHistoricalValidatorStats.bind(this, models));
   app.use('/api', router);
 }
 export default setupRouter;
