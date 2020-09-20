@@ -141,7 +141,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
             value: eraProgress,
             currentBlock: formatNumber(currentEra)
           }),
-        m('.validators-preheader-item', [
+        m('.validators-preheader-item', [ 
           m('h3', 'Est. APR'),
           m('.preheader-item-text', `${apr}%`),
         ]),
@@ -190,7 +190,6 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
               }
             })
           ]),
-        ])
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Update nominations'),
@@ -213,9 +212,9 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
               }
             })
           ]),
+        ])
         ]),
       ])
-    ]);
   }
 });
 
