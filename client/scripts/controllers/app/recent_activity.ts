@@ -9,23 +9,27 @@ class RecentActivityController {
 
   public get initialized() { return this._initialized; }
 
-  public countThreads(comments?: OffchainComment<any>[], reactions?: OffchainReaction<any>[]) {
+  public countThreads(comments, reactions) {
     const threadScopedComments = {};
     if (comments) {
       comments.forEach((c) => {
         const parentEntity = c.community || c.chain;
-        if (threadScopedComments[c.rootProposal]) threadScopedComments[c.rootProposal].push(c.id);
-        else threadScopedComments[c.rootProposal] = [c.id];
-        this._store.addThreadCount(parentEntity, c.rootProposal);
+        if (threadScopedComments[c.root_id]) threadScopedComments[c.root_id].push(c.id);
+        else threadScopedComments[c.root_id] = [c.id];
+        console.log(c);
+        this._store.addThreadCount(parentEntity, c.root_id);
       });
     }
     if (reactions) {
       reactions.forEach((r) => {
         const parentEntity = r.community || r.chain;
-        if (r.commentId) {
-          Object.entries(threadScopedComments).forEach(([key, val]) => {
-            if ((val as any).includes(r.commentId)) {
-              this._store.addThreadCount(parentEntity, key);
+        if (r.comment_id) {
+          Object.entries(threadScopedComments).forEach((arr) => {
+            const threadId = arr[0];
+            const commentArr = arr[1];
+            if ((commentArr as any).includes(r.comment_id)) {
+              console.log(r);
+              this._store.addThreadCount(parentEntity, threadId);
             }
           });
         } else if (r.threadId) {
@@ -44,13 +48,8 @@ class RecentActivityController {
   }
 
   public addAddressesFromActivity(activity: any[]) {
-    console.log(activity);
-    activity
-      .sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at))
+    activity.sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at))
       .forEach((item) => {
-        if (item.Address.address === 'jXC7ghviUzVcVySg3eD8prB7C9m6VzK6cw2MTyMTDTUye5q') {
-          console.log(item);
-        }
         this._store.addAddress(item.Address, item.community || item.chain);
       });
   }

@@ -21,7 +21,7 @@ export enum CommentRefreshOption {
   LoadProposalComments = 'LoadProposalComments',
 }
 
-const modelFromServer = (comment) => {
+export const modelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
