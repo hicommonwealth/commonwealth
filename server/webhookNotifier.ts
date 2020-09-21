@@ -86,7 +86,7 @@ const discordFormat = (content, address?) => {
     "embeds": [
       {
         "author": {
-          "name": `${address ? address.name + ': ' + (address.address).slice(0, 8) : content.user}`,
+          "name": `${address ? address.name + ': ' + (address.address).slice(0, 8) + '...' : content.user}`,
           "url": `${content.url}`,
           "icon_url": "https://commonwealth.im/static/img/logo.png"
         },
