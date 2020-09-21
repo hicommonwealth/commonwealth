@@ -2,7 +2,9 @@ import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
 import { SubstrateEvents } from '@commonwealth/chain-events';
+
 import { NotificationCategories } from '../shared/types';
+import { renderQuillDeltaToText } from '../shared/helpers';
 import { SERVER_URL } from './config';
 
 export interface WebhookContent {
@@ -123,7 +125,7 @@ const discordFormat = (content, address?) => {
   }
   if (!event) {
     switch (content.notificationCategory) {
-      case (NotificationCategories.NewComment): 
+      case (NotificationCategories.NewComment):
         titleLabel = 'New comment on ';
         break;
       case (NotificationCategories.NewThread):
@@ -137,7 +139,15 @@ const discordFormat = (content, address?) => {
     }
     if (content.body) {
       bodytext = decodeURIComponent(content.body);
-      if (bodytext.length > 200) bodytext = `${bodytext.slice(0, 200)}...`;
+      try {
+        // parse and return quill document as text
+        const doc = JSON.parse(bodytext);
+        const text = renderQuillDeltaToText(doc);
+        return `${text.slice(0, 200)}...`;
+      } catch (err) {
+        // return markdown document
+        return `${bodytext.slice(0, 200)}...`;
+      }
     }
   }
   return (content.notificationCategory !== 'chain-event') ? { // Forum Event Discord JSON
@@ -191,7 +201,7 @@ const send = async (models, content: WebhookContent) => {
   let address;
   try {
     address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
-  } catch (e) {
+  } catch (err) {
     // pass nothing if no matching address is found
   }
 
@@ -230,8 +240,8 @@ const send = async (models, content: WebhookContent) => {
       }
       try {
         return await request.post(url).send(data);
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        console.error(err);
       }
     }));
 };
