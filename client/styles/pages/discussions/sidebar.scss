@@ -17,6 +17,9 @@
             .username, .activity-count {
                 font-weight: 500;
             }
+            .activity-count {
+                color: $text-color-lighter;
+            }
             a:hover {
                 text-decoration: none;
             }

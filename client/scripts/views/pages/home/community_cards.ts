@@ -108,7 +108,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
         m('p.card-description', community.description),
         // if no recently active threads, hide this module altogether
         m('.recent-activity', !!monthlyThreads.length && [
-          m('.recent-threads', [ pluralize(monthlyThreads.length, 'active thread'), '/mo' ]),
+          m('.recent-threads', [ pluralize(monthlyThreads.length, 'thread'), '/mo' ]),
           !!monthlyUsers
             && m(UserGallery, {
               users: (monthlyUsers as AddressInfo[]),
