@@ -101,10 +101,6 @@ const discordFormat = (content, address?) => {
         //     "inline": true
         //   },
         // ],
-        "footer": {
-          "text": "–Commonwealth Labs :dove:",
-          "icon_url": "https://commonwealth.im/static/img/logo.png"
-        }
       }
     ]
   } : { // Chain Event Discord JSON
