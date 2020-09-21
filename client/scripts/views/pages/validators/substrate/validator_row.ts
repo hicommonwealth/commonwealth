@@ -110,7 +110,9 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       m('td.val-points', vnode.attrs.eraPoints || '0'),
       m('td.val-apr', `${apr.toFixed(2)}%`),
       // m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
-      m('td.val-rewards-slashes-offenses', false /* TODOO: integrate count for the heading herer */ || '11/10/12'),
+      m('td.val-rewards-slashes-offenses', vnode.attrs.rewardStats?.count),
+      m('td.val-rewards-slashes-offenses', vnode.attrs.slashesStats?.count),
+      m('td.val-rewards-slashes-offenses', vnode.attrs.offencesStats?.count),
     ]);
   }
 });

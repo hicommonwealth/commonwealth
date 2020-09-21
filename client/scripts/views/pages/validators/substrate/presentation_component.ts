@@ -11,7 +11,7 @@ import ValidatorRow from './validator_row';
 import ValidatorRowWaiting from './validator_row_waiting';
 import RecentBlock from './recent_block';
 
-const pageSize = 5;
+const pageSize = 25;
 let result = { validators: [] };
 const model = {
   scroll: false,
@@ -196,6 +196,15 @@ const model = {
     if (validatorStashes.length && (validatorStashes.length - 1) >= model.prevIndex) {
       // console.log("validatorstashes ", validatorStashes)
       result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(model.prevIndex, model.nextIndex));
+      result.validators.forEach((e)=>{
+        e.exposure = e.HistoricalValidatorStatistics[0]?.exposure;
+        e.commissionPer = e.HistoricalValidatorStatistics[0]?.commissionPer;
+        e.apr = e.HistoricalValidatorStatistics[0]?.apr;
+        e.eraPoints = e.HistoricalValidatorStatistics[0]?.eraPoints;
+        e.rewardStats = e.HistoricalValidatorStatistics[0]?.rewardStats;
+        e.slashesStats = e.HistoricalValidatorStatistics[0]?.slashesStats;
+        e.offencesStats = e.HistoricalValidatorStatistics[0]?.offencesStats;
+    }); 
       model.constValidators = [...result.validators, ...model.constValidators];
       model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
       m.redraw();
@@ -401,7 +410,9 @@ export const PresentationComponent_ = {
                 }))),
               m('th.val-apr', 'Est. APR'),
               // m('th.val-last-hash', 'last #'),
-              m('th.val-rewards-slashes-offenses', 'Rewards/Slashes/Offenses')
+              m('th.val-rewards-slashes-offenses', 'Rewards'),
+              m('th.val-rewards-slashes-offenses', 'Slashes'),
+              m('th.val-rewards-slashes-offenses', 'Offenses'),
             ]), m('table.validators-table', [
               result.validators.map((validator) => {
                 // console.log("validator.exposure ===== ", validator.exposure, validator.stash)
@@ -419,10 +430,13 @@ export const PresentationComponent_ = {
                 const blockCount = validator.blockCount;
                 const hasMessage = validator?.hasMessage;
                 const isOnline = validator?.isOnline;
-                const otherTotal = validator?.otherTotal;
+                const otherTotal = chain.chain.coins(Number(validator.exposure?.total) - validator.exposure?.own) ;
                 const commission = validator?.commissionPer;
                 const apr = validator?.apr;
                 const name = validator?.name;
+                const rewardStats = validator?.rewardStats;
+                const slashesStats = validator?.slashesStats;
+                const offencesStats = validator?.offencesStats
                 // let apr = annualPercentRate[validator];
                 // apr = (apr === -1.0 || typeof apr === 'undefined') ? aprAvg : apr;
                 return m(ValidatorRow, {
@@ -438,38 +452,39 @@ export const PresentationComponent_ = {
                   hasMessage,
                   isOnline,
                   apr,
+                  rewardStats,
+                  slashesStats,
+                  offencesStats
                 });
               }),
             ]))
         }, {
           callback: reset,
           name: 'Waiting Validators',
-          content: m('table.validators-table', [
-            m('div.row-input',
-              m('input', {
-                type: 'text',
-                name: 'searchWaiting',
-                autofocus: true,
-                placeholder: 'Search for a name, address or index...',
-                onkeyup: (e) => {
-                  { onSearchHandler(e.target.value) }
-                },
-                onkeydown: (e) => {
-                  { model.onReverseSearch(e.target.value) }
-                },
-                onkeypress: (e) => {
-                  if (!e.target.value || !e.target.value.trim()) {
-                    model.searchIsOn = false;
-                    m.redraw();
-                  }
-                },
-              })),
-            m('tr.validators-heading', [
-              m('th.val-stash-waiting', 'Stash'),
-              m('th.val-nominations', 'Nominations'),
-              m('th.val-waiting-commission', 'Commission'),
-              m('th.val-action', ''),
-            ]),
+          content: [m('div.row-input',
+          m('input', {
+            type: 'text',
+            name: 'searchWaiting',
+            autofocus: true,
+            placeholder: 'Search for a name, address or index...',
+            onkeyup: (e) => {
+              { onSearchHandler(e.target.value) }
+            },
+            onkeydown: (e) => {
+              { model.onReverseSearch(e.target.value) }
+            },
+            onkeypress: (e) => {
+              if (!e.target.value || !e.target.value.trim()) {
+                model.searchIsOn = false;
+                m.redraw();
+              }
+            },
+          })),m('tr.validators-heading', [
+            m('th.val-stash-waiting', 'Stash'),
+            m('th.val-nominations', 'Nominations'),
+            m('th.val-waiting-commission', 'Commission'),
+            m('th.val-action', ''),
+          ]),m('table.validators-table', [
             result.validators.map((validator) => {
               const stash = validator.stash;
               const controller = validator.controller;
@@ -493,16 +508,15 @@ export const PresentationComponent_ = {
                 name
               });
             }),
-          ])
+          ])]
         }, {
           callback: reset,
           name: 'Recent Blocks',
-          content: m('table.validators-table', [
-            m('tr.validators-heading', [
-              m('th.val-block-number', 'Block #'),
-              m('th.val-block-hash', 'Hash'),
-              m('th.val-block-author', 'Author')
-            ]),
+          content: [m('tr.validators-heading', [
+            m('th.val-block-number', 'Block #'),
+            m('th.val-block-hash', 'Hash'),
+            m('th.val-block-author', 'Author')
+          ]),m('table.validators-table', [
             lastHeaders.map((lastHeader) => {
               if (!lastHeader)
                 return null;
@@ -512,7 +526,7 @@ export const PresentationComponent_ = {
                 author: lastHeader.author
               });
             })
-          ])
+          ])]
         }]));
   }
 };

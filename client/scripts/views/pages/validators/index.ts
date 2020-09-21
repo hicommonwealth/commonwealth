@@ -43,6 +43,14 @@ export interface IValidatorAttrs {
   isOnline?: boolean;
   commission?: number;
   apr?: number;
+  rewardStats?: IStatsData;
+  slashesStats?: IStatsData;
+  offencesStats?: IStatsData;
+}
+
+export interface IStatsData {
+  avg: number;
+  count: number;
 }
 
 export interface IValidatorPageState {

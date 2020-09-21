@@ -84,6 +84,7 @@
     padding-left: 20px;
     padding-top: 20px;
     margin-bottom: 23px;
+    margin-top:12px;
 }
 
 .validators-container{
@@ -97,11 +98,15 @@
     padding: 20px;
 }
 .validators-table{
-    height: 200px;
+    height: 55vh;
     overflow-y: scroll;
     &::-webkit-scrollbar {
-        width: 0px;  /* Remove scrollbar space */
-        background: transparent;  /* Optional: just make scrollbar invisible */
+        width: 6px;  /* Remove scrollbar space */
+        background-color:#fff;
+    }
+    &::-webkit-scrollbar-thumb{
+        background-color: #d1d1d1;
+        border-radius: 10px;
     }
 }
 .tab-bar{
@@ -291,6 +296,9 @@
         letter-spacing: -0.2px;
         line-height: 120%;
 
+    }
+    td.val-commission,td.val-points,td.val-apr,td.val-rewards-slashes-offenses{
+        justify-content: center;
     }
 
     .cut-text {
