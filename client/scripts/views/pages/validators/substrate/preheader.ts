@@ -46,13 +46,10 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       ? (app.chain as Substrate).staking.sessionInfo
       : null
   }),
-  view: (vnode) => {
-    const { sessionInfo, globalStatistics, sender } = vnode.state.dynamic;
-    // console.log('globalStatistics ====', globalStatistics);
-    // console.log("sessionInfo ", sessionInfo)
+  view: vnode => {
+    let { sessionInfo, globalStatistics, sender } = vnode.state.dynamic;
     if (!sessionInfo && !globalStatistics) return;
-    // console.log("globalStatistics ", JSON.stringify(globalStatistics));
-    const { count = 0, rows = [] } = globalStatistics;
+    let { count = 0, rows = [] } = globalStatistics;
     let apr = 0.0;
     const { currentEra,
       currentIndex, sessionLength,
@@ -91,12 +88,10 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       // count elected and waiting validators
       if (state === 'Active') {
         elected++;
-      } else if (state === 'Waiting') {
+      } else {
         waiting++;
       }
       // calculate est. apr
-
-      // console.log("stats ====== ", stats)
       apr += stats?.apr ? stats.apr : 0;
     });
     apr /= count;

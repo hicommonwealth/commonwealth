@@ -11,7 +11,7 @@ import ValidatorRow from './validator_row';
 import ValidatorRowWaiting from './validator_row_waiting';
 import RecentBlock from './recent_block';
 
-const pageSize = 25;
+const pageSize = 20;
 let result = { validators: [] };
 const model = {
   scroll: false,
@@ -26,6 +26,7 @@ const model = {
   searchByOptions: [{ label: 'Select', value: '' }, { label: 'name', value: 'value' }, { label: 'address', value: 'value' }],
   validatorNamesAddrss: {},
   allAddresses: [],
+  isLoadingData: false,
   setValue(result: string) {
     model.searchBy = result;
     model.searchCriteria = {};
@@ -114,6 +115,7 @@ const model = {
   // model.currentPage < Math.ceil(model.total[model.currentTab] / model.perPage
 
   async onChange() {
+    console.log('inside async onChange()');
     let validatorStashes: any = model.activeStashes;
     if (model.state === 'Waiting') { validatorStashes = model.waitingStashes; }
     let { prevIndex, nextIndex } = model;
@@ -128,11 +130,14 @@ const model = {
     validatorStashes = validatorStashes.slice(prevIndex, nextIndex);
 
     // 0console.log(validatorStashes.slice(prevIndex, nextIndex), "new fetched")
-    if (validatorStashes.length && validatorStashes.length >= prevIndex) {
+    if (validatorStashes.length)
+     {
       // console.log("prevIndex", prevIndex)
       // console.log("nextIndex", nextIndex);
       // console.log("validatorStashes", validatorStashes);
       // console.log("model.activeStashes", model.activeStashes);
+      model.isLoadingData = true;
+      m.redraw();
       validators = await (app.staking as any).validatorDetail(model.state, validatorStashes);
 
       console.log(validators?.validators, "--------onChange---------");
@@ -140,9 +145,12 @@ const model = {
       result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
       model.constValidators = [...result.validators, ...model.constValidators];
       model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
-      m.redraw();
+      setTimeout(()=>{
+        model.isLoadingData = false;
+        m.redraw();
+      },2000);
     }
-
+    model.scroll = false;
   },
   async onSearch() {
     let validatorStashes: any = [];
@@ -164,12 +172,17 @@ const model = {
 
 
     if (validatorStashes.length && validatorStashes.length >= prevIndex) {
+      model.isLoadingData = true;
+      m.redraw();
       validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
       result.validators = [...result.validators, ...validators?.validators];
       result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
       model.constValidators = [...result.validators, ...model.constValidators];
       model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
-      m.redraw();
+      setTimeout(()=>{
+        model.isLoadingData = false;
+        m.redraw();
+      },2000);
     }
   },
   async refresh() {
@@ -195,19 +208,25 @@ const model = {
     // console.log("nextIndex", model.nextIndex);
     if (validatorStashes.length && (validatorStashes.length - 1) >= model.prevIndex) {
       // console.log("validatorstashes ", validatorStashes)
+      model.isLoadingData = true;
+      m.redraw();
       result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(model.prevIndex, model.nextIndex));
       result.validators.forEach((e)=>{
         e.exposure = e.HistoricalValidatorStatistics[0]?.exposure;
         e.commissionPer = e.HistoricalValidatorStatistics[0]?.commissionPer;
         e.apr = e.HistoricalValidatorStatistics[0]?.apr;
         e.eraPoints = e.HistoricalValidatorStatistics[0]?.eraPoints;
-        e.rewardStats = e.HistoricalValidatorStatistics[0]?.rewardStats;
+        e.rewardStats = e.HistoricalValidatorStatistics[0]?.rewardsStats;
         e.slashesStats = e.HistoricalValidatorStatistics[0]?.slashesStats;
         e.offencesStats = e.HistoricalValidatorStatistics[0]?.offencesStats;
     }); 
       model.constValidators = [...result.validators, ...model.constValidators];
       model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
-      m.redraw();
+      setTimeout(()=>{
+        model.isLoadingData = false;
+        m.redraw();
+      },2000);
+      
     }
   },
   sortIcon(key: string) {
@@ -318,11 +337,12 @@ export const PresentationComponent_ = {
     model.scroll = false;
     $("table.validators-table").on('scroll', function () {
       if (!model.scroll) {
-        // console.log("$(this).scrollTop()", $(this).scrollTop())
-        // console.log("$(this).innerHeight()", $(this).innerHeight())
-        // console.log("$(this).scrollHeight()", $(this)[0].scrollHeight)
-        if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+         console.log("$(this).scrollTop()", $(this).scrollTop())
+         console.log("$(this).innerHeight()", $(this).innerHeight())
+         console.log("$(this).scrollHeight()", $(this)[0].scrollHeight)
+        if ($(this).scrollTop() + $(this).innerHeight() + ($(this)[0].scrollHeight * 0.05)  >= $(this)[0].scrollHeight) {
           // alert('end reached');
+          console.log('inside')
           model.scroll = true;
           if (!model.searchValue && !model.searchValue.trim())
             model.onChange();
@@ -456,8 +476,13 @@ export const PresentationComponent_ = {
                   slashesStats,
                   offencesStats
                 });
-              }),
-            ]))
+              }),  model.isLoadingData && m(Spinner, {
+                message: '',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })
+            ]),
+            ),
         }, {
           callback: reset,
           name: 'Waiting Validators',
