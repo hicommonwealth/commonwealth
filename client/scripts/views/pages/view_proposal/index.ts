@@ -451,6 +451,7 @@ const ViewProposalPage: m.Component<{
   viewCountPrefetchStarted: boolean,
   viewCount: number,
   profilesPrefetchStarted: boolean
+  profilesPrefetchFinished: boolean
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -566,9 +567,10 @@ const ViewProposalPage: m.Component<{
       });
       vnode.state.profilesPrefetchStarted = true;
     }
-    if (!app.profiles.allLoaded()) {
+    if (!app.profiles.allLoaded() && !vnode.state.profilesPrefetchFinished) {
       return m(PageLoading, { narrow: true });
     }
+    vnode.state.profilesPrefetchFinished = true;
 
     const windowListener = (e) => {
       if (vnode.state.editing || activeQuillEditorHasText()) {
@@ -648,6 +650,7 @@ const ViewProposalPage: m.Component<{
       rightSidebar: proposal instanceof OffchainThread
         ? []
         : m(ProposalSidebar, { proposal }),
+      showNewProposalButton: true,
     }, [
       m(ProposalHeader, {
         proposal,

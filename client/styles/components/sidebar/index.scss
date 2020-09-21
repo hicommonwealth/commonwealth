@@ -57,7 +57,7 @@
                 padding: 0 12px;
                 .cui-icon {
                     position: relative;
-                    top: 0;
+                    top: -2px;
                 }
             }
             .cui-button.mobile-sidebar-trigger {
@@ -73,8 +73,9 @@
             }
             .LoginSelector {
                 // responsive logged-in state
-                .NotificationsMenuButton {
-                    margin-left: 7px;
+                .User {
+                    position: relative;
+                    top: -1px;
                 }
                 .user-avatar {
                     margin-right: 0;
@@ -110,6 +111,8 @@
 .Sidebar {
     z-index: 2;
     @include sm-max {
+        max-height: calc(100vh - 60px); // $mobile-sidebar-height
+        overflow-y: scroll;
         .SidebarHeader {
             display: none;
         }
@@ -255,6 +258,10 @@
         width: calc(100% - 34px);
         max-width: calc(100% - 34px);
         height: 72px;
+        @include sm-max {
+            position: relative;
+            bottom: initial;
+        }
 
         // background
         background: $background-color-light-hover;

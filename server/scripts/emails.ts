@@ -17,23 +17,30 @@ const log = factory.getLogger(formatFilename(__filename));
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
-export const createImmediateNotificationEmailObject = (
-  notification_data: IPostNotificationData | IChainEventNotificationData, category_id, chain_name?
+export const createImmediateNotificationEmailObject = async (
+  notification_data: IPostNotificationData | IChainEventNotificationData,
+  category_id,
+  models,
 ) => {
-  let label: IEventLabel;
+  let chainEventLabel: IEventLabel;
   const chainId = (notification_data as IChainEventNotificationData).chainEventType?.chain;
 
-  // enrich chain event notifications with additional label
+  // skip notification categories without emails
+  if (category_id === NotificationCategories.NewReaction
+      || category_id === NotificationCategories.ThreadEdit) return;
+
+  // enrich chain event notifications, using labeler from @commonwealth/chain-events
+  // all other notifications just use the thread title
   if ((notification_data as IChainEventNotificationData).chainEvent !== undefined) {
     const { blockNumber } = (notification_data as IChainEventNotificationData).chainEvent;
     if (SubstrateTypes.EventChains.includes(chainId) && chainId !== 'polkadot') {
-      label = SubstrateEvents.Label(
+      chainEventLabel = SubstrateEvents.Label(
         blockNumber,
         chainId,
         (notification_data as IChainEventNotificationData).chainEvent.event_data as IChainEventData
       );
     // } else if (MolochTypes.EventChains.includes(chainId)) {
-    //   label = MolochEvents.Label(
+    //   chainEventLabel = MolochEvents.Label(
     //     blockNumber,
     //     chainId,
     //     (notification_data as IChainEventNotificationData).chainEvent.event_data,
@@ -41,16 +48,44 @@ export const createImmediateNotificationEmailObject = (
     }
   }
 
+  // assemble email fields
   const { created_at, root_id, root_title, root_type, comment_id, comment_text,
     chain_id, community_id, author_address, author_chain } = (notification_data as IPostNotificationData);
+
   const decodedTitle = decodeURIComponent(root_title).trim();
-  const subjectLine = (label?.heading)
+  const subjectLine = (chainEventLabel?.heading)
     || ((category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
       : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
-        : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
-          : (category_id === NotificationCategories.NewThread) ? `New thread: ${decodedTitle}`
-            : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
-              : 'New activity on Commonwealth');
+        : (category_id === NotificationCategories.NewThread) ? `New thread: ${decodedTitle}`
+          : 'New activity on Commonwealth');
+
+  // fetch author
+  const authorProfile = await models.OffchainProfile.findOne({
+    include: [{
+      model: models.Address,
+      where: { address: author_address, chain: author_chain },
+      required: true,
+    }]
+  });
+  let authorName;
+  try {
+    authorName = authorProfile.Address.name || JSON.parse(authorProfile.data).name || 'Someone';
+  } catch (e) {
+    authorName = 'Someone';
+  }
+
+  // fetch action and community
+  const actionCopy = (chainEventLabel?.heading)
+    || ((category_id === NotificationCategories.NewComment) ? 'commented on'
+      : (category_id === NotificationCategories.NewMention) ? 'mentioned you in the thread'
+        : (category_id === NotificationCategories.NewThread) ? 'created a new thread'
+          : '');
+  const objectCopy = decodeURIComponent(root_title).trim();
+  const communityObject = chain_id
+    ? await models.Chain.findOne({ where: { id: chain_id } })
+    : await models.OffchainCommunity.findOne({ where: { id: community_id } });
+  const communityCopy = communityObject ? ` in ${communityObject.name}:` : ':';
+  const excerpt = decodeURIComponent(comment_text); // TODO: unpack Markdown and Quill
 
   // construct link
   const pseudoProposal = {
@@ -60,42 +95,69 @@ export const createImmediateNotificationEmailObject = (
     community: community_id,
   };
   const proposalUrlArgs = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = label?.linkUrl ? `${SERVER_URL}${label.linkUrl}`
-    : label ? `${SERVER_URL}/${chainId}`
+  const path = chainEventLabel?.linkUrl ? `${SERVER_URL}${chainEventLabel.linkUrl}`
+    : chainEventLabel ? `${SERVER_URL}/${chainId}`
       : (getProposalUrl as any)(...proposalUrlArgs);
 
   // construct email
+  const emailData = {
+    notification: {
+      // email subject:
+      subject: subjectLine,
+      // email body:
+      author: authorName,
+      action: actionCopy,
+      rootObject: objectCopy,
+      community: communityCopy,
+      excerpt,
+      path,
+      // used for chain notifications:
+      // title: chainEventLabel?.heading || subjectLine,
+      // body: chainEventLabel?.label || subjectLine,
+    }
+  };
   return {
     from: 'Commonwealth <no-reply@commonwealth.im>',
     to: null,
     bcc: null,
     subject: subjectLine,
-    templateId: DynamicTemplate.ImmediateEmailNotification, // 'd-3f30558a95664528a2427b40292fec51',
-    dynamic_template_data: {
-      notification: {
-        subject: subjectLine,
-        title: label?.heading || subjectLine,
-        body: label?.label || subjectLine,
-        path,
-      }
-    },
+    templateId: DynamicTemplate.ImmediateEmailNotification,
+    dynamic_template_data: emailData,
   };
 };
 
-const createNotificationDigestEmailObject = async (user, notifications) => {
-  let emailObjArray = [];
-  emailObjArray = await Promise.all(notifications.map(async (n) => {
+const createNotificationDigestEmailObject = async (user, notifications, models) => {
+  const emailObjArray = await Promise.all(notifications.map(async (n) => {
     const { created_at, root_id, root_title, root_type, comment_id, comment_text,
       chain_id, community_id, author_address, author_chain } = JSON.parse(n.notification_data);
-    const decodedTitle = decodeURIComponent(root_title).trim();
-    const nSubscription = await n.getSubscription();
-    const { category_id } = nSubscription;
-    const content = (category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
-      : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
-        : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
-          : (category_id === NotificationCategories.NewThread) ? `New thread: ${decodedTitle}`
-            : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
-              : 'New activity on Commonwealth';
+    const { category_id } = await n.getSubscription();
+
+    // fetch author
+    const authorProfile = await models.OffchainProfile.findOne({
+      include: [{
+        model: models.Address,
+        where: { address: author_address, chain: author_chain },
+        required: true,
+      }]
+    });
+    let authorName;
+    try {
+      authorName = authorProfile.Address.name || JSON.parse(authorProfile.data).name || 'Someone';
+    } catch (e) {
+      authorName = 'Someone';
+    }
+
+    // fetch name
+    const actionCopy = (category_id === NotificationCategories.NewComment) ? 'commented on'
+      : (category_id === NotificationCategories.NewMention) ? 'mentioned you in the thread'
+        : (category_id === NotificationCategories.NewThread) ? 'created a new thread'
+          : '';
+    const objectCopy = decodeURIComponent(root_title).trim();
+    const communityObject = chain_id
+      ? await models.Chain.findOne({ where: { id: chain_id } })
+      : await models.OffchainCommunity.findOne({ where: { id: community_id } });
+    const communityCopy = communityObject ? ` in ${communityObject.name}:` : ':';
+    const excerpt = decodeURIComponent(comment_text); // TODO: unpack Markdown and Quill
 
     // construct link
     const pseudoProposal = {
@@ -108,7 +170,15 @@ const createNotificationDigestEmailObject = async (user, notifications) => {
     const path = (getProposalUrl as any)(...args);
 
     // return data
-    return { path, content, decodedTitle, category_id, subscription: nSubscription };
+    return {
+      // email body:
+      author: authorName,
+      action: actionCopy,
+      rootObject: objectCopy,
+      community: communityCopy,
+      excerpt,
+      path,
+    };
   }));
 
   // construct email
@@ -127,14 +197,18 @@ const createNotificationDigestEmailObject = async (user, notifications) => {
 
 export const sendImmediateNotificationEmail = async (subscription, emailObject) => {
   const user = await subscription.getUser();
-  if (!emailObject) return;
-  // emailObject.to = (process.env.NODE_ENV === 'development') ? 'raymond@commonwealth.im' : user.email;
-  emailObject.to = 'raymond@commonwealth.im';
-  emailObject.bcc = 'raymond@commonwealth.im';
+  if (!emailObject) {
+    console.log('attempted to send empty immediate notification email');
+    return;
+  }
+  emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
+  emailObject.bcc = 'raymond+bcc@commonwealth.im';
 
   try {
+    console.log('sending immediate notification email');
     await sgMail.send(emailObject);
   } catch (e) {
+    console.log('Failed to send immediate notification email', e?.response?.body?.errors);
     log.error(e);
   }
 };
@@ -155,13 +229,14 @@ export const sendBatchedNotificationEmails = async (models) => {
       }],
       where: { is_read: false }
     });
-    const emailObject = await createNotificationDigestEmailObject(user, notifications);
-    // emailObject.to = (process.env.NODE_ENV === 'development') ? 'raymond@commonwealth.im' : user.email;
-    emailObject.to = 'raymond@commonwealth.im';
-    emailObject.bcc = 'raymond@commonwealth.im';
+    const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
+    emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
+    emailObject.bcc = 'raymond+bcc@commonwealth.im';
     try {
+      console.log('sending batch notification email');
       await sgMail.send(emailObject);
     } catch (e) {
+      console.log('Failed to send batch notification email', e?.response?.body?.errors);
       log.error(e);
     }
   }));

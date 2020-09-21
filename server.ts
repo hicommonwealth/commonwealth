@@ -75,8 +75,6 @@ const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
   captureUnhandledRejections: true,
 });
 
-console.log(+new Date());
-
 const app = express();
 const compiler = DEV ? webpack(devWebpackConfig) : webpack(prodWebpackConfig);
 const SequelizeStore = SessionSequelizeStore(session.Store);
@@ -169,15 +167,11 @@ if (DEV) {
   if (!NO_PRERENDER) setupPrerenderServer();
 }
 
-console.log(+new Date());
-
 setupMiddleware();
 setupPassport(models);
 setupAPI(app, models, viewCountCache, identityFetchCache);
 setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 setupErrorHandlers(app, rollbar);
-
-console.log(+new Date());
 
 async function main() {
   if (SHOULD_SEND_EMAILS) {
