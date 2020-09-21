@@ -62,7 +62,7 @@ const Chat = {
       const scroller = $(vnode.dom).find('.chat-messages')[0];
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
-    const onIncomingMessage = (text, author, author_chain, timestamp?) => {
+    const onIncomingMessage = (text, author, author_chain, timestamp?) => { // timestamp is used for scrollback only
       const sender = { address: author, chain: author_chain };
       vnode.state.messages.push({ sender, text, timestamp: timestamp || moment() });
       vnode.state.typing = false;
@@ -88,6 +88,7 @@ const Chat = {
     });
     vnode.state.chat.addListener(WebsocketMessageType.Message, onIncomingMessage);
     vnode.state.chat.addListener(WebsocketMessageType.Typing, onIncomingTypingIndicator);
+    vnode.state.chat.addListener(WebsocketMessageType.InitializeScrollback, onIncomingMessage);
     vnode.state.messages = [];
     vnode.state.outgoingTypingInputHandler = _.throttle((e) => {
       if (!vnode.state.chat.isConnected) return;
