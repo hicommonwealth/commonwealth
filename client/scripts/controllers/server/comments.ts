@@ -114,6 +114,7 @@ class CommentsController {
       });
       const { result } = res;
       this._store.add(modelFromServer(result));
+      app.recentActivity.addAddressesFromActivity([result]);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
@@ -180,6 +181,7 @@ class CommentsController {
           if (!comment.Address) console.error('Comment missing linked address');
           const model = modelFromServer(comment);
           this._store.add(model);
+          app.recentActivity.removeAddressActivity([comment]);
           return model;
         })).then((result) => {
           resolve(result);

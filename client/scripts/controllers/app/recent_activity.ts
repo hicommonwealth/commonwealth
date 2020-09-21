@@ -13,15 +13,22 @@ class RecentActivityController {
     threads.forEach((thread) => this._store.addThread(thread));
   }
 
-  public addAddresses(addresses: AddressInfo[], parentEntity: string) {
-    addresses.forEach((addr) => this._store.addAddress(addr, parentEntity));
+  public addAddresses(addresses: AddressInfo[], community: string) {
+    addresses.forEach((addr) => this._store.addAddress(addr, community));
   }
 
   public addAddressesFromActivity(activity: any[]) {
-    activity.sort((a, b) => (b.updated_at || b.created_at) - (a.updated_at || a.created_at))
-      .forEach((item) => {
-        this._store.addAddress(item.Address, item.community || item.chain);
-      });
+    activity.forEach((item) => {
+      const parentEntity = item.community || item.chain;
+      this._store.addAddress(item.Address, parentEntity);
+    });
+  }
+
+  public removeAddressActivity(activity: any[]) {
+    activity.forEach((item) => {
+      const parentEntity = item.community || item.chain;
+      this._store.removeAddressActivity(item.Address, parentEntity);
+    });
   }
 
   public getThreadsByCommunity(community: string): Array<OffchainThread> {
@@ -38,6 +45,10 @@ class RecentActivityController {
 
   public getMostActiveUsers(community: string, count: number = 5): Array<IAddressCountAndInfo> {
     return this._store.getMostActiveUsers(community, count);
+  }
+
+  public removeThread(id: number, community: string) {
+    return this._store.removeThread(id, community);
   }
 }
 

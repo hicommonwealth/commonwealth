@@ -34,15 +34,15 @@ class RecentActivityStore {
     return this;
   }
 
-  public removeThread(thread: OffchainThread) {
-    const parentEntity = thread.community || thread.chain;
+  public removeThread(threadId: number, parentEntity: string) {
     const communityStore = this._threadsByCommunity[parentEntity];
-    const matchingthread = communityStore.filter((t) => t.id === thread.id)[0];
+    const matchingthread = communityStore.filter((t) => t.id === threadId)[0];
     const proposalIndex = communityStore.indexOf(matchingthread);
     if (proposalIndex === -1) {
       throw new Error('thread not in store');
     }
     communityStore.splice(proposalIndex, 1);
+    console.log(this);
     return this;
   }
 
@@ -62,9 +62,14 @@ class RecentActivityStore {
     return this;
   }
 
-  public removeAddress(address: AddressInfo, parentEntity: string) {
+  public removeAddressActivity(address: AddressInfo, parentEntity: string) {
     const communityStore = this._addressesByCommunity[parentEntity];
-    delete communityStore[address.id];
+    if (communityStore[address.id]) {
+      communityStore[address.id]['postCount'] -= 1;
+    }
+    if (communityStore[address.id]['postCount'] < 1) {
+      delete communityStore[address.id];
+    }
     return this;
   }
 
