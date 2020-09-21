@@ -66,9 +66,9 @@ class RecentActivityStore {
     const communityStore = this._addressesByCommunity[parentEntity];
     if (communityStore[addressId]) {
       communityStore[addressId]['postCount'] -= 1;
-    }
-    if (communityStore[addressId]['postCount'] < 1) {
-      delete communityStore[addressId];
+      if (communityStore[addressId]['postCount'] < 1) {
+        delete communityStore[addressId];
+      }
     }
     return this;
   }

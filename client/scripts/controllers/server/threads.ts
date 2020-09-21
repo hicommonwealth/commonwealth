@@ -158,7 +158,7 @@ class ThreadsController {
       }).then((result) => {
         _this.store.remove(proposal);
         app.recentActivity.removeThread(proposal.id, proposal.community || proposal.chain);
-        app.recentActivity.removeAddressActivity([proposal]);
+        // app.recentActivity.removeAddressActivity([proposal]);
         m.redraw();
         resolve(result);
       }).catch((e) => {

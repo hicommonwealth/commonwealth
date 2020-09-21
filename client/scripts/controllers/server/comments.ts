@@ -173,7 +173,7 @@ class CommentsController {
       }).then((result) => {
         const existing = this._store.getById(comment.id);
         this._store.remove(existing);
-        app.recentActivity.removeAddressActivity([comment]);
+        // app.recentActivity.removeAddressActivity([comment]);
         resolve(result);
       }).catch((e) => {
         console.error(e);
