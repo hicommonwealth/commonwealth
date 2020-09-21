@@ -29,13 +29,10 @@ class RecentActivityController {
             }
           });
         } else if (r.threadId) {
-          if (threadScopedComments[r.threadId]) threadScopedComments[r.threadId].push(`reaction_${r.id}`);
-          else threadScopedComments[r.threadId] = [${r.id}];
+          this._store.addThreadCount(parentEntity, r.threadId);
         }
       });
     }
-
-    this._store.addThreadActivity()
   }
 
   public addThreads(threads: OffchainThread[]) {
