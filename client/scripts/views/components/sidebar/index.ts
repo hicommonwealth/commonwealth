@@ -22,6 +22,7 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
   view: (vnode) => {
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+    const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     const featuredTopics = {};
     const otherTopics = {};
@@ -103,6 +104,12 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
           active: onDiscussionsPage(m.route.get()),
           label: 'All Discussions',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
+          contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+        }),
+        m(ListItem, {
+          active: onChatPage(m.route.get()),
+          label: 'Chat',
+          onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
         }),
       ]),

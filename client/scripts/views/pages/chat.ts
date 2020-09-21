@@ -1,5 +1,4 @@
-/*
-import 'components/community_chat.scss';
+import 'pages/chat.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
@@ -8,8 +7,12 @@ import moment from 'moment-twitter';
 
 import { link, isSameAccount } from 'helpers';
 import app from 'state';
+import { WebsocketMessageType } from 'types';
+
+import { AddressInfo } from 'models';
 import ChatController from 'controllers/server/socket/chat';
 import User from 'views/components/widgets/user';
+import Sublayout from 'views/sublayout';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import PageLoading from 'views/pages/loading';
@@ -20,8 +23,6 @@ const TYPING_INDICATOR_OUTGOING_FREQUENCY = 1000;
 const TYPING_INDICATOR_INCOMING_PERSISTENCE = 2000;
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
-// websocket purpose
-const SOCKET_PURPOSE = 'chat';
 
 const formatTimestampForChat = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
@@ -78,15 +79,15 @@ const Chat = {
     };
     const server = CHAT_SERVER.startsWith('localhost') ? `ws://${CHAT_SERVER}` : `wss://${CHAT_SERVER}`;
     const chatRoomUrl = `${server}/?room=${vnode.attrs.room}`;
-    vnode.state.chat = new ChatController(chatRoomUrl, SOCKET_PURPOSE, app.user.jwt, (connected) => {
+    vnode.state.chat = new ChatController(chatRoomUrl, app.user.jwt, (connected) => {
       if (connected) {
         vnode.state.messages = [];
         vnode.state.chat.initializeScrollback(app.user.jwt);
         scrollToChatBottom();
       }
     });
-    vnode.state.chat.addListener(onIncomingMessage);
-    vnode.state.chat.addTypingListener(onIncomingTypingIndicator);
+    vnode.state.chat.addListener(WebsocketMessageType.Message, onIncomingMessage);
+    vnode.state.chat.addListener(WebsocketMessageType.Typing, onIncomingTypingIndicator);
     vnode.state.messages = [];
     vnode.state.outgoingTypingInputHandler = _.throttle((e) => {
       if (!vnode.state.chat.isConnected) return;
@@ -117,7 +118,7 @@ const Chat = {
         groupedMessages.length === 0 && vnode.state.chat.isConnected
           && m('.chat-message-placeholder', 'No messages yet'),
         groupedMessages.map((grp) => m('.chat-message-group', [
-          m(User, { user: [grp.sender.address, grp.sender.chain], linkify: true }),
+          m(User, { user: new AddressInfo(null, grp.sender.address, grp.sender.chain, null), linkify: true }),
           m('.chat-message-group-timestamp', formatTimestampForChat(grp.messages[0].timestamp)),
           m('.clear'),
           grp.messages.map((msg) => m('.chat-message-text', [
@@ -178,5 +179,4 @@ const ChatPage = {
   },
 };
 
-export default CommunityChatOuter;
-*/
+export default ChatPage;
