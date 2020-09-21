@@ -72,7 +72,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       : {};
 
     const nominatorsList = vnode.attrs.nominators;
-    const commission = vnode.attrs.commission || 0;
+    const commission = vnode.attrs.commission / 10.0  || 0;
     const apr = vnode.attrs?.apr || 0;
 
     return m('tr.ValidatorRow', [
@@ -86,7 +86,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
         hasMessage: vnode.attrs.hasMessage,
         blockCount: vnode.attrs.blockCount
       })),
-      
+
       m('td.val-total', [
         // formatCoin(app.chain.chain.coins(vnode.attrs.total), true), ' '
         vnode.attrs.total.format(true)
@@ -110,9 +110,9 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       m('td.val-points', vnode.attrs.eraPoints || '0'),
       m('td.val-apr', `${apr.toFixed(2)}%`),
       // m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
-      m('td.val-rewards-slashes-offenses', vnode.attrs.rewardStats?.count),
-      m('td.val-rewards-slashes-offenses', vnode.attrs.slashesStats?.count),
-      m('td.val-rewards-slashes-offenses', vnode.attrs.offencesStats?.count),
+      m('td.val-rewards', vnode.attrs.rewardStats?.count),
+      m('td.val-slashes', vnode.attrs.slashesStats?.count),
+      m('td.val-offenses', vnode.attrs.offencesStats?.count),
     ]);
   }
 });

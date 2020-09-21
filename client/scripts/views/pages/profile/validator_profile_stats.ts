@@ -44,7 +44,7 @@ export interface IValidatorPageState {
   rewards: any;
   fullYearRewards: any;
   offences: any;
-  fullYearOffences:any;
+  fullYearOffences: any;
 }
 export interface IValidatorAttrs {
   address: string;
@@ -287,10 +287,10 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                       label: 'Edit profile'
                     }),
                   ] : [
-                    // TODO: actions for others' accounts
-                  ]
+                      // TODO: actions for others' accounts
+                    ]
                 ])))),
-        ]),
+        ], m(Button, { label: 'Validator Profile' })),
         m('div.profile-stats-row2.row', [
           m('.imonline',
             m('.data-row-block',
@@ -327,10 +327,10 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                   onOwnProfile ? [
                     editIdentityAction(account, vnode.state.identity)
                   ] : [
-                    // TODO: actions for others' accounts
-                  ]
+                      // TODO: actions for others' accounts
+                    ]
                 ])))),
-        ])
+          , m(Button, { label: 'Another Button' })])
       ]));
   }
 });

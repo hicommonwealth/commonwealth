@@ -430,9 +430,9 @@ export const PresentationComponent_ = {
                 }))),
               m('th.val-apr', 'Est. APR'),
               // m('th.val-last-hash', 'last #'),
-              m('th.val-rewards-slashes-offenses', 'Rewards'),
-              m('th.val-rewards-slashes-offenses', 'Slashes'),
-              m('th.val-rewards-slashes-offenses', 'Offenses'),
+              m('th.val-rewards', 'Rewards'),
+              m('th.val-slashes', 'Slashes'),
+              m('th.val-offenses', 'Offenses'),
             ]), m('table.validators-table', [
               result.validators.map((validator) => {
                 // console.log("validator.exposure ===== ", validator.exposure, validator.stash)

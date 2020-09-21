@@ -100,13 +100,17 @@
 .validators-table{
     height: 55vh;
     overflow-y: scroll;
+    padding-right: 15px;
+    padding-left: 15px;
     &::-webkit-scrollbar {
         width: 6px;  /* Remove scrollbar space */
         background-color:#fff;
+        
     }
     &::-webkit-scrollbar-thumb{
         background-color: #d1d1d1;
         border-radius: 10px;
+        
     }
 }
 .tab-bar{
@@ -126,8 +130,15 @@
 
 .ViewNominatorsModal {
     position: relative !important;
-    box-shadow: 0px 16px 24px rgba(67, 90, 111, 0.3) !important;
     border-radius: 4px !important;
+    max-height: 500px;
+    .modal-table{
+        border-collapse: collapse;
+    }
+    .modal-table-row{
+        border-bottom: 1px solid #e4e4e4 !important;
+        // z-index: 9999;
+    }
     @include xs-max {
         .popup {
             min-width: 310px;
@@ -297,7 +308,17 @@
         line-height: 120%;
 
     }
-    td.val-commission,td.val-points,td.val-apr,td.val-rewards-slashes-offenses{
+    th.val-stash{
+        padding-left:15px;
+    }
+    th.val-offenses{
+        margin-right:10px;
+    }
+    th.val-rewards,th.val-slashes,th.val-offenses{
+        justify-content: center;
+    }
+
+    td.val-commission,td.val-points,td.val-apr,td.val-rewards,td.val-slashes,td.val-offenses{
         justify-content: center;
     }
 
@@ -320,11 +341,11 @@
     }
 
     .val-other{
-        flex: 0.35 0 5% !important;
+        flex: 0.35 0 12% !important;
 
     }
     .val-total {
-        flex: 0.35 0 5% !important;
+        flex: 0.35 0 9% !important;
         // padding-left: 0.3vw !important;
         margin-right: 17px;
 
@@ -347,7 +368,7 @@
     }
 
     .val-commission {
-        flex: 0.35 0 5% !important;
+        flex: 0.35 0 10% !important;
         padding-left: 0.5vw !important;
         margin-right: 17px;
 
@@ -372,9 +393,9 @@
         text-overflow: ellipsis;
     }
 
-    .sort-icon .cui-icon.cui-lg svg, .cui-lg .cui-icon svg{
-        min-width: 10px !important;
-        min-height: 10px !important;
+    .sort-icon .svg{
+        width: 10px !important;
+        height: 10px !important;
     }
 
     .sort-icon .cui-icon svg{
@@ -383,9 +404,9 @@
         vertical-align: middle;
         stroke: #536E7C !important;
         margin-left: 4px!important;
-        margin-bottom: 4px!important;
-        min-width: 10px !important;
-        min-height: 10px !important;
+        padding-bottom: 4px!important;
+        width: 10px !important;
+        height: 10px !important;
     }
     .validators-heading{
         padding-top: 24px;

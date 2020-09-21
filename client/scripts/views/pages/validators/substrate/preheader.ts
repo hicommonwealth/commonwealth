@@ -55,7 +55,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       currentIndex, sessionLength,
       sessionProgress, eraLength,
       eraProgress, isEpoch } = sessionInfo;
-
+      
     const nominators: string[] = [];
     let elected: number = 0;
     let waiting: number = 0;
