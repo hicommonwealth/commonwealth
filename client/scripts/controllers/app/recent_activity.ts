@@ -1,6 +1,5 @@
-import { IAddressCountAndInfo } from './../../stores/ActivityStore';
-import { OffchainThread, AddressInfo } from 'models';
-import RecentActivityStore, { IKeyedAddressCountAndInfo } from '../../stores/ActivityStore';
+import { OffchainThread, AddressInfo, OffchainComment, OffchainReaction } from 'models';
+import RecentActivityStore, { IKeyedAddressCountAndInfo, IAddressCountAndInfo } from '../../stores/ActivityStore';
 class RecentActivityController {
   private _store = new RecentActivityStore();
 
@@ -10,7 +9,28 @@ class RecentActivityController {
 
   public get initialized() { return this._initialized; }
 
-  public addThreads(threads: OffchainThread[]) {
+  public addThreads(threads: OffchainThread[], comments?: OffchainComment<any>[], reactions?: OffchainReaction<any>[]) {
+    const root_ids = {};
+    if (comments) {
+      comments.forEach((c) => {
+        if (root_ids[c.rootProposal]) root_ids[c.rootProposal].push(c.id);
+        else root_ids[c.rootProposal] = [c.id];
+      });
+    }
+    if (reactions) {
+      reactions.forEach((r) => {
+        if (r.commentId) {
+          if (!!Object.values(root_ids).filter((arr: any[]) => arr.includes(r.commentId)).length) {
+            
+          }
+        } else if (root_ids[r.threadId || r.proposalId]) {
+          root_ids[r.threadId || r.proposalId].push(r.id);
+       
+        } else {
+          root_ids[r.threadId || r.proposalId] = 1;
+        }
+      });
+    }
     threads.forEach((thread) => this._store.addThread(thread));
   }
 
