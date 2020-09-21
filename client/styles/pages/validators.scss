@@ -128,10 +128,25 @@
     margin-bottom: 16px !important;
 }
 
+.popup{
+    box-shadow: 0px 16px 24px rgba(67, 90, 111, 0.3);
+    
+    &::-webkit-scrollbar {
+        width: 9px;  /* Remove scrollbar space */
+        background-color:#fff;
+       
+    }
+    &::-webkit-scrollbar-thumb{
+        background-color: #d1d1d1;
+        border-radius: 10px;
+    }
+}
+
 .ViewNominatorsModal {
     position: relative !important;
     border-radius: 4px !important;
     max-height: 500px;
+    width: 440px;
     .modal-table{
         border-collapse: collapse;
     }

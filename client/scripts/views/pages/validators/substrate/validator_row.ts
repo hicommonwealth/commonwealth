@@ -82,8 +82,8 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
         trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
       }), m(ValidatorRowImOnline, {
         toBeElected: vnode.attrs.toBeElected,
-        isOnline: vnode.attrs.isOnline,
-        hasMessage: vnode.attrs.hasMessage,
+        isOnline: true,//vnode.attrs.isOnline,
+        hasMessage: true,//vnode.attrs.hasMessage,
         blockCount: vnode.attrs.blockCount
       })),
 
