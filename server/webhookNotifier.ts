@@ -1,6 +1,5 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
-import e from 'express';
 import { capitalize } from 'lodash';
 import { SubstrateEvents } from '@commonwealth/chain-events';
 import { NotificationCategories } from '../shared/types';
@@ -20,6 +19,62 @@ export interface WebhookContent {
 
 // do not send webhook notifications for noisy reaction types
 // const SUPPRESSED_NOTIFICATION_TYPES = [NotificationCategories.NewReaction];
+
+
+const getFilteredContentMarkdown = (content, address) => {
+  let event;
+  if (content.chainEvent && content.chainEventType) {
+    event = SubstrateEvents.Label(
+      content.chainEvent.block_number,
+      content.chainEventType.chain,
+      content.chainEvent.event_data
+    );
+  }
+  return [
+    address ? `*Name:* ${address.name}` : null,
+    content.user ? `*Address:* _${content.user}_` : null,
+    (!content.community && content.chain) ? `*Chain:* ${content.chain}` : null,
+    content.community ? `*Community:* ${content.community}` : null,
+    content.notificationCategory ? `*Type:* ${content.notificationCategory}` : null,
+    content.chainEventType
+      ? `*${capitalize(content.chainEventType.event_name)}* event on _${capitalize(content.chainEventType.chain)}_`
+      : null,
+    content.chainEvent && content.chainEventType
+      ? `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}`
+      : null,
+    content.title ? `*Title:* ${decodeURIComponent(content.title)}` : null,
+    content.bodyUrl ? `*External Link:* ${content.bodyUrl}` : null,
+    content.url ? `*Link:* ${content.url}` : null,
+  ].filter((elt) => !!elt);
+};
+
+const getFilteredContent = (content, address) => {
+  let event;
+  if (content.chainEvent && content.chainEventType) {
+    event = SubstrateEvents.Label(
+      content.chainEvent.block_number,
+      content.chainEventType.chain,
+      content.chainEvent.event_data
+    );
+  }
+  return [
+    address ? `Name: ${address.name}` : null,
+    content.user ? `Address: ${content.user}` : null,
+    (!content.community && content.chain) ? `Chain: ${content.chain}` : null,
+    content.community ? `Community: ${content.community}` : null,
+    content.notificationCategory ? `Type: ${content.notificationCategory}` : null,
+    content.chainEventType
+      ? `${capitalize(content.chainEventType.event_name)} event on ${capitalize(content.chainEventType.chain)}`
+      : null,
+    content.chainEvent && content.chainEventType
+      ? `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}`
+      : null,
+    content.title ? `Title: ${decodeURIComponent(content.title)}` : null,
+    content.bodyUrl ? `External Link: ${content.bodyUrl}` : null,
+    content.url ? `Link: ${content.url}` : null,
+  ].filter((elt) => !!elt);
+};
+
 
 const validURL = (str) => {
   const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
@@ -65,7 +120,7 @@ const discordFormat = (content, address?) => {
       content.chainEventType.chain,
       content.chainEvent.event_data
     );
-  };
+  }
   if (!event) {
     switch (content.notificationCategory) {
       case (NotificationCategories.NewComment): 
@@ -130,60 +185,6 @@ const discordFormat = (content, address?) => {
       }
     ]
   };
-}
-
-const getFilteredContentMarkdown = (content, address) => {
-  let event;
-  if (content.chainEvent && content.chainEventType) {
-    event = SubstrateEvents.Label(
-      content.chainEvent.block_number,
-      content.chainEventType.chain,
-      content.chainEvent.event_data
-    );
-  }
-  return [
-    address ? `*Name:* ${address.name}` : null,
-    content.user ? `*Address:* _${content.user}_` : null,
-    (!content.community && content.chain) ? `*Chain:* ${content.chain}` : null,
-    content.community ? `*Community:* ${content.community}` : null,
-    content.notificationCategory ? `*Type:* ${content.notificationCategory}` : null,
-    content.chainEventType
-      ? `*${capitalize(content.chainEventType.event_name)}* event on _${capitalize(content.chainEventType.chain)}_`
-      : null,
-    content.chainEvent && content.chainEventType
-      ? `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}`
-      : null,
-    content.title ? `*Title:* ${decodeURIComponent(content.title)}` : null,
-    content.bodyUrl ? `*External Link:* ${content.bodyUrl}` : null,
-    content.url ? `*Link:* ${content.url}` : null,
-  ].filter((elt) => !!elt);
-};
-
-const getFilteredContent = (content, address) => {
-  let event;
-  if (content.chainEvent && content.chainEventType) {
-    event = SubstrateEvents.Label(
-      content.chainEvent.block_number,
-      content.chainEventType.chain,
-      content.chainEvent.event_data
-    );
-  }
-  return [
-    address ? `Name: ${address.name}` : null,
-    content.user ? `Address: ${content.user}` : null,
-    (!content.community && content.chain) ? `Chain: ${content.chain}` : null,
-    content.community ? `Community: ${content.community}` : null,
-    content.notificationCategory ? `Type: ${content.notificationCategory}` : null,
-    content.chainEventType
-      ? `${capitalize(content.chainEventType.event_name)} event on ${capitalize(content.chainEventType.chain)}`
-      : null,
-    content.chainEvent && content.chainEventType
-      ? `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}`
-      : null,
-    content.title ? `Title: ${decodeURIComponent(content.title)}` : null,
-    content.bodyUrl ? `External Link: ${content.bodyUrl}` : null,
-    content.url ? `Link: ${content.url}` : null,
-  ].filter((elt) => !!elt);
 };
 
 const send = async (models, content: WebhookContent) => {
@@ -233,8 +234,6 @@ const send = async (models, content: WebhookContent) => {
         console.error(e);
       }
     }));
-
-
 };
 
 export default send;
