@@ -10,24 +10,27 @@ class RecentActivityController {
   public get initialized() { return this._initialized; }
 
   public countThreads(comments?: OffchainComment<any>[], reactions?: OffchainReaction<any>[]) {
-    const rootIds = {};
+    const threadScopedComments = {};
     if (comments) {
       comments.forEach((c) => {
-        if (rootIds[c.rootProposal]) rootIds[c.rootProposal].push(`comment_${c.id}`);
-        else rootIds[c.rootProposal] = [`comment_${c.id}`];
+        const parentEntity = c.community || c.chain;
+        if (threadScopedComments[c.rootProposal]) threadScopedComments[c.rootProposal].push(c.id);
+        else threadScopedComments[c.rootProposal] = [c.id];
+        this._store.addThreadCount(parentEntity, c.rootProposal);
       });
     }
     if (reactions) {
       reactions.forEach((r) => {
+        const parentEntity = r.community || r.chain;
         if (r.commentId) {
-          Object.entries(rootIds).forEach(([key, val]) => {
-            if ((val as any).includes(`comment_${r.commentId}`)) {
-              rootIds[key] = `reaction_${r.id}`;
+          Object.entries(threadScopedComments).forEach(([key, val]) => {
+            if ((val as any).includes(r.commentId)) {
+              this._store.addThreadCount(parentEntity, key);
             }
           });
         } else if (r.threadId) {
-          if (rootIds[r.threadId]) rootIds[r.threadId].push(`reaction_${r.id}`);
-          else rootIds[r.threadId] = [`reaction_${r.id}`];
+          if (threadScopedComments[r.threadId]) threadScopedComments[r.threadId].push(`reaction_${r.id}`);
+          else threadScopedComments[r.threadId] = [${r.id}];
         }
       });
     }
