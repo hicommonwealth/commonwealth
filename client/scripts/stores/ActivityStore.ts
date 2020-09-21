@@ -62,13 +62,13 @@ class RecentActivityStore {
     return this;
   }
 
-  public removeAddressActivity(address: AddressInfo, parentEntity: string) {
+  public removeAddressActivity(addressId: number | string, parentEntity: string) {
     const communityStore = this._addressesByCommunity[parentEntity];
-    if (communityStore[address.id]) {
-      communityStore[address.id]['postCount'] -= 1;
+    if (communityStore[addressId]) {
+      communityStore[addressId]['postCount'] -= 1;
     }
-    if (communityStore[address.id]['postCount'] < 1) {
-      delete communityStore[address.id];
+    if (communityStore[addressId]['postCount'] < 1) {
+      delete communityStore[addressId];
     }
     return this;
   }

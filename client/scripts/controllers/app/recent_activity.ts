@@ -28,7 +28,8 @@ class RecentActivityController {
   public removeAddressActivity(activity: any[]) {
     activity.forEach((item) => {
       const parentEntity = item.community || item.chain;
-      this._store.removeAddressActivity(item.Address, parentEntity);
+      const addressId = item.Address?.id || item.address_id;
+      this._store.removeAddressActivity(addressId, parentEntity);
     });
   }
 
