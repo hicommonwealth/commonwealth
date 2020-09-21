@@ -67,7 +67,7 @@ const discordFormat = (content, address?) => {
       content.chainEventType.chain,
       content.chainEvent.event_data
     );
-  };
+  }
   if (!event) {
     switch (content.notificationCategory) {
       case (NotificationCategories.NewComment):
@@ -140,7 +140,7 @@ const discordFormat = (content, address?) => {
       }
     ]
   };
-}
+};
 
 const getFilteredContentMarkdown = (content, address) => {
   let event;
@@ -200,7 +200,7 @@ const send = async (models, content: WebhookContent) => {
   let address;
   try {
     address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
-  } catch (e) {
+  } catch (err) {
     // pass nothing if no matching address is found
   }
 
@@ -239,12 +239,10 @@ const send = async (models, content: WebhookContent) => {
       }
       try {
         return await request.post(url).send(data);
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        console.error(err);
       }
     }));
-
-
 };
 
 export default send;
