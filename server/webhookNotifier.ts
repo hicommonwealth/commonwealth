@@ -58,6 +58,7 @@ const telegramFormat = (content, address) => {
 const discordFormat = (content, address?) => {
   let event;
   let titleLabel;
+  let bodytext;
   if (content.chainEvent && content.chainEventType) event = SubstrateEvents.Label(content.chainEvent.block_number, content.chainEventType.chain, content.chainEvent.event_data);
   if (!event) {
     switch (content.notificationCategory) {
@@ -73,6 +74,10 @@ const discordFormat = (content, address?) => {
       default:
         titleLabel = '';
     }
+    if (content.body) {
+      bodytext = content.body;
+      if (bodytext.length > 200) bodytext = bodytext.slice(0, 200) + '...';
+    }
   }
   return (content.notificationCategory !== 'chain-event') ? { // Forum Event Discord JSON
     'username': 'Commonwealth',
@@ -87,7 +92,7 @@ const discordFormat = (content, address?) => {
         },
         "title": `${titleLabel}${decodeURIComponent(content.title)}`,
         "url": `${content.url}`,
-        "description": `${content.body}`,
+        "description": `${bodytext}`,
         "color": 15258703,
         // "fields": [
         //   {
