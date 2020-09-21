@@ -4,6 +4,7 @@ import m from 'mithril';
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
+import CommunityInfoModule from '../../components/sidebar/community_info_module';
 
 
 export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: number }, {}> = {
@@ -16,7 +17,7 @@ export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: num
         linkify: true,
         tooltip: true,
       }),
-      m('.activity-count', activityCount)
+      m('.activity-count', `${activityCount}/mo`)
     ]);
   }
 };
@@ -36,6 +37,7 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
           });
         })),
       ]),
+      m(CommunityInfoModule)
     ]);
   }
 };
