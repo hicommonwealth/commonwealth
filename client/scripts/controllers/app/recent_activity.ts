@@ -16,7 +16,6 @@ class RecentActivityController {
         const parentEntity = c.community || c.chain;
         if (threadScopedComments[c.root_id]) threadScopedComments[c.root_id].push(c.id);
         else threadScopedComments[c.root_id] = [c.id];
-        console.log(c);
         this._store.addThreadCount(parentEntity, c.root_id);
       });
     }
@@ -28,7 +27,6 @@ class RecentActivityController {
             const threadId = arr[0];
             const commentArr = arr[1];
             if ((commentArr as any).includes(r.comment_id)) {
-              console.log(r);
               this._store.addThreadCount(parentEntity, threadId);
             }
           });
@@ -66,8 +64,12 @@ class RecentActivityController {
     return this._store.getAddressActivityByCommunity(community);
   }
 
-  public getMostActiveUsers(community: string, userCount): Array<IAddressCountAndInfo> {
-    return this._store.getMostActiveUsers(community, userCount);
+  public getMostActiveUsers(community: string, count: number = 5): Array<IAddressCountAndInfo> {
+    return this._store.getMostActiveUsers(community, count);
+  }
+
+  public getMostActiveThreadIds(community: string, count: number = 5) {
+    return this._store.getMostActiveThreadIds(community, count);
   }
 }
 

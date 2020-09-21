@@ -54,7 +54,6 @@ class RecentActivityStore {
   }
 
   public addThreadCount(parentEntity: string, threadId: number | string) {
-    console.log({ parentEntity, threadId });
     if (!this._activityScopedThreads[parentEntity]) {
       this._activityScopedThreads[parentEntity] = {};
     }
@@ -112,7 +111,7 @@ class RecentActivityStore {
     return this._addressesByCommunity[communityId] || {};
   }
 
-  public getMostActiveUsers(communityId: string, count: number = 5): Array<IAddressCountAndInfo> {
+  public getMostActiveUsers(communityId: string, count: number): Array<IAddressCountAndInfo> {
     const communityStore = this._addressesByCommunity[communityId];
     return communityStore
       ? Object.values(communityStore).sort((a, b) => {
@@ -121,10 +120,10 @@ class RecentActivityStore {
       : [];
   }
 
-  public getMostActiveThreadIds(parentEntity: string, count: number = 5) {
+  public getMostActiveThreadIds(parentEntity: string, count: number) {
     return Object.entries(this._activityScopedThreads[parentEntity]).sort((a: any[], b: any[]) => {
       return b[1] - a[1];
-    }).slice(0, count);
+    }).map((arr) => [arr[0].split('_')[0], arr[0].split('_')[1], arr[1]]).slice(0, count);
   }
 }
 
