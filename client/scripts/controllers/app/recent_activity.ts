@@ -9,7 +9,7 @@ class RecentActivityController {
 
   public get initialized() { return this._initialized; }
 
-  public addThreads(threads: OffchainThread[], comments?: OffchainComment<any>[], reactions?: OffchainReaction<any>[]) {
+  public countThreads(comments?: OffchainComment<any>[], reactions?: OffchainReaction<any>[]) {
     const rootIds = {};
     if (comments) {
       comments.forEach((c) => {
@@ -31,7 +31,12 @@ class RecentActivityController {
         }
       });
     }
-    threads.forEach((thread) => this._store.addThread(thread, rootIds[thread.id].length));
+
+    this._store.addThreadActivity()
+  }
+
+  public addThreads(threads: OffchainThread[]) {
+    threads.forEach((thread) => this._store.addThread(thread));
   }
 
   public addAddresses(addresses: AddressInfo[], parentEntity: string) {
