@@ -75,7 +75,7 @@ const discordFormat = (content, address?) => {
         titleLabel = '';
     }
     if (content.body) {
-      bodytext = content.body;
+      bodytext = decodeURIComponent(content.body);
       if (bodytext.length > 200) bodytext = bodytext.slice(0, 200) + '...';
     }
   }
@@ -86,7 +86,7 @@ const discordFormat = (content, address?) => {
     "embeds": [
       {
         "author": {
-          "name": `${address ? address.name : content.user}`,
+          "name": `${address ? address.name + ': ' + address.address : content.user}`,
           "url": `${content.url}`,
           "icon_url": "https://commonwealth.im/static/img/logo.png"
         },
