@@ -19,16 +19,9 @@ interface ICommunityThreads {
   [parentEntity: string]: Array<OffchainThread>;
 }
 
-interface ICountedThreads {
-  [parentEntity: string]: {
-    [threadId: string]: number;
-  }
-}
-
 class RecentActivityStore {
   private _threadsByCommunity: ICommunityThreads = {};
   private _addressesByCommunity: ICommunityAddresses = {};
-  private _activityScopedThreads: ICountedThreads = {};
 
   public addThread(thread: OffchainThread) {
     thread = modelFromServer(thread);
@@ -50,19 +43,6 @@ class RecentActivityStore {
       throw new Error('thread not in store');
     }
     communityStore.splice(proposalIndex, 1);
-    return this;
-  }
-
-  public addThreadCount(parentEntity: string, threadId: number | string) {
-    if (!this._activityScopedThreads[parentEntity]) {
-      this._activityScopedThreads[parentEntity] = {};
-    }
-    const communityStore = this._activityScopedThreads[parentEntity];
-    if (!communityStore[threadId]) {
-      communityStore[threadId] = 1;
-    } else {
-      communityStore[threadId] += 1;
-    }
     return this;
   }
 
@@ -118,12 +98,6 @@ class RecentActivityStore {
         return (b.postCount - a.postCount);
       }).slice(0, count)
       : [];
-  }
-
-  public getMostActiveThreadIds(parentEntity: string, count: number) {
-    return Object.entries(this._activityScopedThreads[parentEntity]).sort((a: any[], b: any[]) => {
-      return b[1] - a[1];
-    }).map((arr) => [arr[0].split('_')[0], arr[0].split('_')[1], arr[1]]).slice(0, count);
   }
 }
 
