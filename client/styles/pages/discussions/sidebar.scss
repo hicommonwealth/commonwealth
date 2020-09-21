@@ -5,7 +5,7 @@
     .user-activity {
         margin-bottom: 20px;
         .user-activity-header {
-            color: $text-color-light;
+            color: $text-color-lighter;
             font-weight: 500;
             font-size: 15px;
             padding: 3px 0 6px;
@@ -20,14 +20,6 @@
             a:hover {
                 text-decoration: none;
             }
-        }
-    }
-    .forum-activity {
-        .forum-activity-header {
-            color: $text-color-light;
-            font-weight: 500;
-            font-size: 15px;
-            padding: 3px 0 6px;
         }
     }
 }

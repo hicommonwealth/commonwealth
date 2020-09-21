@@ -63,7 +63,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.invites = data.invites;
 
       // add recentActivity
-      const { recentThreads, recentComments, recentReactions } = data;
+      const { recentThreads, recentComments } = data;
       app.recentActivity.addThreads(recentThreads);
       app.recentActivity.addAddressesFromActivity(recentThreads.concat(recentComments));
 
