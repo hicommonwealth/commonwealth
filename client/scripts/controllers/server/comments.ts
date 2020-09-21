@@ -163,6 +163,26 @@ class CommentsController {
     }
   }
 
+  public async delete(comment) {
+    const _this = this;
+    return new Promise((resolve, reject) => {
+      // TODO: Change to DELETE /comment
+      $.post(`${app.serverUrl()}/deleteComment`, {
+        jwt: app.user.jwt,
+        comment_id: comment.id,
+      }).then((result) => {
+        const existing = this._store.getById(comment.id);
+        this._store.remove(existing);
+        app.recentActivity.removeAddressActivity([comment]);
+        resolve(result);
+      }).catch((e) => {
+        console.error(e);
+        notifyError('Could not delete comment');
+        reject(e);
+      });
+    });
+  }
+
   public async refresh(proposal, chainId: string, communityId: string) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -181,7 +201,6 @@ class CommentsController {
           if (!comment.Address) console.error('Comment missing linked address');
           const model = modelFromServer(comment);
           this._store.add(model);
-          app.recentActivity.removeAddressActivity([comment]);
           return model;
         })).then((result) => {
           resolve(result);
@@ -192,25 +211,6 @@ class CommentsController {
         console.log('Failed to load comments');
         reject(new Error(err.responseJSON?.error ? err.responseJSON.error : 'Error loading comments'));
       }
-    });
-  }
-
-  public async delete(comment) {
-    const _this = this;
-    return new Promise((resolve, reject) => {
-      // TODO: Change to DELETE /comment
-      $.post(`${app.serverUrl()}/deleteComment`, {
-        jwt: app.user.jwt,
-        comment_id: comment.id,
-      }).then((result) => {
-        const existing = this._store.getById(comment.id);
-        this._store.remove(existing);
-        resolve(result);
-      }).catch((e) => {
-        console.error(e);
-        notifyError('Could not delete comment');
-        reject(e);
-      });
     });
   }
 

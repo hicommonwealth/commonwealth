@@ -20,6 +20,7 @@ class RecentActivityController {
   public addAddressesFromActivity(activity: any[]) {
     activity.forEach((item) => {
       const parentEntity = item.community || item.chain;
+      if (parentEntity === 'internal') console.log(item);
       this._store.addAddress(item.Address, parentEntity);
     });
   }

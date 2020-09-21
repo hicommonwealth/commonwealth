@@ -98,9 +98,10 @@ class RecentActivityStore {
 
   public getMostActiveUsers(communityId: string, count: number): Array<IAddressCountAndInfo> {
     const communityStore = this._addressesByCommunity[communityId];
+    console.log(communityStore);
     return communityStore
       ? Object.values(communityStore).sort((a, b) => {
-        return (b.postCount - a.postCount);
+        return (b['postCount'] - a['postCount']);
       }).slice(0, count)
       : [];
   }
