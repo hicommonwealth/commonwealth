@@ -152,8 +152,10 @@ const Chat = {
                     e.preventDefault();
                     if (!vnode.state.chat.isConnected) return;
                     const $textarea = $(e.target).closest('form').find('textarea.ResizableTextarea');
-                    const message = $textarea.val();
-                    vnode.state.chat.send('message', message, app.chain.meta.chain.id, app.user.activeAccount.address, app.user.jwt);
+                    const message = JSON.stringify({ text: $textarea.val() });
+                    vnode.state.chat.send(
+                      'message', message, app.chain.meta.chain.id, app.user.activeAccount.address, app.user.jwt
+                    );
                     vnode.state.oninput = false; // HACK: clear the typing debounce
                     $textarea.val('');
                   }

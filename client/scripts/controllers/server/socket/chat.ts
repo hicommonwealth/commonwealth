@@ -24,12 +24,12 @@ class ChatController extends WebsocketController {
 
   public async onmessage(event) {
     console.log('chat: websocket received message');
-    const payload : IWebsocketsPayload<any> = JSON.parse(event.data);
-    if (payload.event === 'message') {
-      this.getListeners()[WebsocketMessageType.Message].call(this, payload.data, payload.address, payload.chain);
-    } else if (payload.event === 'typing') {
+    const payload = JSON.parse(event.data);
+    if (payload.event === WebsocketMessageType.Message) {
+      this.getListeners()[WebsocketMessageType.Message].call(this, payload.text, payload.address, payload.chain);
+    } else if (payload.event === WebsocketMessageType.Typing) {
       this.getListeners()[WebsocketMessageType.Typing].call(this);
-    } else if (payload.event === 'scrollback') {
+    } else if (payload.event === WebsocketMessageType.InitializeScrollback) {
       const scrollback = payload.data.reverse();
       for (const message of scrollback) {
         const timestamp = moment(message.created_at);
@@ -43,7 +43,7 @@ class ChatController extends WebsocketController {
 
   public initializeScrollback(jwt) {
     try {
-      const payload : IWebsocketsPayload<any> = { event: WebsocketMessageType.InitializeScrollback, jwt };
+      const payload = { event: WebsocketMessageType.InitializeScrollback, jwt };
       this._ws.send(JSON.stringify(payload));
     } catch (e) {
       // do nothing
@@ -52,7 +52,7 @@ class ChatController extends WebsocketController {
 
   public sendTypingIndicator(jwt) {
     try {
-      const payload : IWebsocketsPayload<any> = { event: WebsocketMessageType.Typing, jwt };
+      const payload = { event: WebsocketMessageType.Typing, jwt };
       this._ws.send(JSON.stringify(payload));
     } catch (e) {
       // do nothing
