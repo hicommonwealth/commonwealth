@@ -57,7 +57,23 @@ const telegramFormat = (content, address) => {
 
 const discordFormat = (content, address?) => {
   let event;
+  let titleLabel;
   if (content.chainEvent && content.chainEventType) event = SubstrateEvents.Label(content.chainEvent.block_number, content.chainEventType.chain, content.chainEvent.event_data);
+  if (!event) {
+    switch (content.notificationCategory) {
+      case (NotificationCategories.NewComment): 
+        titleLabel = 'New comment on ';
+        break;
+      case (NotificationCategories.NewThread):
+        titleLabel = 'New thread: ';
+        break;
+      case (NotificationCategories.NewReaction):
+        titleLabel = 'New reaction on ';
+        break;
+      default:
+        titleLabel = '';
+    }
+  }
   return (content.notificationCategory !== 'chain-event') ? { // Forum Event Discord JSON
     'username': 'Commonwealth',
     'avatar_url': 'https://commonwealth.im/static/img/logo.png',
@@ -69,26 +85,17 @@ const discordFormat = (content, address?) => {
           "url": `${content.url}`,
           "icon_url": "https://commonwealth.im/static/img/logo.png"
         },
-        "title": `${decodeURIComponent(content.title)}`,
+        "title": `${titleLabel}${decodeURIComponent(content.title)}`,
         "url": `${content.url}`,
-        "description": `Type: ${content.notificationCategory}`,
+        "description": `${content.body}`,
         "color": 15258703,
-        "fields": [
-          {
-            "name": "Text",
-            "value": "More text",
-            "inline": true
-          },
-          {
-            "name": "Even more text",
-            "value": "Yup",
-            "inline": true
-          },
-          {
-            "name": "Thanks!",
-            "value": "You're welcome :wink:"
-          }
-        ],
+        // "fields": [
+        //   {
+        //     "name": "Text",
+        //     "value": "More text",
+        //     "inline": true
+        //   },
+        // ],
         "footer": {
           "text": "–Commonwealth Labs :dove:",
           "icon_url": "https://commonwealth.im/static/img/logo.png"
