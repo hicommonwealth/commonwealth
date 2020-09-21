@@ -16,21 +16,24 @@ interface ICommunityAddresses {
 }
 
 interface ICommunityThreads {
-  [parentEntity: string]: Array<OffchainThread>;
+  [parentEntity: string]: any[];
 }
 
 class RecentActivityStore {
   private _threadsByCommunity: ICommunityThreads = {};
   private _addressesByCommunity: ICommunityAddresses = {};
 
-  public addThread(thread: OffchainThread) {
+  public addThread(thread: OffchainThread, activityCount: number = 0) {
     thread = modelFromServer(thread);
     const parentEntity = thread.community || thread.chain;
     if (!this._threadsByCommunity[parentEntity]) {
       this._threadsByCommunity[parentEntity] = [];
     }
-    this._threadsByCommunity[parentEntity].push(thread);
-    this._threadsByCommunity[parentEntity].sort(byAscendingCreationDate);
+    this._threadsByCommunity[parentEntity].push([thread, activityCount]);
+    this._threadsByCommunity[parentEntity].sort((arrA, arrB) => {
+      return arrB[1] - arrA[1];
+    });
+    console.log(this);
     return this;
   }
 

@@ -10,28 +10,28 @@ class RecentActivityController {
   public get initialized() { return this._initialized; }
 
   public addThreads(threads: OffchainThread[], comments?: OffchainComment<any>[], reactions?: OffchainReaction<any>[]) {
-    const root_ids = {};
+    const rootIds = {};
     if (comments) {
       comments.forEach((c) => {
-        if (root_ids[c.rootProposal]) root_ids[c.rootProposal].push(c.id);
-        else root_ids[c.rootProposal] = [c.id];
+        if (rootIds[c.rootProposal]) rootIds[c.rootProposal].push(`comment_${c.id}`);
+        else rootIds[c.rootProposal] = [`comment_${c.id}`];
       });
     }
     if (reactions) {
       reactions.forEach((r) => {
         if (r.commentId) {
-          if (!!Object.values(root_ids).filter((arr: any[]) => arr.includes(r.commentId)).length) {
-            
-          }
-        } else if (root_ids[r.threadId || r.proposalId]) {
-          root_ids[r.threadId || r.proposalId].push(r.id);
-       
-        } else {
-          root_ids[r.threadId || r.proposalId] = 1;
+          Object.entries(rootIds).forEach(([key, val]) => {
+            if ((val as any).includes(`comment_${r.commentId}`)) {
+              rootIds[key] = `reaction_${r.id}`;
+            }
+          });
+        } else if (r.threadId) {
+          if (rootIds[r.threadId]) rootIds[r.threadId].push(`reaction_${r.id}`);
+          else rootIds[r.threadId] = [`reaction_${r.id}`];
         }
       });
     }
-    threads.forEach((thread) => this._store.addThread(thread));
+    threads.forEach((thread) => this._store.addThread(thread, rootIds[thread.id].length));
   }
 
   public addAddresses(addresses: AddressInfo[], parentEntity: string) {
