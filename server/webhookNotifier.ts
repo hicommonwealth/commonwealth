@@ -1,10 +1,11 @@
 import request from 'superagent';
-import { NotificationCategories } from '../shared/types';
 import { Op } from 'sequelize';
-import e from 'express';
 import { capitalize } from 'lodash';
-import { SERVER_URL } from './config';
 import { SubstrateEvents } from '@commonwealth/chain-events';
+
+import { NotificationCategories } from '../shared/types';
+import { renderQuillDeltaToText } from '../shared/helpers';
+import { SERVER_URL } from './config';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -21,6 +22,62 @@ export interface WebhookContent {
 // do not send webhook notifications for noisy reaction types
 // const SUPPRESSED_NOTIFICATION_TYPES = [NotificationCategories.NewReaction];
 
+
+const getFilteredContentMarkdown = (content, address) => {
+  let event;
+  if (content.chainEvent && content.chainEventType) {
+    event = SubstrateEvents.Label(
+      content.chainEvent.block_number,
+      content.chainEventType.chain,
+      content.chainEvent.event_data
+    );
+  }
+  return [
+    address ? `*Name:* ${address.name}` : null,
+    content.user ? `*Address:* _${content.user}_` : null,
+    (!content.community && content.chain) ? `*Chain:* ${content.chain}` : null,
+    content.community ? `*Community:* ${content.community}` : null,
+    content.notificationCategory ? `*Type:* ${content.notificationCategory}` : null,
+    content.chainEventType
+      ? `*${capitalize(content.chainEventType.event_name)}* event on _${capitalize(content.chainEventType.chain)}_`
+      : null,
+    content.chainEvent && content.chainEventType
+      ? `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}`
+      : null,
+    content.title ? `*Title:* ${decodeURIComponent(content.title)}` : null,
+    content.bodyUrl ? `*External Link:* ${content.bodyUrl}` : null,
+    content.url ? `*Link:* ${content.url}` : null,
+  ].filter((elt) => !!elt);
+};
+
+const getFilteredContent = (content, address) => {
+  let event;
+  if (content.chainEvent && content.chainEventType) {
+    event = SubstrateEvents.Label(
+      content.chainEvent.block_number,
+      content.chainEventType.chain,
+      content.chainEvent.event_data
+    );
+  }
+  return [
+    address ? `Name: ${address.name}` : null,
+    content.user ? `Address: ${content.user}` : null,
+    (!content.community && content.chain) ? `Chain: ${content.chain}` : null,
+    content.community ? `Community: ${content.community}` : null,
+    content.notificationCategory ? `Type: ${content.notificationCategory}` : null,
+    content.chainEventType
+      ? `${capitalize(content.chainEventType.event_name)} event on ${capitalize(content.chainEventType.chain)}`
+      : null,
+    content.chainEvent && content.chainEventType
+      ? `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}`
+      : null,
+    content.title ? `Title: ${decodeURIComponent(content.title)}` : null,
+    content.bodyUrl ? `External Link: ${content.bodyUrl}` : null,
+    content.url ? `Link: ${content.url}` : null,
+  ].filter((elt) => !!elt);
+};
+
+
 const validURL = (str) => {
   const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
     + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
@@ -33,138 +90,134 @@ const validURL = (str) => {
 
 const slackFormat = (content, address) => {
   return JSON.stringify({
-    "type": 'section',
+    'type': 'section',
     // "text": `\`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``,
     // "format": "plain",
-    "text": `${getFilteredContentMarkdown(content, address).join('\n')}`,
-    "format": "mrkdwn",
+    'text': `${getFilteredContentMarkdown(content, address).join('\n')}`,
+    'format': 'mrkdwn',
   });
 };
 
 const matrixFormat = (content, address) => {
   return {
-    "text": `${getFilteredContent(content, address).join('\n')}`,
-    "format": 'plain',
-    "displayName": "Commonwealth Webhook",
-    "avatarUrl": "http://commonwealthLogoGoesHere" // TODO
+    'text': `${getFilteredContent(content, address).join('\n')}`,
+    'format': 'plain',
+    'displayName': 'Commonwealth Webhook',
+    'avatarUrl': 'http://commonwealthLogoGoesHere' // TODO
   };
-}
+};
 
 const telegramFormat = (content, address) => {
   return {
-  }
-}
+  };
+};
 
 const discordFormat = (content, address?) => {
   let event;
-  if (content.chainEvent && content.chainEventType) event = SubstrateEvents.Label(content.chainEvent.block_number, content.chainEventType.chain, content.chainEvent.event_data);
+  let titleLabel;
+  let bodytext;
+  if (content.chainEvent && content.chainEventType) {
+    event = SubstrateEvents.Label(
+      content.chainEvent.block_number,
+      content.chainEventType.chain,
+      content.chainEvent.event_data
+    );
+  }
+  if (!event) {
+    switch (content.notificationCategory) {
+      case (NotificationCategories.NewComment):
+        titleLabel = 'New comment on thread: ';
+        break;
+      case (NotificationCategories.NewThread):
+        titleLabel = 'New thread: ';
+        break;
+      case (NotificationCategories.NewReaction):
+        titleLabel = 'New reaction on thread: ';
+        break;
+      default:
+        titleLabel = '';
+    }
+    if (content.body) {
+      bodytext = decodeURIComponent(content.body);
+      try {
+        // parse and use quill document
+        const doc = JSON.parse(bodytext);
+        const text = renderQuillDeltaToText(doc);
+        if (text.length > 200) {
+          bodytext = `${text.slice(0, 200)}...`;
+        } else {
+          bodytext = text;
+        }
+      } catch (err) {
+        // use markdown document directly
+        if (bodytext.length > 200) {
+          bodytext = `${bodytext.slice(0, 200)}...`;
+        }
+      }
+    }
+  }
   return (content.notificationCategory !== 'chain-event') ? { // Forum Event Discord JSON
     'username': 'Commonwealth',
     'avatar_url': 'https://commonwealth.im/static/img/logo.png',
     // 'content': ``,
-    "embeds": [
+    'embeds': [
       {
-        "author": {
-          "name": `${address ? address.name : content.user}`,
-          "url": `${content.url}`,
-          "icon_url": "https://commonwealth.im/static/img/logo.png"
+        'author': {
+          'name': `${address ? `${address.name}: ${(address.address).slice(0, 8)}...` : content.user}`,
+          'url': `${content.url}`,
+          'icon_url': 'https://commonwealth.im/static/img/logo.png'
         },
-        "title": `${decodeURIComponent(content.title)}`,
-        "url": `${content.url}`,
-        "description": `Type: ${content.notificationCategory}`,
-        "color": 15258703,
-        "fields": [
-          {
-            "name": "Text",
-            "value": "More text",
-            "inline": true
-          },
-          {
-            "name": "Even more text",
-            "value": "Yup",
-            "inline": true
-          },
-          {
-            "name": "Thanks!",
-            "value": "You're welcome :wink:"
-          }
-        ],
-        "footer": {
-          "text": "–Commonwealth Labs :dove:",
-          "icon_url": "https://commonwealth.im/static/img/logo.png"
-        }
+        'title': `${titleLabel}${decodeURIComponent(content.title)}`,
+        'url': `${content.url}`,
+        'description': `${bodytext}`,
+        'color': 15258703,
+        // "fields": [
+        //   {
+        //     "name": "Text",
+        //     "value": "More text",
+        //     "inline": true
+        //   },
+        // ],
       }
     ]
   } : { // Chain Event Discord JSON
     'username': 'Commonwealth',
     'avatar_url': 'https://commonwealth.im/static/img/logo.png',
-    "embeds": [
+    'embeds': [
       {
         // "author": {
         //   "name": `Chain Event`,
         //   "url": `${content.url}`,
         //   "icon_url": "https://commonwealth.im/static/img/logo.png"
         // },
-        "title": `${capitalize(content.chainEventType.chain)}`,
-        "url": `${SERVER_URL}/${content.chainEventType.chain}`,
-        "color": 15258703,
-        "description": `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}`,
-        "footer": {
-          "text": "–Commonwealth Labs :dove:",
-          "icon_url": "https://commonwealth.im/static/img/logo.png"
+        'title': `${capitalize(content.chainEventType.chain)}`,
+        'url': `${SERVER_URL}/${content.chainEventType.chain}`,
+        'color': 15258703,
+        'description': `${event.heading} on ${capitalize(content.chainEventType.chain)} \n`
+          + `Block ${content.chainEvent.block_number} \n${event.label}`,
+        'footer': {
+          'text': '–Commonwealth Labs :dove:',
+          'icon_url': 'https://commonwealth.im/static/img/logo.png'
         }
       }
     ]
   };
-}
-
-const getFilteredContentMarkdown = (content, address) => {
-  let event;
-  if (content.chainEvent && content.chainEventType) event = SubstrateEvents.Label(content.chainEvent.block_number, content.chainEventType.chain, content.chainEvent.event_data);
-  return [
-    address ? `*Name:* ${address.name}` : null,
-    content.user ? `*Address:* _${content.user}_` : null,
-    (!content.community && content.chain) ? `*Chain:* ${content.chain}` : null,
-    content.community ? `*Community:* ${content.community}` : null,
-    content.notificationCategory ? `*Type:* ${content.notificationCategory}` : null,
-    content.chainEventType ? `*${capitalize(content.chainEventType.event_name)}* event on _${capitalize(content.chainEventType.chain)}_` : null,
-    content.chainEvent && content.chainEventType ? `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}` : null,
-    content.title ? `*Title:* ${decodeURIComponent(content.title)}` : null,
-    content.bodyUrl ? `*External Link:* ${content.bodyUrl}` : null,
-    content.url ? `*Link:* ${content.url}` : null,
-  ].filter((elt) => !!elt);
-};
-
-const getFilteredContent = (content, address) => {
-  let event;
-  if (content.chainEvent && content.chainEventType) event = SubstrateEvents.Label(content.chainEvent.block_number, content.chainEventType.chain, content.chainEvent.event_data);
-  return [
-    address ? `Name: ${address.name}` : null,
-    content.user ? `Address: ${content.user}` : null,
-    (!content.community && content.chain) ? `Chain: ${content.chain}` : null,
-    content.community ? `Community: ${content.community}` : null,
-    content.notificationCategory ? `Type: ${content.notificationCategory}` : null,
-    content.chainEventType ? `${capitalize(content.chainEventType.event_name)} event on ${capitalize(content.chainEventType.chain)}` : null,
-    content.chainEvent && content.chainEventType ? `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}` : null,
-    content.title ? `Title: ${decodeURIComponent(content.title)}` : null,
-    content.bodyUrl ? `External Link: ${content.bodyUrl}` : null,
-    content.url ? `Link: ${content.url}` : null,
-  ].filter((elt) => !!elt);
 };
 
 const send = async (models, content: WebhookContent) => {
   let address;
   try {
     address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
-  } catch (e) {
+  } catch (err) {
     // pass nothing if no matching address is found
   }
 
   // if a community is passed with the content, we know that it is from an offchain community
   const chainOrCommObj = (content.community) ? { offchain_community_id: content.community }
     : (content.chain) ? { chain_id: content.chain }
-    : null;
-  const notificationCategory = (content.chainEvent) ? content.chainEvent.chain_event_type_id : content.notificationCategory;
+      : null;
+  const notificationCategory = (content.chainEvent)
+    ? content.chainEvent.chain_event_type_id : content.notificationCategory;
   // grab all webhooks for specific community
   const chainOrCommWebhooks = await models.Webhook.findAll({
     where: {
@@ -188,17 +241,16 @@ const send = async (models, content: WebhookContent) => {
       const data = (url.indexOf('slack') !== -1) ? slackFormat(content, address)
         : (url.indexOf('discord') !== -1) ? discordFormat(content, address)
           : null;
-      if (!data) { console.error('webhook not supported'); return; };
-
-      try {
-        return await request.post(url).send(data);
-      } catch (e) {
-        console.error(e)
+      if (!data) {
+        console.error('webhook not supported');
         return;
       }
+      try {
+        return await request.post(url).send(data);
+      } catch (err) {
+        console.error(err);
+      }
     }));
-
-
 };
 
 export default send;
