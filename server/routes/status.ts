@@ -91,28 +91,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       model: models.Address,
     }
   });
-  const recentReactions = await models.OffchainReaction.findAll({
-    where: {
-      [Op.or]: [
-        {
-          chain: {
-            [Op.in]: chains.map((c) => c.id),
-          }
-        },
-        {
-          community: {
-            [Op.in]: publicCommunities.map((c) => c.id),
-          }
-        }
-      ],
-      created_at: {
-        [Op.gt]: thirtyDaysAgo
-      }
-    },
-    include: {
-      model: models.Address,
-    }
-  });
 
   const { user } = req;
 
@@ -126,7 +104,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       notificationCategories,
       recentThreads,
       recentComments,
-      recentReactions,
       loggedIn: false,
     });
   }
@@ -265,7 +242,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     notificationCategories,
     recentThreads: recentThreads_,
     recentComments,
-    recentReactions,
     roles,
     invites,
     loggedIn: true,

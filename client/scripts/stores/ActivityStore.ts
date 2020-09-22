@@ -1,3 +1,4 @@
+import app from 'state';
 import { modelFromServer } from '../controllers/server/threads';
 import { AddressInfo, OffchainThread } from '../models';
 import { byAscendingCreationDate } from '../helpers';
@@ -121,9 +122,24 @@ class RecentActivityStore {
   }
 
   public getMostActiveThreadIds(parentEntity: string, count: number) {
-    return Object.entries(this._activityScopedThreads[parentEntity]).sort((a: any[], b: any[]) => {
-      return b[1] - a[1];
-    }).map((arr) => [arr[0].split('_')[0], arr[0].split('_')[1], arr[1]]).slice(0, count);
+    const comments = {};
+    const reactions = {};
+    const allThreads = this.getThreadsByCommunity(parentEntity);
+    allThreads.forEach((thread) => {
+      const allComments = app.comments.getByProposal(thread);
+      comments[thread.id] = allComments;
+      reactions[thread.id] = app.reactions.getByPost(thread);
+      allComments.forEach((c) => {
+        reactions[thread.id].concat(app.reactions.getByPost(c));
+      });
+    });
+    allThreads.sort((threadA, threadB) => {
+      const totalActivityA = comments[threadA.id]?.length + reactions[threadA.id]?.length;
+      const totalActivityB = comments[threadB.id]?.length + reactions[threadB.id]?.length;
+      return (totalActivityB - totalActivityA);
+    });
+    console.log(allThreads);
+    return allThreads.slice(0, count);
   }
 }
 
