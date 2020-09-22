@@ -238,6 +238,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       title: proposal.title || '',
       chain: finalComment.chain,
       community: finalComment.community,
+      body: finalComment.text,
     },
     req.wss,
     [ finalComment.Address.address ],
@@ -270,6 +271,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
         title: proposal.title || '',
         chain: finalComment.chain,
         community: finalComment.community,
+        body: finalComment.text,
       },
       req.wss,
       [ finalComment.Address.address ],
@@ -315,6 +317,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
           title: proposal.title || '',
           chain: finalComment.chain,
           community: finalComment.community,
+          body: finalComment.text,
         }, // TODO: add webhook data for mentions
         req.wss,
         [ finalComment.Address.address ],

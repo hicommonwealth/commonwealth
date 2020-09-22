@@ -11,10 +11,11 @@
         color: #fff;
     }
 
-    @include xs-max {
-        .notification-count {
+    @include sm-max {
+        .cui-button-label {
+            overflow: visible;
             position: relative;
-            top: 1px;
+            top: -2px !important;
         }
     }
     .cui-icon {
@@ -79,8 +80,8 @@
     .NotificationButtons {
         .cui-button {
             margin: 0;
-            border-radius: 0;
-            border-top: 1px #d8dee0 solid;
+            border-radius: 0 !important;
+            border-top: 1px #d8dee0 solid !important;
             height: 44px;
             .cui-button-label {
                 text-align: center;
