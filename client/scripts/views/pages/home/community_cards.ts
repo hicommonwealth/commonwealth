@@ -85,7 +85,6 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
         const id = Number(Object.keys(app.recentActivity.activeAddresses[community.id])[idx]);
         return new AddressInfo(id, auth[1], auth[0], null);
       }) : null;
-
     return m(Card, {
       elevation: 1,
       interactive: true,
