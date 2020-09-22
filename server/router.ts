@@ -87,6 +87,7 @@ import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import setPrivacy from './routes/setPrivacy';
 import pinThread from './routes/pinThread';
+import bulkOffchain from './routes/bulkOffchain';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -113,6 +114,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), deleteAddress.bind(this, models));
   // TODO: Change to PUT /node
   router.post('/selectNode', passport.authenticate('jwt', { session: false }), selectNode.bind(this, models));
+
+  router.get('/bulkOffchain', passport.authenticate('jwt', { session: false }), bulkOffchain.bind(this, models));
 
   // chains
   // TODO: Change to POST /chainNode
