@@ -138,7 +138,6 @@ class RecentActivityStore {
       const totalActivityB = comments[threadB.id]?.length + reactions[threadB.id]?.length;
       return (totalActivityB - totalActivityA);
     });
-    console.log(allThreads);
     return allThreads.slice(0, count);
   }
 }

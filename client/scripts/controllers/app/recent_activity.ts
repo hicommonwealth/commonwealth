@@ -68,7 +68,7 @@ class RecentActivityController {
     return this._store.getMostActiveUsers(community, count);
   }
 
-  public getMostActiveThreadIds(community: string, count: number = 5) {
+  public getMostActiveThreadIds(community: string, count: number = 3) {
     return this._store.getMostActiveThreadIds(community, count);
   }
 }
