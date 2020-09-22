@@ -106,12 +106,12 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
           onclick: (e) => m.route.set(`/${app.activeId()}`),
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
         }),
-        m(ListItem, {
-          active: onChatPage(m.route.get()),
-          label: 'Chat',
-          onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-          contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
-        }),
+        // m(ListItem, {
+        //   active: onChatPage(m.route.get()),
+        //   label: 'Chat',
+        //   onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+        //   contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+        // }),
       ]),
       m(List, [
         featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && !app.threads.initialized
