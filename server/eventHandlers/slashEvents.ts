@@ -1,9 +1,11 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
+import getLast30DaysStats  from './computeStats'
 
 
 export default class extends IEventHandler {
   constructor(
-    private readonly _models
+    private readonly _models,
+    private readonly _chain: string
   ) {
     super();
   }
@@ -20,7 +22,7 @@ export default class extends IEventHandler {
 
     // 2) Get relevant data from DB for processing.
     // Get last created validator's record from 'HistoricalValidatorStatistic' table. as slash event contains validator's AccountID.
-    const latestValidators = await this._models.HistoricalValidatorStatistic.findOne({
+    const latestValidatorStat = await this._models.HistoricalValidatorStatistic.findOne({
       where: {
         stash: newSlashEventData.validator
       },
@@ -28,11 +30,15 @@ export default class extends IEventHandler {
         ['created_at', 'DESC']
       ]
     });
-    if (!latestValidators) {
+    if (!latestValidatorStat) {
       return dbEvent;
     }
 
-    let validator = JSON.parse(JSON.stringify(latestValidators));
+    let validator = JSON.parse(JSON.stringify(latestValidatorStat));
+
+    // Added Last 30 days Slash count and averages for a validator.
+    const [thirtyDaysAvg, thirtyDaysCount] = await getLast30DaysStats(this._chain, newSlashEventData.kind, newSlashEventData.validator);
+    validator.slashesStats = {count: thirtyDaysCount, avg: thirtyDaysAvg }
 
     // 3) Modify exposures for validators based of slash balance.
     // TODO: once finalized how we'll apply slash on the validator's exposure then modify the logic based to decided criteria.
