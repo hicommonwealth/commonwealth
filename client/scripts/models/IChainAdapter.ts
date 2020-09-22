@@ -3,6 +3,7 @@ import { ApiStatus, IApp } from 'state';
 import { Coin } from 'adapters/currency';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 import { clearLocalStorage } from 'stores/PersistentStore';
+import $ from 'jquery';
 
 import { CommentRefreshOption } from 'controllers/server/comments';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
@@ -65,11 +66,18 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
   public async initServer(): Promise<void> {
     clearLocalStorage();
-    await this.app.threads.refreshAll(this.id, null, true);
-    await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.ResetAndLoadOffchainComments);
-    await this.app.reactions.refreshAll(this.id, null, true);
-    await this.app.topics.refreshAll(this.id, null, true);
-    await this.meta.chain.getAdminsAndMods(this.id);
+    const response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+      chain: this.id,
+      community: null,
+      jwt: this.app.user.jwt,
+    });
+    const { threads, comments, reactions, topics, admins } = response.result;
+    console.log(admins);
+    this.app.threads.initialize(threads, true);
+    this.app.comments.initialize(comments, true);
+    this.app.reactions.initialize(reactions, true);
+    this.app.topics.initialize(topics, true);
+    this.meta.chain.setAdmins(admins);
     // if we're loading entities from chain, only pull completed
     if (this.chainEntities) {
       const refresh = this.usingServerChainEntities

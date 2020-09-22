@@ -143,6 +143,21 @@ class TopicsController {
     }
   }
 
+  public initialize(initialTopics, reset = true) {
+    if (reset) {
+      this._store.clear();
+    }
+    console.log(initialTopics);
+    initialTopics.forEach((t) => {
+      try {
+        this._store.add(modelFromServer(t));
+      } catch (e) {
+        // malformed topic
+      }
+    });
+    this._initialized = true;
+  }
+
   public getTopicListing = (topic, activeTopic) => {
     // Iff a topic is already in the TopicStore, e.g. due to app.topics.edit, it will be excluded from
     // addition to the TopicStore, since said store will be more up-to-date
