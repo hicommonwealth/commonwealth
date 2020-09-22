@@ -19,9 +19,12 @@ interface ICommunityThreads {
   [parentEntity: string]: Array<OffchainThread>;
 }
 
-class RecentActivityStore {
+export class ActiveThreadsStore {
   private _threadsByCommunity: ICommunityThreads = {};
-  private _addressesByCommunity: ICommunityAddresses = {};
+
+  public getThreadsByCommunity(communityId: string): Array<OffchainThread> {
+    return this._threadsByCommunity[communityId] || [];
+  }
 
   public addThread(thread: OffchainThread) {
     thread = modelFromServer(thread);
@@ -43,6 +46,34 @@ class RecentActivityStore {
     }
     communityStore.splice(proposalIndex, 1);
     return this;
+  }
+
+  public clearThreads() {
+    this._threadsByCommunity = {};
+  }
+}
+
+export class ActiveAddressesStore {
+  private _addressesByCommunity: ICommunityAddresses = {};
+
+  public getAddressesByCommunity(communityId: string): Array<AddressInfo> {
+    const communityStore = this._addressesByCommunity[communityId];
+    return communityStore
+      ? Object.values(communityStore).map((a) => a.addressInfo)
+      : [];
+  }
+
+  public getAddressActivityByCommunity(communityId: string): IIdScopedAddressCountAndInfo {
+    return this._addressesByCommunity[communityId] || {};
+  }
+
+  public getMostActiveUsers(communityId: string, count: number): Array<IAddressCountAndInfo> {
+    const communityStore = this._addressesByCommunity[communityId];
+    return communityStore
+      ? Object.values(communityStore).sort((a, b) => {
+        return (b['postCount'] - a['postCount']);
+      }).slice(0, count)
+      : [];
   }
 
   public addAddress(address: any, parentEntity: string) {
@@ -72,37 +103,7 @@ class RecentActivityStore {
     return this;
   }
 
-  public clearThreads() {
-    this._threadsByCommunity = {};
-  }
-
   public clearAddresses() {
     this._addressesByCommunity = {};
   }
-
-  public getThreadsByCommunity(communityId: string): Array<OffchainThread> {
-    return this._threadsByCommunity[communityId] || [];
-  }
-
-  public getAddressesByCommunity(communityId: string): Array<AddressInfo> {
-    const communityStore = this._addressesByCommunity[communityId];
-    return communityStore
-      ? Object.values(communityStore).map((a) => a.addressInfo)
-      : [];
-  }
-
-  public getAddressActivityByCommunity(communityId: string): IIdScopedAddressCountAndInfo {
-    return this._addressesByCommunity[communityId] || {};
-  }
-
-  public getMostActiveUsers(communityId: string, count: number): Array<IAddressCountAndInfo> {
-    const communityStore = this._addressesByCommunity[communityId];
-    return communityStore
-      ? Object.values(communityStore).sort((a, b) => {
-        return (b['postCount'] - a['postCount']);
-      }).slice(0, count)
-      : [];
-  }
 }
-
-export default RecentActivityStore;
