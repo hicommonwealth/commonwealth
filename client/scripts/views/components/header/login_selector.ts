@@ -213,12 +213,6 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
               : m.route.set('/settings'),
             label: 'Settings'
           }),
-          m(MenuItem, {
-            onclick: () => (app.activeChainId() || app.activeCommunityId())
-              ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationSettings`)
-              : m.route.set('/notificationSettings'),
-            label: 'Notification settings'
-          }),
           m(MenuDivider),
           m(MenuItem, {
             onclick: () => app.modals.create({ modal: FeedbackModal }),
