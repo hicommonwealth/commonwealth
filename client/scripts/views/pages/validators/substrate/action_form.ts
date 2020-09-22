@@ -32,8 +32,8 @@ const ActionForm: m.Component<IActionFormAttrs, IActionFormState> = {
         m(FormLabel, vnode.attrs.titleMsg),
         m(Input, {
           placeholder: vnode.attrs.placeholder,
-          onchange: (e) => {
-            const result= (e.target as any).value;
+          oninput: (e) => {
+            const result = (e.target as any).value;
             vnode.state.data = vnode.attrs.onChangeHandler(result);
           },
         }),

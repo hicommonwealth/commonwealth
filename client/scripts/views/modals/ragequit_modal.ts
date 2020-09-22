@@ -30,7 +30,7 @@ const RagequitModal: m.Component<IAttrs, IState> = {
             oncreate: (vvnode) => {
               $(vvnode.dom).focus();
             },
-            onchange: (e) => {
+            oninput: (e) => {
               const result = (e.target as any).value;
               vnode.state.sharesToBurn = result.toString();
             }
