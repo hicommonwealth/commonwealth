@@ -174,6 +174,29 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     }
   });
 
+  const recentComments_ = await models.OffchainComment.findAll({
+    where: {
+      [Op.or]: [
+        {
+          chain: {
+            [Op.in]: chains.map((c) => c.id),
+          }
+        },
+        {
+          community: {
+            [Op.in]: allCommunities.map((c) => (c as any).id),
+          }
+        }
+      ],
+      created_at: {
+        [Op.gt]: thirtyDaysAgo
+      }
+    },
+    include: {
+      model: models.Address,
+    }
+  });
+
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
     where: { user_id: user.id }
@@ -241,7 +264,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     contractCategories,
     notificationCategories,
     recentThreads: recentThreads_,
-    recentComments,
+    recentComments: recentComments_,
     roles,
     invites,
     loggedIn: true,

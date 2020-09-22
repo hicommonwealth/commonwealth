@@ -96,6 +96,8 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+      app.recentActivity.addThreads([response.result]);
+      app.recentActivity.addAddressesFromActivity([response.result]);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
@@ -155,6 +157,8 @@ class ThreadsController {
         'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);
+        app.recentActivity.removeThread(proposal.id, proposal.community || proposal.chain);
+        // app.recentActivity.removeAddressActivity([proposal]);
         m.redraw();
         resolve(result);
       }).catch((e) => {

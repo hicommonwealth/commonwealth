@@ -13,7 +13,6 @@ yarn-error.log
 coverage/
 *.sw*
 .env
-.nvm/
 
 # Database downloads
 latest.dump
