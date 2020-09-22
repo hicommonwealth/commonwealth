@@ -45,7 +45,7 @@ class SubstrateTreasury extends ProposalModule<
   }
 
   public computeBond(amount: SubstrateCoin): SubstrateCoin {
-    const computed = amount.muln(this.bondPct);
+    const computed = amount.divn(this.bondPct);
     return this.bondMinimum.gt(computed) ? this.bondMinimum : this._Chain.coins(computed);
   }
 
