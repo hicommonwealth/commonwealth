@@ -69,7 +69,7 @@ const EdgewareFunctionPicker = {
             m(FormLabel, `${name} (${app.chain.currency})`),
             m(Input, {
               placeholder: `${name} (${app.chain.currency})`,
-              onchange: (e) => {
+              oninput: (e) => {
                 const result = (e.target as any).value;
                 vnode.state.form.args[index] = app.chain.chain.coins(parseFloat(result), true);
                 m.redraw(); // TODO: why is this needed?
@@ -83,7 +83,7 @@ const EdgewareFunctionPicker = {
             m(FormLabel, `${name} (${type})`),
             m(Input, {
               placeholder: `${name} (${type})`,
-              onchange: (e) => {
+              oninput: (e) => {
                 const result = (e.target as any).value;
                 vnode.state.form.args[index] = result.split(',').map((str) => str.trim());
                 m.redraw(); // TODO: why is this needed?
@@ -96,7 +96,7 @@ const EdgewareFunctionPicker = {
           m(FormLabel, `${name}`),
           m(Input, {
             placeholder: `${name} (${type})`,
-            onchange: (e) => {
+            oninput: (e) => {
               const result = (e.target as any).value;
               vnode.state.form.args[index] = result;
               m.redraw(); // TODO: why is this needed?
