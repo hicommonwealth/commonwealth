@@ -3,24 +3,23 @@ import BN from 'bn.js';
 // duplicated in helpers.ts
 export function formatNumberShort(num: number) {
   const round = (n, digits?) => {
-    if (digits === undefined) digits = 2;
-    return Math.round(n * Math.pow(10, digits)) / Math.pow(10, digits);
-  };
+      if (digits === undefined) digits = 2
+      return Math.round(n * Math.pow(10, digits)) / Math.pow(10, digits)
+  }
 
   const precise = (n, digits?) => {
-    if (digits === undefined) digits = 3;
-    return n.toPrecision(digits)
-  };
+      if (digits === undefined) digits = 3
+      return n.toPrecision(digits)
+  }
 
-  // TODO: Clean this up
-  return num > 1_000_000_000_000 ? round(num / 1_000_000_000_000) + 't' :
-    num > 1_000_000_000 ? round(num / 1_000_000_000) + 'b' :
-    num > 1_000_000 ? round(num / 1_000_000) + 'm' :
-    num > 1_000 ? round(num / 1_000) + 'k' :
-    num > 0.1 ? round(num) :
-    num > 0.01 ? precise(num, 2) :
-    num > 0.001 ? precise(num, 1) :
-    num.toString();
+  return num > 1_000_000_000_000 ? round(num / 1_000_000_000_000).toFixed(2) + 't'
+      : num > 1_000_000_000 ? round(num / 1_000_000_000).toFixed(2) + 'b'
+          : num > 1_000_000 ? round(num / 1_000_000).toFixed(2) + 'm'
+              : num > 1_000 ? round(num / 1_000).toFixed(2) + 'k'
+                  : num > 0.1 ? round(num).toFixed(2)
+                      : num > 0.01 ? Number(precise(num, 2)).toFixed(2)
+                          : num > 0.001 ? Number(precise(num, 1)).toFixed(2)
+                              : num.toFixed(2)
 }
 
 const nf = new Intl.NumberFormat();

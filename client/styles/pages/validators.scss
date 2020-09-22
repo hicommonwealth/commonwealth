@@ -81,8 +81,7 @@
     border: 1px solid rgba(231, 231, 231, 0.5);
     box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
     border-radius: 3px;
-    padding-left: 20px;
-    padding-top: 20px;
+    padding: 20px;
     margin-bottom: 23px;
     margin-top:12px;
 }
@@ -129,10 +128,10 @@
 }
 
 .popup{
-    box-shadow: 0px 16px 24px rgba(67, 90, 111, 0.3);
+    // box-shadow: 0px 16px 24px rgba(67, 90, 111, 0.3);
     
     &::-webkit-scrollbar {
-        width: 9px;  /* Remove scrollbar space */
+        width: 6px;  /* Remove scrollbar space */
         background-color:#fff;
        
     }
@@ -140,12 +139,13 @@
         background-color: #d1d1d1;
         border-radius: 10px;
     }
+    overflow-y: hidden !important;
 }
 
 .ViewNominatorsModal {
     position: relative !important;
     border-radius: 4px !important;
-    max-height: 500px;
+    max-height: 520px;
     width: 440px;
     .modal-table{
         border-collapse: collapse;
@@ -153,6 +153,22 @@
     .modal-table-row{
         border-bottom: 1px solid #e4e4e4 !important;
         // z-index: 9999;
+    }
+   
+    .compact-modal-body{
+        overflow: hidden;
+        overflow-y: scroll;
+        height: 400px;
+        width: 427px;
+        &::-webkit-scrollbar {
+            width: 6px;  /* Remove scrollbar space */
+            background-color:#fff;
+           
+        }
+        &::-webkit-scrollbar-thumb{
+            background-color: #d1d1d1;
+            border-radius: 10px;
+        }
     }
     @include xs-max {
         .popup {
@@ -173,7 +189,17 @@
         }
     }
 }
+.button-col{
+    padding: 19px 0px 16px 19px;
+    margin-left: 30px;
+    .cui-button{
+        color: #536E7C !important;
 
+        &:visited{
+            color: #536E7C !important;
+        }
+    }
+}
 .ManageStakingModal {
     min-width: 780px;
     .compact-modal-title h3 .User .user-avatar {
@@ -271,9 +297,14 @@
         }
     }
 }
-
+.Validators .val-nominators:hover{
+    color: #5F7DEF !important;
+    text-decoration: underline !important;
+}
 .Validators {
     width: 100%;
+  
+    
     .validators-table {
         table-layout: auto !important;
         width: 100%;
@@ -323,6 +354,10 @@
         line-height: 120%;
 
     }
+    .im-online-icons{
+        margin-left: 5px;
+    }
+
     th.val-stash{
         padding-left:15px;
     }
@@ -331,20 +366,20 @@
     }
     th.val-rewards,th.val-slashes,th.val-offenses{
         justify-content: center;
+        padding-left:5px;
+        padding-right:5px;
+        // flex: 0.35 0 6% !important;
     }
 
     td.val-commission,td.val-points,td.val-apr,td.val-rewards,td.val-slashes,td.val-offenses{
-        justify-content: center;
+        justify-content: left;
     }
 
     .cut-text {
         display: inline-block !important;
     }
 
-    .val-last-hash {
-        padding-left: 0.5vw !important;
-    }
-
+ 
     .val-author,
     .val-block-author {
         padding-left: 4vw !important;
@@ -362,33 +397,48 @@
     .val-total {
         flex: 0.35 0 9% !important;
         // padding-left: 0.3vw !important;
-        margin-right: 17px;
+        margin-right: 5px;
 
     }
-    
-    .val-controller,
-    .val-stash {
+    th.val-total{
+        margin-right: 12px;
+    }
+    .val-controller
+    {
         flex: 0.5 0 10% !important;
     }
-
-    .val-points {
+    .val-stash {
+        flex: 0.5 0 18% !important;
+    }
+    td.val-points {
+        flex: 0 0 9% !important;
+    }
+    th.val-points{
+        // padding-left: 10px;
+        margin-right:10px;
         flex: 0 0 8% !important;
-        margin-right: 17px;
+
     }
     .val-stash-td{
-        flex: 0.5 0 10% !important; 
+        flex: 0.5 0 17% !important; 
     }
-    .val-apr{
+    th.val-apr{
         flex: 0 0 8% !important;
     }
-
-    .val-commission {
-        flex: 0.35 0 10% !important;
-        padding-left: 0.5vw !important;
-        margin-right: 17px;
+    td.val-apr{
+        flex: 0 0 8% !important;
 
     }
+    th.val-commission {
+        flex: 0.35 0 10% !important;
+        // padding-left: 0.5vw !important;
+        // margin-right: 17px;
 
+    }
+    td.val-commission{
+        flex: 0.35 0 11% !important;
+        margin-left: 12px;
+    }
     .val-name {
         font-weight: 500;
     }
@@ -397,8 +447,9 @@
     }
 
     .cui-icon svg {
-        width: 0.938vw !important;
-        height: 0.938vw !important;
+        width: 13px !important;
+        height: auto !important;
+        stroke: #536E7C;
     }
     .User {
         display: inline-block;
@@ -427,19 +478,8 @@
         padding-top: 24px;
         padding-bottom: 24px;
     }
-    .val-other a{
-        color: #000000 !important;
-        text-decoration: none !important;
-        &:hover{
-            color: #5F7DEF !important;
-            text-decoration: underline !important;
-        }
-        &:visited{
-            color: #5F7DEF !important;
-            text-decoration: underline !important;
-        }
-    }
-
+ 
+    
     @media only screen and (max-width: 1300px) {
         th {
             //  padding-right: 5px !important;
@@ -473,7 +513,7 @@
         display: grid;
         grid-row-gap: 30px;
         grid-template-columns: auto auto auto auto auto auto auto;
-        margin-bottom: 30px;
+        // margin-bottom: 30px;
         // .validators-preheader-item {
 
         // }
@@ -563,6 +603,7 @@
     background: #fff !important;
     color: #000 !important;
     padding-bottom: 0 !important;
+    margin-left: 13px;
     h1,
     h2{
         font-family: "Inter",sans-serif !important;
@@ -596,7 +637,21 @@
     }
 }
 .compact-modal-body {
+    overflow: hidden;
+        overflow-y: scroll;
+        height: 400px;
+        width: 427px;
+        &::-webkit-scrollbar {
+            width: 6px;  /* Remove scrollbar space */
+            background-color:#fff;
+           
+        }
+        &::-webkit-scrollbar-thumb{
+            background-color: #d1d1d1;
+            border-radius: 10px;
+        }
     padding: 20px 32px 0 !important;
+    padding-right: 10px !important;
     &:last-child {
         padding-bottom: 16px !important;
     }
@@ -607,7 +662,8 @@
 
     .amount,
     .priority {
-        text-align: right !important;
+        text-align: left !important;
+        width: 100px;;
     }
 
     // avatar div
@@ -695,7 +751,7 @@
 
 .cui-popover-dismiss {
     min-width: 76px !important;
-    font-family: Inter !important;
+    font-family: "Inter", sans-serif !important;
     font-style: normal !important;
     font-weight: 500 !important;
     font-size: 12px !important;
@@ -707,7 +763,7 @@
 }
 
 .User label {
-    font-family: Inter !important;
+    font-family: "Inter", sans-serif !important;
     font-style: normal !important;
     font-weight: 500 !important;
     font-size: 12px !important;
@@ -721,10 +777,10 @@
     min-height: 15px !important;
 }
 
-.cui-icon svg {
-    stroke: #252525 !important;
-    margin-left: 5px !important;
-}
+// .cui-icon svg {
+//     stroke: #252525 !important;
+//     margin-left: 5px !important;
+// }
 
 
 // Nominator Modal
@@ -794,3 +850,18 @@ table.modal-table {
 tr.modal-table-row{
     border-bottom: 1px solid #E4E4E4 !important;
 }
+
+.val-nominators{
+    color: #000000 !important;
+    text-decoration: none !important;
+    &:hover{
+        color: #5F7DEF !important;
+        text-decoration: underline !important;
+    }
+    &:visited{
+        color: #000 !important;
+        text-decoration: underline !important;
+    }
+}
+
+

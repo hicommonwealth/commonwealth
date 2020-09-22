@@ -5,7 +5,7 @@ import mixpanel from 'mixpanel-browser';
 import { from } from 'rxjs';
 import app, { ApiStatus } from 'state';
 import { formatAddressShort } from 'helpers/index';
-import { Coin, formatCoin } from 'adapters/currency';
+import { Coin, formatCoin, formatNumberShort } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
 import { u32 } from '@polkadot/types';
 import { HeaderExtended } from '@polkadot/api-derive';
@@ -18,6 +18,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Sublayout from 'views/sublayout';
 import { ICommissionInfo } from 'controllers/chain/substrate/staking';
+import { Button } from 'construct-ui';
 
 import * as CosmosValidationViews from './cosmos';
 import { SubstratePresentationComponent, SubstratePreHeader } from './substrate';
@@ -96,6 +97,15 @@ export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiti
           }),
         ])
       ]),
+      m(".row.button-row",m(".col-xs-12.button-col",m(Button, {
+        label: 'Dismiss',
+        class: 'modal_dismissBtn',
+        href: '#',
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.getList().forEach((m)=>app.modals.remove(m));
+        }
+      })))
     ]);
   }
 };
@@ -114,12 +124,12 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     lastHeader: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.lastHeader
       : null,
-    // nominatedBy: (app.chain.base === ChainBase.Substrate)
-    //   ? (app.chain as Substrate).staking.nominatedBy
-    //   : null,
-    // annualPercentRate: (app.chain.base === ChainBase.Substrate)
-    //   ? (app.chain as Substrate).staking.annualPercentRate
-    //   : null
+    nominatedBy: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.nominatedBy
+      : null,
+    annualPercentRate: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.annualPercentRate
+      : null
   }),
   view: (vnode) => {
     let vComponents = [];

@@ -16,7 +16,8 @@ interface IPreHeaderState {
   dynamic: {
     sessionInfo: DeriveSessionProgress;
     globalStatistics: any,
-    sender: SubstrateAccount
+    sender: SubstrateAccount,
+    validators: IValidators;
   },
 }
 
@@ -42,13 +43,15 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
+    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
     sessionInfo: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.sessionInfo
       : null
   }),
   view: vnode => {
-    let { sessionInfo, globalStatistics, sender } = vnode.state.dynamic;
-    if (!sessionInfo && !globalStatistics) return;
+    const { sessionInfo, globalStatistics, sender, validators } = vnode.state.dynamic;
+    if (!validators && !sessionInfo && !globalStatistics) return;
+    
     let { count = 0, rows = [] } = globalStatistics;
     let apr = 0.0;
     const { currentEra,
