@@ -126,13 +126,13 @@ const discordFormat = (content, address?) => {
   if (!event) {
     switch (content.notificationCategory) {
       case (NotificationCategories.NewComment):
-        titleLabel = 'New comment on ';
+        titleLabel = 'New comment on thread: ';
         break;
       case (NotificationCategories.NewThread):
         titleLabel = 'New thread: ';
         break;
       case (NotificationCategories.NewReaction):
-        titleLabel = 'New reaction on ';
+        titleLabel = 'New reaction on thread: ';
         break;
       default:
         titleLabel = '';
@@ -140,13 +140,19 @@ const discordFormat = (content, address?) => {
     if (content.body) {
       bodytext = decodeURIComponent(content.body);
       try {
-        // parse and return quill document as text
+        // parse and use quill document
         const doc = JSON.parse(bodytext);
         const text = renderQuillDeltaToText(doc);
-        return `${text.slice(0, 200)}...`;
+        if (text.length > 200) {
+          bodytext = `${text.slice(0, 200)}...`;
+        } else {
+          bodytext = text;
+        }
       } catch (err) {
-        // return markdown document
-        return `${bodytext.slice(0, 200)}...`;
+        // use markdown document directly
+        if (bodytext.length > 200) {
+          bodytext = `${bodytext.slice(0, 200)}...`;
+        }
       }
     }
   }
@@ -187,7 +193,8 @@ const discordFormat = (content, address?) => {
         'title': `${capitalize(content.chainEventType.chain)}`,
         'url': `${SERVER_URL}/${content.chainEventType.chain}`,
         'color': 15258703,
-        'description': `${event.heading} on ${capitalize(content.chainEventType.chain)} \nBlock ${content.chainEvent.block_number} \n${event.label}`,
+        'description': `${event.heading} on ${capitalize(content.chainEventType.chain)} \n`
+          + `Block ${content.chainEvent.block_number} \n${event.label}`,
         'footer': {
           'text': '–Commonwealth Labs :dove:',
           'icon_url': 'https://commonwealth.im/static/img/logo.png'
