@@ -7,12 +7,12 @@ export interface IAddressCountAndInfo {
   addressInfo: AddressInfo;
 }
 
-export interface IKeyedAddressCountAndInfo {
+export interface IIdScopedAddressCountAndInfo {
   [addressId: string]: IAddressCountAndInfo;
 }
 
 interface ICommunityAddresses {
-  [parentEntity: string]: IKeyedAddressCountAndInfo;
+  [parentEntity: string]: IIdScopedAddressCountAndInfo;
 }
 
 interface ICommunityThreads {
@@ -42,7 +42,6 @@ class RecentActivityStore {
       throw new Error('thread not in store');
     }
     communityStore.splice(proposalIndex, 1);
-    console.log(this);
     return this;
   }
 
@@ -92,13 +91,12 @@ class RecentActivityStore {
       : [];
   }
 
-  public getAddressActivityByCommunity(communityId: string): IKeyedAddressCountAndInfo {
+  public getAddressActivityByCommunity(communityId: string): IIdScopedAddressCountAndInfo {
     return this._addressesByCommunity[communityId] || {};
   }
 
   public getMostActiveUsers(communityId: string, count: number): Array<IAddressCountAndInfo> {
     const communityStore = this._addressesByCommunity[communityId];
-    console.log(communityStore);
     return communityStore
       ? Object.values(communityStore).sort((a, b) => {
         return (b['postCount'] - a['postCount']);

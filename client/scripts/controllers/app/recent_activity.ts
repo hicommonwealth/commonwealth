@@ -1,5 +1,5 @@
 import { OffchainThread, AddressInfo, OffchainComment, OffchainReaction } from 'models';
-import RecentActivityStore, { IKeyedAddressCountAndInfo, IAddressCountAndInfo } from '../../stores/ActivityStore';
+import RecentActivityStore, { IIdScopedAddressCountAndInfo, IAddressCountAndInfo } from '../../stores/ActivityStore';
 class RecentActivityController {
   private _store = new RecentActivityStore();
 
@@ -20,7 +20,6 @@ class RecentActivityController {
   public addAddressesFromActivity(activity: any[]) {
     activity.forEach((item) => {
       const parentEntity = item.community || item.chain;
-      if (parentEntity === 'internal') console.log(item);
       this._store.addAddress(item.Address, parentEntity);
     });
   }
@@ -41,7 +40,7 @@ class RecentActivityController {
     return this._store.getAddressesByCommunity(community);
   }
 
-  public getAddressActivityByCommunity(community:string): IKeyedAddressCountAndInfo {
+  public getAddressActivityByCommunity(community:string): IIdScopedAddressCountAndInfo {
     return this._store.getAddressActivityByCommunity(community);
   }
 
