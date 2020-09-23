@@ -380,8 +380,8 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
       });
     };
 
-    const AllComments = (comments, replyParent2) => {
-      return comments.map((comment, index) => {
+    const AllComments = (comments2, replyParent2) => {
+      return comments2.map((comment, index) => {
         return ([
           m(ProposalComment, {
             comment,
@@ -390,7 +390,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
             parent: proposal,
             proposal,
             callback: createdCommentCallback,
-            isLast: index === comments.length - 1,
+            isLast: index === comments2.length - 1,
           }),
           // if comment has children, they are fetched & rendered
           !!comment.childComments.length
@@ -479,7 +479,6 @@ const ViewProposalPage: m.Component<{
         profilesStarted: false,
         profilesFinished: false,
       };
-      console.log(vnode.state.prefetch);
     }
     const proposalId = identifier.split('-')[0];
     const proposalType = type;
@@ -685,6 +684,6 @@ const ViewProposalPage: m.Component<{
       }),
     ]);
   }
-}
+};
 
 export default ViewProposalPage;
