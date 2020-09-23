@@ -41,6 +41,12 @@
     }
 
     .new-thread-form-body {
+        max-width: 100%;
+    }
+    &.has-drafts .new-thread-form-body {
+        max-width: calc(100% - 205px);
+    }
+    .new-thread-form-body {
         padding-bottom: 24px;
         flex: 9;
         .cui-tabs {

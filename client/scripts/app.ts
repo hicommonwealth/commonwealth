@@ -411,9 +411,8 @@ $(() => {
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
-    '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/notificationSettings':     redirectRoute(() => '/edgeware/notificationSettings'),
-    '/:scope/notificationSettings': importRoute('views/pages/notification_settings', { scoped: true }),
+    '/notifications':            redirectRoute(() => '/edgeware/notifications'),
+    '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
@@ -425,7 +424,7 @@ $(() => {
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
+    '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),

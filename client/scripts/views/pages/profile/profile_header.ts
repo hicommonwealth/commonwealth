@@ -91,9 +91,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             m('.User', account.profile ? m(User, { user: account, hideAvatar: true }) : account.address),
           ]),
           m('.info-row', [
-            m('span.profile-headline', account.profile && account.profile.headline
-              ? account.profile.headline
-              : m('.no-headline', 'No headline')),
+            account.profile?.headline && m('span.profile-headline', account.profile.headline),
             m('span.username', formatAddressShort(account.address, account.chain)),
             !vnode.state.copied && m('a.copy-address', {
               href: '#',

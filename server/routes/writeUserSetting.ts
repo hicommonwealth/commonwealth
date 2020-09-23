@@ -3,7 +3,7 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const VALID_DIGEST_INTERVALS = ['daily', 'weekly', 'monthly', 'never'];
+const VALID_DIGEST_INTERVALS = ['daily', 'never'];
 
 export const Errors = {
   InvalidUser: 'Invalid user',

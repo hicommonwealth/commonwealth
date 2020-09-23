@@ -10,7 +10,7 @@ import {
   WebsocketMessageType, IWebsocketsPayload,
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData
 } from '../../shared/types';
-import { createNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
+import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
@@ -18,12 +18,10 @@ import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
-const sgMail = require('@sendgrid/mail');
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
-sgMail.setApiKey(SENDGRID_API_KEY);
 
 export interface SubscriptionAttributes {
   id?: number;
@@ -82,7 +80,6 @@ export default (
       chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
     }, {
       underscored: true,
-      paranoid: true,
       indexes: [
         { fields: ['subscriber_id'] },
         { fields: ['category_id', 'object_id', 'is_active'] },
@@ -151,34 +148,32 @@ export default (
 
     const subscribers = await models.Subscription.findAll({ where: findOptions });
     // create notifications (data should always exist, but we check anyway)
-    if (!notification_data) return [];
-    let msg;
-    if (isChainEventData(notification_data)) {
-    //   const chainId = (notification_data as IChainEventNotificationData).chainEvent.type.chain;
-    //   const chain = await models.Chain.findOne({ where: { id: chainId }, });
-    //   msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id, chain.name);
-      msg = createNotificationEmailObject((notification_data as IChainEventNotificationData), category_id);
-      log.info('is chain event!');
-    } else {
-      msg = createNotificationEmailObject((notification_data as IPostNotificationData), category_id);
+    if (!notification_data) {
+      log.info('Subscription is missing notification data, will not trigger send emails or webhooks');
+      return [];
     }
-    const notifications: any[] = await Promise.all(subscribers.map(async (subscription) => {
-      const notificationObj: any = {
-        subscription_id: subscription.id,
-      };
-      if (isChainEventData(notification_data)) {
-        notificationObj.notification_data = '';
-        notificationObj.chain_event_id = notification_data.chainEvent.id;
-      } else {
-        notificationObj.notification_data = JSON.stringify(notification_data);
-      }
-      const notification = await models.Notification.create(notificationObj);
 
-      // send immediate email to subscriber if turned on
-      if (subscription.immediate_email) {
-        sendImmediateNotificationEmail(subscription, msg);
-      }
-      return notification;
+    let msg;
+    try {
+      msg = await createImmediateNotificationEmailObject(notification_data, category_id, models);
+    } catch (e) {
+      console.log('Error generating immediate notification email!');
+      console.trace(e);
+    }
+
+    const notifications = await Promise.all(subscribers.map(async (subscription) => {
+      const notification = await models.Notification.create(
+        isChainEventData(notification_data)
+          ? {
+            subscription_id: subscription.id,
+            notification_data: '',
+            chain_event_id: notification_data.chainEvent.id
+          } : {
+            subscription_id: subscription.id,
+            notification_data: JSON.stringify(notification_data)
+          }
+      );
+      if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
     }));
 
     // send data to relevant webhooks
@@ -189,28 +184,29 @@ export default (
       });
     }
 
-    // send websocket state updates
-    const created_at = new Date();
-    if (wss) {
-      const payload: IWebsocketsPayload<any> = {
-        event: WebsocketMessageType.Notification,
-        data: {
-          topic: category_id,
-          object_id,
-          created_at,
-        }
-      };
-      if (isChainEventData(notification_data)) {
-        payload.data.notification_data = {};
-        payload.data.ChainEvent = notification_data.chainEvent.toJSON();
-        payload.data.ChainEvent.ChainEventType = notification_data.chainEventType.toJSON();
-      } else {
-        payload.data.notification_data = notification_data;
-      }
-      const subscriberIds: number[] = subscribers.map((s) => s.subscriber_id);
-      const userNotificationMap = _.object(subscriberIds, notifications);
-      wss.emit(WebsocketMessageType.Notification, payload, userNotificationMap);
-    }
+    // // send websocket state updates
+    // // TODO: debug and figure out why this may fail and prevent calls from returning
+    // const created_at = new Date();
+    // if (wss) {
+    //   const payload: IWebsocketsPayload<any> = {
+    //     event: WebsocketMessageType.Notification,
+    //     data: {
+    //       topic: category_id,
+    //       object_id,
+    //       created_at,
+    //     }
+    //   };
+    //   if (isChainEventData(notification_data)) {
+    //     payload.data.notification_data = {};
+    //     payload.data.ChainEvent = notification_data.chainEvent.toJSON();
+    //     payload.data.ChainEvent.ChainEventType = notification_data.chainEventType.toJSON();
+    //   } else {
+    //     payload.data.notification_data = notification_data;
+    //   }
+    //   const subscriberIds: number[] = subscribers.map((s) => s.subscriber_id);
+    //   const userNotificationMap = _.object(subscriberIds, notifications);
+    //   wss.emit(WebsocketMessageType.Notification, payload, userNotificationMap);
+    // }
     return notifications;
   };
 

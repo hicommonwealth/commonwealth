@@ -122,6 +122,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
       title: proposal.title || '',
       chain: finalReaction.chain,
       community: finalReaction.community,
+      body: (comment_id) ? comment.text : '',
     },
     req.wss,
     [ finalReaction.Address.address ],

@@ -67,9 +67,9 @@ export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Arra
     }
   },
   view: (vnode) => {
-    return m('.MobileNewProposalButton', [
+    return m('.NewProposalButton.MobileNewProposalButton', [
       m(PopoverMenu, {
-        class: 'NewProposalButton',
+        class: 'new-proposal-button-popover',
         transitionDuration: 0,
         hoverCloseDelay: 0,
         hasArrow: false,
@@ -113,22 +113,17 @@ const NewProposalButton: m.Component<{
       });
     }
 
-    const ProposalButtonGroup = m(ButtonGroup, [
-      m(Button, {
-        disabled: !app.user.activeAccount,
-        intent: 'primary',
-        label: 'New thread',
-        fluid,
-        onclick: () => app.modals.create({ modal: NewThreadModal }),
-      }),
+    const ProposalButtonGroup = m(ButtonGroup, {
+      class: 'NewProposalButton',
+    }, [
       m(PopoverMenu, {
-        class: 'NewProposalButton',
+        class: 'new-proposal-button-popover',
         transitionDuration: 0,
         hoverCloseDelay: 0,
         hasArrow: false,
         trigger: m(Button, {
           disabled: !app.user.activeAccount,
-          iconLeft: Icons.CHEVRON_DOWN,
+          label: 'New thread',
           intent: 'primary',
         }),
         position: 'bottom-end',
@@ -137,6 +132,13 @@ const NewProposalButton: m.Component<{
           align: 'left',
         },
         content: getNewProposalMenu(councilCandidates),
+      }),
+      m(Button, {
+        disabled: !app.user.activeAccount,
+        intent: 'primary',
+        iconLeft: Icons.EDIT,
+        fluid,
+        onclick: () => app.modals.create({ modal: NewThreadModal }),
       }),
     ]);
 

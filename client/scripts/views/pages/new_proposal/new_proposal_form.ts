@@ -297,7 +297,7 @@ const NewProposalForm = {
     if (!dataLoaded) {
       return m(Spinner, {
         fill: true,
-        message: 'Proposal loading...',
+        message: 'Connecting to chain...',
         size: 'xl',
         style: 'visibility: visible; opacity: 1;'
       });
@@ -316,7 +316,6 @@ const NewProposalForm = {
                 (m_) => ({ name: 'councilMotionType', value: m_.name, label: m_.label })
               ),
               callback: (result) => {
-                if (vnode.state.councilMotionType === result) return;
                 vnode.state.councilMotionType = result;
                 vnode.state.councilMotionDescription = motions.find((m_) => m_.name === result).description;
                 m.redraw();
@@ -349,7 +348,6 @@ const NewProposalForm = {
                 },
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.form.title === result) return;
                   vnode.state.form.title = result;
                   m.redraw();
                 },
@@ -362,7 +360,7 @@ const NewProposalForm = {
                   name: 'description',
                   placeholder: 'Enter a description',
                 },
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
                   if (vnode.state.form.description === result) return;
                   vnode.state.form.description = result;
@@ -381,9 +379,8 @@ const NewProposalForm = {
                 oncreate: (vvnode) => {
                   vnode.state.form.beneficiary = author.address;
                 },
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.form.beneficiary === result) return;
                   vnode.state.form.beneficiary = result;
                   m.redraw();
                 },
@@ -395,9 +392,9 @@ const NewProposalForm = {
                 name: 'amount',
                 autofocus: true,
                 placeholder: 'Amount of treasury proposal',
-                onchange: (e) => {
+                autocomplete: 'off',
+                oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.form.amount === app.chain.chain.coins(parseFloat(result), true)) return;
                   vnode.state.form.amount = app.chain.chain.coins(parseFloat(result), true);
                   m.redraw();
                 },
@@ -452,7 +449,7 @@ const NewProposalForm = {
                 oncreate: (vvnode) => $(vvnode.dom).val(app.chain.base === ChainBase.Substrate
                   ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
                   : +(app.chain as Cosmos).governance.minDeposit),
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.deposit = parseFloat(result);
                   m.redraw();
@@ -466,9 +463,8 @@ const NewProposalForm = {
               m(Input, {
                 name: 'voting_period',
                 placeholder: 'Blocks (minimum enforced)',
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.votingPeriod === +result) return;
                   vnode.state.votingPeriod = +result;
                   m.redraw();
                 },
@@ -479,9 +475,8 @@ const NewProposalForm = {
               m(Input, {
                 name: 'enactment_delay',
                 placeholder: 'Blocks (minimum enforced)',
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.enactmentDelay === +result) return;
                   vnode.state.enactmentDelay = +result;
                   m.redraw();
                 },
@@ -495,7 +490,6 @@ const NewProposalForm = {
                 (r) => ({ name: 'referendum', value: r.identifier, label: `${r.shortIdentifier}: ${r.title}` })
               ),
               callback: (result) => {
-                if (vnode.state.referendumId === result) return;
                 vnode.state.referendumId = result;
                 m.redraw();
               },
@@ -509,7 +503,6 @@ const NewProposalForm = {
                 label: `${(app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(0, 8)}...`,
               }] : [],
               callback: (result) => {
-                if (vnode.state.nextExternalProposalHash === result) return;
                 vnode.state.nextExternalProposalHash = result;
                 m.redraw();
               },
@@ -520,7 +513,6 @@ const NewProposalForm = {
               (r) => ({ name: 'external_proposal', value: r.identifier, label: r.shortIdentifier })
             ),
             callback: (result) => {
-              if (vnode.state.treasuryProposalIndex === result) return;
               vnode.state.treasuryProposalIndex = result;
               m.redraw();
             },
@@ -531,9 +523,8 @@ const NewProposalForm = {
               m(Input, {
                 name: 'threshold',
                 placeholder: 'How many members must vote yes to execute?',
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.threshold === +result) return;
                   vnode.state.threshold = +result;
                   m.redraw();
                 },
@@ -546,9 +537,8 @@ const NewProposalForm = {
               m(Input, {
                 name: 'applicant_address',
                 placeholder: 'Applicant Address',
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.applicantAddress === result) return;
                   vnode.state.applicantAddress = result;
                   m.redraw();
                 },
@@ -559,9 +549,8 @@ const NewProposalForm = {
               m(Input, {
                 name: 'token_tribute',
                 placeholder: 'Tribute in tokens',
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.tokenTribute === +result) return;
                   vnode.state.tokenTribute = +result;
                   m.redraw();
                 },
@@ -572,9 +561,8 @@ const NewProposalForm = {
               m(Input, {
                 name: 'shares_requested',
                 placeholder: 'Moloch shares requested',
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.sharesRequested === +result) return;
                   vnode.state.sharesRequested = +result;
                   m.redraw();
                 },
@@ -585,9 +573,8 @@ const NewProposalForm = {
               m(Input, {
                 name: 'title',
                 placeholder: 'Proposal Title',
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.title === result) return;
                   vnode.state.title = result;
                   m.redraw();
                 },
@@ -598,9 +585,8 @@ const NewProposalForm = {
               m(Input, {
                 name: 'description',
                 placeholder: 'Proposal Description',
-                onchange: (e) => {
+                oninput: (e) => {
                   const result = (e.target as any).value;
-                  if (vnode.state.description === result) return;
                   vnode.state.description = result;
                   m.redraw();
                 },
