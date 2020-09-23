@@ -4,7 +4,6 @@ import $ from 'jquery';
 import { Button, Icons, Icon } from 'construct-ui';
 import * as clipboard from 'clipboard-polyfill';
 import { Unsubscribable } from 'rxjs';
-import { externalLink, formatAddressShort, isSameAccount } from 'helpers';
 
 import app from 'state';
 import { Account, ChainBase } from 'models';
@@ -19,6 +18,14 @@ import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { getMaxListeners } from 'superagent';
 import { ValidatorHeaderStats } from './validator_header_stats';
 import validatorIdentity from '../validators/substrate/validator_identity';
+
+
+function formatToSize(inputTxt: string, size: number){
+  if(inputTxt.length > size){
+    inputTxt = inputTxt.substring(0, 13)+'...';
+  }
+  return inputTxt;
+}
 
 
 function capitalizeFirstLetter(string) {
@@ -74,7 +81,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             // TODO: Badges for identity verification, etc.
           ]),
           m('.info-row', [
-            m('span.username.address', formatAddressShort(account.address)),
+            m('span.username.address', formatToSize(account.address,16)),
           ]),
         ]),
         m(ValidatorHeaderStats, { account, address: account.address }),
