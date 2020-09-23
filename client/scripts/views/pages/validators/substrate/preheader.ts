@@ -25,20 +25,11 @@ interface IPreHeaderAttrs {
   sender: SubstrateAccount;
   annualPercentRate: ICommissionInfo;
 }
-const offence = {
-  count: null,
-  setCount(offences) {
-    offence.count = offences.length;
-    m.redraw();
-  }
-};
 
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
   oncreate: async (vnode) => {
     vnode.state.dynamic.globalStatistics = await app.staking.globalStatistics();
     vnode.state.dynamic.sender = app.user.activeAccount as SubstrateAccount;
-    const offences = await app.chainEvents.offences();
-    offence.setCount(offences);
   },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
@@ -51,18 +42,16 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
   view: vnode => {
     const { sessionInfo, globalStatistics, sender, validators } = vnode.state.dynamic;
     if (!validators && !sessionInfo && !globalStatistics) return;
+
     
-    let { count = 0, rows = [] } = globalStatistics;
-    let apr = 0.0;
     const { currentEra,
-      currentIndex, sessionLength,
-      sessionProgress, eraLength,
-      eraProgress, isEpoch } = sessionInfo;
-      
+    currentIndex, sessionLength,
+    sessionProgress, eraLength,
+    eraProgress, isEpoch } = sessionInfo;
     const nominators: string[] = [];
     let elected: number = 0;
-    let waiting: number = 0;
-    let totalStaked = (app.chain as Substrate).chain.coins(0);
+    let waiting: number = globalStatistics.waiting;
+    let totalStaked = (app.chain as Substrate).chain.coins(globalStatistics.totalStaked);
     let hasClaimablePayouts = false;
 
     if (app.chain.base === ChainBase.Substrate) {
@@ -73,31 +62,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           }
         });
     }
-    rows.forEach((stats) => {
-      stats.exposure = stats.HistoricalValidatorStatistics[0]?.exposure;
-      const { exposure = {}, state = '' } = stats;
-      const valStake = (app.chain as Substrate).chain.coins(+exposure?.total)
-        || (app.chain as Substrate).chain.coins(0);
-      totalStaked = (app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));
-
-      // count total nominators
-      const others = exposure?.others || [];
-      others.forEach((obj) => {
-        const nominator = obj.who.toString();
-        if (!nominators.includes(nominator)) {
-          nominators.push(nominator);
-        }
-      });
-      // count elected and waiting validators
-      if (state === 'Active') {
-        elected++;
-      } else {
-        waiting++;
-      }
-      // calculate est. apr
-      apr += stats?.apr ? stats.apr : 0;
-    });
-    apr /= count;
+    
     const totalbalance = (app.chain as Substrate).chain.totalbalance;
     const staked = `${(totalStaked.muln(10000).div(totalbalance).toNumber() / 100).toFixed(2)}%`;
 
@@ -105,7 +70,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       m('.validators-preheader', [
         m('.validators-preheader-item', [
           m('h3', 'Validators'),
-          m('.preheader-item-text', `${elected}/${count}`),
+          m('.preheader-item-text', `${globalStatistics.elected}/${globalStatistics.count}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Waiting'),
@@ -113,13 +78,13 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Nominators'),
-          m('.preheader-item-text', `${nominators.length}`),
+          m('.preheader-item-text', `${globalStatistics.nominators}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Offences'),
-          m('.preheader-item-text', offence.count === null
+          m('.preheader-item-text', globalStatistics?.offences === undefined
             ? 'Loading'
-            : `${offence.count}`),
+            : `${globalStatistics.offences}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Last Block'),
@@ -127,21 +92,21 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         ]),
         (isEpoch
           && sessionProgress && m(CardSummary, {
-          title: 'Epoch',
-          total: sessionLength,
-          value: sessionProgress,
-          currentBlock: formatNumber(currentIndex)
-        })),
+            title: 'Epoch',
+            total: sessionLength,
+            value: sessionProgress,
+            currentBlock: formatNumber(currentIndex)
+          })),
         eraProgress
-          && m(CardSummary, {
-            title: 'Era',
-            total: eraLength,
-            value: eraProgress,
-            currentBlock: formatNumber(currentEra)
-          }),
-        m('.validators-preheader-item', [ 
+        && m(CardSummary, {
+          title: 'Era',
+          total: eraLength,
+          value: eraProgress,
+          currentBlock: formatNumber(currentEra)
+        }),
+        m('.validators-preheader-item', [
           m('h3', 'Est. APR'),
-          m('.preheader-item-text', `${apr}%`),
+          m('.preheader-item-text', `${globalStatistics.aprPercentage.toFixed(2)}%`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Supply'),
@@ -211,8 +176,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
             })
           ]),
         ])
-        ]),
-      ])
+      ]),
+    ])
   }
 });
 

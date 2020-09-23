@@ -339,9 +339,6 @@ export const PresentationComponent_ = {
     model.scroll = false;
     $("table.validators-table").on('scroll', function () {
       if (!model.scroll) {
-         console.log("$(this).scrollTop()", $(this).scrollTop())
-         console.log("$(this).innerHeight()", $(this).innerHeight())
-         console.log("$(this).scrollHeight()", $(this)[0].scrollHeight)
         if ($(this).scrollTop() + $(this).innerHeight() + ($(this)[0].scrollHeight * 0.05)  >= $(this)[0].scrollHeight) {
           // alert('end reached');
           console.log('inside')
