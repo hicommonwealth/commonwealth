@@ -124,6 +124,7 @@ export const sendBatchedNotificationEmails = (models) => {
   }).then((users) => {
     log.info(`Sending to ${users.length} users`);
 
+    const { Op } = models.sequelize;
     const last24hours = new Date((new Date() as any) - 24 * 60 * 60 * 1000);
     Promise.all(users.map(async (user) => {
       const notifications = await models.Notification.findAll({
