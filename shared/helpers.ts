@@ -1,3 +1,13 @@
+export const smartTrim = (text, maxLength = 200) => {
+  if (text.length > maxLength) {
+    const smartTrimmedText = text.slice(0, maxLength).replace(/\W+$/, '');
+    if (smartTrimmedText.length === 0) return `${text.slice(0, maxLength)}...`;
+    return `${smartTrimmedText}...`;
+  } else {
+    return text;
+  }
+};
+
 export const validURL = (str) => {
   const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
     + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name

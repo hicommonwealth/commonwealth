@@ -4,7 +4,7 @@ import { capitalize } from 'lodash';
 import { SubstrateEvents } from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
-import { validURL, renderQuillDeltaToText } from '../shared/helpers';
+import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/helpers';
 import { getForumNotificationCopy } from '../shared/notificationFormatter';
 import { SERVER_URL } from './config';
 
@@ -44,28 +44,21 @@ const getFilteredContent = (content, address) => {
     const actedOnLink = content.url;
 
     const notificationTitlePrefix = content.notificationCategory === NotificationCategories.NewComment
-      ? 'Comment on '
+      ? 'Comment on: '
       : content.notificationCategory === NotificationCategories.NewThread ? 'New thread: '
-        : content.notificationCategory === NotificationCategories.NewReaction ? 'Reaction on '
-          : 'New activity on ';
+        : content.notificationCategory === NotificationCategories.NewReaction ? 'Reaction on: '
+          : 'Activity on: ';
     const notificationExcerpt = (() => {
       let bodytext = decodeURIComponent(content.body);
       try {
         // parse and use quill document
         const doc = JSON.parse(bodytext);
         const text = renderQuillDeltaToText(doc);
-        if (text.length > 200) {
-          bodytext = `${text.slice(0, 200)}...`;
-        } else {
-          bodytext = text;
-        }
+        return smartTrim(text);
       } catch (err) {
         // use markdown document directly
-        if (bodytext.length > 200) {
-          bodytext = `${bodytext.slice(0, 200)}...`;
-        }
+        return smartTrim(bodytext);
       }
-      return bodytext;
     })();
 
     return { community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt };

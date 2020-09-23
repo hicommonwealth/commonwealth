@@ -1,5 +1,6 @@
 import { IPostNotificationData, IChainEventNotificationData, NotificationCategories } from './types';
 import { getProposalUrl } from './utils';
+import { renderQuillDeltaToText, smartTrim } from './helpers';
 
 import { SERVER_URL } from '../server/config';
 
@@ -17,8 +18,8 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   const decodedTitle = decodeURIComponent(root_title).trim();
 
   // email subject line
-  const emailSubjectLine = ((category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
-    : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
+  const emailSubjectLine = ((category_id === NotificationCategories.NewComment) ? `Comment on: ${decodedTitle}`
+    : (category_id === NotificationCategories.NewMention) ? `You were mentioned in: ${decodedTitle}`
       : (category_id === NotificationCategories.NewThread) ? `New thread: ${decodedTitle}`
         : 'New activity on Commonwealth');
 
@@ -46,8 +47,19 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   const communityObject = chain_id
     ? await models.Chain.findOne({ where: { id: chain_id } })
     : await models.OffchainCommunity.findOne({ where: { id: community_id } });
-  const communityCopy = communityObject ? ` in ${communityObject.name}:` : ':';
-  const excerpt = decodeURIComponent(comment_text); // TODO: unpack Markdown and Quill
+  const communityCopy = communityObject ? `in ${communityObject.name}:` : ':';
+  const excerpt = (() => {
+    const text = decodeURIComponent(comment_text);
+    try {
+      // return rendered quill doc
+      const doc = JSON.parse(text);
+      const finalText = renderQuillDeltaToText(doc);
+      return smartTrim(finalText);
+    } catch (e) {
+      // return markdown
+      return smartTrim(text);
+    }
+  })();
 
   // link to proposal
   const pseudoProposal = {
