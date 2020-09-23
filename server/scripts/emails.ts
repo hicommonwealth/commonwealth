@@ -65,7 +65,7 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
 const createNotificationDigestEmailObject = async (user, notifications, models) => {
   const emailObjArray = await Promise.all(notifications.map(async (n) => {
     const { category_id } = await n.getSubscription();
-    const notification_data = JSON.parse(n.notificationData);
+    const notification_data = JSON.parse(n.notification_data);
 
     if (notification_data.chain_event) {
       // TODO: implement chain event
@@ -92,7 +92,7 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
     templateId: DynamicTemplate.BatchNotifications,
     dynamic_template_data: {
       notifications: emailObjArray,
-      subject: `New Commonwealth activity: ${notifications.length === 1 ? 'item' : 'items'}`,
+      subject: `${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
       user: user.email,
     },
   };
@@ -135,18 +135,20 @@ export const sendBatchedNotificationEmails = (models) => {
       emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
       emailObject.bcc = 'raymond+bcc@commonwealth.im';
       try {
-        console.log('sending batch notification email');
+        console.log(`sending batch notification email to ${user.email}`);
         await sgMail.send(emailObject);
       } catch (e) {
         console.log('Failed to send batch notification email', e?.response?.body?.errors);
-        log.error(e);
+        console.log(log.error(e));
       }
     })).then(() => {
       process.exit(0);
     }).catch((err) => {
+      console.log(err);
       process.exit(1);
     });
   }).catch((err) => {
-      process.exit(1);
+    console.log(err);
+    process.exit(1);
   });
 };
