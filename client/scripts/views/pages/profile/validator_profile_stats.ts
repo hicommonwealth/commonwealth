@@ -271,26 +271,10 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
             m('.info-row-block',
               m('.profile-data-block',
                 `${fullYearRewards.length} (${formatNumberShort(sumOfFullYearRewards / 1_000_000_000_000_000_000)} EDG)`))), // `${fullYearSlashes.length} (${formatNumberShort(sumOfFullYearSlashes / 1_000_000_000_000_000_000)} EDG)`
-          m('.button-set-identity',
+          m('.bio-actions-edit-profile',
             m('.data-row-block',
-              m('.profile-header-block',
-                m('.bio-actions-edit-profile', [
-                  onOwnProfile ? [
-                    m(Button, {
-                      intent: 'primary',
-                      onclick: () => {
-                        app.modals.create({
-                          modal: EditProfileModal,
-                          data: { account },
-                        });
-                      },
-                      label: 'Edit profile'
-                    }),
-                  ] : [
-                      // TODO: actions for others' accounts
-                    ]
-                ])))),
-        ], m(Button, { label: 'Validator Profile' })),
+              m(Button, { label: 'Validator Profile' }))),
+        ]),
         m('div.profile-stats-row2.row', [
           m('.imonline',
             m('.data-row-block',
@@ -320,17 +304,10 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
             m('.info-row-block',
               m('.profile-data-block',
                 `${rewards.length} (${formatNumberShort(sumOfRewards / 1_000_000_000_000_000_000)} EDG)`))),
-          m('.button-set-identity',
+          m('.bio-actions-edit-identity',
             m('.info-row-block',
-              m('.profile-data-block',
-                m('.bio-actions-edit-identity', [
-                  onOwnProfile ? [
-                    editIdentityAction(account, vnode.state.identity)
-                  ] : [
-                      // TODO: actions for others' accounts
-                    ]
-                ])))),
-          , m(Button, { label: 'Another Button' })])
+            m(Button, { label: 'Another Button' }))),
+          ,])
       ]));
   }
 });

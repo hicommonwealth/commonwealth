@@ -219,6 +219,8 @@ const model = {
         e.rewardStats = e.HistoricalValidatorStatistics[0]?.rewardsStats;
         e.slashesStats = e.HistoricalValidatorStatistics[0]?.slashesStats;
         e.offencesStats = e.HistoricalValidatorStatistics[0]?.offencesStats;
+        e.hasMessage = e.HistoricalValidatorStatistics[0]?.hasMessage;
+        e.isOnline = e.HistoricalValidatorStatistics[0]?.isOnline;
     }); 
       model.constValidators = [...result.validators, ...model.constValidators];
       model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
@@ -375,7 +377,6 @@ export const PresentationComponent_ = {
     //   .filter((elt) => elt > -1.0 && elt < 1000.0);
     // const aprSum = filtered.reduce((prev, curr) => prev + curr, 0.0);
     // const aprAvg = (aprSum * 1.0) / filtered.length;
-
     return m('div.validators-container',
       m(Tabs, [
         {

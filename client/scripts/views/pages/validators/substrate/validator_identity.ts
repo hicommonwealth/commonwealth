@@ -53,6 +53,12 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
     //     m('p', 'Loading ...'),
     //   ]);
 
+
+    // HARD CODED
+    info.email = "hello@example.com"
+    info.web = "http://hello.world"
+    info.twitter = "@adsadad"
+    info.riot = "somedata"
     const clsName = info.isGood
       ? '.icon-ok-circled.green'
       : info.isBad
@@ -66,9 +72,9 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
         // m(`span.identity-icon${clsName}`, ''),
         // TODOO: plan is to get the commented values  from vnode.attrs that is being called from profile_header
         m('div.validator-profile-imonline-icons', validators && m(ImOnline, {
-          toBeElected: (validators[vnode.attrs.stash] ? validators[vnode.attrs.stash].toBeElected : false),
-          isOnline: (validators[vnode.attrs.stash] ? validators[vnode.attrs.stash].isOnline : false),
-          hasMessage: (validators[vnode.attrs.stash] ? validators[vnode.attrs.stash].hasMessage : false),
+          toBeElected: true,//(validators[vnode.attrs.stash] ? validators[vnode.attrs.stash].toBeElected : false),
+          isOnline: true,//(validators[vnode.attrs.stash] ? validators[vnode.attrs.stash].isOnline : false),
+          hasMessage: true,// (validators[vnode.attrs.stash] ? validators[vnode.attrs.stash].hasMessage : false),
         })),
         info.email
         && m('div.validator-profile-identity-icons', [
