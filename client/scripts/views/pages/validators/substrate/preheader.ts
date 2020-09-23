@@ -73,8 +73,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           }
         });
     }
-
     rows.forEach((stats) => {
+      stats.exposure = stats.HistoricalValidatorStatistics[0]?.exposure;
       const { exposure = {}, state = '' } = stats;
       const valStake = (app.chain as Substrate).chain.coins(+exposure?.total)
         || (app.chain as Substrate).chain.coins(0);
