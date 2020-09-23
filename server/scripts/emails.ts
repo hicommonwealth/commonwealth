@@ -123,14 +123,22 @@ export const sendBatchedNotificationEmails = (models) => {
     where: { emailNotificationInterval: 'daily' }
   }).then((users) => {
     log.info(`Sending to ${users.length} users`);
+
+    const last24hours = new Date((new Date() as any) - 24 * 60 * 60 * 1000);
     Promise.all(users.map(async (user) => {
       const notifications = await models.Notification.findAll({
         include: [{
           model: models.Subscription,
           where: { subscriber_id: user.id },
         }],
-        where: { is_read: false }
+        where: {
+          is_read: false,
+          created_at: { [Op.gt]: last24hours }
+        }
       });
+      if (notifications.length === 0) return; // don't notify if there have been no new notifications in the last 24h
+
+      // send notification email
       const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
       emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
       emailObject.bcc = 'raymond+bcc@commonwealth.im';
