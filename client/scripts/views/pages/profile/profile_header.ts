@@ -1,3 +1,4 @@
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
@@ -31,6 +32,13 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
     // wait for info to load before making it clickable
     disabled: vnode.state.chainLoading,
     onclick: async () => {
+      if (!m.route.get().includes(chainObj.name)) {
+        let confirmed = false;
+        confirmed = await confirmationModalWithText(`Must switch to ${chainObj.name} to set on-chain identity. Continue?`)();
+        if (confirmed) {
+          m.route.set(`/${chainObj.name}`);
+        };
+      }
       if (!app.chain?.loaded) {
         vnode.state.chainLoading = true;
         initChain().then(() => {

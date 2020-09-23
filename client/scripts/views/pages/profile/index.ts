@@ -15,10 +15,10 @@ import PageNotFound from 'views/pages/404';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
+import { decodeAddress } from '@polkadot/keyring';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
-import { decodeAddress } from '@polkadot/keyring';
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -29,18 +29,18 @@ const commentModelFromServer = (comment) => {
     const proposalSplit = decodeURIComponent(comment.root_id).split(/-|_/);
     if (proposalSplit[0] === 'discussion') {
       proposal = new OffchainThread(
-      '',
-      '',
-      null,
-      Number(proposalSplit[1]),
-      comment.created_at,
-      null,
-      null,
-      null,
-      comment.community,
-      comment.chain,
-      null,
-      null
+        '',
+        '',
+        null,
+        Number(proposalSplit[1]),
+        comment.created_at,
+        null,
+        null,
+        null,
+        comment.community,
+        comment.chain,
+        null,
+        null
       );
     } else {
       proposal = {
