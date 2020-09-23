@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+import moment from 'moment';
 import {
   SubstrateTypes, MolochTypes,
   SubstrateEvents, MolochEvents, IEventLabel, IEventTitle, IChainEventData } from '@commonwealth/chain-events';
@@ -80,6 +81,7 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
         community: communityCopy,
         excerpt,
         path,
+        createdAt: moment(n.created_at).fromNow(),
       };
     }
   }));
