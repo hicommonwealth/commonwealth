@@ -115,8 +115,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to PUT /node
   router.post('/selectNode', passport.authenticate('jwt', { session: false }), selectNode.bind(this, models));
 
-  router.get('/bulkOffchain', passport.authenticate('jwt', { session: false }), bulkOffchain.bind(this, models));
-
   // chains
   // TODO: Change to POST /chainNode
   router.post('/addChainNode', passport.authenticate('jwt', { session: false }), addChainNode.bind(this, models));
@@ -158,6 +156,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/drafts', getDrafts.bind(this, models));
   router.delete('/drafts', passport.authenticate('jwt', { session: false }), deleteDraft.bind(this, models));
   router.patch('/drafts', passport.authenticate('jwt', { session: false }), editDraft.bind(this, models));
+
+  router.get('/bulkOffchain', bulkOffchain.bind(this, models));
 
   // offchain comments
   // TODO: Change to POST /comment
