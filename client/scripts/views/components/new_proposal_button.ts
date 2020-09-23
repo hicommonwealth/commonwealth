@@ -67,9 +67,9 @@ export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Arra
     }
   },
   view: (vnode) => {
-    return m('.MobileNewProposalButton', [
+    return m('.NewProposalButton.MobileNewProposalButton', [
       m(PopoverMenu, {
-        class: 'NewProposalButton',
+        class: 'new-proposal-button-popover',
         transitionDuration: 0,
         hoverCloseDelay: 0,
         hasArrow: false,
@@ -113,7 +113,9 @@ const NewProposalButton: m.Component<{
       });
     }
 
-    const ProposalButtonGroup = m(ButtonGroup, [
+    const ProposalButtonGroup = m(ButtonGroup, {
+      class: 'NewProposalButton',
+    }, [
       m(Button, {
         disabled: !app.user.activeAccount,
         intent: 'primary',
@@ -122,7 +124,7 @@ const NewProposalButton: m.Component<{
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       }),
       m(PopoverMenu, {
-        class: 'NewProposalButton',
+        class: 'new-proposal-button-popover',
         transitionDuration: 0,
         hoverCloseDelay: 0,
         hasArrow: false,
