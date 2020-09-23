@@ -47,6 +47,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       }, 1);
     }
 
+    if (app.user.unseenPosts[app.activeId()]) {
+      app.user.unseenPosts[app.activeId()]['activePosts'] = 0;
+      app.user.unseenPosts[app.activeId()]['threads'] = 0;
+    }
+
     // Infinite Scroll
     const onscroll = _.debounce(() => {
       const scrollHeight = $(document).height();

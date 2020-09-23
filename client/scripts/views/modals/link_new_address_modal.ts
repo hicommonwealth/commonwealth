@@ -688,7 +688,7 @@ const LinkNewAddressModal: m.Component<{
             placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
               : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here (e.g. cosmos123...)'
                 : 'Paste the address here',
-            onchange: async (e) => {
+            oninput: async (e) => {
               const address = (e.target as any).value;
               vnode.state.error = null;
               vnode.state.enteredAddress = address;
@@ -756,7 +756,7 @@ const LinkNewAddressModal: m.Component<{
               placeholder: (app.chain.base === ChainBase.CosmosSDK)
                 ? 'Paste the entire output'
                 : 'Paste the signature here',
-              onchange: async (e) => {
+              oninput: async (e) => {
                 const signature = (e.target as any).value;
                 const unverifiedAcct = vnode.state.newAddress;
                 const validationToken = unverifiedAcct.validationToken;

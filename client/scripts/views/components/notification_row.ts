@@ -11,7 +11,7 @@ import { Notification, AddressInfo } from 'models';
 import { pluralize } from 'helpers';
 import { IPostNotificationData } from 'shared/types';
 
-import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
+import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
@@ -65,9 +65,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   } else if (category === NotificationCategories.NewThread) {
     notificationHeader = m('span', [ actorName, ' created a new thread ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
-    notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', community_name) ])
-      : m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title || community_name) ]);
+    notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
       ? m('span', [ actorName, ' liked your post ', m('span.commented-obj', decoded_title) ])
