@@ -155,9 +155,7 @@ export default (
 
     let msg;
     try {
-      msg = isChainEventData(notification_data)
-        ? await createImmediateNotificationEmailObject((notification_data as IChainEventNotificationData), category_id, models)
-        : await createImmediateNotificationEmailObject((notification_data as IPostNotificationData), category_id, models);
+      msg = await createImmediateNotificationEmailObject(notification_data, category_id, models);
     } catch (e) {
       console.log('Error generating immediate notification email!');
       console.trace(e);

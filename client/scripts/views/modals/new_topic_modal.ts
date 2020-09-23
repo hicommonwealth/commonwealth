@@ -50,7 +50,7 @@ const NewTopicModal: m.Component<{
                 // use oncreate to focus because autofocus: true fails when component is recycled in a modal
                 setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
               },
-              onchange: (e) => {
+              oninput: (e) => {
                 vnode.state.form.name = (e.target as any).value;
               },
             }),
@@ -62,7 +62,7 @@ const NewTopicModal: m.Component<{
               class: 'topic-form-description',
               tabindex: 2,
               defaultValue: vnode.state.form.description,
-              onchange: (e) => {
+              oninput: (e) => {
                 vnode.state.form.description = (e.target as any).value;
               }
             }),

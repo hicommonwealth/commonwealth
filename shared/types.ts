@@ -38,7 +38,7 @@ export enum WebsocketMessageType {
   Message = 'message',
   Heartbeat = 'heartbeat',
   HeartbeatPong = 'heartbeat-pong',
-  Scrollback = 'scrollback',
+  InitializeScrollback = 'scrollback',
   Typing = 'typing',
   Notification = 'notification',
   ChainEntity = 'chain-entity',

@@ -297,7 +297,7 @@ const NewProposalForm = {
     if (!dataLoaded) {
       return m(Spinner, {
         fill: true,
-        message: 'Proposal loading...',
+        message: 'Connecting to chain...',
         size: 'xl',
         style: 'visibility: visible; opacity: 1;'
       });

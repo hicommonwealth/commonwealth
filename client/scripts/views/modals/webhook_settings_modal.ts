@@ -53,7 +53,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
             } else {
               values.forEach((v) => {
                 if (!vnode.state.selectedCategories.includes(v)) {
-                    vnode.state.selectedCategories.push(v);
+                  vnode.state.selectedCategories.push(v);
                 }
               });
               m.redraw();
@@ -61,7 +61,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
           },
         }),
       });
-    }
+    };
     return m('.WebhookSettingsModal.compact-modal-body-max', [
       m('.CompactModalExitButton.dark', {
         onclick: (e) => {
@@ -70,19 +70,19 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
         }
       }, symbols.times),
       m('.title-section', [
-          m('h4', 'Webhook Settings'),
-          m('p', 'Which events should trigger this webhook?'),
+        m('h4', 'Webhook Settings'),
+        m('p', 'Which events should trigger this webhook?'),
       ]),
       m('.forum-events', [
-          m('h4', 'Off-chain discussions'),
-          m(List, {
-              interactive: false,
-              size: 'sm',
-          }, [
-              row('New thread', [NotificationCategories.NewThread]),
-              row('New comment', [NotificationCategories.NewComment]),
-              row('New reaction', [NotificationCategories.NewReaction]),
-          ])
+        m('h4', 'Off-chain discussions'),
+        m(List, {
+          interactive: false,
+          size: 'sm',
+        }, [
+          row('New thread', [NotificationCategories.NewThread]),
+          row('New comment', [NotificationCategories.NewComment]),
+          row('New reaction', [NotificationCategories.NewReaction]),
+        ])
       ]),
       isChain && m('.chain-events', [
         m('h4', 'On-chain events'),

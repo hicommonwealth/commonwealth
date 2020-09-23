@@ -218,7 +218,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
 
     return m('.ProposalComment', {
       class: `${parentType}-child comment-${comment.id}`,
-      onchange: () => m.redraw(),
+      onchange: () => m.redraw(), // TODO: avoid catching bubbled input events
     }, [
       (!isLast || app.user.activeAccount) && m('.thread-connector'),
       m('.comment-avatar', [
