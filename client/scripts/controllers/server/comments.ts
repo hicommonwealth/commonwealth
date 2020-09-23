@@ -254,6 +254,26 @@ class CommentsController {
     }
   }
 
+  public initialize(initialComments, reset = true) {
+    if (reset) {
+      this._store.clear();
+    }
+    initialComments.forEach((comment) => {
+      if (!comment.Address) {
+        console.error('Comment missing linked address');
+      }
+      const existing = this._store.getById(comment.id);
+      if (existing) {
+        this._store.remove(existing);
+      }
+      try {
+        this._store.add(modelFromServer(comment));
+      } catch (e) {
+        // Comment is on an object that was deleted or unavailable
+      }
+    });
+  };
+
   public deinit() {
     this.store.clear();
   }
