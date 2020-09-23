@@ -20,7 +20,29 @@ export default class extends IEventHandler {
     if (event.data.kind !== SubstrateTypes.EventKind.Slash) {
       return dbEvent;
     }
+
+    const chainEventNewSession = await this._models.ChainEvent.findOne({
+      include: [
+        {
+          model: this._models.ChainEventType,
+          where: {
+            chain: this._chain,
+            event_name: event.data.kind,
+          }
+        }
+      ],
+      order: [
+        ['created_at', 'DESC']
+      ],
+      attributes: ['event_data']
+    });
+
+    if (!chainEventNewSession) { // if no new-session data, do nothing
+      return dbEvent;
+    }
+
     const newSlashEventData = event.data;
+    const sessionEvent = chainEventNewSession.event_data.data;
 
     // 2) Get relevant data from DB for processing.
     // Check for the stash id whether it is in validator table or not.
@@ -37,7 +59,7 @@ export default class extends IEventHandler {
     if (validator){
       validatorStash = validator.stash;
     } else {
-      let activeExposures = [];
+      let activeExposures = sessionEvent.activeExposures;
       let slashedNominators = {};
 
       for (let valid of Object.keys(activeExposures)) {
@@ -76,6 +98,10 @@ export default class extends IEventHandler {
         ['created_at', 'DESC']
       ]
     });
+
+    if (!latestValidatorStats){
+      return dbEvent;
+    }
     let latestValidator = JSON.parse(JSON.stringify(latestValidatorStats));
 
     if ( newExposure ) {
@@ -87,7 +113,7 @@ export default class extends IEventHandler {
 
     // Added Last 30 days Slash count and averages for a validator.
     const [thirtyDaysAvg, thirtyDaysCount] = await getLast30DaysStats(this._chain, newSlashEventData.kind, newSlashEventData.validator);
-    validator.slashesStats = {count: thirtyDaysCount, avg: thirtyDaysAvg }
+    validator.slashesStats = { count: thirtyDaysCount, avg: thirtyDaysAvg }
 
     // 3) Modify exposures for validators based of slash balance.
     latestValidator.block = event.blockNumber.toString();
