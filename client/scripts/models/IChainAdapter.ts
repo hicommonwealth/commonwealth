@@ -72,7 +72,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       jwt: this.app.user.jwt,
     });
     const { threads, comments, reactions, topics, admins } = response.result;
-    console.log(admins);
     this.app.threads.initialize(threads, true);
     this.app.comments.initialize(comments, true);
     this.app.reactions.initialize(reactions, true);

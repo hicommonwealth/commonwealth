@@ -147,12 +147,11 @@ class TopicsController {
     if (reset) {
       this._store.clear();
     }
-    console.log(initialTopics);
     initialTopics.forEach((t) => {
       try {
         this._store.add(modelFromServer(t));
       } catch (e) {
-        // malformed topic
+        console.error(e);
       }
     });
     this._initialized = true;
