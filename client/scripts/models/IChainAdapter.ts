@@ -66,24 +66,38 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
   public async initServer(): Promise<void> {
     clearLocalStorage();
-    const response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
-      chain: this.id,
-      community: null,
-      jwt: this.app.user.jwt,
-    });
+
+    // parallel fetch for offchain data and chain entities
+    let unused, response;
+    if (this.chainEntities) {
+      // if we're loading entities from chain, only pull completed
+      const refresh = this.usingServerChainEntities
+        ? EntityRefreshOption.AllEntities
+        : EntityRefreshOption.CompletedEntities;
+
+      [unused, response] = await Promise.all([
+        this.chainEntities.refresh(this.meta.chain.id, refresh),
+        $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+          chain: this.id,
+          community: null,
+          jwt: this.app.user.jwt,
+        })
+      ]);
+    } else {
+      response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+        chain: this.id,
+        community: null,
+        jwt: this.app.user.jwt,
+      });
+    }
+
     const { threads, comments, reactions, topics, admins } = response.result;
     this.app.threads.initialize(threads, true);
     this.app.comments.initialize(comments, true);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
     this.meta.chain.setAdmins(admins);
-    // if we're loading entities from chain, only pull completed
-    if (this.chainEntities) {
-      const refresh = this.usingServerChainEntities
-        ? EntityRefreshOption.AllEntities
-        : EntityRefreshOption.CompletedEntities;
-      await this.chainEntities.refresh(this.meta.chain.id, refresh);
-    }
+
     this._serverLoaded = true;
   }
 
