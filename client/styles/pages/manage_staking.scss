@@ -11,120 +11,39 @@
     color: #999;
     letter-spacing: 0.2px;
 }
-
-// Progress Bar
-.bar-outer-era {
-    width: 100%;
-    height: 2px;
-    border: #dfe8ee 1px solid;
-    margin-top: 5px;
-    margin-right: 10px;
+.Tabs a.tab-entry.active{
+    border: none !important;
+    font-family: 'Inter', sans-serif;    
+    font-style: normal;
+    font-weight: bold;
+    font-size: 21px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+}
+.Tabs .tab-bar {
+    border: none !important;
+}
+.Tabs a.tab-entry {
+    padding: 0px !important;
+}
+.manage-staking-preheader{
+    margin-bottom: 0 !important;
+    padding: 20px 32px;
+    padding-right: 86px;
 }
 
-.bar-inner-era {
-    width: 0%;
-    height: 2px;
-    background-color: #35d413;
+.manage-staking-presentation .Tabs{
+    border: 1px solid rgba(231, 231, 231, 0.5) !important; 
+    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07) !important;
+    border-radius: 3px !important;
+    padding: 24px 32px;
+    margin-bottom: 32px;
 }
 
-.bar-outer-epoch {
-    width: 100%;
-    height: 2px;
-    border: #dfe8ee 1px solid;
-    margin-top: 5px;
-    margin-right: 10px;
-}
-
-.bar-inner-epoch {
-    width: 0%;
-    height: 2px;
-    background-color: #35d413;
-}
-
-.NewStashForm {
-    margin: 16px 0 10px;
-    .form-group {
-        margin-bottom: 16px;
-    }
-    button {
-        margin: 6px 0;
-    }
-}
-
-.LoadingPage .left-sidebar {
-    display: none !important;
-}
-
-// avatar div
-.user-avatar {
-    margin: -3px 0 !important;
-    width: auto !important;
-    height: auto !important;
-}
-
-// .Jdenticon {
-//     width: 1vw !important;
-//     height: 1vw !important;
-// }
-
-// removed right sidebar
-.right-sidebar {
-    display: none !important;
-}
-
-.user-display-name {
-    padding-left: 0.3em !important;
-}
-
-.validator-preheader-container{
-    background: #FFFFFF;
-    border: 1px solid rgba(231, 231, 231, 0.5);
-    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
-    border-radius: 3px;
-    padding: 20px;
-    margin-bottom: 23px;
-    margin-top:12px;
-}
-
-.validators-container{
-    background: #FFFFFF;
-    border: 1px solid rgba(231, 231, 231, 0.5);
-    box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07);
-    border-radius: 3px;
-}
-
-.Tabs{
-    padding: 20px;
-}
-.validators-table{
-    height: 55vh;
-    overflow-y: scroll;
-    padding-right: 15px;
+.group_button{
+    padding-top: 24px;
     padding-left: 15px;
-    &::-webkit-scrollbar {
-        width: 6px;  /* Remove scrollbar space */
-        background-color:#fff;
-        
-    }
-    &::-webkit-scrollbar-thumb{
-        background-color: #d1d1d1;
-        border-radius: 10px;
-        
-    }
-}
-.tab-bar{
-    margin-bottom: 16px !important;
-}
-
-.row-input input{
-    width: 100%;
-    background: #FFFFFF;
-    border: 1px solid #C7CDD1;
-    box-sizing: border-box;
-    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.08);
-    border-radius: 3px;
-    padding: 10px;
-    margin-bottom: 16px !important;
 }
 
 .popup{
@@ -132,7 +51,7 @@
     
     &::-webkit-scrollbar {
         width: 6px;  /* Remove scrollbar space */
-        background-color:#fff;
+        background-color:#FFFFFF;
        
     }
     &::-webkit-scrollbar-thumb{
@@ -142,56 +61,6 @@
     overflow-y: hidden !important;
 }
 
-.ViewNominatorsModal {
-    position: relative !important;
-    border-radius: 4px !important;
-    max-height: 520px;
-    width: 440px;
-    .modal-table{
-        border-collapse: collapse;
-    }
-    .modal-table-row{
-        border-bottom: 1px solid #e4e4e4 !important;
-        // z-index: 9999;
-    }
-   
-    .compact-modal-body{
-        overflow: hidden;
-        overflow-y: scroll;
-        height: 400px;
-        width: 427px;
-        &::-webkit-scrollbar {
-            width: 6px;  /* Remove scrollbar space */
-            background-color:#fff;
-           
-        }
-        &::-webkit-scrollbar-thumb{
-            background-color: #d1d1d1;
-            border-radius: 10px;
-        }
-    }
-    @include xs-max {
-        .popup {
-            min-width: 310px;
-        }
-        .compact-modal-title {
-            padding: 14px 20px 12px;
-            h1,
-            h2,
-            h3 {
-                font-size: 16px;
-            }
-            h3{
-                padding-bottom: 10px;
-            }
-        }
-        .compact-modal-body,
-        .compact-modal-actions {
-            padding-left: 20px;
-            padding-right: 20px;
-        }
-    }
-}
 .button-col{
     padding: 19px 0px 16px 19px;
     margin-left: 30px;
@@ -264,7 +133,7 @@
 
 .manage-staking {
     max-width: 550px;
-    min-width: 500px;
+    // min-width: 500px;
     .warning{
         background: #ffffe0;
         border-color: #eeeeae;
@@ -314,6 +183,19 @@
         display: flex;
         flex-flow: column nowrap;
         flex: 1 1 auto;
+        overflow: hidden;
+        overflow-y: scroll;
+        height: 232px;
+        &::-webkit-scrollbar {
+            width: 6px;  /* Remove scrollbar space */
+            background-color:#fff;
+           
+        }
+        &::-webkit-scrollbar-thumb{
+            background-color: #d1d1d1;
+            border-radius: 10px;
+        }
+        
     }
     .ValidatorRow{
         border-bottom: 1px solid #E4E4E4 !important;
@@ -332,6 +214,7 @@
         text-overflow: ellipsis;
         min-width: 0px;
         white-space: nowrap;
+        font-weight: bold !important;
     }
     tr,
     .nextValidator {
@@ -361,12 +244,7 @@
         margin-left: 5px;
     }
 
-    th.val-stash{
-        padding-left:15px;
-    }
-    th.val-offenses{
-        margin-right:10px;
-    }
+  
     th.val-rewards,th.val-slashes,th.val-offenses{
         justify-content: center;
         padding-left:5px;
@@ -410,17 +288,26 @@
     {
         flex: 0.5 0 10% !important;
     }
-    .val-stash {
-        flex: 0.5 0 18% !important;
+    th.val-stash {
+        flex: 0.4 0 8% !important;
+    }
+    td.val-stash {
+        flex: 0.31 0 1% !important;
     }
     td.val-points {
         flex: 0 0 9% !important;
     }
     th.val-points{
         // padding-left: 10px;
-        margin-right:10px;
+        margin-right: 10px;
         flex: 0 0 8% !important;
 
+    }
+    td.val-stake{
+        flex: 0.1 0 19% !important;
+    }
+    th.val-stake{
+        flex: 0.5 0 11% !important;
     }
     .val-stash-td{
         flex: 0.5 0 17% !important; 
@@ -439,8 +326,8 @@
 
     }
     td.val-commission{
-        flex: 0.35 0 11% !important;
-        margin-left: 12px;
+        flex: 0.55 0 10% !important;
+        margin-left: 14px;
     }
     .val-name {
         font-weight: 500;
@@ -641,20 +528,20 @@
 }
 .compact-modal-body {
     overflow: hidden;
-        overflow-y: scroll;
-        height: 400px;
-        width: 427px;
-        &::-webkit-scrollbar {
-            width: 6px;  /* Remove scrollbar space */
-            background-color:#fff;
-           
-        }
-        &::-webkit-scrollbar-thumb{
-            background-color: #d1d1d1;
-            border-radius: 10px;
-        }
+    overflow-y: scroll;
+    height: 400px;
+    // width: 427px;
+    &::-webkit-scrollbar {
+        width: 6px;  /* Remove scrollbar space */
+        background-color:#fff;
+        
+    }
+    &::-webkit-scrollbar-thumb{
+        background-color: #d1d1d1;
+        border-radius: 10px;
+    }
     padding: 20px 32px 0 !important;
-    padding-right: 10px !important;
+    // padding-right: 10px !important;
     &:last-child {
         padding-bottom: 16px !important;
     }
@@ -679,6 +566,9 @@
         width: 25px !important;
         height: 25px !important;
     }
+}
+.NewGroup.manage-staking{
+    min-width: 550px;
 }
 .compact-modal-body th {
     font-style: normal !important;
@@ -827,9 +717,20 @@ td.modal-val-stash{
     padding-top: 0.4em !important;
 }
 .preheader-item-text .cui-button{
-    background: linear-gradient(180deg, #79C081 0%, #60A167 100%) !important;
-    border-radius: 4px !important;
-    color: #FFFFFF !important;
+    background: linear-gradient(180deg, #617CEF 0%, #4D6BED 100%);
+    border: 1px solid #4165E0;
+    box-sizing: border-box;
+    border-radius: 4px;
+    &:hover{
+        background: linear-gradient(180deg, #617CEF 0%, #3e5ee9 100%);
+    }
+}
+.preheader-item-text .cui-button .cui-icon {
+    padding-left: 10px;
+}
+.preheader-item-text .cui-button .cui-icon svg{
+    stroke: white !important;
+    color: #FFFFFF;
 }
 
 .dropDown-name a{
@@ -867,4 +768,127 @@ tr.modal-table-row{
     }
 }
 
+.staking-table {
+    table-layout: auto !important;
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1 1 auto;
+    overflow: hidden;
+    overflow-y: scroll;
+    height: 234px;
+    &::-webkit-scrollbar {
+        width: 6px;  /* Remove scrollbar space */
+        background-color:#fff;
+       
+    }
+    &::-webkit-scrollbar-thumb{
+        background-color: #d1d1d1;
+        border-radius: 10px;
+    }
+    th.val-stashes{
+        flex: 0.25 0 15% !important;
+    }
+    td.val-stashes{
+        flex: 0.25 0 15% !important;
+    }
+    td.val-controller{
+        flex: 0.3 0 10.5% !important;
+    }
+    th.val-controller{
+        flex: 0.2 0 5% !important;
+    }
+    th.val-rewards{
+        flex: 0.5 0 10% !important;
+    }
+    td.val-rewards{
+        flex: 0.4 0 5% !important;
+    }
+    th.val-bonded{
+        flex: 0.4 0 5% !important;
 
+    }
+    th.val-bonded{
+        flex: 0.8 0 5% !important;
+    }
+}
+
+
+.ManageStakingRow{
+    border-bottom: 1px solid #e4e4e4 !important; 
+}
+
+// 
+.profile-stats-row1{
+    padding-left: 21px;
+}
+.profile-header-block{
+    font-family: 'Inter', sans-serif;    
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #999999 !important;
+    padding-bottom: 8px;
+}
+
+.profile-data-block{
+    font-family: 'Inter', sans-serif;    
+    font-style: normal;
+    font-weight: normal;
+    font-size: 19px;
+    line-height: 120%;
+    letter-spacing: -0.2px;
+    color: #000000;
+}
+
+
+.total-apr,.own-total-offences,.other-total-slashes,.total-rewards{
+    padding-right: 6em !important;
+    padding-top: 5px;
+    padding-bottom: 20px;
+}
+
+.groups_list{
+    background: linear-gradient(180deg, #F6FAFB 0%, #FEFFFF 100%);
+    border: 1px solid #DEDFE1;
+    box-sizing: border-box;
+    border-radius: 4px;
+    padding: 10px 24px;
+    margin-top: 24px;
+}
+
+.button-options{
+    background: linear-gradient(180deg, #FFFFFF 0%, #F5F6F7 100%);
+    border: 1px solid #C7CDD1;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.06);
+    border-radius: 3px;
+    padding: 5px 7px;
+    margin-top: 10px;
+    margin-right: 5px;
+}
+.button-options-stake{
+    background: linear-gradient(180deg, #FFFFFF 0%, #F5F6F7 100%);
+    border: 1px solid #C7CDD1;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.06);
+    border-radius: 3px;
+    padding: 6px 9px;
+    margin-right: 5px;
+    margin-left: 8px;
+    height: 40px;
+    height: 35px;
+}
+.val-stopButton{
+    // margin-bottom: 10px;
+    padding-top: 10px !important; 
+}
+.val-actions{
+    margin-top: 12px;
+}
+
+.cui-custom-select{
+    margin-right: 33px;
+}
