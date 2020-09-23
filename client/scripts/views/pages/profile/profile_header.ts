@@ -32,14 +32,16 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
     // wait for info to load before making it clickable
     disabled: vnode.state.chainLoading,
     onclick: async () => {
-      if (!m.route.get().includes(chainObj.name)) {
+      const chain = chainObj.name.toLowerCase();
+      console.log({ chain });
+      if (app.activeId() !== chain) {
         let confirmed = false;
-        confirmed = await confirmationModalWithText(`Must switch to ${chainObj.name} to set on-chain identity. Continue?`)();
+        const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
+        confirmed = await confirmationModalWithText(msg)();
         if (confirmed) {
-          m.route.set(`/${chainObj.name}`);
-        };
-      }
-      if (!app.chain?.loaded) {
+          m.route.set(`/${chain}/account/${account.address}`);
+        }
+      } else if (!app.chain?.loaded) {
         vnode.state.chainLoading = true;
         initChain().then(() => {
           vnode.state.chainLoading = false;
@@ -50,12 +52,12 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
         }).catch((err) => {
           vnode.state.chainLoading = false;
         });
-        return;
+      } else {
+        app.modals.create({
+          modal: EditIdentityModal,
+          data: { account, currentIdentity },
+        });
       }
-      app.modals.create({
-        modal: EditIdentityModal,
-        data: { account, currentIdentity },
-      });
     },
     label: vnode.state.chainLoading
       ? 'Loading chain (may take some time)...'
