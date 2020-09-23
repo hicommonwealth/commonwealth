@@ -255,6 +255,28 @@ class ThreadsController {
       });
   }
 
+  public initialize(initialThreads: any[], reset = true) {
+    if (reset) {
+      this._store.clear();
+    }
+
+    for (const thread of initialThreads) {
+      if (!thread.Address) {
+        console.error('OffchainThread missing address');
+      }
+      const existing = this._store.getByIdentifier(thread.id);
+      if (existing) {
+        this._store.remove(existing);
+      }
+      try {
+        this._store.add(modelFromServer(thread));
+      } catch (e) {
+        console.error(e.message);
+      }
+    }
+    this._initialized = true;
+  }
+
   public deinit() {
     this._initialized = false;
     this.store.clear();
