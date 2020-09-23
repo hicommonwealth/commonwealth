@@ -116,31 +116,37 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
   }
 };
 
-export const sendBatchedNotificationEmails = async (models) => {
+export const sendBatchedNotificationEmails = (models) => {
   log.info('Sending daily notification emails');
 
-  const users = await models.User.findAll({
+  models.User.findAll({
     where: { emailNotificationInterval: 'daily' }
-  });
-
-  log.info(`Sending to ${users.length} users`);
-  await Promise.all(users.map(async (user) => {
-    const notifications = await models.Notification.findAll({
-      include: [{
-        model: models.Subscription,
-        where: { subscriber_id: user.id },
-      }],
-      where: { is_read: false }
+  }).then((users) => {
+    log.info(`Sending to ${users.length} users`);
+    Promise.all(users.map(async (user) => {
+      const notifications = await models.Notification.findAll({
+        include: [{
+          model: models.Subscription,
+          where: { subscriber_id: user.id },
+        }],
+        where: { is_read: false }
+      });
+      const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
+      emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
+      emailObject.bcc = 'raymond+bcc@commonwealth.im';
+      try {
+        console.log('sending batch notification email');
+        await sgMail.send(emailObject);
+      } catch (e) {
+        console.log('Failed to send batch notification email', e?.response?.body?.errors);
+        log.error(e);
+      }
+    })).then(() => {
+      process.exit(0);
+    }).catch((err) => {
+      process.exit(1);
     });
-    const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
-    emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
-    emailObject.bcc = 'raymond+bcc@commonwealth.im';
-    try {
-      console.log('sending batch notification email');
-      await sgMail.send(emailObject);
-    } catch (e) {
-      console.log('Failed to send batch notification email', e?.response?.body?.errors);
-      log.error(e);
-    }
-  }));
+  }).catch((err) => {
+      process.exit(1);
+  });
 };
