@@ -14,31 +14,6 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
   if (!chain && !community) return next(new Error(Errors.NeedChainOrCommunity));
 
-  // Threads
-  if (!req.user) { // if not logged in, return public threads
-    const publicThreadsQuery = (community)
-      ? { community: community.id, private: false, }
-      : { chain: chain.id, private: false, };
-
-    const publicThreads = await models.OffchainThread.findAll({
-      where: publicThreadsQuery,
-      include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
-      order: [['created_at', 'DESC']],
-    });
-
-    return res.json({ status: 'Success', result: publicThreads.map((c) => c.toJSON()) });
-  }
-
-  const allThreadsQuery = (community)
-    ? { community: community.id, }
-    : { chain: chain.id, };
-
-  const allThreads = await models.OffchainThread.findAll({
-    where: allThreadsQuery,
-    include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
-    order: [['created_at', 'DESC']],
-  });
-
   const userAddresses = await req.user.getAddresses();
   const userAddressIds = Array.from(userAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id));
   const rolesQuery = (community)
@@ -50,17 +25,41 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
 
   const adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
 
-  const filteredThreads = await allThreads.filter((thread) => {
-    if (thread.private === false) {
-      return true;
-    } else if (userAddressIds.includes(thread.address_id)) {
-      return true;
-    } else if (adminRoles.length > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  });
+  // Threads
+  let filteredThreads;
+  if (!req.user) { // if not logged in, return public threads
+    const publicThreadsQuery = (community)
+      ? { community: community.id, private: false, }
+      : { chain: chain.id, private: false, };
+
+    filteredThreads = await models.OffchainThread.findAll({
+      where: publicThreadsQuery,
+      include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
+      order: [['created_at', 'DESC']],
+    });
+  } else { // if logged in, return public threads and owned private threads
+    const allThreadsQuery = (community)
+      ? { community: community.id, }
+      : { chain: chain.id, };
+
+    const allThreads = await models.OffchainThread.findAll({
+      where: allThreadsQuery,
+      include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
+      order: [['created_at', 'DESC']],
+    });
+
+    filteredThreads = await allThreads.filter((thread) => {
+      if (thread.private === false) {
+        return true;
+      } else if (userAddressIds.includes(thread.address_id)) {
+        return true;
+      } else if (adminRoles.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  }
 
   // Topics
   const topics = await models.OffchainTopic.findAll({
