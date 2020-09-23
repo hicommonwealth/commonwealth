@@ -74,6 +74,9 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
       const [
         emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, path
       ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
+
+      let createdAt = moment(n.created_at).fromNow();
+      if (createdAt === 'a day ago') createdAt = `${moment(Date.now()).diff(n.created_at, 'hours')} hours ago`;
       return {
         author: subjectCopy,
         action: actionCopy,
@@ -81,7 +84,7 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
         community: communityCopy,
         excerpt,
         path,
-        createdAt: moment(n.created_at).fromNow(),
+        createdAt,
       };
     }
   }));
@@ -136,8 +139,11 @@ export const sendBatchedNotificationEmails = (models) => {
         }],
         where: {
           is_read: false,
-          created_at: { [Op.gt]: last24hours }
-        }
+          created_at: { [Op.gt]: last24hours },
+        },
+        order: [
+          ['created_at', 'DESC'],
+        ]
       });
       if (notifications.length === 0) return; // don't notify if there have been no new notifications in the last 24h
 
