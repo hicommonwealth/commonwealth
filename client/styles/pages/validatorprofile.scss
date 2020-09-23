@@ -43,7 +43,6 @@
 }
 
 .validator-profile-identity-icons .cui-icon{
-    padding-right: 8px;
     color: #FFFFFF;
 }
 
@@ -72,7 +71,7 @@
 }
 
 .ProfileHeader .bio-right {
-    flex: 0.7 !important;
+    flex: 0.9 !important;
     margin: 6px 0 0 !important;
 }
 
@@ -99,8 +98,8 @@
     
 }
 
-.total-stake,.own-stake,.other-stake,.commision,.era-points{
-    margin-right: 2em;
+.total-stake,.own-stake,.other-stake,.commision{
+    margin-right: 3em;
 }
 
 
@@ -156,12 +155,12 @@
     padding-right: 3.9em !important;
 }
 .bio-actions-edit-profile{
-    padding-left: 6.8em;
-    padding-top: 0.5vw;
+    padding-left: 8.6em;
+    padding-top: 0.7vw;
 }
 
 .bio-actions-edit-identity{
-    padding-left: 6.6em;
+    padding-left: 8.5em;
 }
 
 .data-row-block .cui-button, .info-row-block .cui-button{
