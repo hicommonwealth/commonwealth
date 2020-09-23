@@ -157,13 +157,14 @@
 }
 .bio-actions-edit-profile{
     padding-left: 6.8em;
+    padding-top: 0.5vw;
 }
 
 .bio-actions-edit-identity{
     padding-left: 6.6em;
 }
 
-.cui-button{
+.data-row-block .cui-button, .info-row-block .cui-button{
     background: linear-gradient(180deg, #FEFFFF 0%, #F6FAFB 100%) !important;
     border: 1px solid #DEDFE1 !important;
     // box-sizing: border-box !important;
@@ -174,7 +175,7 @@
     font-size: 12px !important;
     line-height: 120% !important;
     color: #536E7C !important;
-    height: 35px !important;
+    height: 40px !important;
 }
 
 .profile-data-block span{
