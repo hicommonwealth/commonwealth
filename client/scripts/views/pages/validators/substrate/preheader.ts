@@ -26,6 +26,8 @@ interface IPreHeaderAttrs {
   annualPercentRate: ICommissionInfo;
 }
 
+const itemLoadingSpinner = () => m(Spinner, { active: true, fill: false, size: 'xs' });
+
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
   oncreate: async (vnode) => {
     vnode.state.dynamic.globalStatistics = await app.staking.globalStatistics();
@@ -40,19 +42,45 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       : null
   }),
   view: vnode => {
-    const { sessionInfo, globalStatistics, sender, validators } = vnode.state.dynamic;
-    if (!validators && !sessionInfo && !globalStatistics) return;
-
-    
-    const { currentEra,
-    currentIndex, sessionLength,
-    sessionProgress, eraLength,
-    eraProgress, isEpoch } = sessionInfo;
     const nominators: string[] = [];
-    let elected: number = 0;
-    let waiting: number = globalStatistics.waiting;
-    let totalStaked = (app.chain as Substrate).chain.coins(globalStatistics.totalStaked);
+    const stDynamic = vnode.state.dynamic;
+    let sessionInfo,
+      globalStatistics: { waiting?: any; totalStaked?: any; elected?: any; count?: any; nominators?: any; offences?: any; aprPercentage?: any; },
+      sender,
+      validators: IValidators,
+      currentEra: number,
+      currentIndex: number,
+      sessionLength: any,
+      sessionProgress: any,
+      eraLength: any,
+      eraProgress: any,
+      isEpoch: any;
+    let waiting: number = 0;
+    let totalStaked = undefined;
     let hasClaimablePayouts = false;
+    sessionInfo = globalStatistics = sender = validators = {};
+    currentEra = currentIndex = sessionLength = sessionProgress = 0;
+
+    if (stDynamic.globalStatistics) {
+      globalStatistics = stDynamic.globalStatistics;
+      waiting = globalStatistics.waiting;
+    }
+
+    if (app.chain && stDynamic && stDynamic.sessionInfo && stDynamic.globalStatistics && stDynamic.validators) {
+      sessionInfo = stDynamic.sessionInfo;
+
+      sender = vnode.state.dynamic.sender;
+      validators = stDynamic.validators;
+      currentEra = sessionInfo.currentEra;
+      currentIndex = sessionInfo.currentIndex;
+      sessionLength = sessionInfo.sessionLength;
+      sessionProgress = sessionInfo.sessionProgress;
+      eraLength = sessionInfo.eraLength;
+      eraProgress = sessionInfo.eraProgress
+      isEpoch = sessionInfo.isEpoch
+
+      totalStaked = (app.chain as Substrate).chain.coins(globalStatistics.totalStaked);
+    }
 
     if (app.chain.base === ChainBase.Substrate) {
       (app.chain as Substrate).chain.api.toPromise()
@@ -62,29 +90,36 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           }
         });
     }
-    
-    const totalbalance = (app.chain as Substrate).chain.totalbalance;
-    const staked = `${(totalStaked.muln(10000).div(totalbalance).toNumber() / 100).toFixed(2)}%`;
 
+    const totalbalance = (app.chain as Substrate).chain.totalbalance;
+    const stakedPercentage = totalStaked ? `${(totalStaked.muln(10000).div(totalbalance).toNumber() / 100).toFixed(2)}%` : undefined;
+
+    if (app.chain.base === ChainBase.Substrate) {
+      (app.chain as Substrate).chain.api.toPromise()
+        .then((api) => {
+          if (api.query.staking.erasStakers) {
+            hasClaimablePayouts = true;
+          }
+        });
+    }
     return m('div.validator-preheader-container', [
       m('.validators-preheader', [
         m('.validators-preheader-item', [
           m('h3', 'Validators'),
-          m('.preheader-item-text', `${globalStatistics.elected}/${globalStatistics.count}`),
+          m('.preheader-item-text', globalStatistics.elected ? `${globalStatistics?.elected}/${globalStatistics?.count}` : '--/--'),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Waiting'),
-          m('.preheader-item-text', `${waiting}`),
+          waiting ? m('.preheader-item-text', `${waiting}`) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Nominators'),
-          m('.preheader-item-text', `${globalStatistics.nominators}`),
+          globalStatistics.nominators ?
+            m('.preheader-item-text', `${globalStatistics?.nominators}`) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Offences'),
-          m('.preheader-item-text', globalStatistics?.offences === undefined
-            ? 'Loading'
-            : `${globalStatistics.offences}`),
+          m('.preheader-item-text', `${globalStatistics?.offences}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Last Block'),
@@ -106,19 +141,22 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         }),
         m('.validators-preheader-item', [
           m('h3', 'Est. APR'),
-          m('.preheader-item-text', `${globalStatistics.aprPercentage.toFixed(2)}%`),
+          globalStatistics.aprPercentage ?
+            m('.preheader-item-text', `${globalStatistics?.aprPercentage?.toFixed(2)}%`) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Supply'),
-          m('.preheader-item-text', totalbalance.format(true)),
+          totalbalance ?
+            m('.preheader-item-text', totalbalance?.format(true)) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Staked'),
-          m('.preheader-item-text', totalStaked.format(true)),
+          totalStaked ? m('.preheader-item-text', totalStaked?.format(true)) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Staked'),
-          m('.preheader-item-text', staked),
+          stakedPercentage ?
+            m('.preheader-item-text', stakedPercentage) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Manage Staking'),

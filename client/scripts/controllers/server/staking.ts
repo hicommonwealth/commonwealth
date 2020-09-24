@@ -19,7 +19,6 @@ class StakingController {
         });
     }
     public validatorDetail(state: string, stashes: any) {
-        console.log("stashes ", stashes)
         return new Promise((resolve) => {
             return get('/getValidatorDetail', {
                 state,
