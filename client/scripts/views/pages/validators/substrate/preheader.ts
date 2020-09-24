@@ -171,7 +171,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                   modal: ManageStakingModal,
                   data: { account: sender }
                 });
-              }
+              },
+              disabled: !app.user.activeAccount 
             })
           ]),
         ]),
@@ -188,7 +189,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                   modal: ClaimPayoutModal,
                   data: { account: sender }
                 });
-              }
+              },
             })
           ]),
         ]),
@@ -210,7 +211,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                     // vnode.attrs.sending = false;
                     m.redraw();
                   });
-              }
+              },
+              disabled: !app.user.activeAccount 
             })
           ]),
         ])
