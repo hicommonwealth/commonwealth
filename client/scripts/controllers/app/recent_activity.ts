@@ -16,15 +16,18 @@ class RecentActivityController {
 
   public get initialized() { return this._initialized; }
 
-  public addThreads(threads: OffchainThread[]) {
+  public addThreads(threads: OffchainThread[], clear?: boolean) {
+    if (clear) this._threadsStore.clearThreads();
     threads.forEach((thread) => this._threadsStore.addThread(thread));
   }
 
-  public addAddresses(addresses: AddressInfo[], community: string) {
+  public addAddresses(addresses: AddressInfo[], community: string, clear?: boolean) {
+    if (clear) this._addressStore.clearAddresses();
     addresses.forEach((addr) => this._addressStore.addAddress(addr, community));
   }
 
-  public addAddressesFromActivity(activity: any[]) {
+  public addAddressesFromActivity(activity: any[], clear?: boolean) {
+    if (clear) this._addressStore.clearAddresses();
     activity.forEach((item) => {
       const parentEntity = item.community || item.chain;
       this._addressStore.addAddress(item.Address, parentEntity);
