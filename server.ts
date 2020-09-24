@@ -174,14 +174,15 @@ setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 setupErrorHandlers(app, rollbar);
 
 async function main() {
+  // each one-off command should call process.exit() when done
   if (SHOULD_SEND_EMAILS) {
-    await sendBatchedNotificationEmails(models);
+    sendBatchedNotificationEmails(models);
   } else if (SHOULD_RESET_DB) {
     resetServer(models, closeMiddleware);
   } else if (SHOULD_UPDATE_EVENTS) {
     updateEvents(app, models);
   } else if (SHOULD_UPDATE_BALANCES) {
-    await updateBalances(app, models);
+    updateBalances(app, models);
   } else if (SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS) {
     // Run fetchStats here to populate lockdrop stats for Edgeware Lockdrop.
     // This only needs to run once on prod to make the necessary queries.

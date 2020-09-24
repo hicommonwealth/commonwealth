@@ -114,7 +114,7 @@ const send = async (models, content: WebhookContent) => {
         } : {
           type: 'section',
           text: `${notificationTitlePrefix}<${actedOnLink}|${actedOn}>`
-            + `\n> ${notificationExcerpt}`,
+            + `\n> ${notificationExcerpt.split('\n').join('\n> ')}`,
           format: 'mrkdwn',
         });
       } else if (url.indexOf('discord') !== -1) {

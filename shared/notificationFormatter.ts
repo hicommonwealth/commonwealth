@@ -47,7 +47,7 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   const communityObject = chain_id
     ? await models.Chain.findOne({ where: { id: chain_id } })
     : await models.OffchainCommunity.findOne({ where: { id: community_id } });
-  const communityCopy = communityObject ? `in ${communityObject.name}:` : ':';
+  const communityCopy = communityObject ? `in ${communityObject.name}` : '';
   const excerpt = (() => {
     const text = decodeURIComponent(comment_text);
     try {
