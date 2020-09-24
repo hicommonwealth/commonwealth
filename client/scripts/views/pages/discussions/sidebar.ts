@@ -1,12 +1,12 @@
-import { slugify } from 'helpers';
 import 'pages/discussions/sidebar.scss';
 
+import { slugify } from 'helpers';
 import m from 'mithril';
-import app from 'state';
-import User from 'views/components/widgets/user';
-import { AddressInfo, OffchainThread } from 'models';
-import CommunityInfoModule from '../../components/sidebar/community_info_module';
 
+import app from 'state';
+import { AddressInfo, OffchainThread } from 'models';
+import User from 'views/components/widgets/user';
+import CommunityInfoModule from 'views/components/sidebar/community_info_module';
 
 export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: number }, {}> = {
   view: (vnode) => {
@@ -18,7 +18,7 @@ export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: num
         linkify: true,
         tooltip: true,
       }),
-      m('.activity-count', `${activityCount}/mo`)
+      m('.activity-count', activityCount)
     ]);
   }
 };
@@ -40,7 +40,7 @@ export const MostActiveThread: m.Component<{ thread: OffchainThread }> = {
       m(User, {
         user: new AddressInfo(null, thread.author, thread.authorChain, null),
         linkify: true,
-      })
+      }),
     ]);
   }
 };

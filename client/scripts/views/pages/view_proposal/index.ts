@@ -335,7 +335,6 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
       proposal, comments, createdCommentCallback, getSetGlobalEditingStatus,
       getSetGlobalReplyStatus, replyParent
     } = vnode.attrs;
-
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
@@ -381,8 +380,8 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
       });
     };
 
-    const AllComments = (comments, replyParent2) => {
-      return comments.map((comment, index) => {
+    const AllComments = (comments2, replyParent2) => {
+      return comments2.map((comment, index) => {
         return ([
           m(ProposalComment, {
             comment,
@@ -391,7 +390,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
             parent: proposal,
             proposal,
             callback: createdCommentCallback,
-            isLast: index === comments.length - 1,
+            isLast: index === comments2.length - 1,
           }),
           // if comment has children, they are fetched & rendered
           !!comment.childComments.length
@@ -439,6 +438,15 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
+interface IPrefetch {
+  [identifier: string]: {
+    commentsStarted: boolean,
+    viewCountStarted: boolean,
+    profilesStarted: boolean,
+    profilesFinished: boolean,
+  }
+}
+
 const ViewProposalPage: m.Component<{
   identifier: string,
   type: string
@@ -446,12 +454,9 @@ const ViewProposalPage: m.Component<{
   editing: boolean,
   replyParent: number | boolean,
   highlightedComment: boolean,
-  commentsPrefetchStarted: boolean,
+  prefetch: IPrefetch,
   comments,
-  viewCountPrefetchStarted: boolean,
   viewCount: number,
-  profilesPrefetchStarted: boolean
-  profilesPrefetchFinished: boolean
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -466,6 +471,15 @@ const ViewProposalPage: m.Component<{
   view: (vnode) => {
     const { identifier, type } = vnode.attrs;
     if (typeof identifier !== 'string') return m(PageNotFound);
+    if (!vnode.state.prefetch || !vnode.state.prefetch[identifier]) {
+      vnode.state.prefetch = {};
+      vnode.state.prefetch[identifier] = {
+        commentsStarted: false,
+        viewCountStarted: false,
+        profilesStarted: false,
+        profilesFinished: false,
+      };
+    }
     const proposalId = identifier.split('-')[0];
     const proposalType = type;
 
@@ -492,7 +506,7 @@ const ViewProposalPage: m.Component<{
     }
 
     // load comments
-    if (!vnode.state.commentsPrefetchStarted) {
+    if (!vnode.state.prefetch[identifier]['commentsStarted']) {
       (app.activeCommunityId()
         ? app.comments.refresh(proposal, null, app.activeCommunityId())
         : app.comments.refresh(proposal, app.activeChainId(), null))
@@ -504,7 +518,7 @@ const ViewProposalPage: m.Component<{
           vnode.state.comments = [];
           m.redraw();
         });
-      vnode.state.commentsPrefetchStarted = true;
+      vnode.state.prefetch[identifier]['commentsStarted'] = true;
     }
 
     if (vnode.state.comments?.length) {
@@ -512,10 +526,9 @@ const ViewProposalPage: m.Component<{
         return c.rootProposal !== `${vnode.attrs.type}_${vnode.attrs.identifier.split('-')[0]}`;
       });
       if (mismatchedComments.length) {
-        vnode.state.commentsPrefetchStarted = false;
+        vnode.state.prefetch[identifier]['commentsStarted'] = false;
       }
     }
-
 
     const createdCommentCallback = () => {
       vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
@@ -523,7 +536,7 @@ const ViewProposalPage: m.Component<{
     };
 
     // load view count
-    if (!vnode.state.viewCountPrefetchStarted && proposal instanceof OffchainThread) {
+    if (!vnode.state.prefetch[identifier]['viewCountStarted'] && proposal instanceof OffchainThread) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
         community: app.activeCommunityId(),
@@ -540,10 +553,10 @@ const ViewProposalPage: m.Component<{
         vnode.state.viewCount = 0;
         throw new Error('could not load view count');
       });
-      vnode.state.viewCountPrefetchStarted = true;
-    } else if (!vnode.state.viewCountPrefetchStarted) {
+      vnode.state.prefetch[identifier]['viewCountStarted'] = true;
+    } else if (!vnode.state.prefetch[identifier]['viewCountStarted']) {
       // view counts currently not supported for proposals
-      vnode.state.viewCountPrefetchStarted = true;
+      vnode.state.prefetch[identifier]['viewCountStarted'] = true;
       vnode.state.viewCount = 0;
     }
 
@@ -556,7 +569,7 @@ const ViewProposalPage: m.Component<{
 
     // load profiles
     // TODO: recursively fetch child comments as well (prevent reloading flash for threads with child comments)
-    if (vnode.state.profilesPrefetchStarted === undefined) {
+    if (vnode.state.prefetch[identifier]['profilesStarted'] === undefined) {
       if (proposal instanceof OffchainThread) {
         app.profiles.getProfile(proposal.authorChain, proposal.author);
       } else if (proposal.author instanceof Account) { // AnyProposal
@@ -565,12 +578,12 @@ const ViewProposalPage: m.Component<{
       vnode.state.comments.forEach((comment) => {
         app.profiles.getProfile(comment.authorChain, comment.author);
       });
-      vnode.state.profilesPrefetchStarted = true;
+      vnode.state.prefetch[identifier]['profilesStarted'] = true;
     }
-    if (!app.profiles.allLoaded() && !vnode.state.profilesPrefetchFinished) {
+    if (!app.profiles.allLoaded() && !vnode.state.prefetch[identifier]['profilesFinished']) {
       return m(PageLoading, { narrow: true });
     }
-    vnode.state.profilesPrefetchFinished = true;
+    vnode.state.prefetch[identifier]['profilesFinished'] = true;
 
     const windowListener = (e) => {
       if (vnode.state.editing || activeQuillEditorHasText()) {
@@ -648,7 +661,7 @@ const ViewProposalPage: m.Component<{
     return m(Sublayout, {
       class: 'ViewProposalPage',
       rightSidebar: proposal instanceof OffchainThread
-        ? []
+        ? null
         : m(ProposalSidebar, { proposal }),
       showNewProposalButton: true,
     }, [

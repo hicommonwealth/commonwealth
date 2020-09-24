@@ -1,7 +1,10 @@
 @import 'client/styles/shared';
+@import 'client/styles/components/right_sidebar';
 
 .ListingSidebar {
-    margin: 10px 15px;
+    margin: 10px 18px;
+    @include community-info-module-styles();
+
     .user-activity {
         margin-bottom: 20px;
         .user-activity-header {
@@ -14,17 +17,24 @@
             display: flex;
             justify-content: space-between;
             padding: 5px 0;
+            .User .user-avatar {
+                position: relative;
+                top: 2px;
+            }
             .username, .activity-count {
                 font-weight: 500;
             }
             .activity-count {
                 color: $text-color-lighter;
+                position: relative;
+                top: 1px;
             }
             a:hover {
                 text-decoration: none;
             }
         }
     }
+
     .CommunityInfoModule {
         position: absolute;
         bottom: 14px;
