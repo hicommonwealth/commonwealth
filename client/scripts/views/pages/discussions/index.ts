@@ -21,6 +21,8 @@ import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 import Listing from 'views/pages/listing';
+
+import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
 
 interface IDiscussionPageState {
@@ -212,6 +214,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       title: topic || 'Discussions',
       description: topicDescription,
       showNewProposalButton: true,
+      rightSidebar: m(ListingSidebar, { entity: app.activeId() })
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [

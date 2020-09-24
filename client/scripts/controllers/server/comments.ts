@@ -21,7 +21,7 @@ export enum CommentRefreshOption {
   LoadProposalComments = 'LoadProposalComments',
 }
 
-const modelFromServer = (comment) => {
+export const modelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
@@ -114,6 +114,7 @@ class CommentsController {
       });
       const { result } = res;
       this._store.add(modelFromServer(result));
+      app.recentActivity.addAddressesFromActivity([result]);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
@@ -162,6 +163,27 @@ class CommentsController {
     }
   }
 
+  public async delete(comment) {
+    const _this = this;
+    return new Promise((resolve, reject) => {
+      // TODO: Change to DELETE /comment
+      $.post(`${app.serverUrl()}/deleteComment`, {
+        jwt: app.user.jwt,
+        comment_id: comment.id,
+      }).then((result) => {
+        const existing = this._store.getById(comment.id);
+        this._store.remove(existing);
+        // Properly removing from recent activity will require comments/threads to have an address_id
+        // app.recentActivity.removeAddressActivity([comment]);
+        resolve(result);
+      }).catch((e) => {
+        console.error(e);
+        notifyError('Could not delete comment');
+        reject(e);
+      });
+    });
+  }
+
   public async refresh(proposal, chainId: string, communityId: string) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -190,25 +212,6 @@ class CommentsController {
         console.log('Failed to load comments');
         reject(new Error(err.responseJSON?.error ? err.responseJSON.error : 'Error loading comments'));
       }
-    });
-  }
-
-  public async delete(comment) {
-    const _this = this;
-    return new Promise((resolve, reject) => {
-      // TODO: Change to DELETE /comment
-      $.post(`${app.serverUrl()}/deleteComment`, {
-        jwt: app.user.jwt,
-        comment_id: comment.id,
-      }).then((result) => {
-        const existing = this._store.getById(comment.id);
-        this._store.remove(existing);
-        resolve(result);
-      }).catch((e) => {
-        console.error(e);
-        notifyError('Could not delete comment');
-        reject(e);
-      });
     });
   }
 

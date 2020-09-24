@@ -9,7 +9,7 @@ import { ReactionStore } from 'stores';
 import { OffchainReaction, AnyProposal, OffchainComment, OffchainThread, Proposal, ChainEntity } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
-const modelFromServer = (reaction) => {
+export const modelFromServer = (reaction) => {
   return new OffchainReaction(
     reaction.id,
     reaction.Address.address,

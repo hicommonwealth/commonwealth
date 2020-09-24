@@ -11,7 +11,7 @@ import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo } from 'mod
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 
-const modelFromServer = (thread) => {
+export const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
@@ -96,6 +96,8 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+      app.recentActivity.addThreads([response.result]);
+      app.recentActivity.addAddressesFromActivity([response.result]);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
@@ -155,6 +157,9 @@ class ThreadsController {
         'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);
+        app.recentActivity.removeThread(proposal.id, proposal.community || proposal.chain);
+        // Properly removing from recent activity will require comments/threads to have an address_id
+        // app.recentActivity.removeAddressActivity([proposal]);
         m.redraw();
         resolve(result);
       }).catch((e) => {
