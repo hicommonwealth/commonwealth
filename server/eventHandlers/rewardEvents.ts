@@ -1,7 +1,8 @@
 /* eslint-disable max-len */
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
 import BN from 'bn.js';
-import getLast30DaysStats  from './computeStats'
+import getLast30DaysStats from './computeStats'
+import getLast30DaysAPR from './computeAPR'
 
 
 export default class extends IEventHandler {
@@ -92,7 +93,7 @@ export default class extends IEventHandler {
     validator.eventType = newRewardEventData.kind;
     validator.commissionPer = activeValidatorsInfo.commissionPer;
     validator.eraPoints = activeValidatorsInfo.eraPoints;
-    validator.apr = 0; // TODO: APR to be computed over here
+    validator.apr = await getLast30DaysAPR(this._chain, event.data.kind, validator.stash);
     validator.created_at = new Date().toISOString();
     validator.updated_at = new Date().toISOString();
     delete validator.id;

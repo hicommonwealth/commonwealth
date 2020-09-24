@@ -113,6 +113,9 @@ export default class extends IEventHandler {
       isOnline: false,
       hasMessage: false,
       toBeElected: false,
+      rewardsStats: {},
+      slashesStats: {},
+      offencesStats: {},
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
