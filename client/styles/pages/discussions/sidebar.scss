@@ -2,17 +2,18 @@
 @import 'client/styles/components/right_sidebar';
 
 .ListingSidebar {
-    margin: 10px 18px;
+    margin: 10px 20px;
     @include community-info-module-styles();
 
+    .user-activity-header,
+    .forum-activity-header {
+        color: $text-color-lighter;
+        font-weight: 500;
+        font-size: 15px;
+        padding: 3px 0 6px;
+    }
     .user-activity {
         margin-bottom: 20px;
-        .user-activity-header {
-            color: $text-color-lighter;
-            font-weight: 500;
-            font-size: 15px;
-            padding: 3px 0 6px;
-        }
         .MostActiveUser {
             display: flex;
             justify-content: space-between;
@@ -31,6 +32,23 @@
             }
             a:hover {
                 text-decoration: none;
+            }
+        }
+    }
+    .forum-activity {
+        margin-bottom: 20px;
+        .MostActiveThread {
+            margin: 4px 0 13px;
+            .active-thread a {
+                color: #111;
+                font-weight: 500;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                display: block;
+                white-space: nowrap;
+            }
+            .User .user-display-name {
+                color: $text-color-light;
             }
         }
     }
