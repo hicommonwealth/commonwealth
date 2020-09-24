@@ -58,6 +58,10 @@ class RecentActivityController {
     return this._addressStore.getMostActiveUsers(community, count);
   }
 
+  public getMostActiveThreads(community: string, count: number = 3) {
+    return this._threadsStore.getMostActiveThreads(community, count);
+  }
+
   public removeThread(id: number, community: string) {
     return this._threadsStore.removeThread(id, community);
   }
