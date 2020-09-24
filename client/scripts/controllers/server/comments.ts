@@ -173,6 +173,7 @@ class CommentsController {
       }).then((result) => {
         const existing = this._store.getById(comment.id);
         this._store.remove(existing);
+        // Properly removing from recent activity will require comments/threads to have an address_id
         // app.recentActivity.removeAddressActivity([comment]);
         resolve(result);
       }).catch((e) => {

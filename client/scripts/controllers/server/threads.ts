@@ -158,6 +158,7 @@ class ThreadsController {
       }).then((result) => {
         _this.store.remove(proposal);
         app.recentActivity.removeThread(proposal.id, proposal.community || proposal.chain);
+        // Properly removing from recent activity will require comments/threads to have an address_id
         // app.recentActivity.removeAddressActivity([proposal]);
         m.redraw();
         resolve(result);
