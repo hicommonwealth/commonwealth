@@ -13,7 +13,8 @@
     "unit-test": "nyc ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
     "integration-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/*.spec.ts",
     "test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/*.spec.ts ./test/unit/**/*.spec.ts",
-    "listen": "ts-node -T ./scripts/listener.ts"
+    "listen": "ts-node -T ./scripts/listener.ts",
+    "scrape": "ts-node -T ./scripts/scraper.ts"
   },
   "engines": {
     "node": "12.3.1"
