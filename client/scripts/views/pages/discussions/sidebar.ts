@@ -13,11 +13,11 @@ export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: num
     return m('.MostActiveUser', [
       m(User, {
         user,
-        avatarSize: 24,
+        avatarSize: 20,
         linkify: true,
         tooltip: true,
       }),
-      m('.activity-count', `${activityCount}/mo`)
+      m('.activity-count', activityCount)
     ]);
   }
 };

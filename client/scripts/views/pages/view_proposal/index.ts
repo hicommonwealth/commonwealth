@@ -218,7 +218,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
 
     return m('.ProposalComment', {
       class: `${parentType}-child comment-${comment.id}`,
-      onchange: () => m.redraw(),
+      onchange: () => m.redraw(), // TODO: avoid catching bubbled input events
     }, [
       (!isLast || app.user.activeAccount) && m('.thread-connector'),
       m('.comment-avatar', [
@@ -648,7 +648,7 @@ const ViewProposalPage: m.Component<{
     return m(Sublayout, {
       class: 'ViewProposalPage',
       rightSidebar: proposal instanceof OffchainThread
-        ? []
+        ? null
         : m(ProposalSidebar, { proposal }),
       showNewProposalButton: true,
     }, [

@@ -140,7 +140,10 @@ const CreateComment: m.Component<{
                 vnode.state.quillEditorState = state;
               },
               editorNamespace: `${document.location.pathname}-commenting`,
-              onkeyboardSubmit: submitComment,
+              onkeyboardSubmit: () => {
+                submitComment();
+                m.redraw(); // ensure button is disabled
+              },
               tabindex: vnode.attrs.tabindex,
             }),
             m('.form-bottom', [

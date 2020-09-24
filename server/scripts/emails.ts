@@ -5,180 +5,83 @@ import {
 
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
-import { getProposalUrl } from '../../shared/utils';
+import { getForumNotificationCopy } from '../../shared/notificationFormatter';
 import {
   IPostNotificationData, NotificationCategories,
   DynamicTemplate, IChainEventNotificationData
 } from '../../shared/types';
 
-const { Op } = Sequelize;
 const log = factory.getLogger(formatFilename(__filename));
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
-export const createImmediateNotificationEmailObject = async (
-  notification_data: IPostNotificationData | IChainEventNotificationData,
-  category_id,
-  models,
-) => {
-  let chainEventLabel: IEventLabel;
-  const chainId = (notification_data as IChainEventNotificationData).chainEventType?.chain;
+export const createImmediateNotificationEmailObject = async (notification_data, category_id, models) => {
+  if (notification_data.chainEvent !== undefined) {
+    let chainEventLabel: IEventLabel;
+    // chainEventLabel?.label
+    // chainEventLabel?.heading
 
-  // skip notification categories without emails
-  if (category_id === NotificationCategories.NewReaction
-      || category_id === NotificationCategories.ThreadEdit) return;
-
-  // enrich chain event notifications, using labeler from @commonwealth/chain-events
-  // all other notifications just use the thread title
-  if ((notification_data as IChainEventNotificationData).chainEvent !== undefined) {
-    const { blockNumber } = (notification_data as IChainEventNotificationData).chainEvent;
-    if (SubstrateTypes.EventChains.includes(chainId) && chainId !== 'polkadot') {
+    if (SubstrateTypes.EventChains.includes(notification_data.chainEventType?.chain)) {
       chainEventLabel = SubstrateEvents.Label(
-        blockNumber,
-        chainId,
+        notification_data.chainEvent?.blockNumber,
+        notification_data.chainEventType?.chain,
         (notification_data as IChainEventNotificationData).chainEvent.event_data as IChainEventData
       );
-    // } else if (MolochTypes.EventChains.includes(chainId)) {
-    //   chainEventLabel = MolochEvents.Label(
-    //     blockNumber,
-    //     chainId,
-    //     (notification_data as IChainEventNotificationData).chainEvent.event_data,
-    //   );
+    } else if (MolochTypes.EventChains.includes(notification_data.chainEventType?.chain)) {
+      chainEventLabel = MolochEvents.Label(
+        notification_data.chainEvent?.blockNumber,
+        notification_data.chainEventType?.chain,
+        (notification_data as IChainEventNotificationData).chainEvent.event_data,
+      );
     }
+    // TODO: send chain event immediate notification email
+  } else {
+    if (category_id === NotificationCategories.NewReaction || category_id === NotificationCategories.ThreadEdit) return;
+    const [
+      emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, path
+    ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
+    return {
+      from: 'Commonwealth <no-reply@commonwealth.im>',
+      to: null,
+      bcc: null,
+      subject: emailSubjectLine,
+      templateId: DynamicTemplate.ImmediateEmailNotification,
+      dynamic_template_data: {
+        notification: {
+          subject: emailSubjectLine,
+          author: subjectCopy,
+          action: actionCopy,
+          rootObject: objectCopy,
+          community: communityCopy,
+          excerpt,
+          path,
+        }
+      }
+    };
   }
-
-  // assemble email fields
-  const { created_at, root_id, root_title, root_type, comment_id, comment_text,
-    chain_id, community_id, author_address, author_chain } = (notification_data as IPostNotificationData);
-
-  const decodedTitle = decodeURIComponent(root_title).trim();
-  const subjectLine = (chainEventLabel?.heading)
-    || ((category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
-      : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
-        : (category_id === NotificationCategories.NewThread) ? `New thread: ${decodedTitle}`
-          : 'New activity on Commonwealth');
-
-  // fetch author
-  const authorProfile = await models.OffchainProfile.findOne({
-    include: [{
-      model: models.Address,
-      where: { address: author_address, chain: author_chain },
-      required: true,
-    }]
-  });
-  let authorName;
-  try {
-    authorName = authorProfile.Address.name || JSON.parse(authorProfile.data).name || 'Someone';
-  } catch (e) {
-    authorName = 'Someone';
-  }
-
-  // fetch action and community
-  const actionCopy = (chainEventLabel?.heading)
-    || ((category_id === NotificationCategories.NewComment) ? 'commented on'
-      : (category_id === NotificationCategories.NewMention) ? 'mentioned you in the thread'
-        : (category_id === NotificationCategories.NewThread) ? 'created a new thread'
-          : '');
-  const objectCopy = decodeURIComponent(root_title).trim();
-  const communityObject = chain_id
-    ? await models.Chain.findOne({ where: { id: chain_id } })
-    : await models.OffchainCommunity.findOne({ where: { id: community_id } });
-  const communityCopy = communityObject ? ` in ${communityObject.name}:` : ':';
-  const excerpt = decodeURIComponent(comment_text); // TODO: unpack Markdown and Quill
-
-  // construct link
-  const pseudoProposal = {
-    id: root_id,
-    title: root_title,
-    chain: chain_id,
-    community: community_id,
-  };
-  const proposalUrlArgs = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = chainEventLabel?.linkUrl ? `${SERVER_URL}${chainEventLabel.linkUrl}`
-    : chainEventLabel ? `${SERVER_URL}/${chainId}`
-      : (getProposalUrl as any)(...proposalUrlArgs);
-
-  // construct email
-  const emailData = {
-    notification: {
-      // email subject:
-      subject: subjectLine,
-      // email body:
-      author: authorName,
-      action: actionCopy,
-      rootObject: objectCopy,
-      community: communityCopy,
-      excerpt,
-      path,
-      // used for chain notifications:
-      // title: chainEventLabel?.heading || subjectLine,
-      // body: chainEventLabel?.label || subjectLine,
-    }
-  };
-  return {
-    from: 'Commonwealth <no-reply@commonwealth.im>',
-    to: null,
-    bcc: null,
-    subject: subjectLine,
-    templateId: DynamicTemplate.ImmediateEmailNotification,
-    dynamic_template_data: emailData,
-  };
 };
 
 const createNotificationDigestEmailObject = async (user, notifications, models) => {
   const emailObjArray = await Promise.all(notifications.map(async (n) => {
-    const { created_at, root_id, root_title, root_type, comment_id, comment_text,
-      chain_id, community_id, author_address, author_chain } = JSON.parse(n.notification_data);
     const { category_id } = await n.getSubscription();
+    const notification_data = JSON.parse(n.notificationData);
 
-    // fetch author
-    const authorProfile = await models.OffchainProfile.findOne({
-      include: [{
-        model: models.Address,
-        where: { address: author_address, chain: author_chain },
-        required: true,
-      }]
-    });
-    let authorName;
-    try {
-      authorName = authorProfile.Address.name || JSON.parse(authorProfile.data).name || 'Someone';
-    } catch (e) {
-      authorName = 'Someone';
+    if (notification_data.chain_event) {
+      // TODO: implement chain event
+    } else {
+      const [
+        emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, path
+      ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
+      return {
+        author: subjectCopy,
+        action: actionCopy,
+        rootObject: objectCopy,
+        community: communityCopy,
+        excerpt,
+        path,
+      };
     }
-
-    // fetch name
-    const actionCopy = (category_id === NotificationCategories.NewComment) ? 'commented on'
-      : (category_id === NotificationCategories.NewMention) ? 'mentioned you in the thread'
-        : (category_id === NotificationCategories.NewThread) ? 'created a new thread'
-          : '';
-    const objectCopy = decodeURIComponent(root_title).trim();
-    const communityObject = chain_id
-      ? await models.Chain.findOne({ where: { id: chain_id } })
-      : await models.OffchainCommunity.findOne({ where: { id: community_id } });
-    const communityCopy = communityObject ? ` in ${communityObject.name}:` : ':';
-    const excerpt = decodeURIComponent(comment_text); // TODO: unpack Markdown and Quill
-
-    // construct link
-    const pseudoProposal = {
-      id: root_id,
-      title: root_title,
-      chain: chain_id,
-      community: community_id,
-    };
-    const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-    const path = (getProposalUrl as any)(...args);
-
-    // return data
-    return {
-      // email body:
-      author: authorName,
-      action: actionCopy,
-      rootObject: objectCopy,
-      community: communityCopy,
-      excerpt,
-      path,
-    };
   }));
 
   // construct email

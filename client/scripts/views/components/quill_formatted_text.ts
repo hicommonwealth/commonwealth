@@ -1,92 +1,11 @@
 /* eslint-disable no-restricted-syntax */
+
 import 'components/quill_formatted_text.scss';
 
 import m from 'mithril';
 import { Icon, Icons } from 'construct-ui';
 import { loadScript } from 'helpers';
-
-interface IQuillJSON {
-  ops: IQuillOps[];
-}
-
-interface IQuillOps {
-  insert: string;
-  attributes: string;
-}
-
-// Truncate a Quill document to the first `length` characters.
-//
-// If non-text elements are in the document, they will remain by
-// default.
-export const sliceQuill = (json: IQuillJSON, length: number) => {
-  let count = 0;
-  const completeObjects = [];
-  const truncatedObj = [];
-  for (const ele of json.ops) {
-    if (count >= length) break;
-    const text = ele.insert;
-    if (count + text.length > length) {
-      const fullText = text;
-      ele.insert = `${text.slice(0, length - count)}\n`;
-      truncatedObj.push(ele);
-      count += fullText.length;
-    } else {
-      completeObjects.push(ele);
-      count += text.length;
-    }
-  }
-  return ({ ops: completeObjects.concat(truncatedObj) });
-};
-
-const preprocessQuillDeltaForRendering = (nodes) => {
-  // split up nodes at line boundaries
-  const lines = [];
-  for (const node of nodes) {
-    if (typeof node.insert === 'string') {
-      node.insert.match(/[^\n]+\n?|\n/g).forEach((line) => {
-        lines.push({ attributes: node.attributes, insert: line });
-      });
-    } else {
-      lines.push(node);
-    }
-  }
-  // group nodes under parents
-  const result = [];
-  let parent = { children: [], attributes: undefined };
-  for (const node of lines) {
-    if (typeof node.insert === 'string' && node.insert.endsWith('\n')) {
-      parent.attributes = node.attributes;
-      // concatenate code-block node parents together, keeping newlines
-      if (result.length > 0 && result[result.length - 1].attributes && parent.attributes
-                 && parent.attributes['code-block'] && result[result.length - 1].attributes['code-block']) {
-        parent.children.push({ insert: node.insert });
-        result[result.length - 1].children = result[result.length - 1].children.concat(parent.children);
-      } else {
-        parent.children.push({ insert: node.insert });
-        result.push(parent);
-      }
-      parent = { children: [], attributes: undefined };
-    } else {
-      parent.children.push(node);
-    }
-  }
-  // If there was no \n at the end of the document, we need to push whatever remains in `parent`
-  // onto the result. This may happen if we are rendering a truncated Quill document
-  if (parent.children.length > 0) {
-    result.push(parent);
-  }
-
-  // trim empty newlines at end of document
-  while (result.length
-         && result[result.length - 1].children.length === 1
-         && typeof result[result.length - 1].children[0].insert === 'string'
-         && result[result.length - 1].children[0].insert === '\n'
-         && result[result.length - 1].children[0].attributes === undefined) {
-    result.pop();
-  }
-
-  return result;
-};
+import { preprocessQuillDeltaForRendering } from '../../../../shared/helpers';
 
 const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
