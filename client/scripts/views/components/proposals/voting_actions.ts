@@ -114,9 +114,10 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
   }
 };
 
-const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction }> = {
+const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction, votingModalOpen: boolean }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
+    const { votingModalOpen } = vnode.state;
     if (proposal instanceof SubstrateTreasuryProposal) {
       return m(CannotVote, { action: 'Send to council or democracy' });
     } else if (!app.isLoggedIn()) {
@@ -142,8 +143,14 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       return m(CannotVote, { action: 'Unrecognized proposal type' });
     }
 
-    const voteYes = (e) => {
+    const onModalClose = () => {
+      vnode.state.votingModalOpen = false;
+      m.redraw();
+    }
+
+    const voteYes = async (e) => {
       e.preventDefault();
+      vnode.state.votingModalOpen = true;
       mixpanel.track('Proposal Funnel', {
         'Step No': 3,
         'Step': 'Vote Yes',
@@ -155,16 +162,16 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         'Last Vote Created': new Date().toISOString()
       });
       if (proposal instanceof SubstrateDemocracyProposal) {
-        createTXModal(proposal.submitVoteTx(new DepositVote(user, proposal.deposit))); // TODO: new code, test
+        createTXModal(proposal.submitVoteTx(new DepositVote(user, proposal.deposit), onModalClose)); // TODO: new code, test
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
         if (vnode.state.conviction === undefined) throw new Error('Must select a conviction');
         createTXModal(proposal.submitVoteTx(
-          new BinaryVote(user, true, convictionToWeight(vnode.state.conviction))
+          new BinaryVote(user, true, convictionToWeight(vnode.state.conviction)), onModalClose
         ));
       } else if (proposal instanceof SubstrateCollectiveProposal) {
-        createTXModal(proposal.submitVoteTx(new BinaryVote(user, true)));
+        createTXModal(proposal.submitVoteTx(new BinaryVote(user, true), onModalClose));
       } else if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.YES)));
+        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.YES), null, onModalClose));
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
           .then(() => m.redraw())
@@ -177,6 +184,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     };
     const voteNo = (e) => {
       e.preventDefault();
+      vnode.state.votingModalOpen = true;
       mixpanel.track('Proposal Funnel', {
         'Step No': 3,
         'Step': 'Vote No',
@@ -190,15 +198,15 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       if (proposal instanceof EdgewareSignalingProposal) {
         createTXModal(proposal.submitVoteTx(new SignalingVote(proposal, user, [
           (app.chain.chain as SubstrateChain).createType('VoteOutcome', [0])
-        ], app.chain.chain.coins(0)))); // fake balance, not needed for voting
+        ], app.chain.chain.coins(0)), onModalClose)); // fake balance, not needed for voting
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
         if (vnode.state.conviction === undefined) throw new Error('Must select a conviction'); // TODO: new code, test
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, false,
-          convictionToWeight(vnode.state.conviction))));
+          convictionToWeight(vnode.state.conviction)), onModalClose));
       } else if (proposal instanceof SubstrateCollectiveProposal) {
-        createTXModal(proposal.submitVoteTx(new BinaryVote(user, false)));
+        createTXModal(proposal.submitVoteTx(new BinaryVote(user, false), onModalClose));
       } else if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.NO)));
+        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.NO), null, onModalClose));
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
       } else {
@@ -207,6 +215,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     };
     const cancelProposal = (e) => {
       e.preventDefault();
+      vnode.state.votingModalOpen = true;
       mixpanel.track('Proposal Funnel', {
         'Step No': 3,
         'Step': 'Cancel Proposal',
@@ -219,8 +228,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       });
       if (proposal instanceof MolochProposal) {
         proposal.abortTx()
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+          .then(() => { onModalClose(); m.redraw(); })
+          .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else {
         throw new Error('Invalid proposal type');
       }
@@ -228,6 +237,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     // V2 only
     // const sponsorProposal = (e) => {
     //   e.preventDefault();
+    //   vnode.state.votingModalOpen = true;
     //   mixpanel.track('Proposal Funnel', {
     //     'Step No': 3,
     //     'Step': 'Cancel Proposal',
@@ -246,6 +256,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     // };
     const processProposal = (e) => {
       e.preventDefault();
+      vnode.state.votingModalOpen = true;
       mixpanel.track('Proposal Funnel', {
         'Step No': 3,
         'Step': 'Cancel Proposal',
@@ -258,14 +269,16 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       });
       if (proposal instanceof MolochProposal) {
         proposal.processTx()
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+          .then(() => { onModalClose(); m.redraw(); })
+          .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else {
+        onModalClose()
         throw new Error('Invalid proposal type');
       }
     };
     const voteAbstain = (e) => {
       e.preventDefault();
+      vnode.state.votingModalOpen = true;
       mixpanel.track('Proposal Funnel', {
         'Step No': 3,
         'Step': 'Vote Abstain',
@@ -277,13 +290,14 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         'Last Thread Created': new Date().toISOString()
       });
       if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.ABSTAIN)));
+        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.ABSTAIN), null, onModalClose));
       } else {
         throw new Error('Invalid proposal type');
       }
     };
     const voteVeto = (e) => {
       e.preventDefault();
+      vnode.state.votingModalOpen = true;
       mixpanel.track('Proposal Funnel', {
         'Step No': 3,
         'Step': 'Vote Veto',
@@ -295,7 +309,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         'Last Thread Created': new Date().toISOString()
       });
       if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.VETO)));
+        createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.VETO), null, onModalClose));
       } else {
         throw new Error('Invalid proposal type');
       }
@@ -303,6 +317,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
 
     const voteForChoice = (e, choice) => {
       e.preventDefault();
+      vnode.state.votingModalOpen = true;
       mixpanel.track('Proposal Funnel', {
         'Step No': 3,
         'Step': `Vote for choice ${choice.toString()}`,
@@ -312,7 +327,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       if (proposal instanceof EdgewareSignalingProposal) {
         createTXModal(proposal.submitVoteTx(new SignalingVote(proposal, user, [
           (app.chain.chain as SubstrateChain).createType('VoteOutcome', choice)
-        ], app.chain.chain.coins(0)))); // fake balance, not needed for voting
+        ], app.chain.chain.coins(0)), onModalClose)); // fake balance, not needed for voting
       }
     };
 
@@ -399,7 +414,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         return m(`${cl[0]}`, [
           m(Button, {
             intent: cl[1],
-            disabled: !canVote || hasVotedForChoice[c.toHex()],
+            disabled: !canVote || hasVotedForChoice[c.toHex()] || votingModalOpen,
             onclick: (e) => voteForChoice(e, c),
             label: hasVotedForChoice[c.toHex()]
               ? `Voted ${hexToUtf8(c.toHex())}`
@@ -411,7 +426,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const yesButton = m('.yes-button', [
       m(Button, {
         intent: 'positive',
-        disabled: !canVote || hasVotedYes,
+        disabled: !canVote || hasVotedYes || votingModalOpen,
         onclick: voteYes,
         label: hasVotedYes ? 'Voted yes' : 'Vote yes'
       }),
@@ -419,7 +434,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const noButton = m('.no-button', [
       m(Button, {
         intent: 'negative',
-        disabled: !canVote || hasVotedNo,
+        disabled: !canVote || hasVotedNo || votingModalOpen,
         onclick: voteNo,
         label: hasVotedNo ? 'Voted no' : 'Vote no'
       })
@@ -428,7 +443,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const multiDepositApproveButton = m('.approve-button', [
       m(Button, {
         intent: 'positive',
-        disabled: !canVote,
+        disabled: !canVote || votingModalOpen,
         onclick: voteYes,
         label: (hasVotedYes && !canVote) ? 'Already approved' : 'Second'
       }),
@@ -437,7 +452,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const abstainButton = m('.abstain-button', [
       m(Button, {
         intent: 'none',
-        disabled: !canVote || hasVotedAbstain,
+        disabled: !canVote || hasVotedAbstain || votingModalOpen,
         onclick: voteAbstain,
         label: hasVotedAbstain ? 'Voted abstain' : 'Vote abstain'
       }),
@@ -446,7 +461,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const noWithVetoButton = m('.veto-button', [
       m(Button, {
         intent: 'negative',
-        disabled: !canVote || hasVotedVeto,
+        disabled: !canVote || hasVotedVeto || votingModalOpen,
         onclick: voteVeto,
         label: hasVotedVeto ? 'Vetoed' : 'Veto'
       }),
@@ -455,7 +470,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const cancelButton = (proposal.votingType === VotingType.MolochYesNo) && m('.veto-button', [
       m(Button, {
         intent: 'negative',
-        disabled: !((proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed),
+        disabled: !((proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed)
+          || votingModalOpen,
         onclick: cancelProposal,
         label: (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel'
       }),
@@ -464,8 +480,9 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     // const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
     //  m(Button, {
     //    intent: 'positive',
-    //    disabled: (proposal as MolochProposal).state.sponsored ||
-    //    (proposal as MolochProposal).state.processed,
+    //    disabled: (proposal as MolochProposal).state.sponsored
+    //      || (proposal as MolochProposal).state.processed
+    //      || votingModalOpen
     //    onclick: sponsorProposal,
     //    label: (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor',
     //  }),
@@ -474,7 +491,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     const processButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
       m(Button, {
         intent: 'none',
-        disabled: (proposal as MolochProposal).state !== MolochProposalState.ReadyToProcess,
+        disabled: (proposal as MolochProposal).state !== MolochProposalState.ReadyToProcess || votingModalOpen,
         onclick: processProposal,
         label: (proposal as MolochProposal).data.processed ? 'Processed' : 'Process'
       })

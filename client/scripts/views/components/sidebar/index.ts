@@ -22,6 +22,7 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
   view: (vnode) => {
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+    const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     const featuredTopics = {};
     const otherTopics = {};
@@ -105,10 +106,16 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
           onclick: (e) => m.route.set(`/${app.activeId()}`),
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
         }),
+        // m(ListItem, {
+        //   active: onChatPage(m.route.get()),
+        //   label: 'Chat',
+        //   onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+        //   contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+        // }),
       ]),
       m(List, [
-        !app.threads.initialized &&
-          m(ListItem, {
+        featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && !app.threads.initialized
+          && m(ListItem, {
             class: 'section-callout',
             label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
           }),

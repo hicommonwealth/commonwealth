@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .NotificationRow {
     display: flex;
     flex-direction: column;
@@ -15,6 +17,9 @@
     > .User,
     > .UserGallery {
         margin-bottom: 10px;
+    }
+    > .UserGallery .User {
+        margin-right: 4px;
     }
     .comment-body {
         flex: 1;

@@ -32,7 +32,6 @@ import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import viewCount from './routes/viewCount';
-import updateUserEmailInterval from './routes/updateUserEmailInterval';
 import updateEmail from './routes/updateEmail';
 import mergeAccounts from './routes/mergeAccounts';
 
@@ -89,10 +88,12 @@ import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import setPrivacy from './routes/setPrivacy';
 import pinThread from './routes/pinThread';
+import bulkOffchain from './routes/bulkOffchain';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
 import createWebhook from './routes/webhooks/createWebhook';
+import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
@@ -157,6 +158,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.delete('/drafts', passport.authenticate('jwt', { session: false }), deleteDraft.bind(this, models));
   router.patch('/drafts', passport.authenticate('jwt', { session: false }), editDraft.bind(this, models));
 
+  router.get('/bulkOffchain', bulkOffchain.bind(this, models));
+
   // offchain comments
   // TODO: Change to POST /comment
   router.post('/createComment', passport.authenticate('jwt', { session: false }), createComment.bind(this, models));
@@ -214,8 +217,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/upgradeMember', passport.authenticate('jwt', { session: false }), upgradeMember.bind(this, models));
 
   // user model update
-  // TODO: Change to PUT /userEmailInterval
-  router.post('/updateUserEmailInterval', passport.authenticate('jwt', { session: false }), updateUserEmailInterval.bind(this, models));
   // TODO: Change to PUT /email
   router.post('/updateEmail', passport.authenticate('jwt', { session: false }), updateEmail.bind(this, models));
 
@@ -228,6 +229,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // third-party webhooks
   // TODO: Change to POST /webhook
   router.post('/createWebhook', passport.authenticate('jwt', { session: false }), createWebhook.bind(this, models));
+  router.post('/updateWebhook', passport.authenticate('jwt', { session: false }), updateWebhook.bind(this, models));
   // TODO: Change to DELETE /webhook
   router.post('/deleteWebhook', passport.authenticate('jwt', { session: false }), deleteWebhook.bind(this, models));
   // TODO: Change to GET /webhooks

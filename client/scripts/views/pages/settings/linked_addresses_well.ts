@@ -80,7 +80,7 @@ const LinkedAddressesWell: m.Component<{}> = {
     const addressGroups = Object.entries(_.groupBy(app.user.addresses, (account) => account.chain));
 
     return m('.LinkedAddressesWell', [
-      m('h4', 'Linked Addresses'),
+      m('h4', 'My Addresses'),
       addressGroups.map(([chain_id, addresses]) => m('.address-group', [
         m('h4', app.config.chains.getById(chain_id)?.name),
         addresses.sort(orderAccountsByAddress).map((account) => m(AccountRow, { account })),

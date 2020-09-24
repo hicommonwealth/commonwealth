@@ -8,13 +8,15 @@ import app from 'state';
 import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
 import { Notification, AddressInfo } from 'models';
+import { pluralize } from 'helpers';
 import { IPostNotificationData } from 'shared/types';
 
-import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
+import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy } from '@commonwealth/chain-events';
+import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel,
+         chainSupportedBy } from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import UserGallery from './widgets/user_gallery';
 
@@ -63,9 +65,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   } else if (category === NotificationCategories.NewThread) {
     notificationHeader = m('span', [ actorName, ' created a new thread ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
-    notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', community_name) ])
-      : m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title || community_name) ]);
+    notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
       ? m('span', [ actorName, ' liked your post ', m('span.commented-obj', decoded_title) ])
@@ -123,20 +123,20 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     notificationHeader = parent_comment_id
       ? m('span', [
         actorName,
-        length > 0 && ` and ${length} others`,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
         ' commented on ',
         m('span.commented-obj', decoded_title)
       ])
       : m('span', [
         actorName,
-        length > 0 && ` and ${length} others`,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
         ' responded in ',
         m('span.commented-obj', decoded_title)
       ]);
   } else if (category === NotificationCategories.NewThread) {
     notificationHeader = m('span', [
       actorName,
-      length > 0 && ` and ${length} others`,
+      length > 0 && ` and ${pluralize(length, 'other')}`,
       ' created new threads in ',
       m('span.commented-obj', community_name)
     ]);
@@ -144,13 +144,13 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     notificationHeader = (!comment_id)
       ? m('span', [
         actorName,
-        length > 0 && ` and ${length} others`,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
         ' mentioned you in ',
         m('span.commented-obj', community_name)
       ])
       : m('span', [
         actorName,
-        length > 0 && ` and ${length} others`,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
         ' mentioned you in ',
         m('span.commented-obj', decoded_title || community_name)
       ]);
@@ -158,13 +158,13 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     notificationHeader = (!comment_id)
       ? m('span', [
         actorName,
-        length > 0 && ` and ${length} others`,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
         ' liked your post ',
         m('span.commented-obj', decoded_title)
       ])
       : m('span', [
         actorName,
-        length > 0 && ` and ${length} others`,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
         ' liked your comment in ',
         m('span.commented-obj', decoded_title || community_name)
       ]);

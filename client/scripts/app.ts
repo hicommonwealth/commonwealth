@@ -62,6 +62,11 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
 
+      // add recentActivity
+      const { recentThreads, recentComments } = data;
+      app.recentActivity.addThreads(recentThreads, true);
+      app.recentActivity.addAddressesFromActivity(recentThreads.concat(recentComments), true);
+
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
@@ -363,7 +368,7 @@ $(() => {
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
-      console.log('onmatch called, for:', path);
+      console.log('onmatch called, for:', path, (+new Date() / 1000));
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -371,6 +376,7 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
+      console.log('render called:', path, (+new Date() / 1000));
       const { scoped, hideSidebar } = attrs;
       let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'
@@ -408,11 +414,8 @@ $(() => {
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
-    '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/notificationSettings':     redirectRoute(() => '/edgeware/notificationSettings'),
-    '/:scope/notificationSettings': importRoute('views/pages/subscriptions/notificationSettings', { scoped: true }),
-    '/chainEventSettings':        redirectRoute(() => '/edgeware/chainEventSettings'),
-    '/:scope/chainEventSettings': importRoute('views/pages/subscriptions/chainEventSettings', { scoped: true }),
+    '/notifications':            redirectRoute(() => '/edgeware/notifications'),
+    '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
@@ -424,7 +427,7 @@ $(() => {
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
+    '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),

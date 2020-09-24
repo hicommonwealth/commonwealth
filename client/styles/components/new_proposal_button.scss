@@ -1,6 +1,17 @@
 @import 'client/styles/shared';
 
-.MobileNewProposalButton {
+button.NewProposalButton {
+    padding: 0 10px;
+}
+
+.cui-button-group.NewProposalButton > button:first-child {
+    padding: 0 12px 0 12px;
+}
+.cui-button-group.NewProposalButton > button:last-child {
+    padding: 0 10px 0 10px;
+}
+
+.NewProposalButton.MobileNewProposalButton {
     padding: 0;
     @include xs-max {
         .cui-button {
@@ -14,6 +25,6 @@
     }
 }
 
-.cui-popover.NewProposalButton {
+.cui-popover.new-proposal-button-popover {
     z-index: 51;
 }

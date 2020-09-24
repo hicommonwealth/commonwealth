@@ -76,16 +76,14 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       m('.cover'),
       m('.bio-main', [
         m('.bio-left', [ // TODO: Rename class to non-bio to avoid confusion with Bio component
-          m('.avatar', account.profile.getAvatar(90)),
+          m('.avatar', account.profile?.getAvatar(90)),
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', m(User, { user: account, hideAvatar: true })),
+            m('.User', account.profile ? m(User, { user: account, hideAvatar: true }) : account.address),
           ]),
           m('.info-row', [
-            m('span.profile-headline', account.profile && account.profile.headline
-              ? account.profile.headline
-              : m('.no-headline', 'No headline')),
+            account.profile?.headline && m('span.profile-headline', account.profile.headline),
             m('span.username', formatAddressShort(account.address, account.chain)),
             !vnode.state.copied && m('a.copy-address', {
               href: '#',

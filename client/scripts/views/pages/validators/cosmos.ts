@@ -36,7 +36,7 @@ export const NewCosmosDelegationModal : m.Component<{ validatorAddr }, ICosmosDe
             m(FormLabel, 'Amount'),
             m(Input, {
               placeholder: 'Enter amount to delegate:',
-              onchange: (e) => {
+              oninput: (e) => {
                 const result = (e.target as any).value;
                 vnode.state.delegationAmount = app.chain.chain.coins(parseFloat(result), true);
               }

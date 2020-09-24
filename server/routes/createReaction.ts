@@ -56,7 +56,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
       default: options,
       include: [ models.Address]
     });
-    if (created) finalReaction = await models.OffchainReaction.find({
+    if (created) finalReaction = await models.OffchainReaction.findOne({
       where: options,
       include: [ models.Address]
     });
@@ -117,10 +117,12 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
     notification_data,
     {
       user: finalReaction.Address.address,
+      author_chain: finalReaction.Address.chain,
       url: cwUrl,
       title: proposal.title || '',
       chain: finalReaction.chain,
       community: finalReaction.community,
+      body: (comment_id) ? comment.text : '',
     },
     req.wss,
     [ finalReaction.Address.address ],

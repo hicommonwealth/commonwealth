@@ -45,6 +45,53 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
+  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
+  const recentThreads = await models.OffchainThread.findAll({
+    where: {
+      [Op.or]: [
+        {
+          chain: {
+            [Op.in]: chains.map((c) => c.id),
+          }
+        },
+        {
+          community: {
+            [Op.in]: publicCommunities.map((c) => c.id),
+          }
+        }
+      ],
+      created_at: {
+        [Op.gt]: thirtyDaysAgo
+      }
+    },
+    include: {
+      model: models.Address,
+    }
+  });
+
+  const recentComments = await models.OffchainComment.findAll({
+    where: {
+      [Op.or]: [
+        {
+          chain: {
+            [Op.in]: chains.map((c) => c.id),
+          }
+        },
+        {
+          community: {
+            [Op.in]: publicCommunities.map((c) => c.id),
+          }
+        }
+      ],
+      created_at: {
+        [Op.gt]: thirtyDaysAgo
+      }
+    },
+    include: {
+      model: models.Address,
+    }
+  });
+
   const { user } = req;
 
   if (!user) {
@@ -55,6 +102,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       contractCategories,
       communities: publicCommunities,
       notificationCategories,
+      recentThreads,
+      recentComments,
       loggedIn: false,
     });
   }
@@ -101,6 +150,52 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     }],
   });
   const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
+
+  const recentThreads_ = await models.OffchainThread.findAll({
+    where: {
+      [Op.or]: [
+        {
+          chain: {
+            [Op.in]: chains.map((c) => c.id),
+          }
+        },
+        {
+          community: {
+            [Op.in]: allCommunities.map((c) => (c as any).id),
+          }
+        }
+      ],
+      created_at: {
+        [Op.gt]: thirtyDaysAgo
+      }
+    },
+    include: {
+      model: models.Address,
+    }
+  });
+
+  const recentComments_ = await models.OffchainComment.findAll({
+    where: {
+      [Op.or]: [
+        {
+          chain: {
+            [Op.in]: chains.map((c) => c.id),
+          }
+        },
+        {
+          community: {
+            [Op.in]: allCommunities.map((c) => (c as any).id),
+          }
+        }
+      ],
+      created_at: {
+        [Op.gt]: thirtyDaysAgo
+      }
+    },
+    include: {
+      model: models.Address,
+    }
+  });
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
@@ -168,6 +263,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     offchainTopics,
     contractCategories,
     notificationCategories,
+    recentThreads: recentThreads_,
+    recentComments: recentComments_,
     roles,
     invites,
     loggedIn: true,

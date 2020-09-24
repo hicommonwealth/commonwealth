@@ -23,6 +23,7 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
     href: target,
     onclick: (e) => {
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+      if (e.target.target === '_blank') return;
       e.preventDefault();
       e.stopPropagation();
       if (window.location.href.split('?')[0] === target.split('?')[0]) {
@@ -111,6 +112,14 @@ export function byDescendingCreationDate(a, b) {
 
 export function byAscendingCreationDate(a, b) {
   return +a.createdAt - +b.createdAt;
+}
+
+export function byDescendingUpdatedDate(a, b) {
+  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt)
+}
+
+export function byAscendingUpdatedDate(a, b) {
+  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt)
 }
 
 export function orderAccountsByAddress(a, b) {

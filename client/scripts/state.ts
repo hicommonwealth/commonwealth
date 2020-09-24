@@ -5,9 +5,10 @@ import {
   ICommunityAdapter,
   NotificationCategory,
 } from 'models';
+import { ReplaySubject } from 'rxjs';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
-import { ReplaySubject } from 'rxjs';
+import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
@@ -29,6 +30,11 @@ export const enum LoginState {
   LoggedIn = 'logged_in',
 }
 
+interface IRecentActivity {
+  activeAddresses;
+  activeThreads;
+}
+
 export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
@@ -44,6 +50,9 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
+
+  recentActivity: RecentActivityController;
+
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
   activeCommunityId(): string;
@@ -90,6 +99,8 @@ const app: IApp = {
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
+
+  recentActivity: new RecentActivityController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,

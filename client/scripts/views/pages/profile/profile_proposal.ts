@@ -11,7 +11,6 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
     const proposal = vnode.attrs.proposal;
     const { slug, identifier } = proposal;
     const { attachments, author, body, title, createdAt, chain, community } = proposal;
-
     return m('.ProfileProposal', [
       m('.summary', [
         m(User, { user: new AddressInfo(null, author, proposal.authorChain, null), linkify: true, hideAvatar: true }),
@@ -21,7 +20,7 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
         ` ${createdAt.fromNow()}`
       ]),
       m('.activity.proposal', [
-        proposal.kind === OffchainThreadKind.Forum
+        proposal.kind === OffchainThreadKind.Forum || proposal.kind === OffchainThreadKind.Link
           ? link('a.proposal-title', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, title)
           : m('a.proposal-title', title),
         // TODO: show a truncated thread once we have a good formatting stripping helper
