@@ -38,27 +38,22 @@ export default class extends IEventHandler {
       case SubstrateTypes.EventKind.Bonded: {
         validator.exposure.own = (Number(validator.exposure.own) + Number(bondEventData.amount)).toString();
         validator.exposure.total = (Number(validator.exposure.total) + Number(bondEventData.amount)).toString();
-        validator.block = event.blockNumber.toString();
-        validator.eventType = bondEventData.kind;
-        validator.created_at = new Date().toISOString();
-        validator.updated_at = new Date().toISOString();
-        delete validator.id;
         break;
       }
       case SubstrateTypes.EventKind.Unbonded: {
         validator.exposure.own = (Number(validator.exposure.own) - Number(bondEventData.amount)).toString();
         validator.exposure.total = (Number(validator.exposure.total) - Number(bondEventData.amount)).toString();
-        validator.block = event.blockNumber.toString();
-        validator.eventType = bondEventData.kind;
-        validator.created_at = new Date().toISOString();
-        validator.updated_at = new Date().toISOString();
-        delete validator.id;
         break;
       }
       default: {
         return dbEvent;
       }
     }
+    validator.block = event.blockNumber.toString();
+    validator.eventType = bondEventData.kind;
+    validator.created_at = new Date().toISOString();
+    validator.updated_at = new Date().toISOString();
+    delete validator.id;
 
     // 4) create/update event data in database.
     await this._models.HistoricalValidatorStatistic.create( validator );

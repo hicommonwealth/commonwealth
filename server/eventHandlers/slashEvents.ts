@@ -1,5 +1,5 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
-import getLast30DaysStats  from './computeStats'
+import { computeEventStats } from './computeStats'
 import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 
@@ -112,8 +112,8 @@ export default class extends IEventHandler {
     }
 
     // Added Last 30 days Slash count and averages for a validator.
-    const [thirtyDaysAvg, thirtyDaysCount] = await getLast30DaysStats(this._chain, newSlashEventData.kind, newSlashEventData.validator);
-    validator.slashesStats = { count: thirtyDaysCount, avg: thirtyDaysAvg }
+    const [slashStatsAvg, slashStatsCount] = await computeEventStats(this._chain, newSlashEventData.kind, newSlashEventData.validator, 30);
+    validator.slashesStats = { count: slashStatsCount, avg: slashStatsAvg }
 
     // 3) Modify exposures for validators based of slash balance.
     latestValidator.block = event.blockNumber.toString();

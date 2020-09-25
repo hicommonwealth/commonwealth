@@ -60,14 +60,6 @@ export default class extends IEventHandler {
         validatorsList.forEach((validator: any) => {
           validator.uptime = uptimePercent(Number(validator.onlineCount), Number(validator.offlineCount), 1).toString();  // 1 for AllGood event
           validator.isOnline = true
-          validator.block = event.blockNumber.toString();
-          validator.eventType = imOnlineEventData.kind;
-          validator.created_at = new Date().toISOString();
-          validator.updated_at = new Date().toISOString();
-          delete validator.id;
-          delete validator.onlineCount;
-          delete validator.offlineCount;
-          delete validator.row_number;
         });
         break;  
       }
@@ -75,14 +67,6 @@ export default class extends IEventHandler {
         validatorsList.forEach((validator: any) => {
           validator.uptime = uptimePercent(Number(validator.onlineCount), Number(validator.offlineCount), 0).toString();  // 0 for SomeOffline event
           validator.isOnline = false
-          validator.block = event.blockNumber.toString();
-          validator.eventType = imOnlineEventData.kind;
-          validator.created_at = new Date().toISOString();
-          validator.updated_at = new Date().toISOString();
-          delete validator.id;
-          delete validator.onlineCount;
-          delete validator.offlineCount;
-          delete validator.row_number;
         });
         break;
       }
@@ -90,6 +74,16 @@ export default class extends IEventHandler {
         return dbEvent;
       }
     }
+    validatorsList.forEach((validator: any) => {
+      validator.block = event.blockNumber.toString();
+      validator.eventType = imOnlineEventData.kind;
+      validator.created_at = new Date().toISOString();
+      validator.updated_at = new Date().toISOString();
+      delete validator.id;
+      delete validator.onlineCount;
+      delete validator.offlineCount;
+      delete validator.row_number;
+    });
 
     // 4) create/update event data in database.
     // await this._models.HistoricalValidatorStatistic.bulkCreate( validatorsList, {ignoreDuplicates: true} );

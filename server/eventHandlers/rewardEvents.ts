@@ -1,8 +1,7 @@
 /* eslint-disable max-len */
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
 import BN from 'bn.js';
-import getLast30DaysStats from './computeStats'
-import getLast30DaysAPR from './computeAPR'
+import { computeEventStats, getAPR } from './computeStats'
 
 
 export default class extends IEventHandler {
@@ -69,8 +68,8 @@ export default class extends IEventHandler {
     let validator = JSON.parse(JSON.stringify(latestValidatorStat));
 
     // Added Last 30 days Rewards count and averages for a validator.
-    const [thirtyDaysAvg, thirtyDaysCount] = await getLast30DaysStats(this._chain, newRewardEventData.kind, validator.stash);
-    validator.rewardsStats = {count: thirtyDaysCount, avg: thirtyDaysAvg }
+    const [rewardsStatsAvg, rewardsStatsCount] = await computeEventStats(this._chain, newRewardEventData.kind, validator.stash, 30);
+    validator.rewardsStats = {count: rewardsStatsCount, avg: rewardsStatsAvg }
 
     // 3) Modify exposures for validators based of reward amount.
     // Getting updated validator info from the new-session event data related to rewards calculation (e.g. exposure(s) for each validator, commissionPer, eraPoints, rewardDestination)
@@ -93,7 +92,7 @@ export default class extends IEventHandler {
     validator.eventType = newRewardEventData.kind;
     validator.commissionPer = activeValidatorsInfo.commissionPer;
     validator.eraPoints = activeValidatorsInfo.eraPoints;
-    validator.apr = await getLast30DaysAPR(this._chain, event.data.kind, validator.stash);
+    validator.apr = await getAPR(this._chain, event.data.kind, validator.stash, 30);
     validator.created_at = new Date().toISOString();
     validator.updated_at = new Date().toISOString();
     delete validator.id;

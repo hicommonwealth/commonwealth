@@ -1,5 +1,5 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
-import getLast30DaysStats  from './computeStats'
+import { computeEventStats } from './computeStats'
 import {sequelize} from '../database'
 
 
@@ -38,8 +38,8 @@ export default class extends IEventHandler {
     validatorsList.forEach(async (validator: any) => {
 
       // Added Last 30 days Offences count for a validator.
-      const [thirtyDaysAvg, thirtyDaysCount] = await getLast30DaysStats(this._chain, newOffenceEventData.kind, validator.stash);
-      validator.offencesStats = {count: thirtyDaysCount }
+      const [offenceStatsAvg, offenceStatsCount] = await computeEventStats(this._chain, newOffenceEventData.kind, validator.stash, 30);
+      validator.offencesStats = {count: offenceStatsCount }
 
       validator.block = event.blockNumber.toString();
       validator.eventType = newOffenceEventData.kind;
