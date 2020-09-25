@@ -1,4 +1,6 @@
-import { OffchainThread, AddressInfo, OffchainComment, OffchainReaction } from 'models';
+import { moment } from 'moment-twitter';
+import { OffchainThread, AddressInfo, OffchainComment, OffchainReaction, OffchainTopic } from 'models';
+import AbridgedThread from 'client/scripts/models/AbridgedThreads';
 import {
   ActiveAddressesStore,
   ActiveThreadsStore,
@@ -8,20 +10,32 @@ import {
 
 
 interface IAbridgedThread {
-  address: any,
+  id: number
+  Address: any,
   author_chain: string,
   title: string,
   created_at: any,
   community: string,
   chain: string,
+  topic: OffchainTopic,
   pinned?: boolean,
-  topic?: string,
   url?: string
 }
 
 export const modelAbridgedThreadFromServer = (thread: IAbridgedThread) => {
-
-}
+  return new AbridgedThread(
+    thread.id,
+    thread.Address.address,
+    thread.Address.chain,
+    decodeURIComponent(thread.title),
+    moment(thread.created_at),
+    thread.community,
+    thread.chain,
+    thread.topic,
+    thread.pinned,
+    thread.url
+  );
+};
 
 class RecentActivityController {
   private _threadsStore = new ActiveThreadsStore();
