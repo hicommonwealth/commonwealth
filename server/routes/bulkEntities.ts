@@ -44,7 +44,6 @@ const bulkEntities = async (models, req: Request, res: Response, next: NextFunct
     entityFindOptions.where.completed = true;
   }
   if (!req.query.include_preimage) {
-    console.log('default');
     entityFindOptions.where.type = { [Op.notLike]: '%preimage%' };
   }
   const entities = await models.ChainEntity.findAll(entityFindOptions);
