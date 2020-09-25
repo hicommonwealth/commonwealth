@@ -1,5 +1,4 @@
 import app from 'state';
-import { IAbridgedThreadFromServer } from '../controllers/app/recent_activity';
 import { AddressInfo } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 import AbridgedThread from '../models/AbridgedThreads';

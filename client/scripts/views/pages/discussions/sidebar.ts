@@ -4,7 +4,7 @@ import { slugify } from 'helpers';
 import m from 'mithril';
 
 import app from 'state';
-import { AddressInfo, OffchainThread } from 'models';
+import { AddressInfo, AbridgedThread } from 'models';
 import User from 'views/components/widgets/user';
 import CommunityInfoModule from 'views/components/sidebar/community_info_module';
 
@@ -23,7 +23,7 @@ export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: num
   }
 };
 
-export const MostActiveThread: m.Component<{ thread: OffchainThread }> = {
+export const MostActiveThread: m.Component<{ thread: AbridgedThread }> = {
   view: (vnode) => {
     const { thread } = vnode.attrs;
     return m('.MostActiveThread', [
@@ -38,7 +38,7 @@ export const MostActiveThread: m.Component<{ thread: OffchainThread }> = {
         }, thread.title),
       ]),
       m(User, {
-        user: new AddressInfo(null, thread.author, thread.authorChain, null),
+        user: new AddressInfo(null, thread.address, thread.authorChain, null),
         linkify: true,
       }),
     ]);

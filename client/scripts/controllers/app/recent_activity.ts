@@ -1,6 +1,5 @@
-import { IAbridgedThreadFromServer } from './recent_activity';
 import { moment } from 'moment-twitter';
-import { OffchainThread, AddressInfo, OffchainComment, OffchainReaction, OffchainTopic } from 'models';
+import { OffchainThread, AddressInfo, OffchainTopic } from 'models';
 import AbridgedThread from 'client/scripts/models/AbridgedThreads';
 import {
   ActiveAddressesStore,
@@ -79,7 +78,7 @@ class RecentActivityController {
     });
   }
 
-  public getThreadsByCommunity(community: string): Array<OffchainThread> {
+  public getThreadsByCommunity(community: string): Array<AbridgedThread> {
     return this._threadsStore.getThreadsByCommunity(community);
   }
 
