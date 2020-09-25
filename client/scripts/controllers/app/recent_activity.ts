@@ -1,3 +1,4 @@
+import { IAbridgedThreadFromServer } from './recent_activity';
 import { moment } from 'moment-twitter';
 import { OffchainThread, AddressInfo, OffchainComment, OffchainReaction, OffchainTopic } from 'models';
 import AbridgedThread from 'client/scripts/models/AbridgedThreads';
@@ -8,23 +9,24 @@ import {
   IAddressCountAndInfo
 } from '../../stores/ActivityStore';
 
-
-interface IAbridgedThread {
-  id: number
+export interface IAbridgedThreadFromServer {
+  id: number,
+  address_id: number,
   Address: any,
   author_chain: string,
   title: string,
   created_at: any,
   community: string,
   chain: string,
-  topic: OffchainTopic,
+  topic?: OffchainTopic,
   pinned?: boolean,
   url?: string
 }
 
-export const modelAbridgedThreadFromServer = (thread: IAbridgedThread) => {
+export const modelAbridgedThreadFromServer = (thread: IAbridgedThreadFromServer): AbridgedThread => {
   return new AbridgedThread(
     thread.id,
+    thread.address_id,
     thread.Address.address,
     thread.Address.chain,
     decodeURIComponent(thread.title),
@@ -48,9 +50,12 @@ class RecentActivityController {
 
   public get initialized() { return this._initialized; }
 
-  public addThreads(threads: OffchainThread[], clear?: boolean) {
+  public addThreads(threads: IAbridgedThreadFromServer[], clear?: boolean) {
     if (clear) this._threadsStore.clearThreads();
-    threads.forEach((thread) => this._threadsStore.addThread(thread));
+    threads.forEach((thread) => {
+      const modeledThread = modelAbridgedThreadFromServer(thread);
+      this._threadsStore.addThread(modeledThread);
+    });
   }
 
   public addAddresses(addresses: AddressInfo[], community: string, clear?: boolean) {

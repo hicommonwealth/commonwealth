@@ -1,7 +1,8 @@
 import app from 'state';
-import { modelFromServer } from '../controllers/server/threads';
-import { AddressInfo, OffchainThread } from '../models';
+import { IAbridgedThreadFromServer } from '../controllers/app/recent_activity';
+import { AddressInfo } from '../models';
 import { byAscendingCreationDate } from '../helpers';
+import AbridgedThread from '../models/AbridgedThreads';
 
 export interface IAddressCountAndInfo {
   postCount: number;
@@ -17,13 +18,13 @@ interface ICommunityAddresses {
 }
 
 interface ICommunityThreads {
-  [parentEntity: string]: Array<OffchainThread>;
+  [parentEntity: string]: Array<AbridgedThread>;
 }
 
 export class ActiveThreadsStore {
   private _threadsByCommunity: ICommunityThreads = {};
 
-  public getThreadsByCommunity(communityId: string): Array<OffchainThread> {
+  public getThreadsByCommunity(communityId: string): Array<AbridgedThread> {
     return this._threadsByCommunity[communityId] || [];
   }
 
@@ -47,8 +48,7 @@ export class ActiveThreadsStore {
     return allThreads.slice(0, count);
   }
 
-  public addThread(thread: OffchainThread) {
-    thread = modelFromServer(thread);
+  public addThread(thread: AbridgedThread) {
     const parentEntity = thread.community || thread.chain;
     if (!this._threadsByCommunity[parentEntity]) {
       this._threadsByCommunity[parentEntity] = [];
