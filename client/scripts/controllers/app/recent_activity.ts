@@ -12,7 +12,6 @@ export interface IAbridgedThreadFromServer {
   id: number,
   address_id: number,
   Address: any,
-  author_chain: string,
   title: string,
   created_at: any,
   community: string,
