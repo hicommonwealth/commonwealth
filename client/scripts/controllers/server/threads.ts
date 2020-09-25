@@ -1,4 +1,3 @@
-import { modelAbridgedThreadFromServer } from './../app/recent_activity';
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
 import moment from 'moment-twitter';
@@ -6,7 +5,7 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { ProposalStore, TopicStore } from 'stores';
+import { ProposalStore } from 'stores';
 import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo } from 'models';
 
 import { notifyError } from 'controllers/app/notifications';

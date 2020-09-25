@@ -1,6 +1,5 @@
 import { moment } from 'moment-twitter';
-import { OffchainThread, AddressInfo, OffchainTopic } from 'models';
-import AbridgedThread from 'client/scripts/models/AbridgedThreads';
+import { AddressInfo, OffchainTopic, AbridgedThread } from 'models';
 import {
   ActiveAddressesStore,
   ActiveThreadsStore,
