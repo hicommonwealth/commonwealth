@@ -98,13 +98,12 @@ class ThreadsController {
       this._store.add(result);
       app.recentActivity.addThreads([{
         id: response.result.id,
-        address_id: response.result.address_id,
         Address: response.result.Address,
         title: response.result.title,
         created_at: response.result.created_at,
         community: response.result.community,
         chain: response.result.chain,
-        topic: response.result.Topic,
+        topic: response.result.topic,
         pinned: response.result.pinned,
         url: response.result.pinned
       }]);

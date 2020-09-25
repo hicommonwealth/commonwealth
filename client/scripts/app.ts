@@ -64,6 +64,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
 
       // add recentActivity
       const { recentThreads, recentComments } = data;
+      console.log(recentThreads);
       app.recentActivity.addThreads(recentThreads, true);
       app.recentActivity.addAddressesFromActivity(recentThreads.concat(recentComments), true);
 

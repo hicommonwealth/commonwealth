@@ -8,22 +8,21 @@ import {
 } from '../../stores/ActivityStore';
 
 export interface IAbridgedThreadFromServer {
-  id: number,
-  address_id: number,
-  Address: any,
-  title: string,
-  created_at: any,
-  community: string,
-  chain: string,
-  topic?: OffchainTopic,
-  pinned?: boolean,
-  url?: string
+  id: number;
+  Address: any;
+  title: string;
+  created_at: any;
+  community: string;
+  chain: string;
+  topic?: OffchainTopic;
+  pinned?: boolean;
+  url?: string;
 }
 
 export const modelAbridgedThreadFromServer = (thread: IAbridgedThreadFromServer): AbridgedThread => {
   return new AbridgedThread(
     thread.id,
-    thread.address_id,
+    thread.Address.id,
     thread.Address.address,
     thread.Address.chain,
     decodeURIComponent(thread.title),
@@ -51,6 +50,7 @@ class RecentActivityController {
     if (clear) this._threadsStore.clearThreads();
     threads.forEach((thread) => {
       const modeledThread = modelAbridgedThreadFromServer(thread);
+      console.log(modeledThread);
       this._threadsStore.addThread(modeledThread);
     });
   }

@@ -31,7 +31,7 @@ class AbridgedThread implements IUniqueId {
     created_at: moment.Moment,
     community: string,
     chain: string,
-    topic: OffchainTopic,
+    topic: any,
     pinned?: boolean,
     url?: string
   ) {
@@ -44,8 +44,8 @@ class AbridgedThread implements IUniqueId {
     this.createdAt = created_at;
     this.community = community;
     this.chain = chain;
-    this.pinned = pinned;
     this.topic = topic;
+    this.pinned = pinned;
     this.url = url;
   }
 }
