@@ -32,8 +32,8 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
         }),
         ' commented',
         (proposal.chain || proposal.community) && [
-          ' in a ',
-          link('a', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`, 
+          ' on a ',
+          link('a', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`,
             (proposal instanceof OffchainThread) ? 'thread' : 'proposal')
         ]
       ]),
