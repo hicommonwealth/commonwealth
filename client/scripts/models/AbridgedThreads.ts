@@ -5,14 +5,21 @@ import OffchainTopic from './OffchainTopic';
 class AbridgedThread implements IUniqueId {
   public readonly id: number;
   public readonly address: string;
-  public readonly author_chain: string;
+  public readonly authorChain: string;
   public readonly title: string;
-  public readonly created_at: moment.Moment;
+  public readonly createdAt: moment.Moment;
   public readonly community: string;
   public readonly chain: string;
   public readonly topic: OffchainTopic;
   public readonly pinned?: boolean;
   public readonly url?: string;
+
+  public readonly slug = 'discussion';
+  public readonly identifier: string;
+
+  public get uniqueIdentifier() {
+    return `${this.slug}_${this.identifier}`;
+  }
 
   constructor(
     id: number,
@@ -27,10 +34,11 @@ class AbridgedThread implements IUniqueId {
     url?: string
   ) {
     this.id = id;
+    this.identifier = `${id}`;
     this.address = address;
-    this.author_chain = author_chain;
+    this.authorChain = author_chain;
     this.title = title;
-    this.created_at = created_at;
+    this.createdAt = created_at;
     this.community = community;
     this.chain = chain;
     this.pinned = pinned;
