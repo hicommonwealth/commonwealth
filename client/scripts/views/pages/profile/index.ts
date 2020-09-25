@@ -237,6 +237,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
     return m(Sublayout, {
       class: 'ProfilePage',
+      showNewProposalButton: true,
     }, [
       m('.forum-container-alt', [
         m(ProfileHeader, {
