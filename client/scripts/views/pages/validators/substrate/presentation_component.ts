@@ -340,8 +340,6 @@ export const PresentationComponent_ = {
     $("table.validators-table").on('scroll', function () {
       if (!model.scroll) {
         if ($(this).scrollTop() + $(this).innerHeight() + ($(this)[0].scrollHeight * 0.05)  >= $(this)[0].scrollHeight) {
-          // alert('end reached');
-          console.log('inside')
           model.scroll = true;
           if (!model.searchValue && !model.searchValue.trim())
             model.onChange();
@@ -386,9 +384,6 @@ export const PresentationComponent_ = {
               autofocus: true,
               placeholder: 'Search for a name, address or index...',
               onkeyup: (e) => {
-                { onSearchHandler(e.target.value) }
-              },
-              onkeydown: (e) => {
                 { model.onReverseSearch(e.target.value) }
               },
               onkeypress: (e) => {
@@ -491,9 +486,6 @@ export const PresentationComponent_ = {
             autofocus: true,
             placeholder: 'Search for a name, address or index...',
             onkeyup: (e) => {
-              { onSearchHandler(e.target.value) }
-            },
-            onkeydown: (e) => {
               { model.onReverseSearch(e.target.value) }
             },
             onkeypress: (e) => {
