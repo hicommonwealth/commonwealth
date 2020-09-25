@@ -5,6 +5,24 @@ import {
   IIdScopedAddressCountAndInfo,
   IAddressCountAndInfo
 } from '../../stores/ActivityStore';
+
+
+interface IAbridgedThread {
+  address: any,
+  author_chain: string,
+  title: string,
+  created_at: any,
+  community: string,
+  chain: string,
+  pinned?: boolean,
+  topic?: string,
+  url?: string
+}
+
+export const modelAbridgedThreadFromServer = (thread: IAbridgedThread) => {
+
+}
+
 class RecentActivityController {
   private _threadsStore = new ActiveThreadsStore();
   private _addressStore = new ActiveAddressesStore();
