@@ -25,6 +25,12 @@ const numBuckets = 16;
 const bucketSize = 27000; // blocks shown over a single bucket
 const ySteps = 4;
 
+// 30 days start and endDate
+const todayDate = new Date();
+todayDate.setDate(new Date().getDate() - 30);
+const _startDate = todayDate.toISOString();
+const _endDate = new Date().toISOString();
+
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
@@ -190,7 +196,14 @@ function generateBuckets(v, bucketCount, jumpIdx, recentBlockNum) {
 
 async function assignApiValues(route, obj: IGraphData, addr, latestBlock) {
   try {
-    const apiRes = await $.get(`${app.serverUrl()}/${route}`, { chain: app.chain.class, stash: addr, onlyValue: true, version: 38 });
+    const apiRes = await $.get(`${app.serverUrl()}/${route}`, {
+      chain: app.chain.class,
+      stash: addr,
+      onlyValue: true,
+      version: 38,
+      startDate: _startDate,
+      endDate: _endDate
+    });
     const bucket = generateBuckets(apiRes.result[addr],
       numBuckets,
       bucketSize,
@@ -364,13 +377,13 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // OWN STAKE OVER TIME
           ownStakeGraph ? (ownStakeGraph.blocks.length ? m(chartComponent, {
             title: 'OWN STAKE OVER TIME (Millions)', // Title
@@ -383,13 +396,13 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'OWN STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OWN STAKE OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'OWN STAKE OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // OTHER STAKE OVER TIME
           otherStakeGraph ? (otherStakeGraph.blocks.length ? m(chartComponent, {
             title: 'OTHER STAKE OVER TIME (Millions)', // Title
@@ -402,13 +415,13 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'OTHER STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OTHER STAKE OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'OTHER STAKE OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // NOMINATORS OVER TIME
           nominatorGraph ? (nominatorGraph.blocks.length ? m(chartComponent, {
             title: 'NOMINATORS OVER TIME (count)', // Title
@@ -421,13 +434,13 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'NOMINATORS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'NOMINATORS OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'NOMINATORS OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // SLASHES OVER TIME
           slashesGraph ? (slashesGraph.blocks.length ? m(chartComponent, {
             title: 'SLASHES OVER TIME (Millions)', // Title
@@ -440,13 +453,13 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'SLASHES OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'SLASHES OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'SLASHES OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // IMONLINE OVER TIME
           imOnlineGraph ? (imOnlineGraph.blocks.length ? m(chartComponent, {
             title: 'IMONLINE OVER TIME (percent)', // Title
@@ -459,13 +472,13 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'IMONLINE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'IMONLINE OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'IMONLINE OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // REWARDS OVER TIME
           rewardsGraph ? (rewardsGraph.blocks.length ? m(chartComponent, {
             title: 'REWARDS OVER TIME (Millions)', // Title
@@ -478,13 +491,13 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
 
           offenceGraph ? (offenceGraph.blocks.length ? m(chartComponent, {
             title: 'OFFENCES OVER TIME (count)', // Title
@@ -497,13 +510,13 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
 
         ])
         // ]),
