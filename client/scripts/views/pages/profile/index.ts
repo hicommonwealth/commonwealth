@@ -20,6 +20,10 @@ import lineModel from './graph_models/linemodel';
 
 import ProfileHeader from './profile_header';
 
+// Global bucket const
+const numBuckets = 16;
+const bucketSize = 27000 ; // blocks shown over a single bucket
+const ySteps = 4;
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -95,7 +99,14 @@ export enum UserContent {
 
 interface IGraphData {
   blocks: any[], // x axis
-  values: any[] // y axis
+  values: any[] // y axis,
+  minValue: number,
+  maxValue: number,
+  yStepSize: number
+}
+
+function getEmptyGraphData() {
+  return { blocks: [], values: [], minValue: undefined, maxValue: undefined, yStepSize: undefined }
 }
 
 export interface IProfileAttrs {
@@ -127,6 +138,10 @@ interface IProfilePageState {
   fetchedBlock: boolean;
 }
 
+interface IGraphApi {
+  route: string,
+  data: any
+}
 
 function buildBucketKeys(bk, bucket, recentBlockNum, jumpIdx) {
   for (let i = 0; i < bucket.length; i++) {
@@ -143,7 +158,10 @@ function addInDesiredBucket(bucketCount, recentBlockNum, bucket, jumpIdx, v, vk)
   let k = 0;
   while (k < bucketCount) {
     if (Number(vk) <= recentBlockNum && (recentBlockNum - Number(vk)) <= ((k + 1) * jumpIdx)) {
-      bucket[(bucketCount - 1) - (k)] += Number(v[vk]);
+
+      let numToAdd = typeof(v[vk]) === ('object') ? 0 : Number(v[vk]) ; 
+
+      bucket[(bucketCount - 1) - (k)] = (bucket[(bucketCount - 1) - (k)] + Number(v[vk])) / 2
       k = bucketCount;
     }
     k++;
@@ -164,125 +182,45 @@ function generateBuckets(v, bucketCount, jumpIdx, recentBlockNum) {
   };
 }
 
+async function assignApiValues(route, obj: IGraphData, addr, latestBlock) {
+  try {
+    const apiRes = await $.get(`${app.serverUrl()}/${route}`, { chain: app.chain.class, stash: addr });
+    console.log(route, apiRes)
+    const bucket = generateBuckets(apiRes.result.validators[addr],
+      numBuckets,
+      bucketSize,
+      latestBlock);
+      // /if (route === 'getOtherStakeOverTime')
+        debugger;
+    obj.blocks = bucket.key;
+    obj.values = bucket.value.map((x) => {
+      return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0); // 1EDG = 10^18
+    });
+    obj.maxValue = Math.max.apply(Math, obj.values);
+    obj.minValue = Math.min.apply(Math, obj.values);
+    obj.yStepSize = obj.maxValue / ySteps;
+  } catch (e) {
+    // /console.error(e);
+  }
+}
+
+
 const dataGetter = async (vnode) => {
-  // request for total stake OVER TIME
-  try {
-    const tsot = await $.get(`${app.serverUrl()}/getTotalStakeOverTime`, { chain: app.chain.class, stash: vnode.state.account.address });
-    vnode.state.totalStakeGraph = { blocks: [], values: [] };
-    const tsot_bucketRes = generateBuckets(tsot.result.validators[vnode.state.account.address],
-      10,
-      43200,
-      vnode.state.latestBlock);
-    vnode.state.totalStakeGraph.blocks = tsot_bucketRes.key;
-    vnode.state.totalStakeGraph.values = tsot_bucketRes.value.map((x) => {
-      return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0); // 1EDG = 10^18
-    });
-  } catch (e) {
-    vnode.state.totalStakeGraph = { blocks: [], values: [] };
-  }
+  const address = vnode.state.account.address;
+  const latestBlock = vnode.state.latestBlock;
 
-
-  // request for own stake OVER TIME
-  try {
-    const osot = await $.get(`${app.serverUrl()}/getOwnStakeOverTime`, { chain: app.chain.class, stash: vnode.state.account.address });
-    vnode.state.ownStakeGraph = { blocks: [], values: [] };
-    const osot_bucketRes = generateBuckets(osot.result.validators[vnode.state.account.address],
-      10,
-      43200,
-      vnode.state.latestBlock);
-    vnode.state.ownStakeGraph.blocks = osot_bucketRes.key;
-    vnode.state.ownStakeGraph.values = osot_bucketRes.value.map((x) => {
-      return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0); // 1EDG = 10^18
-    });
-  } catch (e) {
-    vnode.state.ownStakeGraph = { blocks: [], values: [] };
-  }
-
-  // request for other stake OVER TIME
-  try {
-    const otsot = await $.get(`${app.serverUrl()}/getOtherStakeOverTime`, { chain: app.chain.class, stash: vnode.state.account.address, onlyValue: true });
-    vnode.state.otherStakeGraph = { blocks: [], values: [] };
-    const otsot_bucketRes = generateBuckets(otsot.result.validators[vnode.state.account.address],
-      10,
-      43200,
-      vnode.state.latestBlock);
-    vnode.state.otherStakeGraph.blocks = otsot_bucketRes.key;
-    vnode.state.otherStakeGraph.values = otsot_bucketRes.value.map((x) => {
-      return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0);
-    });
-  } catch (e) {
-    vnode.state.otherStakeGraph = { blocks: [], values: [] };
-  }
-
-  // request for nominators OVER TIME
-  try {
-    const gnot = await $.get(`${app.serverUrl()}/getNominatorsOverTime`, { chain: app.chain.class, stash: vnode.state.account.address, onlyValue: true });
-    vnode.state.nominatorGraph = { blocks: [], values: [] };
-    const gnot_bucketRes = generateBuckets(gnot.result.nominators[vnode.state.account.address],
-      10,
-      43200,
-      vnode.state.latestBlock);
-    vnode.state.nominatorGraph.blocks = gnot_bucketRes.key;
-    vnode.state.nominatorGraph.values = gnot_bucketRes.value;
-  } catch (e) {
-    vnode.state.nominatorGraph = { blocks: [], values: [] };
-  }
-
-  // request for slashes OVER TIME
-  try {
-    const gsr = await $.get(`${app.serverUrl()}/getSlashes`, { chain: app.chain.class, stash: vnode.state.account.address });
-    vnode.state.slashesGraph = { blocks: [], values: [] };
-    const gsr_bucketRes = generateBuckets(gsr.result.slashes[vnode.state.account.address],
-      10,
-      43200,
-      vnode.state.latestBlock);
-    vnode.state.slashesGraph.blocks = gsr_bucketRes.key;
-    vnode.state.slashesGraph.values = gsr_bucketRes.value;
-  } catch (e) {
-    vnode.state.slashesGraph = { blocks: [], values: [] };
-  }
-
-  // request for ImOnline OVER TIME
-  try {
-    const gim = await $.get(`${app.serverUrl()}/getImOnline`, { chain: app.chain.class, stash: vnode.state.account.address });
-    vnode.state.imOnlineGraph = { blocks: [], values: [] };
-    vnode.state.imOnlineGraph.blocks = (Object.keys(gim.result.validators[vnode.state.account.address]));
-    vnode.state.imOnlineGraph.values = (Object.values(gim.result.validators[vnode.state.account.address]));
-  } catch (e) {
-    vnode.state.imOnlineGraph = { blocks: [], values: [] };
-  }
-  // request for REWARDS OVER TIME
-  try {
-    const gr = await $.get(`${app.serverUrl()}/getRewards`, { chain: app.chain.class, stash: vnode.state.account.address });
-    vnode.state.rewardsGraph = { blocks: [], values: [] };
-    const gr_bucketRes = generateBuckets(gr.result.validators[vnode.state.account.address],
-      10,
-      43200,
-      vnode.state.latestBlock);
-    vnode.state.rewardsGraph.blocks = gr_bucketRes.key;
-    vnode.state.rewardsGraph.values = gr_bucketRes.value.map((x) => {
-      return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0); // 1EDG = 10^18
-    });
-  } catch (e) {
-    vnode.state.rewardsGraph = { blocks: [], values: [] };
-  }
-  // request for OFFENCES OVER TIME
-  try {
-    const go = await $.get(`${app.serverUrl()}/getOffences`, { chain: app.chain.class, stash: vnode.state.account.address });
-    Object.keys(go.result.validators[vnode.state.account.address]).forEach((key) => {
-      go.result.validators[vnode.state.account.address][key] = 1;
-    });
-    vnode.state.offenceGraph = { blocks: [], values: [] };
-    const go_bucketRes = generateBuckets(go.result.validators[vnode.state.account.address],
-      10,
-      43200,
-      vnode.state.latestBlock);
-    vnode.state.offenceGraph.blocks = go_bucketRes.key;
-    vnode.state.offenceGraph.values = go_bucketRes.value;
-  } catch (e) {
-    vnode.state.offenceGraph = { blocks: [], values: [] };
-  }
-};
+  const apiCalls: IGraphApi[] = [
+    { route: 'getTotalStakeOverTime', data: vnode.state.totalStakeGraph },
+    { route: 'getOwnStakeOverTime', data: vnode.state.ownStakeGraph },
+    { route: 'getOtherStakeOverTime', data: vnode.state.otherStakeGraph },
+    { route: 'getNominatorsOverTime', data: vnode.state.nominatorGraph },
+    { route: 'getSlashes', data: vnode.state.slashesGraph },
+    { route: 'getImOnline', data: vnode.state.imOnlineGraph },
+    { route: 'getRewards', data: vnode.state.rewardsGraph },
+    { route: 'getOffences', data: vnode.state.offenceGraph },
+  ]
+  apiCalls.forEach(api => assignApiValues(api.route, api.data, address, latestBlock));
+}
 
 const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
   getObservables: (attrs) => ({
@@ -296,18 +234,27 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
     vnode.state.account = null;
     vnode.state.threads = [];
     vnode.state.comments = [];
-    vnode.state.totalStakeGraph = undefined;
-    vnode.state.nominatorGraph = undefined;
-    vnode.state.ownStakeGraph = undefined;
-    vnode.state.otherStakeGraph = undefined;
-    vnode.state.imOnlineGraph = undefined;
-    vnode.state.rewardsGraph = undefined;
-    vnode.state.slashesGraph = undefined;
-    vnode.state.offenceGraph = undefined;
-    vnode.state.latestBlock = undefined;
+    // vnode.state.totalStakeGraph = undefined;
+    // vnode.state.nominatorGraph = undefined;
+    // vnode.state.ownStakeGraph = undefined;
+    // vnode.state.otherStakeGraph = undefined;
+    // vnode.state.imOnlineGraph = undefined;
+    // vnode.state.rewardsGraph = undefined;
+    // vnode.state.slashesGraph = undefined;
+    // vnode.state.offenceGraph = undefined;
+    // vnode.state.latestBlock = undefined;
     vnode.state.fetchedBlock = false;
   },
   oncreate: async (vnode) => {
+    vnode.state.totalStakeGraph = getEmptyGraphData();
+    vnode.state.slashesGraph = getEmptyGraphData();
+    vnode.state.rewardsGraph = getEmptyGraphData();
+    vnode.state.ownStakeGraph = getEmptyGraphData();
+    vnode.state.otherStakeGraph = getEmptyGraphData();
+    vnode.state.offenceGraph = getEmptyGraphData();
+    vnode.state.nominatorGraph = getEmptyGraphData();
+    vnode.state.imOnlineGraph = getEmptyGraphData();
+
     const loadProfile = async () => {
       const chain = (m.route.param('base'))
         ? m.route.param('base')
@@ -391,6 +338,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
     if (!account) {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
+    //debugger;
     return m(Sublayout, {
       class: 'ProfilePage',
     }, [
@@ -403,8 +351,8 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
         m('.row', [
           // TOTAL STAKE OVER TIME
           totalStakeGraph ? (totalStakeGraph.blocks.length ? m(chartComponent, {
-            title: 'TOTAL STAKE OVER TIME - in millions', // Title
-            model: lineModel,
+            title: 'TOTAL STAKE OVER TIME (Thousands)', // Title
+            model: lineModel(totalStakeGraph.maxValue, totalStakeGraph.minValue, totalStakeGraph.yStepSize),
             xvalues: totalStakeGraph.blocks,
             yvalues: totalStakeGraph.values,
             addColorStop0: 'rgba(99, 113, 209, 0.23)',
@@ -413,36 +361,36 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'TOTAL STAKE OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // OWN STAKE OVER TIME
           ownStakeGraph ? (ownStakeGraph.blocks.length ? m(chartComponent, {
             title: 'OWN STAKE OVER TIME - in millions', // Title
-            model: lineModel,
+            model: lineModel(ownStakeGraph.maxValue, ownStakeGraph.minValue, ownStakeGraph.yStepSize),
             xvalues: ownStakeGraph.blocks,
             yvalues: ownStakeGraph.values,
             addColorStop0: 'rgba(53, 212, 19, 0.23)',
             addColorStop1: 'rgba(53, 212, 19, 0)',
-            color: 'rgb(53, 212, 19)'
+            color: 'rgb(53, 212, 19)',
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'OWN STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OWN STAKE OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'OWN STAKE OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // OTHER STAKE OVER TIME
           otherStakeGraph ? (otherStakeGraph.blocks.length ? m(chartComponent, {
             title: 'OTHER STAKE OVER TIME - in millions', // Title
-            model: lineModel,
+            model: lineModel(otherStakeGraph.maxValue, otherStakeGraph.minValue, otherStakeGraph.yStepSize),
             xvalues: otherStakeGraph.blocks,
             yvalues: otherStakeGraph.values,
             addColorStop0: 'rgba(83, 110, 124, 0.23)',
@@ -451,17 +399,17 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'OTHER STAKE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OTHER STAKE OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'OTHER STAKE OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // NOMINATORS OVER TIME
           nominatorGraph ? (nominatorGraph.blocks.length ? m(chartComponent, {
             title: 'NOMINATORS OVER TIME', // Title
-            model: lineModel,
+            model: lineModel(nominatorGraph.maxValue, nominatorGraph.minValue, nominatorGraph.yStepSize),
             xvalues: nominatorGraph.blocks,
             yvalues: nominatorGraph.values,
             addColorStop0: 'rgba(237, 146, 61, 0.23)',
@@ -470,17 +418,17 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'NOMINATORS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'NOMINATORS OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'NOMINATORS OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // SLASHES OVER TIME
           slashesGraph ? (slashesGraph.blocks.length ? m(chartComponent, {
             title: 'SLASHES OVER TIME', // Title
-            model: lineModel,
+            model: lineModel(slashesGraph.maxValue, slashesGraph.minValue, slashesGraph.yStepSize),
             xvalues: slashesGraph.blocks,
             yvalues: slashesGraph.values,
             addColorStop0: 'rgba(53, 212, 19, 0.23)',
@@ -489,17 +437,17 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'SLASHES OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'SLASHES OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'SLASHES OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // IMONLINE OVER TIME
           imOnlineGraph ? (imOnlineGraph.blocks.length ? m(chartComponent, {
             title: 'IMONLINE OVER TIME', // Title
-            model: lineModel,
+            model: lineModel(imOnlineGraph.maxValue, imOnlineGraph.minValue, imOnlineGraph.yStepSize),
             xvalues: imOnlineGraph.blocks,
             yvalues: imOnlineGraph.values,
             addColorStop0: 'rgba(99, 113, 209, 0.23)',
@@ -508,17 +456,17 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'IMONLINE OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'IMONLINE OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'IMONLINE OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // REWARDS OVER TIME
           rewardsGraph ? (rewardsGraph.blocks.length ? m(chartComponent, {
             title: 'REWARDS OVER TIME', // Title
-            model: lineModel,
+            model: lineModel(rewardsGraph.maxValue, rewardsGraph.minValue, rewardsGraph.yStepSize),
             xvalues: rewardsGraph.blocks,
             yvalues: rewardsGraph.values,
             addColorStop0: 'rgba(0, 0, 0, 0.23)',
@@ -527,17 +475,17 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
           // OFFENCES OVER TIME
           offenceGraph ? (offenceGraph.blocks.length ? m(chartComponent, {
             title: 'OFFENCES OVER TIME', // Title
-            model: lineModel,
+            model: lineModel(offenceGraph.maxValue, offenceGraph.minValue, offenceGraph.yStepSize),
             xvalues: offenceGraph.blocks,
             yvalues: offenceGraph.values,
             addColorStop0: 'rgba(99, 113, 209 0.23)',
@@ -546,13 +494,13 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
             m('div.row.graph-title', m('p', 'OFFENCES OVER TIME')), // Give same Title here
             m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OFFENCES OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+              m('div.row.graph-title', m('p', 'OFFENCES OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
         ])
         // ]),
         // ]),
