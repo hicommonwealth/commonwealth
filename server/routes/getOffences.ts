@@ -64,7 +64,7 @@ export async function getOffencesFunc(models, req: Request, next: NextFunction) 
 };
 
 
-const getOffences = async (models, req: Request, res: Response, next: NextFunction, calledFromServer?: boolean) => {
+const getOffences = async (models, req: Request, res: Response, next: NextFunction) => {
   return res.json(await getOffencesFunc(models, req, next));
 };
 
