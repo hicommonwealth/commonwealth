@@ -18,7 +18,7 @@ interface IEventData {
   offenders: Array<string>;
 }
 
-const getOffences = async (models, req: Request, res: Response, next: NextFunction) => {
+const getOffences = async (models, req: Request, res: Response, next: NextFunction, calledFromServer?: boolean) => {
   const { chain, stash } = req.query;
   const { startDate, endDate } = req.query;
   const validators: { [key: string]: { [block: string]: any } } = {};
@@ -60,6 +60,7 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     });
   });
 
+  if (calledFromServer) return { status: 'Success', result: validators || {} };
   return res.json({ status: 'Success', result: validators || {} });
 };
 

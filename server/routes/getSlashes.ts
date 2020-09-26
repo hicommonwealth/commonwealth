@@ -10,10 +10,10 @@ interface IEventData {
   validator: string;
 }
 
-const getSlashes = async (models, req: Request, res: Response, next: NextFunction) => {
+const getSlashes = async (models, req: Request, res: Response, next: NextFunction, calledFromServer?: boolean) => {
   const { chain, stash } = req.query;
   const { startDate, endDate } = req.query;
-  let validators: { [key: string]: { [block: string]: any } } = {};
+  const validators: { [key: string]: { [block: string]: any } } = {};
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
   const chainInfo = await models.Chain.findOne({ where: { id: chain } });
@@ -49,7 +49,8 @@ const getSlashes = async (models, req: Request, res: Response, next: NextFunctio
     validators[key][slash.block_number.toString()] = event_data.amount;
   });
 
-  return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
+  if (calledFromServer) return { status: 'Success', result: validators || {}, denom: 'EDG' };
+  else return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
 };
 
 export default getSlashes;

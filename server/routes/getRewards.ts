@@ -19,7 +19,7 @@ interface IEventData {
   validator: string;
 }
 
-const getRewards = async (models, req: Request, res: Response, next: NextFunction) => {
+const getRewards = async (models, req: Request, res: Response, next: NextFunction, calledFromServer?: boolean) => {
   const { chain, stash } = req.query;
   const { startDate, endDate } = req.query;
   let { version } = req.query;
@@ -110,7 +110,6 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     }
     // get rewards for the user(s)
     rewards = await models.ChainEvent.findAll(reward_query);
-    if (!rewards.length) { return res.json({ status: 'Success', result: validators || {} }); }
 
     rewards.forEach((reward) => {
       const event_data: IEventData = reward.dataValues.event_data;
@@ -123,8 +122,8 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
       validators[validator_id][block_number] = event_data['amount'];
     });
   }
-
-  return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
+  if (calledFromServer) return { status: 'Success', result: validators || {}, denom: 'EDG' };
+  else return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
 
 };
 
