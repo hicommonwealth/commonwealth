@@ -38,6 +38,16 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     startDate.setDate(startDate.getDate() - 30);
     startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
+
+    // if date isn't defined we get for last 30 days
+    if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
+      const daysAgo = 30;
+      startDate = new Date(); // today
+      startDate.setDate(startDate.getDate() - daysAgo); // 30 days ago
+      startDate = new Date(startDate); // formatted
+      endDate = new Date(); // today
+    }
+
   let where: any = {
     chain_event_type_id: `${chain}-offences-offence`
   };

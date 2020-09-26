@@ -21,11 +21,14 @@ const slashQuery = async (models, req: Request, res: Response, next: NextFunctio
     endDate = new Date(); // today
   }
 
-  const where: any = {
-    '$ChainEvent.chain_event_type_id$': `${chain}-slash`,
+  let where: any = {
+    chain_event_type_id: `${chain}-slash`
   };
 
-  if (stash) where['$ChainEvent.event_data.validator$'] = stash;
+  if (stash) {
+    const stashCheck = { [Op.and]: Sequelize.literal(`event_data->>'validator' = '${stash}'`) };
+    where = Object.assign(where, stashCheck);
+  }
 
   if (startDate && endDate) {
     where.created_at = {

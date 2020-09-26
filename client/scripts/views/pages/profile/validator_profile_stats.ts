@@ -80,28 +80,28 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
     try { // rewards for a year
       const rewardsResponse = await $.get(`${app.serverUrl()}/getRewards`, { chain: app.chain.class, stash: vnode.attrs.address, startDate, endDate });
       vnode.state.fullYearRewards = [];
-      vnode.state.fullYearRewards = Object.values(rewardsResponse.result.validators[vnode.attrs.address]);
+      vnode.state.fullYearRewards = Object.values(rewardsResponse.result.validators[vnode.attrs.address]) || [];
     } catch (e) {
       vnode.state.fullYearRewards = [];
     }
     try { // rewards for a 30 days
       const rewardsResponse = await $.get(`${app.serverUrl()}/getRewards`, { chain: app.chain.class, stash: vnode.attrs.address });
       vnode.state.rewards = [];
-      vnode.state.rewards = Object.values(rewardsResponse.result.validators[vnode.attrs.address]);
+      vnode.state.rewards = Object.values(rewardsResponse.result.validators[vnode.attrs.address]) || [];
     } catch (e) {
       vnode.state.rewards = [];
     }
     try { // slashes for a year
       const slashesResponse = await $.get(`${app.serverUrl()}/getSlashes`, { chain: app.chain.class, stash: vnode.attrs.address, startDate, endDate });
       vnode.state.fullYearSlashes = [];
-      vnode.state.fullYearSlashes = slashesResponse.result.slashes;
+      vnode.state.fullYearSlashes = slashesResponse.result.slashes || [];
     } catch (e) {
       vnode.state.fullYearSlashes = [];
     }
     try { // slash for 30 days
       const slashesResponse = await $.get(`${app.serverUrl()}/getSlashes`, { chain: app.chain.class, stash: vnode.attrs.address });
       vnode.state.slashes = [];
-      vnode.state.slashes = slashesResponse.result.slashes;
+      vnode.state.slashes = slashesResponse.result.slashes || [];
     } catch (e) {
       vnode.state.slashes = [];
     }
