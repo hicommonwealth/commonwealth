@@ -112,8 +112,8 @@ export default class extends IEventHandler {
     }
 
     // Added Last 30 days Slash count and averages for a validator.
-    const [slashStatsAvg, slashStatsCount] = await computeEventStats(this._chain, newSlashEventData.kind, newSlashEventData.validator, 30);
-    validator.slashesStats = { count: slashStatsCount, avg: slashStatsAvg }
+    const [slashStatsSum, slashStatsAvg, slashStatsCount] = await computeEventStats(this._chain, newSlashEventData.kind, newSlashEventData.validator, 30);
+    validator.slashesStats = { count: slashStatsCount, sum:slashStatsSum, avg: slashStatsAvg }
 
     // 3) Modify exposures for validators based of slash balance.
     latestValidator.block = event.blockNumber.toString();

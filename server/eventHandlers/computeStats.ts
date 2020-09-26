@@ -5,6 +5,7 @@ import BN from 'bn.js';
 
 
 export const computeEventStats = async(chain: String, event: String, stash: String, noOfDays: number) => {
+  let eventStatsSum = 0;
   let eventStatsAvg = 0;
   let eventStatsCount = 0;
 
@@ -16,7 +17,7 @@ export const computeEventStats = async(chain: String, event: String, stash: Stri
   if (event !== SubstrateTypes.EventKind.Reward 
     && event !== SubstrateTypes.EventKind.Slash
     && event !== SubstrateTypes.EventKind.Offence ) {
-    return [ eventStatsAvg, eventStatsCount ];
+    return [ eventStatsSum, eventStatsAvg, eventStatsCount ];
   }
 
   // Get ChainEvents based on event type and last 30 days interval per validator.
@@ -33,9 +34,8 @@ export const computeEventStats = async(chain: String, event: String, stash: Stri
       const [validators, metadata] = await sequelize.query(rawQuery);
 
       eventStatsCount = validators.length;
-      validators.map(validator =>{
-        eventStatsAvg = Number(eventStatsAvg) + Number(validator.event_data.amount)
-      })
+      eventStatsSum = validators.reduce((total, reward) => Number(total) + Number(reward.event_data.amount), 0) 
+      eventStatsAvg = Number( (eventStatsSum / eventStatsCount).toFixed(2) );
       break;
     }
     case SubstrateTypes.EventKind.Offence: {
@@ -45,10 +45,10 @@ export const computeEventStats = async(chain: String, event: String, stash: Stri
       break;
     }
     default: {
-      return [ eventStatsAvg, eventStatsCount ];
+      return [ eventStatsSum, eventStatsAvg, eventStatsCount ];
     }
   }
-  return [ eventStatsAvg, eventStatsCount ];
+  return [ eventStatsSum, eventStatsAvg, eventStatsCount ];
 }
 
 const computeAPR = (commissionPer, rewardAmount, ownedAmount, totalStakeAmount, rewardsTimeIntervals) => {

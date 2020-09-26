@@ -68,8 +68,8 @@ export default class extends IEventHandler {
     let validator = JSON.parse(JSON.stringify(latestValidatorStat));
 
     // Added Last 30 days Rewards count and averages for a validator.
-    const [rewardsStatsAvg, rewardsStatsCount] = await computeEventStats(this._chain, newRewardEventData.kind, validator.stash, 30);
-    validator.rewardsStats = {count: rewardsStatsCount, avg: rewardsStatsAvg }
+    const [rewardsStatsSum, rewardsStatsAvg, rewardsStatsCount] = await computeEventStats(this._chain, newRewardEventData.kind, validator.stash, 30);
+    validator.rewardsStats = { count: rewardsStatsCount, sum: rewardsStatsSum, avg: rewardsStatsAvg }
 
     // 3) Modify exposures for validators based of reward amount.
     // Getting updated validator info from the new-session event data related to rewards calculation (e.g. exposure(s) for each validator, commissionPer, eraPoints, rewardDestination)

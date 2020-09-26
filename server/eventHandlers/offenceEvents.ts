@@ -38,7 +38,7 @@ export default class extends IEventHandler {
     validatorsList.forEach(async (validator: any) => {
 
       // Added Last 30 days Offences count for a validator.
-      const [offenceStatsAvg, offenceStatsCount] = await computeEventStats(this._chain, newOffenceEventData.kind, validator.stash, 30);
+      const [offenceStatsSum, offenceStatsAvg, offenceStatsCount] = await computeEventStats(this._chain, newOffenceEventData.kind, validator.stash, 30);
       validator.offencesStats = {count: offenceStatsCount }
 
       validator.block = event.blockNumber.toString();
