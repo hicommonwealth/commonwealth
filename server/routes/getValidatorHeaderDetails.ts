@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { Errors } from './getOffences';
+import getOffences, { Errors } from './getOffences';
 import getRewards from './getRewards';
 import getSlashes from './getSlashes';
-import getOffences from './getOffences';
+
 
 const getValidatorHeaderDetails = async (models, req: Request, res: Response, next: NextFunction) => {
   const { stash } = req.query;
@@ -29,11 +29,11 @@ const getValidatorHeaderDetails = async (models, req: Request, res: Response, ne
   const resp = {};
   resp['apr'] = String(dataValues.apr);
   resp['imOnline'] = String(dataValues.uptime);
-  resp['offenceOver30Days'] = Number(dataValues.offenceStats.count);
-  resp['SlashesOver30DaysCount'] = Number(dataValues.slashesStats.count);
-  resp['SlashesOver30DaysValue'] = String(dataValues.slashesStats.avg);
-  resp['RewardsOver30DaysCount'] = Number(dataValues.rewardsStats.count);
-  resp['RewardsOver30DaysValue'] = String(dataValues.rewardsStats.avg);
+  resp['offenceOver30Days'] = 'offenceStats' in dataValues ? Number(dataValues.offenceStats.count) : 0;
+  resp['SlashesOver30DaysCount'] = 'slashesStats' in dataValues ? Number(dataValues.slashesStats.count) : 0;
+  resp['SlashesOver30DaysValue'] = 'slashesStats' in dataValues ? String(dataValues.slashesStats.avg) : '0';
+  resp['RewardsOver30DaysCount'] = 'rewardsStats' in dataValues ? Number(dataValues.rewardsStats.count) : 0;
+  resp['RewardsOver30DaysValue'] = 'rewardsStats' in dataValues ? String(dataValues.rewardsStats.avg) : '0';
 
 
   req.query.version = '38';
@@ -44,7 +44,7 @@ const getValidatorHeaderDetails = async (models, req: Request, res: Response, ne
 
   let sumRewards = 0;
   let sumSlashes = 0;
-  //respSlashes.result.forEach(a => sumRewards += a.value);
+  // respSlashes.result.forEach(a => sumRewards += a.value);
   //respSlashes.result.forEach(a => sumSlashes += a.value);
   //resp['totalRewardsCount'] = respSlashes.result[stash].length;
   //resp['totalRewardsValue'] = sumRewards;
