@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { getOffencesFunc, Errors } from './getOffences';
 import { getRewardsFunc } from './getRewards';
 import { getSlashesFunc } from './getSlashes';
-const axios = require('axios').default;
 
 
 // helper function
@@ -42,9 +41,9 @@ const getValidatorHeaderDetails = async (models, req: Request, res: Response, ne
   resp['imOnline'] = String(dataValues.uptime);
   resp['offenceOver30Days'] = 'offenceStats' in dataValues ? Number(dataValues.offenceStats.count) : 0;
   resp['SlashesOver30DaysCount'] = 'slashesStats' in dataValues ? Number(dataValues.slashesStats.count) : 0;
-  resp['SlashesOver30DaysValue'] = 'slashesStats' in dataValues ? String(dataValues.slashesStats.avg) : '0';
+  resp['SlashesOver30DaysValue'] = 'slashesStats' in dataValues ? String(dataValues.slashesStats.sum) : '0';
   resp['RewardsOver30DaysCount'] = 'rewardsStats' in dataValues ? Number(dataValues.rewardsStats.count) : 0;
-  resp['RewardsOver30DaysValue'] = 'rewardsStats' in dataValues ? String(dataValues.rewardsStats.avg) : '0';
+  resp['RewardsOver30DaysValue'] = 'rewardsStats' in dataValues ? String(dataValues.rewardsStats.sum) : '0';
   resp['totalSlashesValue'] = sum(respSlashes['result'][stash]);
   resp['totalSlashesCount'] = respSlashes['result'][stash].length;
   resp['totalRewardsValue'] = sum(respRewards['result'][stash]);
