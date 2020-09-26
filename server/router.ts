@@ -54,6 +54,8 @@ import bulkAddresses from './routes/bulkAddresses';
 import createInvite from './routes/createInvite';
 import getInvites from './routes/getInvites';
 import getOffences from './routes/getOffences';
+import getValidatorHeaderDetails from './routes/getValidatorHeaderDetails';
+
 import getRewards from './routes/getRewards';
 import getSlashes from './routes/getSlashes';
 import { getTotalStakeOverTime, getOwnStakeOverTime, getOtherStakeOverTime, getNominatorsOverTime }
@@ -221,6 +223,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to GET /invites
   router.get('/getInvites', passport.authenticate('jwt', { session: false }), getInvites.bind(this, models));
   router.get('/getOffences', getOffences.bind(this, models));
+  router.get('/getValidatorHeaderDetails', getValidatorHeaderDetails.bind(this, models));
   router.get('/getRewards', getRewards.bind(this, models));
   router.get('/getSlashes', getSlashes.bind(this, models));
   router.get('/getOwnStakeOverTime', getOwnStakeOverTime.bind(this, models));
