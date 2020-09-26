@@ -58,10 +58,8 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     where
   });
 
-
-
   offences.forEach((ofc) => {
-    const event_data: IEventData = ofc.dataValues;
+    const event_data: IEventData = ofc.dataValues.event_data;
     event_data.offenders.forEach((offender) => {
       const key = offender.toString();
       if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }

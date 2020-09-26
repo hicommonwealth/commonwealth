@@ -8,6 +8,7 @@ interface IEventData {
   kind: string;
   amount: string;
   validator: string;
+  block_number: number;
 }
 
 const getSlashes = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -51,10 +52,10 @@ const getSlashes = async (models, req: Request, res: Response, next: NextFunctio
   });
 
   slashes.forEach((slash) => {
-    const event_data: IEventData = slash.dataValues;
+    const event_data: IEventData = slash.dataValues.event_data;
     const key = event_data.validator;
     if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }
-    validators[key][slash.block_number.toString()] = event_data.amount;
+    validators[key][slash.dataValues.block_number.toString()] = event_data.amount;
   });
 
   return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });

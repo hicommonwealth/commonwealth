@@ -306,8 +306,8 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                 `${rewards.length} (${formatNumberShort(sumOfRewards / 1_000_000_000_000_000_000)} EDG)`))),
           m('.bio-actions-edit-identity',
             m('.info-row-block',
-            m(Button, { label: 'Another Button' }))),
-          ,])
+              m(Button, { label: 'Another Button' }))),
+        ])
       ]));
   }
 });

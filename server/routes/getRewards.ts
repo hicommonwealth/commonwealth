@@ -23,7 +23,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
   let { version } = req.query;
-
+  version = Number(version);
   // variables
   let validators: { [key: string]: { [block: string]: any } } = {};
   let rewards;

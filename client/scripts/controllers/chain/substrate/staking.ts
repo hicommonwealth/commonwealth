@@ -458,11 +458,11 @@ class SubstrateStaking implements StorageModule {
           const exposure = exposures[index];
           const totalStake = exposure.total.toBn();
           const comm = commissions[key] || 0;
-          if (Object.keys(rewards.validators).length === 1) {
+          if (Object.keys(rewards).length === 1) {
             key = this._app.chain.id;
           }
 
-          const valRewards = rewards.validators[key];
+          const valRewards = rewards[key];
           if (valRewards) {
             const amount = valRewards[valRewards.length - 1].event_data.amount;
             const firstReward = new BN(amount.toString()).muln(Number(comm)).divn(100);
@@ -470,10 +470,10 @@ class SubstrateStaking implements StorageModule {
               .mul((new BN(amount.toString())).sub(firstReward))
               .div(totalStake || new BN(1));
             const totalReward = firstReward.add(secondReward);
-            const length = rewards.validators[key].length;
+            const length = rewards[key].length;
             if (valRewards.length > 1) {
-              const last = rewards.validators[key][length - 1];
-              const secondLast = rewards.validators[key][length - 2];
+              const last = rewards[key][length - 1];
+              const secondLast = rewards[key][length - 2];
               const start = moment(secondLast.created_at);
               const end = moment(last.created_at);
               const startBlock = secondLast.block_number;
