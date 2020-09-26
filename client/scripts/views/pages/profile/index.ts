@@ -22,8 +22,14 @@ import ProfileHeader from './profile_header';
 
 // Global bucket const
 const numBuckets = 16;
-const bucketSize = 27000 ; // blocks shown over a single bucket
+const bucketSize = 27000; // blocks shown over a single bucket
 const ySteps = 4;
+
+// 30 days start and endDate
+const todayDate = new Date();
+todayDate.setDate(new Date().getDate() - 30);
+const _startDate = todayDate.toISOString();
+const _endDate = new Date().toISOString();
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -106,7 +112,7 @@ interface IGraphData {
 }
 
 function getEmptyGraphData() {
-  return { blocks: [], values: [], minValue: undefined, maxValue: undefined, yStepSize: undefined }
+  return { blocks: [], values: [], minValue: undefined, maxValue: undefined, yStepSize: undefined };
 }
 
 export interface IProfileAttrs {
@@ -158,10 +164,16 @@ function addInDesiredBucket(bucketCount, recentBlockNum, bucket, jumpIdx, v, vk)
   let k = 0;
   while (k < bucketCount) {
     if (Number(vk) <= recentBlockNum && (recentBlockNum - Number(vk)) <= ((k + 1) * jumpIdx)) {
-
-      let numToAdd = typeof(v[vk]) === ('object') ? 0 : Number(v[vk]) ; 
-
-      bucket[(bucketCount - 1) - (k)] = (bucket[(bucketCount - 1) - (k)] + Number(v[vk])) / 2
+      const numToAdd = typeof (v[vk]) === ('object')
+        ? ((v[vk]).reduce((sum, value) => sum + Number(value.value), 0))
+        : Number(v[vk]);
+      if (!numToAdd) {
+        if (!bucket[(bucketCount - 1) - (k)])
+          bucket[(bucketCount - 1) - (k)] = 0;
+        bucket[(bucketCount - 1) - (k)]++;
+      } else {
+        bucket[(bucketCount - 1) - (k)] = (bucket[(bucketCount - 1) - (k)] + numToAdd) / 2;
+      }
       k = bucketCount;
     }
     k++;
@@ -184,18 +196,22 @@ function generateBuckets(v, bucketCount, jumpIdx, recentBlockNum) {
 
 async function assignApiValues(route, obj: IGraphData, addr, latestBlock) {
   try {
-    const apiRes = await $.get(`${app.serverUrl()}/${route}`, { chain: app.chain.class, stash: addr });
-    console.log(route, apiRes)
-    const bucket = generateBuckets(apiRes.result.validators[addr],
+    const apiRes = await $.get(`${app.serverUrl()}/${route}`, {
+      chain: app.chain.class,
+      stash: addr,
+      onlyValue: true,
+      version: 38,
+      startDate: _startDate,
+      endDate: _endDate
+    });
+    const bucket = generateBuckets(apiRes.result[addr],
       numBuckets,
       bucketSize,
       latestBlock);
-      // /if (route === 'getOtherStakeOverTime')
-        debugger;
     obj.blocks = bucket.key;
-    obj.values = bucket.value.map((x) => {
+    obj.values = apiRes.denom === 'EDG' ? bucket.value.map((x) => {
       return ((Number(x) / 1_000_000_000_000_000_000) / 1000000).toFixed(0); // 1EDG = 10^18
-    });
+    }) : bucket.value;
     obj.maxValue = Math.max.apply(Math, obj.values);
     obj.minValue = Math.min.apply(Math, obj.values);
     obj.yStepSize = obj.maxValue / ySteps;
@@ -218,9 +234,9 @@ const dataGetter = async (vnode) => {
     { route: 'getImOnline', data: vnode.state.imOnlineGraph },
     { route: 'getRewards', data: vnode.state.rewardsGraph },
     { route: 'getOffences', data: vnode.state.offenceGraph },
-  ]
-  apiCalls.forEach(api => assignApiValues(api.route, api.data, address, latestBlock));
-}
+  ];
+  apiCalls.forEach((api) => assignApiValues(api.route, api.data, address, latestBlock));
+};
 
 const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
   getObservables: (attrs) => ({
@@ -338,7 +354,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
     if (!account) {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
-    //debugger;
+
     return m(Sublayout, {
       class: 'ProfilePage',
     }, [
@@ -351,7 +367,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
         m('.row', [
           // TOTAL STAKE OVER TIME
           totalStakeGraph ? (totalStakeGraph.blocks.length ? m(chartComponent, {
-            title: 'TOTAL STAKE OVER TIME (Thousands)', // Title
+            title: 'TOTAL STAKE OVER TIME (Millions)', // Title
             model: lineModel(totalStakeGraph.maxValue, totalStakeGraph.minValue, totalStakeGraph.yStepSize),
             xvalues: totalStakeGraph.blocks,
             yvalues: totalStakeGraph.values,
@@ -370,7 +386,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
               })))]),
           // OWN STAKE OVER TIME
           ownStakeGraph ? (ownStakeGraph.blocks.length ? m(chartComponent, {
-            title: 'OWN STAKE OVER TIME - in millions', // Title
+            title: 'OWN STAKE OVER TIME (Millions)', // Title
             model: lineModel(ownStakeGraph.maxValue, ownStakeGraph.minValue, ownStakeGraph.yStepSize),
             xvalues: ownStakeGraph.blocks,
             yvalues: ownStakeGraph.values,
@@ -389,7 +405,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
               })))]),
           // OTHER STAKE OVER TIME
           otherStakeGraph ? (otherStakeGraph.blocks.length ? m(chartComponent, {
-            title: 'OTHER STAKE OVER TIME - in millions', // Title
+            title: 'OTHER STAKE OVER TIME (Millions)', // Title
             model: lineModel(otherStakeGraph.maxValue, otherStakeGraph.minValue, otherStakeGraph.yStepSize),
             xvalues: otherStakeGraph.blocks,
             yvalues: otherStakeGraph.values,
@@ -408,7 +424,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
               })))]),
           // NOMINATORS OVER TIME
           nominatorGraph ? (nominatorGraph.blocks.length ? m(chartComponent, {
-            title: 'NOMINATORS OVER TIME', // Title
+            title: 'NOMINATORS OVER TIME (count)', // Title
             model: lineModel(nominatorGraph.maxValue, nominatorGraph.minValue, nominatorGraph.yStepSize),
             xvalues: nominatorGraph.blocks,
             yvalues: nominatorGraph.values,
@@ -427,7 +443,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
               })))]),
           // SLASHES OVER TIME
           slashesGraph ? (slashesGraph.blocks.length ? m(chartComponent, {
-            title: 'SLASHES OVER TIME', // Title
+            title: 'SLASHES OVER TIME (Millions)', // Title
             model: lineModel(slashesGraph.maxValue, slashesGraph.minValue, slashesGraph.yStepSize),
             xvalues: slashesGraph.blocks,
             yvalues: slashesGraph.values,
@@ -446,7 +462,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
               })))]),
           // IMONLINE OVER TIME
           imOnlineGraph ? (imOnlineGraph.blocks.length ? m(chartComponent, {
-            title: 'IMONLINE OVER TIME', // Title
+            title: 'IMONLINE OVER TIME (percent)', // Title
             model: lineModel(imOnlineGraph.maxValue, imOnlineGraph.minValue, imOnlineGraph.yStepSize),
             xvalues: imOnlineGraph.blocks,
             yvalues: imOnlineGraph.values,
@@ -465,10 +481,29 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
               })))]),
           // REWARDS OVER TIME
           rewardsGraph ? (rewardsGraph.blocks.length ? m(chartComponent, {
-            title: 'REWARDS OVER TIME', // Title
+            title: 'REWARDS OVER TIME (Millions)', // Title
             model: lineModel(rewardsGraph.maxValue, rewardsGraph.minValue, rewardsGraph.yStepSize),
             xvalues: rewardsGraph.blocks,
             yvalues: rewardsGraph.values,
+            addColorStop0: 'rgba(237, 146, 61, 0.23)',
+            addColorStop1: 'rgba(237, 146, 61, 0)',
+            color: 'rgb(237, 146, 61)'
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+              m('div.row.graph-title', m('p', 'REWARDS OVER TIME')), // Give same Title here
+              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+                fill: false,
+                message: ' Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;'
+              })))]),
+
+          offenceGraph ? (offenceGraph.blocks.length ? m(chartComponent, {
+            title: 'OFFENCES OVER TIME (count)', // Title
+            model: lineModel(offenceGraph.maxValue, offenceGraph.minValue, offenceGraph.yStepSize),
+            xvalues: offenceGraph.blocks,
+            yvalues: offenceGraph.values,
             addColorStop0: 'rgba(0, 0, 0, 0.23)',
             addColorStop1: 'rgba(0, 0, 0, 0)',
             color: 'rgb(0, 0, 0)'
@@ -482,25 +517,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
                 size: 'xl',
                 style: 'visibility: visible; opacity: 1;'
               })))]),
-          // OFFENCES OVER TIME
-          offenceGraph ? (offenceGraph.blocks.length ? m(chartComponent, {
-            title: 'OFFENCES OVER TIME', // Title
-            model: lineModel(offenceGraph.maxValue, offenceGraph.minValue, offenceGraph.yStepSize),
-            xvalues: offenceGraph.blocks,
-            yvalues: offenceGraph.values,
-            addColorStop0: 'rgba(99, 113, 209 0.23)',
-            addColorStop1: 'rgba(99, 113, 209 0)',
-            color: 'rgb(99, 113, 209)'
-          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OFFENCES OVER TIME')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-              m('div.row.graph-title', m('p', 'OFFENCES OVER TIME')), // Give same Title here
-              m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-                fill: false,
-                message: ' Loading...',
-                size: 'xl',
-                style: 'visibility: visible; opacity: 1;'
-              })))]),
+
         ])
         // ]),
         // ]),
