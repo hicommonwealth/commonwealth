@@ -341,7 +341,7 @@ export const NewThreadForm: m.Component<{
               }),
             ])
             : null,
-          m(FormGroup, { span: { xs: 12, sm: 8 }, order: 2 }, [
+          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 8 : 12) }, order: 2 }, [
             m(Input, {
               placeholder: 'https://',
               oninput: (e) => {
@@ -444,7 +444,7 @@ export const NewThreadForm: m.Component<{
               }),
             ])
             : null,
-          m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 3 }, [
+          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 8 : 12) + (fromDraft ? -2 : 0) }, order: 3 }, [
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
