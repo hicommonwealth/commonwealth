@@ -12,21 +12,13 @@ interface IEventData {
 
 const getSlashes = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
-  let { startDate, endDate } = req.query;
+  const { startDate, endDate } = req.query;
   let validators: { [key: string]: { [block: string]: any } } = {};
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
   const chainInfo = await models.Chain.findOne({ where: { id: chain } });
   if (!chainInfo) return next(new Error(Errors.InvalidChain));
 
-  // if date isn't defined we get for last 30 days
-  if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
-    endDate = new Date();
-    startDate = new Date();
-    endDate = endDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // today's date
-    startDate.setDate(startDate.getDate() - 30);
-    startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
-  }
 
   let where: any = {
     chain_event_type_id: `${chain}-slash`

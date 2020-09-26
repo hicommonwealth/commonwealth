@@ -8,6 +8,7 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
   ChainIdNotFound: 'Cannot find chain id',
   NoRecordsFound: 'No records found',
+  InvalidStashID: 'Provide a valid stash id'
 };
 
 interface IEventData {
@@ -19,8 +20,8 @@ interface IEventData {
 
 const getOffences = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
-  let { startDate, endDate } = req.query;
-  let validators: { [key: string]: { [block: string]: any } } = {};
+  const { startDate, endDate } = req.query;
+  const validators: { [key: string]: { [block: string]: any } } = {};
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
 
@@ -31,14 +32,6 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     return next(new Error(Errors.InvalidChain));
   }
 
-  // if start and end date isn't given, we set it for 30 days for now
-  if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
-    endDate = new Date();
-    startDate = new Date();
-    endDate = endDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // today's date
-    startDate.setDate(startDate.getDate() - 30);
-    startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
-  }
 
   let where: any = {
     chain_event_type_id: `${chain}-offences-offence`
@@ -57,8 +50,6 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
   const offences = await models.ChainEvent.findAll({
     where
   });
-
-
 
   offences.forEach((ofc) => {
     const event_data: IEventData = ofc.dataValues;

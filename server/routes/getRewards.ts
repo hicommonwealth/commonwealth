@@ -21,7 +21,7 @@ interface IEventData {
 
 const getRewards = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
-  let { startDate, endDate } = req.query;
+  const { startDate, endDate } = req.query;
   let { version } = req.query;
 
   // variables
@@ -31,17 +31,8 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
 
   if (!chain) { return next(new Error(Errors.ChainIdNotFound)); }
 
-  //set default version value for edgeware chain 
+  // set default version value for edgeware chain 
   if (chain === 'edgeware' && !version) { version = 31; }
-
-  if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
-    endDate = new Date();
-    startDate = new Date();
-    endDate = endDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // today's date
-    startDate.setDate(startDate.getDate() - 30);
-    startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
-  }
-
 
   const chainInfo = await models.Chain.findOne({ where: { id: chain } });
 

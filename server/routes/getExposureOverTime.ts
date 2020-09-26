@@ -16,7 +16,7 @@ let validators: { [key: string]: { [block: string]: any } } = {};
 // COMMON
 const getStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
-  let { startDate, endDate } = req.query;
+  const { startDate, endDate } = req.query;
 
   // const tmp_chain: string = chain as unknown as string;
   // chain = tmp_chain.toLowerCase();
@@ -24,17 +24,7 @@ const getStakeOverTime = async (models, req: Request, res: Response, next: NextF
   const chainInfo = await models.Chain.findOne({ where: { id: chain } });
   if (!chainInfo) return next(new Error(Errors.InvalidChain));
 
-  // if start and end date isn't given, we set it for 30 days for now
-  if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
-    endDate = new Date();
-    startDate = new Date();
-    endDate = endDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // today's date
-    startDate.setDate(startDate.getDate() - 30);
-    startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
-  }
-
   const where: any = {};
-
   // if stash is given
   if (stash) where['$HistoricalValidatorStatistic.stash$'] = stash;
 
