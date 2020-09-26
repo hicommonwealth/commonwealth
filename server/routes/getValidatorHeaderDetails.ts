@@ -32,9 +32,9 @@ const getValidatorHeaderDetails = async (models, req: Request, res: Response, ne
   const dataValues = historicalData[0].dataValues;
   req.query.version = '38';
   req.query.onlyValue = true;
-  const respRewards = await getSlashesFunc(models, req, next);
+  const respRewards = await getRewardsFunc(models, req, next);
   const respSlashes = await getSlashesFunc(models, req, next);
-  const respOffences = await getSlashesFunc(models, req, next);
+  const respOffences = await getOffencesFunc(models, req, next);
 
   const resp = {};
   resp['apr'] = String(dataValues.apr);
