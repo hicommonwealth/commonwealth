@@ -4,9 +4,16 @@ import { Errors } from './getOffences';
 
 const Op = Sequelize.Op;
 
-const slashQuery = async (models, req: Request, res: Response, next: NextFunction) => {
+interface IEventData {
+  kind: string;
+  amount: string;
+  validator: string;
+}
+
+const getSlashes = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
+  let validators: { [key: string]: { [block: string]: any } } = {};
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
   const chainInfo = await models.Chain.findOne({ where: { id: chain } });
@@ -14,11 +21,11 @@ const slashQuery = async (models, req: Request, res: Response, next: NextFunctio
 
   // if date isn't defined we get for last 30 days
   if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
-    const daysAgo = 30;
-    startDate = new Date(); // today
-    startDate.setDate(startDate.getDate() - daysAgo); // 30 days ago
-    startDate = new Date(startDate); // formatted
-    endDate = new Date(); // today
+    endDate = new Date();
+    startDate = new Date();
+    endDate = endDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // today's date
+    startDate.setDate(startDate.getDate() - 30);
+    startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
 
   let where: any = {
@@ -42,13 +49,15 @@ const slashQuery = async (models, req: Request, res: Response, next: NextFunctio
       ['created_at', 'ASC']
     ],
   });
-  return slashes;
-};
-const getSlashes = async (models, req: Request, res: Response, next: NextFunction) => {
-  console.log("=========== slashes ========= ")
-  const slashes = await slashQuery(models, req, res, next);
-  console.log("=========== slashes ========= ", slashes);
-  return res.json({ status: 'Success', result: slashes });
+
+  slashes.forEach((slash) => {
+    const event_data: IEventData = slash.dataValues;
+    const key = event_data.validator;
+    if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }
+    validators[key][slash.block_number.toString()] = event_data.amount;
+  });
+
+  return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
 };
 
 export default getSlashes;

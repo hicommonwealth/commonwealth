@@ -133,7 +133,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     });
   }
 
-  return res.json({ status: 'Success', result: validators || {} });
+  return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
 
 };
 

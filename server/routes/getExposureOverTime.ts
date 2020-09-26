@@ -64,7 +64,7 @@ const getTotalStakeOverTime = async (models, req: Request, res: Response, next: 
     if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }
     validators[key][event_data.block.toString()] = Number(event_data.exposure.total);
   });
-  return res.json({ status: 'Success', result: validators || {} });
+  return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
 };
 
 const getOwnStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -78,7 +78,7 @@ const getOwnStakeOverTime = async (models, req: Request, res: Response, next: Ne
     validators[key][event_data.block.toString()] = Number(event_data.exposure.own);
   });
 
-  return res.json({ status: 'Success', result: validators || {} });
+  return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
 };
 
 const getOtherStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -100,7 +100,7 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
     validators[key][event_data.block.toString()] = nominatorValue;
   });
 
-  return res.json({ status: 'Success', result: validators || {} });
+  return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
 };
 
 const getNominatorsOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
