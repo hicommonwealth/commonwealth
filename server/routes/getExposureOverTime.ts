@@ -15,9 +15,9 @@ let validators: { [key: string]: { [block: string]: any } } = {};
 
 // COMMON
 const getStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { stash } = req.query;
+  const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
-  const { chain } = req.query;
+
   // const tmp_chain: string = chain as unknown as string;
   // chain = tmp_chain.toLowerCase();
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
@@ -56,96 +56,72 @@ const getStakeOverTime = async (models, req: Request, res: Response, next: NextF
 
 const getTotalStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const stakeOverTime = await getStakeOverTime(models, req, res, next);
-  validators = {};
 
   stakeOverTime.forEach((stake) => {
     const event_data: IEventData = stake.dataValues;
     const key = event_data.stash.toString();
 
-    // eslint-disable-next-line no-prototype-builtins
-    if (validators.hasOwnProperty(key)) {
-      validators[key][event_data.block.toString()] = Number(event_data.exposure.total);
-    } else {
-      validators[key] = {};
-      validators[key][event_data.block.toString()] = Number(event_data.exposure.total);
-    }
+    if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }
+    validators[key][event_data.block.toString()] = Number(event_data.exposure.total);
   });
-  return res.json({ status: 'Success', result: { validators: validators || [] } });
+  return res.json({ status: 'Success', result: validators || {} });
 };
 
 const getOwnStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const stakeOverTime = await getStakeOverTime(models, req, res, next);
-  validators = {};
 
   stakeOverTime.forEach((stake) => {
     const event_data: IEventData = stake.dataValues;
     const key = event_data.stash.toString();
 
-    // eslint-disable-next-line no-prototype-builtins
-    if (validators.hasOwnProperty(key)) {
-      validators[key][event_data.block.toString()] = Number(event_data.exposure.own);
-    } else {
-      validators[key] = {};
-      validators[key][event_data.block.toString()] = Number(event_data.exposure.own);
-    }
+    if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }
+    validators[key][event_data.block.toString()] = Number(event_data.exposure.own);
   });
 
-  return res.json({ status: 'Success', result: { validators: validators || [] } });
+  return res.json({ status: 'Success', result: validators || {} });
 };
 
 const getOtherStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const stakeOverTime = await getStakeOverTime(models, req, res, next);
   const { onlyValue } = req.query;
-  validators = {};
 
   stakeOverTime.forEach((stake) => {
     const event_data: IEventData = stake.dataValues;
     const key = event_data.stash.toString();
 
-    // eslint-disable-next-line no-prototype-builtins
-    if (validators.hasOwnProperty(key)) {
-      let nominatorValue: any = event_data.exposure.others;
-      // eslint-disable-next-line max-len
-      if (onlyValue) nominatorValue = event_data.exposure.others.map((q) => typeof (q.value) === 'string' ? parseInt(q.value, 16) : Number(q.value))
+    if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }
+    let nominatorValue: any = event_data.exposure.others;
+    // eslint-disable-next-line max-len
+    if (onlyValue) {
+      nominatorValue = event_data.exposure.others.map(
+        (q) => typeof (q.value) === 'string' ? parseInt(q.value, 16) : Number(q.value))
         .reduce((a: number, b: number) => a + b);
-      validators[key][event_data.block.toString()] = nominatorValue;
-    } else {
-      validators[key] = {};
-      let nominatorValue: any = event_data.exposure.others;
-      // eslint-disable-next-line max-len
-      if (onlyValue) nominatorValue = event_data.exposure.others.map((q) => typeof (q.value) === 'string' ? parseInt(q.value, 16) : Number(q.value))
-        .reduce((a: number, b: number) => a + b);
-      validators[key][event_data.block.toString()] = nominatorValue;
     }
+    validators[key][event_data.block.toString()] = nominatorValue;
   });
 
-  return res.json({ status: 'Success', result: { validators: validators || [] } });
+  return res.json({ status: 'Success', result: validators || {} });
 };
 
 const getNominatorsOverTime = async (models, req: Request, res: Response, next: NextFunction) => {
   const stakeOverTime = await getStakeOverTime(models, req, res, next);
   const { onlyValue } = req.query;
-  validators = {};
 
   stakeOverTime.forEach((stake) => {
     const event_data: IEventData = stake.dataValues;
     const key = event_data.stash.toString();
 
-    // eslint-disable-next-line no-prototype-builtins
-    if (validators.hasOwnProperty(key)) {
-      let nominatorValue: any = event_data.exposure.others.map((nominator) => nominator.who);
-      if (onlyValue) nominatorValue = nominatorValue.length.toString();
-      validators[key][event_data.block.toString()] = nominatorValue;
-    } else {
-      validators[key] = {};
-      let nominatorValue: any = event_data.exposure.others.map((nominator) => nominator.who);
-      // eslint-disable-next-line max-len
-      if (onlyValue) nominatorValue = nominatorValue.length.toString();
-      validators[key][event_data.block.toString()] = nominatorValue;
+    if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }
+
+    let nominatorValue: any = event_data.exposure.others.map((nominator) => nominator.who);
+    // eslint-disable-next-line max-len
+    if (onlyValue) {
+      nominatorValue = nominatorValue.length.toString();
     }
+    validators[key][event_data.block.toString()] = nominatorValue;
   });
 
-  return res.json({ status: 'Success', result: { nominators: validators || [] } });
+  return res.json({ status: 'Success', result: validators || {} });
 };
 
 export { getTotalStakeOverTime, getOwnStakeOverTime, getOtherStakeOverTime, getNominatorsOverTime };

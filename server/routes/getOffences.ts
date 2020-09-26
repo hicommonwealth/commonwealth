@@ -20,6 +20,7 @@ interface IEventData {
 const getOffences = async (models, req: Request, res: Response, next: NextFunction) => {
   const { chain, stash } = req.query;
   let { startDate, endDate } = req.query;
+  let validators: { [key: string]: { [block: string]: any } } = {};
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
 
@@ -39,15 +40,6 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
 
-    // if date isn't defined we get for last 30 days
-    if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
-      const daysAgo = 30;
-      startDate = new Date(); // today
-      startDate.setDate(startDate.getDate() - daysAgo); // 30 days ago
-      startDate = new Date(startDate); // formatted
-      endDate = new Date(); // today
-    }
-
   let where: any = {
     chain_event_type_id: `${chain}-offences-offence`
   };
@@ -66,23 +58,18 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     where
   });
 
-  let validators: { [key: string]: { [block: string]: any } } = {};
+
 
   offences.forEach((ofc) => {
     const event_data: IEventData = ofc.dataValues;
-    validators = {};
     event_data.offenders.forEach((offender) => {
-      let key = offender;
-      if (validators.hasOwnProperty(key)) {
-        validators[key][ofc.block_number.toString()] = event_data.kind;
-      } else {
-        validators[key] = {};
-        validators[key][ofc.block_number.toString()] = event_data.kind;
-      }
-    })
+      const key = offender.toString();
+      if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }
+      validators[key][ofc.block_number.toString()] = event_data.kind;
+    });
   });
 
-  return res.json({ status: 'Success', result: { validators: validators || [] } });
+  return res.json({ status: 'Success', result: validators || {} });
 };
 
 export default getOffences;
