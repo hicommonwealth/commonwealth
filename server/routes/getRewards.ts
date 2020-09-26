@@ -5,10 +5,8 @@ import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import { Errors } from './getOffences';
+import { sequelize } from '../database';
 const Sequelize = require('sequelize');
-import { sequelize } from './../database'
-
-
 
 const log = factory.getLogger(formatFilename(__filename));
 const Op = Sequelize.Op;
@@ -45,21 +43,26 @@ export async function getRewardsFunc(models, req, next) {
     // join session event with rewards
     // if a stash id is provided then filter out just the session having provided
     // stash id
+    let dateQry = '';
+    if (startDate && endDate) {
+      dateQry += `AND created_at BETWEEN '${startDate}' AND '${endDate}'`;
+    }
+
     let rawQuery = `
       SELECT *
       FROM(
         SELECT block_number  as "session_block_number", event_data as "session_event_data", row_number()
         OVER (ORDER BY created_at DESC) AS "rn"
         FROM "ChainEvents" ce
-        WHERE chain_event_type_id  = '${chain}-new-session' AND created_at BETWEEN '${startDate}' AND '${endDate}'
+        WHERE chain_event_type_id  = '${chain}-new-session' ${dateQry}
       ) newSession
       JOIN (
         SELECT block_number  as "reward_block_number", event_data as "reward_event_data", row_number()
         OVER (ORDER BY created_at DESC) AS "rn"
         FROM "ChainEvents" ce
-        WHERE chain_event_type_id  = '${chain}-reward' AND created_at BETWEEN '${startDate}' AND '${endDate}'
+        WHERE chain_event_type_id  = '${chain}-reward' ${dateQry}
       ) reward
-        ON reward.rn = newSession.rn`
+        ON reward.rn = newSession.rn`;
 
     if (stash) {
       rawQuery += ` where newSession.session_event_data -> 'data' ->> 'active' LIKE '%${stash}%'`;
@@ -67,7 +70,7 @@ export async function getRewardsFunc(models, req, next) {
 
     session_rewards = await sequelize.query(rawQuery, {});
     // fetch the results
-    session_rewards = session_rewards[0]
+    session_rewards = session_rewards[0];
 
     session_rewards.forEach((s_r) => {
       const reward_event_data: IEventData = s_r.reward_event_data;
@@ -88,23 +91,25 @@ export async function getRewardsFunc(models, req, next) {
   else if (chain === 'kusama' || (chain === 'edgeware' && version === 38)) {
     // if using kusama chain or new version of edgeware
 
-    // basic query to fetch rewards from chain-event
-    let reward_query = {
-      where: {
-        '$ChainEventType.chain$': chain,
-        '$ChainEventType.event_name$': 'reward',
-        created_at: { [Op.between]: [startDate, endDate] },
-      },
-      order: [['created_at', 'DESC']],
-      include: [{ model: models.ChainEventType }]
+    let where: any = {
+      chain_event_type_id: `${chain}-reward`
     };
 
-    if (stash) {
-      const qry = { [Op.and]: Sequelize.literal(`event_data->>'validator'='${stash}'`) };
-      reward_query['where'] = Object.assign(reward_query['where'], qry);
+    if (startDate && endDate) {
+      where.created_at = {
+        [Op.between]: [startDate, endDate]
+      };
     }
+
+    if (stash) {
+      const stashCheck = { [Op.and]: Sequelize.literal(`event_data->>'validator'='${stash}'`) };
+      where = Object.assign(where, stashCheck);
+    }
+
     // get rewards for the user(s)
-    rewards = await models.ChainEvent.findAll(reward_query);
+    rewards = await models.ChainEvent.findAll({
+      where
+    });
 
     rewards.forEach((reward) => {
       const event_data: IEventData = reward.dataValues.event_data;
