@@ -43,7 +43,6 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   reactions: ReactionsController;
-  chainEntities: ChainEntityController;
   chainEvents: ChainEventsController;
   topics: TopicsController;
   communities: CommunitiesController;
@@ -91,7 +90,6 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
-  chainEntities: new ChainEntityController(),
   chainEvents: new ChainEventsController(),
   topics: new TopicsController(),
   communities: new CommunitiesController(),

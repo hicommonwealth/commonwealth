@@ -2,7 +2,7 @@
 
 .NewThreadForm {
     display: flex;
-    max-width: 680px;
+    max-width: 600px;
     &.has-drafts {
         max-width: 810px;
     }
@@ -11,10 +11,10 @@
         margin-bottom: 15px;
     }
     .ql-editor {
-        min-height: 170px;
+        min-height: 160px;
     }
     &.link-post .ql-editor {
-        min-height: 119px;
+        min-height: 105px;
     }
     @include xs-max {
         .ql-editor {

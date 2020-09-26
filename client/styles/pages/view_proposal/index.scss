@@ -78,6 +78,7 @@ $discussion-title-font-size: 1.45rem;
         .proposal-content-right {
             flex: 1;
             margin-left: $discussion-comment-padding;
+            margin-right: $discussion-outer-padding;
             @include xs-max {
                 margin-right: 10px;
             }

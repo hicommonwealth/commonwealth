@@ -155,56 +155,52 @@ pre {
         padding-left: 0;
     }
 }
-
-//
-// construct-ui overrides
-// TODO: move to construct.scss
-//
-
-// Small changes to input styles
-.cui-input input,
-.cui-input textarea {
-    font-size: 15px;
-    &::placeholder {
-        color: #aaa;
+.forum-container {
+    padding: 20px 0;
+}
+.MobileSidebarHeader {
+    display: none;
+}
+.Sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: $sidebar-width;
+    height: 100%;
+    background: $background-color-light;
+}
+.layout-container {
+    padding-left: $sidebar-width;
+}
+@include sm-max {
+    $mobile-sidebar-height: 60px;
+    .MobileSidebarHeader {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 99;
+        height: $mobile-sidebar-height;
+        user-select: none;
     }
-    &:focus::placeholder {
-        color: #999;
+    .Sidebar {
+        display: none;
+        position: fixed;
+        top: $mobile-sidebar-height;
+        left: 0;
+        width: 100%;
+        padding: 20px 0;
+        z-index: 99;
+        &.open {
+            display: block;
+        }
     }
-}
-
-// The declarative construct-ui toaster doesn't allow
-// position to be set by default, so we just override it here
-.cui-toaster.cui-toaster-top {
-    top: auto;
-    bottom: 0;
-    z-index: 99999;
-}
-
-.cui-tag.cui-none.cui-xs {
-    border-color: #f1f3f5;
-    padding-top: 0;
-    padding-bottom: 0;
-    cursor: pointer;
-    position: relative;
-    top: -1px;
-    &:hover {
-        border-color: darken(#f1f3f5, 2%);
-        background: darken(#f1f3f5, 2%);
+    .layout-container {
+        padding-top: $mobile-sidebar-height;
+        width: 100%;
+        padding-left: 0;
     }
-}
-
-// reduce padding on menus
-.cui-menu {
-    padding: 2px 0;
-}
-.cui-menu > .cui-menu-divider {
-    margin: 2px 0;
-}
-
-// darken color on menus
-.cui-menu > .cui-button.cui-basic {
-    color: #546e7c;
 }
 
 // allow menus to be wider by default
