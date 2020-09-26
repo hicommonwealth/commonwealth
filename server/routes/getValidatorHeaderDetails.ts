@@ -1,14 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import getOffences, { Errors } from './getOffences';
-import getRewards from './getRewards';
-import getSlashes from './getSlashes';
-import getRewardsFunc from './getRewards';
+import { getOffencesFunc, Errors } from './getOffences';
+import { getRewardsFunc } from './getRewards';
+import { getSlashesFunc } from './getSlashes';
 const axios = require('axios').default;
 
 
 // helper function
 function sum(obj) {
-  return Object.keys(obj).reduce((sum, key) => sum + parseFloat(obj[key] || 0), 0);
+  return Object.keys(obj).reduce((s, key) => s + parseFloat(obj[key] || 0), 0);
 }
 
 const getValidatorHeaderDetails = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -34,9 +33,9 @@ const getValidatorHeaderDetails = async (models, req: Request, res: Response, ne
   const dataValues = historicalData[0].dataValues;
   req.query.version = '38';
   req.query.onlyValue = true;
-  const respRewards = await getRewards(models, req, res, next, true);
-  const respSlashes = await getSlashes(models, req, res, next, true);
-  const respOffences = await getOffences(models, req, res, next, true);
+  const respRewards = await getSlashesFunc(models, req, next);
+  const respSlashes = await getSlashesFunc(models, req, next);
+  const respOffences = await getSlashesFunc(models, req, next);
 
   const resp = {};
   resp['apr'] = String(dataValues.apr);

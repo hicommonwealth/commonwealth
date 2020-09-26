@@ -11,7 +11,9 @@ interface IEventData {
   block_number: number;
 }
 
-const getSlashes = async (models, req: Request, res: Response, next: NextFunction, calledFromServer?: boolean) => {
+
+export async function getSlashesFunc(models, req, next: NextFunction) {
+
   const { chain, stash } = req.query;
   const { startDate, endDate } = req.query;
   const validators: { [key: string]: { [block: string]: any } } = {};
@@ -50,8 +52,11 @@ const getSlashes = async (models, req: Request, res: Response, next: NextFunctio
     validators[key][slash.dataValues.block_number.toString()] = event_data.amount;
   });
 
-  if (calledFromServer) return { status: 'Success', result: validators || {}, denom: 'EDG' };
-  else return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
+  return { status: 'Success', result: validators || {}, denom: 'EDG' };
+}
+
+const getSlashes = async (models, req: Request, res: Response, next: NextFunction) => {
+  return res.json(await getSlashesFunc(models, req, next));
 };
 
 export default getSlashes;

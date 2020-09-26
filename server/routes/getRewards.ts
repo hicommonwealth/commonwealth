@@ -19,7 +19,7 @@ interface IEventData {
   validator: string;
 }
 
-const getRewards = async (models, req: Request, res: Response, next: NextFunction, calledFromServer?: boolean) => {
+export async function getRewardsFunc(models, req, next) {
   const { chain, stash } = req.query;
   const { startDate, endDate } = req.query;
   let { version } = req.query;
@@ -66,13 +66,8 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     }
 
     session_rewards = await sequelize.query(rawQuery, {});
-    session_rewards = session_rewards[0] //fetch the results
-
-    // if no session/reward found 
-    if (session_rewards.length === 0) {
-      return res.json({ status: 'Success', result: validators || {} });
-    }
-
+    // fetch the results
+    session_rewards = session_rewards[0]
 
     session_rewards.forEach((s_r) => {
       const reward_event_data: IEventData = s_r.reward_event_data;
@@ -87,7 +82,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     });
 
     if (stash) {
-      validators = { stash_id: validators[stash] }
+      validators = { stash_id: validators[stash] };
     }
   }
   else if (chain === 'kusama' || (chain === 'edgeware' && version === 38)) {
@@ -105,7 +100,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     };
 
     if (stash) {
-      let qry = { [Op.and]: Sequelize.literal(`event_data->>'validator'='${stash}'`) };
+      const qry = { [Op.and]: Sequelize.literal(`event_data->>'validator'='${stash}'`) };
       reward_query['where'] = Object.assign(reward_query['where'], qry);
     }
     // get rewards for the user(s)
@@ -122,9 +117,12 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
       validators[validator_id][block_number] = event_data['amount'];
     });
   }
-  if (calledFromServer) return { status: 'Success', result: validators || {}, denom: 'EDG' };
-  else return res.json({ status: 'Success', result: validators || {}, denom: 'EDG' });
 
+  return { status: 'Success', result: validators || {}, denom: 'EDG' };
+}
+
+const getRewards = async (models, req: Request, res: Response, next: NextFunction) => {
+  return res.json(await getRewardsFunc(models, req, next));
 };
 
 export default getRewards;
