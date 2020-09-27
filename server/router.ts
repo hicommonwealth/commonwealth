@@ -29,7 +29,6 @@ import viewReactions from './routes/viewReactions';
 import bulkReactions from './routes/bulkReactions';
 import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
-import createChainStake from './routes/createChainStake';
 import createValidatorGroup from './routes/createValidatorGroup';
 import getValidatorGroup from './routes/getValidatorGroup';
 import getChainStake from './routes/getChainStake';
@@ -334,9 +333,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
 
-  // chain_stake
-  router.post('/createChainStake', passport.authenticate('jwt', { session: false }),
-    createChainStake.bind(this, models));
   // validator_group
   router.post('/createValidatorGroup', passport.authenticate('jwt', { session: false }),
     createValidatorGroup.bind(this, models));
