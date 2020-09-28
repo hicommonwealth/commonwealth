@@ -109,7 +109,7 @@ const BatchedSubscriptionRow: m.Component<{
     } else if (everyActive && !someEmail) {
       vnode.state.option = NOTIFICATION_ON_OPTION;
     } else if (someActive) {
-      vnode.state.option = NOTIFICATION_ON_OPTION;
+      vnode.state.option = NOTIFICATION_ON_SOMETIMES_OPTION;
     } else {
       vnode.state.option = NOTIFICATION_OFF_OPTION;
     }
@@ -130,9 +130,9 @@ const BatchedSubscriptionRow: m.Component<{
               : subscription.objectId;
           return subscription.OffchainThread
             ? [ NEW_COMMENTS_LABEL_PREFIX,
-                link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
-                     threadOrComment.toString(), { target: '_blank' })
-              ]
+              link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+                threadOrComment.toString(), { target: '_blank' })
+            ]
             : NEW_COMMENTS_LABEL_PREFIX + threadOrComment.toString();
         }
         case (NotificationCategories.NewReaction): {
@@ -143,9 +143,9 @@ const BatchedSubscriptionRow: m.Component<{
               : subscription.objectId;
           return subscription.OffchainThread
             ? [ NEW_REACTIONS_LABEL_PREFIX,
-                link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
-                     threadOrComment.toString(), { target: '_blank' })
-              ]
+              link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+                threadOrComment.toString(), { target: '_blank' })
+            ]
             : NEW_REACTIONS_LABEL_PREFIX + threadOrComment.toString();
         }
         default:
