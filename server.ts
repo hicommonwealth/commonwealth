@@ -133,8 +133,8 @@ const setupMiddleware = () => {
 
   // add other middlewares
   app.use(logger('dev'));
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json({ limit: '1mb' }));
+  app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
   app.use(cookieParser());
   app.use(sessionParser);
   app.use(passport.initialize());

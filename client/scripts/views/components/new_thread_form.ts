@@ -330,7 +330,7 @@ export const NewThreadForm: m.Component<{
         ]),
         postType === PostType.Link && m(Form, [
           hasTopics
-            && m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
+            ? m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
               m(TopicSelector, {
                 defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
                 topics: app.topics.getByCommunity(app.activeId()),
@@ -339,8 +339,9 @@ export const NewThreadForm: m.Component<{
                 updateFormData: updateTopicState,
                 tabindex: 1,
               }),
-            ]),
-          m(FormGroup, { span: { xs: 12, sm: 8 }, order: 2 }, [
+            ])
+            : null,
+          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 8 : 12) }, order: 2 }, [
             m(Input, {
               placeholder: 'https://',
               oninput: (e) => {
@@ -430,7 +431,7 @@ export const NewThreadForm: m.Component<{
             ])
             : null,
           hasTopics
-            && m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 2, sm: 2 } }, [
+            ? m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 2, sm: 2 } }, [
               m(TopicSelector, {
                 defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
                   ? vnode.state.activeTopic
@@ -441,8 +442,9 @@ export const NewThreadForm: m.Component<{
                 updateFormData: updateTopicState,
                 tabindex: 1,
               }),
-            ]),
-          m(FormGroup, { span: { xs: 12, sm: (fromDraft ? 6 : 8) }, order: 3 }, [
+            ])
+            : null,
+          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 8 : 12) + (fromDraft ? -2 : 0) }, order: 3 }, [
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
