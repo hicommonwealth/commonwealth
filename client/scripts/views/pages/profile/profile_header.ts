@@ -39,7 +39,9 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
         const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
         confirmed = await confirmationModalWithText(msg)();
         if (confirmed) {
-          m.route.set(`/${chain}/account/${account.address}`);
+          m.route.set(`/${chain}/account/${account.address}`, {
+            offerJoin: true
+          });
         }
       } else if (!app.chain?.loaded) {
         vnode.state.chainLoading = true;
@@ -67,6 +69,7 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
 
 export interface IProfileHeaderAttrs {
   account;
+  showJoinCommunityButton: boolean;
   refreshCallback: Function;
 }
 
@@ -78,7 +81,7 @@ export interface IProfileHeaderState {
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
-    const { account, refreshCallback } = vnode.attrs;
+    const { account, showJoinCommunityButton, refreshCallback } = vnode.attrs;
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
       && account.address === app.user.activeAccount?.address;
 
@@ -126,9 +129,16 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               },
               label: 'Edit profile'
             }),
-          ] : [
+          ] : showJoinCommunityButton
+            ? m(Button, {
+              intent: 'primary',
+              onclick: () => {
+                console.log('Joined');
+              }
+            })
+            : [
             // TODO: actions for others' accounts
-          ]
+            ]
         ]),
       ])
     ]);
