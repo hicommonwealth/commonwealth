@@ -31,14 +31,14 @@ const ALL_COMMUNITIES = 'All communities';
 // left column - for identifying the notification type
 const NEW_MENTIONS_LABEL = 'When someone mentions me';
 const NEW_THREADS_LABEL = 'When a thread is created';
-const NEW_ACTIVITY_LABEL = 'When there is new activity on';
+const NEW_ACTIVITY_LABEL = 'When there is new activity on...';
 const NEW_COMMENTS_LABEL_PREFIX = 'New comments on ';
 const NEW_REACTIONS_LABEL_PREFIX = 'New reactions on ';
 
 // right column - for selecting the notification frequency
 const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (alert me immediately)';
 const NOTIFICATION_ON_OPTION = 'On';
-const NOTIFICATION_ON_SOMETIMES_OPTION = '--';
+const NOTIFICATION_ON_SOMETIMES_OPTION = 'Multiple selections';
 const NOTIFICATION_OFF_OPTION = 'Off';
 
 const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: boolean }> = {
@@ -84,10 +84,6 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
           ]) : '',
         vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
       ]),
-      // m('.email-interval-configuration-right', [
-      //   m('h4', 'Immediate emails'),
-      //   'You will also be notified immediately when there is activity on:'
-      // ]),
     ]);
   }
 };
@@ -153,22 +149,25 @@ const BatchedSubscriptionRow: m.Component<{
       }
     };
 
-    const batchLabel = (subscriptions: NotificationSubscription[]) => {
-      const chainOrCommunityId = subscriptions[0].Chain
-        ? subscriptions[0].Chain.id
-        : subscriptions[0].OffchainCommunity
-          ? subscriptions[0].OffchainCommunity.id
+    const batchLabel = (batchLabelSubscriptions: NotificationSubscription[]) => {
+      const subscription = batchLabelSubscriptions[0];
+      const chainOrCommunityId = subscription.Chain
+        ? subscription.Chain.id
+        : subscription.OffchainCommunity
+          ? subscription.OffchainCommunity.id
           : null;
 
-      const threadOrComment = subscriptions[0].OffchainThread
-        ? decodeURIComponent(subscriptions[0].OffchainThread.title)
-        : subscriptions[0].OffchainComment
-          ? decodeURIComponent(subscriptions[0].OffchainComment.id)
-          : subscriptions[0].objectId;
+      const threadOrComment = subscription.OffchainThread
+        ? decodeURIComponent(subscription.OffchainThread.title)
+        : subscription.OffchainComment
+          ? decodeURIComponent(subscription.OffchainComment.id)
+          : subscription.objectId;
 
-      return subscriptions[0].OffchainThread
-        ? [ link('a', `/${chainOrCommunityId}/proposal/discussion/${subscriptions[0].OffchainThread.id}`,
-                 threadOrComment.toString(), { target: '_blank' }) ]
+      return subscription.OffchainThread
+        ? [ link(
+          'a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+          threadOrComment.toString(), { target: '_blank' }
+        ) ]
         : COMMENT_NUM_PREFIX + threadOrComment.toString();
     };
 
@@ -203,6 +202,7 @@ const BatchedSubscriptionRow: m.Component<{
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
             size: 'sm',
+            class: vnode.state.option === NOTIFICATION_ON_SOMETIMES_OPTION ? 'sometimes' : '',
           }),
           onSelect: async (option: string) => {
             vnode.state.option = option;
