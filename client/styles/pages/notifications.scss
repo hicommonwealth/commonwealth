@@ -52,7 +52,11 @@
         td.subscription-setting {
             text-align: right;
             button {
-                width: 120px;
+                width: 170px;
+                text-align: left;
+            }
+            button.sometimes {
+                color: $text-color-light;
             }
         }
     }
