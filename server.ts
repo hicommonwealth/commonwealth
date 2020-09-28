@@ -133,8 +133,8 @@ const setupMiddleware = () => {
 
   // add other middlewares
   app.use(logger('dev'));
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json({ limit: '1mb' }));
+  app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
   app.use(cookieParser());
   app.use(sessionParser);
   app.use(passport.initialize());
@@ -174,14 +174,15 @@ setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 setupErrorHandlers(app, rollbar);
 
 async function main() {
+  // each one-off command should call process.exit() when done
   if (SHOULD_SEND_EMAILS) {
-    await sendBatchedNotificationEmails(models);
+    sendBatchedNotificationEmails(models);
   } else if (SHOULD_RESET_DB) {
     resetServer(models, closeMiddleware);
   } else if (SHOULD_UPDATE_EVENTS) {
     updateEvents(app, models);
   } else if (SHOULD_UPDATE_BALANCES) {
-    await updateBalances(app, models);
+    updateBalances(app, models);
   } else if (SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS) {
     // Run fetchStats here to populate lockdrop stats for Edgeware Lockdrop.
     // This only needs to run once on prod to make the necessary queries.

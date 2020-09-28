@@ -87,6 +87,7 @@ import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import setPrivacy from './routes/setPrivacy';
 import pinThread from './routes/pinThread';
+import bulkOffchain from './routes/bulkOffchain';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -155,6 +156,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/drafts', getDrafts.bind(this, models));
   router.delete('/drafts', passport.authenticate('jwt', { session: false }), deleteDraft.bind(this, models));
   router.patch('/drafts', passport.authenticate('jwt', { session: false }), editDraft.bind(this, models));
+
+  router.get('/bulkOffchain', bulkOffchain.bind(this, models));
 
   // offchain comments
   // TODO: Change to POST /comment

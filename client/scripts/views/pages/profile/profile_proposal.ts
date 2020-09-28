@@ -16,7 +16,10 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
         m(User, { user: new AddressInfo(null, author, proposal.authorChain, null), linkify: true, hideAvatar: true }),
         proposal.kind === OffchainThreadKind.Question ? ' added a question'
           : proposal.kind === OffchainThreadKind.Request ? ' added a task'
-            : ' created a new thread',
+            : [
+              ' created a new ',
+              link('a', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread'),
+            ],
         ` ${createdAt.fromNow()}`
       ]),
       m('.activity.proposal', [
