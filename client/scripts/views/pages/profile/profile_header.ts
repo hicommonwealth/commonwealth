@@ -8,17 +8,14 @@ import { Unsubscribable } from 'rxjs';
 
 import { initChain } from 'app';
 import app from 'state';
-import { Account, ChainBase } from 'models';
 
 import { formatAddressShort, isSameAccount } from 'helpers';
-import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import User from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
-import { notifyError, notifySuccess } from 'client/scripts/controllers/app/notifications';
-import { setActiveAccount } from 'client/scripts/controllers/app/login';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { setActiveAccount } from 'controllers/app/login';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -87,12 +84,21 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     const { account, showJoinCommunityButton, refreshCallback } = vnode.attrs;
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
       && account.address === app.user.activeAccount?.address;
-    console.log(vnode.attrs);
 
-    const joinCommunity = () => {
+    const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.filter((account_) => {
+      return app.user.getRoleInCommunity({
+        account: account_,
+        chain: app.activeChainId(),
+      });
+    }).filter((account_) => {
+      return account_.address === account.address;
+    }).length > 0;
+
+    const joinCommunity = async () => {
+      if (!app.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
       const addressInfo = app.user.addresses
-        .find((a) => a.address === account.address && a.chain === account.chain.id);
+        .find((a) => a.address === account.address && a.chain === app.activeChainId());
       app.user.createRole({
         address: addressInfo,
         chain: app.activeChainId(),
@@ -153,14 +159,30 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               },
               label: 'Edit profile'
             }),
-          ] : showJoinCommunityButton
+          ] : (showJoinCommunityButton && app.activeChainId())
             ? m(Button, {
               intent: 'primary',
-              onclick: () => {
-                console.log('Joined');
-                joinCommunity();
+              onclick: async () => {
+                if (onLinkedProfile) {
+                  vnode.state.loading = true;
+                  try {
+                    await setActiveAccount(account);
+                    m.route.set(`${app.activeId()}/account/${account.address}`);
+                  } catch (e) {
+                    vnode.state.loading = false;
+                    notifyError(e);
+                  }
+                } else {
+                  try {
+                    await joinCommunity();
+                    m.route.set(`${app.activeId()}/account/${account.address}`);
+                  } catch (e) {
+                    vnode.state.loading = false;
+                    notifyError(e);
+                  }
+                }
               },
-              label: 'Join community'
+              label: onLinkedProfile ? 'Switch to address' : 'Join community'
             })
             : [
             // TODO: actions for others' accounts
