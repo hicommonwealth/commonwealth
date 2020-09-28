@@ -99,7 +99,7 @@
 }
 
 .total-stake,.own-stake,.other-stake,.commision{
-    margin-right: 3em;
+    margin-right: 1.5vw;
 }
 
 
@@ -141,10 +141,12 @@
     padding-top: 24px;
 }
 
-.total-apr,.own-total-offences,.other-total-slashes,.total-rewards{
+.own-total-offences,.other-total-slashes,.total-rewards{
     padding-right: 4em !important;
 }
-
+.total-apr{
+    padding-right: 4.9em !important;
+}
 .imonline,.rewards-days{
     padding-right: 3.9em !important;
 }
@@ -152,15 +154,15 @@
     padding-right:2.8em !important;
 }
 .slashes-days{
-    padding-right: 3.9em !important;
+    padding-right: 4.9em !important;
 }
 .bio-actions-edit-profile{
-    padding-left: 8.6em;
+    padding-left: 6.3em;
     padding-top: 0.7vw;
 }
 
 .bio-actions-edit-identity{
-    padding-left: 8.5em;
+    padding-left: 6em;
 }
 
 .data-row-block .cui-button, .info-row-block .cui-button{
@@ -221,4 +223,8 @@
 .graph-spinner{
     justify-content: center !important;
     margin-top: 15%;
+}
+
+.row.graph-row {
+    margin-bottom: 45px;
 }

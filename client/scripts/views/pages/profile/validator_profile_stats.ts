@@ -32,19 +32,8 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity) => {
 };
 export interface IValidatorPageState {
   dynamic: {
-    validators: any,
-    lastHeader: any,
-    annualPercentRate: ICommissionInfo;
+    chainName: any
   };
-  results: any[];
-  identity: SubstrateIdentity | null;
-  slashes: any;
-  fullYearSlashes: any;
-  imOnlinePerCent: any;
-  rewards: any;
-  fullYearRewards: any;
-  offences: any;
-  fullYearOffences: any;
 }
 export interface IValidatorAttrs {
   address: string;
@@ -57,6 +46,7 @@ export interface IValidatorAttrs {
   hasMessage?: boolean;
   blockCount?: u32;
   account: any,
+  apiResponse: any
 }
 
 // getting dates for 1 previous year
@@ -65,177 +55,16 @@ startDate.setFullYear(startDate.getFullYear() - 1);
 startDate = new Date(startDate);
 const endDate = new Date();
 
+const itemLoadingSpinner = () => m(Spinner, { active: true, fill: false, size: 'xs' });
+
 export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPageState>({
   getObservables: (attrs) => ({
     groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
-    lastHeader: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.lastHeader
-      : null,
-    annualPercentRate: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.annualPercentRate
-      : null
+    chainName: app.chain.name.toString()
   }),
   oncreate: async (vnode) => {
-    try { // rewards for a year
-      const rewardsResponse = await $.get(`${app.serverUrl()}/getRewards`, { chain: app.chain.class, stash: vnode.attrs.address, startDate, endDate });
-      vnode.state.fullYearRewards = [];
-      vnode.state.fullYearRewards = Object.values(rewardsResponse.result.validators[vnode.attrs.address]) || [];
-    } catch (e) {
-      vnode.state.fullYearRewards = [];
-    }
-    try { // rewards for a 30 days
-      const rewardsResponse = await $.get(`${app.serverUrl()}/getRewards`, { chain: app.chain.class, stash: vnode.attrs.address });
-      vnode.state.rewards = [];
-      vnode.state.rewards = Object.values(rewardsResponse.result.validators[vnode.attrs.address]) || [];
-    } catch (e) {
-      vnode.state.rewards = [];
-    }
-    try { // slashes for a year
-      const slashesResponse = await $.get(`${app.serverUrl()}/getSlashes`, { chain: app.chain.class, stash: vnode.attrs.address, startDate, endDate });
-      vnode.state.fullYearSlashes = [];
-      vnode.state.fullYearSlashes = slashesResponse.result.slashes || [];
-    } catch (e) {
-      vnode.state.fullYearSlashes = [];
-    }
-    try { // slash for 30 days
-      const slashesResponse = await $.get(`${app.serverUrl()}/getSlashes`, { chain: app.chain.class, stash: vnode.attrs.address });
-      vnode.state.slashes = [];
-      vnode.state.slashes = slashesResponse.result.slashes || [];
-    } catch (e) {
-      vnode.state.slashes = [];
-    }
-    try {
-      const imOnlineResponse = await $.get(`${app.serverUrl()}/getImOnline`, { chain: app.chain.class, stash: vnode.attrs.address });
-      vnode.state.imOnlinePerCent = 0;
-      vnode.state.imOnlinePerCent = Object.values(imOnlineResponse.result.validators[vnode.attrs.address])[0];
-    } catch (e) {
-      vnode.state.imOnlinePerCent = 0;
-    }
-    try { // offences for a year
-      const offencesResponse = await $.get(`${app.serverUrl()}/getOffences`, { stash: vnode.attrs.address, chain: app.chain.class, startDate, endDate });
-      vnode.state.fullYearOffences = 0;
-      vnode.state.fullYearOffences = Object.keys(offencesResponse.result.validators[vnode.attrs.address]).length;
-    } catch (e) {
-      vnode.state.fullYearOffences = 0;
-    }
-    try { // offences for 30 days
-      const offencesResponse = await $.get(`${app.serverUrl()}/getOffences`, { stash: vnode.attrs.address, chain: app.chain.class });
-      vnode.state.offences = 0;
-      vnode.state.offences = Object.keys(offencesResponse.result.validators[vnode.attrs.address]).length;
-    } catch (e) {
-      vnode.state.offences = 0;
-    }
   },
   view: (vnode) => {
-    const { account } = vnode.attrs;
-    const { slashes, fullYearSlashes, rewards, fullYearRewards, offences, fullYearOffences, imOnlinePerCent } = vnode.state;
-
-    // TODO: clean this to pass a better UX for waiting.
-    if (!vnode.state.dynamic || !vnode.state.dynamic.validators) {
-      return m('div.validator-profile-stats',
-        m(Card, {
-          elevation: 0,
-          class: 'home-card',
-          fluid: true
-        }, [ // Dummy Data for now TODOO: Change it to provide real data
-          m('div.profile-stats-row1.row', [
-            m('.total-apr', // TODOO: Integrate real data here.
-              m('.data-row-block',
-                m('.profile-header-block',
-                  'APR')),
-              m('.info-row-block',
-                m('.profile-data-block',
-                  '- %'))),
-            m('.own-total-offences',
-              m('.data-row-block',
-                m('.profile-header-block',
-                  'TOTAL OFFENCES')),
-              m('.info-row-block',
-                m('.profile-data-block',
-                  '-'))), // MIR ROUTE
-            m('.other-total-slashes',
-              m('.data-row-block',
-                m('.profile-header-block',
-                  'TOTAL SLASHES')),
-              m('.info-row-block',
-                m('.profile-data-block',
-                  '-'))), // `${fullYearSlashes.length} (${formatNumberShort(sumOfFullYearSlashes / 1_000_000_000_000_000_000)} EDG)`
-            m('.total-rewards',
-              m('.data-row-block',
-                m('.profile-header-block',
-                  'TOTAL REWARDS')),
-              m('.info-row-block',
-                m('.profile-data-block',
-                  '-'))),
-            m('.button-set-identity',
-              m('.data-row-block',
-                m('.profile-header-block',
-                  m('.bio-actions-edit-profile', [
-                  ])))),
-          ]),
-          m('div.profile-stats-row2.row', [
-            m('.imonline',
-              m('.data-row-block',
-                m('.profile-header-block',
-                  'IMONLINE')),
-              m('.info-row-block',
-                m('.profile-data-block',
-                  '-'))),
-            m('.offences-days',
-              m('.data-row-block',
-                m('.profile-header-block',
-                  'OFFENCES (30 DAYS)')),
-              m('.info-row-block',
-                m('.profile-data-block',
-                  '-'))),
-            m('.slashes-days',
-              m('.data-row-block',
-                m('.profile-header-block',
-                  'SLASHES (30 DAYS)')),
-              m('.info-row-block',
-                m('.profile-data-block',
-                  '-'))),
-            m('.rewards-days',
-              m('.data-row-block',
-                m('.profile-header-block',
-                  'REWARDS (30 DAYS)')),
-              m('.info-row-block',
-                m('.profile-data-block',
-                  '-'))),
-            m('.button-set-identity',
-              m('.info-row-block',
-                m('.profile-data-block',
-                  m('.bio-actions-edit-identity', [
-                  ])))),
-          ])
-        ]));
-    }
-    const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
-      && account.address === app.user.activeAccount?.address;
-    // SPINNER TODOO: un comment this once it loads.
-    // if (!validators) return m('div', m(Card, {
-    //   elevation: 1,
-    //   class: 'home-card',
-    //   fluid: true
-    // }, m(Spinner, {
-    //   fill: true,
-    //   message: 'Loading Stats...',
-    //   size: 'xs',
-    //   style: 'visibility: visible; opacity: 1;'
-    // })));
-    const sumOfSlashes = slashes.reduce((a, b) => {
-      return a + b;
-    }, 0);
-    const sumOfFullYearSlashes = fullYearSlashes.reduce((a, b) => {
-      return a + b;
-    }, 0);
-    const sumOfRewards = rewards.reduce((a, b) => {
-      return a + b;
-    }, 0);
-    const sumOfFullYearRewards = fullYearRewards.reduce((a, b) => {
-      return a + b;
-    }, 0);
     return m('div.validator-profile-stats',
       m(Card, {
         elevation: 0,
@@ -249,28 +78,28 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                 'APR')),
             m('.info-row-block',
               m('.profile-data-block',
-                `${Number(vnode.state.dynamic.annualPercentRate[vnode.attrs.address]).toFixed(2)}%`))),
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse.apr}%` : m('spinner', itemLoadingSpinner())))),
           m('.own-total-offences',
             m('.data-row-block',
               m('.profile-header-block',
                 'TOTAL OFFENCES')),
             m('.info-row-block',
               m('.profile-data-block',
-                `${fullYearOffences}`))),
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse.offenceOver30Days}` : m('spinner', itemLoadingSpinner())))),
           m('.other-total-slashes',
             m('.data-row-block',
               m('.profile-header-block',
                 'TOTAL SLASHES')),
             m('.info-row-block',
               m('.profile-data-block',
-                `${fullYearSlashes.length} (${formatNumberShort(sumOfFullYearSlashes / 1_000_000_000_000_000_000)} EDG)`))), // `${fullYearSlashes.length} (${formatNumberShort(sumOfFullYearSlashes / 1_000_000_000_000_000_000)} EDG)`
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.totalSlashesCount} (${(formatNumberShort(app.chain.chain.coins(vnode.attrs.apiResponse?.totalSlashesValue).inDollars))}) EDG` : m('spinner', itemLoadingSpinner())))),
           m('.total-rewards',
             m('.data-row-block',
               m('.profile-header-block',
                 'TOTAL REWARDS')),
             m('.info-row-block',
               m('.profile-data-block',
-                `${fullYearRewards.length} (${formatNumberShort(sumOfFullYearRewards / 1_000_000_000_000_000_000)} EDG)`))), // `${fullYearSlashes.length} (${formatNumberShort(sumOfFullYearSlashes / 1_000_000_000_000_000_000)} EDG)`
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.totalRewardsCount} (${formatNumberShort(app.chain.chain.coins(vnode.attrs.apiResponse?.totalRewardsValue).inDollars)} EDG)` : m('spinner', itemLoadingSpinner())))),
           m('.bio-actions-edit-profile',
             m('.data-row-block',
               m(Button, { label: 'Validator Profile' }))),
@@ -282,28 +111,28 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                 'IMONLINE')),
             m('.info-row-block',
               m('.profile-data-block',
-                `${imOnlinePerCent}%`))),
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.imOnline}%` : m('spinner', itemLoadingSpinner())))),
           m('.offences-days',
             m('.data-row-block',
               m('.profile-header-block',
                 'OFFENCES (30 DAYS)')),
             m('.info-row-block',
               m('.profile-data-block',
-                `${offences}`))),
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.offenceOver30Days}` : m('spinner', itemLoadingSpinner())))),
           m('.slashes-days',
             m('.data-row-block',
               m('.profile-header-block',
                 'SLASHES (30 DAYS)')),
             m('.info-row-block',
               m('.profile-data-block',
-                `${slashes.length} (${formatNumberShort(sumOfSlashes / 1_000_000_000_000_000_000)} EDG)`))),
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.SlashesOver30DaysCount} (${formatNumberShort(vnode.attrs.apiResponse?.SlashesOver30DaysValue)} EDG)` : m('spinner', itemLoadingSpinner())))),
           m('.rewards-days',
             m('.data-row-block',
               m('.profile-header-block',
                 'REWARDS (30 DAYS)')),
             m('.info-row-block',
               m('.profile-data-block',
-                `${rewards.length} (${formatNumberShort(sumOfRewards / 1_000_000_000_000_000_000)} EDG)`))),
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.RewardsOver30DaysCount} (${formatNumberShort(vnode.attrs.apiResponse?.RewardsOver30DaysValue)} EDG)` : m('spinner', itemLoadingSpinner())))),
           m('.bio-actions-edit-identity',
             m('.info-row-block',
               m(Button, { label: 'Another Button' }))),
