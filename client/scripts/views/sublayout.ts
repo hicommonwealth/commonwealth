@@ -24,11 +24,12 @@ const Sublayout: m.Component<{
 
   // content
   class?: string,
-  title?: string,
-  description?: string,
+  title?: string,                  // displayed at the top of the layout
+  description?: string,            // displayed at the top of the layout
+  sidebarTopic?: number,           // used to override the sidebar
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
-  rightSidebar?
+  rightSidebar?,
 }> = {
   view: (vnode) => {
     const {
@@ -37,6 +38,7 @@ const Sublayout: m.Component<{
       rightSidebar,
       showNewProposalButton,
       showCouncilMenu,
+      sidebarTopic,
     } = vnode.attrs;
 
     let councilCandidates: Array<[SubstrateAccount, number]>;
@@ -56,7 +58,7 @@ const Sublayout: m.Component<{
     ]);
 
     if (vnode.attrs.loadingLayout) return [
-      m(Sidebar),
+      m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m('.LoadingLayout'),
       ]),
@@ -64,7 +66,7 @@ const Sublayout: m.Component<{
     ];
 
     if (vnode.attrs.errorLayout) return [
-      m(Sidebar),
+      m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m(EmptyState, {
           fill: true,
@@ -77,7 +79,7 @@ const Sublayout: m.Component<{
     ];
 
     if (vnode.attrs.pageNotFoundLayout) return [
-      m(Sidebar),
+      m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m(PageNotFound)
       ]),
@@ -85,7 +87,7 @@ const Sublayout: m.Component<{
     ];
 
     return [
-      m(Sidebar),
+      m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
           m(Grid, { class: 'sublayout-grid' }, [
