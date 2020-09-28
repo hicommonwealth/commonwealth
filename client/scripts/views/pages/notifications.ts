@@ -207,6 +207,7 @@ const BatchedSubscriptionRow: m.Component<{
           onSelect: async (option: string) => {
             vnode.state.option = option;
             try {
+              if (subscriptions.length < 1) return;
               if (option === NOTIFICATION_OFF_OPTION) {
                 if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
                 if (someActive) await app.user.notifications.disableSubscriptions(subscriptions);
@@ -612,7 +613,8 @@ const NotificationsPage: m.Component<{}, {
   view: (vnode) => {
     const { communities, subscriptions } = vnode.state;
     const { selectedCommunity, selectedCommunityId, selectableCommunityIds } = vnode.state;
-
+    console.log(selectableCommunityIds);
+    console.log(communities);
     const chains = _.uniq(app.config.chains.getAll());
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
