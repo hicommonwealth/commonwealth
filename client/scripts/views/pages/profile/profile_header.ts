@@ -1,4 +1,3 @@
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
@@ -16,6 +15,8 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import PageLoading from 'views/pages/loading';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -73,6 +74,7 @@ export interface IProfileHeaderAttrs {
 }
 
 export interface IProfileHeaderState {
+  onLinkedProfile: boolean;
   subscription: Unsubscribable | null;
   identity: SubstrateIdentity | null;
   copied: boolean;
@@ -84,6 +86,10 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     const { account, showJoinCommunityButton, refreshCallback } = vnode.attrs;
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
       && account.address === app.user.activeAccount?.address;
+
+    if (app.user.activeAccounts.length === 0) {
+      return m(PageLoading);
+    }
 
     const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.filter((account_) => {
       return app.user.getRoleInCommunity({
@@ -167,7 +173,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   vnode.state.loading = true;
                   try {
                     await setActiveAccount(account);
-                    m.route.set(`${app.activeId()}/account/${account.address}`);
+                    m.route.set(`/${app.activeId()}/account/${account.address}`, {}, { replace: true });
                   } catch (e) {
                     vnode.state.loading = false;
                     notifyError(e);
@@ -175,7 +181,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                 } else {
                   try {
                     await joinCommunity();
-                    m.route.set(`${app.activeId()}/account/${account.address}`);
+                    m.route.set(`/${app.activeId()}/account/${account.address}`, {}, { replace: true });
                   } catch (e) {
                     vnode.state.loading = false;
                     notifyError(e);
