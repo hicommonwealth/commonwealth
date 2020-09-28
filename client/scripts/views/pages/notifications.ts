@@ -524,13 +524,14 @@ const IndividualCommunityNotifications: m.Component<{
 
 const AllCommunitiesNotifications: m.Component<{
   subscriptions: NotificationSubscription[];
-  communities: CommunityInfo[];
+  communities: string[];
 }> = {
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
     const chainIds = app.config.chains.getAll().map((c) => c.id);
-    const communityIds = communities.map((c) => c.id);
+    // const communityIds = communities.map((c) => c.id);
+    const communityIds = communities;
     const batchedSubscriptions = sortSubscriptions(subscriptions.filter((s) => {
       return !chainIds.includes(s.objectId)
         && s.category !== NotificationCategories.NewMention
@@ -564,6 +565,7 @@ const NotificationsPage: m.Component<{}, {
   selectedCommunity: CommunityInfo | ChainInfo;
   selectedCommunityId: string;
   selectableCommunityIds: string[];
+  allCommunityIds: string[];
 }> = {
   oninit: async (vnode) => {
     if (!app.isLoggedIn) {
@@ -596,6 +598,11 @@ const NotificationsPage: m.Component<{}, {
         .filter((c) => selectableCommunityIds.includes(c.id))
     );
 
+    // initialize vnode.state.allCommunityIds
+    vnode.state.allCommunityIds = [];
+    _.uniq(app.config.chains.getAll()).forEach((c) => vnode.state.allCommunityIds.push(c.id));
+    vnode.state.communities.forEach((c) => vnode.state.allCommunityIds.push(c.id));
+
     // initialize selectableCommunityIds
     vnode.state.selectableCommunityIds = [ALL_COMMUNITIES];
     vnode.state.communities.forEach((c) => vnode.state.selectableCommunityIds.push(c.name));
@@ -612,9 +619,7 @@ const NotificationsPage: m.Component<{}, {
   },
   view: (vnode) => {
     const { communities, subscriptions } = vnode.state;
-    const { selectedCommunity, selectedCommunityId, selectableCommunityIds } = vnode.state;
-    console.log(selectableCommunityIds);
-    console.log(communities);
+    const { selectedCommunity, selectedCommunityId, selectableCommunityIds, allCommunityIds } = vnode.state;
     const chains = _.uniq(app.config.chains.getAll());
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
@@ -668,7 +673,7 @@ const NotificationsPage: m.Component<{}, {
               m('th', ''),
             ]),
             selectedCommunityId === ALL_COMMUNITIES
-              && m(AllCommunitiesNotifications, { communities, subscriptions }),
+              && m(AllCommunitiesNotifications, { communities: allCommunityIds, subscriptions }),
             selectedCommunity
               && m(IndividualCommunityNotifications, { subscriptions, community: selectedCommunity }),
             // on-chain event notifications
