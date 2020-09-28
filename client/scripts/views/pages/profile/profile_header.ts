@@ -17,6 +17,8 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import User from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
+import { notifyError, notifySuccess } from 'client/scripts/controllers/app/notifications';
+import { setActiveAccount } from 'client/scripts/controllers/app/login';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -77,6 +79,7 @@ export interface IProfileHeaderState {
   subscription: Unsubscribable | null;
   identity: SubstrateIdentity | null;
   copied: boolean;
+  loading: boolean;
 }
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
@@ -84,6 +87,27 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     const { account, showJoinCommunityButton, refreshCallback } = vnode.attrs;
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
       && account.address === app.user.activeAccount?.address;
+    console.log(vnode.attrs);
+
+    const joinCommunity = () => {
+      vnode.state.loading = true;
+      const addressInfo = app.user.addresses
+        .find((a) => a.address === account.address && a.chain === account.chain.id);
+      app.user.createRole({
+        address: addressInfo,
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      }).then(() => {
+        vnode.state.loading = false;
+        m.redraw();
+        notifySuccess(`Joined with ${formatAddressShort(addressInfo.address, addressInfo.chain)}`);
+        setActiveAccount(account);
+      }).catch((err: any) => {
+        vnode.state.loading = false;
+        m.redraw();
+        notifyError(err.responseJSON.error);
+      });
+    };
 
     return m('.ProfileHeader', [
       m('.cover'),
@@ -134,7 +158,9 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               intent: 'primary',
               onclick: () => {
                 console.log('Joined');
-              }
+                joinCommunity();
+              },
+              label: 'Join community'
             })
             : [
             // TODO: actions for others' accounts
