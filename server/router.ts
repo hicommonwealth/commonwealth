@@ -68,7 +68,7 @@ import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
 import getProfile from './routes/getProfile';
-
+import getValidatorHeaderDetails from './routes/getValidatorHeaderDetails';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -225,6 +225,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/getTotalStakeOverTime', getTotalStakeOverTime.bind(this, models));
   router.get('/getNominatorsOverTime', getNominatorsOverTime.bind(this, models));
   router.get('/getImOnline', getImOnline.bind(this, models));
+  router.get('/getValidatorHeaderDetails', getValidatorHeaderDetails.bind(this, models));
+
   // TODO: Change to PUT /invite
   router.post('/acceptInvite', passport.authenticate('jwt', { session: false }), acceptInvite.bind(this, models));
   // TODO: Change to POST /member
