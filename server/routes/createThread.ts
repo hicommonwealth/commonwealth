@@ -175,7 +175,41 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   } catch (err) {
     return next(new Error(err));
   }
+  // auto-subscribe NewThread subscribers to NewComment/NewReaction as well
+  // findOrCreate because redundant creation if author is also subscribed to NewThreads
   const location = finalThread.community || finalThread.chain;
+  const subscribers = await models.Subscription.findAll({
+    where: {
+      category_id: NotificationCategories.NewThread,
+      object_id: location,
+    }
+  });
+  await Promise.all(subscribers.map((s) => {
+    return models.Subscription.findOrCreate({
+      where: {
+        subscriber_id: s.subscriber_id,
+        category_id: NotificationCategories.NewComment,
+        object_id: `discussion_${finalThread.id}`,
+        offchain_thread_id: finalThread.id,
+        community_id: finalThread.community || null,
+        chain_id: finalThread.chain || null,
+        is_active: true,
+      },
+    });
+  }));
+  await Promise.all(subscribers.map((s) => {
+    return models.Subscription.findOrCreate({
+      where: {
+        subscriber_id: s.subscriber_id,
+        category_id: NotificationCategories.NewReaction,
+        object_id: `discussion_${finalThread.id}`,
+        offchain_thread_id: finalThread.id,
+        community_id: finalThread.community || null,
+        chain_id: finalThread.chain || null,
+        is_active: true,
+      },
+    });
+  }));
   // dispatch notifications to subscribers of the given chain/community
   await models.Subscription.emitNotifications(
     models,
