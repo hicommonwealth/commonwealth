@@ -49,12 +49,6 @@ export interface IValidatorAttrs {
   apiResponse: any
 }
 
-// getting dates for 1 previous year
-let startDate = new Date();
-startDate.setFullYear(startDate.getFullYear() - 1);
-startDate = new Date(startDate);
-const endDate = new Date();
-
 const itemLoadingSpinner = () => m(Spinner, { active: true, fill: false, size: 'xs' });
 
 export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPageState>({
@@ -92,14 +86,14 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                 'TOTAL SLASHES')),
             m('.info-row-block',
               m('.profile-data-block',
-                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.totalSlashesCount} (${(formatNumberShort(app.chain.chain.coins(vnode.attrs.apiResponse?.totalSlashesValue).inDollars))}) EDG` : m('spinner', itemLoadingSpinner())))),
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.totalSlashesCount} (${(formatCoin(app.chain.chain.coins(+vnode.attrs.apiResponse?.totalSlashesValue), true))})` : m('spinner', itemLoadingSpinner())))),
           m('.total-rewards',
             m('.data-row-block',
               m('.profile-header-block',
                 'TOTAL REWARDS')),
             m('.info-row-block',
               m('.profile-data-block',
-                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.totalRewardsCount} (${formatNumberShort(app.chain.chain.coins(vnode.attrs.apiResponse?.totalRewardsValue).inDollars)} EDG)` : m('spinner', itemLoadingSpinner())))),
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.totalRewardsCount} (${formatCoin(app.chain.chain.coins(+vnode.attrs.apiResponse?.totalRewardsValue), true)})` : m('spinner', itemLoadingSpinner())))),
           m('.bio-actions-edit-profile',
             m('.data-row-block',
               m(Button, { label: 'Validator Profile' }))),
@@ -125,14 +119,14 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                 'SLASHES (30 DAYS)')),
             m('.info-row-block',
               m('.profile-data-block',
-                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.SlashesOver30DaysCount} (${formatNumberShort(vnode.attrs.apiResponse?.SlashesOver30DaysValue)} EDG)` : m('spinner', itemLoadingSpinner())))),
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.slashesOver30DaysCount} (${formatCoin(app.chain.chain.coins(+vnode.attrs.apiResponse?.slashesOver30DaysValue), true)})` : m('spinner', itemLoadingSpinner())))),
           m('.rewards-days',
             m('.data-row-block',
               m('.profile-header-block',
                 'REWARDS (30 DAYS)')),
             m('.info-row-block',
               m('.profile-data-block',
-                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.RewardsOver30DaysCount} (${formatNumberShort(vnode.attrs.apiResponse?.RewardsOver30DaysValue)} EDG)` : m('spinner', itemLoadingSpinner())))),
+                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.rewardsOver30DaysCount} (${formatCoin(app.chain.chain.coins(+vnode.attrs.apiResponse?.rewardsOver30DaysValue), true)})` : m('spinner', itemLoadingSpinner())))),
           m('.bio-actions-edit-identity',
             m('.info-row-block',
               m(Button, { label: 'Another Button' }))),

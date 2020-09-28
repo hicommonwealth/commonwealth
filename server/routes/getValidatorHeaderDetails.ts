@@ -39,16 +39,16 @@ const getValidatorHeaderDetails = async (models, req: Request, res: Response, ne
   const resp = {};
   resp['apr'] = String(dataValues.apr);
   resp['imOnline'] = String(dataValues.uptime);
-  resp['offenceOver30Days'] = 'offenceStats' in dataValues ? Number(dataValues.offenceStats.count) : 0;
-  resp['SlashesOver30DaysCount'] = 'slashesStats' in dataValues ? Number(dataValues.slashesStats.count) : 0;
-  resp['SlashesOver30DaysValue'] = 'slashesStats' in dataValues ? String(dataValues.slashesStats.sum) : '0';
-  resp['RewardsOver30DaysCount'] = 'rewardsStats' in dataValues ? Number(dataValues.rewardsStats.count) : 0;
-  resp['RewardsOver30DaysValue'] = 'rewardsStats' in dataValues ? String(dataValues.rewardsStats.sum) : '0';
-  resp['totalSlashesValue'] = stash in respSlashes['result'] ? sum(respSlashes['result'][stash]) : 0;
+  resp['offenceOver30Days'] = 'offencesStats' in dataValues ? Number(dataValues.offencesStats.count) : 0;
+  resp['slashesOver30DaysCount'] = 'slashesStats' in dataValues ? Number(dataValues.slashesStats.count) : 0;
+  resp['slashesOver30DaysValue'] = 'slashesStats' in dataValues ? String(dataValues.slashesStats.sum) : '0';
+  resp['rewardsOver30DaysCount'] = 'rewardsStats' in dataValues ? Number(dataValues.rewardsStats.count) : 0;
+  resp['rewardsOver30DaysValue'] = 'rewardsStats' in dataValues ? String(dataValues.rewardsStats.sum) : '0';
+  resp['totalSlashesValue'] = stash in respSlashes['result'] ? sum(respSlashes['result'][stash]) : '0';
   resp['totalSlashesCount'] = stash in respSlashes['result'] ? Object.keys(respSlashes['result'][stash]).length : 0;
-  resp['totalRewardsValue'] = stash in respRewards['result'] ? sum(respRewards['result'][stash]) : 0;
+  resp['totalRewardsValue'] = stash in respRewards['result'] ? sum(respRewards['result'][stash]) : '0';
   resp['totalRewardsCount'] = stash in respRewards['result'] ? Object.keys(respRewards['result'][stash]).length : 0;
-  resp['totalOffences'] = stash in respOffences['result'] ? respOffences['result'][stash].length : 0;
+  resp['totalOffences'] = stash in respOffences['result'] ? Object.keys(respOffences['result'][stash]).length : 0;
 
   return res.json({ status: 'Success', result: resp || {} });
 };

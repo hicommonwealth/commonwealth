@@ -28,8 +28,8 @@ const ySteps = 4;
 // 30 days start and endDate
 const todayDate = new Date();
 todayDate.setDate(new Date().getDate() - 30);
-const _startDate = todayDate.toISOString();
-const _endDate = new Date().toISOString();
+const _startDate = todayDate.toDateString();
+const _endDate = new Date().toDateString();
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -212,10 +212,10 @@ async function assignApiValues(route, obj: IGraphData, addr, latestBlock) {
       latestBlock);
     obj.blocks = bucket.key;
     obj.values = apiRes.denom === 'EDG' ? bucket.value.map((x) => {
-      return ((Number(x) / 1_000_000_000_000_000_000) / 1000000); // 1EDG = 10^18
+      return ((app.chain.chain.coins(Number(x)).inDollars) / 1000000); // 10^6 in millions
     }) : bucket.value;
-    obj.maxValue = Math.max.apply(Math, obj.values);
-    obj.minValue = Math.min.apply(Math, obj.values);
+    obj.maxValue = Math.max(...obj.values);
+    obj.minValue = Math.min(...obj.values);
     obj.yStepSize = obj.maxValue / ySteps;
   } catch (e) {
     // /console.error(e);

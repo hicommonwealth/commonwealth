@@ -88,11 +88,9 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
       commission: validators[vnode.attrs.address].commissionPer,
       points: validators[vnode.attrs.address].eraPoints,
     } : emptyValidatorStatsInfo;
-    let nominators;
-
     const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
       && account.address === app.user.activeAccount?.address;
-    nominators = (validators) ? validators[vnode.attrs.address]?.exposure.others.map(({ who, value }) => ({
+    const nominators = (validators) ? validators[vnode.attrs.address]?.exposure.others.map(({ who, value }) => ({
       stash: who.toString(),
       balance: app.chain.chain.coins(value)
     })) : [];
@@ -113,7 +111,7 @@ export const ValidatorHeaderStats = makeDynamicComponent<IValidatorAttrs, IValid
     m('.other-stake',
       m('.data-row',
         m('.profile-header',
-          'OTHER STAKE')), // TODOO: ADD A MODAL ON CLICK  by adding ViewNominatorsModal
+          'OTHER STAKE')), // TODO: ADD A MODAL ON CLICK  by adding ViewNominatorsModal
       m('.info-row',
         m('.profile-data',
           validators && nominators?.length === 0 && formatCoin(app.chain.chain.coins(validatorStatInfo.otherTotal), true),
