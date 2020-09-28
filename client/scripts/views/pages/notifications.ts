@@ -103,12 +103,12 @@ const BatchedSubscriptionRow: m.Component<{
     const someActive = subscriptions.some((s) => s.isActive);
     const everyActive = subscriptions.every((s) => s.isActive);
     const someEmail = subscriptions.some((s) => s.immediateEmail);
-    const everyEmail = subscriptions.some((s) => s.immediateEmail);
+    const everyEmail = subscriptions.every((s) => s.immediateEmail);
     if (everyActive && everyEmail) {
       vnode.state.option = NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION;
     } else if (everyActive && !someEmail) {
       vnode.state.option = NOTIFICATION_ON_OPTION;
-    } else if (someActive) {
+    } else if (someActive || someEmail) {
       vnode.state.option = NOTIFICATION_ON_SOMETIMES_OPTION;
     } else {
       vnode.state.option = NOTIFICATION_OFF_OPTION;
