@@ -107,20 +107,21 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       vnode.state.loading = true;
       const addressInfo = app.user.addresses
         .find((a) => a.address === account.address && a.chain === app.activeChainId());
-      app.user.createRole({
-        address: addressInfo,
-        chain: app.activeChainId(),
-        community: app.activeCommunityId(),
-      }).then(() => {
+      try {
+        await app.user.createRole({
+          address: addressInfo,
+          chain: app.activeChainId(),
+          community: app.activeCommunityId(),
+        });
         vnode.state.loading = false;
+        setActiveAccount(account);
         m.redraw();
         notifySuccess(`Joined with ${formatAddressShort(addressInfo.address, addressInfo.chain)}`);
-        setActiveAccount(account);
-      }).catch((err: any) => {
+      } catch (err) {
         vnode.state.loading = false;
         m.redraw();
         notifyError(err.responseJSON.error);
-      });
+      }
     };
 
     return m('.ProfileHeader', [
