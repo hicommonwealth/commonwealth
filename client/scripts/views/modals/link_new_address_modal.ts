@@ -256,6 +256,7 @@ const LinkNewAddressModal: m.Component<{
   loggingInWithAddress?: boolean; // determines whether the header says "Connect a new address" or "Login with address"
   joiningCommunity: string,       // join community after verification
   joiningChain: string,           // join chain after verification
+  useCommandLineWallet: boolean,  //
   alreadyInitializedAccount?: Account<any>; // skip verification, go straight to profile creation (only used for NEAR)
   successCallback;
 }, {
