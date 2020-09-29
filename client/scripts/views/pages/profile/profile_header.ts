@@ -33,7 +33,6 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
     disabled: vnode.state.chainLoading,
     onclick: async () => {
       const chain = chainObj.name.toLowerCase();
-      console.log({ chain });
       if (app.activeId() !== chain) {
         let confirmed = false;
         const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
