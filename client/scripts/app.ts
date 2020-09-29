@@ -7,20 +7,21 @@ import 'construct.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
-
-import app, { ApiStatus, LoginState } from 'state';
-
-import { Layout, LoadingLayout } from 'views/layout';
-import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment-twitter';
 import mixpanel from 'mixpanel-browser';
 
+import app, { ApiStatus, LoginState } from 'state';
+import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
+
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
-import Community from './controllers/chain/community/main';
-import WebsocketController from './controllers/server/socket/index';
-import ConfirmInviteModal from './views/modals/confirm_invite_modal';
+import Community from 'controllers/chain/community/main';
+import WebsocketController from 'controllers/server/socket/index';
+
+import { Layout, LoadingLayout } from 'views/layout';
+import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import LoginModal from 'views/modals/login_modal';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -102,19 +103,23 @@ export async function deinitChainOrCommunity() {
 }
 
 export function handleInviteLinkRedirect() {
-  if (m.route.param('invitemessage')) {
+  const inviteMessage = m.route.param('invitemessage');
+  if (inviteMessage) {
     mixpanel.track('Invite Link Used', {
       'Step No': 1,
-      'Step': m.route.param('invitemessage'),
+      'Step': inviteMessage,
     });
-    if (m.route.param('invitemessage') === 'failure') {
+    if (inviteMessage === 'failure' && m.route.param('message') === 'Must be logged in to accept invites') {
+      notifySuccess('Log in to join a community with an invite link');
+      app.modals.create({ modal: LoginModal });
+    } else if (inviteMessage === 'failure') {
       const message = m.route.param('message');
       notifyError(message);
-    } else if (m.route.param('invitemessage') === 'success') {
+    } else if (inviteMessage === 'success') {
       if (app.config.invites.length === 0) return;
       app.modals.create({ modal: ConfirmInviteModal });
     } else {
-      notifyError('Hmmmm... URL not constructed properly');
+      notifyError('Unexpected error with invite link');
     }
   }
 }

@@ -12,23 +12,22 @@ import { CollectiveVotingButton, CandidacyButton, getCouncilCandidates } from '.
 import { SubstrateAccount } from '../controllers/chain/substrate/account';
 import Substrate from '../controllers/chain/substrate/main';
 
-import PageNotFound from 'views/pages/404';
 import Sidebar from 'views/components/sidebar';
 import RightSidebar from 'views/components/right_sidebar';
 
 const Sublayout: m.Component<{
   // overrides
   loadingLayout?: boolean,
-  pageNotFoundLayout?: boolean,
   errorLayout?,
 
   // content
   class?: string,
-  title?: string,
-  description?: string,
+  title?: string,                  // displayed at the top of the layout
+  description?: string,            // displayed at the top of the layout
+  sidebarTopic?: number,           // used to override the sidebar
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
-  rightSidebar?
+  rightSidebar?,
 }> = {
   view: (vnode) => {
     const {
@@ -37,6 +36,7 @@ const Sublayout: m.Component<{
       rightSidebar,
       showNewProposalButton,
       showCouncilMenu,
+      sidebarTopic,
     } = vnode.attrs;
 
     let councilCandidates: Array<[SubstrateAccount, number]>;
@@ -56,7 +56,7 @@ const Sublayout: m.Component<{
     ]);
 
     if (vnode.attrs.loadingLayout) return [
-      m(Sidebar),
+      m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m('.LoadingLayout'),
       ]),
@@ -64,7 +64,7 @@ const Sublayout: m.Component<{
     ];
 
     if (vnode.attrs.errorLayout) return [
-      m(Sidebar),
+      m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m(EmptyState, {
           fill: true,
@@ -76,16 +76,8 @@ const Sublayout: m.Component<{
       m(RightSidebar, { rightSidebar }),
     ];
 
-    if (vnode.attrs.pageNotFoundLayout) return [
-      m(Sidebar),
-      m('.layout-container', [
-        m(PageNotFound)
-      ]),
-      m(RightSidebar, { rightSidebar }),
-    ];
-
     return [
-      m(Sidebar),
+      m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
           m(Grid, { class: 'sublayout-grid' }, [

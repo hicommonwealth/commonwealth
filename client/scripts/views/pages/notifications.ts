@@ -31,14 +31,14 @@ const ALL_COMMUNITIES = 'All communities';
 // left column - for identifying the notification type
 const NEW_MENTIONS_LABEL = 'When someone mentions me';
 const NEW_THREADS_LABEL = 'When a thread is created';
-const NEW_ACTIVITY_LABEL = 'When there is new activity on';
+const NEW_ACTIVITY_LABEL = 'When there is new activity on...';
 const NEW_COMMENTS_LABEL_PREFIX = 'New comments on ';
 const NEW_REACTIONS_LABEL_PREFIX = 'New reactions on ';
 
 // right column - for selecting the notification frequency
 const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (alert me immediately)';
 const NOTIFICATION_ON_OPTION = 'On';
-const NOTIFICATION_ON_SOMETIMES_OPTION = '--';
+const NOTIFICATION_ON_SOMETIMES_OPTION = 'Multiple selections';
 const NOTIFICATION_OFF_OPTION = 'Off';
 
 const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: boolean }> = {
@@ -84,10 +84,6 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
           ]) : '',
         vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
       ]),
-      // m('.email-interval-configuration-right', [
-      //   m('h4', 'Immediate emails'),
-      //   'You will also be notified immediately when there is activity on:'
-      // ]),
     ]);
   }
 };
@@ -103,13 +99,13 @@ const BatchedSubscriptionRow: m.Component<{
     const someActive = subscriptions.some((s) => s.isActive);
     const everyActive = subscriptions.every((s) => s.isActive);
     const someEmail = subscriptions.some((s) => s.immediateEmail);
-    const everyEmail = subscriptions.some((s) => s.immediateEmail);
+    const everyEmail = subscriptions.every((s) => s.immediateEmail);
     if (everyActive && everyEmail) {
       vnode.state.option = NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION;
     } else if (everyActive && !someEmail) {
       vnode.state.option = NOTIFICATION_ON_OPTION;
-    } else if (someActive) {
-      vnode.state.option = NOTIFICATION_ON_OPTION;
+    } else if (someActive || someEmail) {
+      vnode.state.option = NOTIFICATION_ON_SOMETIMES_OPTION;
     } else {
       vnode.state.option = NOTIFICATION_OFF_OPTION;
     }
@@ -130,9 +126,9 @@ const BatchedSubscriptionRow: m.Component<{
               : subscription.objectId;
           return subscription.OffchainThread
             ? [ NEW_COMMENTS_LABEL_PREFIX,
-                link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
-                     threadOrComment.toString(), { target: '_blank' })
-              ]
+              link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+                threadOrComment.toString(), { target: '_blank' })
+            ]
             : NEW_COMMENTS_LABEL_PREFIX + threadOrComment.toString();
         }
         case (NotificationCategories.NewReaction): {
@@ -143,9 +139,9 @@ const BatchedSubscriptionRow: m.Component<{
               : subscription.objectId;
           return subscription.OffchainThread
             ? [ NEW_REACTIONS_LABEL_PREFIX,
-                link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
-                     threadOrComment.toString(), { target: '_blank' })
-              ]
+              link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+                threadOrComment.toString(), { target: '_blank' })
+            ]
             : NEW_REACTIONS_LABEL_PREFIX + threadOrComment.toString();
         }
         default:
@@ -153,22 +149,25 @@ const BatchedSubscriptionRow: m.Component<{
       }
     };
 
-    const batchLabel = (subscriptions: NotificationSubscription[]) => {
-      const chainOrCommunityId = subscriptions[0].Chain
-        ? subscriptions[0].Chain.id
-        : subscriptions[0].OffchainCommunity
-          ? subscriptions[0].OffchainCommunity.id
+    const batchLabel = (batchLabelSubscriptions: NotificationSubscription[]) => {
+      const subscription = batchLabelSubscriptions[0];
+      const chainOrCommunityId = subscription.Chain
+        ? subscription.Chain.id
+        : subscription.OffchainCommunity
+          ? subscription.OffchainCommunity.id
           : null;
 
-      const threadOrComment = subscriptions[0].OffchainThread
-        ? decodeURIComponent(subscriptions[0].OffchainThread.title)
-        : subscriptions[0].OffchainComment
-          ? decodeURIComponent(subscriptions[0].OffchainComment.id)
-          : subscriptions[0].objectId;
+      const threadOrComment = subscription.OffchainThread
+        ? decodeURIComponent(subscription.OffchainThread.title)
+        : subscription.OffchainComment
+          ? decodeURIComponent(subscription.OffchainComment.id)
+          : subscription.objectId;
 
-      return subscriptions[0].OffchainThread
-        ? [ link('a', `/${chainOrCommunityId}/proposal/discussion/${subscriptions[0].OffchainThread.id}`,
-                 threadOrComment.toString(), { target: '_blank' }) ]
+      return subscription.OffchainThread
+        ? [ link(
+          'a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+          threadOrComment.toString(), { target: '_blank' }
+        ) ]
         : COMMENT_NUM_PREFIX + threadOrComment.toString();
     };
 
@@ -203,10 +202,12 @@ const BatchedSubscriptionRow: m.Component<{
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
             size: 'sm',
+            class: vnode.state.option === NOTIFICATION_ON_SOMETIMES_OPTION ? 'sometimes' : '',
           }),
           onSelect: async (option: string) => {
             vnode.state.option = option;
             try {
+              if (subscriptions.length < 1) return;
               if (option === NOTIFICATION_OFF_OPTION) {
                 if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
                 if (someActive) await app.user.notifications.disableSubscriptions(subscriptions);
@@ -523,13 +524,14 @@ const IndividualCommunityNotifications: m.Component<{
 
 const AllCommunitiesNotifications: m.Component<{
   subscriptions: NotificationSubscription[];
-  communities: CommunityInfo[];
+  communities: string[];
 }> = {
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
     const chainIds = app.config.chains.getAll().map((c) => c.id);
-    const communityIds = communities.map((c) => c.id);
+    // const communityIds = communities.map((c) => c.id);
+    const communityIds = communities;
     const batchedSubscriptions = sortSubscriptions(subscriptions.filter((s) => {
       return !chainIds.includes(s.objectId)
         && s.category !== NotificationCategories.NewMention
@@ -563,6 +565,7 @@ const NotificationsPage: m.Component<{}, {
   selectedCommunity: CommunityInfo | ChainInfo;
   selectedCommunityId: string;
   selectableCommunityIds: string[];
+  allCommunityIds: string[];
 }> = {
   oninit: async (vnode) => {
     if (!app.isLoggedIn) {
@@ -595,6 +598,11 @@ const NotificationsPage: m.Component<{}, {
         .filter((c) => selectableCommunityIds.includes(c.id))
     );
 
+    // initialize vnode.state.allCommunityIds
+    vnode.state.allCommunityIds = [];
+    _.uniq(app.config.chains.getAll()).forEach((c) => vnode.state.allCommunityIds.push(c.id));
+    vnode.state.communities.forEach((c) => vnode.state.allCommunityIds.push(c.id));
+
     // initialize selectableCommunityIds
     vnode.state.selectableCommunityIds = [ALL_COMMUNITIES];
     vnode.state.communities.forEach((c) => vnode.state.selectableCommunityIds.push(c.name));
@@ -611,8 +619,7 @@ const NotificationsPage: m.Component<{}, {
   },
   view: (vnode) => {
     const { communities, subscriptions } = vnode.state;
-    const { selectedCommunity, selectedCommunityId, selectableCommunityIds } = vnode.state;
-
+    const { selectedCommunity, selectedCommunityId, selectableCommunityIds, allCommunityIds } = vnode.state;
     const chains = _.uniq(app.config.chains.getAll());
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
@@ -666,7 +673,7 @@ const NotificationsPage: m.Component<{}, {
               m('th', ''),
             ]),
             selectedCommunityId === ALL_COMMUNITIES
-              && m(AllCommunitiesNotifications, { communities, subscriptions }),
+              && m(AllCommunitiesNotifications, { communities: allCommunityIds, subscriptions }),
             selectedCommunity
               && m(IndividualCommunityNotifications, { subscriptions, community: selectedCommunity }),
             // on-chain event notifications

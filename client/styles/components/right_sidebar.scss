@@ -1,20 +1,5 @@
 @import 'client/styles/shared';
 
-@mixin community-info-module-styles() {
-    .CommunityInfoModule {
-        position: absolute;
-        bottom: 14px;
-        left: 0px;
-        margin: 0 15px;
-
-        // background
-        background: $background-color-light-hover;
-        padding: 16px 18px;
-        border-radius: 4px;
-        width: calc(100% - 30px);
-    }
-}
-
 .RightSidebar {
     position: fixed;
     top: 0;
@@ -26,5 +11,4 @@
     @include md-max {
         display: none;
     }
-    @include community-info-module-styles();
 }
