@@ -84,12 +84,11 @@ export interface ThreadArgs {
   url?: string,
   attachments?: string[],
   mentions?: string[],
-  privacy?: boolean,
   readOnly?: boolean
 }
 export const createThread = async (args: ThreadArgs) => {
   const { chainId, communityId, address, jwt, title, body, topicName, topicId,
-    privacy, readOnly, kind, url, mentions, attachments } = args;
+    readOnly, kind, url, mentions, attachments } = args;
   const timestamp = moment();
   const firstVersion : any = { timestamp, body };
   const versionHistory : string = JSON.stringify(firstVersion);
@@ -110,7 +109,6 @@ export const createThread = async (args: ThreadArgs) => {
       'topic_id': topicId,
       'mentions[]': mentions,
       'url': url,
-      'privacy': privacy || false,
       'readOnly': readOnly || false,
       'jwt': jwt,
     });
