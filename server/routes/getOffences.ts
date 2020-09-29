@@ -8,6 +8,7 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
   ChainIdNotFound: 'Cannot find chain id',
   NoRecordsFound: 'No records found',
+  InvalidStashID: 'Provide a valid stash id'
 };
 
 interface IEventData {
@@ -17,9 +18,10 @@ interface IEventData {
   offenders: Array<string>;
 }
 
-const getOffences = async (models, req: Request, res: Response, next: NextFunction) => {
+export async function getOffencesFunc(models, req: Request, next: NextFunction) {
   const { chain, stash } = req.query;
-  let { startDate, endDate } = req.query;
+  const { startDate, endDate } = req.query;
+  const validators: { [key: string]: { [block: string]: any } } = {};
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
 
@@ -30,14 +32,7 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     return next(new Error(Errors.InvalidChain));
   }
 
-  // if start and end date isn't given, we set it for 30 days for now
-  if (typeof startDate === 'undefined' || typeof endDate === 'undefined') {
-    endDate = new Date();
-    startDate = new Date();
-    endDate = endDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // today's date
-    startDate.setDate(startDate.getDate() - 30);
-    startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
-  }
+
   let where: any = {
     chain_event_type_id: `${chain}-offences-offence`
   };
@@ -56,23 +51,21 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
     where
   });
 
-  let validators: { [key: string]: { [block: string]: any } } = {};
-
   offences.forEach((ofc) => {
-    const event_data: IEventData = ofc.dataValues;
-    validators = {};
+    const event_data: IEventData = ofc.dataValues.event_data;
     event_data.offenders.forEach((offender) => {
-      let key = offender;
-      if (validators.hasOwnProperty(key)) {
-        validators[key][ofc.block_number.toString()] = event_data.kind;
-      } else {
-        validators[key] = {};
-        validators[key][ofc.block_number.toString()] = event_data.kind;
-      }
-    })
+      const key = offender.toString();
+      if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }
+      validators[key][ofc.block_number.toString()] = event_data.kind;
+    });
   });
 
-  return res.json({ status: 'Success', result: { validators: validators || [] } });
+  return { status: 'Success', result: validators || {} };
+}
+
+
+const getOffences = async (models, req: Request, res: Response, next: NextFunction) => {
+  return res.json(await getOffencesFunc(models, req, next));
 };
 
 export default getOffences;

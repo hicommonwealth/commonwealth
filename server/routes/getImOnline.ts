@@ -8,13 +8,14 @@ interface IEventData {
   uptime: number;
   block: BlockNumber;
 }
-// eslint-disable-next-line prefer-const
-let validators: { [key: string]: { [block: string]: any } } = {};
 
 // COMMON
 const getImOnline = async (models, req: Request, res: Response, next: NextFunction) => {
   const { stash } = req.query;
   let { startDate, endDate } = req.query;
+  // eslint-disable-next-line prefer-const
+  let validators: { [key: string]: { [block: string]: any } } = {};
+
   const { chain } = req.query;
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
   const chainInfo = await models.Chain.findOne({ where: { id: chain } });
@@ -42,18 +43,15 @@ const getImOnline = async (models, req: Request, res: Response, next: NextFuncti
     ],
     attributes: ['stash', 'block', 'uptime']
   });
+
   stakeImOnlineOverTime.forEach((element) => {
     const event_data: IEventData = element.dataValues;
     const key = event_data.stash.toString();
-    // eslint-disable-next-line no-prototype-builtins
-    if (validators.hasOwnProperty(key)) {
-      validators[key][event_data.block.toString()] = event_data.uptime;
-    } else {
-      validators[key] = {};
-      validators[key][event_data.block.toString()] = event_data.uptime;
-    }
+
+    if (!Object.prototype.hasOwnProperty.call(validators, key)) { validators[key] = {}; }
+    validators[key][event_data.block.toString()] = event_data.uptime;
   });
-  return res.json({ status: 'Success', result: { validators: validators || [] } });
+  return res.json({ status: 'Success', result: validators || {}  });
 };
 
 export default getImOnline;
