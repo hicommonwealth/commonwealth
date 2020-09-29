@@ -21,6 +21,7 @@ export enum ChainNetwork {
   Kusama = 'kusama',
   Kulupu = 'kulupu',
   Polkadot = 'polkadot',
+  Plasm = 'plasm',
   Cosmos = 'cosmos',
   Ethereum = 'ethereum',
   NEAR = 'near',
@@ -28,6 +29,7 @@ export enum ChainNetwork {
   Metacartel = 'metacartel',
 }
 
+// TODO: this is inconsistently used
 export enum ChainClass {
   Edgeware = 'edgeware',
   Kusama = 'kusama',
@@ -39,6 +41,7 @@ export enum ChainClass {
   Moloch = 'moloch',
 }
 
+// TODO: this is inconsistently used
 export enum OffchainThreadKind {
   Forum = 'forum',
   Link = 'link',
