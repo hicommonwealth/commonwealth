@@ -163,7 +163,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       // await finalComment.destroy();
       // return next(new Error(Errors.ChainEntityNotFound));
     }
-    proposal = prefix;
+    proposal = id;
   } else {
     log.error(`No matching proposal of thread for root_id ${finalComment.root_id}`);
   }
