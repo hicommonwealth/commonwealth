@@ -62,17 +62,8 @@ class ChainEventsController {
     });
   }
 
-  public createChainStake(payload) {
-    return new Promise((resolve) => {
-      return post('/createChainStake', {
-        chain: app.chain.id,
-        jwt: app.user.jwt,
-        ...payload
-      }, resolve);
-    });
-  }
-
-  public getChainStake(payload) {
+  // TODO replace with new route getBoundedStashes
+  public getChainStake(payload): Promise<{stash: string}[]> {
     return new Promise((resolve) => {
       return get('/getChainStake', {
         chain: app.chain.id,

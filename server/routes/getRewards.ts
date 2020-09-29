@@ -29,7 +29,7 @@ export async function getRewardsFunc(models, req, next) {
 
   if (!chain) { return next(new Error(Errors.ChainIdNotFound)); }
 
-  // set default version value for edgeware chain 
+  // set default version value for edgeware chain
   if (chain === 'edgeware' && !version) { version = 31; }
 
   const chainInfo = await models.Chain.findOne({ where: { id: chain } });
@@ -37,9 +37,8 @@ export async function getRewardsFunc(models, req, next) {
 
   // if we are using old version of chain
   if (chain === 'edgeware' && version === 31) {
-
     // there is no validator identifier in reward event in chain-event for old version,
-    // get the sessions and rewards over specified time from chain-event and 
+    // get the sessions and rewards over specified time from chain-event and
     // join session event with rewards
     // if a stash id is provided then filter out just the session having provided
     // stash id
@@ -87,8 +86,7 @@ export async function getRewardsFunc(models, req, next) {
     if (stash) {
       validators = { stash_id: validators[stash] };
     }
-  }
-  else if (chain === 'kusama' || (chain === 'edgeware' && version === 38)) {
+  } else if (chain === 'kusama' || (chain === 'edgeware' && version === 38)) {
     // if using kusama chain or new version of edgeware
 
     let where: any = {

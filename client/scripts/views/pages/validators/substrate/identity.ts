@@ -55,37 +55,37 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
 
     return m('div.identity',
       m('div', [
-        m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }),
+        m('.dropDown-name', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
         m('p.legal', info.legal),
         m('hr'),
         info.email
-          && m('p', [
-            m(Icon, { name: Icons.AT_SIGN, size: 'sm' }),
-            m('label.left-5',
-              externalLink('a', `mailto:${info.email}`,
-                truncate(info.email, truncLength)))
-          ]),
+        && m('p', [
+          m(Icon, { name: Icons.AT_SIGN, size: 'sm' }),
+          m('label.left-5',
+            externalLink('a', `mailto:${info.email}`,
+              truncate(info.email, truncLength)))
+        ]),
         info.web
-          && m('p', [
-            m(Icon, { name: Icons.GLOBE, size: 'sm' }),
-            m('label.left-5',
-              externalLink('a', info.web,
-                truncate(info.web, truncLength)))
-          ]),
+        && m('p', [
+          m(Icon, { name: Icons.GLOBE, size: 'sm' }),
+          m('label.left-5',
+            externalLink('a', info.web,
+              truncate(info.web, truncLength)))
+        ]),
         info.twitter
-          && m('p', [
-            m(Icon, { name: Icons.TWITTER, size: 'sm' }),
-            m('label.left-5',
-              externalLink('a', `https://twitter.com/${info.twitter}`,
-                truncate(info.twitter, truncLength)))
-          ]),
+        && m('p', [
+          m(Icon, { name: Icons.TWITTER, size: 'sm' }),
+          m('label.left-5',
+            externalLink('a', `https://twitter.com/${info.twitter}`,
+              truncate(info.twitter, truncLength)))
+        ]),
         info.riot
-          && m('p', [
-            m(Icon, { name: Icons.FIGMA, size: 'sm' }),
-            m('label.left-5',
-              externalLink('a', `https://riot.im/app/#/user/${info.riot}`,
-                truncate(info.riot, truncLength)))
-          ]),
+        && m('p', [
+          m(Icon, { name: Icons.FIGMA, size: 'sm' }),
+          m('label.left-5',
+            externalLink('a', `https://riot.im/app/#/user/${info.riot}`,
+              truncate(info.riot, truncLength)))
+        ]),
         (info.legal || info.email || info.web || info.twitter || info.riot)
         && (m('hr')),
         m('p.User', [

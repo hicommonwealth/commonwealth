@@ -18,11 +18,6 @@ const MIN_STEP = 1;
 export function openTXModal(txFunc: ITXModalData) {
   try {
     createTXModal(txFunc)
-      .then((modalData: ITXModalData) => {
-        return (app.chain as Substrate).app.chainEvents.createChainStake({
-          stash: modalData.author.address
-        });
-      })
       .then(() => {
         m.route.set(`/${app.activeChainId()}`);
       });

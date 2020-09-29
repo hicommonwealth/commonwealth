@@ -13,6 +13,9 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
 
+import { formatToSize } from '../../../../../shared/helpers';
+
+
 export interface ISubstrateIdentityAttrs {
   account: Account<any>;
   linkify: boolean;
@@ -59,8 +62,8 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
     return linkify
       ? link(`a.user-display-name${(profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
         profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-        profile ? profile.displayName : '--',)
-      : m('a.user-display-name.username', profile ? profile.displayName : '--');
+        profile ? formatToSize(profile.displayName, 13) : '--',)
+      : m('a.user-display-name.username', profile ? formatToSize(profile.displayName, 13) : '--');
   }
 });
 

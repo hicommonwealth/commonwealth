@@ -61,7 +61,7 @@ export async function getOffencesFunc(models, req: Request, next: NextFunction) 
   });
 
   return { status: 'Success', result: validators || {} };
-};
+}
 
 
 const getOffences = async (models, req: Request, res: Response, next: NextFunction) => {

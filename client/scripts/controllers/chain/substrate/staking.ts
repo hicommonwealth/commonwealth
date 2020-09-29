@@ -525,7 +525,7 @@ class SubstrateStaking implements StorageModule {
     return this._Chain.query((api: ApiRx) => api.derive.balances.all(address));
   }
   public get ownStashInfos(): Observable<StakerState[]> {
-    return this._Chain.api.pipe(
+    return this._Chain?.api.pipe(
       switchMap((api: ApiRx) => combineLatest(
         of(api),
         from(this._app.chainEvents.getChainStake({})),
