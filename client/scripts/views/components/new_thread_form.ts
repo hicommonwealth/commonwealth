@@ -388,31 +388,31 @@ export const NewThreadForm: m.Component<{
               name: 'submit',
               disabled: !author || vnode.state.saving,
               onclick: async (e) => {
-                vnode.state.saving = true;
                 if (!detectURL(vnode.state.form.url)) {
                   notifyError('Must provide a valid URL.');
-                } else {
-                  if (!vnode.state.form.linkTitle) {
-                    vnode.state.form.linkTitle = (
-                      $(e.target).closest('.NewThreadForm').find('input[name=\'new-link-title\'').val() as string
-                    );
+                  return;
+                }
+                vnode.state.saving = true;
+                if (!vnode.state.form.linkTitle) {
+                  vnode.state.form.linkTitle = (
+                    $(e.target).closest('.NewThreadForm').find('input[name=\'new-link-title\'').val() as string
+                  );
+                }
+                try {
+                  await newLink(vnode.state.form, vnode.state.quillEditorState, author);
+                  vnode.state.saving = false;
+                  if (isModal) {
+                    $(e.target).trigger('modalcomplete');
+                    setTimeout(() => {
+                      $(e.target).trigger('modalexit');
+                      clearLocalStorage(PostType.Link);
+                    }, 0);
+                  } else {
+                    clearLocalStorage(PostType.Discussion);
                   }
-                  try {
-                    await newLink(vnode.state.form, vnode.state.quillEditorState, author);
-                    vnode.state.saving = false;
-                    if (isModal) {
-                      $(e.target).trigger('modalcomplete');
-                      setTimeout(() => {
-                        $(e.target).trigger('modalexit');
-                        clearLocalStorage(PostType.Link);
-                      }, 0);
-                    } else {
-                      clearLocalStorage(PostType.Discussion);
-                    }
-                  } catch (err) {
-                    vnode.state.saving = false;
-                    notifyError(err.message);
-                  }
+                } catch (err) {
+                  vnode.state.saving = false;
+                  notifyError(err.message);
                 }
               },
             }),

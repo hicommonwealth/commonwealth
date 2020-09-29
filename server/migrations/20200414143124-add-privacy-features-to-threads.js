@@ -55,6 +55,5 @@ module.exports = {
         defaultValue: false
       }
     );
-
   }
 };
