@@ -10,6 +10,13 @@ import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
+import NewSessionHandler from '../eventHandlers/newSessionEvents';
+import RewardHandler from '../eventHandlers/rewardEvents';
+import SlashHandler from '../eventHandlers/slashEvents';
+import BondHandler from '../eventHandlers/bondEvents';
+import ImOnlineHandler from '../eventHandlers/imOnlineEvents';
+import OffenceHandler from '../eventHandlers/offenceEvents';
+import HeartbeatHandler from '../eventHandlers/heartbeatEvents';
 import { sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
@@ -71,8 +78,25 @@ const setupChainEventListeners = async (
     const storageHandler = new EventStorageHandler(models, node.chain);
     const notificationHandler = new EventNotificationHandler(models, wss);
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
+    const newSessionHandler = new NewSessionHandler(models);
+    const rewardHandler = new RewardHandler(models, node.chain);
+    const slashHandler = new SlashHandler(models, node.chain);
+    const bondHandler = new BondHandler(models);
+    const imOnlineHandler = new ImOnlineHandler(models);
+    const offenceHandler = new OffenceHandler(models, node.chain);
+    const heartbeatHandler = new HeartbeatHandler(models, node.chain);
     const identityHandler = new IdentityHandler(models, node.chain);
-    const handlers: IEventHandler[] = [ storageHandler, notificationHandler, entityArchivalHandler ];
+    const handlers: IEventHandler[] = [ storageHandler, 
+      notificationHandler,
+      entityArchivalHandler,
+      newSessionHandler,
+      rewardHandler,
+      slashHandler,
+      bondHandler,
+      imOnlineHandler,
+      offenceHandler,
+      heartbeatHandler
+    ];
     let subscriber: IEventSubscriber<any, any>;
     if (SubstrateTypes.EventChains.includes(node.chain)) {
       // only handle identities on substrate chains
