@@ -587,6 +587,19 @@ describe('Thread Tests', () => {
     let tempThread;
 
     it('should turn on readonly', async () => {
+      const res1 = await modelUtils.createThread({
+        address: userAddress,
+        kind,
+        chainId: chain,
+        communityId: community,
+        title,
+        topicName,
+        topicId,
+        body,
+        jwt: userJWT,
+      });
+      expect(res1.result).to.not.be.null;
+      tempThread = res1.result;
       const res = await chai.request(app)
         .post('/api/setPrivacy')
         .set('Accept', 'application/json')
