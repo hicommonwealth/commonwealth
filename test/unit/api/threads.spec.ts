@@ -612,6 +612,22 @@ describe('Thread Tests', () => {
       expect(res.body.result.read_only).to.be.true;
     });
 
+    it('should fail to comment on a read_only thread', async () => {
+      // create new user + jwt
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const newUserJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+      // try to comment and fail
+      const cRes = await modelUtils.createComment({
+        chain,
+        address: res.address,
+        jwt: newUserJWT,
+        text: 'hello world',
+        root_id: `discussion_${tempThread.id}`,
+      });
+      expect(cRes.result).to.be.undefined;
+      expect(cRes.error).to.be.equal(CreateCommentErrors.CantCommentOnReadOnly);
+    });
+
     it('should turn off readonly as an admin of community', async () => {
       const res = await chai.request(app)
         .post('/api/setPrivacy')
