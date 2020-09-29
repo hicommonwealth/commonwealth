@@ -83,9 +83,12 @@ export interface IProfileHeaderState {
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
-    const { account, showJoinCommunityButton, refreshCallback } = vnode.attrs;
-    const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
-      && account.address === app.user.activeAccount?.address;
+    const { account, refreshCallback } = vnode.attrs;
+    const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
+      ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
+      : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
+
+    const showJoinCommunityButton = vnode.attrs.showJoinCommunityButton && !onOwnProfile;
 
     if (app.user.activeAccounts.length === 0) {
       return m(PageLoading);
@@ -173,7 +176,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   vnode.state.loading = true;
                   try {
                     await setActiveAccount(account);
-                    m.route.set(`/${app.activeId()}/account/${account.address}`, {}, { replace: true });
+                    m.redraw();
                   } catch (e) {
                     vnode.state.loading = false;
                     notifyError(e);
@@ -181,7 +184,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                 } else {
                   try {
                     await joinCommunity();
-                    m.route.set(`/${app.activeId()}/account/${account.address}`, {}, { replace: true });
+                    m.redraw();
                   } catch (e) {
                     vnode.state.loading = false;
                     notifyError(e);
