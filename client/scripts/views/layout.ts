@@ -13,6 +13,7 @@ import { featherIcon } from 'helpers';
 import Sublayout from 'views/sublayout';
 import { AppModals } from 'views/modal';
 import AppToasts from 'views/toast';
+import PageNotFound from 'views/pages/404';
 
 const CHAIN_LOADING_TIMEOUT = 3000;
 
@@ -65,7 +66,7 @@ export const Layout: m.Component<{
         class: hideSidebar ? 'hidden-sidebar' : ''
       }, [
         hideSidebar && m('.home-gradient'),
-        m(Sublayout, { pageNotFoundLayout: true }),
+        m(PageNotFound),
         m(AppModals),
         m(AppToasts),
       ]);

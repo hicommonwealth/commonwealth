@@ -12,14 +12,12 @@ import { CollectiveVotingButton, CandidacyButton, getCouncilCandidates } from '.
 import { SubstrateAccount } from '../controllers/chain/substrate/account';
 import Substrate from '../controllers/chain/substrate/main';
 
-import PageNotFound from 'views/pages/404';
 import Sidebar from 'views/components/sidebar';
 import RightSidebar from 'views/components/right_sidebar';
 
 const Sublayout: m.Component<{
   // overrides
   loadingLayout?: boolean,
-  pageNotFoundLayout?: boolean,
   errorLayout?,
 
   // content
@@ -74,14 +72,6 @@ const Sublayout: m.Component<{
           content: vnode.attrs.errorLayout,
           style: 'color: #546e7b;'
         }),
-      ]),
-      m(RightSidebar, { rightSidebar }),
-    ];
-
-    if (vnode.attrs.pageNotFoundLayout) return [
-      m(Sidebar, { sidebarTopic }),
-      m('.layout-container', [
-        m(PageNotFound)
       ]),
       m(RightSidebar, { rightSidebar }),
     ];
