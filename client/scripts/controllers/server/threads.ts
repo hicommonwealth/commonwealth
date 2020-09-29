@@ -66,7 +66,6 @@ class ThreadsController {
     url?: string,
     attachments?: string[],
     mentions?: string[],
-    privacy?: boolean,
     readOnly?: boolean
   ) {
     const timestamp = moment();
@@ -186,7 +185,7 @@ class ThreadsController {
         return result;
       },
       error: (err) => {
-        notifyError('Could not update thread privacy');
+        notifyError('Could not update thread read_only');
         console.error(err);
       },
     });
