@@ -1,20 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',
-  PrivateOrReadOnly: 'Must pass in read_only or privacy',
+  NoReadOnly: 'Must pass in read_only',
   NoThread: 'Cannot find thread',
   NotAdmin: 'Not an admin',
 };
 
 const setPrivacy = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { thread_id, read_only, privacy } = req.body;
-  if (!read_only && !privacy) return next(new Error(Errors.PrivateOrReadOnly));
+  const { thread_id, read_only } = req.body;
+  if (!read_only) return next(new Error(Errors.NoReadOnly));
 
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
@@ -41,8 +40,6 @@ const setPrivacy = async (models, req: Request, res: Response, next: NextFunctio
     }
 
     if (read_only) thread.read_only = read_only;
-    // threads can be changed from private to public, but not the other way around
-    if (thread.private) thread.private = privacy;
     await thread.save();
 
     const finalThread = await models.OffchainThread.findOne({

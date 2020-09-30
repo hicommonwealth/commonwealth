@@ -106,7 +106,6 @@ export const newThread = async (
   quillEditorState,
   author,
   kind = OffchainThreadKind.Forum,
-  privacy?: boolean,
   readOnly?: boolean
 ) => {
   const topics = app.chain
@@ -166,7 +165,6 @@ export const newThread = async (
       url,
       attachments,
       mentions,
-      privacy,
       readOnly,
     );
   } catch (e) {

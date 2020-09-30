@@ -85,7 +85,6 @@ const threadModelFromServer = (thread) => {
     thread.version_history,
     thread.community,
     thread.chain,
-    thread.private,
     thread.read_only,
     decodeURIComponent(thread.body),
     thread.url,
