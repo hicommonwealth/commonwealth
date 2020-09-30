@@ -47,7 +47,7 @@ async function main() {
   const DEV = process.env.NODE_ENV !== 'production';
 
   // CLI parameters for which task to run
-  const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS;
+  const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
   const SHOULD_RESET_DB = process.env.RESET_DB === 'true';
   const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
   const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
@@ -248,7 +248,7 @@ async function main() {
       }
 
       const exitCode = await listenChainEvents();
-      console.log('setup chain events listener with code ' + exitCode);
+      console.log(`setup chain events listener with code ${exitCode}`);
       if (exitCode) {
         await models.sequelize.close();
         await closeMiddleware();
