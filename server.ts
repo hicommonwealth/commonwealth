@@ -68,8 +68,6 @@ async function main() {
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
   const identityFetchCache = new IdentityFetchCache(10 * 60);
-  const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
-
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
@@ -79,7 +77,7 @@ async function main() {
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
-      const subscribers = await setupChainEventListeners(models, wss, chains, SKIP_EVENT_CATCHUP);
+      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
 
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
@@ -96,14 +94,68 @@ async function main() {
     }
   };
 
+  let rc = null;
   if (RUN_AS_LISTENER) {
+    // hack to keep process running indefinitely
     process.stdin.resume();
-    listenChainEvents().then((rc) => {
-      if (rc) {
-        process.exit(rc);
+    listenChainEvents().then((retcode) => {
+      if (retcode) {
+        process.exit(retcode);
       }
+      // if recode === 0, continue indefinitely
     });
     return;
+  } else if (SHOULD_SEND_EMAILS) {
+    rc = await sendBatchedNotificationEmails(models);
+  } else if (SHOULD_RESET_DB) {
+    rc = await resetServer(models);
+  } else if (SHOULD_UPDATE_EVENTS) {
+    rc = await updateEvents(app, models);
+  } else if (SHOULD_UPDATE_BALANCES) {
+    try {
+      rc = await updateBalances(app, models);
+    } catch (e) {
+      log.error('Failed updating balances: ', e.message);
+      rc = 1;
+    }
+  } else if (SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS) {
+    // Run fetchStats here to populate lockdrop stats for Edgeware Lockdrop.
+    // This only needs to run once on prod to make the necessary queries.
+    try {
+      await fetchStats(models, 'mainnet');
+      log.info('Finished adding Lockdrop statistics into the DB');
+      rc = 0;
+    } catch (e) {
+      log.error('Failed adding Lockdrop statistics into the DB: ', e.message);
+      rc = 1;
+    }
+  } else if (ENTITY_MIGRATION) {
+    // "all" means run for all supported chains, otherwise we pass in the name of
+    // the specific chain to migrate
+    log.info('Started migrating chain entities into the DB');
+    try {
+      await migrateChainEntities(models, ENTITY_MIGRATION === 'all' ? undefined : ENTITY_MIGRATION);
+      log.info('Finished migrating chain entities into the DB');
+      rc = 0;
+    } catch (e) {
+      log.error('Failed migrating chain entities into the DB: ', e.message);
+      rc = 1;
+    }
+  } else if (IDENTITY_MIGRATION) {
+    log.info('Started migrating chain identities into the DB');
+    try {
+      await migrateIdentities(models);
+      log.info('Finished migrating chain identities into the DB');
+      rc = 0;
+    } catch (e) {
+      log.error('Failed migrating chain identities into the DB: ', e.message);
+      rc = 1;
+    }
+  }
+
+  // exit if we have performed a one-off event
+  if (rc !== null) {
+    process.exit(rc);
   }
 
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
@@ -121,6 +173,7 @@ async function main() {
   const devMiddleware = (DEV && !NO_CLIENT_SERVER) ? webpackDevMiddleware(compiler, {
     publicPath: '/build',
   }) : null;
+  const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const closeMiddleware = (): Promise<void> => {
@@ -211,53 +264,16 @@ async function main() {
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 
-  // each one-off command should call process.exit() when done
-  if (SHOULD_SEND_EMAILS) {
-    sendBatchedNotificationEmails(models);
-  } else if (SHOULD_RESET_DB) {
-    resetServer(models, closeMiddleware);
-  } else if (SHOULD_UPDATE_EVENTS) {
-    updateEvents(app, models);
-  } else if (SHOULD_UPDATE_BALANCES) {
-    updateBalances(app, models);
-  } else if (SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS) {
-    // Run fetchStats here to populate lockdrop stats for Edgeware Lockdrop.
-    // This only needs to run once on prod to make the necessary queries.
-    await fetchStats(models, 'mainnet');
-    log.info('Finished adding Lockdrop statistics into the DB');
-    process.exit(0);
-  } else {
-    if (!CHAIN_EVENTS) {
-      setupServer(app, wss, sessionParser);
-    } else {
-      // handle various chain-event cases
-      if (ENTITY_MIGRATION) {
-        // "all" means run for all supported chains, otherwise we pass in the name of
-        // the specific chain to migrate
-        log.info('Started migrating chain entities into the DB');
-        await migrateChainEntities(models, ENTITY_MIGRATION === 'all' ? undefined : ENTITY_MIGRATION);
-        log.info('Finished migrating chain entities into the DB');
-        process.exit(0);
-      }
-
-      if (IDENTITY_MIGRATION) {
-        log.info('Started migrating chain identities into the DB');
-        await migrateIdentities(models);
-        log.info('Finished migrating chain identities into the DB');
-        process.exit(0);
-      }
-
-      const exitCode = await listenChainEvents();
-      console.log(`setup chain events listener with code ${exitCode}`);
-      if (exitCode) {
-        await models.sequelize.close();
-        await closeMiddleware();
-        process.exit(exitCode);
-      }
-
-      setupServer(app, wss, sessionParser);
+  if (CHAIN_EVENTS) {
+    const exitCode = await listenChainEvents();
+    console.log(`setup chain events listener with code: ${exitCode}`);
+    if (exitCode) {
+      await models.sequelize.close();
+      await closeMiddleware();
+      process.exit(exitCode);
     }
   }
+  setupServer(app, wss, sessionParser);
 }
 
 main();
