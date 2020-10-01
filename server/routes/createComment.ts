@@ -229,7 +229,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     root_id,
     {
       created_at: new Date(),
-      root_id,
+      root_id: id,
       root_title,
       root_type: prefix,
       comment_id: Number(finalComment.id),
