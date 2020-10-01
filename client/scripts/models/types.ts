@@ -22,6 +22,7 @@ export enum ChainNetwork {
   Kulupu = 'kulupu',
   Polkadot = 'polkadot',
   Plasm = 'plasm',
+  Stafi = 'stafi',
   Cosmos = 'cosmos',
   Ethereum = 'ethereum',
   NEAR = 'near',

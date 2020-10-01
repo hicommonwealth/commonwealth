@@ -4,6 +4,7 @@ export function constructSubstrateUrl(url: string): string {
     'kusama-rpc.polkadot.io',
     'rpc.polkadot.io',
     'rpc.plasmnet.io',
+    'scan-rpc.stafi.io',
     'rpc.kulupu.corepaper.org',
   ];
   const hasProtocol = url.indexOf('wss://') !== -1 || url.indexOf('ws://') !== -1;
