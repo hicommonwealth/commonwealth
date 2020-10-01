@@ -85,6 +85,9 @@ const CouncilVotingModal = {
             defaultValue: String(currentStake),
             placeholder: 'Amount to lock',
             autocomplete: 'off',
+            oncreate: () => {
+              vnode.state.phragmenStakeAmount = app.chain.chain.coins(parseFloat(String(currentStake)), true);
+            },
             oninput: (e) => {
               vnode.state.phragmenStakeAmount = app.chain.chain.coins(parseFloat(e.target.value), true);
             }
