@@ -26,7 +26,6 @@ export const modelFromServer = (thread) => {
     thread.version_history,
     thread.community,
     thread.chain,
-    thread.private,
     thread.read_only,
     decodeURIComponent(thread.body),
     thread.url,
@@ -67,7 +66,6 @@ class ThreadsController {
     url?: string,
     attachments?: string[],
     mentions?: string[],
-    privacy?: boolean,
     readOnly?: boolean
   ) {
     const timestamp = moment();
@@ -90,7 +88,6 @@ class ThreadsController {
         'topic_name': topicName,
         'topic_id': topicId,
         'url': url,
-        'privacy': privacy,
         'readOnly': readOnly,
         'jwt': app.user.jwt,
       });
@@ -170,14 +167,13 @@ class ThreadsController {
     });
   }
 
-  public async setPrivacy(args: { threadId: number, privacy: boolean, readOnly: boolean, }) {
+  public async setPrivacy(args: { threadId: number, readOnly: boolean, }) {
     return $.ajax({
       url: `${app.serverUrl()}/setPrivacy`,
       type: 'POST',
       data: {
         'jwt': app.user.jwt,
         'thread_id': args.threadId,
-        'privacy': args.privacy,
         'read_only': args.readOnly,
       },
       success: (response) => {
@@ -189,7 +185,7 @@ class ThreadsController {
         return result;
       },
       error: (err) => {
-        notifyError('Could not update thread privacy');
+        notifyError('Could not update thread read_only');
         console.error(err);
       },
     });

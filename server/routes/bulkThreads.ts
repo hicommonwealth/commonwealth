@@ -10,8 +10,8 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
   if (!req.user) { // if not logged in, return public threads
     const publicThreadsQuery = (community)
-      ? { community: community.id, private: false, }
-      : { chain: chain.id, private: false, };
+      ? { community: community.id }
+      : { chain: chain.id, };
 
     const publicThreads = await models.OffchainThread.findAll({
       where: publicThreadsQuery,
@@ -44,9 +44,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
   const adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
 
   const filteredThreads = await allThreads.filter((thread) => {
-    if (thread.private === false) {
-      return true;
-    } else if (userAddressIds.includes(thread.address_id)) {
+    if (userAddressIds.includes(thread.address_id)) {
       return true;
     } else if (adminRoles.length > 0) {
       return true;

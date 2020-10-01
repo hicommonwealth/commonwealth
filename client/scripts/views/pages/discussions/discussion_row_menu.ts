@@ -126,7 +126,6 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
               e.preventDefault();
               app.threads.setPrivacy({
                 threadId: proposal.id,
-                privacy: null,
                 readOnly: !proposal.readOnly,
               }).then(() => m.redraw());
             },

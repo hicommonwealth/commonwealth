@@ -148,24 +148,10 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
           e.preventDefault();
           app.threads.setPrivacy({
             threadId: proposal.id,
-            privacy: null,
             readOnly: !proposal.readOnly,
           }).then(() => m.redraw());
         },
         label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
-      }),
-      // privacy toggle, show only if thread is private
-      (proposal as OffchainThread).privacy && m(MenuItem, {
-        class: 'privacy-to-public-toggle',
-        onclick: (e) => {
-          e.preventDefault();
-          app.threads.setPrivacy({
-            threadId: proposal.id,
-            privacy: false,
-            readOnly: null,
-          }).then(() => m.redraw());
-        },
-        label: 'Reveal to public',
       }),
     ];
   }

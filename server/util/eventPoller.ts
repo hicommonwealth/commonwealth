@@ -37,99 +37,106 @@ const fetchEvents = async (web3, originContract, eventName, fromBlock, blocksPer
   return events;
 };
 
-export const updateEvents = (app, models) => {
-  fs.readFile(path.join(__dirname, 'etc/Lockdrop.json'), async (error, data) => {
-    try {
-      const web3 = await getInfuraWeb3Provider();
-      const json = JSON.parse(data.toString());
-      const contract = new web3.eth.Contract(json.abi, MAINNET_LOCKDROP);
+export const updateEvents = (app, models): Promise<number> => {
+  return new Promise((resolve) => {
+    fs.readFile(path.join(__dirname, 'etc/Lockdrop.json'), async (error, data) => {
+      if (error) {
+        console.log('Error:', error);
+        resolve(1);
+        return;
+      }
+      try {
+        const web3 = await getInfuraWeb3Provider();
+        const json = JSON.parse(data.toString());
+        const contract = new web3.eth.Contract(json.abi, MAINNET_LOCKDROP);
 
-      // get starting block to scan from
-      const lastSignalEvent = await models.EdgewareLockdropEvent.findOne({
-        where: {
-          origin: models.sequelize.where(models.sequelize.fn('LOWER', models.sequelize.col('origin')),
-                                         'LIKE', `%${MAINNET_LOCKDROP}%`),
-          name: 'Signaled',
-        },
-        order: [['blocknum', 'DESC']]
-      });
-      const lastLockEvent = await models.EdgewareLockdropEvent.findOne({
-        where: {
-          origin: models.sequelize.where(models.sequelize.fn('LOWER', models.sequelize.col('origin')),
-                                         'LIKE', `%${MAINNET_LOCKDROP}%`),
-          name: 'Locked',
-        },
-        order: [['blocknum', 'DESC']]
-      });
-      const lastSignalBlock = lastSignalEvent ? lastSignalEvent.blocknum : MAINNET_START_BLOCK;
-      const lastLockBlock = lastLockEvent ? lastLockEvent.blocknum : MAINNET_START_BLOCK;
+        // get starting block to scan from
+        const lastSignalEvent = await models.EdgewareLockdropEvent.findOne({
+          where: {
+            origin: models.sequelize.where(models.sequelize.fn('LOWER', models.sequelize.col('origin')),
+                                          'LIKE', `%${MAINNET_LOCKDROP}%`),
+            name: 'Signaled',
+          },
+          order: [['blocknum', 'DESC']]
+        });
+        const lastLockEvent = await models.EdgewareLockdropEvent.findOne({
+          where: {
+            origin: models.sequelize.where(models.sequelize.fn('LOWER', models.sequelize.col('origin')),
+                                          'LIKE', `%${MAINNET_LOCKDROP}%`),
+            name: 'Locked',
+          },
+          order: [['blocknum', 'DESC']]
+        });
+        const lastSignalBlock = lastSignalEvent ? lastSignalEvent.blocknum : MAINNET_START_BLOCK;
+        const lastLockBlock = lastLockEvent ? lastLockEvent.blocknum : MAINNET_START_BLOCK;
 
-      // get events
-      const events = await Promise.all([
-        fetchEvents(web3, contract, 'Signaled', lastSignalBlock, MAX_BLOCKS_PER_MAINNET_QUERY),
-        fetchEvents(web3, contract, 'Locked', lastLockBlock, MAX_BLOCKS_PER_MAINNET_QUERY),
-      ]);
-      const signalEvents = events[0];
-      const lockEvents = events[1];
+        // get events
+        const events = await Promise.all([
+          fetchEvents(web3, contract, 'Signaled', lastSignalBlock, MAX_BLOCKS_PER_MAINNET_QUERY),
+          fetchEvents(web3, contract, 'Locked', lastLockBlock, MAX_BLOCKS_PER_MAINNET_QUERY),
+        ]);
+        const signalEvents = events[0];
+        const lockEvents = events[1];
 
-      // save events
-      const eventsForCreation = [].concat.apply([], events).map((event) => ({
-        //chain: 'ethereum',
-        origin: event.address,
-        blocknum: event.blockNumber,
-        name: event.event,
-        data: JSON.stringify(event.returnValues),
-      }));
-      const eventsCreated = await models.EdgewareLockdropEvent.bulkCreate(eventsForCreation, { validate: true });
-      console.log(`Added ${eventsCreated.length} events`);
+        // save events
+        const eventsForCreation = [].concat.apply([], events).map((event) => ({
+          //chain: 'ethereum',
+          origin: event.address,
+          blocknum: event.blockNumber,
+          name: event.event,
+          data: JSON.stringify(event.returnValues),
+        }));
+        const eventsCreated = await models.EdgewareLockdropEvent.bulkCreate(eventsForCreation, { validate: true });
+        console.log(`Added ${eventsCreated.length} events`);
 
-      // remove duplicate events
-      await models.sequelize.query(
-        'delete from "EdgewareLockdropEvents" where id in ' +
-          '(SELECT min(id) FROM "EdgewareLockdropEvents" GROUP BY origin, blocknum, data HAVING count(*) > 1)'
-      );
+        // remove duplicate events
+        await models.sequelize.query(
+          'delete from "EdgewareLockdropEvents" where id in ' +
+            '(SELECT min(id) FROM "EdgewareLockdropEvents" GROUP BY origin, blocknum, data HAVING count(*) > 1)'
+        );
 
-      // build lookup table of {signaling addresses => blocknum} for getting balances
-      const addresses = {};
-      signalEvents.map((event) => {
-        const contractAddr = event.returnValues.contractAddr;
-        if (contractAddr in addresses) {
-          addresses[contractAddr] = addresses[contractAddr] > event.blockNumber ?
-            addresses[contractAddr] : event.blockNumber;
-        } else {
-          addresses[contractAddr] = event.blockNumber;
-        }
-      });
-      const addrKeys = Object.keys(addresses);
+        // build lookup table of {signaling addresses => blocknum} for getting balances
+        const addresses = {};
+        signalEvents.map((event) => {
+          const contractAddr = event.returnValues.contractAddr;
+          if (contractAddr in addresses) {
+            addresses[contractAddr] = addresses[contractAddr] > event.blockNumber ?
+              addresses[contractAddr] : event.blockNumber;
+          } else {
+            addresses[contractAddr] = event.blockNumber;
+          }
+        });
+        const addrKeys = Object.keys(addresses);
 
-      // get balances
-      console.log(`Getting balances for ${addrKeys.length} new addresses...`);
-      const balances = await Promise.all(
-        addrKeys.map(async (addr) => {
-          const balance = await web3.eth.getBalance(addr, addresses[addr]);
-          return balance;
-        })
-      );
+        // get balances
+        console.log(`Getting balances for ${addrKeys.length} new addresses...`);
+        const balances = await Promise.all(
+          addrKeys.map(async (addr) => {
+            const balance = await web3.eth.getBalance(addr, addresses[addr]);
+            return balance;
+          })
+        );
 
-      // save balances
-      const balancesForCreation = addrKeys.map((addr, index) => ({
-        address: addr,
-        balance: balances[index],
-        blocknum: addresses[addr],
-      }));
-      const balancesCreated = await models.EdgewareLockdropBalance.bulkCreate(balancesForCreation, { validate: true });
-      console.log(`Saved ${balancesCreated.length} new balances`);
+        // save balances
+        const balancesForCreation = addrKeys.map((addr, index) => ({
+          address: addr,
+          balance: balances[index],
+          blocknum: addresses[addr],
+        }));
+        const balancesCreated = await models.EdgewareLockdropBalance.bulkCreate(balancesForCreation, { validate: true });
+        console.log(`Saved ${balancesCreated.length} new balances`);
 
-      // done!
-      process.exit(0);
-    } catch (e) {
-      console.log('Error:', e);
-      process.exit(1);
-    }
+        // done!
+        resolve(0);
+      } catch (e) {
+        console.log('Error:', e);
+        resolve(1);
+      }
+    });
   });
 };
 
-export const updateBalances = async (app, models, blocknum = 8461046) => {
+export const updateBalances = async (app, models, blocknum = 8461046): Promise<number> => {
   const web3 = await getInfuraWeb3Provider();
   const entries = await models.EdgewareLockdropBalance.findAll();
   console.log(`Checking ${entries.length} balances...`);
@@ -147,7 +154,7 @@ export const updateBalances = async (app, models, blocknum = 8461046) => {
       console.log('Updated', entry.address, ':', entry.balance, '->', balance);
     }
   }
-  process.exit(0);
+  return 0;
 };
 
 export default updateEvents;
