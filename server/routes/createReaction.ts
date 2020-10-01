@@ -13,7 +13,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
   NoPostId: 'Must provide a comment or thread ID',
   NoReaction: 'Must provide a reaction',
-  NoCommentMatch: 'No matching proposal found',
+  NoCommentMatch: 'No matching comment found',
   NoProposalMatch: 'No matching proposal found'
 };
 
