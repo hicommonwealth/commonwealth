@@ -24,6 +24,7 @@ module.exports = {
       }], { transaction: t });
 
       // TODO: add stafi event types
+    });
   },
 
   down: (queryInterface, Sequelize) => {
