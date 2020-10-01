@@ -30,7 +30,7 @@ export enum ChainNetwork {
   Metacartel = 'metacartel',
 }
 
-// TODO: this is inconsistently used
+// TODO: this should be deprecated, and replaced with ChainNetwork in most instances
 export enum ChainClass {
   Edgeware = 'edgeware',
   Kusama = 'kusama',
