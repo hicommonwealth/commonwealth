@@ -55,13 +55,13 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await super.initApi();
   }
 
-  public async initData(useRedesignLogic = true) {
+  public async initData() {
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts),
       this.council.init(this.chain, this.accounts),
       this.technicalCommittee.init(this.chain, this.accounts),
       this.democracyProposals.init(this.chain, this.accounts),
-      this.democracy.init(this.chain, this.accounts, useRedesignLogic),
+      this.democracy.init(this.chain, this.accounts),
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
     ]);

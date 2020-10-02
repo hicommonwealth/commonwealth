@@ -66,7 +66,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.democracyProposals.init(this.chain, this.accounts),
       // always use redesign logic
       // TODO: deprecate "old" logic
-      this.democracy.init(this.chain, this.accounts, true),
+      this.democracy.init(this.chain, this.accounts),
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
       this.signaling.init(this.chain, this.accounts),
