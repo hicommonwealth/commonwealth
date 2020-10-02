@@ -3,7 +3,7 @@ import { NotificationCategories } from '../../shared/types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl } from '../../shared/utils';
+import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import { factory, formatFilename } from '../../shared/logging';
 
@@ -33,6 +33,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       ? []
       : req.body['mentions[]'];
 
+  // TODO: 'let parentComment' here, saves one db query
   if (parent_id) {
     // check that parent comment is in the same community
     const parentCommentIsVisibleToUser = await models.OffchainComment.findOne({
@@ -91,6 +92,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
 
   let parentComment;
   if (parent_id) {
+    // TODO: this query is unnecessary, we queried for parentComment earlier
     parentComment = await models.OffchainComment.findOne({
       where: community ? {
         id: parent_id,
@@ -126,14 +128,16 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   } catch (err) {
     return next(err);
   }
+
   // fetch attached objects to return to user
+  // TODO: we should be able to assemble the object without another query
   const finalComment = await models.OffchainComment.findOne({
     where: { id: comment.id },
     include: [models.Address, models.OffchainAttachment],
   });
 
-  // TODO: This isn't a reliable check and may fail. It should never fail.
-  // Comments always need identified parents.
+  // get parent entity if the comment is on an offchain thread
+  // no parent entity if the comment is on an onchain entity
   let proposal;
   const [prefix, id] = finalComment.root_id.split('_');
   if (prefix === 'discussion') {
@@ -141,6 +145,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       where: { id }
     });
   } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
+    // TODO: better check for on-chain proposal types
     const chainEntity = await proposalIdToEntity(models, chain.id, finalComment.root_id);
     if (!chainEntity) {
       // send a notification email if commenting on an invalid ChainEntity
@@ -158,22 +163,25 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       // await finalComment.destroy();
       // return next(new Error(Errors.ChainEntityNotFound));
     }
-    proposal = await models.Proposal.findOne({ id });
+    proposal = id;
   } else {
-    log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
+    log.error(`No matching proposal of thread for root_id ${finalComment.root_id}`);
   }
 
   if (!proposal) {
     await finalComment.destroy();
     return next(new Error(Errors.ThreadNotFound));
   }
-  if (proposal.read_only) {
+  if (typeof proposal !== 'string' && proposal.read_only) {
     await finalComment.destroy();
     return next(new Error(Errors.CantCommentOnReadOnly));
   }
 
   // craft commonwealth url
-  const cwUrl = getProposalUrl(prefix, proposal, finalComment);
+  const cwUrl = typeof proposal === 'string'
+    ? getProposalUrlWithoutObject(prefix, (finalComment.chain || finalComment.community), proposal, finalComment)
+    : getProposalUrl(prefix, proposal, finalComment);
+  const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
 
   // auto-subscribe comment author to reactions & child comments
   await models.Subscription.create({
@@ -221,8 +229,8 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     root_id,
     {
       created_at: new Date(),
-      root_id: proposal.type_id || proposal.id,
-      root_title: proposal.title || '',
+      root_id: id,
+      root_title,
       root_type: prefix,
       comment_id: Number(finalComment.id),
       comment_text: finalComment.text,
@@ -235,7 +243,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       user: finalComment.Address.address,
       author_chain: finalComment.Address.chain,
       url: cwUrl,
-      title: proposal.title || '',
+      title: root_title,
       chain: finalComment.chain,
       community: finalComment.community,
       body: finalComment.text,
@@ -252,8 +260,8 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       `comment-${parent_id}`,
       {
         created_at: new Date(),
-        root_id: proposal.type_id || proposal.id,
-        root_title: proposal.title || '',
+        root_id,
+        root_title,
         root_type: prefix,
         comment_id: Number(finalComment.id),
         comment_text: finalComment.text,
@@ -300,8 +308,8 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id: proposal.type_id || proposal.id,
-          root_title: proposal.title || '',
+          root_id,
+          root_title,
           root_type: prefix,
           comment_id: Number(finalComment.id),
           comment_text: finalComment.text,

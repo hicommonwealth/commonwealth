@@ -52,6 +52,7 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
     const activeThreads = app.recentActivity.getMostActiveThreads(entity);
 
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
+      m(CommunityInfoModule),
       m('.user-activity', [
         m('.user-activity-header', 'Active members'),
         m('.active-members', activeAddresses.map((user) => {
@@ -67,7 +68,6 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
           return m(MostActiveThread, { thread });
         }))
       ]),
-      m(CommunityInfoModule)
     ]);
   }
 };
