@@ -122,8 +122,8 @@ const CreateInviteLink: m.Component<{
           defaultValue: vnode.state.inviteUses,
           options: [
             { value: 'none', label: 'Unlimited uses' },
-            { value: 1, label: 'One time use' },
-            // { value: 2, label: 'Twice' },
+            { value: '1', label: 'One time use' },
+            // { value: '2', label: 'Twice' },
           ],
           onchange: (e) => {
             vnode.state.inviteUses = (e.target as any).value;

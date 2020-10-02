@@ -1,7 +1,7 @@
 import 'components/proposals/convictions_chooser.scss';
 
 import m from 'mithril';
-import { Select } from 'construct-ui';
+import { CustomSelect } from 'construct-ui';
 
 import app from 'state';
 import {
@@ -10,7 +10,7 @@ import {
 
 export const ConvictionsChooser: m.Component<{ callback: Function }, {}> = {
   view: (vnode) => {
-    return m(Select, {
+    return m(CustomSelect, {
       class: 'ConvictionsChooser',
       name: 'convictions',
       size: 'sm',
@@ -22,8 +22,7 @@ export const ConvictionsChooser: m.Component<{ callback: Function }, {}> = {
         value: c.toString(),
         label: `${convictionToWeight(c)}x weight (${convictionToLocktime(c)}x lock)`,
       })),
-      onchange: (e) => {
-        const result = (e.target as any).value;
+      onSelect: (result) => {
         vnode.attrs.callback(result);
       },
     });
