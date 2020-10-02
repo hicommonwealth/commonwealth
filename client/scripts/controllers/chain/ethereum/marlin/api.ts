@@ -66,9 +66,9 @@ export default class MarlinAPI {
     this._TimelockContract = TimelockFactory.connect(this._TimelockAddress, this._Signer);
   }
 
-  public async init() {
-    // perform fetch of approved ERC20 token and set up contract for approval
-    const tokenAddress = await this._CompContract.approvedToken();
-    this._tokenContract = Erc20Factory.connect(tokenAddress, this._Signer);
-  }
+  // public async init() {
+  //   // perform fetch of approved ERC20 token and set up contract for approval
+  //   const tokenAddress = await this._CompContract.approvedToken();
+  //   this._tokenContract = Erc20Factory.connect(tokenAddress, this._Signer);
+  // }
 }
