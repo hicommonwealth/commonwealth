@@ -34,7 +34,7 @@ class SubstrateDemocracy extends ProposalModule<
   }
 
   // Loads all proposals and referendums currently present in the democracy module
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, useRedesignLogic: boolean): Promise<void> {
+  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, useRedesignLogic: boolean = true): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._useRedesignLogic = useRedesignLogic;

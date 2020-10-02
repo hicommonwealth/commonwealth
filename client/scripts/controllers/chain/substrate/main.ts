@@ -28,18 +28,20 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public readonly base = ChainBase.Substrate;
   public readonly class: ChainClass;
 
-  constructor(meta: NodeInfo, app: IApp, _class: ChainClass) {
+  constructor(meta: NodeInfo, app: IApp, _class: ChainClass, private _enableModules: boolean = true) {
     super(meta, app);
     this.class = _class;
     this.chain = new SubstrateChain(this.app); // kusama chain id
     this.accounts = new SubstrateAccounts(this.app);
-    this.phragmenElections = new SubstratePhragmenElections(this.app);
-    this.council = new SubstrateCouncil(this.app);
-    this.technicalCommittee = new SubstrateTechnicalCommittee(this.app);
-    this.democracyProposals = new SubstrateDemocracyProposals(this.app);
-    this.democracy = new SubstrateDemocracy(this.app);
-    this.treasury = new SubstrateTreasury(this.app);
-    this.identities = new SubstrateIdentities(this.app);
+    if (this._enableModules) {
+      this.phragmenElections = new SubstratePhragmenElections(this.app);
+      this.council = new SubstrateCouncil(this.app);
+      this.technicalCommittee = new SubstrateTechnicalCommittee(this.app);
+      this.democracyProposals = new SubstrateDemocracyProposals(this.app);
+      this.democracy = new SubstrateDemocracy(this.app);
+      this.treasury = new SubstrateTreasury(this.app);
+      this.identities = new SubstrateIdentities(this.app);
+    }
   }
 
   // dispatches event updates to a given entity to the appropriate module
@@ -56,17 +58,19 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   }
 
   public async initData(useRedesignLogic = true) {
-    await Promise.all([
-      this.phragmenElections.init(this.chain, this.accounts),
-      this.council.init(this.chain, this.accounts),
-      this.technicalCommittee.init(this.chain, this.accounts),
-      this.democracyProposals.init(this.chain, this.accounts),
-      this.democracy.init(this.chain, this.accounts, useRedesignLogic),
-      this.treasury.init(this.chain, this.accounts),
-      this.identities.init(this.chain, this.accounts),
-    ]);
-    if (!this.usingServerChainEntities) {
-      await this.chain.initChainEntities();
+    if (this._enableModules) {
+      await Promise.all([
+        this.phragmenElections.init(this.chain, this.accounts),
+        this.council.init(this.chain, this.accounts),
+        this.technicalCommittee.init(this.chain, this.accounts),
+        this.democracyProposals.init(this.chain, this.accounts),
+        this.democracy.init(this.chain, this.accounts, useRedesignLogic),
+        this.treasury.init(this.chain, this.accounts),
+        this.identities.init(this.chain, this.accounts),
+      ]);
+      if (!this.usingServerChainEntities) {
+        await this.chain.initChainEntities();
+      }
     }
     await this.chain.initEventLoop();
     await super.initData(this.usingServerChainEntities);
@@ -75,15 +79,17 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public async deinit(): Promise<void> {
     await super.deinit();
     this.chain.deinitEventLoop();
-    await Promise.all([
-      this.phragmenElections.deinit(),
-      this.council.deinit(),
-      this.technicalCommittee.deinit(),
-      this.democracyProposals.deinit(),
-      this.democracy.deinit(),
-      this.treasury.deinit(),
-      this.identities.deinit(),
-    ]);
+    if (this._enableModules) {
+      await Promise.all([
+        this.phragmenElections.deinit(),
+        this.council.deinit(),
+        this.technicalCommittee.deinit(),
+        this.democracyProposals.deinit(),
+        this.democracy.deinit(),
+        this.treasury.deinit(),
+        this.identities.deinit(),
+      ]);
+    }
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitApi();

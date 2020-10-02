@@ -6,7 +6,7 @@ import Substrate from '../substrate/main';
 
 class Plasm extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
-    super(n, app, ChainClass.Polkadot);
+    super(n, app, ChainClass.Polkadot, false); // disable all governance modules
   }
 
   public async initApi() {
@@ -14,11 +14,6 @@ class Plasm extends Substrate {
     await super.initApi({
       'types': { ...t }
     });
-  }
-
-  public async initData() {
-    // use old democracy logic
-    super.initData(true);
   }
 }
 
