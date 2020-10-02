@@ -381,22 +381,28 @@ $(() => {
 
   interface RouteAttrs {
     scoped: string | boolean;
+    typed?: boolean;
     hideSidebar?: boolean;
     deferChain?: boolean;
   }
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
+    loadCmd: undefined,
     onmatch: () => {
       console.log('onmatch called, for:', path, (+new Date() / 1000));
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
         `./${path}`
-      ).then((p) => p.default);
+      ).then((p) => {
+        // support a custom loading command
+        this.loadCmd = p.loadCmd;
+        return p.default;
+      });
     },
     render: (vnode) => {
       console.log('render called:', path, (+new Date() / 1000));
-      const { scoped, hideSidebar } = attrs;
+      const { scoped, hideSidebar, typed } = attrs;
       let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
@@ -406,14 +412,14 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-
+      const type = typed ? vnode.attrs.type.toString() : null;
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
+      return m(Layout, { scope, deferChain, hideSidebar, loadCmd: this.loadCmd, type }, [ vnode ]);
     },
   });
 
@@ -450,12 +456,12 @@ $(() => {
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
-    '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+    '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true, typed: true }),
     '/:scope/council':           importRoute('views/pages/council/index', { scoped: true }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
     '/:scope/new/signaling':     importRoute('views/pages/new_signaling', { scoped: true }),
-    '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
+    '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true, typed: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),

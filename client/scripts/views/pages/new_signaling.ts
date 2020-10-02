@@ -19,7 +19,8 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { ChainClass } from 'models';
+import { ChainClass, ChainNetwork } from 'models';
+import Substrate, { SubstrateModule } from 'controllers/chain/substrate/main';
 
 export interface ISignalingPageState {
   voteOutcomes: any[];
@@ -56,6 +57,9 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
       notifyInfo('Can only create signaling proposals on Edgeware');
       m.route.set(`/${app.activeChainId()}/discussions`);
       return;
+    }
+    if (!(app.chain as Substrate).activeModules.includes(SubstrateModule.Signaling)) {
+      return m(PageLoading);
     }
 
     const author = app.user.activeAccount;
@@ -215,5 +219,15 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
     ]);
   }
 };
+
+export async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.network !== ChainNetwork.Edgeware) {
+    return;
+  }
+  await (app.chain as Substrate).initModule(SubstrateModule.Signaling);
+}
 
 export default NewSignalingPage;

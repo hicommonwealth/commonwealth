@@ -40,7 +40,7 @@ import {
   ChainEvent,
 } from 'models';
 
-import { SubstrateEvents, SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateEvents, SubstrateTypes, IChainEntityKind } from '@commonwealth/chain-events';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -71,7 +71,13 @@ async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
 }
 
 // dispatches an entity update to the appropriate module
-export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: ChainEvent): void {
+export function handleSubstrateEntityUpdate(
+  chain, activeModules: IChainEntityKind[], entity: ChainEntity, event: ChainEvent,
+): void {
+  // do not handle inactive modules
+  if (!activeModules.includes(entity.type)) {
+    return;
+  }
   switch (entity.type) {
     case SubstrateTypes.EntityKind.DemocracyProposal: {
       const constructorFunc = (e) => new SubstrateDemocracyProposal(
@@ -174,6 +180,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       ss58Format: this._ss58Format,
     });
   }
+
+  private _fetcher: SubstrateEvents.StorageFetcher;
+  public get fetcher() { return this._fetcher; }
 
   private _tokenDecimals: number;
   private _tokenSymbol: string;
@@ -304,20 +313,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   // load existing events and subscribe to future via client node connection
   public initChainEntities(): Promise<void> {
-    const fetcher = new SubstrateEvents.StorageFetcher(this._apiPromise);
+    this._fetcher = new SubstrateEvents.StorageFetcher(this._apiPromise);
     const subscriber = new SubstrateEvents.Subscriber(this._apiPromise);
     const processor = new SubstrateEvents.Processor(this._apiPromise);
     return this._app.chain.chainEntities.subscribeEntities(
       this._app.chain,
-      fetcher,
       subscriber,
       processor,
-      // ensure Preimages come LAST
-      (e1, e2) => {
-        if (e1.data.kind === SubstrateTypes.EventKind.PreimageNoted) return 1;
-        if (e2.data.kind === SubstrateTypes.EventKind.PreimageNoted) return -1;
-        return 0;
-      },
     );
   }
 

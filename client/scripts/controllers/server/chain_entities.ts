@@ -119,17 +119,17 @@ class ChainEntityController {
     return [ entity, event ];
   }
 
-  public async subscribeEntities<Api, RawEvent>(
+  public async fetchEntities<Api>(
     chainAdapter: IChainAdapter<any, any>,
-    fetcher: IStorageFetcher<Api>,
-    subscriber: IEventSubscriber<Api, RawEvent>,
-    processor: IEventProcessor<Api, RawEvent>,
+    fetch: () => Promise<CWEvent[]>,
     eventSortFn?: (a: CWEvent, b: CWEvent) => number,
   ) {
     const chain = chainAdapter.meta.chain.id;
-    this._subscriber = subscriber;
+
     // get existing events
-    const existingEvents = await fetcher.fetch();
+    // TODO: we need to create a new version of @chain-events that exposes
+    //   individual fetch commands, so we can perform incremental loads
+    const existingEvents = await fetch();
     if (eventSortFn) existingEvents.sort(eventSortFn);
     // eslint-disable-next-line no-restricted-syntax
     for (const cwEvent of existingEvents) {
@@ -139,6 +139,15 @@ class ChainEntityController {
         chainAdapter.handleEntityUpdate(entity, event);
       }
     }
+  }
+
+  public async subscribeEntities<Api, RawEvent>(
+    chainAdapter: IChainAdapter<any, any>,
+    subscriber: IEventSubscriber<Api, RawEvent>,
+    processor: IEventProcessor<Api, RawEvent>,
+  ) {
+    const chain = chainAdapter.meta.chain.id;
+    this._subscriber = subscriber;
 
     // kick off subscription to future events
     // TODO: handle unsubscribing

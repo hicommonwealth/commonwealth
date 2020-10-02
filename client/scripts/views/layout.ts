@@ -35,6 +35,8 @@ export const Layout: m.Component<{
   scope: string,
   hideSidebar?: boolean,
   deferChain?: boolean,
+  loadCmd?: (type?: string) => Promise<any>,
+  type?: string
 }, {
   loadingScope,
   deferred
@@ -78,7 +80,11 @@ export const Layout: m.Component<{
         vnode.state.deferred = deferChain;
         selectNode(scopeMatchesChain, deferChain).then(() => {
           if (!deferChain) {
-            initChain();
+            initChain().then(() => {
+              if (vnode.attrs.loadCmd) {
+                vnode.attrs.loadCmd(vnode.attrs.type);
+              }
+            });
           }
         });
         return m(LoadingLayout);
@@ -88,7 +94,11 @@ export const Layout: m.Component<{
       }
     } else if (scope && vnode.state.deferred && !deferChain) {
       vnode.state.deferred = false;
-      initChain();
+      initChain().then(() => {
+        if (vnode.attrs.loadCmd) {
+          vnode.attrs.loadCmd(vnode.attrs.type);
+        }
+      });
       return m(LoadingLayout);
     } else if (!scope && ((app.chain && app.chain.class) || app.community)) {
       // Handle the case where we unload the chain or community, if we're

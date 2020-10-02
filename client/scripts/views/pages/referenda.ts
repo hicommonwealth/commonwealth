@@ -18,7 +18,7 @@ import ConvictionsTable from 'views/components/proposals/convictions_table';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate, { SubstrateModule } from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
@@ -76,7 +76,9 @@ const ReferendaPage: m.Component<{}> = {
     }
   },
   view: (vnode) => {
-    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Referenda' });
+    if (!app.chain || !app.chain.loaded
+        || !(app.chain as Substrate).activeModules.includes(SubstrateModule.Democracy))
+      return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Referenda' });
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
 
     // active proposals
@@ -112,5 +114,15 @@ const ReferendaPage: m.Component<{}> = {
     ]);
   }
 };
+
+export async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  await (app.chain as Substrate).initModule(SubstrateModule.Democracy);
+}
 
 export default ReferendaPage;

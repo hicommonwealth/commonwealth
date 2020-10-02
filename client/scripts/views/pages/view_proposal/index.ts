@@ -20,6 +20,7 @@ import {
   OffchainTopic,
   AnyProposal,
   Account,
+  ChainBase,
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
@@ -494,6 +495,7 @@ const ViewProposalPage: m.Component<{
       proposal = idToProposal(proposalType, proposalId);
     } catch (e) {
       // proposal might be loading, if it's not an offchain thread
+      // TODO: determine secondary loading check based on type
       if (proposalType !== ProposalType.OffchainThread && !app.chain.loaded) {
         return m(PageLoading, { narrow: true });
       }
@@ -688,5 +690,15 @@ const ViewProposalPage: m.Component<{
     ]);
   }
 };
+
+export async function loadCmd(type: string) {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  // TODO: figure out loading logic based on type
+}
 
 export default ViewProposalPage;

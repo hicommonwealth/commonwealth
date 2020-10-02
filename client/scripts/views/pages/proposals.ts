@@ -7,7 +7,7 @@ import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase } from 'models';
+import { ChainClass, ChainBase, ChainNetwork } from 'models';
 import Edgeware from 'controllers/chain/edgeware/main';
 import {
   convictionToWeight, convictionToLocktime, convictions
@@ -18,7 +18,7 @@ import ConvictionsTable from 'views/components/proposals/convictions_table';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate, { SubstrateModule } from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
@@ -98,6 +98,15 @@ const ProposalsPage: m.Component<{}> = {
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 
+    if (onSubstrate) {
+      const activeModules = (app.chain as Substrate).activeModules;
+      // Democracy, Council, and Signaling (Edgeware-only) must be loaded to proceed
+      if (!activeModules.includes(SubstrateModule.Democracy)
+          || !activeModules.includes(SubstrateModule.Council)
+          || (app.chain.network === ChainNetwork.Edgeware
+              && !activeModules.includes(SubstrateModule.Signaling)))
+        return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Proposals' });
+    }
     // active proposals
     const activeDemocracyProposals = onSubstrate
       && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed);
@@ -176,5 +185,19 @@ const ProposalsPage: m.Component<{}> = {
     ]);
   }
 };
+
+export async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  await Promise.all([
+    (app.chain as Substrate).initModule(SubstrateModule.Council),
+    (app.chain as Substrate).initModule(SubstrateModule.Signaling),
+    (app.chain as Substrate).initModule(SubstrateModule.Democracy),
+  ]);
+}
 
 export default ProposalsPage;
