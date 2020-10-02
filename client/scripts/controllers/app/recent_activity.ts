@@ -50,7 +50,6 @@ class RecentActivityController {
     if (clear) this._threadsStore.clearThreads();
     threads.forEach((thread) => {
       const modeledThread = modelAbridgedThreadFromServer(thread);
-      console.log(modeledThread);
       this._threadsStore.addThread(modeledThread);
     });
   }

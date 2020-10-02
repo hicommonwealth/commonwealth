@@ -61,7 +61,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           }
         }
       ],
-      created_at: {
+      updated_at: {
         [Op.gt]: thirtyDaysAgo
       }
     },
@@ -84,7 +84,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           }
         }
       ],
-      created_at: {
+      updated_at: {
         [Op.gt]: thirtyDaysAgo
       }
     },
@@ -167,7 +167,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           }
         }
       ],
-      created_at: {
+      updated_at: {
         [Op.gt]: thirtyDaysAgo
       }
     },
@@ -190,7 +190,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           }
         }
       ],
-      created_at: {
+      updated_at: {
         [Op.gt]: thirtyDaysAgo
       }
     },
