@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
-import { getProposalUrl } from '../../shared/utils';
+import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -65,10 +65,9 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       proposal = await models.OffchainThread.findOne({
         where: { id }
       });
-    } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
-      proposal = await models.Proposal.findOne({
-        where: { identifier: id, type: prefix }
-      });
+    } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
+      // TODO: better check for on-chain proposal types
+      proposal = id;
     } else {
       log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
     }
@@ -76,7 +75,10 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       throw new Error(Errors.NoProposal);
     }
 
-    const cwUrl = getProposalUrl(prefix, proposal, comment);
+    const cwUrl = typeof proposal === 'string'
+      ? getProposalUrlWithoutObject(prefix, (comment.chain || comment.community), proposal, finalComment)
+      : getProposalUrl(prefix, proposal, comment);
+    const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
 
     // dispatch notifications to subscribers of the comment/thread
     await models.Subscription.emitNotifications(
@@ -85,8 +87,8 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       '',
       {
         created_at: new Date(),
-        root_id: proposal.type_id || proposal.id,
-        root_title: proposal.title || '',
+        root_id: comment.root_id,
+        root_title,
         root_type: prefix,
         comment_id: Number(finalComment.id),
         comment_text: finalComment.text,

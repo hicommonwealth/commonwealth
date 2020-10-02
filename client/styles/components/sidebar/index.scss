@@ -7,7 +7,10 @@
 
     .mobile-sidebar-center {
         flex: 1;
-        max-width: calc(100% - 202px);
+        max-width: calc(100% - 100px);
+        &.logged-in {
+            max-width: calc(100% - 202px);
+        }
     }
     .mobile-sidebar-left {
         padding-left: 6px !important;
@@ -55,10 +58,6 @@
         @include sm-max {
             .MobileNewProposalButton .cui-button {
                 padding: 0 12px;
-                .cui-icon {
-                    position: relative;
-                    top: -2px;
-                }
             }
             .cui-button.mobile-sidebar-trigger {
                 padding-left: 12px;

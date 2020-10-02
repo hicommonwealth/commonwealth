@@ -121,17 +121,19 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
   }
 };
 
-export const sendBatchedNotificationEmails = (models) => {
+export const sendBatchedNotificationEmails = async (models): Promise<number> => {
   log.info('Sending daily notification emails');
 
-  models.User.findAll({
-    where: { emailNotificationInterval: 'daily' }
-  }).then((users) => {
+  try {
+    const users = await models.User.findAll({
+      where: { emailNotificationInterval: 'daily' }
+    });
+
     log.info(`Sending to ${users.length} users`);
 
     const { Op } = models.sequelize;
     const last24hours = new Date((new Date() as any) - 24 * 60 * 60 * 1000);
-    Promise.all(users.map(async (user) => {
+    await Promise.all(users.map(async (user) => {
       const notifications = await models.Notification.findAll({
         include: [{
           model: models.Subscription,
@@ -158,14 +160,10 @@ export const sendBatchedNotificationEmails = (models) => {
         console.log('Failed to send batch notification email', e?.response?.body?.errors);
         console.log(log.error(e));
       }
-    })).then(() => {
-      process.exit(0);
-    }).catch((err) => {
-      console.log(err);
-      process.exit(1);
-    });
-  }).catch((err) => {
-    console.log(err);
-    process.exit(1);
-  });
+    }));
+    return 0;
+  } catch (e) {
+    console.log(e.message);
+    return 1;
+  }
 };

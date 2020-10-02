@@ -323,7 +323,9 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           }),
           app.isLoggedIn() && m(MobileNewProposalButton),
         ]),
-        m('.mobile-sidebar-center', [
+        m('.mobile-sidebar-center', {
+          class: app.isLoggedIn() ? 'logged-in' : '',
+        }, [
           m('.community-label', m(CommunitySelector)),
         ]),
         m('.mobile-sidebar-right', [
