@@ -42,6 +42,7 @@ const CannotVote: m.Component<{ action }> = {
           disabled: true,
           fluid: true,
           label: vnode.attrs.action,
+          compact: true,
         }),
       ]),
     ]);
@@ -85,6 +86,7 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
             disabled: (proposal.stage !== SignalingProposalStage.PreVoting),
             onclick: advanceSignalingProposal,
             label: proposalStageMsg,
+            compact: true,
           }),
       ]);
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyReferendum) {
@@ -418,7 +420,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
             onclick: (e) => voteForChoice(e, c),
             label: hasVotedForChoice[c.toHex()]
               ? `Voted ${hexToUtf8(c.toHex())}`
-              : `Vote ${hexToUtf8(c.toHex())}`
+              : `Vote ${hexToUtf8(c.toHex())}`,
+            compact: true,
           }),
         ]);
       });
@@ -428,7 +431,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         intent: 'positive',
         disabled: !canVote || hasVotedYes || votingModalOpen,
         onclick: voteYes,
-        label: hasVotedYes ? 'Voted yes' : 'Vote yes'
+        label: hasVotedYes ? 'Voted yes' : 'Vote yes',
+        compact: true,
       }),
     ]);
     const noButton = m('.no-button', [
@@ -436,7 +440,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         intent: 'negative',
         disabled: !canVote || hasVotedNo || votingModalOpen,
         onclick: voteNo,
-        label: hasVotedNo ? 'Voted no' : 'Vote no'
+        label: hasVotedNo ? 'Voted no' : 'Vote no',
+        compact: true,
       })
     ]);
     // substrate: multi-deposit approve
@@ -445,7 +450,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         intent: 'positive',
         disabled: !canVote || votingModalOpen,
         onclick: voteYes,
-        label: (hasVotedYes && !canVote) ? 'Already approved' : 'Second'
+        label: (hasVotedYes && !canVote) ? 'Already approved' : 'Second',
+        compact: true,
       }),
     ]);
     // cosmos: abstain
@@ -454,7 +460,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         intent: 'none',
         disabled: !canVote || hasVotedAbstain || votingModalOpen,
         onclick: voteAbstain,
-        label: hasVotedAbstain ? 'Voted abstain' : 'Vote abstain'
+        label: hasVotedAbstain ? 'Voted abstain' : 'Vote abstain',
+        compact: true,
       }),
     ]);
     // cosmos: abstain
@@ -463,7 +470,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         intent: 'negative',
         disabled: !canVote || hasVotedVeto || votingModalOpen,
         onclick: voteVeto,
-        label: hasVotedVeto ? 'Vetoed' : 'Veto'
+        label: hasVotedVeto ? 'Vetoed' : 'Veto',
+        compact: true,
       }),
     ]);
     // moloch: cancel
@@ -473,7 +481,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         disabled: !((proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed)
           || votingModalOpen,
         onclick: cancelProposal,
-        label: (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel'
+        label: (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel',
+        compact: true,
       }),
     ]);
     // V2 only: moloch: sponsor
@@ -485,6 +494,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     //      || votingModalOpen
     //    onclick: sponsorProposal,
     //    label: (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor',
+    //    compact: true,
     //  }),
     // ]);
     // moloch: process
@@ -493,7 +503,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         intent: 'none',
         disabled: (proposal as MolochProposal).state !== MolochProposalState.ReadyToProcess || votingModalOpen,
         onclick: processProposal,
-        label: (proposal as MolochProposal).data.processed ? 'Processed' : 'Process'
+        label: (proposal as MolochProposal).data.processed ? 'Processed' : 'Process',
+        compact: true,
       })
     ]);
 

@@ -101,7 +101,7 @@ export class SubstratePhragmenElection extends Proposal<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Elections = Elections;
-    this._title = `Election ${data.round}`;
+    this._title = `Set council votes for election ${data.round}`;
     this.moduleName = moduleName;
 
     this._initialized.next(true);
