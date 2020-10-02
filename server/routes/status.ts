@@ -47,7 +47,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   ]);
   const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
   const recentThreads = await models.OffchainThread.findAll({
-    attributes: ['id', 'address_id', 'title', 'url', 'created_at', 'chain', 'community'],
+    attributes: ['id', 'title', 'url', 'created_at', 'chain', 'community'],
     where: {
       [Op.or]: [
         {
@@ -153,7 +153,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
   const recentThreads_ = await models.OffchainThread.findAll({
-    attributes: ['id', 'address_id', 'title', 'url', 'created_at', 'chain', 'community'],
+    attributes: ['id', 'title', 'url', 'created_at', 'chain', 'community'],
     where: {
       [Op.or]: [
         {
