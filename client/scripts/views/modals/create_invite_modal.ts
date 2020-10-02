@@ -3,7 +3,7 @@ import 'modals/create_invite_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { Button, Input, Form, FormGroup, FormLabel, Select, CustomSelect } from 'construct-ui';
+import { Button, Input, Form, FormGroup, FormLabel, Select } from 'construct-ui';
 
 import app from 'state';
 import { CommunityInfo, ChainInfo } from 'models';

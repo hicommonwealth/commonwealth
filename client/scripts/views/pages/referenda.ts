@@ -14,7 +14,6 @@ import {
 } from 'controllers/chain/substrate/democracy_referendum';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import ConvictionsTable from 'views/components/proposals/convictions_table';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { CountdownUntilBlock } from 'views/components/countdown';

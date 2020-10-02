@@ -19,7 +19,7 @@ import {
 } from 'controllers/chain/edgeware/signaling_proposal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import { ConvictionsChooser } from 'views/components/proposals/convictions_table';
+import ConvictionsChooser from 'views/components/proposals/convictions_chooser';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import Edgeware from 'controllers/chain/edgeware/main';
 import Substrate from 'controllers/chain/substrate/main';
@@ -92,8 +92,7 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyReferendum) {
       if (!vnode.attrs.setConviction) return;
       return m('.ProposalExtensions', [
-        m('strong', 'Conviction voting'),
-        m('div', { style: 'margin-top: 6px' }, [
+        m('div', { style: 'margin-bottom: 12px;' }, [
           'The winning side\'s coins will be timelocked according to the weight of their vote:'
         ]),
         m(ConvictionsChooser, { callback: vnode.attrs.setConviction }),
