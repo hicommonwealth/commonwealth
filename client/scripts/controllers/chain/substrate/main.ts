@@ -47,9 +47,9 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     handleSubstrateEntityUpdate(this, entity, event);
   }
 
-  public async initApi() {
+  public async initApi(additionalOptions?) {
     if (this.apiInitialized) return;
-    await this.chain.resetApi(this.meta);
+    await this.chain.resetApi(this.meta, additionalOptions);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
     await super.initApi();
