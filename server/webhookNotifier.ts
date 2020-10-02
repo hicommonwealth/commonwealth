@@ -6,7 +6,7 @@ import { SubstrateEvents } from '@commonwealth/chain-events';
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/helpers';
 import { getForumNotificationCopy } from '../shared/notificationFormatter';
-import { SERVER_URL } from './config';
+import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK } from './config';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -165,7 +165,12 @@ const send = async (models, content: WebhookContent) => {
         return;
       }
       try {
-        await request.post(url).send(webhookData);
+        if (process.env.NODE_ENV === 'production' || (SLACK_FEEDBACK_WEBHOOK && url === SLACK_FEEDBACK_WEBHOOK)) {
+          await request.post(url).send(webhookData);
+        } else {
+          console.log('Suppressed webhook notification to', url);
+          console.log(webhookData);
+        }
       } catch (err) {
         console.error(err);
       }

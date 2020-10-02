@@ -373,7 +373,6 @@ $(() => {
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
-      console.log('onmatch called, for:', path, (+new Date() / 1000));
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -381,7 +380,6 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      console.log('render called:', path, (+new Date() / 1000));
       const { scoped, hideSidebar } = attrs;
       let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'
