@@ -109,7 +109,7 @@ interface IProfilePageState {
   refreshProfile: boolean;
 }
 
-const ProfilePage: m.Component<{ address: string, offerJoin?: boolean }, IProfilePageState> = {
+const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
     vnode.state.loaded = false;
@@ -198,7 +198,7 @@ const ProfilePage: m.Component<{ address: string, offerJoin?: boolean }, IProfil
       });
     };
 
-    const { offerJoin } = vnode.attrs;
+    const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
       vnode.state.loading = true;
@@ -243,7 +243,7 @@ const ProfilePage: m.Component<{ address: string, offerJoin?: boolean }, IProfil
       m('.forum-container-alt', [
         m(ProfileHeader, {
           account,
-          showJoinCommunityButton: offerJoin,
+          setIdentity,
           refreshCallback: () => { vnode.state.refreshProfile = true; },
         }),
         m('.row.row-narrow.forum-row', [

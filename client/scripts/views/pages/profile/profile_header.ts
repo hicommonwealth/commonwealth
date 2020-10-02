@@ -38,7 +38,7 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
         confirmed = await confirmationModalWithText(msg)();
         if (confirmed) {
           m.route.set(`/${chainObj.id}/account/${account.address}`, {
-            offerJoin: true
+            setIdentity: true
           });
         }
       } else if (!app.chain?.loaded) {
@@ -67,7 +67,7 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
 
 export interface IProfileHeaderAttrs {
   account;
-  showJoinCommunityButton: boolean;
+  setIdentity: boolean;
   refreshCallback: Function;
 }
 
@@ -86,7 +86,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
       : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
 
-    const showJoinCommunityButton = vnode.attrs.showJoinCommunityButton && !onOwnProfile;
+    const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
 
     if (app.user.activeAccounts.length === 0) {
       return m(PageLoading);
