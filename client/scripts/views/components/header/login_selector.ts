@@ -164,7 +164,7 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
             vnode.state.showAddressSelectionHint = false;
           },
           label: [
-            (!app.chain && !app.community) ? m(Icon, { name: Icons.USER })
+            ((!app.chain && !app.community) || app.chainPreloading) ? m(Icon, { name: Icons.USER })
               : (app.user.activeAccount !== null) ? m(User, {
                 user: app.user.activeAccount,
                 showRole: true,

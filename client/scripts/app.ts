@@ -180,6 +180,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
 
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
+  app.chainPreloading = true;
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
@@ -243,6 +244,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   } else {
     throw new Error('Invalid chain');
   }
+  app.chainPreloading = false;
   app.chain.deferred = deferred;
 
   // Load server data without initializing modules/chain connection.
