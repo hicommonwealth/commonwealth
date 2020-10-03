@@ -22,8 +22,8 @@ export const ConvictionsChooser: m.Component<{ callback: (number) => void }, {}>
         value: c.toString(),
         label: `${convictionToWeight(c)}x weight (${convictionToLocktime(c)}x lock)`,
       })),
-      onSelect: (result) => {
-        vnode.attrs.callback(result);
+      onSelect: (option) => {
+        vnode.attrs.callback(parseInt((option as any).value, 10));
       },
     });
   }
