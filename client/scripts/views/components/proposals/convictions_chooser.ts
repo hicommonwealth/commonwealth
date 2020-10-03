@@ -8,7 +8,7 @@ import {
   convictionToWeight, convictionToLocktime, convictions
 } from 'controllers/chain/substrate/democracy_referendum';
 
-export const ConvictionsChooser: m.Component<{ callback: Function }, {}> = {
+export const ConvictionsChooser: m.Component<{ callback: (number) => void }, {}> = {
   view: (vnode) => {
     return m(CustomSelect, {
       class: 'ConvictionsChooser',

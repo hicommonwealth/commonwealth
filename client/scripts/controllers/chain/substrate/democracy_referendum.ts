@@ -98,6 +98,8 @@ export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
   }
 
   public get coinWeight(): Coin {
+    // handle case where an invalid vote was pushed on chain
+    if (this.weight === undefined) return new Coin(this.balance.denom, 0);
     return this.weight < 1
       ? new Coin(this.balance.denom, this.balance.divn(1 / this.weight))
       : new Coin(this.balance.denom, this.balance.muln(this.weight));
