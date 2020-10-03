@@ -40,21 +40,26 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
     return;
   }
 
-  const response = await $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
-    address: account.address,
-    author_chain: account.chain.id,
-    chain,
-    jwt: app.user.jwt,
-    auth: true,
-  } : {
-    address: account.address,
-    author_chain: account.chain.id,
-    community,
-    jwt: app.user.jwt,
-    auth: true,
-  });
-  if (response.status !== 'Success') {
-    throw Error(`Unsuccessful status: ${response.status}`);
+  try {
+    const response = await $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
+      address: account.address,
+      author_chain: account.chain.id,
+      chain,
+      jwt: app.user.jwt,
+      auth: true,
+    } : {
+      address: account.address,
+      author_chain: account.chain.id,
+      community,
+      jwt: app.user.jwt,
+      auth: true,
+    });
+    if (response.status !== 'Success') {
+      throw Error(`Unsuccessful status: ${response.status}`);
+    }
+  } catch (err) {
+    console.log(err);
+    notifyError('Could not set active account');
   }
 
   // update is_user_default
