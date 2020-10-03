@@ -91,7 +91,13 @@ const TreasuryPage: m.Component<{}> = {
     }
   },
   view: (vnode) => {
-    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Treasury' });
+    if (!app.chain || !app.chain.loaded) {
+      return m(PageLoading, {
+        message: 'Connecting to chain (may take up to 30s)...',
+        title: 'Treasury',
+        showNewProposalButton: true,
+      });
+    }
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
 
     const activeTreasuryProposals = onSubstrate

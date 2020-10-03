@@ -207,7 +207,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       vnode.state.loaded = false;
       loadProfile();
     }
-    if (loading || !loaded) return m(PageLoading);
+    if (loading || !loaded) return m(PageLoading, { showNewProposalButton: true });
     if (!account) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     }
