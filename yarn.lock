@@ -4047,17 +4047,17 @@ constants-browserify@^1.0.0:
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
   integrity sha1-wguW2MYXdIqvHBYCF2DNJ/y4y3U=
 
-construct-ui@^0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/construct-ui/-/construct-ui-0.2.6.tgz#d7005a6170f38622e2465f9819d7adbfb6834d00"
-  integrity sha512-Vd/lM/MC1RFT/vNojLe9PpOGBckEAlJgPqAQNqS0X0ytBSHgDohpjx6UTJ46FRnYP6iBSTaLW4dfb3IJx2vhgQ==
+construct-ui@^0.2.9:
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/construct-ui/-/construct-ui-0.2.9.tgz#1e66f7881ff9a8e33d2cd86f0ce22def53126f75"
+  integrity sha512-SKQXpnfpUeNfzuS3lDAPIpS0N8UFvAT/XSHbbw8L3N3zF4SOAN+4HMdTD5oB9ZCM1AB0ypftWQDZWsv+nOjs9Q==
   dependencies:
     classnames "^2.2.6"
-    enquire.js "^2.1.6"
     feather-icons "^4.28.0"
     lodash.debounce "^4.0.8"
     mithril-transition-group "^0.1.7"
     popper.js "^1.16.1"
+    simplestatemanager "^4.1.1"
     tslib "^2.0.0"
 
 contains-path@^0.1.0:
@@ -5209,11 +5209,6 @@ enhanced-resolve@^4.0.0, enhanced-resolve@^4.1.0:
     graceful-fs "^4.1.2"
     memory-fs "^0.5.0"
     tapable "^1.0.0"
-
-enquire.js@^2.1.6:
-  version "2.1.6"
-  resolved "https://registry.yarnpkg.com/enquire.js/-/enquire.js-2.1.6.tgz#3e8780c9b8b835084c3f60e166dbc3c2a3c89814"
-  integrity sha1-PoeAybi4NQhMP2DhZtvDwqPImBQ=
 
 entities@^1.1.1, entities@~1.1.1:
   version "1.1.2"
@@ -12818,6 +12813,11 @@ simple-swizzle@^0.2.2:
   integrity sha1-pNprY1/8zMoz9w0Xy5JZLeleVXo=
   dependencies:
     is-arrayish "^0.3.1"
+
+simplestatemanager@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/simplestatemanager/-/simplestatemanager-4.1.1.tgz#723879947cd8a40dd20645a0ee6a7cadcc669d4f"
+  integrity sha512-RRhB4rPEU10dwERLLrOTx3rdKW6sLHTsYpr+SBKoh/Vl4XETgNnux45+wgX59M1cDiJQX/CuMVu0eOWFSDECDg==
 
 slash@^1.0.0:
   version "1.0.0"
