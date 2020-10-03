@@ -55,7 +55,11 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
+  const actorName = m(User, {
+    user: new AddressInfo(null, author_address, author_chain, null),
+    hideAvatar: true,
+    hideIdentityIcon: true,
+  });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -116,7 +120,11 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
+  const actorName = m(User, {
+    user: new AddressInfo(null, author_address, author_chain, null),
+    hideAvatar: true,
+    hideIdentityIcon: true,
+  });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
