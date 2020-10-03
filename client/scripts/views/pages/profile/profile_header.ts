@@ -113,7 +113,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           community: app.activeCommunityId(),
         });
         vnode.state.loading = false;
-        setActiveAccount(account);
+        await setActiveAccount(account);
         m.redraw();
         notifySuccess(`Joined with ${formatAddressShort(addressInfo.address, addressInfo.chain)}`);
       } catch (err) {
