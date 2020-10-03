@@ -4,7 +4,7 @@ import {
   BigNumberish,
   EventDescription,
   FunctionDescription
-} from "ethers/utils";
+} from 'ethers/utils';
 
 export class TransactionOverrides {
   nonce?: BigNumberish | Promise<BigNumberish>;
@@ -15,13 +15,13 @@ export class TransactionOverrides {
 }
 
 export interface TypedEventDescription<
-  T extends Pick<EventDescription, "encodeTopics">
+  T extends Pick<EventDescription, 'encodeTopics'>
 > extends EventDescription {
-  encodeTopics: T["encodeTopics"];
+  encodeTopics: T['encodeTopics'];
 }
 
 export interface TypedFunctionDescription<
-  T extends Pick<FunctionDescription, "encode">
+  T extends Pick<FunctionDescription, 'encode'>
 > extends FunctionDescription {
-  encode: T["encode"];
+  encode: T['encode'];
 }
