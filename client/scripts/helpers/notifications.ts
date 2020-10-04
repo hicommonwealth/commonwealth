@@ -19,6 +19,16 @@ export const sortNotifications = (n: Notification[]) => {
       || a[0].subscription.category === NotificationCategories.NewMention
     ) {
       a.forEach((n2) => unbatchChainEvents.push([n2]));
+    } else if (!a[0].isRead) {
+      const b: Notification[] = [];
+      a.forEach((n) => {
+        if (n.isRead) {
+          b.push(n);
+        } else {
+          unbatchChainEvents.push([n]);
+        }
+      });
+      unbatchChainEvents.push(b);
     } else {
       unbatchChainEvents.push(a);
     }
