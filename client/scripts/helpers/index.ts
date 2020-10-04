@@ -114,6 +114,14 @@ export function byAscendingCreationDate(a, b) {
   return +a.createdAt - +b.createdAt;
 }
 
+export function byDescendingUpdatedDate(a, b) {
+  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt)
+}
+
+export function byAscendingUpdatedDate(a, b) {
+  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt)
+}
+
 export function orderAccountsByAddress(a, b) {
   return a.address < b.address ? -1
     : a.address > b.address ? 1 : 0;

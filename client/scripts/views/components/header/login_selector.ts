@@ -164,8 +164,12 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
             vnode.state.showAddressSelectionHint = false;
           },
           label: [
-            (!app.chain && !app.community) ? m(Icon, { name: Icons.USER })
-              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
+            ((!app.chain && !app.community) || app.chainPreloading) ? m(Icon, { name: Icons.USER })
+              : (app.user.activeAccount !== null) ? m(User, {
+                user: app.user.activeAccount,
+                showRole: true,
+                hideIdentityIcon: true,
+              })
                 : [
                   m(Icon, { name: Icons.USER }),
                   m('span.hidden-sm', [
@@ -212,12 +216,6 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
               ? m.route.set(`/${app.activeChainId()}/settings`)
               : m.route.set('/settings'),
             label: 'Settings'
-          }),
-          m(MenuItem, {
-            onclick: () => (app.activeChainId() || app.activeCommunityId())
-              ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationSettings`)
-              : m.route.set('/notificationSettings'),
-            label: 'Notification settings'
           }),
           m(MenuDivider),
           m(MenuItem, {

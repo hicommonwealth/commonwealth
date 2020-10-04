@@ -12,7 +12,7 @@ import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
 const User: m.Component<{
   user: Account<any> | AddressInfo;
   avatarSize?: number;
-  avatarOnly?: boolean; // avatarOnly overrides most other properties
+  avatarOnly?: boolean; // overrides most other properties
   hideAvatar?: boolean;
   hideIdentityIcon?: boolean; // only applies to substrate identities
   linkify?: boolean;
@@ -33,7 +33,6 @@ const User: m.Component<{
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
-
     const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id);
 
     const adminsAndMods = app.chain

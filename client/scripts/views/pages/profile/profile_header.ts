@@ -7,15 +7,16 @@ import { Unsubscribable } from 'rxjs';
 
 import { initChain } from 'app';
 import app from 'state';
-import { Account, ChainBase } from 'models';
 
 import { formatAddressShort, isSameAccount } from 'helpers';
-import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import User from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { setActiveAccount } from 'controllers/app/login';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import PageLoading from 'views/pages/loading';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -31,7 +32,16 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
     // wait for info to load before making it clickable
     disabled: vnode.state.chainLoading,
     onclick: async () => {
-      if (!app.chain?.loaded) {
+      if (app.activeId() !== chainObj.id) {
+        let confirmed = false;
+        const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
+        confirmed = await confirmationModalWithText(msg)();
+        if (confirmed) {
+          m.route.set(`/${chainObj.id}/account/${account.address}`, {
+            setIdentity: true
+          });
+        }
+      } else if (!app.chain?.loaded) {
         vnode.state.chainLoading = true;
         initChain().then(() => {
           vnode.state.chainLoading = false;
@@ -42,12 +52,12 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
         }).catch((err) => {
           vnode.state.chainLoading = false;
         });
-        return;
+      } else {
+        app.modals.create({
+          modal: EditIdentityModal,
+          data: { account, currentIdentity },
+        });
       }
-      app.modals.create({
-        modal: EditIdentityModal,
-        data: { account, currentIdentity },
-      });
     },
     label: vnode.state.chainLoading
       ? 'Loading chain (may take some time)...'
@@ -57,35 +67,73 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
 
 export interface IProfileHeaderAttrs {
   account;
+  setIdentity: boolean;
   refreshCallback: Function;
 }
 
 export interface IProfileHeaderState {
+  onLinkedProfile: boolean;
   subscription: Unsubscribable | null;
   identity: SubstrateIdentity | null;
   copied: boolean;
+  loading: boolean;
 }
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account, refreshCallback } = vnode.attrs;
-    const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
-      && account.address === app.user.activeAccount?.address;
+    const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
+      ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
+      : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
+
+    const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
+
+    if (app.user.activeAccounts.length === 0) {
+      return m(PageLoading);
+    }
+
+    const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.filter((account_) => {
+      return app.user.getRoleInCommunity({
+        account: account_,
+        chain: app.activeChainId(),
+      });
+    }).filter((account_) => {
+      return account_.address === account.address;
+    }).length > 0;
+
+    const joinCommunity = async () => {
+      if (!app.activeChainId() || onOwnProfile) return;
+      vnode.state.loading = true;
+      const addressInfo = app.user.addresses
+        .find((a) => a.address === account.address && a.chain === app.activeChainId());
+      try {
+        await app.user.createRole({
+          address: addressInfo,
+          chain: app.activeChainId(),
+          community: app.activeCommunityId(),
+        });
+        vnode.state.loading = false;
+        await setActiveAccount(account);
+        m.redraw();
+        notifySuccess(`Joined with ${formatAddressShort(addressInfo.address, addressInfo.chain)}`);
+      } catch (err) {
+        vnode.state.loading = false;
+        notifyError('Failed to join community');
+      }
+    };
 
     return m('.ProfileHeader', [
       m('.cover'),
       m('.bio-main', [
         m('.bio-left', [ // TODO: Rename class to non-bio to avoid confusion with Bio component
-          m('.avatar', account.profile.getAvatar(90)),
+          m('.avatar', account.profile?.getAvatar(90)),
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', m(User, { user: account, hideAvatar: true })),
+            m('.User', account.profile ? m(User, { user: account, hideAvatar: true }) : account.address),
           ]),
           m('.info-row', [
-            m('span.profile-headline', account.profile && account.profile.headline
-              ? account.profile.headline
-              : m('.no-headline', 'No headline')),
+            account.profile?.headline && m('span.profile-headline', account.profile.headline),
             m('span.username', formatAddressShort(account.address, account.chain)),
             !vnode.state.copied && m('a.copy-address', {
               href: '#',
@@ -118,9 +166,34 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               },
               label: 'Edit profile'
             }),
-          ] : [
+          ] : (showJoinCommunityButton && app.activeChainId())
+            ? m(Button, {
+              intent: 'primary',
+              onclick: async () => {
+                if (onLinkedProfile) {
+                  vnode.state.loading = true;
+                  try {
+                    await setActiveAccount(account);
+                    m.redraw();
+                  } catch (e) {
+                    vnode.state.loading = false;
+                    notifyError(e);
+                  }
+                } else {
+                  try {
+                    await joinCommunity();
+                    m.redraw();
+                  } catch (e) {
+                    vnode.state.loading = false;
+                    notifyError(e);
+                  }
+                }
+              },
+              label: onLinkedProfile ? 'Switch to address' : 'Join community'
+            })
+            : [
             // TODO: actions for others' accounts
-          ]
+            ]
         ]),
       ])
     ]);

@@ -5,9 +5,10 @@ import {
   ICommunityAdapter,
   NotificationCategory,
 } from 'models';
+import { ReplaySubject } from 'rxjs';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
-import { ReplaySubject } from 'rxjs';
+import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
@@ -39,6 +40,7 @@ export interface IApp {
   chain: IChainAdapter<any, any>;
   community: ICommunityAdapter<any, any>;
 
+  chainPreloading: boolean;
   chainAdapterReady: ReplaySubject<boolean>;
   chainModuleReady: ReplaySubject<boolean>;
 
@@ -50,7 +52,7 @@ export interface IApp {
   communities: CommunitiesController;
   user: UserController;
 
-  recentActivity: IRecentActivity;
+  recentActivity: RecentActivityController;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -88,6 +90,7 @@ const app: IApp = {
   chain: null,
   community: null,
 
+  chainPreloading: false,
   chainAdapterReady: new ReplaySubject(1),
   chainModuleReady: new ReplaySubject(1),
 
@@ -99,7 +102,7 @@ const app: IApp = {
   communities: new CommunitiesController(),
   user: new UserController(),
 
-  recentActivity: { activeThreads: null, activeAddresses: null },
+  recentActivity: new RecentActivityController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,

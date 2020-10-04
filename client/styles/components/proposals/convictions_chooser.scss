@@ -1,0 +1,12 @@
+@import 'client/styles/shared';
+
+.ConvictionsChooser {
+    width: 100%;
+    button {
+        width: 100%;
+    }
+    .cui-button-label {
+        width: 90%;
+        text-align: left;
+    }
+}

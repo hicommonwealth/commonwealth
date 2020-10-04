@@ -7,20 +7,21 @@ import 'construct.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
-
-import app, { ApiStatus, LoginState } from 'state';
-
-import { Layout, LoadingLayout } from 'views/layout';
-import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment-twitter';
 import mixpanel from 'mixpanel-browser';
 
+import app, { ApiStatus, LoginState } from 'state';
+import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
+
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
-import Community from './controllers/chain/community/main';
-import WebsocketController from './controllers/server/socket/index';
-import ConfirmInviteModal from './views/modals/confirm_invite_modal';
+import Community from 'controllers/chain/community/main';
+import WebsocketController from 'controllers/server/socket/index';
+
+import { Layout, LoadingLayout } from 'views/layout';
+import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import LoginModal from 'views/modals/login_modal';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -61,8 +62,11 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
-      app.recentActivity.activeAddresses = data.activeAddresses;
-      app.recentActivity.activeThreads = data.activeThreads;
+
+      // add recentActivity
+      const { recentThreads, recentComments } = data;
+      app.recentActivity.addThreads(recentThreads, true);
+      app.recentActivity.addAddressesFromActivity(recentThreads.concat(recentComments), true);
 
       // update the login status
       updateActiveUser(data.user);
@@ -99,19 +103,23 @@ export async function deinitChainOrCommunity() {
 }
 
 export function handleInviteLinkRedirect() {
-  if (m.route.param('invitemessage')) {
+  const inviteMessage = m.route.param('invitemessage');
+  if (inviteMessage) {
     mixpanel.track('Invite Link Used', {
       'Step No': 1,
-      'Step': m.route.param('invitemessage'),
+      'Step': inviteMessage,
     });
-    if (m.route.param('invitemessage') === 'failure') {
+    if (inviteMessage === 'failure' && m.route.param('message') === 'Must be logged in to accept invites') {
+      notifySuccess('Log in to join a community with an invite link');
+      app.modals.create({ modal: LoginModal });
+    } else if (inviteMessage === 'failure') {
       const message = m.route.param('message');
       notifyError(message);
-    } else if (m.route.param('invitemessage') === 'success') {
+    } else if (inviteMessage === 'success') {
       if (app.config.invites.length === 0) return;
       app.modals.create({ modal: ConfirmInviteModal });
     } else {
-      notifyError('Hmmmm... URL not constructed properly');
+      notifyError('Unexpected error with invite link');
     }
   }
 }
@@ -172,6 +180,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
 
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
+  app.chainPreloading = true;
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
@@ -235,6 +244,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   } else {
     throw new Error('Invalid chain');
   }
+  app.chainPreloading = false;
   app.chain.deferred = deferred;
 
   // Load server data without initializing modules/chain connection.
@@ -365,7 +375,6 @@ $(() => {
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
-      console.log('onmatch called, for:', path);
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -410,9 +419,8 @@ $(() => {
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
-    '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/notificationSettings':     redirectRoute(() => '/edgeware/notificationSettings'),
-    '/:scope/notificationSettings': importRoute('views/pages/notification_settings', { scoped: true }),
+    '/notifications':            redirectRoute(() => '/edgeware/notifications'),
+    '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
@@ -424,7 +432,7 @@ $(() => {
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
+    '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),

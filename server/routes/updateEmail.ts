@@ -14,7 +14,7 @@ export const Errors = {
   NoEmail: 'Must provide email',
   NoUser: 'Could not find a user with this email',
   InvalidEmail: 'Invalid email',
-  EmailInUse: 'Email already linked to another account',
+  EmailInUse: 'Email already in use',
 };
 
 const updateEmail = async (models, req: Request, res: Response, next: NextFunction) => {

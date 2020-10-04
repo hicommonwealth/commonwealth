@@ -6,10 +6,17 @@ import _ from 'lodash';
 import app from 'state';
 
 import { ReactionStore } from 'stores';
-import { OffchainReaction, AnyProposal, OffchainComment, OffchainThread, Proposal, ChainEntity } from 'models';
+import {
+  OffchainReaction,
+  AnyProposal,
+  OffchainComment,
+  OffchainThread,
+  Proposal,
+  AbridgedThread
+} from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
-const modelFromServer = (reaction) => {
+export const modelFromServer = (reaction) => {
   return new OffchainReaction(
     reaction.id,
     reaction.Address.address,
@@ -27,7 +34,7 @@ class ReactionsController {
   private _store: ReactionStore = new ReactionStore();
   public get store() { return this._store; }
 
-  public getByPost(post: OffchainThread | AnyProposal | OffchainComment<any>) {
+  public getByPost(post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>) {
     return this._store.getByPost(post);
   }
 
@@ -142,6 +149,28 @@ class ReactionsController {
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
         : 'Error loading reactions');
+    }
+  }
+
+  public initialize(initialReactions, reset = true) {
+    if (reset) {
+      this._store.clear();
+    }
+    for (const reaction of initialReactions) {
+      // TODO: Reactions should always have a linked Address
+      if (!reaction.Address) {
+        console.error('Reaction missing linked address');
+      }
+      // TODO: check `response` against store and update store iff `response` is newer
+      const existing = this._store.getById(reaction.id);
+      if (existing) {
+        this._store.remove(existing);
+      }
+      try {
+        this._store.add(modelFromServer(reaction));
+      } catch (e) {
+        // console.error(e.message);
+      }
     }
   }
 

@@ -47,10 +47,10 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) {
       m.route.set(`/${app.activeChainId()}/login`, {}, { replace: true });
-      return m(PageLoading);
+      return m(PageLoading, { showNewProposalButton: true });
     }
     if (!app.chain || !app.chain.loaded) {
-      return m(PageLoading);
+      return m(PageLoading, { showNewProposalButton: true });
     }
     if (app.chain && app.chain.class !== ChainClass.Edgeware) {
       notifyInfo('Can only create signaling proposals on Edgeware');
@@ -130,7 +130,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                   placeholder: 'Ask a question...',
                   disabled: !author,
                   autocomplete: 'off',
-                  onchange: (e) => {
+                  oninput: (e) => {
                     vnode.state.form.title = (e.target as any).value;
                   }
                 }),
@@ -140,7 +140,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                   name: 'description',
                   placeholder: 'Add a description',
                   disabled: !author,
-                  onchange: (e) => {
+                  oninput: (e) => {
                     vnode.state.form.description = (e.target as any).value;
                   },
                 }),

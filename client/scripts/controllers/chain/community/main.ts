@@ -2,6 +2,7 @@ import { ICommunityAdapter } from 'models';
 
 import { Coin } from 'adapters/currency';
 import { CommentRefreshOption } from 'controllers/server/comments';
+import $ from 'jquery';
 import OffchainAccounts, { OffchainAccount } from './account';
 
 class Community extends ICommunityAdapter<Coin, OffchainAccount> {
@@ -16,11 +17,17 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
   public init = async () => {
     console.log(`Starting ${this.meta.name}`);
     this.accounts = new OffchainAccounts(this.app);
-    await this.app.threads.refreshAll(null, this.id, true);
-    await this.app.comments.refreshAll(null, this.id, CommentRefreshOption.ResetAndLoadOffchainComments);
-    await this.app.reactions.refreshAll(null, this.id, true);
-    await this.app.topics.refreshAll(null, this.id, true);
-    await this.meta.getAdminsAndMods(this.id);
+    const response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+      chain: null,
+      community: this.id,
+      jwt: this.app.user.jwt,
+    });
+    const { threads, comments, reactions, topics, admins } = response.result;
+    this.app.threads.initialize(threads, true);
+    this.app.comments.initialize(comments, true);
+    this.app.reactions.initialize(reactions, true);
+    this.app.topics.initialize(topics, true);
+    this.meta.setAdmins(admins);
     this._serverLoaded = true;
     this._loaded = true;
   }
