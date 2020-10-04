@@ -21,11 +21,11 @@ export const sortNotifications = (n: Notification[]) => {
       a.forEach((n2) => unbatchChainEvents.push([n2]));
     } else if (!a[0].isRead) {
       const b: Notification[] = [];
-      a.forEach((n) => {
-        if (n.isRead) {
-          b.push(n);
+      a.forEach((n2) => {
+        if (n2.isRead) {
+          b.push(n2);
         } else {
-          unbatchChainEvents.push([n]);
+          unbatchChainEvents.push([n2]);
         }
       });
       unbatchChainEvents.push(b);
