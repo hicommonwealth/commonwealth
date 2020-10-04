@@ -27,45 +27,49 @@ function createAccount(account: Account<any>) {
   });
 }
 
-export async function setActiveAccount(account: Account<any>) {
-  return new Promise((resolve, reject) => {
-    const chain = app.activeChainId();
-    const community = app.activeCommunityId();
-    const role = app.user.getRoleInCommunity({ account, chain, community });
+export async function setActiveAccount(account: Account<any>): Promise<void> {
+  const chain = app.activeChainId();
+  const community = app.activeCommunityId();
+  const role = app.user.getRoleInCommunity({ account, chain, community });
 
-    if (!role || role.is_user_default) {
-      app.user.ephemerallySetActiveAccount(account);
-      if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
-        app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
-      }
-      resolve();
-    } else {
-      $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
-        address: account.address,
-        author_chain: account.chain.id,
-        chain,
-        jwt: app.user.jwt,
-        auth: true,
-      } : {
-        address: account.address,
-        author_chain: account.chain.id,
-        community,
-        jwt: app.user.jwt,
-        auth: true,
-      }).then((response) => {
-        // update is_user_default
-        app.user.getAllRolesInCommunity({ chain, community })
-          .forEach((r) => { r.is_user_default = false; });
-        role.is_user_default = true;
-
-        app.user.ephemerallySetActiveAccount(account);
-        if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
-          app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
-        }
-        resolve();
-      }).catch((err) => reject());
+  if (!role || role.is_user_default) {
+    app.user.ephemerallySetActiveAccount(account);
+    if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
     }
-  });
+    return;
+  }
+
+  try {
+    const response = await $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
+      address: account.address,
+      author_chain: account.chain.id,
+      chain,
+      jwt: app.user.jwt,
+      auth: true,
+    } : {
+      address: account.address,
+      author_chain: account.chain.id,
+      community,
+      jwt: app.user.jwt,
+      auth: true,
+    });
+    if (response.status !== 'Success') {
+      throw Error(`Unsuccessful status: ${response.status}`);
+    }
+  } catch (err) {
+    console.log(err);
+    notifyError('Could not set active account');
+  }
+
+  // update is_user_default
+  app.user.getAllRolesInCommunity({ chain, community })
+    .forEach((r) => { r.is_user_default = false; });
+  role.is_user_default = true;
+  app.user.ephemerallySetActiveAccount(account);
+  if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+    app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+  }
 }
 
 export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo, updateFrontend?: boolean) {
