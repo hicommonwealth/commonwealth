@@ -50,6 +50,7 @@ const LoginWithWalletDropdown: m.Component<{
           successCallback: () => {
             m.route.set(next);
             m.redraw();
+            setTimeout(() => m.redraw(), 1); // necessary because address linking may be deferred
           }
         });
       }
@@ -74,6 +75,7 @@ const LoginWithWalletDropdown: m.Component<{
             successCallback: () => {
               m.route.set(next);
               m.redraw();
+              setTimeout(() => m.redraw(), 1); // necessary because address linking may be deferred
             },
           });
         }
