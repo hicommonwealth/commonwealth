@@ -15,11 +15,24 @@ export const sortNotifications = (n: Notification[]) => {
   const unbatchChainEvents = [];
   batched.forEach((a: Notification[]) => {
     if (a[0].chainEvent
+      // unbatch chain-events, comments, and mentions
       || a[0].subscription.category === NotificationCategories.NewComment
       || a[0].subscription.category === NotificationCategories.NewMention
     ) {
       a.forEach((n2) => unbatchChainEvents.push([n2]));
+    } else if (!a[0].isRead) {
+      // unbatch unread notifications.
+      const b: Notification[] = [];
+      a.forEach((n2) => {
+        if (n2.isRead) {
+          b.push(n2);
+        } else {
+          unbatchChainEvents.push([n2]);
+        }
+      });
+      unbatchChainEvents.push(b);
     } else {
+      // don't unbatch at all
       unbatchChainEvents.push(a);
     }
   });
