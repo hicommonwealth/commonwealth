@@ -70,18 +70,6 @@ export default (
     models.Role.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
     models.Role.belongsTo(models.OffchainCommunity, { foreignKey: 'offchain_community_id', targetKey: 'id' });
     models.Role.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
-    models.Role.belongsToMany(models.OffchainThread, {
-      through: 'read_only_roles_threads',
-      as: 'read_only_threads',
-      foreignKey: 'id',
-      otherKey: 'thread_id'
-    });
-    models.Role.belongsToMany(models.OffchainThread, {
-      through: 'private_thread_roles',
-      as: 'private_threads',
-      foreignKey: 'id',
-      otherKey: 'thread_id',
-    });
   };
 
   return Role;

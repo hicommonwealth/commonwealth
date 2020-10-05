@@ -12,7 +12,6 @@ class OffchainThread implements IUniqueId {
   public readonly pinned: boolean;
   public readonly kind: OffchainThreadKind;
   public readonly attachments: OffchainAttachment[];
-  public readonly privacy: boolean;
   public readonly readOnly: boolean;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
@@ -42,7 +41,6 @@ class OffchainThread implements IUniqueId {
     versionHistory: string[],
     community: string,
     chain: string,
-    privacy: boolean,
     readOnly: boolean,
     body?: string,
     url?: string,
@@ -64,7 +62,6 @@ class OffchainThread implements IUniqueId {
     this.versionHistory = versionHistory;
     this.community = community;
     this.chain = chain;
-    this.privacy = privacy;
     this.readOnly = readOnly;
   }
 }

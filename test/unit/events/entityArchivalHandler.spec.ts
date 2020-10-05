@@ -164,7 +164,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
       blockNumber: 10,
       data: {
         kind: SubstrateTypes.EventKind.DemocracyStarted,
-        referendumIndex: 3,
+        referendumIndex: 6,
         endBlock: 100,
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',
@@ -180,7 +180,12 @@ describe('Edgeware Archival Event Handler Tests', () => {
 
     // verify outputs
     assert.deepEqual(handledDbEvent, duplicateEvent);
-    const chainEntities = await models['ChainEntity'].findAll();
+    const chainEntities = await models['ChainEntity'].findAll({
+      where: {
+        chain: 'edgeware',
+        type_id: '6',
+      }
+    });
     assert.lengthOf(chainEntities, 1);
     const entity = await handledDbEvent.getChainEntity();
     assert.deepEqual(entity.toJSON(), chainEntities[0].toJSON());

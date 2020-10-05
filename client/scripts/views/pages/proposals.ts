@@ -14,7 +14,6 @@ import {
 } from 'controllers/chain/substrate/democracy_referendum';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import ConvictionsTable from 'views/components/proposals/convictions_table';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { CountdownUntilBlock } from 'views/components/countdown';
@@ -94,7 +93,13 @@ const ProposalsPage: m.Component<{}> = {
     }
   },
   view: (vnode) => {
-    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Proposals' });
+    if (!app.chain || !app.chain.loaded) {
+      return m(PageLoading, {
+        message: 'Connecting to chain (may take up to 30s)...',
+        title: 'Proposals',
+        showNewProposalButton: true,
+      });
+    }
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 

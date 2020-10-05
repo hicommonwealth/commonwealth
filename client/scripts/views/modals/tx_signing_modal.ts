@@ -394,7 +394,13 @@ const TXSigningModalStates = {
           });
           $parent.trigger('modalcomplete');
         }
-        if (data.status === TransactionStatus.Failed || data.status === TransactionStatus.Error) {
+        // the transaction may be submitted twice, so only go to a
+        // failure state if transaction has not already succeeded
+        if (vnode.state.stateName !== 'SentTransactionRejected'
+            && (data.status === TransactionStatus.Failed || data.status === TransactionStatus.Error)) {
+          if (vnode.state.timerHandle) {
+            clearInterval(vnode.state.timerHandle);
+          }
           vnode.attrs.next('SentTransactionRejected', {
             error: data.err,
             hash: data.hash,

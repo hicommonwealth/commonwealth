@@ -12,7 +12,7 @@ import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
 const User: m.Component<{
   user: Account<any> | AddressInfo;
   avatarSize?: number;
-  avatarOnly?: boolean; // avatarOnly overrides most other properties
+  avatarOnly?: boolean; // overrides most other properties
   hideAvatar?: boolean;
   hideIdentityIcon?: boolean; // only applies to substrate identities
   linkify?: boolean;
