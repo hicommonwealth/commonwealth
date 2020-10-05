@@ -1,5 +1,4 @@
-import 'pages/validators.scss';
-
+import 'pages/manage_staking.scss';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import PageLoading from 'views/pages/loading';

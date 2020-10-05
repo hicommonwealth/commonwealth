@@ -7,7 +7,6 @@ import { formatCoin } from 'adapters/currency';
 import { Icon, Icons, Intent } from 'construct-ui';
 import NewNominator from 'views/pages/manage_staking/substrate/new_nominator';
 import NewValidator from 'views/pages/manage_staking/substrate/new_validator';
-import NewGroup from 'views/pages/manage_staking/groups/new_group';
 
 interface IPreHeaderState {
   dynamic: { }
@@ -19,7 +18,6 @@ interface IPreHeaderAttrs {
 interface IModel {
   onNewNominee(e: Event): void,
   onNewValidate(e: Event): void,
-  onNewgroup(e: Event): void,
 }
 
 const model: IModel = {
@@ -35,12 +33,6 @@ const model: IModel = {
       modal: NewValidator
     });
   },
-  onNewgroup(e: Event) {
-    e.preventDefault();
-    app.modals.create({
-      modal: NewGroup
-    });
-  }
 };
 
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
@@ -52,10 +44,6 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
 
     return [
       m('.manage-staking-preheader.right', [
-        m('.manage-staking-preheader-item.padding-l-r-12', [
-          m('h3', 'Total Bonded'),
-          m('.preheader-item-text', formatCoin(app.chain.chain.coins(bondedTotal), true))
-        ]),
         m('.manage-staking-preheader-item.padding-l-r-12', [
           m('.preheader-item-text', [
             m('button.cui-button.cui-align-center.cui-primary', {
@@ -70,13 +58,6 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
             }, 'Validator ', m(Icon, { name: Icons.PLUS, size: 'xl' }))
           ]),
         ]),
-        app.user.jwt && m('.manage-staking-preheader-item', [
-          m('.preheader-item-text', [
-            m('button.cui-button.cui-align-center.cui-primary', {
-              onclick: model.onNewgroup,
-            }, 'New Group ', m(Icon, { name: Icons.PLUS, size: 'xl' }))
-          ]),
-        ])
       ])
     ];
   }

@@ -1,6 +1,6 @@
 import m from 'mithril';
 import app from 'state';
-import { Popover, Icons, Icon, MenuDivider, MenuItem, Tooltip, PopoverMenu } from 'construct-ui';
+import { Popover, Icons, Icon, MenuDivider, MenuItem, Tooltip, PopoverMenu, Button } from 'construct-ui';
 import { ChainBase } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import User from 'views/components/widgets/user';
@@ -104,54 +104,21 @@ const StakeRow = makeDynamicComponent<StakeRowAttrs, IStakeRowState>({
       })),
       m('td.val-rewards', destination),
       m('td.val-bonded', formatCoin(app.chain.chain.coins(balance), true)),
-      m('td.val-all', isStashValidating
-        ? m(AddressInfo, {
-          address: stashId,
-          withHexSessionId: hexSessionIdNext !== '0x' && [hexSessionIdQueue, hexSessionIdNext],
-          stakingAccount
-        })
-        : isStashNominating && m(ListNominees, {
-          stashId,
-          nominating
-        })),
-      !isLoading && m('td.val-btns', (isStashNominating || isStashValidating)
-        ? m('span.icon-text.pointer', m(Tooltip, {
-          content: 'Stop',
+      !isLoading && m('td.val-stopButton', [m('span.val-stopButtonSpan', m(Button, {
+        class: 'StopButton',
+        iconLeft: Icons.SQUARE,
+        label: 'Stop',
+        size: 'default'
+      })),  m('span.button-options-stake',
+        m(Tooltip, {
+          content: 'Details',
           position: 'top',
           trigger: m(Icon, {
-            name: Icons.STOP_CIRCLE,
+            name: Icons.MORE_HORIZONTAL,
             size: 'lg',
-            onclick: (e) => model.onStop(e, controllerId, stashId)
+            onclick: () => { }
           })
-        }))
-        : m('div',
-          (!sessionIds.length || hexSessionIdNext === '0x')
-            ? m('span.icon-text.pointer', m(Tooltip, {
-              content: 'Session Key',
-              position: 'top',
-              trigger: m(Icon, {
-                name: Icons.KEY,
-                size: 'lg',
-                onclick: (e) => model.onNewSession(e, controllerId, stashId)
-              })
-            })) : m('span.icon-text.pointer', m(Tooltip, {
-              content: 'Validate',
-              position: 'top',
-              trigger: m(Icon, {
-                name: Icons.STAR,
-                size: 'lg',
-                onclick: (e) => model.onSetValidator(e, controllerId, stashId)
-              })
-            })),
-          m('span.icon-text.pointer', m(Tooltip, {
-            position: 'top',
-            content: 'Nominate',
-            trigger: m(Icon, {
-              name: Icons.THUMBS_UP,
-              size: 'lg',
-              onclick: (e) => model.onSetNominators(e, controllerId, stashId)
-            })
-          })))),
+        }))]),
       // m('td.val-settings',
       //   m('span.right',
       //     m(PopoverMenu, {

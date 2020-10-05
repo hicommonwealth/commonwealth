@@ -30,15 +30,13 @@ const StakeList = makeDynamicComponent<StakeListAttrs, IStakeListState>({
   }),
   view: () => {
     return m('div.account_actions',
-      m('table.validators-table', [
+      m('table.staking-table', [
         m('tr.validators-heading', [
           m('th.val-stashes', 'Stashes'),
           m('th.val-controller', 'Controller'),
           m('th.val-rewards', 'Rewards'),
-          m('th.val-bonded', 'Bonded'),
-          m('th.val-action', ''),
-          m('th.val-btns', ''),
-          m('th.val-settings', '')
+          m('th.val-bonded', 'Bonded Amount'),
+          m('th.val-action', 'Options'),
         ]),
         model.foundStashes.map((info) => {
           return m(StakeRow, { info });

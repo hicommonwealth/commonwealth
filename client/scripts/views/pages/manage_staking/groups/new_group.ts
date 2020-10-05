@@ -86,17 +86,17 @@ const NewGroup = makeDynamicComponent<NewGroupAttrs, NewGroupState>({
     if (!validators || model.loading)
       return m('.NewGroup.min-h-200', [
         m('.compact-modal-title.center-lg', [
-          m('h1', 'New Group')
+          m('h3', 'New Group')
         ]),
         m(Spinner)
       ]);
 
     return m('.NewGroup.manage-staking', [
       m('.compact-modal-title.center-lg', [
-        m('h1', 'New Group')
+        m('h3', 'New Group')
       ]),
       m('.compact-modal-body',
-        m('div.padding-t-10',
+        m('div.padding-t-10.new-row',
           m('h5', 'Group Name'),
           m('span.group-name', [
             m(Input, {
@@ -108,30 +108,30 @@ const NewGroup = makeDynamicComponent<NewGroupAttrs, NewGroupState>({
             })
           ])),
         m('span.select', [
-          m('div.compact-modal-title.center-lg.padding-t-10', [
+          m('div.compact-modal-title.center-lg.padding-t-10.new-row', [
             m('h5', 'selected'),
             m('h1', `${model.selected.length} out of ${MAX_SELECT}`)
           ])
         ]),
         m('span.Validators',
-          m('table.validators-table', [
+          m('table.validators-table.new-row', [
             m('tr.validators-heading', [
-              m('th.val-stash', 'Stash'),
-              m('th.val-total', 'Total Stake'),
-              m('th.val-commission', 'Commission'),
-              m('th.val-select', 'Selected')
+              m('th.modal-val-stash', 'Stash'),
+              m('th.modal-val-total', 'Total Stake'),
+              m('th.modal-val-commission', 'Commission'),
+              m('th.modal-val-select', 'Selected')
             ]),
             Object.entries(validators).map(([_stash, { commissionPer, exposure }]) => {
               return m('tr.ValidatorRow',
-                m('td.val-stash', m(Tooltip, {
+                m('td.modal-val-stash', m(Tooltip, {
                   content: m(Identity, { stash : _stash }),
                   trigger: m('div', m(User, { user: app.chain.accounts.get(_stash), linkify: true }))
                 })),
-                m('td.val-total', [
+                m('td.modal-val-total', [
                   formatCoin(app.chain.chain.coins(exposure?.total.toBn()), true), ' '
                 ]),
-                m('td.val-commission', `${commissionPer.toFixed(2)}%`),
-                m('td.val-select',
+                m('td.modal-val-commission', `${commissionPer.toFixed(2)}%`),
+                m('td.modal-val-select',
                   m(Checkbox, {
                     checked: model.checked(_stash),
                     label: '',
@@ -140,7 +140,7 @@ const NewGroup = makeDynamicComponent<NewGroupAttrs, NewGroupState>({
                   })));
             })
           ])),
-        m('div.center-lg.padding-t-10', [
+        m('div.center-lg.padding-t-10.button-rows', [
           m('button.cui-button.cui-align-center.cui-primary', {
             disabled: !model.selected.length || !model.name,
             onclick: (e: Event) => model.create(e, vnode),
