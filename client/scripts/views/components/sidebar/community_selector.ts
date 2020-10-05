@@ -146,8 +146,16 @@ const CommunitySelector = {
               app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
             }
           }, [
-            (roles.length > 1) ? `as ${roles.length} addresses` : (profile) ? `as ${profile.displayName} (${profile.address.slice(0,5)}...)` : null,
-            m(Icon, { name: Icons.STAR }),
+            roles.map((role) => {
+              return m(User, {
+                avatarSize: 18,
+                avatarOnly: true,
+                user: new AddressInfo(null, role.address, role.address_chain, null),
+              });
+            }),
+            m('.star-icon', [
+              m(Icon, { name: Icons.STAR }),
+            ]),
           ]),
         })
         : item instanceof CommunityInfo
@@ -168,8 +176,16 @@ const CommunitySelector = {
                 app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
               },
             }, [
-              (roles.length > 1) ? `as ${roles.length} addresses` : (profile) ? `as ${profile.displayName} (${profile.address.slice(0,5)}...)` : null,
-              m(Icon, { name: Icons.STAR }),
+              roles.map((role) => {
+                return m(User, {
+                  avatarSize: 18,
+                  avatarOnly: true,
+                  user: new AddressInfo(null, role.address, role.address_chain, null),
+                });
+              }),
+              m('.star-icon', [
+                m(Icon, { name: Icons.STAR }),
+              ]),
             ]),
           })
           : m.route.get() !== '/'
