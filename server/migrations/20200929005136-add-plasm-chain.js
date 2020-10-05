@@ -1,5 +1,12 @@
 'use strict';
 
+const PlasmFutureEventKinds = {
+  Slash: 'slash',
+  Reward: 'reward',
+  Bonded: 'bonded',
+  Unbonded: 'unbonded',
+};
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
@@ -24,7 +31,21 @@ module.exports = {
         url: 'wss://rpc.plasmnet.io/',
       }], { transaction: t });
 
-      // TODO: add plasm event types
+      const buildObject = (event_name, chain) => ({
+        id: `${chain}-${event_name}`,
+        chain,
+        event_name,
+      });
+      const plasmObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'plasm'));
+
+      // TODO: somehow switch this on for testing purposes?
+      return queryInterface.bulkInsert(
+        'ChainEventTypes',
+        [
+          ...plasmObjs,
+        ],
+        { transaction: t }
+      );
     });
   },
 
