@@ -36,7 +36,7 @@ module.exports = {
         chain,
         event_name,
       });
-      const plasmObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'plasm'));
+      const plasmObjs = Object.values(PlasmFutureEventKinds).map((s) => buildObject(s, 'plasm'));
 
       // TODO: somehow switch this on for testing purposes?
       return queryInterface.bulkInsert(
