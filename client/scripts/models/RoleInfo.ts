@@ -10,9 +10,8 @@ class RoleInfo {
   public readonly offchain_community_id: string;
   public permission: RolePermission;
   public is_user_default: boolean;
-  public Address: AddressInfo;
 
-  constructor(id, address_id, address, address_chain, chain_id, offchain_community_id, permission, is_user_default, Address?) {
+  constructor(id, address_id, address, address_chain, chain_id, offchain_community_id, permission, is_user_default) {
     this.id = id;
     this.address_id = address_id;
     this.address = address;
@@ -21,7 +20,6 @@ class RoleInfo {
     this.offchain_community_id = offchain_community_id;
     this.permission = permission;
     this.is_user_default = is_user_default;
-    this.Address = Address;
   }
 }
 

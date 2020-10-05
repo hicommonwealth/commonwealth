@@ -132,8 +132,8 @@ const CommunitySelector = {
         community: item.id
       }));
 
-      const profile = (roles[0]?.Address) ? app.profiles.getProfile(roles[0].Address.chain, roles[0].Address.address) : null;
-      if (profile) console.log('profile', profile);
+      const profile = (roles[0]?.address_chain) ? app.profiles.getProfile(roles[0].address_chain, roles[0].address) : null;
+      if (profile) console.log('profile', profile, 'Addresschain', roles[0].address_chain);
 
       return item instanceof ChainInfo
         ? m(ListItem, {
