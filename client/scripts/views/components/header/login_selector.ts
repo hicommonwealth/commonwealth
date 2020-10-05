@@ -165,17 +165,12 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
           },
           label: [
             ((!app.chain && !app.community) || app.chainPreloading) ? m(Icon, { name: Icons.USER })
-              : (app.user.activeAccount !== null) ? m(User, {
-                user: app.user.activeAccount,
-                showRole: true,
-                hideIdentityIcon: true,
-              })
-                : [
-                  m(Icon, { name: Icons.USER }),
-                  m('span.hidden-sm', [
-                    app.user.activeAccounts.length === 0 ? 'Connect an address' : 'Select an address'
-                  ]),
-                ],
+              : (app.user.activeAccount === null || !app.profiles.allLoaded()) ? m(Icon, { name: Icons.USER })
+                : m(User, {
+                  user: app.user.activeAccount,
+                  showRole: true,
+                  hideIdentityIcon: true,
+                })
           ],
         }),
         content: m(Menu, { class: 'LoginSelectorMenu' }, [
