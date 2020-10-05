@@ -4,11 +4,12 @@ import m from 'mithril';
 import { Button, Icon, Icons, List, ListItem, PopoverMenu, MenuItem } from 'construct-ui';
 
 import app from 'state';
-import { ChainInfo, CommunityInfo } from 'models';
+import { AddressInfo, ChainInfo, CommunityInfo, RoleInfo } from 'models';
 import { SwitchIcon } from 'helpers';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
+import User, { UserBlock } from '../widgets/user';
 
 export const CommunityLabel: m.Component<{
   chain?: ChainInfo,
@@ -116,15 +117,23 @@ const CommunitySelector = {
     const unjoinedCommunities = allCommunities.filter((c) => !isInCommunity(c));
 
     const renderCommunity = (item) => {
-      let roles;
-      if (item instanceof ChainInfo) {
-        roles = app.user.getAllRolesInCommunity({ chain: item.id });
-      } else if (item instanceof CommunityInfo) {
-        roles = app.user.getAllRolesInCommunity({ community: item.id });
-      } else {
-        roles = [];
+      if (item instanceof CommunityInfo) console.log(`${item.id}:`, app.user.getAllRolesInCommunity({ community: item.id }));
+      // if (item instanceof ChainInfo) console.log(`${item.id}:`, app.user.getAllRolesInCommunity({ chain: item.id }));
+      const roles: RoleInfo[] = [];
+      if (item instanceof CommunityInfo) {
+        roles.push(...app.user.getAllRolesInCommunity({ community: item.id }));
+      } else if (item instanceof ChainInfo) {
+        roles.push(...app.user.getAllRolesInCommunity({ chain: item.id }));
       }
-      console.log(item.id, roles, app.user.roles)
+      // console.log(`${item.id} array:`, roles);
+      console.log(`${item.id} length:`, roles.length);
+      console.log('is member?: ', app.user.isMember({
+        account: app.user.activeAccount,
+        community: item.id
+      }));
+
+      const profile = (roles[0]?.Address) ? app.profiles.getProfile(roles[0].Address.chain, roles[0].Address.address) : null;
+      if (profile) console.log('profile', profile);
 
       return item instanceof ChainInfo
         ? m(ListItem, {
@@ -146,7 +155,7 @@ const CommunitySelector = {
               app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
             }
           }, [
-            m('.', `${roles.length}`),
+            (roles.length > 1) ? `as ${roles.length} addresses` : (profile) ? `as ${profile.displayName} (${profile.address.slice(0,5)}...)` : null,
             m(Icon, { name: Icons.STAR }),
           ]),
         })
@@ -168,7 +177,7 @@ const CommunitySelector = {
                 app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
               },
             }, [
-              m('.', `${roles.length}`),
+              (roles.length > 1) ? `as ${roles.length} addresses` : (profile) ? `as ${profile.displayName} (${profile.address.slice(0,5)}...)` : null,
               m(Icon, { name: Icons.STAR }),
             ]),
           })
