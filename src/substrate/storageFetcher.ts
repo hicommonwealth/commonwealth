@@ -10,7 +10,7 @@ import { ApiPromise } from '@polkadot/api';
 import { Option, Vec } from '@polkadot/types';
 import { BalanceOf, AccountId, Hash, BlockNumber, Registration } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
-import { DeriveProposalImage, DeriveCollectiveProposal } from '@polkadot/api-derive/types';
+import { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { isFunction } from '@polkadot/util';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 
@@ -100,7 +100,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     const treasuryProposalEvents = await this.fetchTreasuryProposals(blockNumber);
 
     /** collective proposals */
-    const collectiveProposalEvents = await this.fetchCollectiveProposals(blockNumber);
+    let technicalCommitteeProposalEvents = [];
+    if (this._api.query.technicalCommittee) {
+      technicalCommitteeProposalEvents = await this.fetchCollectiveProposals('technicalCommittee', blockNumber);
+    }
+    const councilProposalEvents = await this.fetchCollectiveProposals('council', blockNumber);
 
     /** signaling proposals */
     const signalingProposalEvents = await this.fetchSignalingProposals(blockNumber);
@@ -111,7 +115,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       ...democracyReferendaEvents,
       ...democracyPreimageEvents,
       ...treasuryProposalEvents,
-      ...collectiveProposalEvents,
+      ...technicalCommitteeProposalEvents,
+      ...councilProposalEvents,
       ...signalingProposalEvents,
     ];
   }
@@ -227,22 +232,16 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     return proposedEvents.map((data) => ({ blockNumber, data }));
   }
 
-  public async fetchCollectiveProposals(blockNumber: number): Promise<CWEvent<IEventData>[]> {
-    log.info('Migrating collective proposals...');
-    const councilProposals = await this._api.derive.council.proposals();
-    let technicalCommitteeProposals = [];
-    if (this._api.query.technicalCommittee) {
-      technicalCommitteeProposals = await this._api.derive.technicalCommittee.proposals();
-    }
-    const constructProposedEvents = (
-      ps: DeriveCollectiveProposal[],
-      name: 'council' | 'technicalCommittee',
-    ) => ps
-      .filter((p) => p.proposal && p.votes)
+  public async fetchCollectiveProposals(
+    moduleName: 'council' | 'technicalCommittee', blockNumber: number
+  ): Promise<CWEvent<IEventData>[]> {
+    log.info(`Migrating ${moduleName} proposals...`);
+    const proposals = await this._api.derive[moduleName].proposals();
+    const proposedEvents = proposals.filter((p) => p.proposal && p.votes)
       .map((p) => {
         return {
           kind: EventKind.CollectiveProposed,
-          collectiveName: name,
+          collectiveName: moduleName,
           proposalIndex: +p.votes.index,
           proposalHash: p.hash.toString(),
           threshold: +p.votes.threshold,
@@ -256,35 +255,26 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
           proposer: '',
         } as ICollectiveProposed;
       });
-    const constructVotedEvents = (ps: DeriveCollectiveProposal[], name: 'council' | 'technicalCommittee') => ps
-      .filter((p) => p.proposal && p.votes)
+    const votedEvents = _.flatten(proposals.filter((p) => p.proposal && p.votes)
       .map((p) => {
         return [
           ...p.votes.ayes.map((who) => ({
             kind: EventKind.CollectiveVoted,
-            collectiveName: name,
+            collectiveName: moduleName,
             proposalHash: p.hash.toString(),
             voter: who.toString(),
             vote: true,
           } as ICollectiveVoted)),
           ...p.votes.nays.map((who) => ({
             kind: EventKind.CollectiveVoted,
-            collectiveName: name,
+            collectiveName: moduleName,
             proposalHash: p.hash.toString(),
             voter: who.toString(),
             vote: false,
           } as ICollectiveVoted)),
         ];
-      });
-    const proposedEvents = [
-      ...constructProposedEvents(councilProposals, 'council'),
-      ...constructProposedEvents(technicalCommitteeProposals, 'technicalCommittee')
-    ];
-    const votedEvents: ICollectiveVoted[] = _.flatten([
-      constructVotedEvents(councilProposals, 'council'),
-      constructVotedEvents(technicalCommitteeProposals, 'technicalCommittee'),
-    ]);
-    log.info(`Found ${proposedEvents.length} collective proposals and ${votedEvents.length} votes!`);
+      }));
+    log.info(`Found ${proposedEvents.length} ${moduleName} proposals and ${votedEvents.length} votes!`);
     return [...proposedEvents, ...votedEvents].map((data) => ({ blockNumber, data }));
   }
 
