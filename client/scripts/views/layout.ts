@@ -1,14 +1,9 @@
 import 'layout.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
-import { Icons } from 'construct-ui';
 
 import { initChain, initCommunity, deinitChainOrCommunity, selectNode } from 'app';
 import app from 'state';
-
-import { notifyError } from 'controllers/app/notifications';
-import { featherIcon } from 'helpers';
 
 import Sublayout from 'views/sublayout';
 import { AppModals } from 'views/modal';

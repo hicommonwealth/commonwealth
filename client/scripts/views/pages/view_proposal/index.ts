@@ -5,10 +5,9 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { PopoverMenu, MenuDivider, Icon, Icons } from 'construct-ui';
 
-import { NotificationCategories } from 'types';
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { idToProposal, ProposalType } from 'identifiers';
+import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
 import { slugify, isSameAccount } from 'helpers';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -21,6 +20,7 @@ import {
   AnyProposal,
   Account,
   ChainBase,
+  ProposalModule,
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
@@ -495,10 +495,14 @@ const ViewProposalPage: m.Component<{
       proposal = idToProposal(proposalType, proposalId);
     } catch (e) {
       // proposal might be loading, if it's not an offchain thread
-      // TODO: determine secondary loading check based on type
-      if (proposalType !== ProposalType.OffchainThread && !app.chain.loaded) {
-        return m(PageLoading, { narrow: true });
+      if (proposalType !== ProposalType.OffchainThread) {
+        if (!app.chain.loaded) return m(PageLoading, { narrow: true });
+
+        // check if module is still initializing
+        const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
+        if (!c.disabled && !c.initialized) return m(PageLoading, { narrow: true });
       }
+
       // proposal does not exist, 404
       return m(PageNotFound);
     }
@@ -698,7 +702,10 @@ export async function loadCmd(type: string) {
   if (app.chain.base !== ChainBase.Substrate) {
     return;
   }
-  // TODO: figure out loading logic based on type
+  const c = proposalSlugToClass().get(type);
+  if (c && c instanceof ProposalModule && !c.disabled) {
+    await c.init(app.chain.chain, app.chain.accounts);
+  }
 }
 
 export default ViewProposalPage;

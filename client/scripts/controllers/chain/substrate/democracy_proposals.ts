@@ -7,6 +7,7 @@ import { ApiRx } from '@polkadot/api';
 import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { ProposalModule } from 'models';
+import { IApp } from 'state';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';
@@ -56,23 +57,58 @@ class SubstrateDemocracyProposals extends ProposalModule<
     return this.store.getAll().find((proposal) => proposal.hash === hash);
   }
 
+  constructor(app: IApp) {
+    super(app, (e) => new SubstrateDemocracyProposal(this._Chain, this._Accounts, this, e));
+  }
+
   // Loads all proposals and referendums currently present in the democracy module
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    if (this._initializing || this._initialized || this.disabled) return;
+    this._initializing = true;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
-    return new Promise((resolve, reject) => {
-      const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyProposal);
-      const constructorFunc = (e) => new SubstrateDemocracyProposal(this._Chain, this._Accounts, this, e);
-      const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 
-      this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
+    // load server proposals
+    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyProposal);
+    const proposals = entities.map((e) => this._entityConstructor(e));
+
+    return new Promise((resolve, reject) => {
+      this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
         // save parameters
         this._minimumDeposit = this._Chain.coins(api.consts.democracy.minimumDeposit as Balance);
         this._launchPeriod = +(api.consts.democracy.launchPeriod as BlockNumber);
         this._cooloffPeriod = +(api.consts.democracy.cooloffPeriod as BlockNumber);
 
-        // TODO: add preimage to get name
-        const externalsP = new Promise((externalsResolve) => {
+        // fetch proposals from chain
+        const events = await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          this,
+          () => this._Chain.fetcher.fetchDemocracyProposals(this.app.chain.block.height)
+        );
+        const hashes = events.map((e) => e.data.proposalHash);
+        await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          this,
+          () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
+        );
+        // register new chain-event handlers
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
+            if (!this.initialized) return;
+            if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
+              const proposal = this.getByHash(entity.typeId);
+              if (proposal) proposal.update(event);
+            }
+          }
+        );
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.DemocracyProposal, (entity, event) => {
+            if (this.initialized) this.updateProposal(entity, event);
+          }
+        );
+
+        // TODO: add preimage to get name of nextExternal
+        await new Promise((externalsResolve) => {
           this._externalsSubscription = api.queryMulti([
             api.query.democracy.lastTabledWasExternal,
             api.query.democracy.nextExternal,
@@ -81,12 +117,11 @@ class SubstrateDemocracyProposals extends ProposalModule<
             this._nextExternal = nextExternal.unwrapOr(null);
             externalsResolve();
           });
-        }).then(() => {
-          this._initialized = true;
-          resolve();
-        }).catch((err) => {
-          reject(err);
         });
+
+        this._initialized = true;
+        this._initializing = false;
+        resolve();
       },
       (err) => reject(new Error(err)));
     });

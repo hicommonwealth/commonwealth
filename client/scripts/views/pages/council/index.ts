@@ -294,4 +294,15 @@ const CouncilPage: m.Component<{}> = {
   },
 };
 
+export async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const chain = (app.chain as Substrate);
+  await chain.phragmenElections.init(chain.chain, chain.accounts);
+}
+
 export default CouncilPage;

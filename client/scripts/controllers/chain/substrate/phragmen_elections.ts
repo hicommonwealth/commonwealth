@@ -60,18 +60,16 @@ class SubstratePhragmenElections extends ProposalModule<
     super.deinit();
   }
 
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, moduleName?: string): Promise<void> {
+  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     return new Promise((resolve, reject) => {
-      this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
-        if (!moduleName) {
-          moduleName = api.consts.elections
-            ? 'elections'
-            : api.consts.phragmenElections
-              ? 'phragmenElections'
-              : 'electionsPhragmen';
-        }
+      this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
+        const moduleName = api.consts.elections
+          ? 'elections'
+          : api.consts.phragmenElections
+            ? 'phragmenElections'
+            : 'electionsPhragmen';
 
         this._candidacyBond = this._Chain.coins(api.consts[moduleName].candidacyBond as BalanceOf);
         this._votingBond = this._Chain.coins(api.consts[moduleName].votingBond as BalanceOf);
@@ -79,7 +77,7 @@ class SubstratePhragmenElections extends ProposalModule<
         this._desiredRunnersUp = +api.consts[moduleName].desiredRunnersUp;
         this._termDuration = +api.consts[moduleName].termDuration;
 
-        const memberP = new Promise((memberResolve) => {
+        await new Promise((memberResolve) => {
           this._memberSubscription = api.queryMulti([
             [ api.query[moduleName].members ],
             [ api.query[moduleName].runnersUp ]
@@ -94,8 +92,8 @@ class SubstratePhragmenElections extends ProposalModule<
         });
 
         let currentIndex: number;
-        const roundP = new Promise((roundResolve) => {
-          return api.query[moduleName].electionRounds().pipe(
+        await new Promise((roundResolve) => {
+          api.query[moduleName].electionRounds<u32>().pipe(
             // take current block number to determine when round ends
             flatMap((voteIndex: u32) => {
               currentIndex = +voteIndex;
@@ -118,12 +116,8 @@ class SubstratePhragmenElections extends ProposalModule<
           });
         });
 
-        Promise.all([roundP, memberP]).then(() => {
-          this._initialized = true;
-          resolve();
-        }).catch((err) => {
-          reject(err);
-        });
+        this._initialized = true;
+        resolve();
       });
     });
   }

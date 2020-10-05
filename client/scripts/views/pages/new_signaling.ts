@@ -20,7 +20,7 @@ import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ChainClass, ChainNetwork } from 'models';
-import Substrate, { SubstrateModule } from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/main';
 
 export interface ISignalingPageState {
   voteOutcomes: any[];
@@ -58,7 +58,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
       m.route.set(`/${app.activeChainId()}/discussions`);
       return;
     }
-    if (!(app.chain as Substrate).activeModules.includes(SubstrateModule.Signaling)) {
+    if (!(app.chain as Substrate).signaling.disabled && !(app.chain as Substrate).signaling.initialized) {
       return m(PageLoading);
     }
 
@@ -227,7 +227,8 @@ export async function loadCmd() {
   if (app.chain.network !== ChainNetwork.Edgeware) {
     return;
   }
-  await (app.chain as Substrate).initModule(SubstrateModule.Signaling);
+  const chain = (app.chain as Substrate);
+  await chain.signaling.init(chain.chain, chain.accounts);
 }
 
 export default NewSignalingPage;

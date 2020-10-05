@@ -37,6 +37,7 @@ export type IdentityInfoProps = {
 class SubstrateIdentities implements StorageModule {
   private _initialized: boolean = false;
   public get initialized() { return this._initialized; }
+  private _initializing: boolean = false;
 
   private _store: SubstrateIdentityStore;
   public get store() { return this._store; }
@@ -137,6 +138,9 @@ class SubstrateIdentities implements StorageModule {
   }
 
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    if (this._initializing || this._initialized || this.disabled) return;
+    this._initializing = true;
+
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._store = new SubstrateIdentityStore(
@@ -179,6 +183,7 @@ class SubstrateIdentities implements StorageModule {
           this._registrars = rs.map((r) => r.unwrapOr(null));
           if (!this._initialized) {
             this._initialized = true;
+            this._initializing = false;
             resolve();
           }
         });

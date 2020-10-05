@@ -36,11 +36,9 @@ import {
   IChainModule,
   ITXData,
   ChainClass,
-  ChainEntity,
-  ChainEvent,
 } from 'models';
 
-import { SubstrateEvents, SubstrateTypes, IChainEntityKind } from '@commonwealth/chain-events';
+import { SubstrateEvents } from '@commonwealth/chain-events';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -49,13 +47,6 @@ import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
 import { constructSubstrateUrl } from 'substrate';
 import { SubstrateAccount } from './account';
-import SubstrateDemocracyProposal from './democracy_proposal';
-import { SubstrateDemocracyReferendum } from './democracy_referendum';
-import { SubstrateTreasuryProposal } from './treasury_proposal';
-import { SubstrateCollectiveProposal } from './collective_proposal';
-import { EdgewareSignalingProposal } from '../edgeware/signaling_proposal';
-
-export type HandlerId = number;
 
 // creates a substrate API provider and waits for it to emit a connected event
 async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
@@ -68,81 +59,6 @@ async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
   if (unsubscribe) unsubscribe();
   window['wsProvider'] = provider;
   return provider;
-}
-
-// dispatches an entity update to the appropriate module
-export function handleSubstrateEntityUpdate(
-  chain, activeModules: IChainEntityKind[], entity: ChainEntity, event: ChainEvent,
-): void {
-  // do not handle inactive modules
-  if (!activeModules.includes(entity.type)) {
-    return;
-  }
-  switch (entity.type) {
-    case SubstrateTypes.EntityKind.DemocracyProposal: {
-      const constructorFunc = (e) => new SubstrateDemocracyProposal(
-        chain.chain, chain.accounts, chain.democracyProposals, e
-      );
-      return chain.democracyProposals.updateProposal(constructorFunc, entity, event);
-    }
-    case SubstrateTypes.EntityKind.DemocracyReferendum: {
-      const constructorFunc = (e) => new SubstrateDemocracyReferendum(
-        chain.chain, chain.accounts, chain.democracy, e
-      );
-      return chain.democracy.updateProposal(constructorFunc, entity, event);
-    }
-    case SubstrateTypes.EntityKind.DemocracyPreimage: {
-      if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
-        console.log('dispatching preimage noted, from entity', entity);
-        const proposal = chain.democracyProposals.getByHash(entity.typeId);
-        if (proposal) {
-          proposal.update(event);
-        }
-        const referendum = chain.democracy.getByHash(entity.typeId);
-        if (referendum) {
-          referendum.update(event);
-        }
-      }
-      break;
-    }
-    case SubstrateTypes.EntityKind.TreasuryProposal: {
-      const constructorFunc = (e) => new SubstrateTreasuryProposal(
-        chain.chain, chain.accounts, chain.treasury, e
-      );
-      return chain.treasury.updateProposal(constructorFunc, entity, event);
-    }
-    case SubstrateTypes.EntityKind.CollectiveProposal: {
-      const collectiveName = (event.data as SubstrateTypes.ICollectiveProposalEvents).collectiveName;
-      if (collectiveName && collectiveName === 'technicalCommittee'
-        && (chain.class === ChainClass.Kusama || chain.class === ChainClass.Polkadot)) {
-        const constructorFunc = (e) => new SubstrateCollectiveProposal(
-          chain.chain, chain.accounts, chain.technicalCommittee, e
-        );
-        return chain.technicalCommittee.updateProposal(constructorFunc, entity, event);
-      } else {
-        const constructorFunc = (e) => new SubstrateCollectiveProposal(
-          chain.chain, chain.accounts, chain.council, e
-        );
-        return chain.council.updateProposal(constructorFunc, entity, event);
-      }
-    }
-    case SubstrateTypes.EntityKind.SignalingProposal: {
-      if (chain.class === ChainClass.Edgeware) {
-        const constructorFunc = (e) => new EdgewareSignalingProposal(
-          chain.chain, chain.accounts, chain.signaling, e
-        );
-        return chain.signaling.updateProposal(constructorFunc, entity, event);
-      } else {
-        console.error('Received signaling update on non-edgeware chain!');
-        break;
-      }
-    }
-    default:
-      console.error('Received invalid substrate chain entity!');
-      break;
-  }
-  // force titles to update?
-  m.redraw();
 }
 
 export interface ISubstrateTXData extends ITXData {
@@ -317,7 +233,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const subscriber = new SubstrateEvents.Subscriber(this._apiPromise);
     const processor = new SubstrateEvents.Processor(this._apiPromise);
     return this._app.chain.chainEntities.subscribeEntities(
-      this._app.chain,
+      this._app.chain.id,
       subscriber,
       processor,
     );

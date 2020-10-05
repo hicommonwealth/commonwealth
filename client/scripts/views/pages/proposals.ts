@@ -18,7 +18,7 @@ import ConvictionsTable from 'views/components/proposals/convictions_table';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import Substrate, { SubstrateModule } from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
@@ -94,18 +94,18 @@ const ProposalsPage: m.Component<{}> = {
     }
   },
   view: (vnode) => {
-    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Proposals' });
+    if (!app.chain || !app.chain.loaded)
+      return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Proposals' });
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 
     if (onSubstrate) {
-      const activeModules = (app.chain as Substrate).activeModules;
       // Democracy, Council, and Signaling (Edgeware-only) must be loaded to proceed
-      if (!activeModules.includes(SubstrateModule.Democracy)
-          || !activeModules.includes(SubstrateModule.Council)
-          || (app.chain.network === ChainNetwork.Edgeware
-              && !activeModules.includes(SubstrateModule.Signaling)))
+      const chain = app.chain as Substrate;
+      if (!chain.democracy.initialized || !chain.council.initialized || !chain.democracyProposals.initialized
+          || (!chain.signaling.disabled && !chain.signaling.initialized)) {
         return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Proposals' });
+      }
     }
     // active proposals
     const activeDemocracyProposals = onSubstrate
@@ -193,10 +193,12 @@ export async function loadCmd() {
   if (app.chain.base !== ChainBase.Substrate) {
     return;
   }
+  const chain = (app.chain as Substrate);
   await Promise.all([
-    (app.chain as Substrate).initModule(SubstrateModule.Council),
-    (app.chain as Substrate).initModule(SubstrateModule.Signaling),
-    (app.chain as Substrate).initModule(SubstrateModule.Democracy),
+    chain.council.init(chain.chain, chain.accounts),
+    chain.signaling.init(chain.chain, chain.accounts),
+    chain.democracyProposals.init(chain.chain, chain.accounts),
+    chain.democracy.init(chain.chain, chain.accounts),
   ]);
 }
 
