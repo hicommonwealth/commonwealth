@@ -51,6 +51,11 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.bulkDelete('OffchainReactions', { chain: 'plasm' }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainComments', { chain: 'plasm' }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainThreads', { chain: 'plasm' }, { transaction: t });
+      await queryInterface.bulkDelete('Addresses', { chain: 'plasm' }, { transaction: t });
+      await queryInterface.bulkDelete('ChainEventTypes', { chain: 'plasm' }, { transaction: t });
       await queryInterface.bulkDelete('ChainNodes', { chain: 'plasm' }, { transaction: t });
       await queryInterface.bulkDelete('Chains', { id: ['plasm'] }, { transaction: t });
     });
