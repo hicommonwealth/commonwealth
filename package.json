@@ -1,6 +1,6 @@
 {
   "name": "@commonwealth/chain-events",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Listen to various chains for events.",
   "license": "GPL-3.0",
   "files": [

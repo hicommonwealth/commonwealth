@@ -90,7 +90,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
 
     /** democracy preimages */
     const proposalHashes = democracyProposalEvents
-      .map((d) => (d.data as IDemocracyStarted).proposalHash);
+      .map((d) => (d.data as IDemocracyProposed).proposalHash);
     const referendaHashes = democracyReferendaEvents
       .filter((d) => d.data.kind === EventKind.DemocracyStarted)
       .map((d) => (d.data as IDemocracyStarted).proposalHash);
@@ -121,7 +121,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     ];
   }
 
-  public async fetchDemocracyProposals(blockNumber: number): Promise<CWEvent<IEventData>[]> {
+  public async fetchDemocracyProposals(blockNumber: number): Promise<CWEvent<IDemocracyProposed>[]> {
     log.info('Fetching democracy proposals...');
     const publicProps = await this._api.query.democracy.publicProps();
     const deposits: Array<Option<[BalanceOf, Vec<AccountId>] & Codec>> = await this._api.queryMulti(
@@ -152,7 +152,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     return proposedEvents.map((data) => ({ blockNumber, data }));
   }
 
-  public async fetchDemocracyReferenda(blockNumber: number): Promise<CWEvent<IEventData>[]> {
+  public async fetchDemocracyReferenda(blockNumber: number): Promise<CWEvent<IDemocracyStarted | IDemocracyPassed>[]> {
     log.info('Migrating democracy referenda...');
     const activeReferenda = await this._api.derive.democracy.referendumsActive();
     const startEvents = activeReferenda.map((r) => {
@@ -190,7 +190,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   // must pass proposal hashes found in prior events
-  public async fetchDemocracyPreimages(hashes: string[]): Promise<CWEvent<IEventData>[]> {
+  public async fetchDemocracyPreimages(hashes: string[]): Promise<CWEvent<IPreimageNoted>[]> {
     log.info('Migrating preimages...');
     const hashCodecs = hashes.map((hash) => this._api.createType('Hash', hash));
     const preimages = await this._api.derive.democracy.preimages(hashCodecs);
@@ -215,7 +215,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     return cwEvents;
   }
 
-  public async fetchTreasuryProposals(blockNumber: number): Promise<CWEvent<IEventData>[]> {
+  public async fetchTreasuryProposals(blockNumber: number): Promise<CWEvent<ITreasuryProposed>[]> {
     log.info('Migrating treasury proposals...');
     const proposals = await this._api.derive.treasury.proposals();
     const proposedEvents = proposals.proposals.map((p) => {
@@ -234,7 +234,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
 
   public async fetchCollectiveProposals(
     moduleName: 'council' | 'technicalCommittee', blockNumber: number
-  ): Promise<CWEvent<IEventData>[]> {
+  ): Promise<CWEvent<ICollectiveProposed | ICollectiveVoted>[]> {
     log.info(`Migrating ${moduleName} proposals...`);
     const proposals = await this._api.derive[moduleName].proposals();
     const proposedEvents = proposals.filter((p) => p.proposal && p.votes)
@@ -278,7 +278,9 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     return [...proposedEvents, ...votedEvents].map((data) => ({ blockNumber, data }));
   }
 
-  public async fetchSignalingProposals(blockNumber: number): Promise<CWEvent<IEventData>[]> {
+  public async fetchSignalingProposals(
+    blockNumber: number
+  ): Promise<CWEvent<ISignalingNewProposal | ISignalingCommitStarted | ISignalingVotingStarted | ISignalingVotingCompleted>[]> {
     log.info('Migrating signaling proposals...');
     if (!this._api.query.voting || !this._api.query.signaling) {
       log.info('Found no signaling proposals (wrong chain)!');
