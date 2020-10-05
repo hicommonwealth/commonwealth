@@ -138,7 +138,7 @@ class SubstrateIdentities implements StorageModule {
   }
 
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
-    if (this._initializing || this._initialized || this.disabled) return;
+    if (this._initializing || this._initialized) return;
     this._initializing = true;
 
     this._Chain = ChainInfo;
