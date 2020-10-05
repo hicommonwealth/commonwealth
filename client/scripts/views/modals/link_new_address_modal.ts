@@ -72,7 +72,7 @@ const accountVerifiedCallback = async (account: Account<any>, vnode) => {
         await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
       }
       // set the address as active
-      setActiveAccount(account);
+      await setActiveAccount(account);
       if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
         app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
       }
@@ -106,12 +106,12 @@ const accountVerifiedCallback = async (account: Account<any>, vnode) => {
     await initAppState(false);
     // load addresses for the current chain/community
     if (app.community) {
-      updateActiveAddresses(undefined);
+      await updateActiveAddresses(undefined);
     } else if (app.chain) {
       const chain = app.user.selectedNode
         ? app.user.selectedNode.chain
         : app.config.nodes.getByChain(app.activeChainId())[0].chain;
-      updateActiveAddresses(chain);
+      await updateActiveAddresses(chain);
     } else {
       notifyError('Signed in, but no chain or community found');
     }

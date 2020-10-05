@@ -185,9 +185,10 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
               class: 'switch-user',
               align: 'left',
               basic: true,
-              onclick: (e) => {
+              onclick: async (e) => {
                 const currentActive = app.user.activeAccount;
-                setActiveAccount(account).then(() => { m.redraw(); });
+                await setActiveAccount(account);
+                m.redraw();
               },
               label: m(UserBlock, {
                 user: account,

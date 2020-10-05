@@ -150,7 +150,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
   console.log(`${c.name.toUpperCase()} started.`);
 
   // Initialize available addresses
-  updateActiveAddresses();
+  await updateActiveAddresses();
 
   // Redraw with community fully loaded
   m.redraw();
@@ -251,7 +251,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   await app.chain.initServer();
 
   // Instantiate active addresses before chain fully loads
-  updateActiveAddresses(n.chain);
+  await updateActiveAddresses(n.chain);
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
@@ -284,7 +284,7 @@ export async function initChain(): Promise<void> {
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
-  updateActiveAddresses(n.chain);
+  await updateActiveAddresses(n.chain);
 
   // Finish redraw to remove loading dialog
   m.redraw();
