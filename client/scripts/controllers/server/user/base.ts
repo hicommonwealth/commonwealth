@@ -94,6 +94,7 @@ export default class {
   public setJWT(JWT: string): void { this._setJWT(JWT); }
 
   public setRoles(roles = []): void {
+    if (this._roles.length) this._roles = [];
     roles.forEach((role) => {
       role.address = role.Address.address;
       role.address_chain = role.Address.chain;
