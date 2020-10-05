@@ -278,7 +278,6 @@ export default class extends Base {
     const roles = this.roles.filter((role) => addressinfo
       ? role.address_id === addressinfo.id
       : true);
-
     if (options.chain) {
       return roles.map((r) => r.chain_id).indexOf(options.chain) !== -1;
     } else if (options.community) {

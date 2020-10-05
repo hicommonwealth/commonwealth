@@ -96,7 +96,6 @@ export default class {
   public setRoles(roles = []): void {
     roles.forEach((role) => {
       role.address = role.Address.address;
-      delete role.Address;
       this._roles.push(role);
     });
   }
