@@ -117,23 +117,14 @@ const CommunitySelector = {
     const unjoinedCommunities = allCommunities.filter((c) => !isInCommunity(c));
 
     const renderCommunity = (item) => {
-      if (item instanceof CommunityInfo) console.log(`${item.id}:`, app.user.getAllRolesInCommunity({ community: item.id }));
-      // if (item instanceof ChainInfo) console.log(`${item.id}:`, app.user.getAllRolesInCommunity({ chain: item.id }));
       const roles: RoleInfo[] = [];
       if (item instanceof CommunityInfo) {
         roles.push(...app.user.getAllRolesInCommunity({ community: item.id }));
       } else if (item instanceof ChainInfo) {
         roles.push(...app.user.getAllRolesInCommunity({ chain: item.id }));
       }
-      // console.log(`${item.id} array:`, roles);
-      console.log(`${item.id} length:`, roles.length);
-      console.log('is member?: ', app.user.isMember({
-        account: app.user.activeAccount,
-        community: item.id
-      }));
 
       const profile = (roles[0]?.address_chain) ? app.profiles.getProfile(roles[0].address_chain, roles[0].address) : null;
-      if (profile) console.log('profile', profile, 'Addresschain', roles[0].address_chain);
 
       return item instanceof ChainInfo
         ? m(ListItem, {
