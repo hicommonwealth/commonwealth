@@ -150,7 +150,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
   console.log(`${c.name.toUpperCase()} started.`);
 
   // Initialize available addresses
-  updateActiveAddresses();
+  await updateActiveAddresses();
 
   // Redraw with community fully loaded
   m.redraw();
@@ -180,6 +180,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
 
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
+  app.chainPreloading = true;
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
@@ -257,13 +258,14 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   } else {
     throw new Error('Invalid chain');
   }
+  app.chainPreloading = false;
   app.chain.deferred = deferred;
 
   // Load server data without initializing modules/chain connection.
   await app.chain.initServer();
 
   // Instantiate active addresses before chain fully loads
-  updateActiveAddresses(n.chain);
+  await updateActiveAddresses(n.chain);
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
@@ -296,7 +298,7 @@ export async function initChain(): Promise<void> {
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
-  updateActiveAddresses(n.chain);
+  await updateActiveAddresses(n.chain);
 
   // Finish redraw to remove loading dialog
   m.redraw();
@@ -387,7 +389,6 @@ $(() => {
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
-      console.log('onmatch called, for:', path, (+new Date() / 1000));
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -395,7 +396,6 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      console.log('render called:', path, (+new Date() / 1000));
       const { scoped, hideSidebar } = attrs;
       let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'

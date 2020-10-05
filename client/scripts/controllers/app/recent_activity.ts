@@ -1,10 +1,40 @@
-import { OffchainThread, AddressInfo, OffchainComment, OffchainReaction } from 'models';
+import moment from 'moment-twitter';
+import { AddressInfo, OffchainTopic, AbridgedThread } from 'models';
 import {
   ActiveAddressesStore,
   ActiveThreadsStore,
   IIdScopedAddressCountAndInfo,
   IAddressCountAndInfo
 } from '../../stores/ActivityStore';
+
+export interface IAbridgedThreadFromServer {
+  id: number;
+  Address: any;
+  title: string;
+  created_at: any;
+  community: string;
+  chain: string;
+  topic?: OffchainTopic;
+  pinned?: boolean;
+  url?: string;
+}
+
+export const modelAbridgedThreadFromServer = (thread: IAbridgedThreadFromServer): AbridgedThread => {
+  return new AbridgedThread(
+    thread.id,
+    thread.Address.id,
+    thread.Address.address,
+    thread.Address.chain,
+    decodeURIComponent(thread.title),
+    moment(thread.created_at),
+    thread.community,
+    thread.chain,
+    thread.topic,
+    thread.pinned,
+    thread.url
+  );
+};
+
 class RecentActivityController {
   private _threadsStore = new ActiveThreadsStore();
   private _addressStore = new ActiveAddressesStore();
@@ -16,9 +46,12 @@ class RecentActivityController {
 
   public get initialized() { return this._initialized; }
 
-  public addThreads(threads: OffchainThread[], clear?: boolean) {
+  public addThreads(threads: IAbridgedThreadFromServer[], clear?: boolean) {
     if (clear) this._threadsStore.clearThreads();
-    threads.forEach((thread) => this._threadsStore.addThread(thread));
+    threads.forEach((thread) => {
+      const modeledThread = modelAbridgedThreadFromServer(thread);
+      this._threadsStore.addThread(modeledThread);
+    });
   }
 
   public addAddresses(addresses: AddressInfo[], community: string, clear?: boolean) {
@@ -42,7 +75,7 @@ class RecentActivityController {
     });
   }
 
-  public getThreadsByCommunity(community: string): Array<OffchainThread> {
+  public getThreadsByCommunity(community: string): Array<AbridgedThread> {
     return this._threadsStore.getThreadsByCommunity(community);
   }
 

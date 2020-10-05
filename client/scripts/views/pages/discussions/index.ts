@@ -96,7 +96,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: topic || 'Discussions' });
+    if (!activeEntity?.serverLoaded) return m(PageLoading, {
+      title: topic || 'Discussions',
+      showNewProposalButton: true,
+    });
 
     localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
 

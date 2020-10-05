@@ -6,6 +6,10 @@ class Kulupu extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
     super(n, app, ChainClass.Kulupu);
   }
+
+  public async initData() {
+    super.initData();
+  }
 }
 
 export default Kulupu;

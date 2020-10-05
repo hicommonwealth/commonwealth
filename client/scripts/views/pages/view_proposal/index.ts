@@ -485,7 +485,7 @@ const ViewProposalPage: m.Component<{
 
     // load app controller
     if (!app.threads.initialized) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
     // load proposal
@@ -495,7 +495,7 @@ const ViewProposalPage: m.Component<{
     } catch (e) {
       // proposal might be loading, if it's not an offchain thread
       if (proposalType !== ProposalType.OffchainThread && !app.chain.loaded) {
-        return m(PageLoading, { narrow: true });
+        return m(PageLoading, { narrow: true, showNewProposalButton: true });
       }
       // proposal does not exist, 404
       return m(PageNotFound);
@@ -561,10 +561,10 @@ const ViewProposalPage: m.Component<{
     }
 
     if (vnode.state.comments === undefined) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
     if (vnode.state.viewCount === undefined) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
     // load profiles
@@ -581,7 +581,7 @@ const ViewProposalPage: m.Component<{
       vnode.state.prefetch[identifier]['profilesStarted'] = true;
     }
     if (!app.profiles.allLoaded() && !vnode.state.prefetch[identifier]['profilesFinished']) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
     vnode.state.prefetch[identifier]['profilesFinished'] = true;
 

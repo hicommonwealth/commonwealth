@@ -96,7 +96,7 @@
     "clipboard-polyfill": "^2.8.6",
     "commander": "^2.19.0",
     "connect-session-sequelize": "^6.1.1",
-    "construct-ui": "^0.2.6",
+    "construct-ui": "^0.2.9",
     "cookie-parser": "^1.4.4",
     "copy-webpack-plugin": "^4.6.0",
     "crypto-js": "^3.1.9-1",
