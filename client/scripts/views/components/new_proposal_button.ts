@@ -22,41 +22,42 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
     (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
-      onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, {
+      onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
         type: ProposalType.CosmosProposal
       }),
       label: 'New proposal'
     }),
-    app.chain?.base === ChainBase.Substrate && activeAccount?.chainClass === ChainClass.Edgeware && m(MenuItem, {
-      onclick: () => { m.route.set(`/${activeAccount.chain.id}/new/signaling`); },
+    app.chain?.base === ChainBase.Substrate && app.chain?.class === ChainClass.Edgeware && m(MenuItem, {
+      onclick: () => { m.route.set(`/${app.chain.id}/new/signaling`); },
       label: 'New signaling proposal'
     }),
-    app.chain?.base === ChainBase.Substrate && m(MenuItem, {
-      onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, {
-        type: ProposalType.SubstrateTreasuryProposal
+    app.chain?.base === ChainBase.Substrate && app.chain?.class !== ChainClass.Plasm && [
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          type: ProposalType.SubstrateTreasuryProposal
+        }),
+        label: 'New treasury proposal'
       }),
-      label: 'New treasury proposal'
-    }),
-    app.chain?.base === ChainBase.Substrate && m(MenuItem, {
-      onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, {
-        type: ProposalType.SubstrateDemocracyProposal
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          type: ProposalType.SubstrateDemocracyProposal
+        }),
+        label: 'New democracy proposal'
       }),
-      label: 'New democracy proposal'
-    }),
-    app.chain?.base === ChainBase.Substrate && m(MenuItem, {
-      class: activeAccount && (activeAccount as any).isCouncillor ? '' : 'disabled',
-      onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, {
-        type: ProposalType.SubstrateCollectiveProposal
+      m(MenuItem, {
+        class: activeAccount && (activeAccount as any).isCouncillor ? '' : 'disabled',
+        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          type: ProposalType.SubstrateCollectiveProposal
+        }),
+        label: 'New council motion'
       }),
-      label: 'New council motion'
-    }),
-    app.chain?.base === ChainBase.Substrate
-      && candidates
-      && [
-        m(MenuDivider),
-        m(CollectiveVotingButton, { candidates, menuStyle: true }),
-        m(CandidacyButton, { candidates, menuStyle: true }),
-      ]
+      candidates
+        && [
+          m(MenuDivider),
+          m(CollectiveVotingButton, { candidates, menuStyle: true }),
+          m(CandidacyButton, { candidates, menuStyle: true }),
+        ]
+    ],
   ];
 };
 

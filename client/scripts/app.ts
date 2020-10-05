@@ -212,6 +212,20 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
       './controllers/chain/kulupu/main'
     )).default;
     app.chain = new Kulupu(n, app);
+  } else if (n.chain.network === ChainNetwork.Plasm) {
+    const Plasm = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "plasm-main" */
+      './controllers/chain/plasm/main'
+    )).default;
+    app.chain = new Plasm(n, app);
+  } else if (n.chain.network === ChainNetwork.Stafi) {
+    const Stafi = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "stafi-main" */
+      './controllers/chain/stafi/main'
+    )).default;
+    app.chain = new Stafi(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */

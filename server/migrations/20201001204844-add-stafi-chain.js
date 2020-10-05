@@ -1,9 +1,4 @@
 'use strict';
-const SequelizeLib = require('sequelize');
-const Op = SequelizeLib.Op;
-
-// TODO: if we can use typescript in migrations, we can simply get these
-//   from the shared/events/edgeware/types file.
 
 const SubstrateEventKinds = {
   Slash: 'slash',
@@ -46,21 +41,25 @@ const SubstrateEventKinds = {
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    // add chain_event and chain_event_type tables
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkInsert('Chains', [{
-        id: 'kulupu',
-        network: 'kulupu',
-        symbol: 'KLP',
-        name: 'Kulupu',
-        description: 'A proof of work blockchain with on-chain governance, online upgrade, and signed mining.',
-        icon_url: '/static/img/protocols/klp.png',
-        active: true,
+        id: 'stafi',
+        symbol: 'FIS',
+        name: 'StaFi',
+        icon_url: '/static/img/protocols/fis.png',
         type: 'chain',
+        network: 'stafi',
+        active: true,
+        description: 'An open-source DeFi protocol built to unlock the liquidity of staked assets',
+        telegram: 'https://t.me/stafi_protocol',
+        website: 'https://www.stafi.io/',
+        chat: 'https://discord.com/invite/jB77etn',
+        github: 'https://github.com/stafiprotocol/stafi-node',
       }], { transaction: t });
+
       await queryInterface.bulkInsert('ChainNodes', [{
-        chain: 'kulupu',
-        url: 'wss://rpc.kulupu.corepaper.org/ws',
+        chain: 'stafi',
+        url: 'wss://scan-rpc.stafi.io/',
       }], { transaction: t });
 
       const buildObject = (event_name, chain) => ({
@@ -68,13 +67,13 @@ module.exports = {
         chain,
         event_name,
       });
-      const kulupuObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'kulupu'));
+      const stafiObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'stafi'));
 
       // TODO: somehow switch this on for testing purposes?
       return queryInterface.bulkInsert(
         'ChainEventTypes',
         [
-          ...kulupuObjs,
+          ...stafiObjs,
         ],
         { transaction: t }
       );
@@ -83,13 +82,13 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.bulkDelete('OffchainReactions', { chain: 'kulupu' }, { transaction: t });
-      await queryInterface.bulkDelete('OffchainComments', { chain: 'kulupu' }, { transaction: t });
-      await queryInterface.bulkDelete('OffchainThreads', { chain: 'kulupu' }, { transaction: t });
-      await queryInterface.bulkDelete('Addresses', { chain: 'kulupu' }, { transaction: t });
-      await queryInterface.bulkDelete('ChainEventTypes', { chain: 'kulupu' }, { transaction: t });
-      await queryInterface.bulkDelete('ChainNodes', { chain: 'kulupu' }, { transaction: t });
-      await queryInterface.bulkDelete('Chains', { id: ['kulupu'] }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainReactions', { chain: 'stafi' }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainComments', { chain: 'stafi' }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainThreads', { chain: 'stafi' }, { transaction: t });
+      await queryInterface.bulkDelete('Addresses', { chain: 'stafi' }, { transaction: t });
+      await queryInterface.bulkDelete('ChainEventTypes', { chain: 'stafi' }, { transaction: t });
+      await queryInterface.bulkDelete('ChainNodes', { chain: 'stafi' }, { transaction: t });
+      await queryInterface.bulkDelete('Chains', { id: ['stafi'] }, { transaction: t });
     });
   }
 };

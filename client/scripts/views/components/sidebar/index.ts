@@ -8,7 +8,7 @@ import { Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Ta
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase, AddressInfo } from 'models';
+import { ChainClass, ChainBase, ChainNetwork, AddressInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
@@ -160,7 +160,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
-        || app.chain.base === ChainBase.Substrate
+        || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
         || app.chain.class === ChainClass.Moloch);
     if (!hasProposals) return;
 
