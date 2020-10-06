@@ -97,7 +97,8 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
   // dispatch notifications
   const notification_data = {
     created_at: new Date(),
-    root_id: comment ? id : proposal instanceof models.OffchainThread ? proposal.id : proposal?.root_id,
+    root_id: comment ? comment.root_id.split('_')[1] : proposal instanceof models.OffchainThread
+      ? proposal.id : proposal?.root_id,
     root_title,
     root_type,
     chain_id: finalReaction.chain,
