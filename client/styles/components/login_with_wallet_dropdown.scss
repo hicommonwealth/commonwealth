@@ -3,6 +3,17 @@
 .LoginWithWalletDropdown {
 }
 
+.login-with-web3 {
+    .cui-icon {
+        position: relative;
+        top: -2px;
+        margin-left: 4px;
+        svg polyline {
+            stroke-width: 2.25px;
+        }
+    }
+}
+
 .LoginWithWalletDropdownPopoverMenu {
     .chain-login-label {
         display: flex;
@@ -10,5 +21,9 @@
             margin: 3px 0;
             margin-left: 10px;
         }
+    }
+    .ChainIcon {
+        position: relative;
+        top: 2px;
     }
 }
