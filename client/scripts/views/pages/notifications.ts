@@ -684,16 +684,22 @@ const NotificationsPage: m.Component<{}, {
               m('th', NOTIFICATION_TABLE_PRE_COPY),
               m('th', ''),
             ]),
-            selectedCommunityId === ALL_COMMUNITIES
-              && m(AllCommunitiesNotifications, { communities: allCommunityIds, subscriptions }),
+            selectedCommunityId === ALL_COMMUNITIES && [
+              m(AllCommunitiesNotifications, { communities: allCommunityIds, subscriptions }),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Edgeware chain events')),
+              m(EdgewareChainEventNotifications),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Kulupu chain events')),
+              m(KulupuChainEventNotifications),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Kusama chain events')),
+              m(KusamaChainEventNotifications),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Polkadot chain events')),
+              m(PolkadotChainEventNotifications),
+            ],
             selectedCommunity
               && m(IndividualCommunityNotifications, { subscriptions, community: selectedCommunity }),
             // on-chain event notifications
             selectedCommunity instanceof ChainInfo && [
-              m('tr.on-chain-events-header', [
-                m('th', CHAIN_NOTIFICATION_TABLE_PRE_COPY),
-                m('th', ''),
-              ]),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, CHAIN_NOTIFICATION_TABLE_PRE_COPY)),
               selectedCommunity.network === ChainNetwork.Edgeware && m(EdgewareChainEventNotifications),
               selectedCommunity.network === ChainNetwork.Kulupu && m(KulupuChainEventNotifications),
               selectedCommunity.network === ChainNetwork.Kusama && m(KusamaChainEventNotifications),
