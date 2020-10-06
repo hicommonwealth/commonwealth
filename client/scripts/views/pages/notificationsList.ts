@@ -1,17 +1,13 @@
 import 'pages/notificationsList.scss';
 
 import m from 'mithril';
+import Infinite from 'mithril-infinite';
+import { Button, ButtonGroup } from 'construct-ui';
 
 import app from 'state';
-import { Button, ButtonGroup } from 'construct-ui';
+import { sortNotifications } from 'helpers/notifications';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
-import { sortNotifications } from 'helpers/notifications';
-
-const Notifications = {
-  view: (vnode) => {
-  }
-};
 
 const NotificationsPage = {
   view: (vnode) => {
@@ -47,7 +43,15 @@ const NotificationsPage = {
           }),
         ]),
         m('.NotificationsList', [
-          sortedNotifications.map((data) => m(NotificationRow, { notifications: (data as any[]) })),
+          sortedNotifications.length > 0
+            ? m(Infinite, {
+              maxPages: 1, // prevents rollover/repeat
+              pageData: () => sortedNotifications,
+              item: (data, opts, index) => {
+                return m(NotificationRow, { notifications: data });
+              },
+            })
+            : m('.no-notifications', 'No Notifications'),
         ])
       ]),
     ]);
