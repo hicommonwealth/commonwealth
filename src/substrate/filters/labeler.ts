@@ -90,21 +90,21 @@ export const Label: LabelerFilter = (
       const { authorityId } = data;
       return {
         heading: 'Heartbeat Received',
-        label: `A new heartbeat was received from ${fmtAddr(authorityId)}.`,
+        label: `A heartbeat was received from ${fmtAddr(authorityId)}.`,
       };
     }
     case EventKind.SomeOffline: {
       const { sessionIndex } = data;
       return {
         heading: 'Some Offline',
-        label: `At the end of session ${sessionIndex}, at least one validator was found to be offline.`,
+        label: `At least one validator went offline during session ${sessionIndex}.`,
       };
     }
     case EventKind.AllGood: {
       const { sessionIndex } = data;
       return {
         heading: 'All Good',
-        label: `At the end of session ${sessionIndex}, no offence was committed.`,
+        label: `No validators committed offences during session ${sessionIndex}.`,
       };
     }
 
