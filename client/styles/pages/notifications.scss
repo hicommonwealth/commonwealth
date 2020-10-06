@@ -33,8 +33,13 @@
             border: none;
             padding: 6px 0;
             height: 43px;
-            &.subscription-label a {
-                margin-left: 20px;
+            &.subscription-label {
+                padding-right: 30px;
+            }
+            .item-metadata {
+                font-size: 90%;
+                color: $text-color-medium;
+                margin-left: 6px;
             }
         }
         tr:nth-child(2) td {

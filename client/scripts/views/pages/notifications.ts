@@ -3,6 +3,7 @@ import 'pages/notifications.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
+import moment from 'moment-twitter';
 import { Checkbox, Button, Icons, ListItem, Table, SelectList, RadioGroup } from 'construct-ui';
 import { SubstrateEvents, SubstrateTypes, IChainEventKind, TitlerFilter } from '@commonwealth/chain-events';
 
@@ -31,8 +32,8 @@ const ALL_COMMUNITIES = 'All communities';
 const NEW_MENTIONS_LABEL = 'When someone mentions me';
 const NEW_THREADS_LABEL = 'When a thread is created';
 const NEW_ACTIVITY_LABEL = 'When there is new activity on...';
-const NEW_COMMENTS_LABEL_SUFFIX = ' (new comments)';
-const NEW_REACTIONS_LABEL_SUFFIX = ' (new reactions)';
+const NEW_COMMENTS_LABEL_SUFFIX = '(new comments only)';
+const NEW_REACTIONS_LABEL_SUFFIX = '(new reactions only)';
 
 // right column - for selecting the notification frequency
 const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (alert me immediately)';
@@ -123,13 +124,15 @@ const BatchedSubscriptionRow: m.Component<{
             : subscription.OffchainComment
               ? decodeURIComponent(subscription.OffchainComment.id)
               : subscription.objectId;
+
           return subscription.OffchainThread ? [
             link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
               threadOrComment.toString(), { target: '_blank' }),
-            NEW_COMMENTS_LABEL_SUFFIX,
+            m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
+            m('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
           ] : [
             threadOrComment.toString(),
-            NEW_COMMENTS_LABEL_SUFFIX,
+            m('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
           ];
         }
         case (NotificationCategories.NewReaction): {
@@ -141,10 +144,11 @@ const BatchedSubscriptionRow: m.Component<{
           return subscription.OffchainThread ? [
             link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
               threadOrComment.toString(), { target: '_blank' }),
-            NEW_REACTIONS_LABEL_SUFFIX,
+            m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
+            m('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
           ] : [
             threadOrComment.toString(),
-            NEW_REACTIONS_LABEL_SUFFIX,
+            m('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
           ];
         }
         default:
@@ -166,12 +170,11 @@ const BatchedSubscriptionRow: m.Component<{
           ? decodeURIComponent(subscription.OffchainComment.id)
           : subscription.objectId;
 
-      return subscription.OffchainThread
-        ? [ link(
-          'a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
-          threadOrComment.toString(), { target: '_blank' }
-        ) ] : null;
-      // : COMMENT_NUM_PREFIX + threadOrComment.toString();
+      return subscription.OffchainThread ? [
+        link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+          threadOrComment.toString(), { target: '_blank' }),
+        m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
+      ] : [ threadOrComment.toString() ];
     };
 
     // hide subscriptions on threads/comments that have been deleted
