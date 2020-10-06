@@ -82,18 +82,10 @@ export const PolkadotChainNotificationTypes = {
     'polkadot-preimage-reaped',
     'polkadot-preimage-used',
   ],
-  // Signaling: [
-  //     'polkadot-signaling-commit-started',
-  //     'polkadot-signaling-new-proposal',
-  //     'polkadot-signaling-voting-completed',
-  //     'polkadot-signaling-voting-started',
-  // ],
   // Treasury: [
   //     'polkadot-treasury-awarded',
   //     'polkadot-treasury-proposed',
   //     'polkadot-treasury-rejected',
-  //     'polkadot-treasury-reward-minting',
-  //     'polkadot-treasury-reward-minting-v2'
   // ],
   Validator: [
     'polkadot-bonded',
@@ -136,18 +128,10 @@ export const KusamaChainNotificationTypes = {
     'kusama-preimage-reaped',
     'kusama-preimage-used',
   ],
-  // Signaling: [
-  //     'kusama-signaling-commit-started',
-  //     'kusama-signaling-new-proposal',
-  //     'kusama-signaling-voting-completed',
-  //     'kusama-signaling-voting-started',
-  // ],
   // Treasury: [
   //     'kusama-treasury-awarded',
   //     'kusama-treasury-proposed',
   //     'kusama-treasury-rejected',
-  //     'kusama-treasury-reward-minting',
-  //     'kusama-treasury-reward-minting-v2'
   // ],
   Validator: [
     'kusama-bonded',
@@ -190,18 +174,10 @@ export const KulupuChainNotificationTypes = {
     'kulupu-preimage-reaped',
     'kulupu-preimage-used',
   ],
-  // Signaling: [
-  //     'kulupu-signaling-commit-started',
-  //     'kulupu-signaling-new-proposal',
-  //     'kulupu-signaling-voting-completed',
-  //     'kulupu-signaling-voting-started',
-  // ],
   // Treasury: [
   //     'kulupu-treasury-awarded',
   //     'kulupu-treasury-proposed',
   //     'kulupu-treasury-rejected',
-  //     'kulupu-treasury-reward-minting',
-  //     'kulupu-treasury-reward-minting-v2'
   // ],
   Validator: [
     'kulupu-bonded',
@@ -213,4 +189,3 @@ export const KulupuChainNotificationTypes = {
     'kulupu-vote-delegated',
   ],
 };
-

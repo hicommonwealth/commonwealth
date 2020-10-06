@@ -11,7 +11,7 @@ import app from 'state';
 import { NotificationSubscription, ChainInfo, CommunityInfo, ChainNetwork } from 'models';
 import { NotificationCategories } from 'types';
 
-import { link } from 'helpers';
+import { link, pluralize } from 'helpers';
 import { sortSubscriptions } from 'helpers/notifications';
 import {
   EdgewareChainNotificationTypes, KusamaChainNotificationTypes,
@@ -23,7 +23,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import PageError from 'views/pages/error';
 
-const NOTIFICATION_TABLE_PRE_COPY = 'Off-chain discussions';
+const NOTIFICATION_TABLE_PRE_COPY = 'Off-chain discussion events';
 const CHAIN_NOTIFICATION_TABLE_PRE_COPY = 'On-chain events';
 
 const ALL_COMMUNITIES = 'All communities';
@@ -36,7 +36,7 @@ const NEW_COMMENTS_LABEL_SUFFIX = '(new comments only)';
 const NEW_REACTIONS_LABEL_SUFFIX = '(new reactions only)';
 
 // right column - for selecting the notification frequency
-const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (alert me immediately)';
+const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (immediate)';
 const NOTIFICATION_ON_OPTION = 'On';
 const NOTIFICATION_ON_SOMETIMES_OPTION = 'Multiple selections';
 const NOTIFICATION_OFF_OPTION = 'Off';
@@ -503,7 +503,9 @@ const KulupuChainEventNotifications: m.Component = {
 const IndividualCommunityNotifications: m.Component<{
   community: CommunityInfo | ChainInfo;
   subscriptions: NotificationSubscription[];
-}, {}> = {
+}, {
+  expanded: boolean;
+}> = {
   view: (vnode) => {
     const { community, subscriptions } = vnode.attrs;
     const filteredSubscriptions = subscriptions.filter(
@@ -524,12 +526,22 @@ const IndividualCommunityNotifications: m.Component<{
         m('td'),
       ]),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
-      batchedSubscriptions.length > 0 && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
+      vnode.state.expanded && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, {
           subscriptions: subscriptions2,
           key: subscriptions2[0].id,
         });
-      })
+      }),
+      batchedSubscriptions.length > 0 && m('tr', [
+        m('td', { colspan: 2 }, [
+          m('a.expand-notifications-link', {
+            href: '#',
+            onclick: (e) => { e.preventDefault(); vnode.state.expanded = !vnode.state.expanded; },
+          }, [
+            `${vnode.state.expanded ? 'Hide' : 'Show'} ${pluralize(batchedSubscriptions.length, 'thread')}`,
+          ]),
+        ]),
+      ]),
     ];
   },
 };
@@ -537,6 +549,8 @@ const IndividualCommunityNotifications: m.Component<{
 const AllCommunitiesNotifications: m.Component<{
   subscriptions: NotificationSubscription[];
   communities: string[];
+}, {
+  expanded: boolean;
 }> = {
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
@@ -564,9 +578,19 @@ const AllCommunitiesNotifications: m.Component<{
         m('td', NEW_ACTIVITY_LABEL),
         m('td'),
       ]),
-      batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
+      vnode.state.expanded && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, { subscriptions: subscriptions2 });
-      })
+      }),
+      batchedSubscriptions.length > 0 && m('tr', [
+        m('td', { colspan: 2 }, [
+          m('a.expand-notifications-link', {
+            href: '#',
+            onclick: (e) => { e.preventDefault(); vnode.state.expanded = !vnode.state.expanded; },
+          }, [
+            `${vnode.state.expanded ? 'Hide' : 'Show'} ${pluralize(batchedSubscriptions.length, 'thread')}`,
+          ]),
+        ]),
+      ]),
     ];
   },
 };
