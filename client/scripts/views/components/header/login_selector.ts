@@ -215,10 +215,16 @@ const LoginSelector: m.Component<{ small?: boolean }, {
             m(MenuDivider),
           ],
           m(MenuItem, {
+            onclick: () => (app.activeChainId() || app.activeCommunityId())
+              ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
+              : m.route.set('/notifications'),
+            label: 'Notification settings'
+          }),
+          m(MenuItem, {
             onclick: () => app.activeChainId()
               ? m.route.set(`/${app.activeChainId()}/settings`)
               : m.route.set('/settings'),
-            label: 'Settings'
+            label: 'Login & address settings'
           }),
           m(MenuDivider),
           m(MenuItem, {
