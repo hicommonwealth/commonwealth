@@ -289,6 +289,8 @@ const ChainStatusModule: m.Component<{}> = {
     const formattedUrl = url
       .replace('ws://', '')
       .replace('wss://', '')
+      .replace('http://', '')
+      .replace('https://', '')
       .split('/')[0]
       .split(':')[0];
 
