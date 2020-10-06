@@ -452,11 +452,11 @@ const EdgewareChainEventNotifications: m.Component = {
     return [
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: EdgewareChainNotificationTypes.Council, }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, }),
-      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: EdgewareChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Signaling events', notificationTypeArray: EdgewareChainNotificationTypes.Signaling, }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: EdgewareChainNotificationTypes.Treasury, }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: EdgewareChainNotificationTypes.Validator, }),
-      m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: EdgewareChainNotificationTypes.Vote, }),
+      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: EdgewareChainNotificationTypes.Preimage, }),
+      m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: EdgewareChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -466,10 +466,10 @@ const KusamaChainEventNotifications: m.Component = {
     return [
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KusamaChainNotificationTypes.Council, }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KusamaChainNotificationTypes.Democracy, }),
-      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KusamaChainNotificationTypes.Preimage, }),
       // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KusamaChainNotificationTypes.Treasury, }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KusamaChainNotificationTypes.Validator, }),
-      m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: KusamaChainNotificationTypes.Vote, }),
+      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KusamaChainNotificationTypes.Preimage, }),
+      m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: KusamaChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -479,10 +479,10 @@ const PolkadotChainEventNotifications: m.Component = {
     return [
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: PolkadotChainNotificationTypes.Council, }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: PolkadotChainNotificationTypes.Democracy, }),
-      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
       // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: PolkadotChainNotificationTypes.Treasury, }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: PolkadotChainNotificationTypes.Validator, }),
-      m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: PolkadotChainNotificationTypes.Vote, }),
+      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
+      m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: PolkadotChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -492,10 +492,10 @@ const KulupuChainEventNotifications: m.Component = {
     return [
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KulupuChainNotificationTypes.Council, }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KulupuChainNotificationTypes.Democracy, }),
-      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KulupuChainNotificationTypes.Preimage, }),
       // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KulupuChainNotificationTypes.Treasury, }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KulupuChainNotificationTypes.Validator, }),
-      m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: KulupuChainNotificationTypes.Vote, }),
+      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KulupuChainNotificationTypes.Preimage, }),
+      m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: KulupuChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };

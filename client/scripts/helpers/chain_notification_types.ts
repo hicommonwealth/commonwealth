@@ -47,7 +47,7 @@ export const EdgewareChainNotificationTypes = {
     'edgeware-slash',
     'edgeware-unbonded',
   ],
-  Vote: [
+  VotingDelegation: [
     'edgeware-vote-delegated',
   ],
 };
@@ -82,18 +82,18 @@ export const PolkadotChainNotificationTypes = {
     'polkadot-preimage-reaped',
     'polkadot-preimage-used',
   ],
-  // Treasury: [
-  //     'polkadot-treasury-awarded',
-  //     'polkadot-treasury-proposed',
-  //     'polkadot-treasury-rejected',
-  // ],
+  Treasury: [
+    'polkadot-treasury-awarded',
+    'polkadot-treasury-proposed',
+    'polkadot-treasury-rejected',
+  ],
   Validator: [
     'polkadot-bonded',
     'polkadot-reward',
     'polkadot-slash',
     'polkadot-unbonded',
   ],
-  Vote: [
+  VotingDelegation: [
     'polkadot-vote-delegated',
   ],
 };
@@ -128,18 +128,18 @@ export const KusamaChainNotificationTypes = {
     'kusama-preimage-reaped',
     'kusama-preimage-used',
   ],
-  // Treasury: [
-  //     'kusama-treasury-awarded',
-  //     'kusama-treasury-proposed',
-  //     'kusama-treasury-rejected',
-  // ],
+  Treasury: [
+    'kusama-treasury-awarded',
+    'kusama-treasury-proposed',
+    'kusama-treasury-rejected',
+  ],
   Validator: [
     'kusama-bonded',
     'kusama-reward',
     'kusama-slash',
     'kusama-unbonded',
   ],
-  Vote: [
+  VotingDelegation: [
     'kusama-vote-delegated',
   ],
 };
@@ -174,18 +174,18 @@ export const KulupuChainNotificationTypes = {
     'kulupu-preimage-reaped',
     'kulupu-preimage-used',
   ],
-  // Treasury: [
-  //     'kulupu-treasury-awarded',
-  //     'kulupu-treasury-proposed',
-  //     'kulupu-treasury-rejected',
-  // ],
+  Treasury: [
+    'kulupu-treasury-awarded',
+    'kulupu-treasury-proposed',
+    'kulupu-treasury-rejected',
+  ],
   Validator: [
     'kulupu-bonded',
     'kulupu-reward',
     'kulupu-slash',
     'kulupu-unbonded',
   ],
-  Vote: [
+  VotingDelegation: [
     'kulupu-vote-delegated',
   ],
 };
