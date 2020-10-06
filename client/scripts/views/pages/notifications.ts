@@ -4,7 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment-twitter';
-import { Checkbox, Button, Icons, ListItem, Table, SelectList, RadioGroup } from 'construct-ui';
+import { Checkbox, Button, Icons, ListItem, Table, Tag, SelectList, RadioGroup } from 'construct-ui';
 import { SubstrateEvents, SubstrateTypes, IChainEventKind, TitlerFilter } from '@commonwealth/chain-events';
 
 import app from 'state';
@@ -351,9 +351,10 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
 const ChainEventSubscriptionRow: m.Component<{
   title: string;
   notificationTypeArray: string[];
+  recommended?: boolean;
 }, { option: string, }> = {
   view: (vnode) => {
-    const { title, notificationTypeArray, } = vnode.attrs;
+    const { title, notificationTypeArray, recommended } = vnode.attrs;
     const subscriptions = app.user.notifications.subscriptions.filter((s) => {
       return (
         s.category === NotificationCategories.ChainEvent
@@ -375,7 +376,10 @@ const ChainEventSubscriptionRow: m.Component<{
     }
 
     return m('tr.ChainEventSubscriptionRow', [
-      m('td.subscription-label', title),
+      m('td.subscription-label', [
+        title,
+        recommended && m(Tag, { size: 'xs', label: 'Recommended' }),
+      ]),
       m('td.subscription-setting', [
         m(SelectList, {
           class: 'EventSubscriptionTypeSelectList',
@@ -450,9 +454,9 @@ const ChainEventSubscriptionRow: m.Component<{
 const EdgewareChainEventNotifications: m.Component = {
   view: (vnode) => {
     return [
-      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: EdgewareChainNotificationTypes.Council, }),
-      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, }),
-      m(ChainEventSubscriptionRow, { title: 'Signaling events', notificationTypeArray: EdgewareChainNotificationTypes.Signaling, }),
+      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: EdgewareChainNotificationTypes.Council, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Signaling events', notificationTypeArray: EdgewareChainNotificationTypes.Signaling, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: EdgewareChainNotificationTypes.Treasury, }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: EdgewareChainNotificationTypes.Validator, }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: EdgewareChainNotificationTypes.Preimage, }),
@@ -464,9 +468,9 @@ const EdgewareChainEventNotifications: m.Component = {
 const KusamaChainEventNotifications: m.Component = {
   view: (vnode) => {
     return [
-      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KusamaChainNotificationTypes.Council, }),
-      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KusamaChainNotificationTypes.Democracy, }),
-      // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KusamaChainNotificationTypes.Treasury, }),
+      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KusamaChainNotificationTypes.Council, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KusamaChainNotificationTypes.Democracy, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KusamaChainNotificationTypes.Treasury, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KusamaChainNotificationTypes.Validator, }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KusamaChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: KusamaChainNotificationTypes.VotingDelegation, }),
@@ -477,9 +481,9 @@ const KusamaChainEventNotifications: m.Component = {
 const PolkadotChainEventNotifications: m.Component = {
   view: (vnode) => {
     return [
-      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: PolkadotChainNotificationTypes.Council, }),
-      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: PolkadotChainNotificationTypes.Democracy, }),
-      // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: PolkadotChainNotificationTypes.Treasury, }),
+      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: PolkadotChainNotificationTypes.Council, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: PolkadotChainNotificationTypes.Democracy, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: PolkadotChainNotificationTypes.Treasury, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: PolkadotChainNotificationTypes.Validator, }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: PolkadotChainNotificationTypes.VotingDelegation, }),
@@ -490,9 +494,9 @@ const PolkadotChainEventNotifications: m.Component = {
 const KulupuChainEventNotifications: m.Component = {
   view: (vnode) => {
     return [
-      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KulupuChainNotificationTypes.Council, }),
-      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KulupuChainNotificationTypes.Democracy, }),
-      // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KulupuChainNotificationTypes.Treasury, }),
+      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KulupuChainNotificationTypes.Council, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KulupuChainNotificationTypes.Democracy, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KulupuChainNotificationTypes.Treasury, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KulupuChainNotificationTypes.Validator, }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KulupuChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: KulupuChainNotificationTypes.VotingDelegation, }),

@@ -36,6 +36,9 @@
             &.subscription-label {
                 padding-right: 30px;
                 line-height: 1.2;
+                .cui-tag {
+                    margin-left: 8px;
+                }
             }
             .item-metadata {
                 font-size: 90%;
