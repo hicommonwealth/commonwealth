@@ -499,7 +499,7 @@ const ViewProposalPage: m.Component<{
 
     // load app controller
     if (!app.threads.initialized) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
     // load proposal
@@ -509,13 +509,13 @@ const ViewProposalPage: m.Component<{
     } catch (e) {
       // proposal might be loading, if it's not an offchain thread
       if (proposalType !== ProposalType.OffchainThread) {
-        if (!app.chain.loaded) return m(PageLoading, { narrow: true });
+        if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
 
         // check if module is still initializing
         const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
         if (!c.disabled && !c.initialized) {
           if (!c.initializing) loadCmd(proposalType);
-          return m(PageLoading, { narrow: true });
+          return m(PageLoading, { narrow: true, showNewProposalButton: true });
         }
       }
 
@@ -583,10 +583,10 @@ const ViewProposalPage: m.Component<{
     }
 
     if (vnode.state.comments === undefined) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
     if (vnode.state.viewCount === undefined) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
     // load profiles
@@ -603,7 +603,7 @@ const ViewProposalPage: m.Component<{
       vnode.state.prefetch[identifier]['profilesStarted'] = true;
     }
     if (!app.profiles.allLoaded() && !vnode.state.prefetch[identifier]['profilesFinished']) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
     vnode.state.prefetch[identifier]['profilesFinished'] = true;
 

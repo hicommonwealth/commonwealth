@@ -6,7 +6,7 @@ import Substrate from '../substrate/main';
 
 class Plasm extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
-    super(n, app, ChainClass.Polkadot);
+    super(n, app, ChainClass.Plasm);
 
     // disable all governance modules
     this.phragmenElections.disable();

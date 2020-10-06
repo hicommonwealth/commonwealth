@@ -1,5 +1,12 @@
 'use strict';
 
+const PlasmFutureEventKinds = {
+  Slash: 'slash',
+  Reward: 'reward',
+  Bonded: 'bonded',
+  Unbonded: 'unbonded',
+};
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
@@ -24,12 +31,31 @@ module.exports = {
         url: 'wss://rpc.plasmnet.io/',
       }], { transaction: t });
 
-      // TODO: add plasm event types
+      const buildObject = (event_name, chain) => ({
+        id: `${chain}-${event_name}`,
+        chain,
+        event_name,
+      });
+      const plasmObjs = Object.values(PlasmFutureEventKinds).map((s) => buildObject(s, 'plasm'));
+
+      // TODO: somehow switch this on for testing purposes?
+      return queryInterface.bulkInsert(
+        'ChainEventTypes',
+        [
+          ...plasmObjs,
+        ],
+        { transaction: t }
+      );
     });
   },
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.bulkDelete('OffchainReactions', { chain: 'plasm' }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainComments', { chain: 'plasm' }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainThreads', { chain: 'plasm' }, { transaction: t });
+      await queryInterface.bulkDelete('Addresses', { chain: 'plasm' }, { transaction: t });
+      await queryInterface.bulkDelete('ChainEventTypes', { chain: 'plasm' }, { transaction: t });
       await queryInterface.bulkDelete('ChainNodes', { chain: 'plasm' }, { transaction: t });
       await queryInterface.bulkDelete('Chains', { id: ['plasm'] }, { transaction: t });
     });

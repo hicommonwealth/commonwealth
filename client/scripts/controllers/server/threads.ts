@@ -5,7 +5,7 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { ProposalStore, TopicStore } from 'stores';
+import { ProposalStore } from 'stores';
 import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo } from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -93,7 +93,17 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
-      app.recentActivity.addThreads([response.result]);
+      app.recentActivity.addThreads([{
+        id: response.result.id,
+        Address: response.result.Address,
+        title: response.result.title,
+        created_at: response.result.created_at,
+        community: response.result.community,
+        chain: response.result.chain,
+        topic: response.result.topic,
+        pinned: response.result.pinned,
+        url: response.result.pinned
+      }]);
       app.recentActivity.addAddressesFromActivity([response.result]);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()

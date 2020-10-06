@@ -40,7 +40,7 @@ import {
 
 import { SubstrateEvents } from '@commonwealth/chain-events';
 
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { notifySuccess, notifyError, notifyInfo } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
@@ -166,7 +166,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         console.log('api error');
         this.app.chain.networkStatus = ApiStatus.Disconnected;
         this.app.chain.networkError = err.message;
-        notifyError('API error');
+        notifyInfo('Reconnecting to chain...');
         this._suppressAPIDisconnectErrors = true;
         setTimeout(() => {
           this._suppressAPIDisconnectErrors = false;

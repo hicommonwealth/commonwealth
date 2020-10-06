@@ -217,12 +217,20 @@ const CouncilPage: m.Component<{}> = {
   },
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
-      return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
+      return m(PageLoading, {
+        message: 'Connecting to chain (may take up to 30s)...',
+        title: 'Council',
+        showNewProposalButton: true
+      });
     }
     const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
     if (!initialized) {
       if (!(app.chain as Substrate).phragmenElections.initializing) loadCmd();
-      return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
+      return m(PageLoading, {
+        message: 'Connecting to chain (may take up to 30s)...',
+        title: 'Council',
+        showNewProposalButton: true
+      });
     }
 
     const candidates = getCouncilCandidates();

@@ -59,10 +59,10 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) {
       m.route.set(`/${app.activeChainId()}/login`, {}, { replace: true });
-      return m(PageLoading);
+      return m(PageLoading, { showNewProposalButton: true });
     }
     if (!app.chain || !app.chain.loaded) {
-      return m(PageLoading);
+      return m(PageLoading, { showNewProposalButton: true });
     }
     if (app.chain && app.chain.class !== ChainClass.Edgeware) {
       notifyInfo('Can only create signaling proposals on Edgeware');

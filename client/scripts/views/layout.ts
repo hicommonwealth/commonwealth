@@ -30,7 +30,6 @@ export const Layout: m.Component<{
   scope: string,
   hideSidebar?: boolean,
   deferChain?: boolean,
-  type?: string
 }, {
   loadingScope,
   deferred

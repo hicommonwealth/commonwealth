@@ -27,8 +27,6 @@ class SubstrateDemocracy extends ProposalModule<
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
-  private _useRedesignLogic: boolean;
-  public get isRedesignLogic() { return this._useRedesignLogic; }
 
   public getByHash(hash: string) {
     return this.store.getAll().find((referendum) => referendum.hash === hash);
@@ -39,12 +37,11 @@ class SubstrateDemocracy extends ProposalModule<
   }
 
   // Loads all proposals and referendums currently present in the democracy module
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, useRedesignLogic: boolean = true): Promise<void> {
+  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
-    this._useRedesignLogic = useRedesignLogic;
 
     // load server referenda
     const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyReferendum);

@@ -50,46 +50,36 @@ const LoginWithWalletDropdown: m.Component<{
           successCallback: () => {
             m.route.set(next);
             m.redraw();
+            setTimeout(() => m.redraw(), 1); // necessary because address linking may be deferred
           }
         });
       }
     });
-    const menuItems = sortedChains.map((chain) => getMenuItemForChain(chain))
-      .concat(sortedChainsWithCLI.length > 0 ? m(MenuDivider) : null)
-      .concat(sortedChainsWithCLI.map((chain) => getMenuItemForChain(chain, true)));
+    const menuItems = (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== 0)
+      ? [
+        getMenuItemForChain(app.chain.meta.chain),
+        getMenuItemForChain(app.chain.meta.chain, true)
+      ] : app.chain ? [
+        getMenuItemForChain(app.chain.meta.chain)
+      ] : sortedChains.map((chain) => getMenuItemForChain(chain))
+        .concat(sortedChainsWithCLI.length > 0 ? m(MenuDivider) : null)
+        .concat(sortedChainsWithCLI.map((chain) => getMenuItemForChain(chain, true)));
 
-    return app.chain
-      ? m(Button, {
+    return m(PopoverMenu, {
+      trigger: m(Button, {
         intent: 'primary',
         fluid: true,
         class: 'login-with-web3',
-        label,
-        onclick: (e) => {
-          $(e.target).trigger('modalexit');
-          m.route.set(`/${app.chain.id}/web3login`, web3loginParams);
-          app.modals.lazyCreate('link_new_address_modal', {
-            loggingInWithAddress,
-            joiningChain,
-            joiningCommunity,
-            successCallback: () => {
-              m.route.set(next);
-              m.redraw();
-            },
-          });
-        }
-      })
-      : m(PopoverMenu, {
-        trigger: m(Button, {
-          intent: 'primary',
-          fluid: true,
-          class: 'login-with-web3',
+        label: [
           label,
-        }),
-        addToStack: true,
-        class: 'LoginWithWalletDropdownPopoverMenu',
-        transitionDuration: 0,
-        content: menuItems,
-      });
+          m(Icon, { name: Icons.CHEVRON_DOWN }),
+        ]
+      }),
+      addToStack: true,
+      class: 'LoginWithWalletDropdownPopoverMenu',
+      transitionDuration: 0,
+      content: menuItems,
+    });
   }
 };
 
