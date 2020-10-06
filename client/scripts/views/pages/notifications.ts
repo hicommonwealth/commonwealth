@@ -174,7 +174,11 @@ const BatchedSubscriptionRow: m.Component<{
       // : COMMENT_NUM_PREFIX + threadOrComment.toString();
     };
 
-    if (!_.some(subscriptions, (s) => s.OffchainThread)) return;
+    // hide subscriptions on threads/comments that have been deleted
+    if (_.every(subscriptions, (s) => !s.OffchainComment && !s.OffchainThread
+      && (s.category === NotificationCategories.NewComment || s.category === NotificationCategories.NewReaction))) {
+      return;
+    }
 
     return m('tr.BatchedSubscriptionRow', [
       m('td.subscription-label', [
