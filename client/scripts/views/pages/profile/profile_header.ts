@@ -88,18 +88,15 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
 
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
 
-    if (app.user.activeAccounts.length === 0) {
-      return m(PageLoading);
-    }
-
-    const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.filter((account_) => {
-      return app.user.getRoleInCommunity({
-        account: account_,
-        chain: app.activeChainId(),
-      });
-    }).filter((account_) => {
-      return account_.address === account.address;
-    }).length > 0;
+    const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
+      && app.user.activeAccounts.filter((account_) => {
+        return app.user.getRoleInCommunity({
+          account: account_,
+          chain: app.activeChainId(),
+        });
+      }).filter((account_) => {
+        return account_.address === account.address;
+      }).length > 0;
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
