@@ -90,21 +90,21 @@ export const Label: LabelerFilter = (
       const { authorityId } = data;
       return {
         heading: 'Heartbeat Received',
-        label: ` A new heartbeat was received from ${fmtAddr(authorityId)}.`,
+        label: `A new heartbeat was received from ${fmtAddr(authorityId)}.`,
       };
     }
     case EventKind.SomeOffline: {
       const { sessionIndex } = data;
       return {
         heading: 'Some Offline',
-        label: `At the end of the session: ${sessionIndex}, at least one validator was found to be offline.`,
+        label: `At the end of session ${sessionIndex}, at least one validator was found to be offline.`,
       };
     }
     case EventKind.AllGood: {
       const { sessionIndex } = data;
       return {
         heading: 'All Good',
-        label: `At the end of the session: ${sessionIndex}, no offence was committed.`,
+        label: `At the end of session ${sessionIndex}, no offence was committed.`,
       };
     }
 
@@ -115,7 +115,7 @@ export const Label: LabelerFilter = (
       const { sessionIndex } = data;
       return {
         heading: 'New Session',
-        label: `Session ${sessionIndex.toString()} has begun.`,
+        label: `Session ${sessionIndex.toString()} started.`,
         // TODO: get link to validator page
       };
     }
@@ -274,7 +274,7 @@ export const Label: LabelerFilter = (
       const { proposalHash, referendumIndex } = data;
       return {
         heading: 'Preimage Invalid',
-        label: `A preimage for referendum ${referendumIndex} was invalid.`,
+        label: `A preimage for referendum ${referendumIndex} was found to be invalid.`,
         linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
@@ -290,7 +290,7 @@ export const Label: LabelerFilter = (
       const { proposalHash, noter, reaper } = data;
       return {
         heading: 'Preimage Reaped',
-        label: `A preimage noted by ${fmtAddr(noter)} was reaped by ${fmtAddr(reaper)}.`,
+        label: `A preimage noted by ${fmtAddr(noter)} was cleaned up from the chain by ${fmtAddr(reaper)}.`,
         // TODO: see linkURL comment above, but also we could link to the reaper?
       };
     }
@@ -358,7 +358,7 @@ export const Label: LabelerFilter = (
       const { who } = data;
       return {
         heading: 'Council Member Kicked',
-        label: `Council member ${fmtAddr(who)} left the council.`,
+        label: `${fmtAddr(who)} left the council.`,
         // TODO: this could also link to the member's page
         linkUrl: chainId ? `/${chainId}/council/` : null,
       };
@@ -367,7 +367,7 @@ export const Label: LabelerFilter = (
       const { who } = data;
       return {
         heading: 'Council Member Renounced',
-        label: `Candidate ${fmtAddr(who)} renounced their candidacy.`,
+        label: `${fmtAddr(who)} renounced their council candidacy.`,
         // TODO: this could also link to the member's page
         linkUrl: chainId ? `/${chainId}/council/` : null,
       };
@@ -469,7 +469,7 @@ export const Label: LabelerFilter = (
       const { voteId } = data;
       return {
         heading: 'Signaling Proposal Completed',
-        label: 'A signaling proposal\'s voting phase has completed.',
+        label: 'A signaling proposal\'s voting phase completed.',
         linkUrl: chainId ? `/${chainId}/proposal/signalingproposal/${voteId}` : null,
       };
     }
