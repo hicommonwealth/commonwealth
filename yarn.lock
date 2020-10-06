@@ -1005,6 +1005,11 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-2.5.0.tgz#e327a98ba1d26b7756ff62885a0aa0967a375449"
   integrity sha512-t3jm8FrhL9tkkJTofkznTqo/XXdHi21w5yXwalEnaMOp22ZwZ0f/mmKdlgMMLPFa6bSVHbY88mKESwJT/7m5Lg==
 
+"@plasm/types@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@plasm/types/-/types-1.3.0.tgz#b20408dcdb537867ec92986c226c08ece0da2d41"
+  integrity sha512-+O2xZv8DSNqobR6zDQK2posDKXx5O61OAaI0MQV0NXA/1Pw9xuAKhEwhZyYjqKGnhOzg/M6dnS/OSyzR8o9FbA==
+
 "@polkadot/api-derive@2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@polkadot/api-derive/-/api-derive-2.0.1.tgz#a61ebe0854d33c3b6fd55c3ebae4c7549b6f210b"

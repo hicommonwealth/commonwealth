@@ -383,10 +383,10 @@ const TXSigningModalStates = {
       }
 
       vnode.attrs.stateData.obs.subscribe((data: ITransactionResult) => {
+        if (vnode.state.timerHandle) {
+          clearInterval(vnode.state.timerHandle);
+        }
         if (data.status === TransactionStatus.Success) {
-          if (vnode.state.timerHandle) {
-            clearInterval(vnode.state.timerHandle);
-          }
           vnode.attrs.next('SentTransactionSuccess', {
             hash: data.hash,
             blocknum: data.blocknum,

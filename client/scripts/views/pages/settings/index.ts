@@ -27,7 +27,7 @@ const SettingsPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'SettingsPage',
-      title: 'Settings',
+      title: 'Login & Address Settings',
     }, [
       m('br'),
       m(EmailWell, { github: true }),

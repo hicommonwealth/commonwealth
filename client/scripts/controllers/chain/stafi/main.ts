@@ -2,14 +2,10 @@ import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import Substrate from '../substrate/main';
 
-class Kulupu extends Substrate {
+class Stafi extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
-    super(n, app, ChainClass.Kulupu);
-  }
-
-  public async initData() {
-    super.initData();
+    super(n, app, ChainClass.Stafi);
   }
 }
 
-export default Kulupu;
+export default Stafi;

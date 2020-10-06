@@ -30,7 +30,7 @@ export interface ISubstrateIdentityState {
 const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
   getObservables: (attrs) => ({
     groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount) && (!attrs.profile.isOnchain)
+    identity: (attrs.account instanceof SubstrateAccount) && (!attrs.profile.isOnchain) && (app.chain as Substrate).identities
       ? (app.chain as Substrate).identities.get(attrs.account)
       : null,
   }),

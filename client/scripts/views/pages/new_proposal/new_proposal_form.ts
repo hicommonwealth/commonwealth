@@ -8,7 +8,7 @@ import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
-import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
+import { ITXModalData, ProposalModule, ChainBase, ChainClass, OffchainThreadKind } from 'models';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
@@ -43,6 +43,7 @@ const NewProposalForm = {
 
     if (!author) return m('div', 'Must be logged in');
     if (!callback) return m('div', 'Must have callback');
+    if (app.chain?.class === ChainClass.Plasm) return m('div', 'Unsupported network');
 
     let hasCouncilMotionChooser : boolean;
     let hasAction : boolean;

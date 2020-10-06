@@ -26,10 +26,10 @@ const NotificationButtons: m.Component = {
         },
       }),
       m(Button, {
-        label: 'Configure notifications',
+        label: 'See all',
         onclick: () => (app.activeChainId() || app.activeCommunityId())
-          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
-          : m.route.set('/notifications'),
+          ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationsList`)
+          : m.route.set('/notificationsList'),
       }),
     ]);
   }

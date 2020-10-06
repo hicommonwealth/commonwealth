@@ -8,7 +8,6 @@ import { Button, Colors, Input, Icons, Icon, Tooltip, Classes } from 'construct-
 
 import { SocialAccount } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
 
 interface IState {
