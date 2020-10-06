@@ -91,7 +91,10 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint: boolean }> = {
+const LoginSelector: m.Component<{ small?: boolean }, {
+  showAddressSelectionHint: boolean,
+  profileLoadComplete: boolean
+}> = {
   view: (vnode) => {
     const { small } = vnode.attrs;
 
@@ -146,6 +149,10 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
       // });
     };
 
+    if (!vnode.state.profileLoadComplete && app.profiles.allLoaded()) {
+      vnode.state.profileLoadComplete = true;
+    }
+
     return m('.LoginSelector', [
       wrapHint(m(Popover, {
         hasArrow: false,
@@ -165,7 +172,7 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
           },
           label: [
             ((!app.chain && !app.community) || app.chainPreloading) ? m(Icon, { name: Icons.USER })
-              : (app.user.activeAccount === null || !app.profiles.allLoaded()) ? m(Icon, { name: Icons.USER })
+              : (app.user.activeAccount === null || !vnode.state.profileLoadComplete) ? m(Icon, { name: Icons.USER })
                 : m(User, {
                   user: app.user.activeAccount,
                   showRole: true,
