@@ -21,6 +21,7 @@ export abstract class ProposalModule<
   public disable() { this._disabled = true; }
 
   protected _initializing: boolean = false;
+  public get initializing() { return this._initializing; }
   protected _initialized: boolean = false;
   public get initialized() { return this._initialized; }
 

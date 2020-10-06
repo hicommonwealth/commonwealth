@@ -60,6 +60,20 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   }
 };
 
+async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const chain = (app.chain as Substrate);
+  await Promise.all([
+    chain.democracy.init(chain.chain, chain.accounts),
+    chain.democracyProposals.init(chain.chain, chain.accounts),
+  ]);
+}
+
 const ReferendaPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ReferendaPage' });
@@ -81,6 +95,7 @@ const ReferendaPage: m.Component<{}> = {
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     if (onSubstrate) {
       if (!(app.chain as Substrate).democracy.initialized || !(app.chain as Substrate).democracyProposals.initialized) {
+        if (!(app.chain as Substrate).democracy.initializing) loadCmd();
         return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Referenda' });
       }
     }
@@ -118,19 +133,5 @@ const ReferendaPage: m.Component<{}> = {
     ]);
   }
 };
-
-export async function loadCmd() {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
-  }
-  const chain = (app.chain as Substrate);
-  await Promise.all([
-    chain.democracy.init(chain.chain, chain.accounts),
-    chain.democracyProposals.init(chain.chain, chain.accounts),
-  ]);
-}
 
 export default ReferendaPage;

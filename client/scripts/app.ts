@@ -387,18 +387,13 @@ $(() => {
   }
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
-    loadCmd: undefined,
     onmatch: () => {
       console.log('onmatch called, for:', path, (+new Date() / 1000));
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
         `./${path}`
-      ).then((p) => {
-        // support a custom loading command
-        this.loadCmd = p.loadCmd;
-        return p.default;
-      });
+      ).then((p) => p.default);
     },
     render: (vnode) => {
       console.log('render called:', path, (+new Date() / 1000));
@@ -419,7 +414,7 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      return m(Layout, { scope, deferChain, hideSidebar, loadCmd: this.loadCmd, type }, [ vnode ]);
+      return m(Layout, { scope, deferChain, hideSidebar, type }, [ vnode ]);
     },
   });
 

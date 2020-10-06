@@ -197,6 +197,17 @@ export const getCouncilCandidates = () => {
   return candidates;
 };
 
+async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const chain = (app.chain as Substrate);
+  await chain.phragmenElections.init(chain.chain, chain.accounts);
+}
+
 const CouncilPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
@@ -205,11 +216,12 @@ const CouncilPage: m.Component<{}> = {
     });
   },
   view: (vnode) => {
-    if (!app.chain) {
+    if (!app.chain || !app.chain.loaded) {
       return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
     }
     const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
     if (!initialized) {
+      if (!(app.chain as Substrate).phragmenElections.initializing) loadCmd();
       return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Council' });
     }
 
@@ -293,16 +305,5 @@ const CouncilPage: m.Component<{}> = {
     ]);
   },
 };
-
-export async function loadCmd() {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
-  }
-  const chain = (app.chain as Substrate);
-  await chain.phragmenElections.init(chain.chain, chain.accounts);
-}
 
 export default CouncilPage;

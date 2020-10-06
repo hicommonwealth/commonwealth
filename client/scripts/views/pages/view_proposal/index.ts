@@ -448,6 +448,19 @@ interface IPrefetch {
   }
 }
 
+async function loadCmd(type: string) {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const c = proposalSlugToClass().get(type);
+  if (c && c instanceof ProposalModule && !c.disabled) {
+    await c.init(app.chain.chain, app.chain.accounts);
+  }
+}
+
 const ViewProposalPage: m.Component<{
   identifier: string,
   type: string
@@ -500,7 +513,10 @@ const ViewProposalPage: m.Component<{
 
         // check if module is still initializing
         const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
-        if (!c.disabled && !c.initialized) return m(PageLoading, { narrow: true });
+        if (!c.disabled && !c.initialized) {
+          if (!c.initializing) loadCmd(proposalType);
+          return m(PageLoading, { narrow: true });
+        }
       }
 
       // proposal does not exist, 404
@@ -694,18 +710,5 @@ const ViewProposalPage: m.Component<{
     ]);
   }
 };
-
-export async function loadCmd(type: string) {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
-  }
-  const c = proposalSlugToClass().get(type);
-  if (c && c instanceof ProposalModule && !c.disabled) {
-    await c.init(app.chain.chain, app.chain.accounts);
-  }
-}
 
 export default ViewProposalPage;

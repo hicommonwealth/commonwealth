@@ -38,7 +38,7 @@ class ChainEntityController {
   private _store: ChainEntityStore = new ChainEntityStore();
   public get store() { return this._store; }
   private _subscriber: IEventSubscriber<any, any>;
-  private _handlers: { [t: string]: EntityHandler[] }
+  private _handlers: { [t: string]: EntityHandler[] } = {};
 
   public constructor() {
     // do nothing

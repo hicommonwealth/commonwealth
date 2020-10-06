@@ -25,9 +25,23 @@ import {
   DropdownFormField,
   RadioSelectorFormField
 } from 'views/components/forms';
+import PageLoading from 'views/pages/loading';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
+
+async function loadCmd(type: string) {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const c = proposalSlugToClass().get(type);
+  if (c && c instanceof ProposalModule && !c.disabled) {
+    await c.init(app.chain.chain, app.chain.accounts);
+  }
+}
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -63,6 +77,20 @@ const NewProposalForm = {
     let hasMolochFields : boolean;
     // data loaded
     let dataLoaded : boolean = true;
+
+    // wait for chain if not offchain
+    if (proposalTypeEnum !== ProposalType.OffchainThread) {
+      if (!app.chain || !app.chain.loaded)
+        return m(PageLoading, { narrow: true });
+
+      // check if module is still initializing
+      const c = proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any>;
+      if (!c.disabled && !c.initialized) {
+        if (!c.initializing) loadCmd(proposalTypeEnum);
+        return m(PageLoading, { narrow: true });
+      }
+    }
+
     if (proposalTypeEnum === ProposalType.SubstrateDemocracyProposal) {
       hasAction = true;
       hasToggle = true;

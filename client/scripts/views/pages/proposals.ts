@@ -78,6 +78,22 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   }
 };
 
+async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const chain = (app.chain as Substrate);
+  await Promise.all([
+    chain.council.init(chain.chain, chain.accounts),
+    chain.signaling.init(chain.chain, chain.accounts),
+    chain.democracyProposals.init(chain.chain, chain.accounts),
+    chain.democracy.init(chain.chain, chain.accounts),
+  ]);
+}
+
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
@@ -104,6 +120,7 @@ const ProposalsPage: m.Component<{}> = {
       const chain = app.chain as Substrate;
       if (!chain.democracy.initialized || !chain.council.initialized || !chain.democracyProposals.initialized
           || (!chain.signaling.disabled && !chain.signaling.initialized)) {
+        if (!chain.democracy.initializing) loadCmd();
         return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Proposals' });
       }
     }
@@ -185,21 +202,5 @@ const ProposalsPage: m.Component<{}> = {
     ]);
   }
 };
-
-export async function loadCmd() {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
-  }
-  const chain = (app.chain as Substrate);
-  await Promise.all([
-    chain.council.init(chain.chain, chain.accounts),
-    chain.signaling.init(chain.chain, chain.accounts),
-    chain.democracyProposals.init(chain.chain, chain.accounts),
-    chain.democracy.init(chain.chain, chain.accounts),
-  ]);
-}
 
 export default ProposalsPage;

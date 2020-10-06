@@ -35,6 +35,17 @@ export interface IBinaryOptionState {
   second: string | number;
 }
 
+async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.network !== ChainNetwork.Edgeware) {
+    return;
+  }
+  const chain = (app.chain as Substrate);
+  await chain.signaling.init(chain.chain, chain.accounts);
+}
+
 export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
   oninit: (vnode) => {
     vnode.state.voteOutcomes = ['Yes', 'No'];
@@ -59,6 +70,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
       return;
     }
     if (!(app.chain as Substrate).signaling.disabled && !(app.chain as Substrate).signaling.initialized) {
+      if (!(app.chain as Substrate).signaling.initializing) loadCmd();
       return m(PageLoading);
     }
 
@@ -219,16 +231,5 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
     ]);
   }
 };
-
-export async function loadCmd() {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.network !== ChainNetwork.Edgeware) {
-    return;
-  }
-  const chain = (app.chain as Substrate);
-  await chain.signaling.init(chain.chain, chain.accounts);
-}
 
 export default NewSignalingPage;

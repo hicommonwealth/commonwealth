@@ -76,6 +76,17 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   }
 };
 
+async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const chain = (app.chain as Substrate);
+  await chain.treasury.init(chain.chain, chain.accounts);
+}
+
 const TreasuryPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'TreasuryPage' });
@@ -96,6 +107,7 @@ const TreasuryPage: m.Component<{}> = {
       return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Treasury' });
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     if (onSubstrate && !(app.chain as Substrate).treasury.initialized) {
+      if (!(app.chain as Substrate).treasury.initializing) loadCmd();
       return m(PageLoading, { message: 'Connecting to chain (may take up to 30s)...', title: 'Treasury' });
     }
 
@@ -130,16 +142,5 @@ const TreasuryPage: m.Component<{}> = {
     ]);
   }
 };
-
-export async function loadCmd() {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
-  }
-  const chain = (app.chain as Substrate);
-  await chain.treasury.init(chain.chain, chain.accounts);
-}
 
 export default TreasuryPage;
