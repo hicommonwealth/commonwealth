@@ -30,10 +30,10 @@ export const sortNotifications = (n: Notification[]) => {
           unbatchChainEvents.push([n2]);
         }
       });
-      unbatchChainEvents.push(b);
+      if (b.length) unbatchChainEvents.push(b);
     } else {
       // don't unbatch at all
-      unbatchChainEvents.push(a);
+      if (a.length) unbatchChainEvents.push(a);
     }
   });
   unbatchChainEvents.sort((a, b) => {
