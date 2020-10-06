@@ -14,7 +14,7 @@ import app, { ApiStatus, LoginState } from 'state';
 import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from 'controllers/chain/community/main';
 import WebsocketController from 'controllers/server/socket/index';
@@ -110,7 +110,7 @@ export function handleInviteLinkRedirect() {
       'Step': inviteMessage,
     });
     if (inviteMessage === 'failure' && m.route.param('message') === 'Must be logged in to accept invites') {
-      notifySuccess('Log in to join a community with an invite link');
+      notifyInfo('Log in to join a community with an invite link');
       app.modals.create({ modal: LoginModal });
     } else if (inviteMessage === 'failure') {
       const message = m.route.param('message');
@@ -131,7 +131,7 @@ export function handleUpdateEmailConfirmation() {
       'Step': m.route.param('confirmation'),
     });
     if (m.route.param('confirmation') === 'success') {
-      notifySuccess('Success! Email confirmed');
+      notifySuccess('Email confirmed!');
     }
   }
 }
@@ -528,7 +528,7 @@ $(() => {
     }
   }
   if (m.route.param('loggedin')) {
-    notifySuccess('Logged in');
+    notifySuccess('Logged in!');
   } else if (m.route.param('loginerror')) {
     notifyError('Could not log in');
     console.error(m.route.param('loginerror'));

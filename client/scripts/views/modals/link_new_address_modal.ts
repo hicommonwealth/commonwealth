@@ -15,7 +15,7 @@ import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 import Substrate from 'controllers/chain/substrate/main';
 import Ethereum from 'controllers/chain/ethereum/main';
 import Near from 'controllers/chain/near/main';
@@ -97,7 +97,6 @@ const accountVerifiedCallback = async (account: Account<any>, vnode) => {
     mixpanel.people.set({
       'Last Address Created': new Date().toISOString()
     });
-    notifySuccess('Success! Logged in');
     $(vnode.dom).trigger('modalforceexit');
     if (vnode.attrs.successCallback) vnode.attrs.successCallback();
     m.redraw();
@@ -119,7 +118,6 @@ const accountVerifiedCallback = async (account: Account<any>, vnode) => {
     if (account.profile && account.profile.initialized && account.profile.name) {
       $(vnode.dom).trigger('modalforceexit');
       if (vnode.attrs.successCallback) vnode.attrs.successCallback();
-      notifySuccess('Success! Logged in');
     } else {
       vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
     }

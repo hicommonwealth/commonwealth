@@ -115,7 +115,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         vnode.state.loading = false;
         await setActiveAccount(account);
         m.redraw();
-        notifySuccess(`Joined with ${formatAddressShort(addressInfo.address, addressInfo.chain)}`);
+        notifySuccess('Joined community');
       } catch (err) {
         vnode.state.loading = false;
         notifyError('Failed to join community');
