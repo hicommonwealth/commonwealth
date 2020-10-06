@@ -25,15 +25,14 @@ import PageError from 'views/pages/error';
 const NOTIFICATION_TABLE_PRE_COPY = 'Off-chain discussions';
 const CHAIN_NOTIFICATION_TABLE_PRE_COPY = 'On-chain events';
 
-const COMMENT_NUM_PREFIX = 'Comment #';
 const ALL_COMMUNITIES = 'All communities';
 
 // left column - for identifying the notification type
 const NEW_MENTIONS_LABEL = 'When someone mentions me';
 const NEW_THREADS_LABEL = 'When a thread is created';
 const NEW_ACTIVITY_LABEL = 'When there is new activity on...';
-const NEW_COMMENTS_LABEL_PREFIX = 'New comments on ';
-const NEW_REACTIONS_LABEL_PREFIX = 'New reactions on ';
+const NEW_COMMENTS_LABEL_SUFFIX = ' (new comments)';
+const NEW_REACTIONS_LABEL_SUFFIX = ' (new reactions)';
 
 // right column - for selecting the notification frequency
 const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (alert me immediately)';
@@ -124,12 +123,14 @@ const BatchedSubscriptionRow: m.Component<{
             : subscription.OffchainComment
               ? decodeURIComponent(subscription.OffchainComment.id)
               : subscription.objectId;
-          return subscription.OffchainThread
-            ? [ NEW_COMMENTS_LABEL_PREFIX,
-              link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
-                threadOrComment.toString(), { target: '_blank' })
-            ]
-            : NEW_COMMENTS_LABEL_PREFIX + threadOrComment.toString();
+          return subscription.OffchainThread ? [
+            link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+              threadOrComment.toString(), { target: '_blank' }),
+            NEW_COMMENTS_LABEL_SUFFIX,
+          ] : [
+            threadOrComment.toString(),
+            NEW_COMMENTS_LABEL_SUFFIX,
+          ];
         }
         case (NotificationCategories.NewReaction): {
           const threadOrComment = subscription.OffchainThread
@@ -137,12 +138,14 @@ const BatchedSubscriptionRow: m.Component<{
             : subscription.OffchainComment
               ? decodeURIComponent(subscription.OffchainComment.id)
               : subscription.objectId;
-          return subscription.OffchainThread
-            ? [ NEW_REACTIONS_LABEL_PREFIX,
-              link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
-                threadOrComment.toString(), { target: '_blank' })
-            ]
-            : NEW_REACTIONS_LABEL_PREFIX + threadOrComment.toString();
+          return subscription.OffchainThread ? [
+            link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+              threadOrComment.toString(), { target: '_blank' }),
+            NEW_REACTIONS_LABEL_SUFFIX,
+          ] : [
+            threadOrComment.toString(),
+            NEW_REACTIONS_LABEL_SUFFIX,
+          ];
         }
         default:
           break;
@@ -167,9 +170,11 @@ const BatchedSubscriptionRow: m.Component<{
         ? [ link(
           'a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
           threadOrComment.toString(), { target: '_blank' }
-        ) ]
-        : COMMENT_NUM_PREFIX + threadOrComment.toString();
+        ) ] : null;
+      // : COMMENT_NUM_PREFIX + threadOrComment.toString();
     };
+
+    if (!_.some(subscriptions, (s) => s.OffchainThread)) return;
 
     return m('tr.BatchedSubscriptionRow', [
       m('td.subscription-label', [
