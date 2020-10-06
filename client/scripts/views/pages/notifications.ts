@@ -4,7 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment-twitter';
-import { Checkbox, Button, Icons, ListItem, Table, Tag, SelectList, RadioGroup } from 'construct-ui';
+import { Checkbox, Button, Icons, ListItem, Table, Tag, Grid, Col, SelectList, RadioGroup } from 'construct-ui';
 import { SubstrateEvents, SubstrateTypes, IChainEventKind, TitlerFilter } from '@commonwealth/chain-events';
 
 import app from 'state';
@@ -46,9 +46,10 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
     if (!app.user) return;
     if (vnode.state.interval === undefined) vnode.state.interval = app.user.emailInterval;
 
-    return m('.EmailIntervalConfiguration', [
-      m('.email-interval-configuration-left', [
-        m('h4', 'Receive notification emails'),
+    return m(Grid, { class: 'EmailIntervalConfiguration' }, [
+      m(Col, { class: 'email-interval-configuration-left', span: { xs: 12, md: 6 } }, [
+        m('h4', 'Notification digest'),
+        m('p', 'You can receive a digest with all your unread notifications:'),
         m(RadioGroup, {
           options: ['daily', 'never'],
           name: 'interval',
@@ -83,6 +84,14 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
             ' to continue receiving notification emails.'
           ]) : '',
         vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
+      ]),
+      m(Col, { class: 'email-interval-configuration-right', span: { xs: 12, md: 6 } }, [
+        m('h4', 'Immediate email notifications'),
+        m('p', [
+          'You can also select ',
+          m('strong', 'On (immediate)'),
+          ' to always receive an email when the selected event occurs.'
+        ]),
       ]),
     ]);
   }
