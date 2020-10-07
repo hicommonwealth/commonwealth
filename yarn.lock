@@ -784,12 +784,12 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.3.3.tgz#c71bc7c83cdb176891093e1810eeb633a0078049"
-  integrity sha512-ykqSTmfCfASUXZ+IkOFtCf8vzEuQjQ2B0qVttDf34Wf7Ou79o3rIH0H/GxDKAexp8A1gGQJ3GzdE2c3JZ+w9xg==
+"@commonwealth/chain-events@0.3.5":
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.3.5.tgz#ffbedb12dbb4e45a16e5914cdc0a9ccdde712dfd"
+  integrity sha512-fXkEU4IFkjnroWyQmUlX/DO2R0KUZuqqxmddTpaGDbLJF9opqJu8p4B1/6ghQArl08w305BhIf8FLDC9O4i0+Q==
   dependencies:
-    "@edgeware/node-types" "3.0.3"
+    "@edgeware/node-types" "3.0.4"
     "@polkadot/api" "2.0.1"
     bn.js "^5.1.2"
     ethereum-block-by-date "^1.2.2"
@@ -804,6 +804,11 @@
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.0.3.tgz#edf69e3bb7bbef954ac804ab90bbfa6e126bd42d"
   integrity sha512-W/32co0unxMH0FJShz9cIpYYNvHNrHK739kcj4qRtDeY22fabyfboWvLrdfF1FA+ZkfNia16D3TDDTtLZh9sfg==
+
+"@edgeware/node-types@3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.0.4.tgz#b971b6d780a240b6c697008403e3ad0884d9b60c"
+  integrity sha512-RZc39LoFdW+ZUSJ3Ftc5YWQs4kjtaeuFPEZ0DrgAJj+eSwZlwQPT8jbEBDC31CnJdjMvKdWVW1e09f/R0xS0fQ==
 
 "@emotion/is-prop-valid@^0.8.1":
   version "0.8.8"
