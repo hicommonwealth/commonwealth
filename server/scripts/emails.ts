@@ -64,19 +64,23 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
 };
 
 const createNotificationDigestEmailObject = async (user, notifications, models) => {
+  console.log(6);
   const emailObjArray = await Promise.all(notifications.map(async (n) => {
     const { category_id } = await n.getSubscription();
     const notification_data = JSON.parse(n.notification_data);
 
+    console.log(7);
     if (notification_data.chain_event) {
       // TODO: implement chain event
     } else {
+      console.log(8);
       const [
         emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, path
       ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
 
       let createdAt = moment(n.created_at).fromNow();
       if (createdAt === 'a day ago') createdAt = `${moment(Date.now()).diff(n.created_at, 'hours')} hours ago`;
+      console.log(9);
       return {
         author: subjectCopy,
         action: actionCopy,
@@ -89,6 +93,7 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
     }
   }));
 
+  console.log(10);
   // construct email
   return {
     from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -132,8 +137,11 @@ export const sendBatchedNotificationEmails = async (models): Promise<number> => 
     log.info(`Sending to ${users.length} users`);
 
     const { Op } = models.sequelize;
+    console.log(1);
     const last24hours = new Date((new Date() as any) - 24 * 60 * 60 * 1000);
+    console.log(2);
     await Promise.all(users.map(async (user) => {
+      console.log(3);
       const notifications = await models.Notification.findAll({
         include: [{
           model: models.Subscription,
@@ -149,6 +157,7 @@ export const sendBatchedNotificationEmails = async (models): Promise<number> => 
       });
       if (notifications.length === 0) return; // don't notify if there have been no new notifications in the last 24h
 
+      console.log(4);
       // send notification email
       const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
       emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;

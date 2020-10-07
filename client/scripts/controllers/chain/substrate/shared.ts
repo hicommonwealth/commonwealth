@@ -36,17 +36,9 @@ import {
   IChainModule,
   ITXData,
   ChainClass,
-  ChainEntity,
-  ChainEvent,
 } from 'models';
 
-import { SubstrateEvents, SubstrateTypes } from '@commonwealth/chain-events';
-
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
-import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling_proposal';
+import { SubstrateEvents } from '@commonwealth/chain-events';
 
 import { notifySuccess, notifyError, notifyInfo } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -55,75 +47,6 @@ import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
 import { constructSubstrateUrl } from 'substrate';
 import { SubstrateAccount } from './account';
-
-// dispatches an entity update to the appropriate module
-export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: ChainEvent): void {
-  switch (entity.type) {
-    case SubstrateTypes.EntityKind.DemocracyProposal: {
-      const constructorFunc = (e) => new SubstrateDemocracyProposal(
-        chain.chain, chain.accounts, chain.democracyProposals, e
-      );
-      return chain.democracyProposals.updateProposal(constructorFunc, entity, event);
-    }
-    case SubstrateTypes.EntityKind.DemocracyReferendum: {
-      const constructorFunc = (e) => new SubstrateDemocracyReferendum(
-        chain.chain, chain.accounts, chain.democracy, e
-      );
-      return chain.democracy.updateProposal(constructorFunc, entity, event);
-    }
-    case SubstrateTypes.EntityKind.DemocracyPreimage: {
-      if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
-        console.log('dispatching preimage noted, from entity', entity);
-        const proposal = chain.democracyProposals.getByHash(entity.typeId);
-        if (proposal) {
-          proposal.update(event);
-        }
-        const referendum = chain.democracy.getByHash(entity.typeId);
-        if (referendum) {
-          referendum.update(event);
-        }
-      }
-      break;
-    }
-    case SubstrateTypes.EntityKind.TreasuryProposal: {
-      const constructorFunc = (e) => new SubstrateTreasuryProposal(
-        chain.chain, chain.accounts, chain.treasury, e
-      );
-      return chain.treasury.updateProposal(constructorFunc, entity, event);
-    }
-    case SubstrateTypes.EntityKind.CollectiveProposal: {
-      const collectiveName = (event.data as SubstrateTypes.ICollectiveProposalEvents).collectiveName;
-      if (collectiveName && collectiveName === 'technicalCommittee'
-        && (chain.class === ChainClass.Kusama || chain.class === ChainClass.Polkadot)) {
-        const constructorFunc = (e) => new SubstrateCollectiveProposal(
-          chain.chain, chain.accounts, chain.technicalCommittee, e
-        );
-        return chain.technicalCommittee.updateProposal(constructorFunc, entity, event);
-      } else {
-        const constructorFunc = (e) => new SubstrateCollectiveProposal(
-          chain.chain, chain.accounts, chain.council, e
-        );
-        return chain.council.updateProposal(constructorFunc, entity, event);
-      }
-    }
-    case SubstrateTypes.EntityKind.SignalingProposal: {
-      if (chain.class === ChainClass.Edgeware) {
-        const constructorFunc = (e) => new EdgewareSignalingProposal(
-          chain.chain, chain.accounts, chain.signaling, e
-        );
-        return chain.signaling.updateProposal(constructorFunc, entity, event);
-      } else {
-        console.error('Received signaling update on non-edgeware chain!');
-        break;
-      }
-    }
-    default:
-      console.error('Received invalid substrate chain entity!');
-      break;
-  }
-  // force titles to update?
-  m.redraw();
-}
 
 export interface ISubstrateTXData extends ITXData {
   nonce: string;
