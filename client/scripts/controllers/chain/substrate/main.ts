@@ -30,6 +30,11 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public readonly base = ChainBase.Substrate;
   public readonly class: ChainClass;
 
+  public get timedOut() {
+    console.log(this.chain);
+    return !!this.chain?.timedOut;
+  }
+
   constructor(
     meta: NodeInfo,
     app: IApp,
@@ -37,7 +42,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   ) {
     super(meta, app);
     this.class = _class;
-    this.chain = new SubstrateChain(this.app); // kusama chain id
+    this.chain = new SubstrateChain(this.app);
     this.accounts = new SubstrateAccounts(this.app);
     this.phragmenElections = new SubstratePhragmenElections(this.app);
     this.council = new SubstrateCouncil(this.app);

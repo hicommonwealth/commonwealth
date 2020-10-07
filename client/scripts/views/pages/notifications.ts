@@ -49,7 +49,7 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
     return m(Grid, { class: 'EmailIntervalConfiguration' }, [
       m(Col, { class: 'email-interval-configuration-left', span: { xs: 12, md: 6 } }, [
         m('h4', 'Notification digest'),
-        m('p', 'You can receive a digest with all your unread notifications:'),
+        m('p', 'Receive a digest of your unread notifications'),
         m(RadioGroup, {
           options: ['daily', 'never'],
           name: 'interval',
@@ -88,9 +88,9 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
       m(Col, { class: 'email-interval-configuration-right', span: { xs: 12, md: 6 } }, [
         m('h4', 'Immediate email notifications'),
         m('p', [
-          'You can also select ',
+          'Select ',
           m('strong', 'On (immediate)'),
-          ' to always receive an email when the selected event occurs.'
+          ' to receive an email immediately when the selected event occurs'
         ]),
       ]),
     ]);

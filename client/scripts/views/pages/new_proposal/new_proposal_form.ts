@@ -29,6 +29,7 @@ import PageLoading from 'views/pages/loading';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
+import ErrorPage from 'views/pages/error';
 
 async function loadCmd(type: string) {
   if (!app || !app.chain || !app.chain.loaded) {
@@ -324,6 +325,12 @@ const NewProposalForm = {
     const asCosmos = (app.chain as Cosmos);
 
     if (!dataLoaded) {
+      if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
+        return m(ErrorPage, {
+          message: 'Chain connection timed out.',
+          title: 'Proposals',
+        });
+      }
       return m(Spinner, {
         fill: true,
         message: 'Connecting to chain...',
