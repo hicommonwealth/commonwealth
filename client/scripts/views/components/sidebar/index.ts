@@ -16,7 +16,7 @@ import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
-import CommunitySelector, { CommunityLabel } from './community_selector';
+import CommunitySelector from './community_selector';
 
 const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaInitialized: true }> = {
   view: (vnode) => {
