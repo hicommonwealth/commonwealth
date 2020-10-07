@@ -111,7 +111,7 @@ const TreasuryPage: m.Component<{}> = {
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 30s)...',
+        message: 'Connecting to chain (may take up to 10s)...',
         title: 'Treasury',
         showNewProposalButton: true,
       });
@@ -120,7 +120,7 @@ const TreasuryPage: m.Component<{}> = {
     if (onSubstrate && !(app.chain as Substrate).treasury.initialized) {
       if (!(app.chain as Substrate).treasury.initializing) loadCmd();
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 30s)...',
+        message: 'Connecting to chain (may take up to 10s)...',
         title: 'Treasury',
         showNewProposalButton: true,
       });

@@ -98,7 +98,7 @@ const ReferendaPage: m.Component<{}> = {
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 30s)...',
+        message: 'Connecting to chain (may take up to 10s)...',
         title: 'Referenda',
         showNewProposalButton: true,
       });
@@ -108,7 +108,7 @@ const ReferendaPage: m.Component<{}> = {
       if (!(app.chain as Substrate).democracy.initialized || !(app.chain as Substrate).democracyProposals.initialized) {
         if (!(app.chain as Substrate).democracy.initializing) loadCmd();
         return m(PageLoading, {
-          message: 'Connecting to chain (may take up to 30s)...',
+          message: 'Connecting to chain (may take up to 10s)...',
           title: 'Referenda',
           showNewProposalButton: true,
         });

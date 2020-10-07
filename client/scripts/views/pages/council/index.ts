@@ -225,7 +225,7 @@ const CouncilPage: m.Component<{}> = {
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 30s)...',
+        message: 'Connecting to chain (may take up to 10s)...',
         title: 'Council',
         showNewProposalButton: true
       });
@@ -234,7 +234,7 @@ const CouncilPage: m.Component<{}> = {
     if (!initialized) {
       if (!(app.chain as Substrate).phragmenElections.initializing) loadCmd();
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 30s)...',
+        message: 'Connecting to chain (may take up to 10s)...',
         title: 'Council',
         showNewProposalButton: true
       });

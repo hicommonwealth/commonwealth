@@ -118,7 +118,7 @@ const ProposalsPage: m.Component<{}> = {
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 30s)...',
+        message: 'Connecting to chain (may take up to 10s)...',
         title: 'Proposals',
         showNewProposalButton: true,
       });
@@ -133,7 +133,7 @@ const ProposalsPage: m.Component<{}> = {
           || (!chain.signaling.disabled && !chain.signaling.initialized)) {
         if (!chain.democracy.initializing) loadCmd();
         return m(PageLoading, {
-          message: 'Connecting to chain (may take up to 30s)...',
+          message: 'Connecting to chain (may take up to 10s)...',
           title: 'Proposals',
           showNewProposalButton: true,
         });
