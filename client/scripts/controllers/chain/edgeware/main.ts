@@ -6,6 +6,7 @@ import Substrate from '../substrate/main';
 class Edgeware extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
     super(n, app, ChainClass.Edgeware);
+
     this.technicalCommittee.disable();
   }
 
