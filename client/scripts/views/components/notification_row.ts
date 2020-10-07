@@ -72,7 +72,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ' liked your post ', m('span.commented-obj', decoded_title) ])
+      ? m('span', [ actorName, ' liked the post ', m('span.commented-obj', decoded_title) ])
       : m('span', [ actorName, ' liked your comment in ', m('span.commented-obj', decoded_title || community_name) ]);
   }
   const pseudoProposal = {
@@ -167,7 +167,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
       ? m('span', [
         actorName,
         length > 0 && ` and ${pluralize(length, 'other')}`,
-        ' liked your post ',
+        ' liked the post ',
         m('span.commented-obj', decoded_title)
       ])
       : m('span', [
