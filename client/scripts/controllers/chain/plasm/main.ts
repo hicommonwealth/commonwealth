@@ -16,8 +16,7 @@ class Plasm extends Substrate {
     this.democracy.disable();
     this.treasury.disable();
     this.signaling.disable();
-
-    // TODO: should we disable identity as well?
+    this.identities.disable();
   }
 
   public async initApi() {
