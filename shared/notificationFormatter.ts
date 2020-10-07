@@ -1,6 +1,5 @@
 import { IPostNotificationData, IChainEventNotificationData, NotificationCategories } from './types';
-import { getProposalUrl } from './utils';
-import { renderQuillDeltaToText, smartTrim } from './helpers';
+import { getProposalUrl, renderQuillDeltaToText, smartTrim } from './utils';
 
 import { SERVER_URL } from '../server/config';
 
