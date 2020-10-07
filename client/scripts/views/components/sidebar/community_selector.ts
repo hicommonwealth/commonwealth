@@ -136,45 +136,14 @@ const CommunitySelector = {
             e.stopPropagation();
             m.route.set(item.id ? `/${item.id}` : '/');
           },
-          contentRight: app.isLoggedIn() && app.user.isMember({
-            account: app.user.activeAccount,
-            chain: item.id
-          }) && m('.community-star-toggle', {
-            onclick: (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
-            }
-          }, [
-            roles.map((role) => {
-              return m(User, {
-                avatarSize: 18,
-                avatarOnly: true,
-                user: new AddressInfo(null, role.address, role.address_chain, null),
-              });
-            }),
-            m('.star-icon', [
-              m(Icon, { name: Icons.STAR }),
-            ]),
-          ]),
-        })
-        : item instanceof CommunityInfo
-          ? m(ListItem, {
-            class: app.communities.isStarred(null, item.id) ? 'starred' : '',
-            label: m(CommunityLabel, { community: item }),
-            selected: app.activeCommunityId() === item.id,
-            onclick: () => {
-              m.route.set(item.id ? `/${item.id}` : '/');
-            },
-            contentRight: app.isLoggedIn() && app.user.isMember({
-              account: app.user.activeAccount,
-              community: item.id
-            }) && m('.community-star-toggle', {
+          contentRight: app.isLoggedIn()
+            && roles.length > 0
+            && m('.community-star-toggle', {
               onclick: (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
-              },
+                app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+              }
             }, [
               roles.map((role) => {
                 return m(User, {
@@ -187,6 +156,35 @@ const CommunitySelector = {
                 m(Icon, { name: Icons.STAR }),
               ]),
             ]),
+        })
+        : item instanceof CommunityInfo
+          ? m(ListItem, {
+            class: app.communities.isStarred(null, item.id) ? 'starred' : '',
+            label: m(CommunityLabel, { community: item }),
+            selected: app.activeCommunityId() === item.id,
+            onclick: () => {
+              m.route.set(item.id ? `/${item.id}` : '/');
+            },
+            contentRight: app.isLoggedIn()
+              && roles.length > 0
+              && m('.community-star-toggle', {
+                onclick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                },
+              }, [
+                roles.map((role) => {
+                  return m(User, {
+                    avatarSize: 18,
+                    avatarOnly: true,
+                    user: new AddressInfo(null, role.address, role.address_chain, null),
+                  });
+                }),
+                m('.star-icon', [
+                  m(Icon, { name: Icons.STAR }),
+                ]),
+              ]),
           })
           : m.route.get() !== '/'
             ? m(ListItem, {
