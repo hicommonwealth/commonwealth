@@ -91,7 +91,10 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint: boolean }> = {
+const LoginSelector: m.Component<{ small?: boolean }, {
+  showAddressSelectionHint: boolean,
+  profileLoadComplete: boolean
+}> = {
   view: (vnode) => {
     const { small } = vnode.attrs;
 
@@ -146,6 +149,10 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
       // });
     };
 
+    if (!vnode.state.profileLoadComplete && app.profiles.allLoaded()) {
+      vnode.state.profileLoadComplete = true;
+    }
+
     return m('.LoginSelector', [
       wrapHint(m(Popover, {
         hasArrow: false,
@@ -164,14 +171,13 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
             vnode.state.showAddressSelectionHint = false;
           },
           label: [
-            (!app.chain && !app.community) ? m(Icon, { name: Icons.USER })
-              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
-                : [
-                  m(Icon, { name: Icons.USER }),
-                  m('span.hidden-sm', [
-                    app.user.activeAccounts.length === 0 ? 'Connect an address' : 'Select an address'
-                  ]),
-                ],
+            ((!app.chain && !app.community) || app.chainPreloading) ? m(Icon, { name: Icons.USER })
+              : (app.user.activeAccount === null || !vnode.state.profileLoadComplete) ? m(Icon, { name: Icons.USER })
+                : m(User, {
+                  user: app.user.activeAccount,
+                  showRole: true,
+                  hideIdentityIcon: true,
+                })
           ],
         }),
         content: m(Menu, { class: 'LoginSelectorMenu' }, [
@@ -181,9 +187,10 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
               class: 'switch-user',
               align: 'left',
               basic: true,
-              onclick: (e) => {
+              onclick: async (e) => {
                 const currentActive = app.user.activeAccount;
-                setActiveAccount(account).then(() => { m.redraw(); });
+                await setActiveAccount(account);
+                m.redraw();
               },
               label: m(UserBlock, {
                 user: account,
@@ -208,10 +215,16 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
             m(MenuDivider),
           ],
           m(MenuItem, {
+            onclick: () => (app.activeChainId() || app.activeCommunityId())
+              ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
+              : m.route.set('/notifications'),
+            label: 'Notification settings'
+          }),
+          m(MenuItem, {
             onclick: () => app.activeChainId()
               ? m.route.set(`/${app.activeChainId()}/settings`)
               : m.route.set('/settings'),
-            label: 'Settings'
+            label: 'Login & address settings'
           }),
           m(MenuDivider),
           m(MenuItem, {

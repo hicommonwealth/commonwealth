@@ -20,7 +20,7 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;
 
-    const { slug, identifier, } = proposal;
+    const { slug, identifier } = proposal;
 
     return m('.ProfileCommentGroup', [
       m('.summary', [
@@ -32,9 +32,13 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
         }),
         ' commented',
         (proposal.chain || proposal.community) && [
-          ' in a ',
-          link('a', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`, 
+          ' on a ',
+          link('a', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`,
             (proposal instanceof OffchainThread) ? 'thread' : 'proposal')
+        ],
+        comments[0] && comments[0].createdAt && [
+          m.trust(' &middot; '),
+          m('span', comments[0].createdAt.fromNow()),
         ]
       ]),
       m('.activity', [

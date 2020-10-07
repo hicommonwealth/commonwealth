@@ -19,7 +19,8 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { ChainClass } from 'models';
+import { ChainClass, ChainNetwork } from 'models';
+import Substrate from 'controllers/chain/substrate/main';
 
 export interface ISignalingPageState {
   voteOutcomes: any[];
@@ -32,6 +33,17 @@ export interface ISignalingPageState {
 export interface IBinaryOptionState {
   first: string | number;
   second: string | number;
+}
+
+async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.network !== ChainNetwork.Edgeware) {
+    return;
+  }
+  const chain = (app.chain as Substrate);
+  await chain.signaling.init(chain.chain, chain.accounts);
 }
 
 export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
@@ -47,15 +59,19 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) {
       m.route.set(`/${app.activeChainId()}/login`, {}, { replace: true });
-      return m(PageLoading);
+      return m(PageLoading, { showNewProposalButton: true });
     }
     if (!app.chain || !app.chain.loaded) {
-      return m(PageLoading);
+      return m(PageLoading, { showNewProposalButton: true });
     }
     if (app.chain && app.chain.class !== ChainClass.Edgeware) {
       notifyInfo('Can only create signaling proposals on Edgeware');
       m.route.set(`/${app.activeChainId()}/discussions`);
       return;
+    }
+    if (!(app.chain as Substrate).signaling.disabled && !(app.chain as Substrate).signaling.initialized) {
+      if (!(app.chain as Substrate).signaling.initializing) loadCmd();
+      return m(PageLoading);
     }
 
     const author = app.user.activeAccount;

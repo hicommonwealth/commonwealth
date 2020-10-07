@@ -8,7 +8,7 @@ import { Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Ta
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase, AddressInfo } from 'models';
+import { ChainClass, ChainBase, ChainNetwork, AddressInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
@@ -18,8 +18,10 @@ import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import CommunitySelector, { CommunityLabel } from './community_selector';
 
-const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
+const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaInitialized: true }> = {
   view: (vnode) => {
+    const { sidebarTopic } = vnode.attrs;
+
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
@@ -56,7 +58,8 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
       label: [
         name,
       ],
-      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
+      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
+        || (sidebarTopic && sidebarTopic === id),
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${app.activeId()}/discussions/${name}`);
@@ -101,7 +104,7 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
             }),
         }),
         m(ListItem, {
-          active: onDiscussionsPage(m.route.get()),
+          active: onDiscussionsPage(m.route.get()) && !sidebarTopic,
           label: 'All Discussions',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
@@ -157,7 +160,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
-        || app.chain.base === ChainBase.Substrate
+        || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
         || app.chain.class === ChainClass.Moloch);
     if (!hasProposals) return;
 
@@ -286,6 +289,8 @@ const ChainStatusModule: m.Component<{}> = {
     const formattedUrl = url
       .replace('ws://', '')
       .replace('wss://', '')
+      .replace('http://', '')
+      .replace('https://', '')
       .split('/')[0]
       .split(':')[0];
 
@@ -296,8 +301,10 @@ const ChainStatusModule: m.Component<{}> = {
   }
 };
 
-const Sidebar: m.Component<{}, { open: boolean }> = {
+const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
   view: (vnode) => {
+    const { sidebarTopic } = vnode.attrs;
+
     return [
       m('.MobileSidebarHeader', {
         onclick: (e) => {
@@ -318,7 +325,9 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
           }),
           app.isLoggedIn() && m(MobileNewProposalButton),
         ]),
-        m('.mobile-sidebar-center', [
+        m('.mobile-sidebar-center', {
+          class: app.isLoggedIn() ? 'logged-in' : '',
+        }, [
           m('.community-label', m(CommunitySelector)),
         ]),
         m('.mobile-sidebar-right', [
@@ -334,7 +343,7 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
         },
       }, [
         m('.SidebarHeader', m(CommunitySelector)),
-        (app.chain || app.community) && m(OffchainNavigationModule),
+        (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
         (app.chain || app.community) && m(OnchainNavigationModule),
         app.chain && m(ChainStatusModule),
       ])

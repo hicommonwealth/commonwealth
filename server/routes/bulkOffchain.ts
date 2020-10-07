@@ -30,8 +30,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
 
   // Threads
   const publicThreadsQuery = (community)
-    ? { community: community.id, private: false, }
-    : { chain: chain.id, private: false, };
+    ? { community: community.id }
+    : { chain: chain.id };
 
   const filteredThreads = await models.OffchainThread.findAll({
     where: publicThreadsQuery,

@@ -5,6 +5,8 @@ import Substrate from '../substrate/main';
 class Polkadot extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
     super(n, app, ChainClass.Polkadot);
+
+    this.signaling.disable();
   }
 }
 

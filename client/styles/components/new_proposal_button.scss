@@ -27,4 +27,7 @@ button.NewProposalButton {
 
 .cui-popover.new-proposal-button-popover {
     z-index: 51;
+    .cui-menu-divider:last-child {
+        display: none !important;
+    }
 }

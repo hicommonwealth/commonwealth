@@ -14,10 +14,12 @@ export class DepositVote<C extends Coin> implements IVote<C> {
 export class BinaryVote<C extends Coin> implements IVote<C> {
   public readonly account: Account<C>;
   public readonly choice: boolean;
+  public readonly amount: number;
   public readonly weight: number;
-  constructor(account: Account<C>, choice: boolean, weight?: number) {
+  constructor(account: Account<C>, choice: boolean, amount?: number, weight?: number) {
     this.account = account;
     this.choice = choice;
+    this.amount = amount;
     this.weight = weight;
   }
 }
