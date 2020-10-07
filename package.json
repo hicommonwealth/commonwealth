@@ -1,6 +1,6 @@
 {
   "name": "@commonwealth/chain-events",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Listen to various chains for events.",
   "license": "GPL-3.0",
   "files": [
@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/hicommonwealth/chain-events#readme",
   "dependencies": {
-    "@edgeware/node-types": "3.0.3",
+    "@edgeware/node-types": "3.0.4",
     "@polkadot/api": "2.0.1",
     "bn.js": "^5.1.2",
     "ethereum-block-by-date": "^1.2.2",
