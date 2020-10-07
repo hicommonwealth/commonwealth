@@ -4,7 +4,7 @@ import { capitalize } from 'lodash';
 import { SubstrateEvents } from '@commonwealth/chain-events';
 
 import { NotificationCategories } from '../shared/types';
-import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/helpers';
+import { smartTrim, validURL, renderQuillDeltaToText } from './helpers';
 import { getForumNotificationCopy } from '../shared/notificationFormatter';
 import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK } from './config';
 
