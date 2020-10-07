@@ -24,6 +24,7 @@ import NewProposalPage from 'views/pages/new_proposal/index';
 import { Grid, Col, List } from 'construct-ui';
 import moment from 'moment';
 import Listing from './listing';
+import ErrorPage from './error';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -90,6 +91,12 @@ const ReferendaPage: m.Component<{}> = {
   },
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
+      if (app.chain?.timedOut) {
+        return m(ErrorPage, {
+          message: 'Chain connection timed out.',
+          title: 'Proposals',
+        });
+      }
       return m(PageLoading, {
         message: 'Connecting to chain (may take up to 30s)...',
         title: 'Referenda',

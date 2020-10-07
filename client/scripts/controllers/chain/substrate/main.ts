@@ -30,6 +30,10 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public readonly base = ChainBase.Substrate;
   public readonly class: ChainClass;
 
+  public get timedOut() {
+    return !!this.chain?.timedOut;
+  }
+
   constructor(
     meta: NodeInfo,
     app: IApp,

@@ -26,6 +26,7 @@ import { Grid, Col, Button, MenuItem } from 'construct-ui';
 import CouncilRow from './council_row';
 import ListingHeader from '../../components/listing_header';
 import Listing from '../listing';
+import ErrorPage from '../error';
 
 interface ICouncilElectionVoterAttrs {
   vote: PhragmenElectionVote;
@@ -217,6 +218,12 @@ const CouncilPage: m.Component<{}> = {
   },
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
+      if (app.chain?.timedOut) {
+        return m(ErrorPage, {
+          message: 'Chain connection timed out.',
+          title: 'Proposals',
+        });
+      }
       return m(PageLoading, {
         message: 'Connecting to chain (may take up to 30s)...',
         title: 'Council',

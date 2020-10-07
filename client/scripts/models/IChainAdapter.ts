@@ -18,6 +18,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   protected _apiInitialized: boolean = false;
   public get apiInitialized() { return this._apiInitialized; }
 
+  public readonly timedOut: boolean;
+
   protected _loaded: boolean = false;
   public get loaded() { return this._loaded; }
 

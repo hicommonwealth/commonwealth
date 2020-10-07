@@ -48,19 +48,6 @@ import { u128, TypeRegistry } from '@polkadot/types';
 import { constructSubstrateUrl } from 'substrate';
 import { SubstrateAccount } from './account';
 
-// creates a substrate API provider and waits for it to emit a connected event
-async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
-  const nodeUrl = constructSubstrateUrl(node.url);
-  const provider = new WsProvider(nodeUrl, 10 * 1000);
-  let unsubscribe: () => void;
-  await new Promise((resolve) => {
-    unsubscribe = provider.on('connected', () => resolve());
-  });
-  if (unsubscribe) unsubscribe();
-  window['wsProvider'] = provider;
-  return provider;
-}
-
 export interface ISubstrateTXData extends ITXData {
   nonce: string;
   blockHash: string;
@@ -143,42 +130,75 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
   public get registry() { return this._api.registry; }
 
-  public async resetApi(selectedNode: NodeInfo, additionalOptions?): Promise<ApiRx> {
+  private _connectTime = 0;
+  private _timedOut: boolean = false;
+  public get timedOut() { return this._timedOut; }
+
+  // creates a substrate API provider and waits for it to emit a connected event
+  public async createApiProvider(node: NodeInfo): Promise<WsProvider> {
+    this._suppressAPIDisconnectErrors = false;
+    const INTERVAL = 1000;
+    const CONNECT_TIMEOUT = 10000;
+
+    const nodeUrl = constructSubstrateUrl(node.url);
+    const provider = new WsProvider(nodeUrl, INTERVAL);
+
     const connectedCb = () => {
       this.app.chain.networkStatus = ApiStatus.Connected;
       this.app.chain.networkError = null;
       this._suppressAPIDisconnectErrors = false;
+      this._connectTime = 0;
       m.redraw();
     };
     const disconnectedCb = () => {
-      if (!this._suppressAPIDisconnectErrors && this.app.chain && selectedNode === this.app.chain.meta) {
+      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {
         this.app.chain.networkStatus = ApiStatus.Disconnected;
         this.app.chain.networkError = null;
         this._suppressAPIDisconnectErrors = true;
         setTimeout(() => {
           this._suppressAPIDisconnectErrors = false;
-        }, 5000);
+        }, CONNECT_TIMEOUT);
         m.redraw();
       }
     };
     const errorCb = (err) => {
-      if (!this._suppressAPIDisconnectErrors && this.app.chain && selectedNode === this.app.chain.meta) {
-        console.log('api error');
+      console.log(`api error; waited ${this._connectTime}ms`);
+      this._connectTime += INTERVAL;
+      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {
+        if (this.app.chain.networkStatus === ApiStatus.Connected) {
+          notifyInfo('Reconnecting to chain...');
+        } else {
+          notifyInfo('Connecting to chain...');
+        }
         this.app.chain.networkStatus = ApiStatus.Disconnected;
         this.app.chain.networkError = err.message;
-        notifyInfo('Reconnecting to chain...');
         this._suppressAPIDisconnectErrors = true;
         setTimeout(() => {
-          this._suppressAPIDisconnectErrors = false;
-        }, 5000);
+          // this._suppressAPIDisconnectErrors = false;
+          provider.disconnect();
+          this._timedOut = true;
+          m.redraw();
+        }, CONNECT_TIMEOUT);
         m.redraw();
       }
     };
-    const provider = await createApiProvider(selectedNode);
-    if (provider.isConnected) connectedCb();
+
     this._removeConnectedCb = provider.on('connected', connectedCb);
     this._removeDisconnectedCb = provider.on('disconnected', disconnectedCb);
     this._removeErrorCb = provider.on('error', errorCb);
+
+    let unsubscribe: () => void;
+    await new Promise((resolve) => {
+      unsubscribe = provider.on('connected', () => resolve());
+    });
+    if (unsubscribe) unsubscribe();
+    window['wsProvider'] = provider;
+    if (provider.isConnected) connectedCb();
+    return provider;
+  }
+
+  public async resetApi(selectedNode: NodeInfo, additionalOptions?): Promise<ApiRx> {
+    const provider = await this.createApiProvider(selectedNode);
 
     // note that we reuse the same provider and type registry to create both an rxjs
     // and a promise-based API -- this avoids creating multiple connections to the node
