@@ -198,6 +198,17 @@ export const getCouncilCandidates = () => {
   return candidates;
 };
 
+async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const chain = (app.chain as Substrate);
+  await chain.phragmenElections.init(chain.chain, chain.accounts);
+}
+
 const CouncilPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
@@ -214,15 +225,16 @@ const CouncilPage: m.Component<{}> = {
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 30s)...',
+        message: 'Connecting to chain (may take up to 10s)...',
         title: 'Council',
-        showNewProposalButton: true,
+        showNewProposalButton: true
       });
     }
     const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
     if (!initialized) {
+      if (!(app.chain as Substrate).phragmenElections.initializing) loadCmd();
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 30s)...',
+        message: 'Connecting to chain (may take up to 10s)...',
         title: 'Council',
         showNewProposalButton: true
       });

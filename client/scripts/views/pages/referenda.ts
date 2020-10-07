@@ -60,6 +60,20 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   }
 };
 
+async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const chain = (app.chain as Substrate);
+  await Promise.all([
+    chain.democracy.init(chain.chain, chain.accounts),
+    chain.democracyProposals.init(chain.chain, chain.accounts),
+  ]);
+}
+
 const ReferendaPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ReferendaPage' });
@@ -84,12 +98,22 @@ const ReferendaPage: m.Component<{}> = {
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 30s)...',
+        message: 'Connecting to chain (may take up to 10s)...',
         title: 'Referenda',
         showNewProposalButton: true,
       });
     }
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
+    if (onSubstrate) {
+      if (!(app.chain as Substrate).democracy.initialized || !(app.chain as Substrate).democracyProposals.initialized) {
+        if (!(app.chain as Substrate).democracy.initializing) loadCmd();
+        return m(PageLoading, {
+          message: 'Connecting to chain (may take up to 10s)...',
+          title: 'Referenda',
+          showNewProposalButton: true,
+        });
+      }
+    }
 
     // active proposals
     const activeDemocracyReferenda = onSubstrate

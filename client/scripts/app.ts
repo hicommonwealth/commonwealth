@@ -406,7 +406,6 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
