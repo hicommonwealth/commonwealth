@@ -4,7 +4,7 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import { formatAddressShort, link } from 'helpers';
-import { Tooltip, Tag, Icon, Icons } from 'construct-ui';
+import { Tooltip, Tag, Icon, Icons, Popover } from 'construct-ui';
 
 import app from 'state';
 import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
@@ -136,7 +136,12 @@ const User: m.Component<{
     ]);
 
     return tooltip
-      ? m(Tooltip, { content: tooltipPopover, hoverOpenDelay: 1000, trigger: userFinal, key: profile?.address || '-' })
+      ? m(Popover, {
+        interactionType: 'hover',
+        content: tooltipPopover,
+        trigger: userFinal,
+        key: profile?.address || '-'
+      })
       : userFinal;
   }
 };
