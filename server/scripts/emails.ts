@@ -40,7 +40,7 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
   } else {
     if (category_id === NotificationCategories.NewReaction || category_id === NotificationCategories.ThreadEdit) return;
     const [
-      emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, path
+      emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath
     ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
     return {
       from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -56,7 +56,8 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
           rootObject: objectCopy,
           community: communityCopy,
           excerpt,
-          path,
+          proposalPath,
+          authorPath,
         }
       }
     };
@@ -72,7 +73,7 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
       // TODO: implement chain event
     } else {
       const [
-        emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, path
+        emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath
       ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
 
       let createdAt = moment(n.created_at).fromNow();
@@ -83,7 +84,8 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
         rootObject: objectCopy,
         community: communityCopy,
         excerpt,
-        path,
+        proposalPath,
+        authorPath,
         createdAt,
       };
     }
