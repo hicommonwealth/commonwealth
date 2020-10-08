@@ -14,7 +14,7 @@
     }
 
     .ql-editor {
-        min-height: 320px;
+        min-height: calc(100vh - 360px);
         @include xs-max {
             min-height: calc(100vh - 440px);
         }
@@ -94,6 +94,7 @@
         }
         button[name="submit"], button[name="submission"] {
             margin-right: 12px;
+            margin-bottom: 8px;
         }
         .error-message {
             @include error-text;

@@ -6,19 +6,24 @@
         padding: 18px 24px 20px;
         margin-bottom: 40px;
         display: flex;
-        .email-interval-configuration-left,
-        .email-interval-configuration-right {
-            flex: 1;
-        }
-        .email-interval-configuration-right {
-            padding-left: 20px;
-        }
         h4 {
             margin: 0;
-            margin-bottom: 10px;
         }
         p {
-            margin-bottom: 0;
+            margin: 3px 0 15px;
+            line-height: 1.2;
+        }
+        .cui-radio {
+            margin-bottom: 15px;
+        }
+        .email-interval-configuration-left,
+        .email-interval-configuration-right {
+            padding-right: 10px;
+        }
+        @include sm-max {
+            .email-interval-configuration-left {
+                margin-bottom: 20px;
+            }
         }
     }
     .NotificationsTable {
@@ -33,8 +38,17 @@
             border: none;
             padding: 6px 0;
             height: 43px;
-            &.subscription-label a {
-                margin-left: 20px;
+            &.subscription-label {
+                padding-right: 30px;
+                line-height: 1.2;
+                .cui-tag {
+                    margin-left: 8px;
+                }
+            }
+            .item-metadata {
+                font-size: 90%;
+                color: $text-color-medium;
+                margin-left: 6px;
             }
         }
         tr:nth-child(2) td {
@@ -52,7 +66,11 @@
         td.subscription-setting {
             text-align: right;
             button {
-                width: 120px;
+                width: 170px;
+                text-align: left;
+            }
+            button.sometimes {
+                color: $text-color-light;
             }
         }
     }
@@ -67,5 +85,14 @@
         padding: 0;
         min-width: 125px;
         overflow: scroll;
+    }
+    .cui-list-item.cui-active {
+        background: none;
+    }
+    .cui-list-item.cui-selected {
+        background: $background-color-light;
+    }
+    .cui-list-item:hover {
+        background: $background-color-light !important;
     }
 }

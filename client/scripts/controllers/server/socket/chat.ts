@@ -3,6 +3,7 @@ import moment from 'moment-twitter';
 import app from 'state';
 import { IWebsocketsPayload, WebsocketMessageType } from 'types';
 import { Account } from 'models';
+import { notifyError } from 'controllers/app/notifications';
 
 import WebsocketController from '.';
 
@@ -46,7 +47,7 @@ class ChatController extends WebsocketController {
       const payload = { event: WebsocketMessageType.InitializeScrollback, jwt };
       this._ws.send(JSON.stringify(payload));
     } catch (e) {
-      // do nothing
+      notifyError('Could not load past messages');
     }
   }
 
@@ -55,7 +56,7 @@ class ChatController extends WebsocketController {
       const payload = { event: WebsocketMessageType.Typing, jwt };
       this._ws.send(JSON.stringify(payload));
     } catch (e) {
-      // do nothing
+      console.error('Could not send typing indicator');
     }
   }
 }

@@ -3,7 +3,6 @@
 
 .ListingSidebar {
     margin: 10px 20px;
-    @include community-info-module-styles();
 
     .user-activity-header,
     .forum-activity-header {
@@ -51,17 +50,5 @@
                 color: $text-color-light;
             }
         }
-    }
-
-    .CommunityInfoModule {
-        position: absolute;
-        bottom: 14px;
-        left: 0px;
-        margin: 0 15px;
-
-        // background
-        background: $background-color-light-hover;
-        padding: 16px 18px;
-        border-radius: 4px;
     }
 }

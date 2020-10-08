@@ -6,7 +6,14 @@ import _ from 'lodash';
 import app from 'state';
 
 import { ReactionStore } from 'stores';
-import { OffchainReaction, AnyProposal, OffchainComment, OffchainThread, Proposal, ChainEntity } from 'models';
+import {
+  OffchainReaction,
+  AnyProposal,
+  OffchainComment,
+  OffchainThread,
+  Proposal,
+  AbridgedThread
+} from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
 export const modelFromServer = (reaction) => {
@@ -27,7 +34,7 @@ class ReactionsController {
   private _store: ReactionStore = new ReactionStore();
   public get store() { return this._store; }
 
-  public getByPost(post: OffchainThread | AnyProposal | OffchainComment<any>) {
+  public getByPost(post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>) {
     return this._store.getByPost(post);
   }
 

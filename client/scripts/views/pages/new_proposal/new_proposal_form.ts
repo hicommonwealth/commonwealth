@@ -8,7 +8,7 @@ import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
-import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
+import { ITXModalData, ProposalModule, ChainBase, ChainClass, OffchainThreadKind } from 'models';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
@@ -25,9 +25,24 @@ import {
   DropdownFormField,
   RadioSelectorFormField
 } from 'views/components/forms';
+import PageLoading from 'views/pages/loading';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
+import ErrorPage from 'views/pages/error';
+
+async function loadCmd(type: string) {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const c = proposalSlugToClass().get(type);
+  if (c && c instanceof ProposalModule && !c.disabled) {
+    await c.init(app.chain.chain, app.chain.accounts);
+  }
+}
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -43,6 +58,7 @@ const NewProposalForm = {
 
     if (!author) return m('div', 'Must be logged in');
     if (!callback) return m('div', 'Must have callback');
+    if (app.chain?.class === ChainClass.Plasm) return m('div', 'Unsupported network');
 
     let hasCouncilMotionChooser : boolean;
     let hasAction : boolean;
@@ -63,6 +79,20 @@ const NewProposalForm = {
     let hasMolochFields : boolean;
     // data loaded
     let dataLoaded : boolean = true;
+
+    // wait for chain if not offchain
+    if (proposalTypeEnum !== ProposalType.OffchainThread) {
+      if (!app.chain || !app.chain.loaded)
+        return m(PageLoading, { narrow: true });
+
+      // check if module is still initializing
+      const c = proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any>;
+      if (!c.disabled && !c.initialized) {
+        if (!c.initializing) loadCmd(proposalTypeEnum);
+        return m(PageLoading, { narrow: true });
+      }
+    }
+
     if (proposalTypeEnum === ProposalType.SubstrateDemocracyProposal) {
       hasAction = true;
       hasToggle = true;
@@ -295,6 +325,12 @@ const NewProposalForm = {
     const asCosmos = (app.chain as Cosmos);
 
     if (!dataLoaded) {
+      if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
+        return m(ErrorPage, {
+          message: 'Chain connection timed out.',
+          title: 'Proposals',
+        });
+      }
       return m(Spinner, {
         fill: true,
         message: 'Connecting to chain...',

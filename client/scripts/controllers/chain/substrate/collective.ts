@@ -1,11 +1,12 @@
 import { first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Call, AccountId } from '@polkadot/types/interfaces';
+import { Vec } from '@polkadot/types';
 import { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { ProposalModule } from 'models';
 import { Unsubscribable } from 'rxjs';
-import { Vec } from '@polkadot/types';
+import { IApp } from 'state';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateCollectiveProposal } from './collective_proposal';
@@ -22,34 +23,57 @@ class SubstrateCollective extends ProposalModule<
     return this._members.find((m) => m.address === account.address) !== undefined;
   }
 
-  private _moduleName: string;
-  public get moduleName() { return this._moduleName; }
+  constructor(app: IApp, public readonly moduleName: 'council' | 'technicalCommittee') {
+    super(app, (e) => new SubstrateCollectiveProposal(this._Chain, this._Accounts, this, e));
+  }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
   // TODO: we may want to track membership here as well as in elections
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, moduleName: string): Promise<void> {
+  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    if (this._initializing || this._initialized || this.disabled) return;
+    this._initializing = true;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
-    this._moduleName = moduleName;
-    return new Promise((resolve, reject) => {
-      const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.CollectiveProposal);
-      const constructorFunc = (e) => new SubstrateCollectiveProposal(this._Chain, this._Accounts, this, e);
-      const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 
-      this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
-        const memberP = new Promise((memberResolve) => {
-          this._memberSubscription = api.query[moduleName].members().subscribe((members: Vec<AccountId>) => {
+    // load server proposals
+    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.CollectiveProposal);
+    entities.map((e) => {
+      const event = e.chainEvents[0];
+      if (event && (event.data as any).collectiveName === this.moduleName) {
+        return this._entityConstructor(e);
+      }
+    });
+
+    return new Promise((resolve, reject) => {
+      this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
+        // fetch proposals from chain
+        await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          this,
+          () => this._Chain.fetcher.fetchCollectiveProposals(this.moduleName, this.app.chain.block.height)
+        );
+
+        // register new chain-event handlers
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.CollectiveProposal, (entity, event) => {
+            if (this.initialized && (event.data as any).collectiveName === this.moduleName) {
+              this.updateProposal(entity, event);
+            }
+          }
+        );
+
+        await new Promise((memberResolve) => {
+          this._memberSubscription = api.query[this.moduleName].members().subscribe((members: Vec<AccountId>) => {
             this._members = members.toArray().map((v) => this._Accounts.fromAddress(v.toString()));
             memberResolve();
           });
-        }).then(() => {
-          this._initialized = true;
-          resolve();
-        }).catch((err) => {
-          reject(err);
         });
+
+        this._initialized = true;
+        this._initializing = false;
+        resolve();
       });
     });
   }
@@ -131,14 +155,20 @@ class SubstrateCollective extends ProposalModule<
 }
 
 export class SubstrateCouncil extends SubstrateCollective {
+  constructor(app: IApp) {
+    super(app, 'council');
+  }
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
-    return super.init(ChainInfo, Accounts, 'council');
+    return super.init(ChainInfo, Accounts);
   }
 }
 
 export class SubstrateTechnicalCommittee extends SubstrateCollective {
+  constructor(app: IApp) {
+    super(app, 'technicalCommittee');
+  }
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
-    return super.init(ChainInfo, Accounts, 'technicalCommittee');
+    return super.init(ChainInfo, Accounts);
   }
 }
 

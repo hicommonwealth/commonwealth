@@ -42,7 +42,7 @@ describe('User Model Routes', () => {
     });
 
     it('should add an email to user with just an address', async () => {
-      const email = 'test2@commonwealth.im';
+      const email = 'test@commonwealth.im';
       const res = await chai.request(app)
         .post('/api/updateEmail')
         .set('Accept', 'application/json')

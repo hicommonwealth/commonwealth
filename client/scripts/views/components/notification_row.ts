@@ -55,7 +55,11 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
+  const actorName = m(User, {
+    user: new AddressInfo(null, author_address, author_chain, null),
+    hideAvatar: true,
+    hideIdentityIcon: true,
+  });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -68,7 +72,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ' liked your post ', m('span.commented-obj', decoded_title) ])
+      ? m('span', [ actorName, ' liked the post ', m('span.commented-obj', decoded_title) ])
       : m('span', [ actorName, ' liked your comment in ', m('span.commented-obj', decoded_title || community_name) ]);
   }
   const pseudoProposal = {
@@ -116,7 +120,11 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
+  const actorName = m(User, {
+    user: new AddressInfo(null, author_address, author_chain, null),
+    hideAvatar: true,
+    hideIdentityIcon: true,
+  });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -159,7 +167,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
       ? m('span', [
         actorName,
         length > 0 && ` and ${pluralize(length, 'other')}`,
-        ' liked your post ',
+        ' liked the post ',
         m('span.commented-obj', decoded_title)
       ])
       : m('span', [

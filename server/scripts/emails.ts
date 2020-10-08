@@ -65,19 +65,27 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
 };
 
 const createNotificationDigestEmailObject = async (user, notifications, models) => {
+  console.log(6);
   const emailObjArray = await Promise.all(notifications.map(async (n) => {
-    const { category_id } = await n.getSubscription();
+    const s = await n.getSubscription();
+    console.log(s);
+    console.log(n);
+    console.log(n.notification_data);
+    const { category_id } = s;
     const notification_data = JSON.parse(n.notification_data);
 
+    console.log(7);
     if (notification_data.chain_event) {
       // TODO: implement chain event
     } else {
+      console.log(8);
       const [
         emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath
       ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
 
       let createdAt = moment(n.created_at).fromNow();
       if (createdAt === 'a day ago') createdAt = `${moment(Date.now()).diff(n.created_at, 'hours')} hours ago`;
+      console.log(9);
       return {
         author: subjectCopy,
         action: actionCopy,
@@ -91,6 +99,7 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
     }
   }));
 
+  console.log(10);
   // construct email
   return {
     from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -123,17 +132,19 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
   }
 };
 
-export const sendBatchedNotificationEmails = (models) => {
+export const sendBatchedNotificationEmails = async (models): Promise<number> => {
   log.info('Sending daily notification emails');
 
-  models.User.findAll({
-    where: { emailNotificationInterval: 'daily' }
-  }).then((users) => {
+  try {
+    const users = await models.User.findAll({
+      where: { emailNotificationInterval: 'daily' }
+    });
+
     log.info(`Sending to ${users.length} users`);
 
     const { Op } = models.sequelize;
     const last24hours = new Date((new Date() as any) - 24 * 60 * 60 * 1000);
-    Promise.all(users.map(async (user) => {
+    await Promise.all(users.map(async (user) => {
       const notifications = await models.Notification.findAll({
         include: [{
           model: models.Subscription,
@@ -150,24 +161,21 @@ export const sendBatchedNotificationEmails = (models) => {
       if (notifications.length === 0) return; // don't notify if there have been no new notifications in the last 24h
 
       // send notification email
-      const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
-      emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
-      emailObject.bcc = 'raymond+bcc@commonwealth.im';
       try {
+        const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
+        emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
+        emailObject.bcc = 'raymond+bcc@commonwealth.im';
+
         console.log(`sending batch notification email to ${user.email}`);
         await sgMail.send(emailObject);
       } catch (e) {
         console.log('Failed to send batch notification email', e?.response?.body?.errors);
         console.log(log.error(e));
       }
-    })).then(() => {
-      process.exit(0);
-    }).catch((err) => {
-      console.log(err);
-      process.exit(1);
-    });
-  }).catch((err) => {
-    console.log(err);
-    process.exit(1);
-  });
+    }));
+    return 0;
+  } catch (e) {
+    console.log(e.message);
+    return 1;
+  }
 };

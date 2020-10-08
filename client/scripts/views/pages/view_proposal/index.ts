@@ -5,10 +5,9 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { PopoverMenu, MenuDivider, Icon, Icons } from 'construct-ui';
 
-import { NotificationCategories } from 'types';
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { idToProposal, ProposalType } from 'identifiers';
+import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
 import { slugify, isSameAccount } from 'helpers';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -20,6 +19,8 @@ import {
   OffchainTopic,
   AnyProposal,
   Account,
+  ChainBase,
+  ProposalModule,
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
@@ -447,6 +448,19 @@ interface IPrefetch {
   }
 }
 
+async function loadCmd(type: string) {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const c = proposalSlugToClass().get(type);
+  if (c && c instanceof ProposalModule && !c.disabled) {
+    await c.init(app.chain.chain, app.chain.accounts);
+  }
+}
+
 const ViewProposalPage: m.Component<{
   identifier: string,
   type: string
@@ -485,7 +499,7 @@ const ViewProposalPage: m.Component<{
 
     // load app controller
     if (!app.threads.initialized) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
     // load proposal
@@ -494,9 +508,17 @@ const ViewProposalPage: m.Component<{
       proposal = idToProposal(proposalType, proposalId);
     } catch (e) {
       // proposal might be loading, if it's not an offchain thread
-      if (proposalType !== ProposalType.OffchainThread && !app.chain.loaded) {
-        return m(PageLoading, { narrow: true });
+      if (proposalType !== ProposalType.OffchainThread) {
+        if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
+
+        // check if module is still initializing
+        const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
+        if (!c.disabled && !c.initialized) {
+          if (!c.initializing) loadCmd(proposalType);
+          return m(PageLoading, { narrow: true, showNewProposalButton: true });
+        }
       }
+
       // proposal does not exist, 404
       return m(PageNotFound);
     }
@@ -561,10 +583,10 @@ const ViewProposalPage: m.Component<{
     }
 
     if (vnode.state.comments === undefined) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
     if (vnode.state.viewCount === undefined) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
     // load profiles
@@ -581,7 +603,7 @@ const ViewProposalPage: m.Component<{
       vnode.state.prefetch[identifier]['profilesStarted'] = true;
     }
     if (!app.profiles.allLoaded() && !vnode.state.prefetch[identifier]['profilesFinished']) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
     vnode.state.prefetch[identifier]['profilesFinished'] = true;
 
@@ -660,6 +682,7 @@ const ViewProposalPage: m.Component<{
     const { replyParent } = vnode.state;
     return m(Sublayout, {
       class: 'ViewProposalPage',
+      sidebarTopic: proposal instanceof OffchainThread ? proposal.topic?.id : null,
       rightSidebar: proposal instanceof OffchainThread
         ? null
         : m(ProposalSidebar, { proposal }),
