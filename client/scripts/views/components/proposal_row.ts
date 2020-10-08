@@ -288,7 +288,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
 
     const rowMetadata = [
       m(UserGallery, {
-        tooltip: true,
+        popover: true,
         avatarSize: 24,
         users: app.comments.uniqueCommenters(proposal)
       }),
@@ -352,7 +352,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
                   null
                 ),
                 hideAvatar: true,
-                tooltip: true,
+                popover: true,
               }),
             ]),
             m('.treasury-row-metadata .treasury-user-mobile', [
@@ -364,7 +364,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
                   null
                 ),
                 hideAvatar: true,
-                tooltip: true,
+                popover: true,
               }),
             ]),
           ])

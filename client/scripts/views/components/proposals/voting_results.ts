@@ -42,20 +42,20 @@ const ProposalVotingResults = {
             });
           }
           return vote instanceof SignalingVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+            m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
             m('.vote-choice', signalingVoteToString(vote.choices[0])),
             balanceWeighted && balance && m('.vote-balance', balanceStr),
           ]) : vote instanceof BinaryVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+            m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
             m('.vote-choice', vote.choice ? 'yes' : 'no'),
             balanceWeighted && balance && m('.vote-balance', balanceStr),
             m('.vote-weight', vote.weight && `${vote.weight}x`),
           ]) : vote instanceof DepositVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+            m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
             m('.vote-deposit', formatCoin(vote.deposit, true)),
           ])
             : vote instanceof CosmosVote ? m('.vote', [
-              m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+              m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
               m('.vote-choice', vote.choice.toString()),
               // balanceWeighted && balance && m('.vote-balance', balanceStr),
             ])
@@ -65,7 +65,7 @@ const ProposalVotingResults = {
                 balance && m('.vote-balance', balanceStr),
               ])
                 : m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
                 ]);
         }
       );

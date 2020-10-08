@@ -295,12 +295,12 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
             ),
             avatarOnly: true,
             avatarSize: 26,
-            tooltip: true,
+            popover true,
           })
           : m(UserGallery, {
             users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
             avatarSize: 26,
-            tooltip: true,
+            popover true,
           }),
         m('.comment-body', [
           m('.comment-body-title', notificationHeader),

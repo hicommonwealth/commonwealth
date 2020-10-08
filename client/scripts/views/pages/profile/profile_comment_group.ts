@@ -28,7 +28,7 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           user: new AddressInfo(null, account.address, account.chain, null),
           linkify: true,
           hideAvatar: true,
-          tooltip: true
+          popover: true
         }),
         ' commented',
         (proposal.chain || proposal.community) && [
