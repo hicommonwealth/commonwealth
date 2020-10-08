@@ -109,6 +109,36 @@
     }
 }
 
+.hidden-sidebar .SidebarQuickSwitcher {
+    display: none;
+}
+.SidebarQuickSwitcher {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 18px 14px;
+    width: $quick-switcher-width;
+    background: $background-color-border;
+    z-index: 3;
+    @include sm-max {
+        display: none;
+    }
+    .ChainIcon, .CommunityIcon {
+        cursor: pointer;
+        margin-bottom: 11px;
+        opacity: 0.3;
+        &:hover {
+            opacity: 0.33;
+        }
+    }
+    .quick-switcher-option.active {
+        .ChainIcon, .CommunityIcon {
+            opacity: 1;
+        }
+    }
+}
+
 .Sidebar {
     z-index: 2;
     @include sm-max {

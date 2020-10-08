@@ -24,6 +24,10 @@
 }
 
 .CommunitySelectList {
+    left: $quick-switcher-width - 4px !important;
+    @include sm-max {
+        left: 0 !important;
+    }
     .cui-popover-content {
         max-height: 100vh;
         overflow-y: auto;
