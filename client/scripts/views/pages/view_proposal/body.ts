@@ -59,7 +59,7 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
     return m('.ProposalBodyAvatar', [
       m(User, {
         user: author,
-        tooltip: true,
+        popover: true,
         avatarOnly: true,
         avatarSize: 40,
       }),
@@ -82,7 +82,7 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
     return m('.ProposalBodyAuthor', [
       m(User, {
         user: author,
-        tooltip: true,
+        popover: true,
         linkify: true,
         hideAvatar: true,
       }),

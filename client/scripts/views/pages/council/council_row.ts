@@ -28,7 +28,7 @@ const CouncilRow: m.Component<ICollectiveMemberAttrs> = {
     const rowHeader = m(User, {
       user: account,
       hideAvatar: true,
-      tooltip: true,
+      popover: true,
     });
 
     const rowSubheader = m('span.council-row-subheader', election.isMember(account)

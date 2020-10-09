@@ -56,7 +56,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       m(User, {
         user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
         linkify: true,
-        tooltip: true,
+        popover: true,
         hideAvatar: true,
       }),
     ];
@@ -79,7 +79,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     const rowMetadata = [
       m(UserGallery, {
         avatarSize: 24,
-        tooltip: true,
+        popover: true,
         users: app.comments.uniqueCommenters(
           proposal,
           proposal.author,

@@ -31,7 +31,7 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
           avatarOnly: true,
           avatarSize: 32,
           linkify: true,
-          tooltip: true
+          popover: true
         }),
       ]),
       m('.info-col', [
@@ -40,7 +40,7 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
             user: account,
             hideAvatar: true,
             linkify: true,
-            tooltip: true,
+            popover: true,
           }),
         ]),
         // checking for balance to guarantee that delegate key has loaded
