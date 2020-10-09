@@ -5,10 +5,9 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { PopoverMenu, MenuDivider, Icon, Icons } from 'construct-ui';
 
-import { NotificationCategories } from 'types';
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { idToProposal, ProposalType } from 'identifiers';
+import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
 import { slugify, isSameAccount } from 'helpers';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -20,6 +19,8 @@ import {
   OffchainTopic,
   AnyProposal,
   Account,
+  ChainBase,
+  ProposalModule,
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
@@ -218,7 +219,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
 
     return m('.ProposalComment', {
       class: `${parentType}-child comment-${comment.id}`,
-      onchange: () => m.redraw(),
+      onchange: () => m.redraw(), // TODO: avoid catching bubbled input events
     }, [
       (!isLast || app.user.activeAccount) && m('.thread-connector'),
       m('.comment-avatar', [
@@ -335,7 +336,6 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
       proposal, comments, createdCommentCallback, getSetGlobalEditingStatus,
       getSetGlobalReplyStatus, replyParent
     } = vnode.attrs;
-
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
@@ -381,8 +381,8 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
       });
     };
 
-    const AllComments = (comments, replyParent2) => {
-      return comments.map((comment, index) => {
+    const AllComments = (comments2, replyParent2) => {
+      return comments2.map((comment, index) => {
         return ([
           m(ProposalComment, {
             comment,
@@ -391,7 +391,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
             parent: proposal,
             proposal,
             callback: createdCommentCallback,
-            isLast: index === comments.length - 1,
+            isLast: index === comments2.length - 1,
           }),
           // if comment has children, they are fetched & rendered
           !!comment.childComments.length
@@ -439,6 +439,28 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
+interface IPrefetch {
+  [identifier: string]: {
+    commentsStarted: boolean,
+    viewCountStarted: boolean,
+    profilesStarted: boolean,
+    profilesFinished: boolean,
+  }
+}
+
+async function loadCmd(type: string) {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.base !== ChainBase.Substrate) {
+    return;
+  }
+  const c = proposalSlugToClass().get(type);
+  if (c && c instanceof ProposalModule && !c.disabled) {
+    await c.init(app.chain.chain, app.chain.accounts);
+  }
+}
+
 const ViewProposalPage: m.Component<{
   identifier: string,
   type: string
@@ -446,12 +468,9 @@ const ViewProposalPage: m.Component<{
   editing: boolean,
   replyParent: number | boolean,
   highlightedComment: boolean,
-  commentsPrefetchStarted: boolean,
+  prefetch: IPrefetch,
   comments,
-  viewCountPrefetchStarted: boolean,
   viewCount: number,
-  profilesPrefetchStarted: boolean
-  profilesPrefetchFinished: boolean
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -466,12 +485,21 @@ const ViewProposalPage: m.Component<{
   view: (vnode) => {
     const { identifier, type } = vnode.attrs;
     if (typeof identifier !== 'string') return m(PageNotFound);
+    if (!vnode.state.prefetch || !vnode.state.prefetch[identifier]) {
+      vnode.state.prefetch = {};
+      vnode.state.prefetch[identifier] = {
+        commentsStarted: false,
+        viewCountStarted: false,
+        profilesStarted: false,
+        profilesFinished: false,
+      };
+    }
     const proposalId = identifier.split('-')[0];
     const proposalType = type;
 
     // load app controller
     if (!app.threads.initialized) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
     // load proposal
@@ -480,9 +508,17 @@ const ViewProposalPage: m.Component<{
       proposal = idToProposal(proposalType, proposalId);
     } catch (e) {
       // proposal might be loading, if it's not an offchain thread
-      if (proposalType !== ProposalType.OffchainThread && !app.chain.loaded) {
-        return m(PageLoading, { narrow: true });
+      if (proposalType !== ProposalType.OffchainThread) {
+        if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
+
+        // check if module is still initializing
+        const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
+        if (!c.disabled && !c.initialized) {
+          if (!c.initializing) loadCmd(proposalType);
+          return m(PageLoading, { narrow: true, showNewProposalButton: true });
+        }
       }
+
       // proposal does not exist, 404
       return m(PageNotFound);
     }
@@ -492,7 +528,7 @@ const ViewProposalPage: m.Component<{
     }
 
     // load comments
-    if (!vnode.state.commentsPrefetchStarted) {
+    if (!vnode.state.prefetch[identifier]['commentsStarted']) {
       (app.activeCommunityId()
         ? app.comments.refresh(proposal, null, app.activeCommunityId())
         : app.comments.refresh(proposal, app.activeChainId(), null))
@@ -504,7 +540,7 @@ const ViewProposalPage: m.Component<{
           vnode.state.comments = [];
           m.redraw();
         });
-      vnode.state.commentsPrefetchStarted = true;
+      vnode.state.prefetch[identifier]['commentsStarted'] = true;
     }
 
     if (vnode.state.comments?.length) {
@@ -512,10 +548,9 @@ const ViewProposalPage: m.Component<{
         return c.rootProposal !== `${vnode.attrs.type}_${vnode.attrs.identifier.split('-')[0]}`;
       });
       if (mismatchedComments.length) {
-        vnode.state.commentsPrefetchStarted = false;
+        vnode.state.prefetch[identifier]['commentsStarted'] = false;
       }
     }
-
 
     const createdCommentCallback = () => {
       vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
@@ -523,7 +558,7 @@ const ViewProposalPage: m.Component<{
     };
 
     // load view count
-    if (!vnode.state.viewCountPrefetchStarted && proposal instanceof OffchainThread) {
+    if (!vnode.state.prefetch[identifier]['viewCountStarted'] && proposal instanceof OffchainThread) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
         community: app.activeCommunityId(),
@@ -540,23 +575,23 @@ const ViewProposalPage: m.Component<{
         vnode.state.viewCount = 0;
         throw new Error('could not load view count');
       });
-      vnode.state.viewCountPrefetchStarted = true;
-    } else if (!vnode.state.viewCountPrefetchStarted) {
+      vnode.state.prefetch[identifier]['viewCountStarted'] = true;
+    } else if (!vnode.state.prefetch[identifier]['viewCountStarted']) {
       // view counts currently not supported for proposals
-      vnode.state.viewCountPrefetchStarted = true;
+      vnode.state.prefetch[identifier]['viewCountStarted'] = true;
       vnode.state.viewCount = 0;
     }
 
     if (vnode.state.comments === undefined) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
     if (vnode.state.viewCount === undefined) {
-      return m(PageLoading, { narrow: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
     // load profiles
     // TODO: recursively fetch child comments as well (prevent reloading flash for threads with child comments)
-    if (vnode.state.profilesPrefetchStarted === undefined) {
+    if (vnode.state.prefetch[identifier]['profilesStarted'] === undefined) {
       if (proposal instanceof OffchainThread) {
         app.profiles.getProfile(proposal.authorChain, proposal.author);
       } else if (proposal.author instanceof Account) { // AnyProposal
@@ -565,12 +600,12 @@ const ViewProposalPage: m.Component<{
       vnode.state.comments.forEach((comment) => {
         app.profiles.getProfile(comment.authorChain, comment.author);
       });
-      vnode.state.profilesPrefetchStarted = true;
+      vnode.state.prefetch[identifier]['profilesStarted'] = true;
     }
-    if (!app.profiles.allLoaded() && !vnode.state.profilesPrefetchFinished) {
-      return m(PageLoading, { narrow: true });
+    if (!app.profiles.allLoaded() && !vnode.state.prefetch[identifier]['profilesFinished']) {
+      return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
-    vnode.state.profilesPrefetchFinished = true;
+    vnode.state.prefetch[identifier]['profilesFinished'] = true;
 
     const windowListener = (e) => {
       if (vnode.state.editing || activeQuillEditorHasText()) {
@@ -647,7 +682,10 @@ const ViewProposalPage: m.Component<{
     const { replyParent } = vnode.state;
     return m(Sublayout, {
       class: 'ViewProposalPage',
-      rightSidebar: proposal instanceof OffchainThread ? [] : m(ProposalSidebar, { proposal }),
+      sidebarTopic: proposal instanceof OffchainThread ? proposal.topic?.id : null,
+      rightSidebar: proposal instanceof OffchainThread
+        ? null
+        : m(ProposalSidebar, { proposal }),
       showNewProposalButton: true,
     }, [
       m(ProposalHeader, {

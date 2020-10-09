@@ -1,14 +1,14 @@
 import { switchMap, first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { BlockNumber, BalanceOf, Balance } from '@polkadot/types/interfaces';
-
+import { IApp } from 'state';
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
-import { ProposalModule } from 'models';
+import { ProposalModule, ChainNetwork } from 'models';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { SubstrateTypes } from '@commonwealth/chain-events';
-import { EdgewareSignalingProposal, SignalingProposalStage } from './signaling_proposal';
+import { EdgewareSignalingProposal } from './signaling_proposal';
 
 class EdgewareSignaling extends ProposalModule<
   ApiRx,
@@ -31,9 +31,20 @@ class EdgewareSignaling extends ProposalModule<
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
+  constructor(app: IApp) {
+    super(app, (e) => new EdgewareSignalingProposal(this._Chain, this._Accounts, this, e));
+  }
+
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    if (this._initializing || this._initialized || this.disabled) return;
+    this._initializing = true;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
+
+    // load server proposals
+    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.SignalingProposal);
+    const proposals = entities.map((e) => this._entityConstructor(e));
+
     return new Promise((resolve, reject) => {
       this._Chain.api.pipe(
         switchMap((api: ApiRx) => api.queryMulti([
@@ -41,15 +52,27 @@ class EdgewareSignaling extends ProposalModule<
           api.query.signaling.votingLength,
         ])),
         first(),
-      ).subscribe(([proposalcreationbond, votinglength]: [BalanceOf, BlockNumber]) => {
+      ).subscribe(async ([proposalcreationbond, votinglength]: [BalanceOf, BlockNumber]) => {
         // save parameters
         this._votingPeriod = +votinglength;
         this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
 
-        const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.SignalingProposal);
-        const constructorFunc = (e) => new EdgewareSignalingProposal(this._Chain, this._Accounts, this, e);
-        const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
+        // fetch proposals from chain
+        await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          this,
+          () => this._Chain.fetcher.fetchSignalingProposals(this.app.chain.block.height)
+        );
+
+        // register new chain-event handlers
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.SignalingProposal, (entity, event) => {
+            if (this.initialized) this.updateProposal(entity, event);
+          }
+        );
+
         this._initialized = true;
+        this._initializing = false;
         resolve();
       },
       (err) => reject(new Error(err)));

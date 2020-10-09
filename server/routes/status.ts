@@ -47,6 +47,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   ]);
   const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
   const recentThreads = await models.OffchainThread.findAll({
+    attributes: ['id', 'title', 'url', 'created_at', 'chain', 'community'],
     where: {
       [Op.or]: [
         {
@@ -60,7 +61,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           }
         }
       ],
-      created_at: {
+      updated_at: {
         [Op.gt]: thirtyDaysAgo
       }
     },
@@ -83,29 +84,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           }
         }
       ],
-      created_at: {
-        [Op.gt]: thirtyDaysAgo
-      }
-    },
-    include: {
-      model: models.Address,
-    }
-  });
-  const recentReactions = await models.OffchainReaction.findAll({
-    where: {
-      [Op.or]: [
-        {
-          chain: {
-            [Op.in]: chains.map((c) => c.id),
-          }
-        },
-        {
-          community: {
-            [Op.in]: publicCommunities.map((c) => c.id),
-          }
-        }
-      ],
-      created_at: {
+      updated_at: {
         [Op.gt]: thirtyDaysAgo
       }
     },
@@ -117,28 +96,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   const { user } = req;
 
   if (!user) {
-    const activeAddresses = {};
-    const activeThreads = {};
-    const allContent = recentThreads.concat(recentComments).concat(recentReactions)
-      .sort((a, b) => (b.created_at) - (a.created_at));
-    allContent.forEach((item) => {
-      const entity = item.community || item.chain;
-      if (activeAddresses[entity] && !activeAddresses[entity][item.address_id]) {
-        activeAddresses[entity][item.address_id] = [item.Address.chain, item.Address.address];
-      } else if (!activeAddresses[entity]) {
-        const addr = {};
-        addr[item.address_id] = [item.Address.chain, item.Address.address];
-        activeAddresses[entity] = addr;
-      }
-    });
-    recentThreads.forEach((thread) => {
-      const entity = thread.community || thread.chain;
-      if (activeThreads[entity]) {
-        activeThreads[entity] += 1;
-      } else if (!activeThreads[entity]) {
-        activeThreads[entity] = 1;
-      }
-    });
     return res.json({
       chains,
       nodes,
@@ -146,8 +103,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       contractCategories,
       communities: publicCommunities,
       notificationCategories,
-      activeAddresses,
-      activeThreads,
+      recentThreads,
+      recentComments,
       loggedIn: false,
     });
   }
@@ -196,6 +153,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
   const recentThreads_ = await models.OffchainThread.findAll({
+    attributes: ['id', 'title', 'url', 'created_at', 'chain', 'community'],
     where: {
       [Op.or]: [
         {
@@ -209,7 +167,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           }
         }
       ],
-      created_at: {
+      updated_at: {
         [Op.gt]: thirtyDaysAgo
       }
     },
@@ -218,29 +176,29 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     }
   });
 
-  const activeAddresses = {};
-  const activeThreads = {};
-  const allContent = recentThreads_.concat(recentComments).concat(recentReactions)
-    .sort((a, b) => (b.created_at) - (a.created_at));
+  const recentComments_ = await models.OffchainComment.findAll({
+    where: {
+      [Op.or]: [
+        {
+          chain: {
+            [Op.in]: chains.map((c) => c.id),
+          }
+        },
+        {
+          community: {
+            [Op.in]: allCommunities.map((c) => (c as any).id),
+          }
+        }
+      ],
+      updated_at: {
+        [Op.gt]: thirtyDaysAgo
+      }
+    },
+    include: {
+      model: models.Address,
+    }
+  });
 
-  allContent.forEach((item) => {
-    const entity = item.community || item.chain;
-    if (activeAddresses[entity] && !activeAddresses[entity][item.address_id]) {
-      activeAddresses[entity][item.address_id] = [item.Address.chain, item.Address.address];
-    } else if (!activeAddresses[entity]) {
-      const addr = {};
-      addr[item.address_id] = [item.Address.chain, item.Address.address];
-      activeAddresses[entity] = addr;
-    }
-  });
-  recentThreads_.forEach((thread) => {
-    const entity = thread.community || thread.chain;
-    if (activeThreads[entity]) {
-      activeThreads[entity] += 1;
-    } else if (!activeThreads[entity]) {
-      activeThreads[entity] = 1;
-    }
-  });
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
     where: { user_id: user.id }
@@ -307,8 +265,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     offchainTopics,
     contractCategories,
     notificationCategories,
-    activeAddresses,
-    activeThreads,
+    recentThreads: recentThreads_,
+    recentComments: recentComments_,
     roles,
     invites,
     loggedIn: true,

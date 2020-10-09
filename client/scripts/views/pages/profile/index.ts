@@ -15,10 +15,10 @@ import PageNotFound from 'views/pages/404';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
+import { decodeAddress } from '@polkadot/keyring';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
-import { decodeAddress } from '@polkadot/keyring';
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -29,18 +29,18 @@ const commentModelFromServer = (comment) => {
     const proposalSplit = decodeURIComponent(comment.root_id).split(/-|_/);
     if (proposalSplit[0] === 'discussion') {
       proposal = new OffchainThread(
-      '',
-      '',
-      null,
-      Number(proposalSplit[1]),
-      comment.created_at,
-      null,
-      null,
-      null,
-      comment.community,
-      comment.chain,
-      null,
-      null
+        '',
+        '',
+        null,
+        Number(proposalSplit[1]),
+        comment.created_at,
+        null,
+        null,
+        null,
+        comment.community,
+        comment.chain,
+        null,
+        null
       );
     } else {
       proposal = {
@@ -85,7 +85,6 @@ const threadModelFromServer = (thread) => {
     thread.version_history,
     thread.community,
     thread.chain,
-    thread.private,
     thread.read_only,
     decodeURIComponent(thread.body),
     thread.url,
@@ -109,7 +108,7 @@ interface IProfilePageState {
   refreshProfile: boolean;
 }
 
-const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
+const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
     vnode.state.loaded = false;
@@ -198,6 +197,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       });
     };
 
+    const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
       vnode.state.loading = true;
@@ -208,7 +208,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       vnode.state.loaded = false;
       loadProfile();
     }
-    if (loading || !loaded) return m(PageLoading);
+    if (loading || !loaded) return m(PageLoading, { showNewProposalButton: true });
     if (!account) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     }
@@ -237,10 +237,12 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
     return m(Sublayout, {
       class: 'ProfilePage',
+      showNewProposalButton: true,
     }, [
       m('.forum-container-alt', [
         m(ProfileHeader, {
           account,
+          setIdentity,
           refreshCallback: () => { vnode.state.refreshProfile = true; },
         }),
         m('.row.row-narrow.forum-row', [

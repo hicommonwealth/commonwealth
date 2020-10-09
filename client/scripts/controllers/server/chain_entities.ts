@@ -3,7 +3,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { ChainEntityStore } from 'stores';
-import { ChainEntity, ChainEvent, ChainEventType, IChainAdapter } from 'models';
+import { ChainEntity, ChainEvent, ChainEventType, IChainAdapter, IChainModule, ProposalModule } from 'models';
 import app from 'state';
 import {
   CWEvent,
@@ -13,6 +13,7 @@ import {
   IEventProcessor,
   IEventSubscriber,
   SubstrateTypes,
+  IChainEntityKind,
 } from '@commonwealth/chain-events';
 
 export enum EntityRefreshOption {
@@ -31,10 +32,13 @@ const get = (route, args, callback) => {
   }).catch((e) => console.error(e));
 };
 
+type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void
+
 class ChainEntityController {
   private _store: ChainEntityStore = new ChainEntityStore();
   public get store() { return this._store; }
   private _subscriber: IEventSubscriber<any, any>;
+  private _handlers: { [t: string]: EntityHandler[] } = {};
 
   public constructor() {
     // do nothing
@@ -68,6 +72,7 @@ class ChainEntityController {
       entity = existingEntity;
     }
     entity.addEvent(event);
+    this.emitUpdate(entity, event);
   }
 
   public refresh(chain: string, refreshOption: EntityRefreshOption) {
@@ -86,6 +91,7 @@ class ChainEntityController {
   }
 
   public deinit() {
+    this.clearEntityHandlers();
     this.store.clear();
     if (this._subscriber) {
       this._subscriber.unsubscribe();
@@ -119,26 +125,55 @@ class ChainEntityController {
     return [ entity, event ];
   }
 
-  public async subscribeEntities<Api, RawEvent>(
-    chainAdapter: IChainAdapter<any, any>,
-    fetcher: IStorageFetcher<Api>,
-    subscriber: IEventSubscriber<Api, RawEvent>,
-    processor: IEventProcessor<Api, RawEvent>,
+  public async fetchEntities<T extends CWEvent>(
+    chain: string,
+    proposalModule: ProposalModule<any, any, any>,
+    fetch: () => Promise<T[]>,
     eventSortFn?: (a: CWEvent, b: CWEvent) => number,
-  ) {
-    const chain = chainAdapter.meta.chain.id;
-    this._subscriber = subscriber;
+  ): Promise<T[]> {
     // get existing events
-    const existingEvents = await fetcher.fetch();
+    const existingEvents = await fetch();
     if (eventSortFn) existingEvents.sort(eventSortFn);
     // eslint-disable-next-line no-restricted-syntax
     for (const cwEvent of existingEvents) {
       const result = this._handleCWEvent(chain, cwEvent);
       if (result) {
         const [ entity, event ] = result;
-        chainAdapter.handleEntityUpdate(entity, event);
+        proposalModule.updateProposal(entity, event);
       }
     }
+    return existingEvents;
+  }
+
+  public registerEntityHandler(type: IChainEntityKind, fn: EntityHandler) {
+    if (!this._handlers[type]) {
+      this._handlers[type] = [ fn ];
+    } else {
+      this._handlers[type].push(fn);
+    }
+  }
+
+  public clearEntityHandlers(): void {
+    this._handlers = {};
+  }
+
+  public emitUpdate(entity: ChainEntity, event: ChainEvent): void {
+    const handlers = this._handlers[entity.type];
+    if (!handlers) {
+      console.log(`No handler for entity type ${entity.type}, ignoring.`);
+      return;
+    }
+    for (const handler of handlers) {
+      handler(entity, event);
+    }
+  }
+
+  public async subscribeEntities<Api, RawEvent>(
+    chain: string,
+    subscriber: IEventSubscriber<Api, RawEvent>,
+    processor: IEventProcessor<Api, RawEvent>,
+  ): Promise<void> {
+    this._subscriber = subscriber;
 
     // kick off subscription to future events
     // TODO: handle unsubscribing
@@ -150,7 +185,7 @@ class ChainEntityController {
         const result = this._handleCWEvent(chain, cwEvent);
         if (result) {
           const [ entity, event ] = result;
-          chainAdapter.handleEntityUpdate(entity, event);
+          this.emitUpdate(entity, event);
         }
       }
     });

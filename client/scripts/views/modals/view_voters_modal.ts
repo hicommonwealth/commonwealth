@@ -30,7 +30,7 @@ const VoterRow: m.Component<IVoterRowAttrs> = {
             user: account,
             avatarOnly: true,
             avatarSize: 36,
-            tooltip: true,
+            popover: true,
           }),
         ]),
         m('.proposal-pre-mobile', [
@@ -38,7 +38,7 @@ const VoterRow: m.Component<IVoterRowAttrs> = {
             user: account,
             avatarOnly: true,
             avatarSize: 16,
-            tooltip: true,
+            popover: true,
           }),
         ]),
       ]),
@@ -50,14 +50,14 @@ const VoterRow: m.Component<IVoterRowAttrs> = {
               m(User, {
                 user: account,
                 hideAvatar: true,
-                tooltip: true,
+                popover: true,
               }),
             ]),
             m('.proposal-user-mobile', [
               m(User, {
                 user: account,
                 hideAvatar: true,
-                tooltip: true,
+                popover: true,
               }),
             ]),
           ]),

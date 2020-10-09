@@ -104,7 +104,7 @@ export default function (
   });
 
   // TODO: maybe unify these, or else remove the event type from payload and add it manually here?
-  wss.on(WebsocketMessageType.Scrollback, (payload: IWebsocketsPayload<any>, userIds: number[]) => {
+  wss.on(WebsocketMessageType.InitializeScrollback, (payload: IWebsocketsPayload<any>, userIds: number[]) => {
     if (logging) log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(userIds)}`);
     // eslint-disable-next-line no-restricted-syntax
     for (const user of userIds) {

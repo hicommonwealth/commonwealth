@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 import 'pages/discussions/index.scss';
 
 import $ from 'jquery';
@@ -13,17 +12,18 @@ import { pluralize } from 'helpers';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import Substrate from 'controllers/chain/substrate/main';
+
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
+import Listing from 'views/pages/listing';
 
-import { getLastUpdate } from './weekly_listing';
-import Listing from '../listing';
+import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
-import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
-import Substrate from 'client/scripts/controllers/chain/substrate/main';
 
 interface IDiscussionPageState {
   lookback?: number;
@@ -32,7 +32,22 @@ interface IDiscussionPageState {
   defaultLookback: number;
 }
 
-const LastSeenDivider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last visit'), m('hr') ]);
+const getLastUpdate = (proposal) => {
+  const lastComment = Number(app.comments.lastCommented(proposal));
+  const createdAt = Number(proposal.createdAt.utc());
+  const lastUpdate = Math.max(createdAt, lastComment);
+  return lastUpdate;
+};
+
+const getLastSeenDivider = (hasText = true) => {
+  return m('.LastSeenDivider', hasText ? [
+    m('hr'),
+    m('span', 'Last visit'),
+    m('hr'),
+  ] : [
+    m('hr'),
+  ]);
+};
 
 const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   oncreate: (vnode) => {
@@ -46,6 +61,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       setTimeout(() => {
         window.scrollTo(0, Number(localStorage[`${app.activeId()}-discussions-scrollY`]));
       }, 1);
+    }
+
+    if (app.user.unseenPosts[app.activeId()]) {
+      app.user.unseenPosts[app.activeId()]['activePosts'] = 0;
+      app.user.unseenPosts[app.activeId()]['threads'] = 0;
     }
 
     // Infinite Scroll
@@ -76,7 +96,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: topic || 'Discussions' });
+    if (!activeEntity?.serverLoaded) return m(PageLoading, {
+      title: topic || 'Discussions',
+      showNewProposalButton: true,
+    });
 
     localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
 
@@ -135,16 +158,22 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     if (allThreads.length) {
       let visitMarkerPlaced = false;
-      // pinned threads are inserted at the top of the listing
-      const pinnedThreads = allThreads.filter((t) => t.pinned);
-      if (pinnedThreads.length > 0) {
-        listing.push(m(PinnedListing, { proposals: pinnedThreads }));
-      }
 
+      // normal threads
       const sortedThreads = allThreads.filter((t) => !t.pinned);
 
       const firstThread = sortedThreads[0];
       const lastThread = sortedThreads[sortedThreads.length - 1];
+
+      // pinned threads - inserted at the top of the listing
+      const pinnedThreads = allThreads.filter((t) => t.pinned);
+      if (pinnedThreads.length > 0) {
+        listing.push(m(PinnedListing, { proposals: pinnedThreads }));
+
+        if (getLastUpdate(firstThread) > lastVisited) {
+          listing.push(getLastSeenDivider(false));
+        }
+      }
 
       const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited;
       const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited;
@@ -161,11 +190,15 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         sortedThreads.slice(0, vnode.state.lookback).forEach((proposal) => {
           const row = m(DiscussionRow, { proposal });
           if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
-            listing = [m('.discussion-group-wrap', listing), LastSeenDivider, m('.discussion-group-wrap', [row])];
+            listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
             visitMarkerPlaced = true;
             count += 1;
           } else {
-            visitMarkerPlaced ? listing[2].children.push(row) : listing.push(row);
+            if (visitMarkerPlaced) {
+              listing[2].children.push(row);
+            } else {
+              listing.push(row);
+            }
             count += 1;
           }
         });
@@ -184,6 +217,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       title: topic || 'Discussions',
       description: topicDescription,
       showNewProposalButton: true,
+      rightSidebar: m(ListingSidebar, { entity: app.activeId() })
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [

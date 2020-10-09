@@ -12,7 +12,11 @@ const RightSidebar: m.Component<{
 
     return m('.RightSidebar', [
       rightSidebar,
-      !rightSidebar && (app.chain || app.community) && m(CommunityInfoModule),
+      !rightSidebar
+        && (app.chain || app.community)
+        && m('div', { style: 'margin: 30px 20px 0;' }, [
+          m(CommunityInfoModule)
+        ]),
     ]);
   }
 };

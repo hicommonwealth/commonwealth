@@ -7,7 +7,10 @@
 
     .mobile-sidebar-center {
         flex: 1;
-        max-width: calc(100% - 202px);
+        max-width: calc(100% - 100px);
+        &.logged-in {
+            max-width: calc(100% - 202px);
+        }
     }
     .mobile-sidebar-left {
         padding-left: 6px !important;
@@ -34,8 +37,7 @@
         }
         > .MobileNewProposalButton,
         > .cui-button,
-        > .cui-overlay,
-        > .LoginSelector {
+        > .cui-overlay {
             display: inline-block;
         }
         > .LoginSelector > .cui-button > .cui-button-label > * {
@@ -45,7 +47,7 @@
         > .MobileNewProposalButton,
         > .community-label,
         > .LoginSelector {
-            margin-left: 7px;
+            margin-left: 9px;
         }
         > .cui-button .cui-button-label {
             display: inline-block;
@@ -55,10 +57,6 @@
         @include sm-max {
             .MobileNewProposalButton .cui-button {
                 padding: 0 12px;
-                .cui-icon {
-                    position: relative;
-                    top: -2px;
-                }
             }
             .cui-button.mobile-sidebar-trigger {
                 padding-left: 12px;
@@ -83,6 +81,9 @@
                 .user-display-name {
                     display: none;
                 }
+                .LoginSelectorMenu .user-display-name {
+                    display: inline;
+                }
                 .cui-tag.role-tag {
                     display: none;
                 }
@@ -104,6 +105,36 @@
                     display: none;
                 }
             }
+        }
+    }
+}
+
+.hidden-sidebar .SidebarQuickSwitcher {
+    display: none;
+}
+.SidebarQuickSwitcher {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 18px 14px;
+    width: $quick-switcher-width;
+    background: $background-color-border;
+    z-index: 3;
+    @include sm-max {
+        display: none;
+    }
+    .ChainIcon, .CommunityIcon {
+        cursor: pointer;
+        margin-bottom: 11px;
+        opacity: 0.3;
+        &:hover {
+            opacity: 0.33;
+        }
+    }
+    .quick-switcher-option.active {
+        .ChainIcon, .CommunityIcon {
+            opacity: 1;
         }
     }
 }

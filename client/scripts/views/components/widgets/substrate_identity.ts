@@ -30,7 +30,7 @@ export interface ISubstrateIdentityState {
 const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
   getObservables: (attrs) => ({
     groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount) && (!attrs.profile.isOnchain)
+    identity: (attrs.account instanceof SubstrateAccount) && (!attrs.profile.isOnchain) && (app.chain as Substrate).identities
       ? (app.chain as Substrate).identities.get(attrs.account)
       : null,
   }),
@@ -77,11 +77,11 @@ const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAtt
 
 const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
   view: (vnode) => {
-    const { profile, linkify, account, addrShort } = vnode.attrs;
+    const { profile, linkify, account, addrShort, hideIdentityIcon } = vnode.attrs;
 
     const quality = profile?.isOnchain && profile?.name && getIdentityQuality(Object.values(profile.judgements));
 
-    if (profile?.isOnchain && profile?.name && quality) {
+    if (profile?.isOnchain && profile?.name && quality && !hideIdentityIcon) {
       const name = [ profile.name, m(`span.identity-icon${
         quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
       }${quality === IdentityQuality.Good

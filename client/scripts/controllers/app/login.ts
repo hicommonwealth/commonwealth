@@ -27,45 +27,49 @@ function createAccount(account: Account<any>) {
   });
 }
 
-export async function setActiveAccount(account: Account<any>) {
-  return new Promise((resolve, reject) => {
-    const chain = app.activeChainId();
-    const community = app.activeCommunityId();
-    const role = app.user.getRoleInCommunity({ account, chain, community });
+export async function setActiveAccount(account: Account<any>): Promise<void> {
+  const chain = app.activeChainId();
+  const community = app.activeCommunityId();
+  const role = app.user.getRoleInCommunity({ account, chain, community });
 
-    if (!role || role.is_user_default) {
-      app.user.ephemerallySetActiveAccount(account);
-      if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
-        app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
-      }
-      resolve();
-    } else {
-      $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
-        address: account.address,
-        author_chain: account.chain.id,
-        chain,
-        jwt: app.user.jwt,
-        auth: true,
-      } : {
-        address: account.address,
-        author_chain: account.chain.id,
-        community,
-        jwt: app.user.jwt,
-        auth: true,
-      }).then((response) => {
-        // update is_user_default
-        app.user.getAllRolesInCommunity({ chain, community })
-          .forEach((r) => { r.is_user_default = false; });
-        role.is_user_default = true;
-
-        app.user.ephemerallySetActiveAccount(account);
-        if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
-          app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
-        }
-        resolve();
-      }).catch((err) => reject());
+  if (!role || role.is_user_default) {
+    app.user.ephemerallySetActiveAccount(account);
+    if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
     }
-  });
+    return;
+  }
+
+  try {
+    const response = await $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
+      address: account.address,
+      author_chain: account.chain.id,
+      chain,
+      jwt: app.user.jwt,
+      auth: true,
+    } : {
+      address: account.address,
+      author_chain: account.chain.id,
+      community,
+      jwt: app.user.jwt,
+      auth: true,
+    });
+    if (response.status !== 'Success') {
+      throw Error(`Unsuccessful status: ${response.status}`);
+    }
+  } catch (err) {
+    console.log(err);
+    notifyError('Could not set active account');
+  }
+
+  // update is_user_default
+  app.user.getAllRolesInCommunity({ chain, community })
+    .forEach((r) => { r.is_user_default = false; });
+  role.is_user_default = true;
+  app.user.ephemerallySetActiveAccount(account);
+  if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+    app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+  }
 }
 
 export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo, updateFrontend?: boolean) {
@@ -88,7 +92,7 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
   }
 }
 
-export function updateActiveAddresses(chain?: ChainInfo) {
+export async function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
@@ -112,7 +116,7 @@ export function updateActiveAddresses(chain?: ChainInfo) {
 
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
-    setActiveAccount(memberAddresses[0]);
+    await setActiveAccount(memberAddresses[0]);
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
@@ -124,7 +128,7 @@ export function updateActiveAddresses(chain?: ChainInfo) {
       const account = app.user.activeAccounts.find((a) => {
         return a.chain.id === existingAddress.chain && a.address === existingAddress.address;
       });
-      if (account) setActiveAccount(account);
+      if (account) await setActiveAccount(account);
     }
   }
 }
@@ -205,28 +209,26 @@ export async function createUserWithAddress(address: string, keytype?: string): 
   return account;
 }
 
-export function unlinkLogin(account) {
-  // TODO: make this an async function, and properly wait for ajax request, setActiveAccount, etc
+export async function unlinkLogin(account) {
   const unlinkingCurrentlyActiveAccount = app.user.activeAccount === account;
   // TODO: Change to DELETE /address
-  return $.post(`${app.serverUrl()}/deleteAddress`, {
+  await $.post(`${app.serverUrl()}/deleteAddress`, {
     address: account.address,
     chain: account.chain,
     auth: true,
     jwt: app.user.jwt,
-  }).then((result) => {
-    // Remove from all address stores in the frontend state.
-    // This might be more gracefully handled by calling initAppState again.
-    let index = app.user.activeAccounts.indexOf(account);
-    app.user.activeAccounts.splice(index, 1);
-    index = app.user.addresses.indexOf(app.user.addresses.find((a) => a.address === account.address));
-    app.user.addresses.splice(index, 1);
-
-    if (!unlinkingCurrentlyActiveAccount) return;
-    if (app.user.activeAccounts.length > 0) {
-      setActiveAccount(app.user.activeAccounts[0]);
-    } else {
-      app.user.ephemerallySetActiveAccount(null);
-    }
   });
+  // Remove from all address stores in the frontend state.
+  // This might be more gracefully handled by calling initAppState again.
+  let index = app.user.activeAccounts.indexOf(account);
+  app.user.activeAccounts.splice(index, 1);
+  index = app.user.addresses.indexOf(app.user.addresses.find((a) => a.address === account.address));
+  app.user.addresses.splice(index, 1);
+
+  if (!unlinkingCurrentlyActiveAccount) return;
+  if (app.user.activeAccounts.length > 0) {
+    await setActiveAccount(app.user.activeAccounts[0]);
+  } else {
+    app.user.ephemerallySetActiveAccount(null);
+  }
 }

@@ -5,14 +5,6 @@ export const RECONNECT_DELAY = 5000;
 // how often to send heartbeats to avoid being disconnected
 export const HEARTBEAT_DELAY = 15000;
 
-export interface IScrollbackMessage {
-  address: string;
-  chain: string;
-  room: string;
-  created_at: string;
-  text: string;
-}
-
 export type WebsocketMessageHandler = (payload: IWebsocketsPayload<any>) => void;
 const DefaultWebsocketHandler = (
   key: WebsocketMessageType,
@@ -53,6 +45,7 @@ class WebsocketController {
       // set up new heartbeat time
       const heartbeatTimer = setInterval(() => {
         const heartbeat: IWebsocketsPayload<any> = { event: WebsocketMessageType.Heartbeat, jwt };
+        if (ws.readyState !== ws.OPEN) return;
         ws.send(JSON.stringify(heartbeat));
       }, HEARTBEAT_DELAY);
       this._heartbeatTimer = +heartbeatTimer;
@@ -94,6 +87,9 @@ class WebsocketController {
   }
   public removeListener(type: WebsocketMessageType) {
     this._listeners[type] = DefaultWebsocketHandler.bind(null, type);
+  }
+  public getListeners() {
+    return this._listeners;
   }
 }
 

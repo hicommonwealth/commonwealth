@@ -71,7 +71,7 @@ const EditTopicModal : m.Component<{
               class: 'topic-form-name',
               tabindex: 1,
               defaultValue: vnode.state?.form?.name,
-              onchange: (e) => {
+              oninput: (e) => {
                 vnode.state.form.name = (e.target as any).value;
               },
             }),
@@ -84,7 +84,7 @@ const EditTopicModal : m.Component<{
               class: 'topic-form-description',
               tabindex: 2,
               defaultValue: vnode.state.form.description,
-              onchange: (e) => {
+              oninput: (e) => {
                 vnode.state.form.description = (e.target as any).value;
               }
             }),

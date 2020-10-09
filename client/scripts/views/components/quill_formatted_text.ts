@@ -5,7 +5,7 @@ import 'components/quill_formatted_text.scss';
 import m from 'mithril';
 import { Icon, Icons } from 'construct-ui';
 import { loadScript } from 'helpers';
-import { preprocessQuillDeltaForRendering } from '../../../../shared/helpers';
+import { preprocessQuillDeltaForRendering } from '../../../../shared/utils';
 
 const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
