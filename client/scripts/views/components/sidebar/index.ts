@@ -4,7 +4,9 @@ import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
-import { Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner } from 'construct-ui';
+import {
+  Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner
+} from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
@@ -37,13 +39,17 @@ const SidebarQuickSwitcher = {
 
     const size = 36;
     return m('.SidebarQuickSwitcher', [
-      quickSwitcherCommunities.map((item) => m('.quick-switcher-option', {
-        class: (
-          (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
+      quickSwitcherCommunities.map((item) => m(Tooltip, {
+        hoverOpenDelay: 0,
+        hoverCloseDelay: 0,
+        transitionDuration: 0,
+        position: 'right',
+        content: m('.quick-switcher-option-text', item.name),
+        trigger: m('.quick-switcher-option', {
+          class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
             || (item instanceof CommunityInfo && item.id === app?.community?.id)
-        ) ? 'active' : ''
-      }, [
-        item instanceof ChainInfo
+          ? ' active' : '',
+        }, item instanceof ChainInfo
           ? m(ChainIcon, {
             size,
             chain: item,
@@ -53,8 +59,8 @@ const SidebarQuickSwitcher = {
             size,
             community: item,
             onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-          }) : null
-      ])),
+          }) : null),
+      })),
     ]);
   }
 };
