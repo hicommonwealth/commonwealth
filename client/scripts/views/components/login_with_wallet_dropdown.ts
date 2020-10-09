@@ -76,6 +76,7 @@ const LoginWithWalletDropdown: m.Component<{
         ]
       }),
       addToStack: true,
+      closeOnContentClick: true,
       class: 'LoginWithWalletDropdownPopoverMenu',
       transitionDuration: 0,
       content: menuItems,

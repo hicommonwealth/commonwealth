@@ -140,6 +140,7 @@ const User: m.Component<{
         interactionType: 'hover',
         content: userPopover,
         trigger: userFinal,
+        closeOnContentClick: true,
         key: profile?.address || '-'
       })
       : userFinal;
