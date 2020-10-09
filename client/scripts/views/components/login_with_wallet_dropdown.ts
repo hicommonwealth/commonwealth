@@ -55,7 +55,7 @@ const LoginWithWalletDropdown: m.Component<{
         });
       }
     });
-    const menuItems = (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== 0)
+    const menuItems = (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== -1)
       ? [
         getMenuItemForChain(app.chain.meta.chain),
         getMenuItemForChain(app.chain.meta.chain, true)
