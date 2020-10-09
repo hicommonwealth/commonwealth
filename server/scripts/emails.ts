@@ -197,7 +197,10 @@ export const sendBatchedNotificationEmails = async (models): Promise<number> => 
           ['created_at', 'DESC'],
         ]
       });
-      if (notifications.length === 0) return; // don't notify if there have been no new notifications in the last 24h
+      if (notifications.length === 0) {
+        console.log(`empty digest for ${user.email}`);
+        return; // don't notify if no new notifications in the last 24h
+      }
 
       // send notification email
       try {
