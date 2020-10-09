@@ -24,18 +24,21 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
 const SidebarQuickSwitcher = {
   view: (vnode) => {
-    const quickSwitcherCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
+    const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
       .concat(app.config.chains.getAll())
       .sort((a, b) => a.name.localeCompare(b.name))
-      .filter((item) => {
-        // filter out non-starred communities
-        if (item instanceof ChainInfo && !app.communities.isStarred(item.id, null)) return false;
-        if (item instanceof CommunityInfo && !app.communities.isStarred(null, item.id)) return false;
-        // only show chains with nodes
-        return (item instanceof ChainInfo)
-          ? app.config.nodes.getByChain(item.id)?.length > 0
-          : true;
-      });
+      .filter((item) => (item instanceof ChainInfo)
+        ? app.config.nodes.getByChain(item.id)?.length > 0
+        : true); // only chains with nodes
+
+    const starredCommunities = allCommunities.filter((item) => {
+      // filter out non-starred communities
+      if (item instanceof ChainInfo && !app.communities.isStarred(item.id, null)) return false;
+      if (item instanceof CommunityInfo && !app.communities.isStarred(null, item.id)) return false;
+      return true;
+    });
+
+    const quickSwitcherCommunities = starredCommunities.length > 0 ? starredCommunities : allCommunities;
 
     const size = 36;
     return m('.SidebarQuickSwitcher', [
