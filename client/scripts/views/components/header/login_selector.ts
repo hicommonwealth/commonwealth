@@ -16,6 +16,7 @@ import { notifySuccess } from 'controllers/app/notifications';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from 'views/components/widgets/user';
+import CreateInviteModal from 'views/modals/create_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
@@ -118,6 +119,11 @@ const LoginSelector: m.Component<{ small?: boolean }, {
       });
     });
     const isPrivateCommunity = app.community?.meta.privacyEnabled;
+    const isAdmin = app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    });
 
     if (!vnode.state.profileLoadComplete && app.profiles.allLoaded()) {
       vnode.state.profileLoadComplete = true;
@@ -137,7 +143,6 @@ const LoginSelector: m.Component<{ small?: boolean }, {
           label: [
             app.user.activeAccount ? m(User, {
               user: app.user.activeAccount,
-              showRole: true,
               hideIdentityIcon: true,
             }) : [
               m('span.hidden-sm', [
@@ -161,6 +166,7 @@ const LoginSelector: m.Component<{ small?: boolean }, {
               label: m(UserBlock, {
                 user: account,
                 selected: isSameAccount(account, app.user.activeAccount),
+                showRole: true,
                 compact: true
               }),
             })),
@@ -169,6 +175,22 @@ const LoginSelector: m.Component<{ small?: boolean }, {
                 modal: SelectAddressModal,
               }),
               label: activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
+            }),
+            (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
+              class: 'invite-user',
+              align: 'left',
+              basic: true,
+              onclick: (e) => {
+                e.preventDefault();
+                const data = app.activeCommunityId()
+                  ? { communityInfo: app.community.meta }
+                  : { chainInfo: app.chain.meta.chain }
+                app.modals.create({
+                  modal: CreateInviteModal,
+                  data,
+                });
+              },
+              label: 'Invite members',
             }),
           ],
         ]),
