@@ -82,7 +82,6 @@ class SubstrateTreasury extends ProposalModule<
         this._bondMinimum = this._Chain.coins(api.consts.treasury.proposalBondMinimum as BalanceOf);
         this._spendPeriod = +(api.consts.treasury.spendPeriod as BlockNumber);
         this._burnPct = +(api.consts.treasury.burn as Permill) / 1_000_000;
-
         // kick off subscriptions
         const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
         await new Promise((innerResolve) => {

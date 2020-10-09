@@ -5,7 +5,12 @@ import m from 'mithril';
 import { Spinner } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 
-const LoadingPage: m.Component<{ title?: string, message?: string, narrow?: boolean, showNewProposalButton?: boolean }> = {
+const LoadingPage: m.Component<{
+  title?: string,
+  message?: string,
+  narrow?: boolean,
+  showNewProposalButton?: boolean
+}> = {
   view: (vnode) => {
     const { title, message, narrow, showNewProposalButton } = vnode.attrs;
 
