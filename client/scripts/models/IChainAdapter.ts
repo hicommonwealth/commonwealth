@@ -32,7 +32,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public get serverLoaded() { return this._serverLoaded; }
 
   private async _postModuleLoad(listenEvents = false): Promise<void> {
-    await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.LoadProposalComments);
+    // await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.LoadProposalComments);
     // await this.app.reactions.refreshAll(this.id, null, false);
 
     // attach listener for entity update events

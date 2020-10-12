@@ -1,3 +1,4 @@
+import Sequelize from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
@@ -47,18 +48,24 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
   });
 
   // Comments
-  const whereOptions: any = {};
-  if (community) {
-    whereOptions.community = community.id;
-  } else {
-    whereOptions.chain = chain.id;
-    whereOptions.root_id = { [Op.like]: 'discussion%' };
-  }
-  const comments = await models.OffchainComment.findAll({
-    where: whereOptions,
-    include: [ models.Address, models.OffchainAttachment ],
-    order: [['created_at', 'DESC']],
-  });
+  const whereOptions = community
+    ? `WHERE community='${community.id}'`
+    : `WHERE chain=${chain.id} AND root_id LIKE 'discussion%'`;
+
+  const query = `SELECT *
+    FROM "OffchainThreads"
+    WHERE id in 
+      (SELECT CAST(TRIM('discussion_' FROM root_id) AS int) FROM
+        (SELECT root_id, created_at, id FROM
+          (SELECT root_id, MAX(created_at) as created_at, MAX(id) as id FROM "OffchainComments" 
+          ${whereOptions}
+          GROUP BY root_id) grouped_comments
+        ORDER BY created_at DESC LIMIT 20) ordered_comments
+      )
+  ;`;
+
+  const comments = await models.sequelize.query(query);
+  console.log(comments);
 
   // Reactions
   const reactions = await models.OffchainReaction.findAll({
