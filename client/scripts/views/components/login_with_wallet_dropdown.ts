@@ -57,7 +57,11 @@ const LoginWithWalletDropdown: m.Component<{
           joiningCommunity,
           useCommandLineWallet: !!cli,
           successCallback: () => {
-            m.route.set(next);
+            if (next === '/?') {
+              m.route.set(`/${chain.id}`);
+            } else {
+              m.route.set(next);
+            }
             m.redraw();
             setTimeout(() => m.redraw(), 1); // necessary because address linking may be deferred
           }
