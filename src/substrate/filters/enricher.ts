@@ -119,8 +119,8 @@ export async function Enrich(
             commissionPer, 
             controllerId, 
             rewardDestination,
-            nextSessionIds: await api.query.session.nextKeys(key),
-            eraPoints: eraPointsIndividual[key]
+            nextSessionIds: await (await api.query.session.nextKeys(key)).toString(),
+            eraPoints: Number(eraPointsIndividual[key])
           };
         });
         // erasStakers(EraIndex, AccountId): Exposure -> api.query.staking.erasStakers // KUSAMA

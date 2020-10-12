@@ -14,7 +14,7 @@ import { ValidatorId } from '@polkadot/types/interfaces';
 import { OffenceDetails, ReportIdOf } from '@polkadot/types/interfaces/offences';
 import { Enrich } from '../../../src/substrate/filters/enricher';
 import { constructFakeApi, constructOption, constructIdentityJudgement } from './testUtil';
-import { EventKind, IdentityJudgement } from '../../../src/substrate/types';
+import { EventKind, IdentityJudgement, Validator } from '../../../src/substrate/types';
 
 const { assert } = chai;
 const offenceDetails = [ 
@@ -299,6 +299,15 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     const currentEra = 12;
     const sessionIndex = 1;
     const event = constructEvent(['1']);
+    const validatorInfo: { [key: string]: Validator } = {
+      'DbuPiksDXhFFEWgjsEghUypTJjQKyULiNESYji3Gaose2NV': {
+        commissionPer: 2,
+        controllerId: 'GXTJJh2kQJoS9amET2WmZ82uFkm7HYCScoP9bEDV5JyKsWE',
+        rewardDestination: 'Staked',
+        nextSessionIds: `JCghFN7mD4ETKzMbvSVmMMPwWutJGk6Bm1yKWk8Z9KhPGeZ', 'EDy8hbM5LATNV7P8pPdefEeEs4uptVC1UiVepYNBMhs9Hfj'`,
+        eraPoints: 20
+      }
+    }
     const result = await Enrich(api, blockNumber, kind, event);
     console.log('result', result)
     assert.deepEqual(result, {
@@ -310,7 +319,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         waiting: waiting?.map((validator) => validator.toString()),
         sessionIndex,
         currentEra,
-        validatorInfo: {},
+        validatorInfo,
       }
     })
   });
