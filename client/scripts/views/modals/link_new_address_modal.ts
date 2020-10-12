@@ -286,7 +286,26 @@ const LinkNewAddressModal: m.Component<{
     $(window).off('popstate', vnode.state.onpopstate);
   },
   view: (vnode) => {
-    if (!app.chain) return; // TODO: avoid flash of empty modal when app.chain is being loaded
+    const linkAddressHeader = m('.compact-modal-title', [
+      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
+    ]);
+
+    // TODO: refactor this out so we don't have duplicated loading code
+    if (!app.chain) return m('.LinkNewAddressModal', {
+      key: 'placeholder', // prevent vnode from being reused so later oninit / oncreate code runs
+    }, [
+      m('.link-address-step', [
+        linkAddressHeader,
+        m('.link-address-step-narrow', [
+          m(Button, {
+            class: 'account-adder-placeholder',
+            intent: 'primary',
+            label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ],
+            disabled: true,
+          }),
+        ])
+      ])
+    ]);
 
     if (vnode.state.step === undefined) {
       if (vnode.attrs.alreadyInitializedAccount) {
@@ -301,10 +320,6 @@ const LinkNewAddressModal: m.Component<{
     // gaiacli 'https://cosmos.network/docs/cosmos-hub/installation.html',
     // subkey 'https://substrate.dev/docs/en/ecosystem/subkey'
     // polkadot-js 'https://github.com/polkadot-js/extension'
-
-    const linkAddressHeader = m('.compact-modal-title', [
-      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
-    ]);
 
     // TODO: hack to fix linking now that keyToMsgSend is async
     if (vnode.state.newAddress) {
@@ -375,9 +390,7 @@ const LinkNewAddressModal: m.Component<{
               },
               label: 'Continue to NEAR wallet'
             }),
-          ] : app.chain.networkStatus !== ApiStatus.Connected ? [
-            m('.accounts-list-unavailable', 'Must be connected to chain')
-          ] : [
+          ] : app.chain.networkStatus !== ApiStatus.Connected ? [] : [
             [ChainBase.Ethereum
             ].indexOf(app.chain.base) !== -1 && (app.chain as Ethereum).webWallet.accounts.map(
               (address) => m(EthereumLinkAccountItem, {

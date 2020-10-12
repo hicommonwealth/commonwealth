@@ -48,7 +48,7 @@
 }
 
 .LoginSelector {
-    button.cui-button .cui-icon {
+    button.cui-button .cui-icon:last-child {
         position: relative;
         top: -2px;
     }
