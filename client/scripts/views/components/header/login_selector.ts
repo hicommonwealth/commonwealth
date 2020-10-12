@@ -9,7 +9,7 @@ import { Button, ButtonGroup, Icon, Icons, List, Menu, MenuItem, MenuDivider,
 
 import app from 'state';
 import { ChainInfo, CommunityInfo } from 'models';
-import { isSameAccount } from 'helpers';
+import { isSameAccount, pluralize } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
 
@@ -125,6 +125,9 @@ const LoginSelector: m.Component<{ small?: boolean }, {
       community: app.activeCommunityId()
     });
 
+    const activeAccountsByRole = app.user.getActiveAccountsByRole();
+    const nAccountsWithoutRole = activeAccountsByRole.filter(([account, role], index) => !role).length;
+
     if (!vnode.state.profileLoadComplete && app.profiles.allLoaded()) {
       vnode.state.profileLoadComplete = true;
     }
@@ -170,11 +173,14 @@ const LoginSelector: m.Component<{ small?: boolean }, {
                 compact: true
               }),
             })),
+            activeAddressesWithRole.length > 0 && m(MenuDivider),
             !isPrivateCommunity && m(MenuItem, {
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
               }),
-              label: activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
+              label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
+                : activeAddressesWithRole.length > 0 ? 'Manage addresses'
+                : 'Connect a new address',
             }),
             (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
               class: 'invite-user',
