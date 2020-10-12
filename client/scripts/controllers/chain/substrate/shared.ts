@@ -36,108 +36,17 @@ import {
   IChainModule,
   ITXData,
   ChainClass,
-  ChainEntity,
-  ChainEvent,
 } from 'models';
 
-import { SubstrateEvents, SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateEvents } from '@commonwealth/chain-events';
 
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { notifySuccess, notifyError, notifyInfo } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
 import { constructSubstrateUrl } from 'substrate';
 import { SubstrateAccount } from './account';
-import SubstrateDemocracyProposal from './democracy_proposal';
-import { SubstrateDemocracyReferendum } from './democracy_referendum';
-import { SubstrateTreasuryProposal } from './treasury_proposal';
-import { SubstrateCollectiveProposal } from './collective_proposal';
-import { EdgewareSignalingProposal } from '../edgeware/signaling_proposal';
-
-export type HandlerId = number;
-
-// creates a substrate API provider and waits for it to emit a connected event
-async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
-  const nodeUrl = constructSubstrateUrl(node.url);
-  const provider = new WsProvider(nodeUrl, 10 * 1000);
-  let unsubscribe: () => void;
-  await new Promise((resolve) => {
-    unsubscribe = provider.on('connected', () => resolve());
-  });
-  if (unsubscribe) unsubscribe();
-  window['wsProvider'] = provider;
-  return provider;
-}
-
-// dispatches an entity update to the appropriate module
-export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: ChainEvent): void {
-  switch (entity.type) {
-    case SubstrateTypes.EntityKind.DemocracyProposal: {
-      const constructorFunc = (e) => new SubstrateDemocracyProposal(
-        chain.chain, chain.accounts, chain.democracyProposals, e
-      );
-      return chain.democracyProposals.updateProposal(constructorFunc, entity, event);
-    }
-    case SubstrateTypes.EntityKind.DemocracyReferendum: {
-      const constructorFunc = (e) => new SubstrateDemocracyReferendum(
-        chain.chain, chain.accounts, chain.democracy, e
-      );
-      return chain.democracy.updateProposal(constructorFunc, entity, event);
-    }
-    case SubstrateTypes.EntityKind.DemocracyPreimage: {
-      if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
-        console.log('dispatching preimage noted, from entity', entity);
-        const proposal = chain.democracyProposals.getByHash(entity.typeId);
-        if (proposal) {
-          proposal.update(event);
-        }
-        const referendum = chain.democracy.getByHash(entity.typeId);
-        if (referendum) {
-          referendum.update(event);
-        }
-      }
-      break;
-    }
-    case SubstrateTypes.EntityKind.TreasuryProposal: {
-      const constructorFunc = (e) => new SubstrateTreasuryProposal(
-        chain.chain, chain.accounts, chain.treasury, e
-      );
-      return chain.treasury.updateProposal(constructorFunc, entity, event);
-    }
-    case SubstrateTypes.EntityKind.CollectiveProposal: {
-      const collectiveName = (event.data as SubstrateTypes.ICollectiveProposalEvents).collectiveName;
-      if (collectiveName && collectiveName === 'technicalCommittee'
-        && (chain.class === ChainClass.Kusama || chain.class === ChainClass.Polkadot)) {
-        const constructorFunc = (e) => new SubstrateCollectiveProposal(
-          chain.chain, chain.accounts, chain.technicalCommittee, e
-        );
-        return chain.technicalCommittee.updateProposal(constructorFunc, entity, event);
-      } else {
-        const constructorFunc = (e) => new SubstrateCollectiveProposal(
-          chain.chain, chain.accounts, chain.council, e
-        );
-        return chain.council.updateProposal(constructorFunc, entity, event);
-      }
-    }
-    case SubstrateTypes.EntityKind.SignalingProposal: {
-      if (chain.class === ChainClass.Edgeware) {
-        const constructorFunc = (e) => new EdgewareSignalingProposal(
-          chain.chain, chain.accounts, chain.signaling, e
-        );
-        return chain.signaling.updateProposal(constructorFunc, entity, event);
-      } else {
-        console.error('Received signaling update on non-edgeware chain!');
-        break;
-      }
-    }
-    default:
-      console.error('Received invalid substrate chain entity!');
-      break;
-  }
-  // force titles to update?
-  m.redraw();
-}
 
 export interface ISubstrateTXData extends ITXData {
   nonce: string;
@@ -174,6 +83,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       ss58Format: this._ss58Format,
     });
   }
+
+  private _fetcher: SubstrateEvents.StorageFetcher;
+  public get fetcher() { return this._fetcher; }
 
   private _tokenDecimals: number;
   private _tokenSymbol: string;
@@ -218,42 +130,78 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
   public get registry() { return this._api.registry; }
 
-  public async resetApi(selectedNode: NodeInfo, additionalOptions?): Promise<ApiRx> {
+  private _connectTime = 0;
+  private _timedOut: boolean = false;
+  public get timedOut() {
+    return this._timedOut;
+  }
+
+  // creates a substrate API provider and waits for it to emit a connected event
+  public async createApiProvider(node: NodeInfo): Promise<WsProvider> {
+    this._suppressAPIDisconnectErrors = false;
+    const INTERVAL = 1000;
+    const CONNECT_TIMEOUT = 10000;
+
+    const nodeUrl = constructSubstrateUrl(node.url);
+    const provider = new WsProvider(nodeUrl, INTERVAL);
+
     const connectedCb = () => {
       this.app.chain.networkStatus = ApiStatus.Connected;
       this.app.chain.networkError = null;
       this._suppressAPIDisconnectErrors = false;
+      this._connectTime = 0;
       m.redraw();
     };
     const disconnectedCb = () => {
-      if (!this._suppressAPIDisconnectErrors && this.app.chain && selectedNode === this.app.chain.meta) {
+      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {
         this.app.chain.networkStatus = ApiStatus.Disconnected;
         this.app.chain.networkError = null;
         this._suppressAPIDisconnectErrors = true;
         setTimeout(() => {
           this._suppressAPIDisconnectErrors = false;
-        }, 5000);
+        }, CONNECT_TIMEOUT);
         m.redraw();
       }
     };
     const errorCb = (err) => {
-      if (!this._suppressAPIDisconnectErrors && this.app.chain && selectedNode === this.app.chain.meta) {
-        console.log('api error');
+      console.log(`api error; waited ${this._connectTime}ms`);
+      this._connectTime += INTERVAL;
+      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {
+        if (this.app.chain.networkStatus === ApiStatus.Connected) {
+          notifyInfo('Reconnecting to chain...');
+        } else {
+          notifyInfo('Connecting to chain...');
+        }
         this.app.chain.networkStatus = ApiStatus.Disconnected;
         this.app.chain.networkError = err.message;
-        notifyError('API error');
         this._suppressAPIDisconnectErrors = true;
         setTimeout(() => {
-          this._suppressAPIDisconnectErrors = false;
-        }, 5000);
+          // this._suppressAPIDisconnectErrors = false;
+          console.log('chain connection timed out!');
+          provider.disconnect();
+          this._timedOut = true;
+          m.redraw();
+        }, CONNECT_TIMEOUT);
         m.redraw();
       }
     };
-    const provider = await createApiProvider(selectedNode);
-    if (provider.isConnected) connectedCb();
+
     this._removeConnectedCb = provider.on('connected', connectedCb);
     this._removeDisconnectedCb = provider.on('disconnected', disconnectedCb);
     this._removeErrorCb = provider.on('error', errorCb);
+
+    let unsubscribe: () => void;
+    await new Promise((resolve) => {
+      unsubscribe = provider.on('connected', () => resolve());
+    });
+    if (unsubscribe) unsubscribe();
+    window['wsProvider'] = provider;
+    if (provider.isConnected) connectedCb();
+    return provider;
+  }
+
+  public async resetApi(selectedNode: NodeInfo, additionalOptions?): Promise<ApiRx> {
+    const provider = await this.createApiProvider(selectedNode);
 
     // note that we reuse the same provider and type registry to create both an rxjs
     // and a promise-based API -- this avoids creating multiple connections to the node
@@ -304,20 +252,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   // load existing events and subscribe to future via client node connection
   public initChainEntities(): Promise<void> {
-    const fetcher = new SubstrateEvents.StorageFetcher(this._apiPromise);
+    this._fetcher = new SubstrateEvents.StorageFetcher(this._apiPromise);
     const subscriber = new SubstrateEvents.Subscriber(this._apiPromise);
     const processor = new SubstrateEvents.Processor(this._apiPromise);
     return this._app.chain.chainEntities.subscribeEntities(
-      this._app.chain,
-      fetcher,
+      this._app.chain.id,
       subscriber,
       processor,
-      // ensure Preimages come LAST
-      (e1, e2) => {
-        if (e1.data.kind === SubstrateTypes.EventKind.PreimageNoted) return 1;
-        if (e2.data.kind === SubstrateTypes.EventKind.PreimageNoted) return -1;
-        return 0;
-      },
     );
   }
 

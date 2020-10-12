@@ -4,11 +4,14 @@ import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
-import { Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner } from 'construct-ui';
+import {
+  Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner
+} from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase, AddressInfo } from 'models';
+import { link } from 'helpers';
+import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
@@ -17,9 +20,58 @@ import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import CommunitySelector, { CommunityLabel } from './community_selector';
+import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
-const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
+const SidebarQuickSwitcher = {
   view: (vnode) => {
+    const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
+      .concat(app.config.chains.getAll())
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .filter((item) => (item instanceof ChainInfo)
+        ? app.config.nodes.getByChain(item.id)?.length > 0
+        : true); // only chains with nodes
+
+    const starredCommunities = allCommunities.filter((item) => {
+      // filter out non-starred communities
+      if (item instanceof ChainInfo && !app.communities.isStarred(item.id, null)) return false;
+      if (item instanceof CommunityInfo && !app.communities.isStarred(null, item.id)) return false;
+      return true;
+    });
+
+    const quickSwitcherCommunities = starredCommunities.length > 0 ? starredCommunities : allCommunities;
+
+    const size = 36;
+    return m('.SidebarQuickSwitcher', [
+      quickSwitcherCommunities.map((item) => m(Tooltip, {
+        hoverOpenDelay: 0,
+        hoverCloseDelay: 0,
+        transitionDuration: 0,
+        position: 'right',
+        content: m('.quick-switcher-option-text', item.name),
+        trigger: m('.quick-switcher-option', {
+          class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
+            || (item instanceof CommunityInfo && item.id === app?.community?.id)
+          ? ' active' : '',
+        }, item instanceof ChainInfo
+          ? m(ChainIcon, {
+            size,
+            chain: item,
+            onclick: link ? (() => m.route.set(`/${item.id}`)) : null
+          }) : item instanceof CommunityInfo
+          ? m(CommunityIcon, {
+            size,
+            community: item,
+            onclick: link ? (() => m.route.set(`/${item.id}`)) : null
+          }) : null),
+      })),
+    ]);
+  }
+};
+
+const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaInitialized: true }> = {
+  view: (vnode) => {
+    const { sidebarTopic } = vnode.attrs;
+
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
@@ -56,7 +108,8 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
       label: [
         name,
       ],
-      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
+      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
+        || (sidebarTopic && sidebarTopic === id),
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${app.activeId()}/discussions/${name}`);
@@ -101,7 +154,7 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
             }),
         }),
         m(ListItem, {
-          active: onDiscussionsPage(m.route.get()),
+          active: onDiscussionsPage(m.route.get()) && !sidebarTopic,
           label: 'All Discussions',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
@@ -157,7 +210,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
-        || app.chain.base === ChainBase.Substrate
+        || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
         || app.chain.class === ChainClass.Moloch);
     if (!hasProposals) return;
 
@@ -286,6 +339,8 @@ const ChainStatusModule: m.Component<{}> = {
     const formattedUrl = url
       .replace('ws://', '')
       .replace('wss://', '')
+      .replace('http://', '')
+      .replace('https://', '')
       .split('/')[0]
       .split(':')[0];
 
@@ -296,8 +351,10 @@ const ChainStatusModule: m.Component<{}> = {
   }
 };
 
-const Sidebar: m.Component<{}, { open: boolean }> = {
+const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
   view: (vnode) => {
+    const { sidebarTopic } = vnode.attrs;
+
     return [
       m('.MobileSidebarHeader', {
         onclick: (e) => {
@@ -318,7 +375,9 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
           }),
           app.isLoggedIn() && m(MobileNewProposalButton),
         ]),
-        m('.mobile-sidebar-center', [
+        m('.mobile-sidebar-center', {
+          class: app.isLoggedIn() ? 'logged-in' : '',
+        }, [
           m('.community-label', m(CommunitySelector)),
         ]),
         m('.mobile-sidebar-right', [
@@ -326,6 +385,7 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
           m(LoginSelector, { small: false }),
         ]),
       ]),
+      m(SidebarQuickSwitcher),
       m('.Sidebar', {
         class: vnode.state.open ? 'open' : '',
         onclick: (e) => {
@@ -334,7 +394,7 @@ const Sidebar: m.Component<{}, { open: boolean }> = {
         },
       }, [
         m('.SidebarHeader', m(CommunitySelector)),
-        (app.chain || app.community) && m(OffchainNavigationModule),
+        (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
         (app.chain || app.community) && m(OnchainNavigationModule),
         app.chain && m(ChainStatusModule),
       ])

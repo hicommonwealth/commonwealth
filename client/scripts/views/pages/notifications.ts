@@ -3,14 +3,15 @@ import 'pages/notifications.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
-import { Checkbox, Button, Icons, ListItem, Table, SelectList, RadioGroup } from 'construct-ui';
+import moment from 'moment-twitter';
+import { Checkbox, Button, Icons, ListItem, Table, Tag, Grid, Col, SelectList, RadioGroup } from 'construct-ui';
 import { SubstrateEvents, SubstrateTypes, IChainEventKind, TitlerFilter } from '@commonwealth/chain-events';
 
 import app from 'state';
 import { NotificationSubscription, ChainInfo, CommunityInfo, ChainNetwork } from 'models';
 import { NotificationCategories } from 'types';
 
-import { link } from 'helpers';
+import { link, pluralize } from 'helpers';
 import { sortSubscriptions } from 'helpers/notifications';
 import {
   EdgewareChainNotificationTypes, KusamaChainNotificationTypes,
@@ -22,23 +23,22 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import PageError from 'views/pages/error';
 
-const NOTIFICATION_TABLE_PRE_COPY = 'Off-chain discussions';
+const NOTIFICATION_TABLE_PRE_COPY = 'Off-chain discussion events';
 const CHAIN_NOTIFICATION_TABLE_PRE_COPY = 'On-chain events';
 
-const COMMENT_NUM_PREFIX = 'Comment #';
 const ALL_COMMUNITIES = 'All communities';
 
 // left column - for identifying the notification type
 const NEW_MENTIONS_LABEL = 'When someone mentions me';
 const NEW_THREADS_LABEL = 'When a thread is created';
-const NEW_ACTIVITY_LABEL = 'When there is new activity on';
-const NEW_COMMENTS_LABEL_PREFIX = 'New comments on ';
-const NEW_REACTIONS_LABEL_PREFIX = 'New reactions on ';
+const NEW_ACTIVITY_LABEL = 'When there is new activity on...';
+const NEW_COMMENTS_LABEL_SUFFIX = '(new comments only)';
+const NEW_REACTIONS_LABEL_SUFFIX = '(new reactions only)';
 
 // right column - for selecting the notification frequency
-const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (alert me immediately)';
+const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (immediate)';
 const NOTIFICATION_ON_OPTION = 'On';
-const NOTIFICATION_ON_SOMETIMES_OPTION = '--';
+const NOTIFICATION_ON_SOMETIMES_OPTION = 'Multiple selections';
 const NOTIFICATION_OFF_OPTION = 'Off';
 
 const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: boolean }> = {
@@ -46,9 +46,10 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
     if (!app.user) return;
     if (vnode.state.interval === undefined) vnode.state.interval = app.user.emailInterval;
 
-    return m('.EmailIntervalConfiguration', [
-      m('.email-interval-configuration-left', [
-        m('h4', 'Receive notification emails'),
+    return m(Grid, { class: 'EmailIntervalConfiguration' }, [
+      m(Col, { class: 'email-interval-configuration-left', span: { xs: 12, md: 6 } }, [
+        m('h4', 'Notification digest'),
+        m('p', 'Receive a digest of your unread notifications'),
         m(RadioGroup, {
           options: ['daily', 'never'],
           name: 'interval',
@@ -84,10 +85,14 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
           ]) : '',
         vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
       ]),
-      // m('.email-interval-configuration-right', [
-      //   m('h4', 'Immediate emails'),
-      //   'You will also be notified immediately when there is activity on:'
-      // ]),
+      m(Col, { class: 'email-interval-configuration-right', span: { xs: 12, md: 6 } }, [
+        m('h4', 'Immediate email notifications'),
+        m('p', [
+          'Select ',
+          m('strong', 'On (immediate)'),
+          ' to receive an email immediately when the selected event occurs'
+        ]),
+      ]),
     ]);
   }
 };
@@ -103,13 +108,13 @@ const BatchedSubscriptionRow: m.Component<{
     const someActive = subscriptions.some((s) => s.isActive);
     const everyActive = subscriptions.every((s) => s.isActive);
     const someEmail = subscriptions.some((s) => s.immediateEmail);
-    const everyEmail = subscriptions.some((s) => s.immediateEmail);
+    const everyEmail = subscriptions.every((s) => s.immediateEmail);
     if (everyActive && everyEmail) {
       vnode.state.option = NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION;
     } else if (everyActive && !someEmail) {
       vnode.state.option = NOTIFICATION_ON_OPTION;
-    } else if (someActive) {
-      vnode.state.option = NOTIFICATION_ON_OPTION;
+    } else if (someActive || someEmail) {
+      vnode.state.option = NOTIFICATION_ON_SOMETIMES_OPTION;
     } else {
       vnode.state.option = NOTIFICATION_OFF_OPTION;
     }
@@ -128,12 +133,16 @@ const BatchedSubscriptionRow: m.Component<{
             : subscription.OffchainComment
               ? decodeURIComponent(subscription.OffchainComment.id)
               : subscription.objectId;
-          return subscription.OffchainThread
-            ? [ NEW_COMMENTS_LABEL_PREFIX,
-                link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
-                     threadOrComment.toString(), { target: '_blank' })
-              ]
-            : NEW_COMMENTS_LABEL_PREFIX + threadOrComment.toString();
+
+          return subscription.OffchainThread ? [
+            link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+              threadOrComment.toString(), { target: '_blank' }),
+            m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
+            m('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
+          ] : [
+            threadOrComment.toString(),
+            m('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
+          ];
         }
         case (NotificationCategories.NewReaction): {
           const threadOrComment = subscription.OffchainThread
@@ -141,36 +150,47 @@ const BatchedSubscriptionRow: m.Component<{
             : subscription.OffchainComment
               ? decodeURIComponent(subscription.OffchainComment.id)
               : subscription.objectId;
-          return subscription.OffchainThread
-            ? [ NEW_REACTIONS_LABEL_PREFIX,
-                link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
-                     threadOrComment.toString(), { target: '_blank' })
-              ]
-            : NEW_REACTIONS_LABEL_PREFIX + threadOrComment.toString();
+          return subscription.OffchainThread ? [
+            link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+              threadOrComment.toString(), { target: '_blank' }),
+            m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
+            m('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
+          ] : [
+            threadOrComment.toString(),
+            m('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
+          ];
         }
         default:
           break;
       }
     };
 
-    const batchLabel = (subscriptions: NotificationSubscription[]) => {
-      const chainOrCommunityId = subscriptions[0].Chain
-        ? subscriptions[0].Chain.id
-        : subscriptions[0].OffchainCommunity
-          ? subscriptions[0].OffchainCommunity.id
+    const batchLabel = (batchLabelSubscriptions: NotificationSubscription[]) => {
+      const subscription = batchLabelSubscriptions[0];
+      const chainOrCommunityId = subscription.Chain
+        ? subscription.Chain.id
+        : subscription.OffchainCommunity
+          ? subscription.OffchainCommunity.id
           : null;
 
-      const threadOrComment = subscriptions[0].OffchainThread
-        ? decodeURIComponent(subscriptions[0].OffchainThread.title)
-        : subscriptions[0].OffchainComment
-          ? decodeURIComponent(subscriptions[0].OffchainComment.id)
-          : subscriptions[0].objectId;
+      const threadOrComment = subscription.OffchainThread
+        ? decodeURIComponent(subscription.OffchainThread.title)
+        : subscription.OffchainComment
+          ? decodeURIComponent(subscription.OffchainComment.id)
+          : subscription.objectId;
 
-      return subscriptions[0].OffchainThread
-        ? [ link('a', `/${chainOrCommunityId}/proposal/discussion/${subscriptions[0].OffchainThread.id}`,
-                 threadOrComment.toString(), { target: '_blank' }) ]
-        : COMMENT_NUM_PREFIX + threadOrComment.toString();
+      return subscription.OffchainThread ? [
+        link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+          threadOrComment.toString(), { target: '_blank' }),
+        m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
+      ] : [ threadOrComment.toString() ];
     };
+
+    // hide subscriptions on threads/comments that have been deleted
+    if (_.every(subscriptions, (s) => !s.OffchainComment && !s.OffchainThread
+      && (s.category === NotificationCategories.NewComment || s.category === NotificationCategories.NewReaction))) {
+      return;
+    }
 
     return m('tr.BatchedSubscriptionRow', [
       m('td.subscription-label', [
@@ -203,10 +223,12 @@ const BatchedSubscriptionRow: m.Component<{
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
             size: 'sm',
+            class: vnode.state.option === NOTIFICATION_ON_SOMETIMES_OPTION ? 'sometimes' : '',
           }),
           onSelect: async (option: string) => {
             vnode.state.option = option;
             try {
+              if (subscriptions.length < 1) return;
               if (option === NOTIFICATION_OFF_OPTION) {
                 if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
                 if (someActive) await app.user.notifications.disableSubscriptions(subscriptions);
@@ -338,9 +360,10 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
 const ChainEventSubscriptionRow: m.Component<{
   title: string;
   notificationTypeArray: string[];
+  recommended?: boolean;
 }, { option: string, }> = {
   view: (vnode) => {
-    const { title, notificationTypeArray, } = vnode.attrs;
+    const { title, notificationTypeArray, recommended } = vnode.attrs;
     const subscriptions = app.user.notifications.subscriptions.filter((s) => {
       return (
         s.category === NotificationCategories.ChainEvent
@@ -362,7 +385,10 @@ const ChainEventSubscriptionRow: m.Component<{
     }
 
     return m('tr.ChainEventSubscriptionRow', [
-      m('td.subscription-label', title),
+      m('td.subscription-label', [
+        title,
+        recommended && m(Tag, { size: 'xs', label: 'Recommended' }),
+      ]),
       m('td.subscription-setting', [
         m(SelectList, {
           class: 'EventSubscriptionTypeSelectList',
@@ -437,13 +463,13 @@ const ChainEventSubscriptionRow: m.Component<{
 const EdgewareChainEventNotifications: m.Component = {
   view: (vnode) => {
     return [
-      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: EdgewareChainNotificationTypes.Council, }),
-      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, }),
-      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: EdgewareChainNotificationTypes.Preimage, }),
-      m(ChainEventSubscriptionRow, { title: 'Signaling events', notificationTypeArray: EdgewareChainNotificationTypes.Signaling, }),
+      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: EdgewareChainNotificationTypes.Council, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Signaling events', notificationTypeArray: EdgewareChainNotificationTypes.Signaling, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: EdgewareChainNotificationTypes.Treasury, }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: EdgewareChainNotificationTypes.Validator, }),
-      m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: EdgewareChainNotificationTypes.Vote, }),
+      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: EdgewareChainNotificationTypes.Preimage, }),
+      m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: EdgewareChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -451,12 +477,12 @@ const EdgewareChainEventNotifications: m.Component = {
 const KusamaChainEventNotifications: m.Component = {
   view: (vnode) => {
     return [
-      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KusamaChainNotificationTypes.Council, }),
-      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KusamaChainNotificationTypes.Democracy, }),
-      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KusamaChainNotificationTypes.Preimage, }),
-      // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KusamaChainNotificationTypes.Treasury, }),
+      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KusamaChainNotificationTypes.Council, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KusamaChainNotificationTypes.Democracy, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KusamaChainNotificationTypes.Treasury, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KusamaChainNotificationTypes.Validator, }),
-      m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: KusamaChainNotificationTypes.Vote, }),
+      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KusamaChainNotificationTypes.Preimage, }),
+      m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: KusamaChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -464,12 +490,12 @@ const KusamaChainEventNotifications: m.Component = {
 const PolkadotChainEventNotifications: m.Component = {
   view: (vnode) => {
     return [
-      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: PolkadotChainNotificationTypes.Council, }),
-      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: PolkadotChainNotificationTypes.Democracy, }),
-      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
-      // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: PolkadotChainNotificationTypes.Treasury, }),
+      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: PolkadotChainNotificationTypes.Council, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: PolkadotChainNotificationTypes.Democracy, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: PolkadotChainNotificationTypes.Treasury, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: PolkadotChainNotificationTypes.Validator, }),
-      m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: PolkadotChainNotificationTypes.Vote, }),
+      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
+      m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: PolkadotChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -477,12 +503,12 @@ const PolkadotChainEventNotifications: m.Component = {
 const KulupuChainEventNotifications: m.Component = {
   view: (vnode) => {
     return [
-      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KulupuChainNotificationTypes.Council, }),
-      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KulupuChainNotificationTypes.Democracy, }),
-      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KulupuChainNotificationTypes.Preimage, }),
-      // m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KulupuChainNotificationTypes.Treasury, }),
+      m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KulupuChainNotificationTypes.Council, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KulupuChainNotificationTypes.Democracy, recommended: true }),
+      m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KulupuChainNotificationTypes.Treasury, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KulupuChainNotificationTypes.Validator, }),
-      m(ChainEventSubscriptionRow, { title: 'Vote events', notificationTypeArray: KulupuChainNotificationTypes.Vote, }),
+      m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KulupuChainNotificationTypes.Preimage, }),
+      m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: KulupuChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -490,7 +516,9 @@ const KulupuChainEventNotifications: m.Component = {
 const IndividualCommunityNotifications: m.Component<{
   community: CommunityInfo | ChainInfo;
   subscriptions: NotificationSubscription[];
-}, {}> = {
+}, {
+  expanded: boolean;
+}> = {
   view: (vnode) => {
     const { community, subscriptions } = vnode.attrs;
     const filteredSubscriptions = subscriptions.filter(
@@ -511,25 +539,38 @@ const IndividualCommunityNotifications: m.Component<{
         m('td'),
       ]),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
-      batchedSubscriptions.length > 0 && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
+      vnode.state.expanded && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, {
           subscriptions: subscriptions2,
           key: subscriptions2[0].id,
         });
-      })
+      }),
+      batchedSubscriptions.length > 0 && m('tr', [
+        m('td', { colspan: 2 }, [
+          m('a.expand-notifications-link', {
+            href: '#',
+            onclick: (e) => { e.preventDefault(); vnode.state.expanded = !vnode.state.expanded; },
+          }, [
+            `${vnode.state.expanded ? 'Hide' : 'Show'} ${pluralize(batchedSubscriptions.length, 'thread')}`,
+          ]),
+        ]),
+      ]),
     ];
   },
 };
 
 const AllCommunitiesNotifications: m.Component<{
   subscriptions: NotificationSubscription[];
-  communities: CommunityInfo[];
+  communities: string[];
+}, {
+  expanded: boolean;
 }> = {
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
     const chainIds = app.config.chains.getAll().map((c) => c.id);
-    const communityIds = communities.map((c) => c.id);
+    // const communityIds = communities.map((c) => c.id);
+    const communityIds = communities;
     const batchedSubscriptions = sortSubscriptions(subscriptions.filter((s) => {
       return !chainIds.includes(s.objectId)
         && s.category !== NotificationCategories.NewMention
@@ -550,9 +591,19 @@ const AllCommunitiesNotifications: m.Component<{
         m('td', NEW_ACTIVITY_LABEL),
         m('td'),
       ]),
-      batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
+      vnode.state.expanded && batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, { subscriptions: subscriptions2 });
-      })
+      }),
+      batchedSubscriptions.length > 0 && m('tr', [
+        m('td', { colspan: 2 }, [
+          m('a.expand-notifications-link', {
+            href: '#',
+            onclick: (e) => { e.preventDefault(); vnode.state.expanded = !vnode.state.expanded; },
+          }, [
+            `${vnode.state.expanded ? 'Hide' : 'Show'} ${pluralize(batchedSubscriptions.length, 'thread')}`,
+          ]),
+        ]),
+      ]),
     ];
   },
 };
@@ -563,6 +614,7 @@ const NotificationsPage: m.Component<{}, {
   selectedCommunity: CommunityInfo | ChainInfo;
   selectedCommunityId: string;
   selectableCommunityIds: string[];
+  allCommunityIds: string[];
 }> = {
   oninit: async (vnode) => {
     if (!app.isLoggedIn) {
@@ -595,6 +647,11 @@ const NotificationsPage: m.Component<{}, {
         .filter((c) => selectableCommunityIds.includes(c.id))
     );
 
+    // initialize vnode.state.allCommunityIds
+    vnode.state.allCommunityIds = [];
+    _.uniq(app.config.chains.getAll()).forEach((c) => vnode.state.allCommunityIds.push(c.id));
+    vnode.state.communities.forEach((c) => vnode.state.allCommunityIds.push(c.id));
+
     // initialize selectableCommunityIds
     vnode.state.selectableCommunityIds = [ALL_COMMUNITIES];
     vnode.state.communities.forEach((c) => vnode.state.selectableCommunityIds.push(c.name));
@@ -611,8 +668,7 @@ const NotificationsPage: m.Component<{}, {
   },
   view: (vnode) => {
     const { communities, subscriptions } = vnode.state;
-    const { selectedCommunity, selectedCommunityId, selectableCommunityIds } = vnode.state;
-
+    const { selectedCommunity, selectedCommunityId, selectableCommunityIds, allCommunityIds } = vnode.state;
     const chains = _.uniq(app.config.chains.getAll());
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
@@ -665,16 +721,22 @@ const NotificationsPage: m.Component<{}, {
               m('th', NOTIFICATION_TABLE_PRE_COPY),
               m('th', ''),
             ]),
-            selectedCommunityId === ALL_COMMUNITIES
-              && m(AllCommunitiesNotifications, { communities, subscriptions }),
+            selectedCommunityId === ALL_COMMUNITIES && [
+              m(AllCommunitiesNotifications, { communities: allCommunityIds, subscriptions }),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Edgeware chain events')),
+              m(EdgewareChainEventNotifications),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Kulupu chain events')),
+              m(KulupuChainEventNotifications),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Kusama chain events')),
+              m(KusamaChainEventNotifications),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, 'Polkadot chain events')),
+              m(PolkadotChainEventNotifications),
+            ],
             selectedCommunity
               && m(IndividualCommunityNotifications, { subscriptions, community: selectedCommunity }),
             // on-chain event notifications
             selectedCommunity instanceof ChainInfo && [
-              m('tr.on-chain-events-header', [
-                m('th', CHAIN_NOTIFICATION_TABLE_PRE_COPY),
-                m('th', ''),
-              ]),
+              m('tr.on-chain-events-header', m('th', { colspan: 2 }, CHAIN_NOTIFICATION_TABLE_PRE_COPY)),
               selectedCommunity.network === ChainNetwork.Edgeware && m(EdgewareChainEventNotifications),
               selectedCommunity.network === ChainNetwork.Kulupu && m(KulupuChainEventNotifications),
               selectedCommunity.network === ChainNetwork.Kusama && m(KusamaChainEventNotifications),

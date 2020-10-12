@@ -58,7 +58,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
             existingEntity = ChainEntity.fromJSON(chainEntity);
           }
           this.chainEntities.update(existingEntity, eventModel);
-          this.handleEntityUpdate(existingEntity, eventModel);
         }
       );
     }
@@ -127,10 +126,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this._apiInitialized = false;
     this._loaded = false;
     console.log(`Stopping ${this.meta.chain.id}...`);
-  }
-
-  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
-    throw new Error('not implemented');
   }
 
   public abstract base: ChainBase;

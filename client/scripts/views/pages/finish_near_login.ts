@@ -117,9 +117,9 @@ const FinishNearLogin: m.Component<{}, IState> = {
               const chain = app.user.selectedNode
                 ? app.user.selectedNode.chain
                 : app.config.nodes.getByChain(app.activeChainId())[0].chain;
-              updateActiveAddresses(chain);
+              await updateActiveAddresses(chain);
             }
-            setActiveAccount(acct);
+            await setActiveAccount(acct);
           })
           .then(() => {
             vnode.state.validationCompleted = true;

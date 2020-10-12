@@ -30,7 +30,6 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
     const visitedChain = !!unseenPosts[chain];
     const updatedThreads = unseenPosts[chain]?.activePosts || 0;
     const monthlyThreads = app.recentActivity.getThreadsByCommunity(chain);
-    const monthlyUsers = app.recentActivity.getAddressesByCommunity(chain);
 
     return m(Card, {
       elevation: 1,
@@ -58,13 +57,10 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
         m('p.card-description', chainInfo.description),
         // if no recently active threads, hide this module altogether
         m('.recent-activity', !!monthlyThreads.length && [
-          m('.recent-threads', [ pluralize(monthlyThreads.length, 'thread'), '/mo' ]),
-          !!monthlyUsers
-            && m(UserGallery, {
-              users: (monthlyUsers as AddressInfo[]),
-              maxUsers: 12,
-              avatarSize: 20,
-            })
+          m('.recent-threads', [
+            pluralize(monthlyThreads.length, 'thread'),
+            ' this month',
+          ]),
         ])
       ]),
     ]);
@@ -78,7 +74,6 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
     const visitedCommunity = !!unseenPosts[community.id];
     const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
     const monthlyThreads = app.recentActivity.getThreadsByCommunity(community.id);
-    const monthlyUsers = app.recentActivity.getAddressesByCommunity(community.id);
 
     return m(Card, {
       elevation: 1,
@@ -108,13 +103,10 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
         m('p.card-description', community.description),
         // if no recently active threads, hide this module altogether
         m('.recent-activity', !!monthlyThreads.length && [
-          m('.recent-threads', [ pluralize(monthlyThreads.length, 'thread'), '/mo' ]),
-          !!monthlyUsers
-            && m(UserGallery, {
-              users: (monthlyUsers as AddressInfo[]),
-              maxUsers: 12,
-              avatarSize: 20,
-            })
+          m('.recent-threads', [
+            pluralize(monthlyThreads.length, 'thread'),
+            ' this month',
+          ]),
         ])
       ]),
     ]);

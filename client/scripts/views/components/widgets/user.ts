@@ -4,7 +4,7 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import { formatAddressShort, link } from 'helpers';
-import { Tooltip, Tag, Icon, Icons } from 'construct-ui';
+import { Tooltip, Tag, Icon, Icons, Popover } from 'construct-ui';
 
 import app from 'state';
 import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
@@ -12,12 +12,12 @@ import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
 const User: m.Component<{
   user: Account<any> | AddressInfo;
   avatarSize?: number;
-  avatarOnly?: boolean; // avatarOnly overrides most other properties
+  avatarOnly?: boolean; // overrides most other properties
   hideAvatar?: boolean;
   hideIdentityIcon?: boolean; // only applies to substrate identities
   linkify?: boolean;
   onclick?: any;
-  tooltip?: boolean;
+  popover?: boolean;
   showRole?: boolean;
 }, {
   identityWidgetLoading: boolean;
@@ -25,7 +25,7 @@ const User: m.Component<{
 }> = {
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
-    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip, showRole } = vnode.attrs;
+    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, popover, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
@@ -110,7 +110,7 @@ const User: m.Component<{
         showRole && roleTag,
       ]);
 
-    const tooltipPopover = m('.UserTooltip', {
+    const userPopover = m('.UserPopover', {
       onclick: (e) => {
         e.stopPropagation();
       }
@@ -135,8 +135,14 @@ const User: m.Component<{
       showRole && roleTag,
     ]);
 
-    return tooltip
-      ? m(Tooltip, { content: tooltipPopover, hoverOpenDelay: 1000, trigger: userFinal, key: profile?.address || '-' })
+    return popover
+      ? m(Popover, {
+        interactionType: 'hover',
+        content: userPopover,
+        trigger: userFinal,
+        closeOnContentClick: true,
+        key: profile?.address || '-'
+      })
       : userFinal;
   }
 };
@@ -144,13 +150,13 @@ const User: m.Component<{
 export const UserBlock: m.Component<{
   user: Account<any> | AddressInfo,
   hideIdentityIcon?: boolean,
-  tooltip?: boolean,
+  popover?: boolean,
   showRole?: boolean,
   selected?: boolean,
   compact?: boolean,
 }> = {
   view: (vnode) => {
-    const { user, hideIdentityIcon, tooltip, showRole, selected, compact } = vnode.attrs;
+    const { user, hideIdentityIcon, popover, showRole, selected, compact } = vnode.attrs;
 
     let profile;
     if (user instanceof AddressInfo) {
@@ -168,7 +174,7 @@ export const UserBlock: m.Component<{
           user,
           avatarOnly: true,
           avatarSize: 28,
-          tooltip,
+          popover,
         }),
         // TODO: this is weird...symbol display should not depend on user being an Account
         user.chain instanceof ChainInfo && m('.user-block-symbol', user.chain.symbol),
@@ -179,7 +185,7 @@ export const UserBlock: m.Component<{
             user,
             hideAvatar: true,
             hideIdentityIcon,
-            tooltip,
+            popover,
             showRole,
           }),
         ]),

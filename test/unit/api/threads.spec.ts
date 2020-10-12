@@ -474,7 +474,6 @@ describe('Thread Tests', () => {
       const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
-      const privacy = true;
       const res = await chai.request(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
@@ -484,7 +483,6 @@ describe('Thread Tests', () => {
           'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
-          'privacy': privacy,
           'read_only': readOnly,
           'jwt': userJWT,
         });
@@ -497,7 +495,6 @@ describe('Thread Tests', () => {
       const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
-      const privacy = true;
       const res = await chai.request(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
@@ -507,7 +504,6 @@ describe('Thread Tests', () => {
           'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
-          'privacy': privacy,
           'read_only': readOnly,
           'jwt': adminJWT,
         });
@@ -522,7 +518,6 @@ describe('Thread Tests', () => {
       const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
-      const privacy = true;
       const res = await chai.request(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
@@ -532,7 +527,6 @@ describe('Thread Tests', () => {
           'body': null,
           'version_history': versionHistory,
           'attachments[]': null,
-          'privacy': privacy,
           'read_only': readOnly,
           'jwt': adminJWT,
         });
@@ -548,7 +542,6 @@ describe('Thread Tests', () => {
       const recentEdit : any = { timestamp: moment(), body: newBody };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
-      const privacy = true;
       const res = await chai.request(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
@@ -558,7 +551,6 @@ describe('Thread Tests', () => {
           'body': newBody,
           'version_history': versionHistory,
           'attachments[]': null,
-          'privacy': privacy,
           'read_only': readOnly,
           'jwt': adminJWT,
         });
@@ -573,7 +565,6 @@ describe('Thread Tests', () => {
       const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
-      const privacy = true;
       const res = await chai.request(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
@@ -584,24 +575,19 @@ describe('Thread Tests', () => {
           'title': newTitle,
           'version_history': versionHistory,
           'attachments[]': null,
-          'privacy': privacy,
           'read_only': readOnly,
           'jwt': adminJWT,
         });
       expect(res.status).to.be.equal(200);
       expect(res.body.result.title).to.be.equal(newTitle);
     });
-
-    it.skip('should fail to show private threads to a user without access', async () => {
-      // TODO: Use /bulkThreads to fetch threads for a user without access
-      // TODO: and ensure that a created private thread is not shown to the user
-    });
   });
 
   describe('/setPrivacy', () => {
     let tempThread;
-    it('should create a private thread as non-admin', async () => {
-      const res = await modelUtils.createThread({
+
+    it('should turn on readonly', async () => {
+      const res1 = await modelUtils.createThread({
         address: userAddress,
         kind,
         chainId: chain,
@@ -611,26 +597,35 @@ describe('Thread Tests', () => {
         topicId,
         body,
         jwt: userJWT,
-        privacy: true,
       });
-      expect(res.status).to.be.equal('Success');
-      expect(res.result.private).to.be.true;
-      tempThread = res.result;
-    });
-
-    it('should turn off privacy as non-admin and turn on readonly', async () => {
+      expect(res1.result).to.not.be.null;
+      tempThread = res1.result;
       const res = await chai.request(app)
         .post('/api/setPrivacy')
         .set('Accept', 'application/json')
         .send({
           thread_id: tempThread.id,
-          privacy: false,
           read_only: 'true',
           jwt: userJWT,
         });
       expect(res.status).to.be.equal(200);
-      expect(res.body.result.private).to.be.false;
       expect(res.body.result.read_only).to.be.true;
+    });
+
+    it('should fail to comment on a read_only thread', async () => {
+      // create new user + jwt
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const newUserJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+      // try to comment and fail
+      const cRes = await modelUtils.createComment({
+        chain,
+        address: res.address,
+        jwt: newUserJWT,
+        text: 'hello world',
+        root_id: `discussion_${tempThread.id}`,
+      });
+      expect(cRes.result).to.be.undefined;
+      expect(cRes.error).to.be.equal(CreateCommentErrors.CantCommentOnReadOnly);
     });
 
     it('should turn off readonly as an admin of community', async () => {
@@ -643,11 +638,10 @@ describe('Thread Tests', () => {
           jwt: adminJWT,
         });
       expect(res.status).to.be.equal(200);
-      expect(res.body.result.private).to.be.false;
       expect(res.body.result.read_only).to.be.false;
     });
 
-    it('should fail without read_only or privacy', async () => {
+    it('should fail without read_only', async () => {
       const res = await chai.request(app)
         .post('/api/setPrivacy')
         .set('Accept', 'application/json')
@@ -656,7 +650,7 @@ describe('Thread Tests', () => {
           jwt: adminJWT,
         });
       expect(res.status).to.be.equal(500);
-      expect(res.body.error).to.be.equal(setPrivacyErrors.PrivateOrReadOnly);
+      expect(res.body.error).to.be.equal(setPrivacyErrors.NoReadOnly);
     });
 
 
@@ -665,7 +659,6 @@ describe('Thread Tests', () => {
         .post('/api/setPrivacy')
         .set('Accept', 'application/json')
         .send({
-          privacy: 'true',
           read_only: 'true',
           jwt: adminJWT,
         });
@@ -679,7 +672,6 @@ describe('Thread Tests', () => {
         .set('Accept', 'application/json')
         .send({
           thread_id: 123458,
-          privacy: 'true',
           read_only: 'true',
           jwt: adminJWT,
         });
@@ -696,7 +688,6 @@ describe('Thread Tests', () => {
         .set('Accept', 'application/json')
         .send({
           thread_id: tempThread.id,
-          privacy: 'true',
           read_only: 'true',
           jwt: newUserJWT,
         });

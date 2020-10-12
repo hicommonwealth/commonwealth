@@ -45,6 +45,7 @@ class WebsocketController {
       // set up new heartbeat time
       const heartbeatTimer = setInterval(() => {
         const heartbeat: IWebsocketsPayload<any> = { event: WebsocketMessageType.Heartbeat, jwt };
+        if (ws.readyState !== ws.OPEN) return;
         ws.send(JSON.stringify(heartbeat));
       }, HEARTBEAT_DELAY);
       this._heartbeatTimer = +heartbeatTimer;

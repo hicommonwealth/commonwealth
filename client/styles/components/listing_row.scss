@@ -3,6 +3,13 @@
 .ListingRow {
     @include listing-row-base;
 
+    .UserGallery {
+        .User {
+            margin-top: 2px;
+            margin-right: -16px;
+        }
+    }
+
     .row-left {
         line-height: 1.1;
         flex: $listing-left-flex;
@@ -68,6 +75,7 @@
                     text-align: right;
                     font-size: $text-size-item-meta;
                     color: $text-color-light;
+                    padding-top: 2px;
                     &.older {
                         min-width: 116px;
                     }

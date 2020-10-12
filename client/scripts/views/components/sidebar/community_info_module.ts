@@ -5,7 +5,6 @@ import m from 'mithril';
 import app from 'state';
 import { Button, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
 
-import CreateInviteModal from 'views/modals/create_invite_modal';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 
 const removeUrlPrefix = (url) => {
@@ -37,23 +36,6 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
         }, [
           m(Icon, { name: Icons.SETTINGS }),
         ]),
-        // TODO: get this working for chains
-        (app.community?.meta.invitesEnabled
-              || isAdmin)
-          && m('.community-info-action', {
-            onclick: (e) => {
-              e.preventDefault();
-              const data = app.activeCommunityId()
-                ? { communityInfo: app.community.meta }
-                : { chainInfo: app.chain.meta.chain }
-              app.modals.create({
-                modal: CreateInviteModal,
-                data,
-              });
-            },
-          }, [
-            m(Icon, { name: Icons.MAIL }),
-          ]),
       ]),
       m('.community-description', description),
       website && m('.community-info', [
