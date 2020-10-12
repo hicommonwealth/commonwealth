@@ -47,25 +47,28 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       : { chain_id: chain.id },
   });
 
-  // Comments
+  // Threads
   const whereOptions = community
     ? `WHERE community='${community.id}'`
     : `WHERE chain=${chain.id} AND root_id LIKE 'discussion%'`;
 
   const query = `SELECT *
     FROM "OffchainThreads"
-    WHERE id in 
-      (SELECT CAST(TRIM('discussion_' FROM root_id) AS int) FROM
-        (SELECT root_id, created_at, id FROM
-          (SELECT root_id, MAX(created_at) as created_at, MAX(id) as id FROM "OffchainComments" 
+    WHERE id in (
+      SELECT CAST(TRIM('discussion_' FROM root_id) AS int)
+      FROM (
+        SELECT root_id, created_at, id
+        FROM (
+          SELECT root_id, MAX(created_at) as created_at, MAX(id) as id 
+          FROM "OffchainComments" 
           ${whereOptions}
           GROUP BY root_id) grouped_comments
         ORDER BY created_at DESC LIMIT 20) ordered_comments
       )
   ;`;
 
-  const comments = await models.sequelize.query(query);
-  console.log(comments);
+  const threads = await models.sequelize.query(query);
+  console.log(threads);
 
   // Reactions
   const reactions = await models.OffchainReaction.findAll({
@@ -93,10 +96,9 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     status: 'Success',
     result: {
       topics: topics.map((c) => c.toJSON()),
-      comments: comments.map((c) => c.toJSON()),
       reactions: reactions.map((c) => c.toJSON()),
       admins: admins.map((p) => p.toJSON()),
-      threads: filteredThreads.map((c) => c.toJSON()),
+      threads: threads.map((c) => c.toJSON()),
     }
   });
 };
