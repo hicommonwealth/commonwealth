@@ -21,9 +21,15 @@ const LoginWithWalletDropdown: m.Component<{
 
     // prev and next must work whether the modal is on the web3login page, or not...which is why this is so confusing
     const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
-    const next = (m.route.param('prev') && m.route.param('prev').indexOf('web3login') === -1) ? m.route.param('prev')
-      : joiningChain ? `/${joiningChain}` : joiningCommunity ? `/${joiningCommunity}` :
-      m.route.get().indexOf('web3login') === -1 ? m.route.get() : app.chain ? `/${app.chain.meta.chain.id}` : '/';
+    const next = (m.route.param('prev') && m.route.param('prev').indexOf('web3login') === -1 && m.route.param('prev') !== '/')
+      ? m.route.param('prev')
+      : joiningChain ? `/${joiningChain}`
+      : joiningCommunity ? `/${joiningCommunity}`
+      : m.route.get().indexOf('web3login') === -1 && m.route.get().replace(/\?.*/, '') !== '/' ? m.route.get()
+      : app.chain ? `/${app.chain.meta.chain.id}`
+      : app.community ? `/${app.community.meta.id}`
+      : '/?';
+    // only redirect to home as an absolute last resort
 
     const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress } : joiningChain
       ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };

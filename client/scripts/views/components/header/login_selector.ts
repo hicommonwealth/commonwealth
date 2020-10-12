@@ -236,7 +236,6 @@ const LoginSelector: m.Component<{ small?: boolean }, {
               $.get(`${app.serverUrl()}/logout`).then(async () => {
                 await initAppState();
                 notifySuccess('Logged out');
-                m.route.set('/');
                 m.redraw();
               }).catch((err) => {
                 // eslint-disable-next-line no-restricted-globals
