@@ -299,6 +299,7 @@ const LinkNewAddressModal: m.Component<{
         m('.link-address-step-narrow', [
           m(Button, {
             class: 'account-adder-placeholder',
+            key: 'placeholder',
             intent: 'primary',
             label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ],
             disabled: true,
