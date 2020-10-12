@@ -4,7 +4,7 @@ import { makeDynamicComponent } from 'models/mithril';
 import { ChainBase } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import { IValidators } from 'controllers/chain/substrate/account';
-import { ICommissionInfo } from 'controllers/chain/substrate/staking';
+import { ICommissionInfo, GroupValidator } from 'controllers/chain/substrate/staking';
 import { from } from 'rxjs';
 import Spinner from 'views/pages/spinner';
 import BN from 'bn.js';
@@ -29,12 +29,7 @@ export interface IStakeListState {
   dynamic: {
     validators: IValidators;
     apr: ICommissionInfo;
-    groups: {
-      name: string,
-      stashes: string[],
-      id: number,
-      chain?: string
-    }[]
+    groups: GroupValidator[]
   }
 }
 
@@ -51,7 +46,7 @@ const StakeList = makeDynamicComponent<StakeListAttrs, IStakeListState>({
       ? (app.chain as Substrate).staking.annualPercentRate
       : null,
     groups: (app.chain.base === ChainBase.Substrate)
-      ? from((app.chain as Substrate).app.chainEvents.getValidatorGroups({}))
+      ? (app.chain as Substrate).staking.getValidatorGroups
       : null
   }),
   view: (vnode) => {
@@ -142,35 +137,31 @@ const StakeList = makeDynamicComponent<StakeListAttrs, IStakeListState>({
                   online = validators[stash].isOnline;
                 }
                 const stake = (app.chain as Substrate).chain.coins(stashStake).format(true);
-                const arr = [];
-                for (let i = 0; i < 16; i++) {
-                  arr.push(m('tr.ValidatorRow.details',
-                    m('td.val-stash',
+                return m('tr.ValidatorRow.details',
+                  m('td.val-stash',
+                    m(Tooltip, {
+                      content: m(Identity, { stash }),
+                      trigger: m('div', m(User, { user: app.chain.accounts.get(stash), linkify: true }))
+                    }),
+                    m(Icon, {
+                      name: online
+                        ? Icons.WIFI
+                        : Icons.WIFI_OFF,
+                      size: 'xs'
+                    })),
+                  m('td.val-stake', stake),
+                  m('td.val-commission', `${commissionPer.toFixed(2)}%`),
+                  m('.val-actions',
+                    m('span.button-options',
                       m(Tooltip, {
-                        content: m(Identity, { stash }),
-                        trigger: m('div', m(User, { user: app.chain.accounts.get(stash), linkify: true }))
-                      }),
-                      m(Icon, {
-                        name: online
-                          ? Icons.WIFI
-                          : Icons.WIFI_OFF,
-                        size: 'xs'
-                      })),
-                    m('td.val-stake', stake),
-                    m('td.val-commission', `${commissionPer.toFixed(2)}%`),
-                    m('.val-actions',
-                      m('span.button-options',
-                        m(Tooltip, {
-                          content: 'Details',
-                          position: 'top',
-                          trigger: m(Icon, {
-                            name: Icons.MORE_HORIZONTAL,
-                            size: 'lg',
-                            onclick: () => { }
-                          })
-                        })))));
-                }
-                return arr;
+                        content: 'Details',
+                        position: 'top',
+                        trigger: m(Icon, {
+                          name: Icons.MORE_HORIZONTAL,
+                          size: 'lg',
+                          onclick: () => { }
+                        })
+                      }))));
               }))])
         ];
       })), m('.row.group_button', app.user.jwt && m('.manage-staking-preheader-item', [
