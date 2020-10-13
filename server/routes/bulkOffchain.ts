@@ -50,8 +50,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
 
   // Threads
   const whereOptions = community
-    ? `WHERE community = :community`
-    : `WHERE chain = :chain AND root_id LIKE 'discussion%'`;
+    ? `community = :community`
+    : `chain = :chain AND root_id LIKE 'discussion%'`;
 
   const replacements = community
     ? { community: community.id }
@@ -67,7 +67,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           FROM (
             SELECT root_id, MAX(created_at) as created_at 
             FROM "OffchainComments" 
-            ${whereOptions} AND deleted_at IS NULL
+            WHERE ${whereOptions}
+              AND deleted_at IS NULL
             GROUP BY root_id) grouped_comments
           ORDER BY created_at DESC LIMIT 20
         ) ordered_comments
@@ -89,7 +90,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         [Op.in]: threadIds.map((id) => id.id)
       }
     },
-    include: [ models.Address ],
+    include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
   });
 
   // Reactions
