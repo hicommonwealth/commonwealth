@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
@@ -49,13 +49,14 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
 
   // Threads
   const whereOptions = community
-    ? `WHERE community='${community.id}'`
-    : `WHERE chain='${chain.id}' AND root_id LIKE 'discussion%'`;
+    ? 'WHERE community=?'
+    : 'WHERE chain=? AND root_id LIKE \'discussion%\'';
 
-  const query = `SELECT *
+  const query = `SELECT * 
     FROM (
-    SELECT *
-      FROM "OffchainThreads"
+    SELECT t.id, t.address_id, t.title, t.kind, t.url, t.pinned,
+      t.chain, t.community, t.read_only, t.created_at
+      FROM "OffchainThreads" AS t
       WHERE id in (
         SELECT CAST(TRIM('discussion_' FROM root_id) AS int)
         FROM (
@@ -63,18 +64,20 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           FROM (
             SELECT root_id, MAX(created_at) as created_at, MAX(id) as id 
             FROM "OffchainComments" 
-            ${whereOptions}
+            ${whereOptions} AND deleted_at IS NOT NULL
             GROUP BY root_id) grouped_comments
           ORDER BY created_at DESC LIMIT 20
         ) ordered_comments
       )
-    ) threads
+    ) AS threads
     LEFT OUTER JOIN "Addresses" AS a
       ON threads.address_id = a.id
   ;`;
 
-  const threads = await models.sequelize.query(query);
-  console.log(threads);
+  const threads = await models.sequelize.query(query, {
+    replacement: [community ? community.id : chain.id],
+    type: QueryTypes.SELECT
+  });
 
   // Reactions
   const reactions = await models.OffchainReaction.findAll({
