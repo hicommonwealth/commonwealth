@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { QueryTypes } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
@@ -49,20 +50,23 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
 
   // Threads
   const whereOptions = community
-    ? 'WHERE community=?'
-    : 'WHERE chain=? AND root_id LIKE \'discussion%\'';
+    ? `WHERE community = :community`
+    : `WHERE chain = :chain AND root_id LIKE 'discussion%'`;
+
+  const replacements = community
+    ? { community: community.id }
+    : { chain: chain.id };
 
   const query = `SELECT * 
     FROM (
-    SELECT t.id, t.address_id, t.title, t.kind, t.url, t.pinned,
-      t.chain, t.community, t.read_only, t.created_at
+    SELECT *
       FROM "OffchainThreads" AS t
       WHERE id in (
         SELECT CAST(TRIM('discussion_' FROM root_id) AS int)
         FROM (
           SELECT root_id, created_at, id
           FROM (
-            SELECT root_id, MAX(created_at) as created_at, MAX(id) as id 
+            SELECT root_id, MAX(created_at) as created_at 
             FROM "OffchainComments" 
             ${whereOptions} AND deleted_at IS NOT NULL
             GROUP BY root_id) grouped_comments
@@ -74,10 +78,17 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       ON threads.address_id = a.id
   ;`;
 
-  const threads = await models.sequelize.query(query, {
-    replacement: [community ? community.id : chain.id],
-    type: QueryTypes.SELECT
-  });
+  let threads;
+  try {
+    threads = await models.sequelize.query(query, {
+      replacements,
+      type: QueryTypes.SELECT
+    });
+  } catch (e) {
+    console.log(e);
+  }
+
+  console.log(threads);
 
   // Reactions
   const reactions = await models.OffchainReaction.findAll({
@@ -107,7 +118,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       topics: topics.map((c) => c.toJSON()),
       reactions: reactions.map((c) => c.toJSON()),
       admins: admins.map((p) => p.toJSON()),
-      threads: threads.map((c) => c.toJSON()),
+      threads,
     }
   });
 };
