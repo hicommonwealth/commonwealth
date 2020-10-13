@@ -57,9 +57,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     ? { community: community.id }
     : { chain: chain.id };
 
-  const query = `SELECT * 
-    FROM (
-    SELECT *
+  const query = `
+    SELECT t.id
       FROM "OffchainThreads" AS t
       WHERE id in (
         SELECT CAST(TRIM('discussion_' FROM root_id) AS int)
@@ -72,21 +71,28 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             GROUP BY root_id) grouped_comments
           ORDER BY created_at DESC LIMIT 20
         ) ordered_comments
-      )
-    ) AS threads
-    LEFT OUTER JOIN "Addresses" AS a
-      ON threads.address_id = a.id
-  ;`;
+      );`;
 
-  let threads;
+  let threadIds;
   try {
-    threads = await models.sequelize.query(query, {
+    threadIds = await models.sequelize.query(query, {
       replacements,
       type: QueryTypes.SELECT
     });
   } catch (e) {
     console.log(e);
   }
+
+  console.log(threadIds.map((id) => id.id));
+
+  const threads = await models.OffchainThread.findAll({
+    where: {
+      id: {
+        [Op.in]: threadIds.map((id) => id.id)
+      }
+    },
+    include: [ models.Address ],
+  });
 
   console.log(threads);
 
