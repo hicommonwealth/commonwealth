@@ -67,7 +67,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           FROM (
             SELECT root_id, MAX(created_at) as created_at 
             FROM "OffchainComments" 
-            ${whereOptions} AND deleted_at IS NOT NULL
+            ${whereOptions} AND deleted_at IS NULL
             GROUP BY root_id) grouped_comments
           ORDER BY created_at DESC LIMIT 20
         ) ordered_comments
@@ -83,8 +83,6 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     console.log(e);
   }
 
-  console.log(threadIds.map((id) => id.id));
-
   const threads = await models.OffchainThread.findAll({
     where: {
       id: {
@@ -93,8 +91,6 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     },
     include: [ models.Address ],
   });
-
-  console.log(threads);
 
   // Reactions
   const reactions = await models.OffchainReaction.findAll({
