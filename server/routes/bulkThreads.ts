@@ -10,7 +10,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
-
+  console.log(req.body);
   // Threads
   let threads;
   if (req.body.cutoffDate) {
@@ -52,7 +52,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     } catch (e) {
       console.log(e);
     }
-
+    console.log(threadIds);
     threads = await models.OffchainThread.findAll({
       where: {
         id: {

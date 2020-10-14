@@ -224,11 +224,11 @@ class ThreadsController {
     });
   }
 
-  public async loadNextPage(chainId: string, communityId: string, cutoffDate: Date, topic?: OffchainTopic) {
+  public async loadNextPage(chainId: string, communityId: string, cutoffDate: moment.Moment, topic?: OffchainTopic) {
     const params = {
       chain: chainId,
       community: communityId,
-      cutoffDate,
+      cutoffDate: cutoffDate._i,
     };
     if (topic) params['topic_id'] = topic.id;
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);

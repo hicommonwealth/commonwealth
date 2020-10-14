@@ -23,7 +23,7 @@ import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
 interface IDiscussionPageState {
-  lookback?: Date;
+  lookback?: moment.Moment;
   postsDepleted?: boolean;
   lastVisitedUpdated?: boolean;
 }
@@ -83,7 +83,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
     vnode.state.lookback = (returningFromThread && localStorage[`${app.activeId()}-lookback`])
       ? localStorage[`${app.activeId()}-lookback`]
-      : vnode.state.lookback instanceof Date
+      : vnode.state.lookback?._isAMomentObject
         ? vnode.state.lookback
         : undefined;
   },
@@ -151,10 +151,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
         .sort(orderDiscussionsbyLastComment);
 
-    vnode.state.lookback = allThreads[allThreads.length - 1].createdAt;
-    console.log(vnode.state.lookback instanceof Date);
-    console.log(vnode.state.lookback);
-
     if (allThreads.length) {
       let visitMarkerPlaced = false;
 
@@ -163,6 +159,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
       const firstThread = sortedThreads[0];
       const lastThread = sortedThreads[sortedThreads.length - 1];
+
+      vnode.state.lookback = lastThread.createdAt;
+      if (vnode.state.lookback) {
+        console.log(vnode.state.lookback._isAMomentObject);
+        console.log(vnode.state.lookback);
+      }
 
       // pinned threads - inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
