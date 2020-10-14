@@ -46,8 +46,8 @@ class CommunitiesController {
           });
           app.user.removeStarredCommunity(star);
         }
-        m.redraw();
         resolve();
+        m.redraw();
       }).catch((err) => {
         reject();
       });

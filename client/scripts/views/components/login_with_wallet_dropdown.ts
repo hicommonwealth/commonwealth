@@ -19,9 +19,20 @@ const LoginWithWalletDropdown: m.Component<{
   view: (vnode) => {
     const { label, loggingInWithAddress, joiningChain, joiningCommunity } = vnode.attrs;
 
+    // prev and next must work whether the modal is on the web3login page, or not...which is why this is so confusing
     const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
-    const next = (m.route.param('prev') && m.route.param('prev').indexOf('web3login') === -1) ? m.route.param('prev')
-      : joiningChain ? `/${joiningChain}` : joiningCommunity ? `/${joiningCommunity}` : '/';
+    const next = (m.route.param('prev')
+                  && m.route.param('prev').indexOf('web3login') === -1
+                  && m.route.param('prev') !== '/')
+      ? m.route.param('prev')
+      : joiningChain ? `/${joiningChain}`
+        : joiningCommunity ? `/${joiningCommunity}`
+          : m.route.get().indexOf('web3login') === -1 && m.route.get().replace(/\?.*/, '') !== '/' ? m.route.get()
+            : app.chain ? `/${app.chain.meta.chain.id}`
+              : app.community ? `/${app.community.meta.id}`
+                : '/?';
+    // only redirect to home as an absolute last resort
+
     const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress } : joiningChain
       ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
 
@@ -48,14 +59,18 @@ const LoginWithWalletDropdown: m.Component<{
           joiningCommunity,
           useCommandLineWallet: !!cli,
           successCallback: () => {
-            m.route.set(next);
+            if (next === '/?') {
+              m.route.set(`/${chain.id}`);
+            } else {
+              m.route.set(next);
+            }
             m.redraw();
             setTimeout(() => m.redraw(), 1); // necessary because address linking may be deferred
           }
         });
       }
     });
-    const menuItems = (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== 0)
+    const menuItems = (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== -1)
       ? [
         getMenuItemForChain(app.chain.meta.chain),
         getMenuItemForChain(app.chain.meta.chain, true)
@@ -76,6 +91,7 @@ const LoginWithWalletDropdown: m.Component<{
         ]
       }),
       addToStack: true,
+      closeOnContentClick: true,
       class: 'LoginWithWalletDropdownPopoverMenu',
       transitionDuration: 0,
       content: menuItems,

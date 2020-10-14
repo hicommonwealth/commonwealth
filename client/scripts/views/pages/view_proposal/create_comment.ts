@@ -124,10 +124,10 @@ const CreateComment: m.Component<{
       class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
     }, [
       m('.create-comment-avatar', [
-        m(User, { user: author, tooltip: true, avatarOnly: true, avatarSize: 36 }),
+        m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 36 }),
       ]),
       m('.create-comment-body', [
-        m(User, { user: author, tooltip: true, hideAvatar: true }),
+        m(User, { user: author, popover: true, hideAvatar: true }),
         (rootProposal instanceof OffchainThread && rootProposal.readOnly)
           ? m(Callout, {
             intent: 'primary',

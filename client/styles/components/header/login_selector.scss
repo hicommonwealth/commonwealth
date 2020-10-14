@@ -48,12 +48,20 @@
 }
 
 .LoginSelector {
-    > button.cui-button .cui-icon {
+    button.cui-button .cui-icon:last-child {
         position: relative;
         top: -2px;
     }
-    > button.cui-button {
+    button.cui-button {
         padding: 0 10px;
+    }
+    button.cui-button.login-selector-right {
+        flex: initial !important;
+        border-radius: 0 4px 4px 0 !important;
+        margin-right: 0 !important;
+    }
+    button.cui-button.login-selector-right:first-child {
+        border-radius: 4px !important;
     }
 }
 

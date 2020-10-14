@@ -349,7 +349,7 @@ const ComponentKit = {
 
       // list
       m('div', [
-        m(List, [ 'List item 1', 'List item 2', 'List item 3', 'List item 4' ].map(item => m(ListItem, {
+        m(List, [ 'List item 1', 'List item 2', 'List item 3', 'List item 4' ].map((item) => m(ListItem, {
           contentLeft: m(Icon, { name: Icons.LINK }),
           contentRight: m(PopoverMenu, {
             closeOnContentClick: true,

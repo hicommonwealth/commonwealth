@@ -4,11 +4,12 @@ import m from 'mithril';
 import { Button, Icon, Icons, List, ListItem, PopoverMenu, MenuItem } from 'construct-ui';
 
 import app from 'state';
-import { ChainInfo, CommunityInfo } from 'models';
+import { AddressInfo, ChainInfo, CommunityInfo, RoleInfo } from 'models';
 import { SwitchIcon } from 'helpers';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
+import User, { UserBlock } from '../widgets/user';
 
 export const CommunityLabel: m.Component<{
   chain?: ChainInfo,
@@ -116,6 +117,17 @@ const CommunitySelector = {
     const unjoinedCommunities = allCommunities.filter((c) => !isInCommunity(c));
 
     const renderCommunity = (item) => {
+      const roles: RoleInfo[] = [];
+      if (item instanceof CommunityInfo) {
+        roles.push(...app.user.getAllRolesInCommunity({ community: item.id }));
+      } else if (item instanceof ChainInfo) {
+        roles.push(...app.user.getAllRolesInCommunity({ chain: item.id }));
+      }
+
+      const profile = (roles[0]?.address_chain)
+        ? app.profiles.getProfile(roles[0].address_chain, roles[0].address)
+        : null;
+
       return item instanceof ChainInfo
         ? m(ListItem, {
           class: app.communities.isStarred(item.id, null) ? 'starred' : '',
@@ -126,18 +138,27 @@ const CommunitySelector = {
             e.stopPropagation();
             m.route.set(item.id ? `/${item.id}` : '/');
           },
-          contentRight: app.isLoggedIn() && app.user.isMember({
-            account: app.user.activeAccount,
-            chain: item.id
-          }) && m('.community-star-toggle', {
-            onclick: (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
-            }
-          }, [
-            m(Icon, { name: Icons.STAR }),
-          ]),
+          contentRight: app.isLoggedIn()
+            && roles.length > 0
+            && m('.community-star-toggle', {
+              onclick: async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                await app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+                m.redraw();
+              }
+            }, [
+              roles.map((role) => {
+                return m(User, {
+                  avatarSize: 18,
+                  avatarOnly: true,
+                  user: new AddressInfo(null, role.address, role.address_chain, null),
+                });
+              }),
+              m('.star-icon', [
+                m(Icon, { name: Icons.STAR, key: item.id, }),
+              ]),
+            ]),
         })
         : item instanceof CommunityInfo
           ? m(ListItem, {
@@ -147,18 +168,27 @@ const CommunitySelector = {
             onclick: () => {
               m.route.set(item.id ? `/${item.id}` : '/');
             },
-            contentRight: app.isLoggedIn() && app.user.isMember({
-              account: app.user.activeAccount,
-              community: item.id
-            }) && m('.community-star-toggle', {
-              onclick: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
-              },
-            }, [
-              m(Icon, { name: Icons.STAR }),
-            ]),
+            contentRight: app.isLoggedIn()
+              && roles.length > 0
+              && m('.community-star-toggle', {
+                onclick: async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  await app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                  m.redraw();
+                },
+              }, [
+                roles.map((role) => {
+                  return m(User, {
+                    avatarSize: 18,
+                    avatarOnly: true,
+                    user: new AddressInfo(null, role.address, role.address_chain, null),
+                  });
+                }),
+                m('.star-icon', [
+                  m(Icon, { name: Icons.STAR, key: item.id, }),
+                ]),
+              ]),
           })
           : m.route.get() !== '/'
             ? m(ListItem, {
@@ -177,7 +207,6 @@ const CommunitySelector = {
           hasArrow: false,
           inline: true,
           trigger: m(Button, {
-            class: 'CommunitySelectList',
             label: [
               currentCommunity instanceof CommunityInfo
                 ? m(CommunityLabel, { community: currentCommunity })
@@ -187,10 +216,10 @@ const CommunitySelector = {
           class: 'CommunitySelectList',
           content: [
             app.isLoggedIn() && [
-              m('h4', 'Your communities'),
+              m('h4', 'You\'re a member of'),
               joinedCommunities.map(renderCommunity),
               joinedCommunities.length === 0 && m('.community-placeholder', 'None'),
-              m('h4', 'More communities'),
+              m('h4', 'Other communities'),
             ],
             unjoinedCommunities.map(renderCommunity),
             renderCommunity('home'),

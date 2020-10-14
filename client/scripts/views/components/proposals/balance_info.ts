@@ -7,9 +7,9 @@ import { makeDynamicComponent } from 'models/mithril';
 
 interface IState {
   dynamic: { freeBalance, lockedBalance, balance }
-};
+}
 
-export const BalanceInfo = makeDynamicComponent<{ account }, IState>({
+const BalanceInfo = makeDynamicComponent<{ account }, IState>({
   getObservables: (attrs) => ({
     groupKey: attrs.account.address,
     freeBalance: (attrs.account as SubstrateAccount).freeBalance,

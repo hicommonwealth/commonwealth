@@ -30,7 +30,8 @@ export interface ISubstrateIdentityState {
 const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
   getObservables: (attrs) => ({
     groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount) && (!attrs.profile.isOnchain) && (app.chain as Substrate).identities
+    identity: (attrs.account instanceof SubstrateAccount && !attrs.profile.isOnchain
+               && (app.chain as Substrate).identities)
       ? (app.chain as Substrate).identities.get(attrs.account)
       : null,
   }),
@@ -108,8 +109,11 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
 
 const SubstrateIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
   view: (vnode) => {
-    if (app.chain?.loaded && vnode.attrs.account) return m(SubstrateOnlineIdentityWidget, vnode.attrs);
-    else return m(SubstrateOfflineIdentityWidget, vnode.attrs);
+    if (app.chain?.loaded && vnode.attrs.account && (app.chain as Substrate).identities?.initialized) {
+      return m(SubstrateOnlineIdentityWidget, vnode.attrs);
+    } else {
+      return m(SubstrateOfflineIdentityWidget, vnode.attrs);
+    }
   }
 };
 

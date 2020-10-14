@@ -59,8 +59,9 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await this.chain.resetApi(this.meta, additionalOptions);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    // TODO: add disabled check
-    await this.identities.init(this.chain, this.accounts);
+    if (this.class !== ChainClass.Plasm) {
+      await this.identities.init(this.chain, this.accounts);
+    }
     await super.initApi();
   }
 

@@ -1,3 +1,4 @@
+import { AddressInfo } from '.';
 import RolePermission from './RolePermission';
 
 class RoleInfo {

@@ -96,6 +96,7 @@ export default class {
   public setRoles(roles = []): void {
     roles.forEach((role) => {
       role.address = role.Address.address;
+      role.address_chain = role.Address.chain;
       delete role.Address;
       this._roles.push(role);
     });
@@ -153,11 +154,12 @@ export default class {
   public setStarredCommunities(star: StarredCommunity[]): void { this._setStarredCommunities(star); }
   public addStarredCommunity(star: StarredCommunity): void { this._starredCommunities.push(star); }
   public removeStarredCommunity(star: StarredCommunity): void {
-    this._starredCommunities.splice(this._starredCommunities.findIndex((s) => (
-      s.user_id === star.user_id
-      && s.chain === star.chain
-      && s.community === star.community
-    ), 1));
+    const index = this._starredCommunities.findIndex((s) => (
+      s.chain
+        ? (s.user_id === star.user_id && s.chain === star.chain)
+        : (s.user_id === star.user_id && s.community === star.community)
+    ));
+    this._starredCommunities.splice(index, 1);
   }
 
 

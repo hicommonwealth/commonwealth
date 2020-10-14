@@ -42,92 +42,6 @@ enum LinkNewAddressWallets {
   CLIWallet,
 }
 
-const accountVerifiedCallback = async (account: Account<any>, vnode) => {
-  if (app.isLoggedIn()) {
-    // existing user
-
-    // initialize role
-    try {
-      // initialize AddressInfo
-      let addressInfo = app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id);
-      //
-      // TODO: do this in a more well-defined way...
-      //
-      // account.addressId is set by all createAccount methods in controllers/login.ts. this means that all cases should
-      // be covered (either the account comes from the backend and the address is also loaded via AddressInfo, or the
-      // account is created on the frontend and the id is available here).
-      //
-      // either way, we should refactor to always hold addressId on Account<any> models
-      if (!addressInfo && account.addressId) {
-        // TODO: add keytype
-        addressInfo = new AddressInfo(account.addressId, account.address, account.chain.id, undefined);
-        app.user.addresses.push(addressInfo);
-      }
-      // link the address to the community
-      if (vnode.attrs.joiningChain
-          && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
-        await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
-      } else if (vnode.attrs.joiningCommunity
-                 && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
-        await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
-      }
-      // set the address as active
-      await setActiveAccount(account);
-      if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
-        app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
-      }
-      // TODO: set the address as default
-    } catch (e) {
-      console.trace(e);
-      // if the address' role wasn't initialized correctly,
-      // setActiveAccount will throw an exception but we should continue
-    }
-
-    vnode.state.newAddress = account;
-    vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
-    vnode.state.error = null;
-    m.redraw();
-    mixpanel.track('Account Creation', {
-      'Step No': 2,
-      'Step': 'Add Address',
-      'Option': 'Wallet',
-      'Scope': app.activeId(),
-    });
-    mixpanel.people.increment('Addresses');
-    mixpanel.people.set({
-      'Last Address Created': new Date().toISOString()
-    });
-    $(vnode.dom).trigger('modalforceexit');
-    if (vnode.attrs.successCallback) vnode.attrs.successCallback();
-    m.redraw();
-  } else {
-    // log in as the new user
-    await initAppState(false);
-    // load addresses for the current chain/community
-    if (app.community) {
-      await updateActiveAddresses(undefined);
-    } else if (app.chain) {
-      const chain = app.user.selectedNode
-        ? app.user.selectedNode.chain
-        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
-      await updateActiveAddresses(chain);
-    } else {
-      notifyError('Signed in, but no chain or community found');
-    }
-    // if we're logging in and have a profile, we can just close out the modal
-    if (account.profile && account.profile.initialized && account.profile.name) {
-      $(vnode.dom).trigger('modalforceexit');
-      if (vnode.attrs.successCallback) vnode.attrs.successCallback();
-    } else {
-      vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
-    }
-    vnode.state.newAddress = account;
-    vnode.state.isNewLogin = true;
-    vnode.state.error = null;
-    m.redraw();
-  }
-};
-
 const EthereumLinkAccountItem: m.Component<{
   address,
   accountVerifiedCallback,
@@ -151,7 +65,7 @@ const EthereumLinkAccountItem: m.Component<{
           .then(() => {
             if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses
             linkNewAddressModalVnode.state.linkingComplete = true;
-            return accountVerifiedCallback(signerAccount, linkNewAddressModalVnode);
+            return accountVerifiedCallback(signerAccount);
           })
           .then(() => m.redraw())
           .catch(errorCallback);
@@ -213,7 +127,7 @@ const SubstrateLinkAccountItem: m.Component<{
             vnode.state.linking = false;
             if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses
             linkNewAddressModalVnode.state.linkingComplete = true;
-            accountVerifiedCallback(signerAccount, vnode.attrs.linkNewAddressModalVnode);
+            accountVerifiedCallback(signerAccount);
           }, (err) => {
             vnode.state.linking = false;
             errorCallback('Verification failed');
@@ -286,8 +200,29 @@ const LinkNewAddressModal: m.Component<{
     $(window).off('popstate', vnode.state.onpopstate);
   },
   view: (vnode) => {
-    if (!app.chain) return; // TODO: avoid flash of empty modal when app.chain is being loaded
+    const linkAddressHeader = m('.compact-modal-title', [
+      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
+    ]);
 
+    // TODO: refactor this out so we don't have duplicated loading code
+    if (!app.chain) return m('.LinkNewAddressModal', {
+      key: 'placeholder', // prevent vnode from being reused so later oninit / oncreate code runs
+    }, [
+      m('.link-address-step', [
+        linkAddressHeader,
+        m('.link-address-step-narrow', [
+          m(Button, {
+            class: 'account-adder-placeholder',
+            key: 'placeholder',
+            intent: 'primary',
+            label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ],
+            disabled: true,
+          }),
+        ])
+      ])
+    ]);
+
+    // initialize the step
     if (vnode.state.step === undefined) {
       if (vnode.attrs.alreadyInitializedAccount) {
         vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
@@ -298,13 +233,11 @@ const LinkNewAddressModal: m.Component<{
           : LinkNewAddressSteps.Step1VerifyWithWebWallet;
       }
     }
+
+    // TODO: add a step to help users install wallets
     // gaiacli 'https://cosmos.network/docs/cosmos-hub/installation.html',
     // subkey 'https://substrate.dev/docs/en/ecosystem/subkey'
     // polkadot-js 'https://github.com/polkadot-js/extension'
-
-    const linkAddressHeader = m('.compact-modal-title', [
-      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
-    ]);
 
     // TODO: hack to fix linking now that keyToMsgSend is async
     if (vnode.state.newAddress) {
@@ -315,6 +248,92 @@ const LinkNewAddressModal: m.Component<{
         vnode.state.cosmosStdTx = stdTx;
       });
     }
+
+    const accountVerifiedCallback = async (account: Account<any>) => {
+      if (app.isLoggedIn()) {
+        // existing user
+
+        // initialize role
+        try {
+          // initialize AddressInfo
+          let addressInfo = app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id);
+          //
+          // TODO: do this in a more well-defined way...
+          //
+          // account.addressId is set by all createAccount methods in controllers/login.ts. this means that all cases should
+          // be covered (either the account comes from the backend and the address is also loaded via AddressInfo, or the
+          // account is created on the frontend and the id is available here).
+          //
+          // either way, we should refactor to always hold addressId on Account<any> models
+          if (!addressInfo && account.addressId) {
+            // TODO: add keytype
+            addressInfo = new AddressInfo(account.addressId, account.address, account.chain.id, undefined);
+            app.user.addresses.push(addressInfo);
+          }
+          // link the address to the community
+          if (vnode.attrs.joiningChain
+              && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
+            await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
+          } else if (vnode.attrs.joiningCommunity
+                     && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
+            await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
+          }
+          // set the address as active
+          await setActiveAccount(account);
+          if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+            app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+          }
+          // TODO: set the address as default
+        } catch (e) {
+          console.trace(e);
+          // if the address' role wasn't initialized correctly,
+          // setActiveAccount will throw an exception but we should continue
+        }
+
+        vnode.state.newAddress = account;
+        vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
+        vnode.state.error = null;
+        m.redraw();
+        mixpanel.track('Account Creation', {
+          'Step No': 2,
+          'Step': 'Add Address',
+          'Option': 'Wallet',
+          'Scope': app.activeId(),
+        });
+        mixpanel.people.increment('Addresses');
+        mixpanel.people.set({
+          'Last Address Created': new Date().toISOString()
+        });
+        $('.LinkNewAddressModal').trigger('modalforceexit');
+        if (vnode.attrs.successCallback) vnode.attrs.successCallback();
+        m.redraw();
+      } else {
+        // log in as the new user
+        await initAppState(false);
+        // load addresses for the current chain/community
+        if (app.community) {
+          await updateActiveAddresses(undefined);
+        } else if (app.chain) {
+          const chain = app.user.selectedNode
+            ? app.user.selectedNode.chain
+            : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+          await updateActiveAddresses(chain);
+        } else {
+          notifyError('Signed in, but no chain or community found');
+        }
+        // if we're logging in and have a profile, we can just close out the modal
+        if (account.profile && account.profile.initialized && account.profile.name) {
+          $('.LinkNewAddressModal').trigger('modalforceexit');
+          if (vnode.attrs.successCallback) vnode.attrs.successCallback();
+        } else {
+          vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
+        }
+        vnode.state.newAddress = account;
+        vnode.state.isNewLogin = true;
+        vnode.state.error = null;
+        m.redraw();
+      }
+    };
 
     return m('.LinkNewAddressModal', [
       vnode.state.step === LinkNewAddressSteps.Step1VerifyWithWebWallet ? m('.link-address-step', [
@@ -375,9 +394,7 @@ const LinkNewAddressModal: m.Component<{
               },
               label: 'Continue to NEAR wallet'
             }),
-          ] : app.chain.networkStatus !== ApiStatus.Connected ? [
-            m('.accounts-list-unavailable', 'Must be connected to chain')
-          ] : [
+          ] : app.chain.networkStatus !== ApiStatus.Connected ? [] : [
             [ChainBase.Ethereum
             ].indexOf(app.chain.base) !== -1 && (app.chain as Ethereum).webWallet.accounts.map(
               (address) => m(EthereumLinkAccountItem, {
@@ -557,7 +574,7 @@ const LinkNewAddressModal: m.Component<{
                 const unverifiedAcct: Account<any> = vnode.state.newAddress;
                 unverifiedAcct.validate(vnode.state.validSig).then(() => {
                   // if no exception was raised, account must be valid
-                  accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address), vnode);
+                  accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address));
                 }, (err) => {
                   vnode.state.error = 'Verification failed. There was an inconsistency error; '
                     + 'please report this to the developers.';

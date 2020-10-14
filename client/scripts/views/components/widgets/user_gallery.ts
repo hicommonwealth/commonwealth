@@ -15,11 +15,11 @@ const UserGallery: m.Component<{
   users: Account<any>[] | AddressInfo[];
   class?: string;
   avatarSize: number;
-  tooltip?: boolean;
+  popover?: boolean;
   maxUsers?: number;
 }, {}> = {
   view: (vnode) => {
-    const { users, avatarSize, tooltip } = vnode.attrs;
+    const { users, avatarSize, popover } = vnode.attrs;
     const userCount = users.length;
     const maxUsers = vnode.attrs.maxUsers || 10;
     const displayedUsers = (users as any)
@@ -28,7 +28,7 @@ const UserGallery: m.Component<{
         return m(User, {
           user,
           avatarOnly: true,
-          tooltip,
+          popover,
           avatarSize,
         });
       });

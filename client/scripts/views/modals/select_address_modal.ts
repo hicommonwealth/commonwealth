@@ -82,7 +82,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
-        m('h3', 'Manage addresses'),
+        m('h3', app.chain?.meta.chain.id ? `Manage ${app.chain.meta.chain.name} addresses` : 'Manage addresses'),
       ]),
       m('.compact-modal-body', [
         m('.select-address-options', [
