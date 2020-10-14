@@ -12,18 +12,15 @@ import { pluralize } from 'helpers';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/main';
-
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
-import DiscussionRow from 'views/pages/discussions/discussion_row';
 import Listing from 'views/pages/listing';
 
 import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
+import DiscussionRow from './discussion_row';
 
 interface IDiscussionPageState {
   lookback?: Date;
@@ -72,7 +69,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
       if (scrollPos > (scrollHeight - 400)) {
-        const args: string[] = app.activeCommunityId()
+        const args = app.activeCommunityId()
           ? [null, app.activeCommunityId(), vnode.state.lookback]
           : [app.activeChainId(), null, vnode.state.lookback];
         if (vnode.attrs.topic) args.push(vnode.attrs.topic);
@@ -177,33 +174,23 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         }
       }
 
-    //   const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited;
-    //   const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited;
-
-
-    //   if (noThreadsSeen() || allThreadsSeen()) {
-    //     listing.push(m('.discussion-group-wrap', sortedThreads
-    //       .slice(0, vnode.state.lookback)
-    //       .map((proposal) => m(DiscussionRow, { proposal }))));
-    //   } else {
-    //     let count = 0;
-    //     sortedThreads.slice(0, vnode.state.lookback).forEach((proposal) => {
-    //       const row = m(DiscussionRow, { proposal });
-    //       if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
-    //         listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
-    //         visitMarkerPlaced = true;
-    //         count += 1;
-    //       } else {
-    //         if (visitMarkerPlaced) {
-    //           listing[2].children.push(row);
-    //         } else {
-    //           listing.push(row);
-    //         }
-    //         count += 1;
-    //       }
-    //     });
-    //   }
-    // }
+      let count = 0;
+      sortedThreads.forEach((proposal) => {
+        const row = m(DiscussionRow, { proposal });
+        if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
+          listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
+          visitMarkerPlaced = true;
+          count += 1;
+        } else {
+          if (visitMarkerPlaced) {
+            listing[2].children.push(row);
+          } else {
+            listing.push(row);
+          }
+          count += 1;
+        }
+      });
+    }
 
     let topicDescription;
     if (topic && app.activeId()) {
@@ -253,7 +240,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         ])
       ]
     ]);
-  },
-};
+  }
+}
 
 export default DiscussionsPage;

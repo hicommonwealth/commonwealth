@@ -224,7 +224,7 @@ class ThreadsController {
     });
   }
 
-  public async loadNextPage(chainId: string, communityId: string, cutoffDate: any, topic?: OffchainTopic) {
+  public async loadNextPage(chainId: string, communityId: string, cutoffDate: Date, topic?: OffchainTopic) {
     const params = {
       chain: chainId,
       community: communityId,
