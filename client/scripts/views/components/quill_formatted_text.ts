@@ -140,7 +140,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
           if (child.insert?.mention) {
             result = m('span.mention', {
               onclick: (e) => {
-                //alert(child.insert.mention.id)
+                // alert(child.insert.mention.id)
               }
             }, child.insert.mention.denotationChar + child.insert.mention.value);
           } else if (child.attributes?.link) {

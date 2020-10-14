@@ -19,7 +19,8 @@ const CommunityMenuChain: m.Component<{ chain: string, nodeList: NodeInfo[], add
 
     const active = app.activeChainId() === chain
       && (!address
-          || (address.chain === app.user.activeAccount?.chain.id && address.address === app.user.activeAccount?.address));
+          || (address.chain === app.user.activeAccount?.chain.id
+              && address.address === app.user.activeAccount?.address));
 
     return m('a.CommunityMenuChain', {
       href: '#',
@@ -49,7 +50,8 @@ const CommunityMenuCommunity: m.Component<{ community: CommunityInfo, address: A
     const { community, address } = vnode.attrs;
     const active = app.activeCommunityId() === community.id
       && (!address
-          || (address.chain === app.user.activeAccount?.chain.id && address.address === app.user.activeAccount?.address));
+          || (address.chain === app.user.activeAccount?.chain.id
+              && address.address === app.user.activeAccount?.address));
 
     return m('a.CommunityMenuCommunity', {
       href: '#',
