@@ -26,10 +26,9 @@ import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
 
 interface IDiscussionPageState {
-  lookback?: number;
+  lookback?: Date;
   postsDepleted?: boolean;
   lastVisitedUpdated?: boolean;
-  defaultLookback: number;
 }
 
 const getLastUpdate = (proposal) => {
@@ -74,28 +73,22 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const scrollPos = $(window).height() + $(window).scrollTop();
       if (scrollPos > (scrollHeight - 400)) {
         const args: string[] = app.activeCommunityId()
-          ? [null, app.activeCommunityId()]
-          : [app.activeChainId(), null];
+          ? [null, app.activeCommunityId(), vnode.state.lookback]
+          : [app.activeChainId(), null, vnode.state.lookback];
         if (vnode.attrs.topic) args.push(vnode.attrs.topic);
         (<any>app.threads.loadNextPage)(...args);
-        if (!vnode.state.postsDepleted) {
-          vnode.state.lookback += vnode.state.defaultLookback;
-          m.redraw();
-        }
+        m.redraw();
       }
     }, 400);
     $(window).on('scroll', onscroll);
   },
   oninit: (vnode) => {
-    // determine lookback length
-    vnode.state.defaultLookback = 20;
-
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
     vnode.state.lookback = (returningFromThread && localStorage[`${app.activeId()}-lookback`])
-      ? Number(localStorage[`${app.activeId()}-lookback`])
-      : Number.isInteger(vnode.state.lookback)
+      ? localStorage[`${app.activeId()}-lookback`]
+      : vnode.state.lookback instanceof Date
         ? vnode.state.lookback
-        : vnode.state.defaultLookback;
+        : undefined;
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
@@ -161,6 +154,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
         .sort(orderDiscussionsbyLastComment);
 
+    vnode.state.lookback = allThreads[allThreads.length - 1].createdAt;
+    console.log(vnode.state.lookback instanceof Date);
+    console.log(vnode.state.lookback);
+
     if (allThreads.length) {
       let visitMarkerPlaced = false;
 
@@ -180,35 +177,33 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         }
       }
 
-      const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited;
-      const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited;
+    //   const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited;
+    //   const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited;
 
-      const visibleThreads = sortedThreads.slice(0, vnode.state.lookback);
-      vnode.state.postsDepleted = (visibleThreads.length < vnode.state.lookback);
 
-      if (noThreadsSeen() || allThreadsSeen()) {
-        listing.push(m('.discussion-group-wrap', sortedThreads
-          .slice(0, vnode.state.lookback)
-          .map((proposal) => m(DiscussionRow, { proposal }))));
-      } else {
-        let count = 0;
-        sortedThreads.slice(0, vnode.state.lookback).forEach((proposal) => {
-          const row = m(DiscussionRow, { proposal });
-          if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
-            listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
-            visitMarkerPlaced = true;
-            count += 1;
-          } else {
-            if (visitMarkerPlaced) {
-              listing[2].children.push(row);
-            } else {
-              listing.push(row);
-            }
-            count += 1;
-          }
-        });
-      }
-    }
+    //   if (noThreadsSeen() || allThreadsSeen()) {
+    //     listing.push(m('.discussion-group-wrap', sortedThreads
+    //       .slice(0, vnode.state.lookback)
+    //       .map((proposal) => m(DiscussionRow, { proposal }))));
+    //   } else {
+    //     let count = 0;
+    //     sortedThreads.slice(0, vnode.state.lookback).forEach((proposal) => {
+    //       const row = m(DiscussionRow, { proposal });
+    //       if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
+    //         listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
+    //         visitMarkerPlaced = true;
+    //         count += 1;
+    //       } else {
+    //         if (visitMarkerPlaced) {
+    //           listing[2].children.push(row);
+    //         } else {
+    //           listing.push(row);
+    //         }
+    //         count += 1;
+    //       }
+    //     });
+    //   }
+    // }
 
     let topicDescription;
     if (topic && app.activeId()) {

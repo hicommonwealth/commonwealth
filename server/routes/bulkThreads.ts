@@ -36,6 +36,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
               FROM "OffchainComments" 
               WHERE ${whereOptions}
                 AND created_at < :created_at
+                AND pinned = FALSE
                 AND deleted_at IS NULL
               GROUP BY root_id) grouped_comments
             ORDER BY created_at DESC LIMIT 20

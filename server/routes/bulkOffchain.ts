@@ -86,8 +86,11 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
 
   const threads = await models.OffchainThread.findAll({
     where: {
-      id: {
-        [Op.in]: threadIds.map((id) => id.id)
+      [Op.or]: {
+        id: {
+          [Op.in]: threadIds.map((id) => id.id)
+        },
+        pinned: true
       }
     },
     include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
