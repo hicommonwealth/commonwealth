@@ -155,7 +155,9 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
             }),
         }),
         m(ListItem, {
-          active: onDiscussionsPage(m.route.get()) && !sidebarTopic,
+          active: onDiscussionsPage(m.route.get())
+            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true)
+            && !sidebarTopic,
           label: 'All Discussions',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
