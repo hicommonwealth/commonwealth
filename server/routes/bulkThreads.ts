@@ -66,7 +66,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       : { chain: chain.id, };
 
     threads = await models.OffchainThread.findAll({
-      where: allThreadsQuery,
+      where: threadsQuery,
       include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
       order: [['created_at', 'DESC']],
     });

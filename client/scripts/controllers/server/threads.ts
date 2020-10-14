@@ -224,6 +224,39 @@ class ThreadsController {
     });
   }
 
+  public async loadNextPage(chainId: string, communityId: string, topic: OffchainTopic) {
+    const params = {
+      chain: chainId,
+      community: communityId,
+    };
+    if (topic) params['topic_id'] = topic.id;
+    const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
+    if (response.status !== 'Success') {
+      throw new Error(`Unsuccessful refresh status: ${response.status}`);
+    }
+    console.log(response.result);
+    const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
+    console.log({ threads });
+    if (topic) {
+      // logic for adding threads to topic-scoped store
+    } else {
+      for (const thread of threads) {
+        if (!thread.Address) {
+          console.error('OffchainThread missing address');
+        }
+        const existing = this._store.getByIdentifier(thread.id);
+        if (existing) {
+          this._store.remove(existing);
+        }
+        try {
+          this._store.add(modelFromServer(thread));
+        } catch (e) {
+          console.error(e.message);
+        }
+      }
+    }
+  }
+
   public refreshAll(chainId: string, communityId: string, reset = false) {
     // TODO: Change to GET /threads
     return $.get(`${app.serverUrl()}/bulkThreads`, {
