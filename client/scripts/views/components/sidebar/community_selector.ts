@@ -139,10 +139,11 @@ const CommunitySelector = {
           contentRight: app.isLoggedIn()
             && roles.length > 0
             && m('.community-star-toggle', {
-              onclick: (e) => {
+              onclick: async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+                await app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+                m.redraw();
               }
             }, [
               roles.map((role) => {
@@ -153,7 +154,7 @@ const CommunitySelector = {
                 });
               }),
               m('.star-icon', [
-                m(Icon, { name: Icons.STAR }),
+                m(Icon, { name: Icons.STAR, key: item.id, }),
               ]),
             ]),
         })
@@ -168,10 +169,11 @@ const CommunitySelector = {
             contentRight: app.isLoggedIn()
               && roles.length > 0
               && m('.community-star-toggle', {
-                onclick: (e) => {
+                onclick: async (e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                  await app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                  m.redraw();
                 },
               }, [
                 roles.map((role) => {
@@ -182,7 +184,7 @@ const CommunitySelector = {
                   });
                 }),
                 m('.star-icon', [
-                  m(Icon, { name: Icons.STAR }),
+                  m(Icon, { name: Icons.STAR, key: item.id, }),
                 ]),
               ]),
           })
