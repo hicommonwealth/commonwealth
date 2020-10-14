@@ -179,8 +179,7 @@ const LoginSelector: m.Component<{ small?: boolean }, {
                 modal: SelectAddressModal,
               }),
               label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-                : activeAddressesWithRole.length > 0 ? 'Manage addresses'
-                : 'Connect a new address',
+                : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
             }),
             (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
               class: 'invite-user',
@@ -189,8 +188,7 @@ const LoginSelector: m.Component<{ small?: boolean }, {
               onclick: (e) => {
                 e.preventDefault();
                 const data = app.activeCommunityId()
-                  ? { communityInfo: app.community.meta }
-                  : { chainInfo: app.chain.meta.chain }
+                  ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain }
                 app.modals.create({
                   modal: CreateInviteModal,
                   data,
