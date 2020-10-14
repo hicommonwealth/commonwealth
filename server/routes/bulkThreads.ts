@@ -61,7 +61,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
     });
   } else {
-    const allThreadsQuery = (community)
+    const threadsQuery = (community)
       ? { community: community.id, }
       : { chain: chain.id, };
 
@@ -83,17 +83,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
   const adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
 
-  const filteredThreads = await threads.filter((thread) => {
-    if (userAddressIds.includes(thread.address_id)) {
-      return true;
-    } else if (adminRoles.length > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  });
-
-  return res.json({ status: 'Success', result: filteredThreads.map((c) => c.toJSON()) });
+  return res.json({ status: 'Success', result: threads.map((c) => c.toJSON()) });
 };
 
 export default bulkThreads;
