@@ -5,7 +5,8 @@
     margin: 10px 20px;
 
     .user-activity-header,
-    .forum-activity-header {
+    .forum-activity-header,
+    .admins-mods-header {
         color: $text-color-lighter;
         font-weight: 500;
         font-size: 15px;
@@ -49,6 +50,19 @@
             .User .user-display-name {
                 color: $text-color-light;
             }
+        }
+    }
+    .admins-mods {
+        margin-bottom: 20px;
+        .User {
+            padding: 5px 0;
+        }
+        .User .user-avatar {
+            position: relative;
+            top: 2px;
+        }
+        .username, .activity-count {
+            font-weight: 500;
         }
     }
 }

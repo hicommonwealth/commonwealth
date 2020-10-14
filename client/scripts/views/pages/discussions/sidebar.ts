@@ -68,6 +68,20 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
           return m(MostActiveThread, { thread });
         }))
       ]),
+      m('.admins-mods', [
+        m('.admins-mods-header', 'Admins and moderators'),
+        (app.chain || app.community) && m('.active-members', [
+          (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((role) => {
+            return m(User, {
+              user: new AddressInfo(null, role.address, role.address_chain, null),
+              avatarSize: 24,
+              linkify: true,
+              popover: true,
+              showRole: true,
+            });
+          }),
+        ]),
+      ]),
     ]);
   }
 };
