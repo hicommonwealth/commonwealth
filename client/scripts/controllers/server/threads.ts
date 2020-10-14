@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 import app from 'state';
 import { ProposalStore } from 'stores';
-import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo } from 'models';
+import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo, OffchainTopic } from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
@@ -224,7 +224,7 @@ class ThreadsController {
     });
   }
 
-  public async loadNextPage(chainId: string, communityId: string, topic: OffchainTopic) {
+  public async loadNextPage(chainId: string, communityId: string, topic?: OffchainTopic) {
     const params = {
       chain: chainId,
       community: communityId,

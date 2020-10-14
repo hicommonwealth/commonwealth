@@ -73,6 +73,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
       if (scrollPos > (scrollHeight - 400)) {
+        const args: string[] = app.activeCommunityId()
+          ? [null, app.activeCommunityId()]
+          : [app.activeChainId(), null];
+        if (vnode.attrs.topic) args.push(vnode.attrs.topic);
+        (<any>app.threads.loadNextPage)(...args);
         if (!vnode.state.postsDepleted) {
           vnode.state.lookback += vnode.state.defaultLookback;
           m.redraw();
