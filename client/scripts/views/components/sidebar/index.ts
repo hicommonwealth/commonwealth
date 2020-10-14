@@ -19,8 +19,9 @@ import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
-import CommunitySelector, { CommunityLabel } from './community_selector';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+
+import CommunitySelector, { CommunityLabel } from './community_selector';
 
 const SidebarQuickSwitcher = {
   view: (vnode) => {
@@ -51,18 +52,18 @@ const SidebarQuickSwitcher = {
         trigger: m('.quick-switcher-option', {
           class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
             || (item instanceof CommunityInfo && item.id === app?.community?.id)
-          ? ' active' : '',
+            ? ' active' : '',
         }, item instanceof ChainInfo
           ? m(ChainIcon, {
             size,
             chain: item,
             onclick: link ? (() => m.route.set(`/${item.id}`)) : null
           }) : item instanceof CommunityInfo
-          ? m(CommunityIcon, {
-            size,
-            community: item,
-            onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-          }) : null),
+            ? m(CommunityIcon, {
+              size,
+              community: item,
+              onclick: link ? (() => m.route.set(`/${item.id}`)) : null
+            }) : null),
       })),
     ]);
   }
