@@ -256,28 +256,36 @@ const LinkNewAddressModal: m.Component<{
         // initialize role
         try {
           // initialize AddressInfo
-          let addressInfo = app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id);
+          // TODO: refactor so addressId is always stored on Account<any> and we can avoid this
           //
-          // TODO: do this in a more well-defined way...
-          //
-          // account.addressId is set by all createAccount methods in controllers/login.ts. this means that all cases should
-          // be covered (either the account comes from the backend and the address is also loaded via AddressInfo, or the
-          // account is created on the frontend and the id is available here).
-          //
-          // either way, we should refactor to always hold addressId on Account<any> models
+          // Note: account.addressId is set by all createAccount
+          // methods in controllers/login.ts. this means that all
+          // cases should be covered (either the account comes from
+          // the backend and the address is also loaded via
+          // AddressInfo, or the account is created on the frontend
+          // and the id is available here).
+          let addressInfo = app.user.addresses
+            .find((a) => a.address === account.address && a.chain === account.chain.id);
+
           if (!addressInfo && account.addressId) {
             // TODO: add keytype
             addressInfo = new AddressInfo(account.addressId, account.address, account.chain.id, undefined);
             app.user.addresses.push(addressInfo);
           }
+
           // link the address to the community
-          if (vnode.attrs.joiningChain
-              && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
-            await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
-          } else if (vnode.attrs.joiningCommunity
-                     && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
-            await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
+          try {
+            if (vnode.attrs.joiningChain
+                && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
+              await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
+            } else if (vnode.attrs.joiningCommunity
+                       && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
+              await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
+            }
+          } catch (e) {
+            // this may fail if the role already exists, e.g. if the address is being migrated from another user
           }
+
           // set the address as active
           await setActiveAccount(account);
           if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
