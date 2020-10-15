@@ -106,8 +106,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     const communityName = selectedNode
       ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
-    const communityDescription = selectedNode
-      ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
 
     const allLastVisited = (typeof app.user.lastVisited === 'string')
       ? JSON.parse(app.user.lastVisited)
@@ -143,10 +141,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     let listing = [];
     const allThreads = topic
-      ? app.threads
-        .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.topic && thread.topic.name === topic)
-        .sort(orderDiscussionsbyLastComment)
+      ? app.threads.topicScopedStore.getByCommunityAndTopic(app.activeId(), topic)
       : app.threads
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
         .sort(orderDiscussionsbyLastComment);

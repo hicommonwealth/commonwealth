@@ -1,19 +1,21 @@
 import IdStore from './IdStore';
 import { OffchainThread } from '../models';
-import { byAscendingCreationDate } from '../helpers';
 
 class TopicScopedThreadStore extends IdStore<OffchainThread> {
-  private _threadsByCommunity: { [community: string]: Array<OffchainThread> }
+  private _threadsByCommunity: { [community: string]: { [topic: string] : Array<OffchainThread> } } = {};
 
   public add(thread: OffchainThread) {
     super.add(thread);
-    this.getAll().sort(byAscendingCreationDate);
     const parentEntity = thread.community ? thread.community : thread.chain;
     if (!this._threadsByCommunity[parentEntity]) {
-      this._threadsByCommunity[parentEntity] = [];
+      this._threadsByCommunity[parentEntity] = {};
     }
-    this._threadsByCommunity[parentEntity].push(thread);
-    this._threadsByCommunity[parentEntity].sort(byAscendingCreationDate);
+    const communityStore = this._threadsByCommunity[parentEntity];
+    const topic = thread.topic.name;
+    if (!communityStore[topic]) {
+      communityStore[topic] = [];
+    }
+    communityStore[topic].push(thread);
     return this;
   }
 
@@ -21,12 +23,14 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
     super.remove(thread);
     const parentEntity = thread.community ? thread.community : thread.chain;
     const communityStore = this._threadsByCommunity[parentEntity];
-    const matchingThread = communityStore.filter((t) => t.id === thread.id)[0];
-    const proposalIndex = communityStore.indexOf(matchingThread);
+    const topic = thread.topic.name;
+    const topicStore = communityStore[topic];
+    const matchingThread = topicStore.filter((t) => t.id === thread.id)[0];
+    const proposalIndex = topicStore.indexOf(matchingThread);
     if (proposalIndex === -1) {
       throw new Error('Topic not in proposals store');
     }
-    communityStore.splice(proposalIndex, 1);
+    topicStore.splice(proposalIndex, 1);
     return this;
   }
 
@@ -35,8 +39,10 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
     this._threadsByCommunity = {};
   }
 
-  public getByCommunity(community: string): Array<OffchainThread> {
-    return this._threadsByCommunity[community] || [];
+  public getByCommunityAndTopic(community: string, topic: string): Array<OffchainThread> {
+    return this._threadsByCommunity[community]
+      ? this._threadsByCommunity[community][topic] || []
+      : [];
   }
 }
 

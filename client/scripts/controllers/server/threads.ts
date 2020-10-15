@@ -240,14 +240,16 @@ class ThreadsController {
     console.log(response.result);
     const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
     console.log({ threads });
-    const store = topic ? this._topicScopedStore[chainId || communityId] : this._store;
+    const store = topic ? this._topicScopedStore : this._store;
     for (const thread of threads) {
       if (!thread.Address) {
         console.error('OffchainThread missing address');
       }
-      const existing = store.getByIdentifier(thread.id);
-      if (existing) {
-        store.remove(existing);
+      if (!topic) {
+        const existing = this._store.getByIdentifier(thread.id);
+        if (existing) {
+          store.remove(existing);
+        }
       }
       try {
         store.add(modelFromServer(thread));
