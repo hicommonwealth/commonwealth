@@ -240,6 +240,7 @@ class ThreadsController {
     console.log(response.result);
     const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
     console.log({ threads });
+    debugger
     const store = topic ? this._topicScopedStore : this._store;
     for (const thread of threads) {
       if (!thread.Address) {

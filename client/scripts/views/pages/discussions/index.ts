@@ -26,6 +26,7 @@ interface IDiscussionPageState {
   lookback?: moment.Moment;
   postsDepleted?: boolean;
   lastVisitedUpdated?: boolean;
+  topicFirstPageFetched: boolean;
 }
 
 const getLastUpdate = (proposal) => {
@@ -85,7 +86,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       ? localStorage[`${app.activeId()}-lookback`]
       : vnode.state.lookback?._isAMomentObject
         ? vnode.state.lookback
-        : undefined;
+        : moment();
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
@@ -95,6 +96,17 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       title: topic || 'Discussions',
       showNewProposalButton: true,
     });
+
+    const topic_id = app.topics.getByName(topic, app.activeId())?.id;
+
+    if (topic && topic_id && !vnode.state.topicFirstPageFetched) {
+      debugger
+      const args = app.activeCommunityId()
+        ? [null, app.activeCommunityId(), vnode.state.lookback, topic_id]
+        : [app.activeChainId(), null, vnode.state.lookback, topic_id];
+      (<any>app.threads.loadNextPage)(...args);
+      vnode.state.topicFirstPageFetched = true;
+    }
 
     localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
 
@@ -156,10 +168,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const lastThread = sortedThreads[sortedThreads.length - 1];
 
       vnode.state.lookback = lastThread.createdAt;
-      if (vnode.state.lookback) {
-        console.log(vnode.state.lookback._isAMomentObject);
-        console.log(vnode.state.lookback);
-      }
 
       // pinned threads - inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
