@@ -8,7 +8,7 @@ import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
-import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
+import { ITXModalData, ProposalModule, ChainBase, ChainClass, OffchainThreadKind } from 'models';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
@@ -28,6 +28,7 @@ import {
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
+import ErrorPage from 'views/pages/error';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -43,6 +44,7 @@ const NewProposalForm = {
 
     if (!author) return m('div', 'Must be logged in');
     if (!callback) return m('div', 'Must have callback');
+    if (app.chain?.class === ChainClass.Plasm) return m('div', 'Unsupported network');
 
     let hasCouncilMotionChooser : boolean;
     let hasAction : boolean;
@@ -63,6 +65,7 @@ const NewProposalForm = {
     let hasMolochFields : boolean;
     // data loaded
     let dataLoaded : boolean = true;
+
     if (proposalTypeEnum === ProposalType.SubstrateDemocracyProposal) {
       hasAction = true;
       hasToggle = true;
@@ -295,6 +298,12 @@ const NewProposalForm = {
     const asCosmos = (app.chain as Cosmos);
 
     if (!dataLoaded) {
+      if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
+        return m(ErrorPage, {
+          message: 'Chain connection timed out.',
+          title: 'Proposals',
+        });
+      }
       return m(Spinner, {
         fill: true,
         message: 'Connecting to chain...',

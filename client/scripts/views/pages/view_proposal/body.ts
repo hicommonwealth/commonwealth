@@ -59,7 +59,7 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
     return m('.ProposalBodyAvatar', [
       m(User, {
         user: author,
-        tooltip: true,
+        popover: true,
         avatarOnly: true,
         avatarSize: 40,
       }),
@@ -82,7 +82,7 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
     return m('.ProposalBodyAuthor', [
       m(User, {
         user: author,
-        tooltip: true,
+        popover: true,
         linkify: true,
         hideAvatar: true,
       }),
@@ -385,12 +385,35 @@ export const ProposalBodyText: m.Component<{ item: AnyProposal | OffchainThread 
         : item.description);
     if (!body) return;
 
+    const getPlaceholder = () => {
+      if (!(item instanceof OffchainThread)) return;
+      const author : Account<any> = app.community
+        ? app.community.accounts.get(item.author, item.authorChain)
+        : app.chain ? app.chain.accounts.get(item.author) : null;
+
+      return m('.ProposalBodyText.proposal-body-placeholder', [
+        author ? [
+          m(User, { user: author, hideAvatar: true, hideIdentityIcon: true }),
+          ' created this thread'
+        ] : [
+          'Created this thread'
+        ]
+      ]);
+    };
+
     return m('.ProposalBodyText', (() => {
       try {
         const doc = JSON.parse(body);
         if (!doc.ops) throw new Error();
+        if (doc.ops.length === 1 && doc.ops[0] && typeof doc.ops[0].insert === 'string'
+            && doc.ops[0].insert.trim() === '') {
+          return getPlaceholder();
+        }
         return m(QuillFormattedText, { doc });
       } catch (e) {
+        if (body.toString().trim() === '') {
+          return getPlaceholder();
+        }
         return m(MarkdownFormattedText, { doc: body });
       }
     })());

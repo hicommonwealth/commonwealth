@@ -1,3 +1,4 @@
+export { default as AbridgedThread } from './AbridgedThread';
 export { default as Account } from './Account';
 export { default as AddressInfo } from './AddressInfo';
 export { default as ChainInfo } from './ChainInfo';

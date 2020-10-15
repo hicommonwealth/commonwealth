@@ -20,7 +20,10 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
               ' created a new ',
               link('a', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread'),
             ],
-        ` ${createdAt.fromNow()}`
+        createdAt && [
+          m.trust(' &middot; '),
+          createdAt.fromNow(),
+        ],
       ]),
       m('.activity.proposal', [
         proposal.kind === OffchainThreadKind.Forum || proposal.kind === OffchainThreadKind.Link

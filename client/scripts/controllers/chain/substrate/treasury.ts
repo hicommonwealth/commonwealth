@@ -3,6 +3,8 @@ import { first, switchMap } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
 import { DeriveBalancesAccount } from '@polkadot/api-derive/types';
+import { stringToU8a, u8aToHex } from '@polkadot/util';
+import { IApp } from 'state';
 import { formatAddressShort } from 'helpers';
 import {
   ISubstrateTreasuryProposal,
@@ -13,7 +15,6 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
-import { stringToU8a, u8aToHex } from '@polkadot/util';
 
 class SubstrateTreasury extends ProposalModule<
   ApiRx,
@@ -60,35 +61,54 @@ class SubstrateTreasury extends ProposalModule<
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
+  constructor(app: IApp) {
+    super(app, (e) => new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, e));
+  }
+
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    if (this._initializing || this._initialized || this.disabled) return;
+    this._initializing = true;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
+
+    // load server proposals
+    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryProposal);
+    const proposals = entities.map((e) => this._entityConstructor(e));
+
     return new Promise((resolve, reject) => {
-      this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
+      this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
         // save parameters
         this._bondPct = +(api.consts.treasury.proposalBond as Permill) / 1_000_000;
         this._bondMinimum = this._Chain.coins(api.consts.treasury.proposalBondMinimum as BalanceOf);
         this._spendPeriod = +(api.consts.treasury.spendPeriod as BlockNumber);
         this._burnPct = +(api.consts.treasury.burn as Permill) / 1_000_000;
-
-        const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryProposal);
-        const constructorFunc = (e) => new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, e);
-        const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
+        // kick off subscriptions
         const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
-
-        new Promise((innerResolve) => {
-          this._potSubscription = this._Chain.api.pipe(
-            switchMap((api: ApiRx) => api.derive.balances.account(TREASURY_ACCOUNT)
-          )).subscribe((pot: DeriveBalancesAccount) => {
-            this._pot.next(this._Chain.coins(pot.freeBalance));
-            innerResolve();
-          });
-        }).then(() => {
-          this._initialized = true;
-          resolve();
-        }).catch((err) => {
-          reject(err);
+        await new Promise((innerResolve) => {
+          this._potSubscription = api.derive.balances.account(TREASURY_ACCOUNT)
+            .subscribe((pot: DeriveBalancesAccount) => {
+              this._pot.next(this._Chain.coins(pot.freeBalance));
+              innerResolve();
+            });
         });
+
+        // fetch proposals from chain
+        await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          this,
+          () => this._Chain.fetcher.fetchTreasuryProposals(this.app.chain.block.height)
+        );
+
+        // register new chain-event handlers
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.TreasuryProposal, (entity, event) => {
+            if (this.initialized) this.updateProposal(entity, event);
+          }
+        );
+
+        this._initialized = true;
+        this._initializing = false;
+        resolve();
       });
     });
   }

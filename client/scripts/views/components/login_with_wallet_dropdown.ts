@@ -19,9 +19,20 @@ const LoginWithWalletDropdown: m.Component<{
   view: (vnode) => {
     const { label, loggingInWithAddress, joiningChain, joiningCommunity } = vnode.attrs;
 
+    // prev and next must work whether the modal is on the web3login page, or not...which is why this is so confusing
     const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
-    const next = (m.route.param('prev') && m.route.param('prev').indexOf('web3login') === -1) ? m.route.param('prev')
-      : joiningChain ? `/${joiningChain}` : joiningCommunity ? `/${joiningCommunity}` : '/';
+    const next = (m.route.param('prev')
+                  && m.route.param('prev').indexOf('web3login') === -1
+                  && m.route.param('prev') !== '/')
+      ? m.route.param('prev')
+      : joiningChain ? `/${joiningChain}`
+        : joiningCommunity ? `/${joiningCommunity}`
+          : m.route.get().indexOf('web3login') === -1 && m.route.get().replace(/\?.*/, '') !== '/' ? m.route.get()
+            : app.chain ? `/${app.chain.meta.chain.id}`
+              : app.community ? `/${app.community.meta.id}`
+                : '/?';
+    // only redirect to home as an absolute last resort
+
     const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress } : joiningChain
       ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
 
@@ -48,48 +59,43 @@ const LoginWithWalletDropdown: m.Component<{
           joiningCommunity,
           useCommandLineWallet: !!cli,
           successCallback: () => {
-            m.route.set(next);
+            if (next === '/?') {
+              m.route.set(`/${chain.id}`);
+            } else {
+              m.route.set(next);
+            }
             m.redraw();
+            setTimeout(() => m.redraw(), 1); // necessary because address linking may be deferred
           }
         });
       }
     });
-    const menuItems = sortedChains.map((chain) => getMenuItemForChain(chain))
-      .concat(sortedChainsWithCLI.length > 0 ? m(MenuDivider) : null)
-      .concat(sortedChainsWithCLI.map((chain) => getMenuItemForChain(chain, true)));
+    const menuItems = (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== -1)
+      ? [
+        getMenuItemForChain(app.chain.meta.chain),
+        getMenuItemForChain(app.chain.meta.chain, true)
+      ] : app.chain ? [
+        getMenuItemForChain(app.chain.meta.chain)
+      ] : sortedChains.map((chain) => getMenuItemForChain(chain))
+        .concat(sortedChainsWithCLI.length > 0 ? m(MenuDivider) : null)
+        .concat(sortedChainsWithCLI.map((chain) => getMenuItemForChain(chain, true)));
 
-    return app.chain
-      ? m(Button, {
+    return m(PopoverMenu, {
+      trigger: m(Button, {
         intent: 'primary',
         fluid: true,
         class: 'login-with-web3',
-        label,
-        onclick: (e) => {
-          $(e.target).trigger('modalexit');
-          m.route.set(`/${app.chain.id}/web3login`, web3loginParams);
-          app.modals.lazyCreate('link_new_address_modal', {
-            loggingInWithAddress,
-            joiningChain,
-            joiningCommunity,
-            successCallback: () => {
-              m.route.set(next);
-              m.redraw();
-            },
-          });
-        }
-      })
-      : m(PopoverMenu, {
-        trigger: m(Button, {
-          intent: 'primary',
-          fluid: true,
-          class: 'login-with-web3',
+        label: [
           label,
-        }),
-        addToStack: true,
-        class: 'LoginWithWalletDropdownPopoverMenu',
-        transitionDuration: 0,
-        content: menuItems,
-      });
+          m(Icon, { name: Icons.CHEVRON_DOWN }),
+        ]
+      }),
+      addToStack: true,
+      closeOnContentClick: true,
+      class: 'LoginWithWalletDropdownPopoverMenu',
+      transitionDuration: 0,
+      content: menuItems,
+    });
   }
 };
 

@@ -15,8 +15,9 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel,
-         chainSupportedBy } from '@commonwealth/chain-events';
+import {
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy
+} from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import UserGallery from './widgets/user_gallery';
 
@@ -55,7 +56,11 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
+  const actorName = m(User, {
+    user: new AddressInfo(null, author_address, author_chain, null),
+    hideAvatar: true,
+    hideIdentityIcon: true,
+  });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -68,7 +73,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ' liked your post ', m('span.commented-obj', decoded_title) ])
+      ? m('span', [ actorName, ' liked the post ', m('span.commented-obj', decoded_title) ])
       : m('span', [ actorName, ' liked your comment in ', m('span.commented-obj', decoded_title || community_name) ]);
   }
   const pseudoProposal = {
@@ -116,7 +121,11 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
+  const actorName = m(User, {
+    user: new AddressInfo(null, author_address, author_chain, null),
+    hideAvatar: true,
+    hideIdentityIcon: true,
+  });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -159,7 +168,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
       ? m('span', [
         actorName,
         length > 0 && ` and ${pluralize(length, 'other')}`,
-        ' liked your post ',
+        ' liked the post ',
         m('span.commented-obj', decoded_title)
       ])
       : m('span', [
@@ -287,12 +296,12 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
             ),
             avatarOnly: true,
             avatarSize: 26,
-            tooltip: true,
+            popover: true,
           })
           : m(UserGallery, {
             users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
             avatarSize: 26,
-            tooltip: true,
+            popover: true,
           }),
         m('.comment-body', [
           m('.comment-body-title', notificationHeader),

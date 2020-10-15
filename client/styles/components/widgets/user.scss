@@ -77,16 +77,16 @@
     .role-tag {
         margin-left: 10px;
         margin-right: 0;
+        margin-top: -5px;
+        margin-bottom: -5px;
         padding: 0 6px;
         background: $background-color-light;
         border-color: $background-color-border;
     }
 }
 
-.UserTooltip {
+.UserPopover {
     text-align: center;
-    padding: 6px;
-    padding-bottom: 4px;
 
     .user-avatar,
     .user-name {

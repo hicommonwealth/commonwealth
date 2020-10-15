@@ -31,7 +31,7 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
           avatarOnly: true,
           avatarSize: 32,
           linkify: true,
-          tooltip: true
+          popover: true
         }),
       ]),
       m('.info-col', [
@@ -40,7 +40,7 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
             user: account,
             hideAvatar: true,
             linkify: true,
-            tooltip: true,
+            popover: true,
           }),
         ]),
         // checking for balance to guarantee that delegate key has loaded
@@ -80,7 +80,6 @@ const LinkedAddressesWell: m.Component<{}> = {
     const addressGroups = Object.entries(_.groupBy(app.user.addresses, (account) => account.chain));
 
     return m('.LinkedAddressesWell', [
-      m('h4', 'My Addresses'),
       addressGroups.map(([chain_id, addresses]) => m('.address-group', [
         m('h4', app.config.chains.getById(chain_id)?.name),
         addresses.sort(orderAccountsByAddress).map((account) => m(AccountRow, { account })),

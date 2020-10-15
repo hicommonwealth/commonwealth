@@ -9,13 +9,14 @@ import { Button, ButtonGroup, Icon, Icons, List, Menu, MenuItem, MenuDivider,
 
 import app from 'state';
 import { ChainInfo, CommunityInfo } from 'models';
-import { isSameAccount } from 'helpers';
+import { isSameAccount, pluralize } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from 'views/components/widgets/user';
+import CreateInviteModal from 'views/modals/create_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
@@ -91,7 +92,9 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint: boolean }> = {
+const LoginSelector: m.Component<{ small?: boolean }, {
+  profileLoadComplete: boolean
+}> = {
   view: (vnode) => {
     const { small } = vnode.attrs;
 
@@ -116,38 +119,21 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
       });
     });
     const isPrivateCommunity = app.community?.meta.privacyEnabled;
+    const isAdmin = app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    });
 
-    // wrap the popover in another popover, to display address selection hint
-    // only show the onboarding hint if 1) we are in a community, 2) the user has a compatible address, and
-    // 3) no address is currently active
-    const shouldShowHint = vnode.state.showAddressSelectionHint === undefined
-      && (app.chain || app.community)
-      && app.user.activeAccount === null
-      && app.user.activeAccounts.length !== 0;
-    if (shouldShowHint) {
-      vnode.state.showAddressSelectionHint = true;
+    const activeAccountsByRole = app.user.getActiveAccountsByRole();
+    const nAccountsWithoutRole = activeAccountsByRole.filter(([account, role], index) => !role).length;
+
+    if (!vnode.state.profileLoadComplete && app.profiles.allLoaded()) {
+      vnode.state.profileLoadComplete = true;
     }
-    const wrapHint = (component) => {
-      return component;
-      // return m(Popover, {
-      //   class: 'login-selector-hint-popover',
-      //   closeOnContentClick: true,
-      //   closeOnOutsideClick: false,
-      //   transitionDuration: 0,
-      //   hoverCloseDelay: 0,
-      //   position: 'top-end',
-      //   onInteraction: () => {
-      //     vnode.state.showAddressSelectionHint = false;
-      //   },
-      //   isOpen: vnode.state.showAddressSelectionHint,
-      //   content: 'Select an address to start posting or commenting',
-      //   inline: true,
-      //   trigger: component
-      // });
-    };
 
-    return m('.LoginSelector', [
-      wrapHint(m(Popover, {
+    return m(ButtonGroup, { class: 'LoginSelector' }, [
+      (app.chain || app.community) && !app.chainPreloading && vnode.state.profileLoadComplete && m(Popover, {
         hasArrow: false,
         class: 'login-selector-popover',
         closeOnContentClick: true,
@@ -156,22 +142,16 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
         position: 'top-end',
         inline: true,
         trigger: m(Button, {
-          intent: 'none',
-          fluid: true,
-          compact: true,
-          size: small ? 'sm' : 'default',
-          onclick: (e) => {
-            vnode.state.showAddressSelectionHint = false;
-          },
+          class: 'login-selector-left',
           label: [
-            (!app.chain && !app.community) ? m(Icon, { name: Icons.USER })
-              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
-                : [
-                  m(Icon, { name: Icons.USER }),
-                  m('span.hidden-sm', [
-                    app.user.activeAccounts.length === 0 ? 'Connect an address' : 'Select an address'
-                  ]),
-                ],
+            app.user.activeAccount ? m(User, {
+              user: app.user.activeAccount,
+              hideIdentityIcon: true,
+            }) : [
+              m('span.hidden-sm', [
+                app.user.activeAccounts.length === 0 ? 'Connect an address' : 'Select an address'
+              ]),
+            ],
           ],
         }),
         content: m(Menu, { class: 'LoginSelectorMenu' }, [
@@ -181,37 +161,74 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
               class: 'switch-user',
               align: 'left',
               basic: true,
-              onclick: (e) => {
+              onclick: async (e) => {
                 const currentActive = app.user.activeAccount;
-                setActiveAccount(account).then(() => { m.redraw(); });
+                await setActiveAccount(account);
+                m.redraw();
               },
               label: m(UserBlock, {
                 user: account,
                 selected: isSameAccount(account, app.user.activeAccount),
+                showRole: true,
                 compact: true
               }),
             })),
-            app.user.activeAccount && app.activeId() && m(MenuItem, {
-              label: 'Edit profile',
-              onclick: (e) => {
-                return m.route.set(
-                  `/${app.activeId()}/account/${app.user.activeAccount.address}?base=${app.user.activeAccount.chain.id}`
-                );
-              }
-            }),
+            activeAddressesWithRole.length > 0 && m(MenuDivider),
             !isPrivateCommunity && m(MenuItem, {
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
               }),
-              label: activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
+              label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
+                : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
             }),
-            m(MenuDivider),
+            (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
+              class: 'invite-user',
+              align: 'left',
+              basic: true,
+              onclick: (e) => {
+                e.preventDefault();
+                const data = app.activeCommunityId()
+                  ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain }
+                app.modals.create({
+                  modal: CreateInviteModal,
+                  data,
+                });
+              },
+              label: 'Invite members',
+            }),
           ],
+        ]),
+      }),
+      m(Popover, {
+        hasArrow: false,
+        class: 'login-selector-popover',
+        closeOnContentClick: true,
+        transitionDuration: 0,
+        hoverCloseDelay: 0,
+        position: 'top-end',
+        inline: true,
+        trigger: m(Button, {
+          class: 'login-selector-right',
+          intent: 'none',
+          fluid: true,
+          compact: true,
+          size: small ? 'sm' : 'default',
+          label: [
+            m(Icon, { name: Icons.USER })
+          ],
+        }),
+        content: m(Menu, { class: 'LoginSelectorMenu' }, [
+          m(MenuItem, {
+            onclick: () => (app.activeChainId() || app.activeCommunityId())
+              ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notifications`)
+              : m.route.set('/notifications'),
+            label: 'Notification settings'
+          }),
           m(MenuItem, {
             onclick: () => app.activeChainId()
               ? m.route.set(`/${app.activeChainId()}/settings`)
               : m.route.set('/settings'),
-            label: 'Settings'
+            label: 'Login & address settings'
           }),
           m(MenuDivider),
           m(MenuItem, {
@@ -223,7 +240,6 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
               $.get(`${app.serverUrl()}/logout`).then(async () => {
                 await initAppState();
                 notifySuccess('Logged out');
-                m.route.set('/');
                 m.redraw();
               }).catch((err) => {
                 // eslint-disable-next-line no-restricted-globals
@@ -234,7 +250,7 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
             label: 'Logout'
           }),
         ]),
-      })),
+      }),
     ]);
   }
 };

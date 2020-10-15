@@ -229,6 +229,11 @@ $discussion-title-font-size: 1.45rem;
     .ProposalBodyReaction {
         display: inline-block;
     }
+    .ProposalBodyText.proposal-body-placeholder {
+        &, .User .user-display-name {
+            color: #999;
+        }
+    }
 
     .comments-error {
         @include error-text();

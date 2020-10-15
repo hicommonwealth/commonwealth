@@ -16,11 +16,18 @@
     }
     .title-selector .ChainIcon {
         position: relative;
-        top: 1px;
+        top: 2px;
+    }
+    .title-selector .CommunityIcon .community-icon span {
+        font-size: 12px;
     }
 }
 
 .CommunitySelectList {
+    left: $quick-switcher-width - 4px !important;
+    @include sm-max {
+        left: 0 !important;
+    }
     .cui-popover-content {
         max-height: 100vh;
         overflow-y: auto;
@@ -31,8 +38,10 @@
         }
     }
     .cui-menu {
-        max-width: 300px;
-        width: 300px;
+        background: $background-color-light;
+        border: none;
+        max-width: 360px;
+        width: 360px;
         padding: 20px 0;
         @include xs-max {
             max-width: 100%;
@@ -60,9 +69,28 @@
         &.cui-selected {
             color: #111;
         }
+        .CommunityLabel {
+            min-width: 200px;
+        }
+        .cui-list-item-content-right {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            .User {
+                position: relative;
+                top: 2px;
+                margin-left: 4px;
+            }
+            .star-icon {
+                display: inline-block;
+                position: relative;
+                top: -2px;
+                margin-left: 10px;
+            }
+        }
         .CommunityLabel .community-name-row {
             position: relative;
-            top: -2px;
+            top: -3px;
         }
     }
     .cui-list-item.select-list-back-home {

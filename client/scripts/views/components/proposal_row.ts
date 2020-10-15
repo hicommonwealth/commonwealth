@@ -123,31 +123,6 @@ export const getSupportText = (proposal: AnyProposal) => {
   }
 };
 
-export const getProposalPieChart = (proposal) => typeof proposal.support === 'number'
-  ? m(ProposalPieChart, {
-    id: `CHART_${proposal.shortIdentifier}`,
-    getData: () => ({
-      chartValues: [ proposal.support, 1 - proposal.support ].reverse(),
-      chartLabels: [ 'Yes', 'No' ].reverse(),
-      chartColors: [ '#1db955', '#d0021b' ].reverse(),
-      formatter: (d, index) => [formatPercentShort(d)],
-    })
-  })
-  : m(ProposalPieChart, {
-    id: `CHART_${proposal.shortIdentifier}`,
-    getData: () => ({
-      chartValues: [
-        // add a small amount so the voted slice always shows up
-        proposal.support.inDollars / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
-        ((app.chain as Substrate).chain.totalbalance.inDollars - proposal.support.inDollars)
-            / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
-      ].reverse(),
-      chartLabels: [ 'Voted', 'Not yet voted' ].reverse(),
-      chartColors: [ '#0088cc', '#dddddd' ].reverse(),
-      formatter: (d, index) => [ `${Math.round((d - 0.004) * 10000000) / 100000}%` ],
-    })
-  });
-
 interface IPieChartAttrs {
   id?: string;
   getData: () => {
@@ -208,6 +183,31 @@ const ProposalPieChart: m.Component<IPieChartAttrs, IPieChartState> = {
     ]);
   }
 };
+
+export const getProposalPieChart = (proposal) => typeof proposal.support === 'number'
+  ? m(ProposalPieChart, {
+    id: `CHART_${proposal.shortIdentifier}`,
+    getData: () => ({
+      chartValues: [ proposal.support, 1 - proposal.support ].reverse(),
+      chartLabels: [ 'Yes', 'No' ].reverse(),
+      chartColors: [ '#1db955', '#d0021b' ].reverse(),
+      formatter: (d, index) => [formatPercentShort(d)],
+    })
+  })
+  : m(ProposalPieChart, {
+    id: `CHART_${proposal.shortIdentifier}`,
+    getData: () => ({
+      chartValues: [
+        // add a small amount so the voted slice always shows up
+        proposal.support.inDollars / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
+        ((app.chain as Substrate).chain.totalbalance.inDollars - proposal.support.inDollars)
+            / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
+      ].reverse(),
+      chartLabels: [ 'Voted', 'Not yet voted' ].reverse(),
+      chartColors: [ '#0088cc', '#dddddd' ].reverse(),
+      formatter: (d, index) => [ `${Math.round((d - 0.004) * 10000000) / 100000}%` ],
+    })
+  });
 
 interface IRowAttrs {
   proposal: AnyProposal;
@@ -288,7 +288,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
 
     const rowMetadata = [
       m(UserGallery, {
-        tooltip: true,
+        popover: true,
         avatarSize: 24,
         users: app.comments.uniqueCommenters(proposal)
       }),
@@ -352,7 +352,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
                   null
                 ),
                 hideAvatar: true,
-                tooltip: true,
+                popover: true,
               }),
             ]),
             m('.treasury-row-metadata .treasury-user-mobile', [
@@ -364,7 +364,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
                   null
                 ),
                 hideAvatar: true,
-                tooltip: true,
+                popover: true,
               }),
             ]),
           ])

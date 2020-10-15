@@ -21,7 +21,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
         return m('.RoleChild', [
           m(User, {
             user: new AddressInfo(addr.id, addr.address, addr.chain, null), //role.Address, // make AddressInfo?
-            tooltip: true,
+            popover: true,
             linkify: false,
             hideAvatar: false,
           }),

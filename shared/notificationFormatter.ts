@@ -1,6 +1,5 @@
 import { IPostNotificationData, IChainEventNotificationData, NotificationCategories } from './types';
-import { getProposalUrl } from './utils';
-import { renderQuillDeltaToText, smartTrim } from './helpers';
+import { getProposalUrl, renderQuillDeltaToText, smartTrim } from './utils';
 
 import { SERVER_URL } from '../server/config';
 
@@ -38,6 +37,9 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
     authorName = 'Someone';
   }
 
+  // author profile link
+  const authorPath = `https://commonwealth.im/${author_chain}/account/${author_address}?base=${author_chain}`;
+
   // action and community
   const actionCopy = ((category_id === NotificationCategories.NewComment) ? 'commented on'
     : (category_id === NotificationCategories.NewMention) ? 'mentioned you in the thread'
@@ -69,9 +71,9 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
     community: community_id,
   };
   const proposalUrlArgs = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = (getProposalUrl as any)(...proposalUrlArgs);
+  const proposalPath = (getProposalUrl as any)(...proposalUrlArgs);
 
-  return [emailSubjectLine, authorName, actionCopy, objectCopy, communityCopy, excerpt, path];
+  return [emailSubjectLine, authorName, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath];
 };
 
 // chain event label: (chainEventLabel?.heading)

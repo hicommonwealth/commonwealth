@@ -5,7 +5,7 @@ import 'components/quill_formatted_text.scss';
 import m from 'mithril';
 import { Icon, Icons } from 'construct-ui';
 import { loadScript } from 'helpers';
-import { preprocessQuillDeltaForRendering } from '../../../../shared/helpers';
+import { preprocessQuillDeltaForRendering } from '../../../../shared/utils';
 
 const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
@@ -140,7 +140,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
           if (child.insert?.mention) {
             result = m('span.mention', {
               onclick: (e) => {
-                //alert(child.insert.mention.id)
+                // alert(child.insert.mention.id)
               }
             }, child.insert.mention.denotationChar + child.insert.mention.value);
           } else if (child.attributes?.link) {

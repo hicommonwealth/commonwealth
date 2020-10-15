@@ -4,12 +4,10 @@ import m from 'mithril';
 import { formatNumberLong } from 'helpers';
 import app, { ApiStatus } from 'state';
 
-interface IAttrs {
+const ChainStatusIndicator: m.Component<{
   hideLabel: boolean;
-}
-
-const ChainStatusIndicator: m.Component<IAttrs> = {
-  view: (vnode: m.VnodeDOM<IAttrs>) => {
+}> = {
+  view: (vnode) => {
     const hideLabel = vnode.attrs.hideLabel;
 
     const apiStatusToClass = new Map<ApiStatus, string>([
@@ -22,7 +20,6 @@ const ChainStatusIndicator: m.Component<IAttrs> = {
       [ApiStatus.Connecting, 'Connecting'],
       [ApiStatus.Connected, 'Online'],
     ]);
-
 
     const blockNum = app.chain?.block?.height ? formatNumberLong(app.chain?.block?.height) : '0';
     const title = !app.chain ? '' : app.chain.networkStatus === ApiStatus.Connected
