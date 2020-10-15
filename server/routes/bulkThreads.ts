@@ -14,7 +14,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
   // Threads
   let threads;
   if (req.query.cutoff_date) {
-    let whereOptions = community
+    let commentOptions = community
       ? `community = :community `
       : `chain = :chain AND root_id LIKE 'discussion%' `;
 
@@ -22,8 +22,9 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       ? { community: community.id }
       : { chain: chain.id };
 
+    let threadOptions;
     if (req.query.topic_id) {
-      whereOptions += `AND topic_id = :topic_id `;
+      threadOptions += `AND topic_id = :topic_id `;
       replacements['topic_id'] = req.query.topic_id;
     }
 
@@ -33,20 +34,18 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       SELECT t.id
         FROM "OffchainThreads" AS t
         WHERE id in (
-          SELECT CAST(TRIM('discussion_' FROM root_id) AS int)
+          SELECT CAST(TRIM('discussion_' FROM root_id) AS int), created_at, id
           FROM (
-            SELECT root_id, created_at, id
-            FROM (
-              SELECT root_id, MAX(created_at) as created_at 
-              FROM "OffchainComments" 
-              WHERE ${whereOptions}
-                AND created_at < :created_at
-                AND pinned = FALSE
-                AND deleted_at IS NULL
-              GROUP BY root_id) grouped_comments
-            ORDER BY created_at DESC LIMIT 20
-          ) ordered_comments
-        );`;
+            SELECT root_id, MAX(created_at) as created_at 
+            FROM "OffchainComments" 
+            WHERE ${commentOptions}
+              AND created_at < :created_at
+              AND pinned = FALSE
+              AND deleted_at IS NULL
+            GROUP BY root_id) grouped_comments
+          ORDER BY created_at DESC LIMIT 20
+        ) ordered_comments
+      );`;
 
     let threadIds;
     try {

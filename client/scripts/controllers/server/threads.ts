@@ -230,9 +230,10 @@ class ThreadsController {
     const params = {
       chain: chainId,
       community: communityId,
-      cutoffDate: cutoffDate._i,
+      cutoff_date: cutoffDate.toISOString(),
     };
     if (topic_id) params['topic_id'] = topic_id;
+    console.log(params);
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);

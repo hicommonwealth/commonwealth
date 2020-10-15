@@ -100,10 +100,13 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const topic_id = app.topics.getByName(topic, app.activeId())?.id;
 
     if (topic && topic_id && !vnode.state.topicFirstPageFetched) {
-      debugger
+      if (!vnode.state.lookback) {
+        vnode.state.lookback = moment();
+      }
       const args = app.activeCommunityId()
         ? [null, app.activeCommunityId(), vnode.state.lookback, topic_id]
         : [app.activeChainId(), null, vnode.state.lookback, topic_id];
+      console.log(...args);
       (<any>app.threads.loadNextPage)(...args);
       vnode.state.topicFirstPageFetched = true;
     }
