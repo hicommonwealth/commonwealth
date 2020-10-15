@@ -5,7 +5,7 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { ProposalStore } from 'stores';
+import { ProposalStore, TopicScopedThreadStore } from 'stores';
 import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo, OffchainTopic } from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -36,7 +36,7 @@ export const modelFromServer = (thread) => {
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
-  private _topicScopedStore = new ProposalStore<OffchainThread>();
+  private _topicScopedStore = new TopicScopedThreadStore();
 
   public get store() { return this._store; }
   public get topicScopedStore() { return this._topicScopedStore; }
@@ -240,7 +240,7 @@ class ThreadsController {
     console.log(response.result);
     const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
     console.log({ threads });
-    const store = topic ? this._topicScopedStore : this._store;
+    const store = topic ? this._topicScopedStore[chainId || communityId] : this._store;
     for (const thread of threads) {
       if (!thread.Address) {
         console.error('OffchainThread missing address');
