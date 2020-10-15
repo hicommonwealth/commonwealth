@@ -36,8 +36,10 @@ export const modelFromServer = (thread) => {
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
+  private _topicScopedStore = new ProposalStore<OffchainThread>();
 
   public get store() { return this._store; }
+  public get topicScopedStore() { return this._topicScopedStore; }
 
   private _initialized = false;
 
@@ -238,22 +240,19 @@ class ThreadsController {
     console.log(response.result);
     const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
     console.log({ threads });
-    if (topic) {
-      // logic for adding threads to topic-scoped store
-    } else {
-      for (const thread of threads) {
-        if (!thread.Address) {
-          console.error('OffchainThread missing address');
-        }
-        const existing = this._store.getByIdentifier(thread.id);
-        if (existing) {
-          this._store.remove(existing);
-        }
-        try {
-          this._store.add(modelFromServer(thread));
-        } catch (e) {
-          console.error(e.message);
-        }
+    const store = topic ? this._topicScopedStore : this._store;
+    for (const thread of threads) {
+      if (!thread.Address) {
+        console.error('OffchainThread missing address');
+      }
+      const existing = store.getByIdentifier(thread.id);
+      if (existing) {
+        store.remove(existing);
+      }
+      try {
+        store.add(modelFromServer(thread));
+      } catch (e) {
+        console.error(e.message);
       }
     }
   }
