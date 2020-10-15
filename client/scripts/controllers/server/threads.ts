@@ -226,13 +226,13 @@ class ThreadsController {
     });
   }
 
-  public async loadNextPage(chainId: string, communityId: string, cutoffDate: moment.Moment, topic?: OffchainTopic) {
+  public async loadNextPage(chainId: string, communityId: string, cutoffDate: moment.Moment, topic_id?: OffchainTopic) {
     const params = {
       chain: chainId,
       community: communityId,
       cutoffDate: cutoffDate._i,
     };
-    if (topic) params['topic_id'] = topic.id;
+    if (topic_id) params['topic_id'] = topic_id;
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
@@ -240,13 +240,12 @@ class ThreadsController {
     console.log(response.result);
     const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
     console.log({ threads });
-    debugger
-    const store = topic ? this._topicScopedStore : this._store;
+    const store = topic_id ? this._topicScopedStore : this._store;
     for (const thread of threads) {
       if (!thread.Address) {
         console.error('OffchainThread missing address');
       }
-      if (!topic) {
+      if (!topic_id) {
         const existing = this._store.getByIdentifier(thread.id);
         if (existing) {
           store.remove(existing);

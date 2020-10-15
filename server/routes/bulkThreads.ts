@@ -10,18 +10,24 @@ const log = factory.getLogger(formatFilename(__filename));
 const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
+  console.log(req.query);
   // Threads
   let threads;
-  if (req.query.cutoffDate) {
-    const whereOptions = community
-      ? `community = :community`
-      : `chain = :chain AND root_id LIKE 'discussion%'`;
+  if (req.query.cutoff_date) {
+    let whereOptions = community
+      ? `community = :community `
+      : `chain = :chain AND root_id LIKE 'discussion%' `;
 
     const replacements = community
       ? { community: community.id }
       : { chain: chain.id };
 
-    replacements['created_at'] = req.query.cutoffDate;
+    if (req.query.topic_id) {
+      whereOptions += `AND topic_id = :topic_id `;
+      replacements['topic_id'] = req.query.topic_id;
+    }
+
+    replacements['created_at'] = req.query.cutoff_date;
 
     const query = `
       SELECT t.id
@@ -51,7 +57,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     } catch (e) {
       console.log(e);
     }
-    console.log(threadIds);
     threads = await models.OffchainThread.findAll({
       where: {
         id: {
@@ -61,12 +66,12 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
     });
   } else {
-    const threadsQuery = (community)
+    const whereOptions = (community)
       ? { community: community.id, }
       : { chain: chain.id, };
 
     threads = await models.OffchainThread.findAll({
-      where: threadsQuery,
+      where: whereOptions,
       include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
       order: [['created_at', 'DESC']],
     });
