@@ -23,7 +23,7 @@ async function loadCmd(type: string) {
   }
 }
 
-const NewProposalPage = {
+const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
   view: (vnode) => {
     vnode.state.typeEnum = vnode.attrs.type;
     vnode.state.titlePre = 'New';

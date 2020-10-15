@@ -89,7 +89,7 @@ async function onclickoverlay(spec, confirmExit, exitCallback) {
   }
 }
 
-const Modal = {
+const Modal: m.Component<{ spec }> = {
   view: (vnode) => {
     const spec = vnode.attrs.spec;
     const completeCallback = spec.completeCallback || (() => undefined);
@@ -112,18 +112,18 @@ const Modal = {
   },
 };
 
-export const CompactModalExitButton = {
+export const CompactModalExitButton: m.Component<{}> = {
   view: (vnode) => {
     return m('.CompactModalExitButton', {
       onclick: (e) => {
         e.preventDefault();
-        $(vnode.dom).trigger('modalexit');
+        $(e.target).trigger('modalexit');
       }
     }, symbols.times);
   }
 };
 
-export const AppModals = {
+export const AppModals: m.Component<{}, { escapeHandler }> = {
   oncreate: (vnode) => {
     vnode.state.escapeHandler = (e) => {
       if (e.keyCode !== 27) return;

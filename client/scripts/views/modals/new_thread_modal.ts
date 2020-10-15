@@ -7,7 +7,7 @@ import app from 'state';
 import { CompactModalExitButton } from 'views/modal';
 import { NewThreadForm } from 'views/components/new_thread_form';
 
-const NewThreadModal = {
+const NewThreadModal: m.Component<{}> = {
   view: (vnode) => {
     const hasTopics = !!(app.community?.meta.topics.length || app.chain?.meta.topics.length);
     return m('.NewThreadModal', [

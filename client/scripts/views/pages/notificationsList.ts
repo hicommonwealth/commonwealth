@@ -9,7 +9,7 @@ import { sortNotifications } from 'helpers/notifications';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
 
-const NotificationsPage = {
+const NotificationsPage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) {
       return m('div', 'Must be logged in to view notifications.');

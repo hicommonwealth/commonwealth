@@ -23,7 +23,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
 import CommunitySelector, { CommunityLabel } from './community_selector';
 
-const SidebarQuickSwitcher = {
+const SidebarQuickSwitcher: m.Component<{}> = {
   view: (vnode) => {
     const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
       .concat(app.config.chains.getAll())

@@ -2,8 +2,8 @@ import 'components/proposals_loading_row.scss';
 
 import m from 'mithril';
 
-const ProposalsLoadingRow: m.Component = {
-  view: (vnode: m.VnodeDOM) => {
+const ProposalsLoadingRow: m.Component<{}> = {
+  view: (vnode) => {
     return m('.ProposalsLoadingRow', [
       m('.proposal-row', [
         m('.proposal-left', [
