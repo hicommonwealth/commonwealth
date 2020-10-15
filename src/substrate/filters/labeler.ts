@@ -11,7 +11,7 @@ function fmtAddr(addr : string) {
 
 // ideally we shouldn't hard-code this stuff, but we need the header to appear before the chain loads
 const EDG_DECIMAL = 18;
-const KUSAMA_DECIMAL = 15;
+const KUSAMA_DECIMAL = 12;
 const KLP_DECIMAL = 12;
 
 function formatNumberShort(num: number) {
