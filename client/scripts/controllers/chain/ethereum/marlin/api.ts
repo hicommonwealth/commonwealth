@@ -10,7 +10,7 @@ import { GovernorAlpha } from 'GovernorAlpha';
 import { GovernorAlphaFactory } from 'GovernorAlphaFactory';
 import { Timelock } from 'Timelock';
 import { TimelockFactory } from 'TimelockFactory';
-// import { Moloch1 } from 'Moloch1';
+import { Moloch1 } from 'Moloch1';
 // import { Moloch1Factory } from 'Moloch1Factory';
 // import { GuildBank1 } from 'GuildBank1';
 // import { GuildBank1Factory } from 'GuildBank1Factory';
