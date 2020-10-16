@@ -50,7 +50,7 @@ const NotificationsPage: m.Component<{}> = {
                   e.preventDefault();
                   const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);
                   if (chainEventNotifications.length === 0) return;
-                  app.user.notifications.clear(chainEventNotifications).then(() => m.redraw());
+                  app.user.notifications.clear(chainEventNotifications).then(() => m.redraw.sync());
                 }
               })
             ],
@@ -66,6 +66,7 @@ const NotificationsPage: m.Component<{}> = {
           sortedNotifications.length > 0
             ? m(Infinite, {
               maxPages: 1, // prevents rollover/repeat
+              key: sortedNotifications.length,
               pageData: () => sortedNotifications,
               item: (data, opts, index) => {
                 return m(NotificationRow, { notifications: data, });
