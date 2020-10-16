@@ -130,7 +130,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   }
 });
 
-const ValidatorPage : m.Component = {
+const ValidatorPage : m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ValidatorPage' });
   },

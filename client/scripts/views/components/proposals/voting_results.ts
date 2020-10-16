@@ -21,7 +21,7 @@ const signalingVoteToString = (v: VoteOutcome): string => {
   return u8aToString(outcomeArray.slice(0, sliceEnd));
 };
 
-const ProposalVotingResults = {
+const ProposalVotingResults: m.Component<{ proposal }> = {
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
     const votes = proposal.getVotes();

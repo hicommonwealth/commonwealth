@@ -175,7 +175,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
           // decode address properly
           if (['kulupu', 'edgeware', 'polkadot', 'kusama'].includes(chain)) {
             try {
-              decodeAddress(address)
+              decodeAddress(address);
               vnode.state.account = {
                 profile: null,
                 chain,

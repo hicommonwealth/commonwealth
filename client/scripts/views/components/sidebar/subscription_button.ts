@@ -5,7 +5,7 @@ import app from 'state';
 import { NotificationCategories } from 'types';
 import { Button, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
 
-const SubscriptionButton = {
+const SubscriptionButton: m.Component<{}> = {
   view: (vnode) => {
     const subscriptions = app.user.notifications;
     const communitySubscription = subscriptions.subscriptions

@@ -302,12 +302,12 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
             && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
         ]),
         m('.comment-body-bottom', [
-          m('.comment-body-bottom-left', [
-            !vnode.state.editing && m(ProposalBodyReaction, { item: comment }),
-          ]),
-          vnode.state.editing && m('.comment-body-bottom-right', [
-            m(ProposalBodyCancelEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
+          vnode.state.editing && m('.comment-body-bottom-left', [
             m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
+            m(ProposalBodyCancelEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
+          ]),
+          m('.comment-body-bottom-right', [
+            !vnode.state.editing && m(ProposalBodyReaction, { item: comment }),
           ]),
         ]),
       ]),

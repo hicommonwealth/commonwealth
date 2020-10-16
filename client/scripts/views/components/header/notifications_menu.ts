@@ -9,7 +9,7 @@ import NotificationRow from 'views/components/notification_row';
 import { Notification } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 
-const NotificationButtons: m.Component = {
+const NotificationButtons: m.Component<{}> = {
   view: (vnode) => {
     const notifications = app.user.notifications.notifications;
     return m(ButtonGroup, {

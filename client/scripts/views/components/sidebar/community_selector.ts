@@ -80,7 +80,7 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const CommunitySelector = {
+const CommunitySelector: m.Component<{}> = {
   view: (vnode) => {
     const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
       .concat(app.config.chains.getAll())
