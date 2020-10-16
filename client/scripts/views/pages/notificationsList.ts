@@ -28,10 +28,6 @@ const NotificationsPage: m.Component<{}> = {
           outlined: true,
         }, [
           m(Button, {
-            label: 'Redraw',
-            onclick: (e) => m.redraw(),
-          }),
-          m(Button, {
             label: 'Refresh',
             onclick: (e) => {
               e.preventDefault();
@@ -72,7 +68,7 @@ const NotificationsPage: m.Component<{}> = {
               maxPages: 1, // prevents rollover/repeat
               pageData: () => sortedNotifications,
               item: (data, opts, index) => {
-                return m(NotificationRow, { notifications: data, key: data[0].id });
+                return m(NotificationRow, { notifications: data, });
               },
             })
             : m('.no-notifications', 'No Notifications'),

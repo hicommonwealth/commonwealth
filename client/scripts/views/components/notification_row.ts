@@ -241,6 +241,7 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       if (!label) {
         return m('li.NotificationRow', {
           class: notification.isRead ? '' : 'unread',
+          key: notification.id,
         }, [
           m('.comment-body', [
             m('.comment-body-top', 'Loading...'),
@@ -249,6 +250,7 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       }
       return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
+        key: notification.id,
         onclick: async () => {
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
@@ -278,6 +280,7 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       } = getBatchNotificationFields(category, notificationData);
       return m('li.NotificationRow', {
         class: notifications[0].isRead ? '' : 'unread',
+        key: notification.id,
         onclick: async () => {
           const notificationArray: Notification[] = [];
           app.user.notifications.markAsRead(notifications).then(() => m.redraw());
