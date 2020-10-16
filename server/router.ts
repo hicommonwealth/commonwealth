@@ -44,6 +44,7 @@ import disableImmediateEmails from './routes/subscription/disableImmediateEmails
 import viewNotifications from './routes/viewNotifications';
 import markNotificationsRead from './routes/markNotificationsRead';
 import clearReadNotifications from './routes/clearReadNotifications';
+import clearNotifications from './routes/clearNotifications';
 import bulkMembers from './routes/bulkMembers';
 import bulkAddresses from './routes/bulkAddresses';
 import createInvite from './routes/createInvite';
@@ -282,6 +283,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to DELETE /notificationsRead
   router.post('/clearReadNotifications', passport.authenticate('jwt', { session: false }),
     clearReadNotifications.bind(this, models));
+  router.post('/clearNotifications', passport.authenticate('jwt', { session: false }),
+    clearNotifications.bind(this, models));
   // TODO: Change to PUT /immediateEmails
   router.post('/enableImmediateEmails', passport.authenticate('jwt', { session: false }),
     enableImmediateEmails.bind(this, models));
