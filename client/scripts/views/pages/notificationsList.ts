@@ -59,7 +59,7 @@ const NotificationsPage: m.Component<{}> = {
             }),
             closeOnContentClick: true,
             closeOnEscapeKey: true,
-            onClosed: () => { console.log(app.user.notifications.notifications.length); m.redraw(); },
+            onClosed: () => { m.redraw(); },
           }),
         ]),
         m('.NotificationsList', [
