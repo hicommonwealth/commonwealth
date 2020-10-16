@@ -682,7 +682,6 @@ const NotificationsPage: m.Component<{}, {
       message: 'This page requires you to be logged in.'
     });
     if (subscriptions.length < 1) return m(PageLoading);
-    console.log(app.user.emailVerified);
     return m(Sublayout, {
       class: 'NotificationsPage',
       title: 'Notification Settings',
