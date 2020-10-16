@@ -26,6 +26,10 @@
     }
     .comment-body {
         flex: 1;
+        .chain-event-notification-top {
+            display: flex;
+            justify-content: space-between;
+        }
     }
     .comment-body-title {
         .User .user-display-name,

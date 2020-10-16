@@ -20,6 +20,7 @@ import {
 } from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import UserGallery from './widgets/user_gallery';
+import { Icon, Icons } from 'construct-ui';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -261,7 +262,16 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
         },
       }, [
         m('.comment-body', [
-          m('.comment-body-top', `${label.heading} on ${chainName}`),
+          m('.comment-body-top.chain-event-notification-top', [
+            `${label.heading} on ${chainName}`,
+            m(Icon, {
+              name: Icons.X,
+              onclick: (e) => {
+                e.preventDefault();
+                app.user.notifications.clear([notification]);
+              },
+            })
+          ]),
           m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
           m('.comment-body-excerpt', label.label),
         ]),
