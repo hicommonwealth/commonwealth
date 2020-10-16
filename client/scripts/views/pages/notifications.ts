@@ -388,6 +388,9 @@ const ChainEventSubscriptionRow: m.Component<{
       m('td.subscription-label', [
         title,
         recommended && m(Tag, { size: 'xs', label: 'Recommended' }),
+        m('.ChainEventDetails', [
+          notificationTypeArray.map((s) => `${s}, `)
+        ]),
       ]),
       m('td.subscription-setting', [
         m(SelectList, {
