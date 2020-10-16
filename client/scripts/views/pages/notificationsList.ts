@@ -2,7 +2,7 @@ import 'pages/notificationsList.scss';
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
-import { Button, ButtonGroup } from 'construct-ui';
+import { Button, ButtonGroup, Popover } from 'construct-ui';
 
 import app from 'state';
 import { sortNotifications } from 'helpers/notifications';
@@ -40,6 +40,23 @@ const NotificationsPage: m.Component<{}> = {
               e.preventDefault();
               app.user.notifications.markAsRead(notifications).then(() => m.redraw());
             }
+          }),
+          m(Popover, {
+            content: [
+              m('p', 'Are you sure?'),
+              m(Button, {
+                label: 'Confirm',
+                onclick: (e) => {
+                  e.preventDefault();
+                  const chainEvents = app.user.notifications.subscriptions.filter((s) => s.ChainEventType !== null);
+                }
+              })
+            ],
+            trigger: m(Button, {
+              label: 'Remove all chain events',
+            }),
+            closeOnContentClick: true,
+            closeOnEscapeKey: true,
           }),
         ]),
         m('.NotificationsList', [
