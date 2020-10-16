@@ -28,6 +28,10 @@ const NotificationsPage: m.Component<{}> = {
           outlined: true,
         }, [
           m(Button, {
+            label: 'Redraw',
+            onclick: (e) => m.redraw(),
+          }),
+          m(Button, {
             label: 'Refresh',
             onclick: (e) => {
               e.preventDefault();
@@ -46,9 +50,11 @@ const NotificationsPage: m.Component<{}> = {
               m('p', 'Are you sure?'),
               m(Button, {
                 label: 'Confirm',
-                onclick: (e) => {
+                onclick: async (e) => {
                   e.preventDefault();
-                  const chainEvents = app.user.notifications.subscriptions.filter((s) => s.ChainEventType !== null);
+                  const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);
+                  if (chainEventNotifications.length === 0) return;
+                  app.user.notifications.clear(chainEventNotifications).then(() => m.redraw());
                 }
               })
             ],
@@ -57,6 +63,7 @@ const NotificationsPage: m.Component<{}> = {
             }),
             closeOnContentClick: true,
             closeOnEscapeKey: true,
+            onClosed: () => { console.log(app.user.notifications.notifications.length); m.redraw(); },
           }),
         ]),
         m('.NotificationsList', [
@@ -65,7 +72,7 @@ const NotificationsPage: m.Component<{}> = {
               maxPages: 1, // prevents rollover/repeat
               pageData: () => sortedNotifications,
               item: (data, opts, index) => {
-                return m(NotificationRow, { notifications: data });
+                return m(NotificationRow, { notifications: data, key: data[0].id });
               },
             })
             : m('.no-notifications', 'No Notifications'),

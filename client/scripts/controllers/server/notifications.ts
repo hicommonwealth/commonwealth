@@ -122,9 +122,9 @@ class NotificationsController {
     // TODO: Decide REST API handling
     return post('/clearNotifications', {
       'notification_ids[]': notifications.map((n) => n.id),
-    }, (result) => {
+    }, async (result) => {
       for (const n of notifications) {
-        this._store.remove(n);
+        await this._store.remove(n);
       }
     });
   }
