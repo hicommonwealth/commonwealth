@@ -27,6 +27,7 @@ export enum ChainNetwork {
   Ethereum = 'ethereum',
   NEAR = 'near',
   Moloch = 'moloch',
+  Marlin = 'marlin',
   Metacartel = 'metacartel',
 }
 
@@ -43,6 +44,7 @@ export enum ChainClass {
   Ethereum = 'ethereum',
   Near = 'near',
   Moloch = 'moloch',
+  Marlin = 'marlin',
 }
 
 // TODO: this is inconsistently used

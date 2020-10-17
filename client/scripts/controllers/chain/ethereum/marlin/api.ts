@@ -68,7 +68,7 @@ export default class MarlinAPI {
 
   public async init() {
     // perform fetch of approved ERC20 token and set up contract for approval
-    // TODO: Do we need to fetch the token? It's in the Comp API Constructor as CompContract
+    // TODO: Do I need to fetch the token? It's in the Comp API Constructor as CompContract
     const tokenAddress = await this._CompContract.address;
     this._tokenContract = Erc20Factory.connect(tokenAddress, this._Signer);
   }

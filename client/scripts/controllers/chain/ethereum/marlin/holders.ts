@@ -1,6 +1,6 @@
 import { IApp } from 'state';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { IMarlinHolder } from 'adapters/chain/marlin/types';
+// import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { IAccountsModule } from 'models';
@@ -48,24 +48,24 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
   }
 
   // returns a Holder immediately given a struct returned from chain
-  public getFromJSON(holder: IMarlinHolder): MarlinHolder {
-    try {
-      return this._store.getByAddress(holder.id);
-    } catch (e) {
-      return new MarlinHolder(this.app, this._Chain, this._Accounts, this, holder.id, holder);
-    }
-  }
+  // public getFromJSON(holder: IMarlinHolder): MarlinHolder {
+  //   try {
+  //     return this._store.getByAddress(holder.id);
+  //   } catch (e) {
+  //     return new MarlinHolder(this.app, this._Chain, this._Accounts, this, holder.id, holder);
+  //   }
+  // }
 
   public async isSenderHolder(): Promise<boolean> {
     const sender = this._api.userAddress;
-    const m = await this._api.comp.balances(sender); // TODO: api.compContract?
+    const m = await this._api.compContract.balances(sender);
     return !m.isZero();
   }
 
   // TODO: Check how contract returns delegates amount
   public async isSenderDelegate(): Promise<boolean> {
     const sender = this._api.userAddress;
-    const delegator = await this._api.comp.delegates(sender); // TODO: api.compContract
+    const delegator = await this._api.compContract.delegates(sender);
     return (parseInt(delegator, 16) === 0);
   }
 }

@@ -4,7 +4,7 @@ import { from, of, Observable, BehaviorSubject } from 'rxjs';
 import { switchMap, first } from 'rxjs/operators';
 
 import { MarlinComp } from 'adapters/chain/ethereum/types';
-import { IMarlinHolder } from 'adapters/chain/Marlin/types';
+// import { IMarlinHolder } from 'adapters/chain/Marlin/types';
 
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -27,7 +27,7 @@ export default class MarlinHolder extends EthereumAccount {
     return from(this.initialized).pipe(
       switchMap(() => this.isHolder
         ? this._balance.asObservable()
-        : of(new MarlinComp(this._Holders.api.contractAddress, 0)))
+        : of(new MarlinComp(this._Holders.api.compAddress, 0)))
     );
   }
 
@@ -41,22 +41,22 @@ export default class MarlinHolder extends EthereumAccount {
     Accounts: EthereumAccounts,
     Holders: MarlinHolders,
     address: string,
-    data?: IMarlinHolder
+    // data?: IMarlinHolder
   ) {
     super(app, ChainInfo, Accounts, address);
     this._Holders = Holders;
-    if (data) {
-      if (address.toLowerCase() !== data.id.toLowerCase()) {
-        throw new Error('member does not correspond with account');
-      }
-      this._isHolder = true;
-      this._balance.next(new MarlinComp(this._Holders.api.compAddress, new BN(data.balances)));
-      this._initialized = Promise.resolve(true);
-    } else {
-      this._initialized = new Promise((resolve, reject) => {
-        this.refresh().then(() => resolve(true));
-      });
-    }
+    // if (data) {
+    //   if (address.toLowerCase() !== data.id.toLowerCase()) {
+    //     throw new Error('member does not correspond with account');
+    //   }
+    //   this._isHolder = true;
+    //   this._balance.next(new MarlinComp(this._Holders.api.compAddress, new BN(data.balances)));
+    //   this._initialized = Promise.resolve(true);
+    // } else {
+    //   this._initialized = new Promise((resolve, reject) => {
+    //     this.refresh().then(() => resolve(true));
+    //   });
+    // }
     Holders.store.add(this);
   }
 

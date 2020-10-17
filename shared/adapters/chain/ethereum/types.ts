@@ -36,3 +36,16 @@ export class MolochShares extends EthereumCoin {
     return this.format();
   }
 }
+
+export class MarlinComp extends EthereumCoin {
+  public readonly contractAddress: string;
+
+  constructor(contractAddress: string, n: number | BN | MolochShares | MarlinComp) {
+    super('Comp', n, false);
+    this.contractAddress = contractAddress;
+  }
+
+  public toString() {
+    return this.format();
+  }
+}
