@@ -69,7 +69,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
           notifications.length > 0
             ? m(Infinite, {
               maxPages: 1, // prevents rollover/repeat
-              pageData: () => sortedNotifications,
+              pageData: () => sortedNotifications.slice(0, 80), // limit the number of rows shown here
               key: notifications.length,
               item: (data, opts, index) => {
                 return m(NotificationRow, { notifications: data });
