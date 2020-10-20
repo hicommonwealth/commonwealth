@@ -122,7 +122,7 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
       label: [
         name,
       ],
-      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
+      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
         || (sidebarTopic && sidebarTopic === id),
       onclick: (e) => {
         e.preventDefault();
