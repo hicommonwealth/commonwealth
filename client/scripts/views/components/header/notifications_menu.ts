@@ -59,7 +59,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
       }),
       position: 'bottom-end',
       inline: true,
-      closeOnContentClick: true,
+      closeOnContentClick: false,
       menuAttrs: {
         align: 'left',
       },
@@ -70,6 +70,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
             ? m(Infinite, {
               maxPages: 1, // prevents rollover/repeat
               pageData: () => sortedNotifications,
+              key: notifications.length,
               item: (data, opts, index) => {
                 return m(NotificationRow, { notifications: data });
               },
