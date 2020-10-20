@@ -29,6 +29,9 @@
         .chain-event-notification-top {
             display: flex;
             justify-content: space-between;
+            .cui-icon-action svg:hover {
+                color: $negative-bg-color;
+            }
         }
     }
     .comment-body-title {
