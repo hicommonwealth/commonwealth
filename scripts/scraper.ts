@@ -23,20 +23,10 @@ const url = networks[chain];
 if (!url) throw new Error(`no url for chain ${chain}`);
 if (chainSupportedBy(chain, SubstrateEvents.Types.EventChains)) {
   // TODO: update this for Beresheet
-  SubstrateEvents.createApi(
-    url,
-    chain === 'edgeware-local'
-      ? dev.types
-      : chain === 'edgeware-testnet'
-        ? Beresheet.types
-        : chain === 'edgeware' ? Mainnet.types : {},
-    chain === 'edgeware-local'
-        ? dev.typesAlias
-        : chain === 'edgeware-testnet'
-          ? Beresheet.typesAlias
-          : chain === 'edgeware' ? Mainnet.typesAlias : {},
-  )
-  .then(async (api) => {
+  const spec = chain === 'edgeware-local' ? dev
+    : chain === 'edgeware-testnet' ? Beresheet
+      : chain === 'edgeware' ? Mainnet : {};
+  SubstrateEvents.createApi(url, spec).then(async (api) => {
     const subscriber = new SubstrateEvents.Subscriber(api);
     const identities = {};
     const FINISH_BLOCK = 1000000;

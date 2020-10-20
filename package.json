@@ -1,6 +1,6 @@
 {
   "name": "@commonwealth/chain-events",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "Listen to various chains for events.",
   "license": "GPL-3.0",
   "files": [
@@ -55,6 +55,7 @@
     "@types/node": "^14.0.14",
     "@types/underscore": "^1.10.1",
     "@types/web3": "^1.2.2",
+    "@types/yargs": "^15.0.9",
     "chai": "^4.2.0",
     "ganache-cli": "^6.9.1",
     "jsdom": "^16.2.2",
@@ -64,6 +65,7 @@
     "ts-mocha": "^7.0.0",
     "ts-node": "^8.10.2",
     "typechain": "^2.0.0",
-    "typescript": "^3.8.2"
+    "typescript": "^3.8.2",
+    "yargs": "^16.1.0"
   }
 }

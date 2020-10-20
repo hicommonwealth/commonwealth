@@ -1,14 +1,9 @@
+import * as yargs from 'yargs';
+
 import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
 import {
   chainSupportedBy, IEventHandler, CWEvent, SubstrateEvents, MolochEvents, EventSupportingChains
 } from '../dist/index';
-
-const args = process.argv.slice(2);
-const chain = args[0] || 'edgeware';
-if (!chainSupportedBy(chain, EventSupportingChains)) {
-  throw new Error(`invalid chain: ${args[0]}`);
-}
-console.log(`Listening to events on ${chain}.`);
 
 const networks = {
   'edgeware': 'ws://mainnet1.edgewa.re:9944',
@@ -20,12 +15,59 @@ const networks = {
 
   'moloch': 'wss://mainnet.infura.io/ws',
   'moloch-local': 'ws://127.0.0.1:9545',
-};
+} as const;
+
+const specs = {
+  'dev': dev,
+  'edgeware-local': dev,
+  'beresheet': Beresheet,
+  'edgeware-testnet': Beresheet,
+  'mainnet': Mainnet,
+  'edgeware': Mainnet,
+  'none': {},
+}
 
 const contracts = {
   'moloch': '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1',
   'moloch-local': '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
 };
+
+const argv = yargs.options({
+  network: {
+    alias: 'n',
+    choices: EventSupportingChains,
+    demandOption: true,
+    description: 'chain to listen on',
+  },
+  spec: {
+    alias: 's',
+    choices: ['dev', 'beresheet', 'mainnet', 'none'] as const,
+    description: 'edgeware spec to use'
+  },
+  url: {
+    alias: 'u',
+    type: 'string',
+    description: 'node url',
+  },
+  contractAddress: {
+    alias: 'c',
+    type: 'string',
+    description: 'eth contract address',
+  }
+}).check((data) => {
+  if (!chainSupportedBy(data.network, SubstrateEvents.Types.EventChains) && data.spec) {
+    throw new Error('cannot pass spec on non-substrate network');
+  }
+  if (!chainSupportedBy(data.network, MolochEvents.Types.EventChains) && data.contractAddress) {
+    throw new Error('cannot pass contract address on non-moloch network');
+  }
+  return true;
+}).argv;
+
+const network = argv.network;
+const spec = specs[argv.spec] || specs[network] || {};
+const url: string = argv.url || networks[network];
+const contract: string | undefined = argv.contractAddress || contracts[network];
 
 class StandaloneEventHandler extends IEventHandler {
   public async handle(event: CWEvent): Promise<any> {
@@ -35,42 +77,25 @@ class StandaloneEventHandler extends IEventHandler {
 
 const skipCatchup = false;
 
-const url = networks[chain];
-
-if (!url) throw new Error(`no url for chain ${chain}`);
-if (chainSupportedBy(chain, SubstrateEvents.Types.EventChains)) {
-  // TODO: update this for Beresheet
-  SubstrateEvents.createApi(
-    url,
-    chain === 'edgeware-local'
-      ? dev.types
-      : chain === 'edgeware-testnet'
-        ? Beresheet.types
-        : chain === 'edgeware' ? Mainnet.types : {},
-    chain === 'edgeware-local'
-        ? dev.typesAlias
-        : chain === 'edgeware-testnet'
-          ? Beresheet.typesAlias
-          : chain === 'edgeware' ? Mainnet.typesAlias : {},
-  )
-  .then(async (api) => {
+console.log(`Connecting to ${network} on url ${url}...`)
+if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
+  SubstrateEvents.createApi(url, spec).then(async (api) => {
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     await fetcher.fetch();
     SubstrateEvents.subscribeEvents({
-      chain,
+      chain: network,
       api,
       handlers: [ new StandaloneEventHandler() ],
       skipCatchup,
       verbose: true,
     });
   });
-} else if (chainSupportedBy(chain, SubstrateEvents.Types.EventChains)) {
-  const contract = contracts[chain];
+} else if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
   const contractVersion = 1;
-  if (!contract) throw new Error(`no contract address for chain ${chain}`);
+  if (!contract) throw new Error(`no contract address for ${network}`);
   MolochEvents.createApi(url, contractVersion, contract).then((api) => {
     MolochEvents.subscribeEvents({
-      chain,
+      chain: network,
       api,
       contractVersion,
       handlers: [ new StandaloneEventHandler() ],

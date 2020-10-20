@@ -1,6 +1,6 @@
 import { WsProvider, ApiPromise } from '@polkadot/api';
 import { TypeRegistry } from '@polkadot/types';
-import { RegistryTypes, OverrideModuleType } from '@polkadot/types/types';
+import { RegisteredTypes } from '@polkadot/types/types';
 
 import { IDisconnectedRange, CWEvent, SubscribeFunc, ISubscribeOptions } from '../interfaces';
 import { Subscriber } from './subscriber';
@@ -17,9 +17,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
 export async function createApi(
-  url: string,
-  types?: RegistryTypes,
-  typesAlias?: Record<string, OverrideModuleType>,
+  url: string, typeOverrides: RegisteredTypes = {},
 ): Promise<ApiPromise> {
   // construct provider
   const provider = new WsProvider(url);
@@ -33,9 +31,8 @@ export async function createApi(
   const registry = new TypeRegistry();
   const api = new ApiPromise({
     provider,
-    types,
-    typesAlias,
-    registry
+    registry,
+    ...typeOverrides
   });
   return api.isReady;
 }
