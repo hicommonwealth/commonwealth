@@ -283,7 +283,7 @@ const NotificationRow: m.Component<{
         m('.comment-body', [
           m('.comment-body-top.chain-event-notification-top', [
             `${label.heading} on ${chainName}`,
-            m(Icon, {
+            !vnode.attrs.onListPage && m(Icon, {
               name: Icons.X,
               onclick: (e) => {
                 e.preventDefault();
