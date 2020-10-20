@@ -31,6 +31,7 @@ import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
+import communityStats from './routes/communityStats';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -136,6 +137,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/deleteCommunity', passport.authenticate('jwt', { session: false }), deleteCommunity.bind(this, models));
   // TODO: Change to PUT /community
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
+  router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
 
   // offchain threads
   // TODO: Change to POST /thread

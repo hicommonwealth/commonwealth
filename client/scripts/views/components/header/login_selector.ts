@@ -124,6 +124,11 @@ const LoginSelector: m.Component<{ small?: boolean }, {
       chain: app.activeChainId(),
       community: app.activeCommunityId()
     });
+    const isAdminOrMod = isAdmin || app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    });
 
     const activeAccountsByRole = app.user.getActiveAccountsByRole();
     const nAccountsWithoutRole = activeAccountsByRole.filter(([account, role], index) => !role).length;
@@ -188,13 +193,20 @@ const LoginSelector: m.Component<{ small?: boolean }, {
               onclick: (e) => {
                 e.preventDefault();
                 const data = app.activeCommunityId()
-                  ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain }
+                  ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain };
                 app.modals.create({
                   modal: CreateInviteModal,
                   data,
                 });
               },
               label: 'Invite members',
+            }),
+            isAdminOrMod && m(MenuItem, {
+              class: 'view-stats',
+              align: 'left',
+              basic: true,
+              onclick: (e) => m.route.set(`/${app.activeId() || 'edgeware'}/communityStats`),
+              label: 'View stats',
             }),
           ],
         ]),
