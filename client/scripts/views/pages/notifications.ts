@@ -102,6 +102,7 @@ const BatchedSubscriptionRow: m.Component<{
   label?: string;
 }, {
   option: string;
+  loading: boolean;
 }> = {
   view: (vnode) => {
     const { label, subscriptions } = vnode.attrs;
@@ -220,6 +221,7 @@ const BatchedSubscriptionRow: m.Component<{
           trigger: m(Button, {
             align: 'left',
             compact: true,
+            disabled: !app.user.emailVerified || vnode.state.loading,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
             size: 'sm',
@@ -227,6 +229,7 @@ const BatchedSubscriptionRow: m.Component<{
           }),
           onSelect: async (option: string) => {
             vnode.state.option = option;
+            vnode.state.loading = true;
             try {
               if (subscriptions.length < 1) return;
               if (option === NOTIFICATION_OFF_OPTION) {
@@ -239,10 +242,11 @@ const BatchedSubscriptionRow: m.Component<{
                 if (!everyActive) await app.user.notifications.enableSubscriptions(subscriptions);
                 await app.user.notifications.enableImmediateEmails(subscriptions);
               }
-              m.redraw();
             } catch (err) {
               notifyError(err.toString());
             }
+            vnode.state.loading = false;
+            m.redraw();
           }
         })
       ]),
@@ -362,7 +366,7 @@ const ChainEventSubscriptionRow: m.Component<{
   notificationTypeArray: string[];
   recommended?: boolean;
   noisy?: boolean;
-}, { option: string, }> = {
+}, { option: string; loading: boolean, }> = {
   view: (vnode) => {
     const { title, notificationTypeArray, recommended, noisy } = vnode.attrs;
     const subscriptions = app.user.notifications.subscriptions.filter((s) => {
@@ -419,12 +423,14 @@ const ChainEventSubscriptionRow: m.Component<{
           trigger: m(Button, {
             align: 'left',
             compact: true,
+            disabled: !app.user.emailVerified || vnode.state.loading,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
             size: 'sm',
           }),
           onSelect: async (option: string) => {
             vnode.state.option = option;
+            vnode.state.loading = true;
             if (option === NOTIFICATION_OFF_OPTION) {
               await app.user.notifications.disableImmediateEmails(subscriptions);
               await app.user.notifications.disableSubscriptions(subscriptions);
@@ -460,6 +466,7 @@ const ChainEventSubscriptionRow: m.Component<{
                 if (!everySubscriptionEmail) await app.user.notifications.enableImmediateEmails(subscriptions);
               }
             }
+            vnode.state.loading = false;
             m.redraw();
           }
         }),
@@ -683,7 +690,6 @@ const NotificationsPage: m.Component<{}, {
       message: 'This page requires you to be logged in.'
     });
     if (subscriptions.length < 1) return m(PageLoading);
-
     return m(Sublayout, {
       class: 'NotificationsPage',
       title: 'Notification Settings',
@@ -710,6 +716,7 @@ const NotificationsPage: m.Component<{}, {
               trigger: m(Button, {
                 align: 'left',
                 compact: true,
+                disabled: !app.user.emailVerified,
                 iconRight: Icons.CHEVRON_DOWN,
                 label: vnode.state.selectedCommunity
                   ? vnode.state.selectedCommunityId

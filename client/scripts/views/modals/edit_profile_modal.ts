@@ -44,6 +44,7 @@ const EditProfileModal = {
             name: 'name',
             defaultValue: account.name,
             placeholder: 'Display name',
+            disabled: account.profile.isOnchain,
             fluid: true,
             autocomplete: 'off',
             oncreate: (vvnode) => {
