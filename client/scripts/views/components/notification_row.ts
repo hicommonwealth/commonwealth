@@ -212,13 +212,13 @@ const NotificationRow: m.Component<{
   Labeler: any,
   MolochTypes: any,
   SubstrateTypes: any,
-  scroll: boolean;
+  scrollOrStop: boolean;
 }> = {
   oncreate: (vnode) => {
     if (m.route.param('id') && vnode.attrs.onListPage
       && m.route.param('id') === vnode.attrs.notifications[0].id.toString()
     ) {
-      vnode.state.scroll = true;
+      vnode.state.scrollOrStop = true;
     }
   },
   view: (vnode) => {
@@ -249,11 +249,11 @@ const NotificationRow: m.Component<{
       }
       m.redraw();
 
-      if (vnode.state.scroll) {
+      if (vnode.state.scrollOrStop) {
         setTimeout(() => {
           document.getElementById(m.route.param('id')).scrollIntoView();
         }, 1);
-        vnode.state.scroll = false;
+        vnode.state.scrollOrStop = false;
       }
 
       if (!label) {
@@ -272,10 +272,11 @@ const NotificationRow: m.Component<{
         key: notification.id,
         id: notification.id,
         onclick: async () => {
+          if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
           app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          await m.route.set(`/${app.activeId()}/notificationsList?id=${notification.id}`);
+          await m.route.set(`/${app.activeId() || 'edgeware'}/notificationsList?id=${notification.id}`);
           m.redraw.sync();
         },
       }, [
@@ -286,7 +287,9 @@ const NotificationRow: m.Component<{
               name: Icons.X,
               onclick: (e) => {
                 e.preventDefault();
+                vnode.state.scrollOrStop = true;
                 app.user.notifications.clear([notification]);
+                m.redraw();
               },
             })
           ]),
