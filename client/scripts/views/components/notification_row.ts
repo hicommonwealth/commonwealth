@@ -205,16 +205,26 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
   });
 };
 
-const NotificationRow: m.Component<{ notifications: Notification[] }, {
+const NotificationRow: m.Component<{
+  notifications: Notification[],
+  onListPage?: boolean,
+}, {
   Labeler: any,
   MolochTypes: any,
   SubstrateTypes: any,
+  scroll: boolean;
 }> = {
+  oncreate: (vnode) => {
+    if (m.route.param('id') && vnode.attrs.onListPage
+      && m.route.param('id') === vnode.attrs.notifications[0].id.toString()
+    ) {
+      vnode.state.scroll = true;
+    }
+  },
   view: (vnode) => {
     const { notifications } = vnode.attrs;
     const notification = notifications[0];
     const { category } = notifications[0].subscription;
-
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
@@ -239,10 +249,18 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       }
       m.redraw();
 
+      if (vnode.state.scroll) {
+        setTimeout(() => {
+          document.getElementById(m.route.param('id')).scrollIntoView();
+        }, 1);
+        vnode.state.scroll = false;
+      }
+
       if (!label) {
         return m('li.NotificationRow', {
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
+          id: notification.id,
         }, [
           m('.comment-body', [
             m('.comment-body-top', 'Loading...'),
@@ -252,12 +270,12 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
         key: notification.id,
+        id: notification.id,
         onclick: async () => {
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
           app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          if (!label.linkUrl) return;
-          await m.route.set(label.linkUrl);
+          await m.route.set(`/${app.activeId()}/notificationsList?id=${notification.id}`);
           m.redraw.sync();
         },
       }, [
@@ -291,6 +309,7 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       return m('li.NotificationRow', {
         class: notifications[0].isRead ? '' : 'unread',
         key: notification.id,
+        id: notification.id,
         onclick: async () => {
           const notificationArray: Notification[] = [];
           app.user.notifications.markAsRead(notifications).then(() => m.redraw());

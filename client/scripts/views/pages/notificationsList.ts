@@ -69,7 +69,7 @@ const NotificationsPage: m.Component<{}> = {
               key: sortedNotifications.length,
               pageData: () => sortedNotifications,
               item: (data, opts, index) => {
-                return m(NotificationRow, { notifications: data });
+                return m(NotificationRow, { notifications: data, onListPage: true, });
               },
             })
             : m('.no-notifications', 'No Notifications'),
