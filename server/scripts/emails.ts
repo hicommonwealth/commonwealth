@@ -51,8 +51,8 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
         notification: {
           chainId: notification_data.chainEventType?.chain,
           blockNumber: notification_data.chainEvent?.blockNumber,
-          label: chainEventLabel.heading,
-          path: `https://commonwealth.im${chainEventLabel.linkUrl}`,
+          label: subject,
+          path: null,
         }
       }
     };

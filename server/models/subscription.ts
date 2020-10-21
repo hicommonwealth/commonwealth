@@ -173,6 +173,9 @@ export default (
             notification_data: JSON.stringify(notification_data)
           }
       );
+      if (msg && isChainEventData(notification_data)) {
+        msg.dynamic_template_data.notification.path = `https://commonwealth.im/${notification_data.chainEventType.chain}/notificationsList?id=${notification.id}`;
+      }
       if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
     }));
 
