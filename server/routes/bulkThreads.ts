@@ -10,10 +10,10 @@ const log = factory.getLogger(formatFilename(__filename));
 const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
-  console.log(req.query);
+  const { cutoff_date, topic_id } = req.query;
   // Threads
   let threads;
-  if (req.query.cutoff_date) {
+  if (cutoff_date) {
     const commentOptions = community
       ? `community = :community `
       : `chain = :chain `;
@@ -23,27 +23,27 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       : { chain: chain.id };
 
     let threadOptions = '';
-    if (req.query.topic_id) {
+    if (topic_id) {
       threadOptions += `AND topic_id = :topic_id `;
-      replacements['topic_id'] = req.query.topic_id;
+      replacements['topic_id'] = topic_id;
     }
 
-    replacements['created_at'] = req.query.cutoff_date;
+    replacements['created_at'] = cutoff_date;
 
     const query = `
       SELECT addr.id AS addr_id, addr.address AS addr_address,
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_community, thread_chain, thread_created, 
         threads.version_history, threads.read_only, threads.body,
-        threads.url, threads.pinned, topics.
+        threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name, 
+        topics.description AS topic_description, topics.chain_id AS topic_chain,
+        topics.community_id AS topic_community
       FROM "Addresses" AS addr
       INNER JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
           t.created_at AS thread_created, t.community AS thread_community,
           t.chain AS thread_chain, t.version_history, t.read_only, t.body,
-          t.url, t.pinned, topics.id AS topic_id, topics.name AS topic_name, 
-          topics.description AS topic_description, topics.chain_id AS topic_chain,
-          topics.community_id AS topic_community
+          t.url, t.pinned, t.topic_id
         FROM "OffchainThreads" t
         INNER JOIN (
           SELECT root_id, MAX(created_at) AS comm_created_at
@@ -60,7 +60,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         ORDER BY c.comm_created_at DESC LIMIT 20
       ) threads
       ON threads.address_id = addr.id
-      INNER JOIN "OffchainTopics" AS topics
+      INNER JOIN "OffchainTopics" topics
       ON threads.topic_id = topics.id`;
 
     let preprocessedThreads;
@@ -79,6 +79,13 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         community: t.thread_community,
         chain: t.thread_chain,
         created_at: t.thread_created,
+        topic: {
+          id: t.topic_id,
+          name: t.topic_name,
+          description: t.topic_description,
+          communityId: t.topic_community,
+          chainId: t.topic_chain
+        },
         Address: {
           id: t.addr_id,
           address: t.addr_address,
@@ -99,7 +106,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     });
   }
 
-  return res.json({ status: 'Success', result: threads.map((c) => c.toJSON()) });
+  return res.json({ status: 'Success', result: cutoff_date ? threads : threads.map((c) => c.toJSON()) });
 };
 
 export default bulkThreads;
