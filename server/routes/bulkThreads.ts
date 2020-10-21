@@ -14,9 +14,9 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
   // Threads
   let threads;
   if (req.query.cutoff_date) {
-    let commentOptions = community
+    const commentOptions = community
       ? `community = :community `
-      : `chain = :chain AND root_id LIKE 'discussion%' `;
+      : `chain = :chain `;
 
     const replacements = community
       ? { community: community.id }
@@ -31,21 +31,26 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     replacements['created_at'] = req.query.cutoff_date;
 
     const query = `
-      SELECT t.id
-        FROM "OffchainThreads" AS t
-        WHERE id in (
-          SELECT CAST(TRIM('discussion_' FROM root_id) AS int), created_at, id
-          FROM (
-            SELECT root_id, MAX(created_at) as created_at 
-            FROM "OffchainComments" 
-            WHERE ${commentOptions}
-              AND created_at < :created_at
-              AND pinned = FALSE
-              AND deleted_at IS NULL
-            GROUP BY root_id) grouped_comments
-          ORDER BY created_at DESC LIMIT 20
-        ) ordered_comments
-      );`;
+      SELECT *
+      FROM "Addresses" AS addr
+      JOIN (
+        SELECT *
+        FROM "OffchainThreads" t
+        JOIN (
+          SELECT root_id, MAX(created_at) AS comm_created_at
+          FROM "OffchainComments"
+          WHERE ${commentOptions}
+            AND root_id LIKE 'discussion%'
+            AND created_at < :created_at
+          GROUP BY root_id
+          ) c
+        ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
+        WHERE t.deleted_at IS NULL
+          ${threadOptions}
+          AND t.pinned = false
+        ORDER BY c.comm_created_at DESC LIMIT 20
+      ) threads
+      ON threads.address_id = addr.id`;
 
     let threadIds;
     try {
