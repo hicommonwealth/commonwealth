@@ -88,6 +88,11 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     return ({
       id: t.thread_id,
       title: t.thread_title,
+      url: t.url,
+      body: t.body,
+      version_history: t.version_history,
+      read_only: t.read_only,
+      pinned: t.pinned,
       community: t.thread_community,
       chain: t.thread_chain,
       created_at: t.thread_created,
