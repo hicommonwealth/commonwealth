@@ -33,14 +33,19 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     const query = `
       SELECT addr.id AS addr_id, addr.address AS addr_address,
         addr.chain AS addr_chain, thread_id, thread_title,
-        thread_community, thread_chain, thread_created
+        thread_community, thread_chain, thread_created, 
+        threads.version_history, threads.read_only, threads.body,
+        threads.url, threads.pinned, topics.
       FROM "Addresses" AS addr
-      JOIN (
+      INNER JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
           t.created_at AS thread_created, t.community AS thread_community,
-          t.chain AS thread_chain
+          t.chain AS thread_chain, t.version_history, t.read_only, t.body,
+          t.url, t.pinned, topics.id AS topic_id, topics.name AS topic_name, 
+          topics.description AS topic_description, topics.chain_id AS topic_chain,
+          topics.community_id AS topic_community
         FROM "OffchainThreads" t
-        JOIN (
+        INNER JOIN (
           SELECT root_id, MAX(created_at) AS comm_created_at
           FROM "OffchainComments"
           WHERE ${commentOptions}
@@ -54,7 +59,9 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           AND t.pinned = false
         ORDER BY c.comm_created_at DESC LIMIT 20
       ) threads
-      ON threads.address_id = addr.id`;
+      ON threads.address_id = addr.id
+      INNER JOIN "OffchainTopics" AS topics
+      ON threads.topic_id = topics.id`;
 
     let preprocessedThreads;
     try {
@@ -65,15 +72,21 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     } catch (e) {
       console.log(e);
     }
-    console.log(preprocessedThreads[0]);
     threads = preprocessedThreads.map((t) => {
       return ({
         id: t.thread_id,
+        title: t.thread_title,
+        community: t.thread_community,
+        chain: t.thread_chain,
+        created_at: t.thread_created,
         Address: {
-
+          id: t.addr_id,
+          address: t.addr_address,
+          chain: t.addr_chain,
         }
-      })
-    })
+      });
+    });
+    console.log(threads[0]);
   } else {
     const whereOptions = (community)
       ? { community: community.id, }
