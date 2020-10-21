@@ -31,10 +31,14 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     replacements['created_at'] = req.query.cutoff_date;
 
     const query = `
-      SELECT *
+      SELECT addr.id AS addr_id, addr.address AS addr_address,
+        addr.chain AS addr_chain, thread_id, thread_title,
+        thread_community, thread_chain, thread_created
       FROM "Addresses" AS addr
       JOIN (
-        SELECT *
+        SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
+          t.created_at AS thread_created, t.community AS thread_community,
+          t.chain AS thread_chain
         FROM "OffchainThreads" t
         JOIN (
           SELECT root_id, MAX(created_at) AS comm_created_at
@@ -62,6 +66,14 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       console.log(e);
     }
     console.log(preprocessedThreads[0]);
+    threads = preprocessedThreads.map((t) => {
+      return ({
+        id: t.thread_id,
+        Address: {
+
+        }
+      })
+    })
   } else {
     const whereOptions = (community)
       ? { community: community.id, }
