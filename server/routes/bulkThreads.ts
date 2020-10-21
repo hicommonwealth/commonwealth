@@ -22,7 +22,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       ? { community: community.id }
       : { chain: chain.id };
 
-    let threadOptions;
+    let threadOptions = '';
     if (req.query.topic_id) {
       threadOptions += `AND topic_id = :topic_id `;
       replacements['topic_id'] = req.query.topic_id;
@@ -52,23 +52,16 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       ) threads
       ON threads.address_id = addr.id`;
 
-    let threadIds;
+    let preprocessedThreads;
     try {
-      threadIds = await models.sequelize.query(query, {
+      preprocessedThreads = await models.sequelize.query(query, {
         replacements,
         type: QueryTypes.SELECT
       });
     } catch (e) {
       console.log(e);
     }
-    threads = await models.OffchainThread.findAll({
-      where: {
-        id: {
-          [Op.in]: threadIds.map((id) => id.id)
-        }
-      },
-      include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
-    });
+    console.log(preprocessedThreads[0]);
   } else {
     const whereOptions = (community)
       ? { community: community.id, }
