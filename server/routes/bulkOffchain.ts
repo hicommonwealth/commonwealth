@@ -49,7 +49,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
   const query = `
     SELECT addr.id AS addr_id, addr.address AS addr_address,
       addr.chain AS addr_chain, thread_id, thread_title,
-      thread_community, thread_chain, thread_created, 
+      thread_community, thread_chain, thread_created, threads.kind
       threads.version_history, threads.read_only, threads.body,
       threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name, 
       topics.description AS topic_description, topics.chain_id AS topic_chain,
@@ -59,7 +59,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
         t.created_at AS thread_created, t.community AS thread_community,
         t.chain AS thread_chain, t.version_history, t.read_only, t.body,
-        t.url, t.pinned, t.topic_id
+        t.url, t.pinned, t.topic_id, t.kind
       FROM "OffchainThreads" t
       INNER JOIN (
         SELECT root_id, MAX(created_at) AS comm_created_at
@@ -91,6 +91,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       url: t.url,
       body: t.body,
       version_history: t.version_history,
+      kind: t.kind,
       read_only: t.read_only,
       pinned: t.pinned,
       community: t.thread_community,
