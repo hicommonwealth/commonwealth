@@ -30,17 +30,6 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
   }
 
-  // Threads
-  const publicThreadsQuery = (community)
-    ? { community: community.id }
-    : { chain: chain.id };
-
-  const filteredThreads = await models.OffchainThread.findAll({
-    where: publicThreadsQuery,
-    include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
-    order: [['created_at', 'DESC']],
-  });
-
   // Topics
   const topics = await models.OffchainTopic.findAll({
     where: community
@@ -58,25 +47,36 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     : { chain: chain.id };
 
   const query = `
-    SELECT t.id
-      FROM "OffchainThreads" AS t
-      WHERE id in (
-        SELECT CAST(TRIM('discussion_' FROM root_id) AS int)
-        FROM (
-          SELECT root_id, created_at, id
-          FROM (
-            SELECT root_id, MAX(created_at) as created_at 
-            FROM "OffchainComments" 
-            WHERE ${whereOptions}
-              AND deleted_at IS NULL
-            GROUP BY root_id) grouped_comments
-          ORDER BY created_at DESC LIMIT 20
-        ) ordered_comments
-      );`;
+    SELECT addr.id AS addr_id, addr.address AS addr_address,
+      addr.chain AS addr_chain, thread_id, thread_title,
+      thread_community, thread_chain, thread_created, 
+      threads.version_history, threads.read_only, threads.body,
+      threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name, 
+      topics.description AS topic_description, topics.chain_id AS topic_chain,
+      topics.community_id AS topic_community
+    FROM "Addresses" AS addr
+    INNER JOIN (
+      SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
+        t.created_at AS thread_created, t.community AS thread_community,
+        t.chain AS thread_chain, t.version_history, t.read_only, t.body,
+        t.url, t.pinned, t.topic_id
+      FROM "OffchainThreads" t
+      INNER JOIN (
+        SELECT root_id, MAX(created_at) AS comm_created_at
+        FROM "OffchainComments"
+        WHERE ${whereOptions}
+        GROUP BY root_id
+        ) c
+      ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
+      ORDER BY c.comm_created_at DESC LIMIT 20
+    ) threads
+    ON threads.address_id = addr.id
+    INNER JOIN "OffchainTopics" topics
+    ON threads.topic_id = topics.id`;
 
-  let threadIds;
+  let preprocessedThreads;
   try {
-    threadIds = await models.sequelize.query(query, {
+    preprocessedThreads = await models.sequelize.query(query, {
       replacements,
       type: QueryTypes.SELECT
     });
@@ -84,17 +84,28 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     console.log(e);
   }
 
-  const threads = await models.OffchainThread.findAll({
-    where: {
-      [Op.or]: {
-        id: {
-          [Op.in]: threadIds.map((id) => id.id)
-        },
-        pinned: true
+  const threads = preprocessedThreads.map((t) => {
+    return ({
+      id: t.thread_id,
+      title: t.thread_title,
+      community: t.thread_community,
+      chain: t.thread_chain,
+      created_at: t.thread_created,
+      topic: {
+        id: t.topic_id,
+        name: t.topic_name,
+        description: t.topic_description,
+        communityId: t.topic_community,
+        chainId: t.topic_chain
+      },
+      Address: {
+        id: t.addr_id,
+        address: t.addr_address,
+        chain: t.addr_chain,
       }
-    },
-    include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
+    });
   });
+  console.log(threads[0]);
 
   // Reactions
   const reactions = await models.OffchainReaction.findAll({
