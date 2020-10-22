@@ -111,7 +111,6 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       }
     });
   });
-  console.log(threads[0]);
 
   // Reactions
   const reactions = await models.OffchainReaction.findAll({

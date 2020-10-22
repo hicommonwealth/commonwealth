@@ -23,7 +23,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
     let threadOptions = '';
     if (topic_id) {
-      threadOptions += `AND topic_id = :topic_id `;
+      threadOptions += ` AND topic_id = :topic_id `;
       replacements['topic_id'] = topic_id;
     }
 
@@ -62,7 +62,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       INNER JOIN "OffchainTopics" topics
       ON threads.topic_id = topics.id`;
 
-    console.log(query);
     let preprocessedThreads;
     try {
       preprocessedThreads = await models.sequelize.query(query, {
@@ -99,7 +98,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         }
       });
     });
-    console.log(threads[0]);
   } else {
     const whereOptions = (community)
       ? { community: community.id, }

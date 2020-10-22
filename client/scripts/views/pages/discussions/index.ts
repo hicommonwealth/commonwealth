@@ -26,7 +26,7 @@ interface IDiscussionPageState {
   lookback?: moment.Moment;
   postsDepleted?: boolean;
   lastVisitedUpdated?: boolean;
-  topicFirstPageFetched: boolean;
+  topicFirstPageFetched: any;
 }
 
 const getLastUpdate = (proposal) => {
@@ -73,7 +73,13 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         const args = app.activeCommunityId()
           ? [null, app.activeCommunityId(), vnode.state.lookback]
           : [app.activeChainId(), null, vnode.state.lookback];
-        if (vnode.attrs.topic) args.push(vnode.attrs.topic);
+        if (vnode.attrs.topic) {
+          const a = app;
+          debugger
+          const topic_id = app.topics.getByName(vnode.attrs.topic, app.activeId())?.id;
+          args.push(topic_id);
+        }
+        console.log(args);
         const moreThreadsLoaded = await (<any>app.threads.loadNextPage)(...args);
         if (!moreThreadsLoaded) vnode.state.postsDepleted = true;
         m.redraw();
@@ -88,6 +94,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       : vnode.state.lookback?._isAMomentObject
         ? vnode.state.lookback
         : moment();
+    vnode.state.topicFirstPageFetched = {};
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
@@ -100,7 +107,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     const topic_id = app.topics.getByName(topic, app.activeId())?.id;
 
-    if (topic && topic_id && !vnode.state.topicFirstPageFetched) {
+    console.log(vnode.state.topicFirstPageFetched);
+    if (topic && topic_id && !vnode.state.topicFirstPageFetched[topic]) {
       if (!vnode.state.lookback) {
         vnode.state.lookback = moment();
       }
@@ -108,8 +116,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         ? [null, app.activeCommunityId(), vnode.state.lookback, topic_id]
         : [app.activeChainId(), null, vnode.state.lookback, topic_id];
       console.log(...args);
-      (<any>app.threads.loadNextPage)(...args);
-      vnode.state.topicFirstPageFetched = true;
+      (<any>app.threads.loadNextPage)(...args).then(() => {
+        vnode.state.topicFirstPageFetched[topic] = true;
+        m.redraw();
+      });
     }
 
     localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
@@ -156,6 +166,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     };
 
     let listing = [];
+    const a = app;
     const allThreads = topic
       ? app.threads.topicScopedStore.getByCommunityAndTopic(app.activeId(), topic)
       : app.threads
