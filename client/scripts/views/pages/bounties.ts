@@ -73,7 +73,7 @@ const BountyRow: m.Component<{bounty: AnyProposal}> = {
     const { bounty } = vnode.attrs;
     return m('', [
       m('h4', `${bounty.title}`),
-      m('span', `bond: ${(bounty as SubstrateTreasuryProposal).bond.format(true)}`),
+      m('span', `${(bounty as SubstrateTreasuryProposal).bond.format(true)} `),
       m('span', 'managed by '),
       m(User, { user: bounty.author }),
     ]);
