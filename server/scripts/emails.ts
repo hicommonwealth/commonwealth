@@ -12,6 +12,7 @@ import {
   IPostNotificationData, NotificationCategories,
   DynamicTemplate, IChainEventNotificationData
 } from '../../shared/types';
+import { capitalize } from 'lodash';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -39,7 +40,7 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
     }
     if (!chainEventLabel) return;
 
-    const subject = `${chainEventLabel.heading} event on ${notification_data.chainEventType?.chain}`;
+    const subject = `${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
 
     return {
       from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -161,8 +162,8 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
     console.log('attempted to send empty immediate notification email');
     return;
   }
-  emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
-  emailObject.bcc = 'raymond+bcc@commonwealth.im';
+  emailObject.to = process.env.NODE_ENV === 'development' ? 'zak@commonwealth.im' : user.email;
+  emailObject.bcc = 'zak@commonwealth.im';
 
   try {
     console.log('sending immediate notification email');
@@ -208,8 +209,8 @@ export const sendBatchedNotificationEmails = async (models): Promise<number> => 
       try {
         console.log(`producing digest for ${user.email}`);
         const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
-        emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
-        emailObject.bcc = 'raymond+bcc@commonwealth.im';
+        emailObject.to = process.env.NODE_ENV === 'development' ? 'zak@commonwealth.im' : user.email;
+        emailObject.bcc = 'zak@commonwealth.im';
 
         console.log(`sending batch notification email to ${user.email}`);
         await sgMail.send(emailObject);
