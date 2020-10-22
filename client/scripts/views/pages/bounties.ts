@@ -8,7 +8,7 @@ import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase } from 'models';
+import { ChainClass, ChainBase, AnyProposal } from 'models';
 import Edgeware from 'controllers/chain/edgeware/main';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
@@ -21,6 +21,8 @@ import { Grid, Col, List } from 'construct-ui';
 import moment from 'moment';
 import Listing from './listing';
 import ErrorPage from './error';
+import User from '../components/widgets/user';
+import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/substrate/treasury_proposal';
 
 
 const SubstrateBountyStats: m.Component<{}> = {
@@ -66,10 +68,15 @@ async function loadCmd() {
   await chain.treasury.init(chain.chain, chain.accounts);
 }
 
-const BountyRow: m.Component<{bounty: any}> = {
+const BountyRow: m.Component<{bounty: AnyProposal}> = {
   view: (vnode) => {
     const { bounty } = vnode.attrs;
-    return m('h4', `${bounty.id}`);
+    return m('', [
+      m('h4', `${bounty.title}`),
+      m('span', `bond: ${(bounty as SubstrateTreasuryProposal).bond.format(true)}`),
+      m('span', 'managed by '),
+      m(User, { user: bounty.author }),
+    ]);
   }
 };
 
