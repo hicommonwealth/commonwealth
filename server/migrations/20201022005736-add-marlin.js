@@ -7,33 +7,43 @@ const Op = SequelizeLib.Op;
 
 const MarlinEventKinds = {
   // Comp Events
-  Approval = 'approval',
-  DelegateChanged = 'delegate-changed',
-  DelegateVotesChanged = 'delegate-votes-changed',
-  Transfer = 'transfer',
+  Approval: 'approval',
+  DelegateChanged: 'delegate-changed',
+  DelegateVotesChanged: 'delegate-votes-changed',
+  Transfer: 'transfer',
   // GovernorAlpha Events
-  ProposalExecuted = 'proposal-executed',
-  ProposalCreated = 'proposal-created',
-  ProposalCanceled = 'proposal-canceled',
-  ProposalQueued = 'proposal-queued',
-  VoteCast = 'vote-cast',
+  ProposalExecuted: 'proposal-executed',
+  ProposalCreated: 'proposal-created',
+  ProposalCanceled: 'proposal-canceled',
+  ProposalQueued: 'proposal-queued',
+  VoteCast: 'vote-cast',
   // Timelock Events
-  CancelTransaction = 'cancel-transaction',
-  ExecuteTransaction = 'execute-transactions',
-  NewAdmin = 'new-admin',
-  NewDelay = 'new-delay',
-  NewPendingAdmin = 'new-pending-admin',
-  QueueTransaction = 'queue-transaction',
+  CancelTransaction: 'cancel-transaction',
+  ExecuteTransaction: 'execute-transactions',
+  NewAdmin: 'new-admin',
+  NewDelay: 'new-delay',
+  NewPendingAdmin: 'new-pending-admin',
+  QueueTransaction: 'queue-transaction',
 };
+
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    // add chain_event and chain_event_type tables
     return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.bulkInsert('Chains', [{
+        id: 'marlin',
+        symbol: 'LIN',
+        name: 'marlin',
+        icon_url: '/static/img/protocols/eth.png',
+        type: 'chain',
+        network: 'marlin',
+        active: true,
+      }], { transaction: t });
+
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'marlin',
         url: 'wss://mainnet.infura.io/ws',
-        address: '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1', // COMP Contract Address
+        address: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // POND Contract Address
       }], { transaction: t });
 
       const buildObject = (event_name, chain) => ({
@@ -56,12 +66,13 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.bulkDelete('ChainEventTypes', {
-        chain: 'marlin',
-      }, { transaction: t });
-      await queryInterface.bulkDelete('ChainNodes', {
-        chain: 'marlin'
-      }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainReactions', { chain: 'marlin' }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainComments', { chain: 'marlin' }, { transaction: t });
+      await queryInterface.bulkDelete('OffchainThreads', { chain: 'marlin' }, { transaction: t });
+      await queryInterface.bulkDelete('Addresses', { chain: 'marlin' }, { transaction: t });
+      await queryInterface.bulkDelete('ChainEventTypes', { chain: 'marlin' }, { transaction: t });
+      await queryInterface.bulkDelete('ChainNodes', { chain: 'marlin' }, { transaction: t });
+      await queryInterface.bulkDelete('Chains', { id: ['marlin'] }, { transaction: t });
     });
   }
 };
