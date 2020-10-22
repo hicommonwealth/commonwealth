@@ -243,6 +243,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
       || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
     const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
       || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
+    const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
@@ -252,7 +253,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     return m('.OnchainNavigationModule.SidebarModule', [
       m(List, [
         m(ListItem, {
-          label: 'On-chain Governance',
+          label: 'On-chain Governance 2',
           class: 'section-header',
         }),
         // referenda (substrate only)
@@ -293,6 +294,15 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
             label: 'Treasury',
             contentLeft: m(Icon, { name: Icons.TRUCK }),
             onclick: (e) => m.route.set(`/${app.activeChainId()}/treasury`),
+            contentRight: [], // TODO
+          }),
+        // bounties (substrate only)
+        !app.community && app.chain?.base === ChainBase.Substrate
+          && m(ListItem, {
+            active: onBountiesPage(m.route.get()),
+            label: 'Bounties',
+            contentLeft: m(Icon, { name: Icons.PAPERCLIP }),
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/bounties`),
             contentRight: [], // TODO
           }),
         // council (substrate only)
