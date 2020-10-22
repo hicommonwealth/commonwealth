@@ -66,7 +66,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     }
 
     // Infinite Scroll
-    const onscroll = _.debounce(() => {
+    const onscroll = _.debounce(async () => {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
       if (scrollPos > (scrollHeight - 400)) {
@@ -74,7 +74,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           ? [null, app.activeCommunityId(), vnode.state.lookback]
           : [app.activeChainId(), null, vnode.state.lookback];
         if (vnode.attrs.topic) args.push(vnode.attrs.topic);
-        (<any>app.threads.loadNextPage)(...args);
+        const moreThreadsLoaded = await (<any>app.threads.loadNextPage)(...args);
+        if (!moreThreadsLoaded) vnode.state.postsDepleted = true;
         m.redraw();
       }
     }, 400);

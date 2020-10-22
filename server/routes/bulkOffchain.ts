@@ -49,7 +49,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
   const query = `
     SELECT addr.id AS addr_id, addr.address AS addr_address,
       addr.chain AS addr_chain, thread_id, thread_title,
-      thread_community, thread_chain, thread_created, threads.kind
+      thread_community, thread_chain, thread_created, threads.kind,
       threads.version_history, threads.read_only, threads.body,
       threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name, 
       topics.description AS topic_description, topics.chain_id AS topic_chain,

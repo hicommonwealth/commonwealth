@@ -226,6 +226,7 @@ class ThreadsController {
     });
   }
 
+  // loadNextPage returns false if there are no more threads to load
   public async loadNextPage(chainId: string, communityId: string, cutoffDate: moment.Moment, topic_id?: OffchainTopic) {
     const params = {
       chain: chainId,
@@ -241,6 +242,9 @@ class ThreadsController {
     console.log(response.result);
     const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
     console.log({ threads });
+    if (!threads.length) {
+      return false;
+    }
     const store = topic_id ? this._topicScopedStore : this._store;
     for (const thread of threads) {
       if (!thread.Address) {
@@ -258,6 +262,7 @@ class ThreadsController {
         console.error(e.message);
       }
     }
+    return true;
   }
 
   public refreshAll(chainId: string, communityId: string, reset = false) {
