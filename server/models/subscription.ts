@@ -2,7 +2,7 @@ import _ from 'underscore';
 import WebSocket from 'ws';
 import Sequelize from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
-import { SENDGRID_API_KEY } from '../config';
+import { SENDGRID_API_KEY, SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { NotificationCategoryAttributes } from './notification_category';
 import { NotificationAttributes } from './notification';
@@ -174,7 +174,7 @@ export default (
           }
       );
       if (msg && isChainEventData(notification_data)) {
-        msg.dynamic_template_data.notification.path = `https://commonwealth.im/${notification_data.chainEventType.chain}/notificationsList?id=${notification.id}`;
+        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${notification_data.chainEventType.chain}/notificationsList?id=${notification.id}`;
       }
       if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
     }));
