@@ -118,6 +118,17 @@ class NotificationsController {
     });
   }
 
+  public clear(notifications: Notification[]) {
+    // TODO: Decide REST API handling
+    return post('/clearNotifications', {
+      'notification_ids[]': notifications.map((n) => n.id),
+    }, async (result) => {
+      for (const n of notifications) {
+        await this._store.remove(n);
+      }
+    });
+  }
+
   public update(n: Notification) {
     if (!this._store.getById(n.id)) {
       this._store.add(n);
