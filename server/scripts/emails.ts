@@ -52,6 +52,7 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
         notification: {
           chainId: notification_data.chainEventType?.chain,
           blockNumber: notification_data.chainEvent?.blockNumber,
+          subject,
           label: subject,
           path: null,
         }
