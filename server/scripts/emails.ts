@@ -162,8 +162,8 @@ export const sendImmediateNotificationEmail = async (subscription, emailObject) 
     console.log('attempted to send empty immediate notification email');
     return;
   }
-  emailObject.to = process.env.NODE_ENV === 'development' ? 'zak@commonwealth.im' : user.email;
-  emailObject.bcc = 'zak@commonwealth.im';
+  emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
+  emailObject.bcc = 'raymond+bcc@commonwealth.im';
 
   try {
     console.log('sending immediate notification email');
@@ -209,8 +209,8 @@ export const sendBatchedNotificationEmails = async (models): Promise<number> => 
       try {
         console.log(`producing digest for ${user.email}`);
         const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
-        emailObject.to = process.env.NODE_ENV === 'development' ? 'zak@commonwealth.im' : user.email;
-        emailObject.bcc = 'zak@commonwealth.im';
+        emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
+        emailObject.bcc = 'raymond+bcc@commonwealth.im';
 
         console.log(`sending batch notification email to ${user.email}`);
         await sgMail.send(emailObject);
