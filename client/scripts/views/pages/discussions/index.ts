@@ -183,7 +183,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     };
 
     let listing = [];
-    const a = app;
     const allThreads = topic
       ? app.threads.topicScopedStore.getByCommunityAndTopic(app.activeId(), topic)
         .sort(orderDiscussionsbyLastComment)
@@ -283,6 +282,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       ]
     ]);
   }
-}
+};
 
 export default DiscussionsPage;
