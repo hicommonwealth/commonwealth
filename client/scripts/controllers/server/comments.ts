@@ -215,48 +215,6 @@ class CommentsController {
     });
   }
 
-  // public async refreshAll(chainId: string, communityId: string, reset: CommentRefreshOption) {
-  //   try {
-  //     const args: any = {
-  //       chain: chainId,
-  //       community: communityId,
-  //     };
-  //     if (reset === CommentRefreshOption.ResetAndLoadOffchainComments) {
-  //       args.offchain_threads_only = 1;
-  //     }
-  //     if (reset === CommentRefreshOption.LoadProposalComments) {
-  //       args.proposals_only = 1;
-  //     }
-  //     // TODO: Change to GET /comments
-  //     const response = await $.get(`${app.serverUrl()}/bulkComments`, args);
-  //     if (response.status !== 'Success') {
-  //       throw new Error(`Unsuccessful status: ${response.status}`);
-  //     }
-  //     if (reset === CommentRefreshOption.ResetAndLoadOffchainComments) {
-  //       this._store.clear();
-  //     }
-  //     await Promise.all(response.result.map(async (comment) => {
-  //       if (!comment.Address) {
-  //         console.error('Comment missing linked address');
-  //       }
-  //       const existing = this._store.getById(comment.id);
-  //       if (existing) {
-  //         this._store.remove(existing);
-  //       }
-  //       try {
-  //         this._store.add(modelFromServer(comment));
-  //       } catch (e) {
-  //         // Comment is on an object that was deleted or unavailable
-  //       }
-  //     }));
-  //   } catch (err) {
-  //     console.log('failed to load bulk comments');
-  //     throw new Error((err.responseJSON && err.responseJSON.error)
-  //       ? err.responseJSON.error
-  //       : 'Error loading comments');
-  //   }
-  // }
-
   public initialize(initialComments, reset = true) {
     if (reset) {
       this._store.clear();
