@@ -234,7 +234,6 @@ class ThreadsController {
       cutoff_date: cutoffDate.toISOString(),
     };
     if (topic_id) params['topic_id'] = topic_id;
-    debugger
     console.log(params);
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {

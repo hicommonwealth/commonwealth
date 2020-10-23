@@ -113,7 +113,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         }
         args.push(topic_id);
       }
-      (<any>app.threads.loadNextPage)(...args).then(() => {
+      (<any>app.threads.loadNextPage)(...args).then((morePostsRemaining) => {
+        if (!morePostsRemaining) vnode.state.postsDepleted = true;
         m.redraw();
       });
 
@@ -130,7 +131,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
-          console.log(args_);
           const morePostsRemaining = await (<any>app.threads.loadNextPage)(...args_);
           if (!morePostsRemaining) vnode.state.postsDepleted = true;
           m.redraw();
@@ -240,6 +240,9 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       topicDescription = topicObject?.description;
     }
 
+    const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted === false);
+    const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted === true);
+
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',
@@ -250,11 +253,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       (app.chain || app.community) && [
         m('.discussions-main', [
           // m(InlineThreadComposer),
-          (!activeEntity || !activeEntity.serverLoaded)
+          (!activeEntity || !activeEntity.serverLoaded || stillFetching)
             ? m('.discussions-main', [
               m(ProposalsLoadingRow),
             ])
-            : allThreads.length === 0
+            : emptyTopic
               // TODO: Ensure that this doesn't get shown on first pass
               ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
               : m(Listing, {
