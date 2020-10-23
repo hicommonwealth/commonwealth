@@ -95,6 +95,7 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+      this._topicScopedStore.add(result);
       app.recentActivity.addThreads([{
         id: response.result.id,
         Address: response.result.Address,
@@ -147,6 +148,7 @@ class ThreadsController {
           this._store.remove(this._store.getByIdentifier(result.id));
         }
         this._store.add(result);
+        this._topicScopedStore.add(result);
         return result;
       },
       error: (err) => {
@@ -166,6 +168,7 @@ class ThreadsController {
         'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);
+        _this._topicScopedStore.remove(proposal);
         app.recentActivity.removeThread(proposal.id, proposal.community || proposal.chain);
         // Properly removing from recent activity will require comments/threads to have an address_id
         // app.recentActivity.removeAddressActivity([proposal]);
@@ -194,6 +197,7 @@ class ThreadsController {
           this._store.remove(this._store.getByIdentifier(result.id));
         }
         this._store.add(result);
+        this._topicScopedStore.add(result);
         return result;
       },
       error: (err) => {
@@ -217,6 +221,7 @@ class ThreadsController {
           this._store.remove(this._store.getByIdentifier(result.id));
         }
         this._store.add(result);
+        this._topicScopedStore.add(result);
         return result;
       },
       error: (err) => {

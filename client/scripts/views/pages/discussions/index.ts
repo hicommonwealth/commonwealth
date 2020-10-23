@@ -208,6 +208,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       // pinned threads - inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
       if (pinnedThreads.length > 0) {
+        debugger
         listing.push(m(PinnedListing, { proposals: pinnedThreads }));
 
         if (getLastUpdate(firstThread) > lastVisited) {

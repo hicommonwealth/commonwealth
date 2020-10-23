@@ -30,13 +30,11 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
   }
 
-  const baseParams = community
-    ? { community_id: community.id }
-    : { chain_id: chain.id };
-
   // Topics
   const topics = await models.OffchainTopic.findAll({
-    where: baseParams
+    where: community
+      ? { community_id: community.id }
+      : { chain_id: chain.id }
   });
 
   // Threads
@@ -44,9 +42,11 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     ? `community = :community`
     : `chain = :chain AND root_id LIKE 'discussion%'`;
 
-  const replacements = baseParams;
+  const replacements = community
+    ? { community: community.id }
+    : { chain: chain.id };
 
-  const threadParams = Object.assign(baseParams, { pinned: false });
+  const threadParams = Object.assign(replacements, { pinned: true });
   const pinnedThreads = await models.OffchainThread.findAll({
     where: threadParams,
     include: [models.Address, { model: models.OffchainTopic, as: 'topic' }]
@@ -116,11 +116,12 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
   });
 
   const allThreads = pinnedThreads.map((t) => t.toJSON()).concat(threads);
-  console.log(allThreads.slice(0, 5));
 
   // Reactions
   const reactions = await models.OffchainReaction.findAll({
-    where: baseParams,
+    where: community
+      ? { community: community.id }
+      : { chain: chain.id },
     include: [ models.Address ],
     order: [['created_at', 'DESC']],
   });
@@ -144,7 +145,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       topics: topics.map((c) => c.toJSON()),
       reactions: reactions.map((r) => r.toJSON()),
       admins: admins.map((a) => a.toJSON()),
-      threads,
+      allThreads,
     }
   });
 };
