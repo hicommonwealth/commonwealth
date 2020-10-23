@@ -598,13 +598,16 @@ export const NewThreadForm: m.Component<{
                   onclick: async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    try {
-                      await app.user.discussionDrafts.delete(draft.id);
-                      vnode.state.recentlyDeletedDrafts.push(draft.id);
-                    } catch (err) {
-                      notifyError(err.message);
+                    const confirmed = await confirmationModalWithText('Are you sure you want to delete this draft?')();
+                    if (confirmed) {
+                      try {
+                        await app.user.discussionDrafts.delete(draft.id);
+                        vnode.state.recentlyDeletedDrafts.push(draft.id);
+                      } catch (err) {
+                        notifyError(err.message);
+                      }
+                      m.redraw();
                     }
-                    m.redraw();
                   }
                 }, 'Delete')
               ]),

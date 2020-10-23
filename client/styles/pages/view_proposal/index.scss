@@ -217,8 +217,8 @@ $discussion-title-font-size: 1.45rem;
     }
     .ProposalBodyCancelEdit,
     .ProposalBodySaveEdit {
-        margin-right: 0;
-        margin-top: 0;
+        margin-right: 12px;
+        margin-top: 14px;
     }
     .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
         stroke: #999;
@@ -228,6 +228,11 @@ $discussion-title-font-size: 1.45rem;
     }
     .ProposalBodyReaction {
         display: inline-block;
+    }
+    .ProposalBodyText.proposal-body-placeholder {
+        &, .User .user-display-name {
+            color: #999;
+        }
     }
 
     .comments-error {

@@ -15,10 +15,12 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel,
-         chainSupportedBy } from '@commonwealth/chain-events';
+import {
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy
+} from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import UserGallery from './widgets/user_gallery';
+import { Icon, Icons } from 'construct-ui';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -203,16 +205,26 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
   });
 };
 
-const NotificationRow: m.Component<{ notifications: Notification[] }, {
+const NotificationRow: m.Component<{
+  notifications: Notification[],
+  onListPage?: boolean,
+}, {
   Labeler: any,
   MolochTypes: any,
   SubstrateTypes: any,
+  scrollOrStop: boolean;
 }> = {
+  oncreate: (vnode) => {
+    if (m.route.param('id') && vnode.attrs.onListPage
+      && m.route.param('id') === vnode.attrs.notifications[0].id.toString()
+    ) {
+      vnode.state.scrollOrStop = true;
+    }
+  },
   view: (vnode) => {
     const { notifications } = vnode.attrs;
     const notification = notifications[0];
     const { category } = notifications[0].subscription;
-
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
@@ -237,9 +249,18 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       }
       m.redraw();
 
+      if (vnode.state.scrollOrStop) {
+        setTimeout(() => {
+          document.getElementById(m.route.param('id')).scrollIntoView();
+        }, 1);
+        vnode.state.scrollOrStop = false;
+      }
+
       if (!label) {
         return m('li.NotificationRow', {
           class: notification.isRead ? '' : 'unread',
+          key: notification.id,
+          id: notification.id,
         }, [
           m('.comment-body', [
             m('.comment-body-top', 'Loading...'),
@@ -248,17 +269,30 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       }
       return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
+        key: notification.id,
+        id: notification.id,
         onclick: async () => {
+          if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
           app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          if (!label.linkUrl) return;
-          await m.route.set(label.linkUrl);
+          await m.route.set(`/${app.activeId() || 'edgeware'}/notificationsList?id=${notification.id}`);
           m.redraw.sync();
         },
       }, [
         m('.comment-body', [
-          m('.comment-body-top', `${label.heading} on ${chainName}`),
+          m('.comment-body-top.chain-event-notification-top', [
+            `${label.heading} on ${chainName}`,
+            !vnode.attrs.onListPage && m(Icon, {
+              name: Icons.X,
+              onclick: (e) => {
+                e.preventDefault();
+                vnode.state.scrollOrStop = true;
+                app.user.notifications.clear([notification]);
+                m.redraw();
+              },
+            })
+          ]),
           m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
           m('.comment-body-excerpt', label.label),
         ]),
@@ -277,6 +311,8 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       } = getBatchNotificationFields(category, notificationData);
       return m('li.NotificationRow', {
         class: notifications[0].isRead ? '' : 'unread',
+        key: notification.id,
+        id: notification.id,
         onclick: async () => {
           const notificationArray: Notification[] = [];
           app.user.notifications.markAsRead(notifications).then(() => m.redraw());

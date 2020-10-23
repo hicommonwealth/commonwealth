@@ -80,7 +80,7 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const CommunitySelector = {
+const CommunitySelector: m.Component<{}> = {
   view: (vnode) => {
     const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
       .concat(app.config.chains.getAll())
@@ -124,7 +124,9 @@ const CommunitySelector = {
         roles.push(...app.user.getAllRolesInCommunity({ chain: item.id }));
       }
 
-      const profile = (roles[0]?.address_chain) ? app.profiles.getProfile(roles[0].address_chain, roles[0].address) : null;
+      const profile = (roles[0]?.address_chain)
+        ? app.profiles.getProfile(roles[0].address_chain, roles[0].address)
+        : null;
 
       return item instanceof ChainInfo
         ? m(ListItem, {
@@ -139,10 +141,11 @@ const CommunitySelector = {
           contentRight: app.isLoggedIn()
             && roles.length > 0
             && m('.community-star-toggle', {
-              onclick: (e) => {
+              onclick: async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+                await app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+                m.redraw();
               }
             }, [
               roles.map((role) => {
@@ -153,7 +156,7 @@ const CommunitySelector = {
                 });
               }),
               m('.star-icon', [
-                m(Icon, { name: Icons.STAR }),
+                m(Icon, { name: Icons.STAR, key: item.id, }),
               ]),
             ]),
         })
@@ -168,10 +171,11 @@ const CommunitySelector = {
             contentRight: app.isLoggedIn()
               && roles.length > 0
               && m('.community-star-toggle', {
-                onclick: (e) => {
+                onclick: async (e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                  await app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                  m.redraw();
                 },
               }, [
                 roles.map((role) => {
@@ -182,7 +186,7 @@ const CommunitySelector = {
                   });
                 }),
                 m('.star-icon', [
-                  m(Icon, { name: Icons.STAR }),
+                  m(Icon, { name: Icons.STAR, key: item.id, }),
                 ]),
               ]),
           })

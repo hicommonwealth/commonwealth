@@ -38,20 +38,22 @@ interface IAttrs {
 
 interface IState {
   collapsed: boolean;
-  oninput: CallableFunction;
+  oninput: CallableFunction | boolean;
   outgoingTypingInputHandler: CallableFunction;
-  chat: IChat;
+  chat: {
+    isConnected;
+    initializeScrollback;
+    send;
+    sendTypingIndicator;
+    addListener;
+  };
   messages: any[];
   typing?: boolean;
   typingTimeout: any;
   loaded: boolean;
 }
 
-interface IChat {
-  isConnected?: boolean;
-}
-
-const Chat = {
+const Chat: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     vnode.state.collapsed = !!localStorage.getItem('cwChatCollapsed');
 
@@ -59,7 +61,7 @@ const Chat = {
     const scrollToChatBottom = () => {
       // Use a synchronous redraw, or otherwise it may not happen in time for us to read the correct scrollHeight
       m.redraw.sync();
-      const scroller = $(vnode.dom).find('.chat-messages')[0];
+      const scroller = $((vnode as any).dom).find('.chat-messages')[0];
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     const onIncomingMessage = (text, author, author_chain, timestamp?) => { // timestamp is used for scrollback only

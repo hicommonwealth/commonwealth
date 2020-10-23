@@ -12,6 +12,7 @@ import {
   IPostNotificationData, NotificationCategories,
   DynamicTemplate, IChainEventNotificationData
 } from '../../shared/types';
+import { capitalize } from 'lodash';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -39,7 +40,7 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
     }
     if (!chainEventLabel) return;
 
-    const subject = `${chainEventLabel.heading} event on ${notification_data.chainEventType?.chain}`;
+    const subject = `${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
 
     return {
       from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -51,8 +52,9 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
         notification: {
           chainId: notification_data.chainEventType?.chain,
           blockNumber: notification_data.chainEvent?.blockNumber,
-          label: chainEventLabel.heading,
-          path: `https://commonwealth.im${chainEventLabel.linkUrl}`,
+          subject,
+          label: subject,
+          path: null,
         }
       }
     };

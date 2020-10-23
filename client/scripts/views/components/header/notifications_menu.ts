@@ -9,7 +9,7 @@ import NotificationRow from 'views/components/notification_row';
 import { Notification } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 
-const NotificationButtons: m.Component = {
+const NotificationButtons: m.Component<{}> = {
   view: (vnode) => {
     const notifications = app.user.notifications.notifications;
     return m(ButtonGroup, {
@@ -59,7 +59,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
       }),
       position: 'bottom-end',
       inline: true,
-      closeOnContentClick: true,
+      closeOnContentClick: false,
       menuAttrs: {
         align: 'left',
       },
@@ -69,7 +69,8 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
           notifications.length > 0
             ? m(Infinite, {
               maxPages: 1, // prevents rollover/repeat
-              pageData: () => sortedNotifications,
+              pageData: () => sortedNotifications.slice(0, 80), // limit the number of rows shown here
+              key: notifications.length,
               item: (data, opts, index) => {
                 return m(NotificationRow, { notifications: data });
               },

@@ -206,7 +206,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       if (pinnedThreads.length > 0) {
         listing.push(m(PinnedListing, { proposals: pinnedThreads }));
 
-        if (getLastUpdate(firstThread) > lastVisited) {
+        if (firstThread && getLastUpdate(firstThread) > lastVisited) {
           listing.push(getLastSeenDivider(false));
         }
       }

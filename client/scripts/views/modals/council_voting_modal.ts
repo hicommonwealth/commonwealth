@@ -16,7 +16,7 @@ import User from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 
-const CouncilVotingModal = {
+const CouncilVotingModal: m.Component<{ candidates }, { votes, error, phragmenStakeAmount }> = {
   view: (vnode) => {
     const author = app.user.activeAccount;
     const candidates = vnode.attrs.candidates || [];
@@ -54,7 +54,7 @@ const CouncilVotingModal = {
       const voteAccts: string[] = vnode.state.votes;
       const voteObj = new PhragmenElectionVote(app.user.activeAccount as SubstrateAccount, voteAccts, stake);
       createTXModal((app.chain as Substrate).phragmenElections.activeElection.submitVoteTx(voteObj)).then(() => {
-        $(vnode.dom).trigger('modalforceexit');
+        $(e.target).trigger('modalforceexit');
       }, (err) => {
         if (err) vnode.state.error = err;
         m.redraw();
@@ -126,7 +126,7 @@ const CouncilVotingModal = {
             const account = app.user.activeAccount as SubstrateAccount;
             createTXModal((app.chain as Substrate).phragmenElections.activeElection.removeVoterTx(account))
               .then(() => {
-                $(vnode.dom).trigger('modalforceexit');
+                $(e.target).trigger('modalforceexit');
               }, (err) => {
                 if (err) vnode.state.error = err;
                 m.redraw();

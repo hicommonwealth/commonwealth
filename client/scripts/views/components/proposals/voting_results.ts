@@ -21,7 +21,7 @@ const signalingVoteToString = (v: VoteOutcome): string => {
   return u8aToString(outcomeArray.slice(0, sliceEnd));
 };
 
-const ProposalVotingResults = {
+const ProposalVotingResults: m.Component<{ proposal }> = {
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
     const votes = proposal.getVotes();
@@ -29,9 +29,9 @@ const ProposalVotingResults = {
       || proposal.votingUnit === VotingUnit.ConvictionCoinVote;
 
     // TODO: fix up this function for cosmos votes
-    const showVotes = (votes : Array<IVote<any>>) => votes.length === 0
+    const showVotes = (votes2 : Array<IVote<any>>) => votes.length === 0
       ? m('.no-votes', 'No votes')
-      : votes.map(
+      : votes2.map(
         (vote) => {
           let balanceStr = '--';
           let balance;
@@ -79,7 +79,9 @@ const ProposalVotingResults = {
           proposal.data.choices.map((outcome) => {
             return {
               name: signalingVoteToString(outcome),
-              content: showVotes(votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))),
+              content: showVotes(
+                votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))
+              ),
             };
           })
         ))
@@ -133,7 +135,9 @@ const ProposalVotingResults = {
           content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.YES))
         }, {
           name: 'No',
-          content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.NO || v.choice === CosmosVoteChoice.VETO))
+          content: showVotes(
+            votes.filter((v) => v.choice === CosmosVoteChoice.NO || v.choice === CosmosVoteChoice.VETO)
+          )
         }, {
           name: 'Abstain',
           content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN))

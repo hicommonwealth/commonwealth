@@ -20,9 +20,9 @@ const ConfirmModal = {
           intent: 'primary',
           onclick: (e) => {
             e.preventDefault();
-            $(vnode.dom).trigger('modalcomplete');
+            $(e.target).trigger('modalcomplete');
             setTimeout(() => {
-              $(vnode.dom).trigger('modalexit');
+              $(e.target).trigger('modalexit');
             }, 0);
           },
           oncreate: (vvnode) => {
@@ -34,7 +34,7 @@ const ConfirmModal = {
           intent: 'none',
           onclick: (e) => {
             e.preventDefault();
-            $(vnode.dom).trigger('modalexit');
+            $(e.target).trigger('modalexit');
           },
           label: secondaryButton,
         }),

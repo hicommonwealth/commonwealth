@@ -10,7 +10,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { NewThreadForm } from '../components/new_thread_form';
 
-const NewThreadPage: m.Component = {
+const NewThreadPage: m.Component<{}> = {
   oncreate: (vnode: VnodeDOM) => {
     mixpanel.track('PageVisit', { 'Page Name': 'NewThreadPage' });
   },

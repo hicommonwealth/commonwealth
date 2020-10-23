@@ -123,6 +123,7 @@ export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyPropos
     if (!body) return;
 
     return m(Input, {
+      size: 'lg',
       name: 'edit-thread-title',
       autocomplete: 'off',
       oninput: (e) => {

@@ -49,7 +49,7 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
   view: (vnode) => {
     const { entity } = vnode.attrs;
     const activeAddresses = app.recentActivity.getMostActiveUsers(entity);
-    const activeThreads = app.recentActivity.getMostActiveThreads(entity);
+    // const activeThreads = app.recentActivity.getMostActiveThreads(entity);
 
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
       m(CommunityInfoModule),
@@ -62,11 +62,25 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
           });
         })),
       ]),
-      m('.forum-activity', [
-        m('.forum-activity-header', 'Active threads'),
-        m('.active-threads', activeThreads.map((thread) => {
-          return m(MostActiveThread, { thread });
-        }))
+      // m('.forum-activity', [
+      //   m('.forum-activity-header', 'Active threads'),
+      //   m('.active-threads', activeThreads.map((thread) => {
+      //     return m(MostActiveThread, { thread });
+      //   }))
+      // ]),
+      m('.admins-mods', [
+        m('.admins-mods-header', 'Admins and moderators'),
+        (app.chain || app.community) && m('.active-members', [
+          (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((role) => {
+            return m(User, {
+              user: new AddressInfo(null, role.address, role.address_chain, null),
+              avatarSize: 24,
+              linkify: true,
+              popover: true,
+              showRole: true,
+            });
+          }),
+        ]),
       ]),
     ]);
   }

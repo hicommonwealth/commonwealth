@@ -139,6 +139,12 @@
     }
 }
 
+.SidebarQuickSwitcherItemTooltip.cui-popover.cui-tooltip {
+    .cui-popover-content {
+        padding: 8px 10px;
+    }
+}
+
 .Sidebar {
     z-index: 2;
     @include sm-max {
