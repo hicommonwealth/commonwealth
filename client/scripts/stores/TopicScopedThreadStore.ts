@@ -15,6 +15,12 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
     if (!communityStore[topic]) {
       communityStore[topic] = [];
     }
+    const topicStore = communityStore[topic];
+    const matchingThread = topicStore.filter((t) => t.id === thread.id)[0];
+    if (matchingThread) {
+      const proposalIndex = topicStore.indexOf(matchingThread);
+      topicStore.splice(proposalIndex, 1);
+    }
     communityStore[topic].push(thread);
     return this;
   }

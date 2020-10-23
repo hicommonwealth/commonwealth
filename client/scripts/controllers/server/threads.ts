@@ -234,6 +234,7 @@ class ThreadsController {
       cutoff_date: cutoffDate.toISOString(),
     };
     if (topic_id) params['topic_id'] = topic_id;
+    debugger
     console.log(params);
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
@@ -242,9 +243,6 @@ class ThreadsController {
     console.log(response.result);
     const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
     console.log({ threads });
-    if (!threads.length) {
-      return false;
-    }
     const store = topic_id ? this._topicScopedStore : this._store;
     for (const thread of threads) {
       if (!thread.Address) {
@@ -262,7 +260,7 @@ class ThreadsController {
         console.error(e.message);
       }
     }
-    return true;
+    return !(threads.length < 20);
   }
 
   public refreshAll(chainId: string, communityId: string, reset = false) {
