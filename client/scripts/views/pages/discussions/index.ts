@@ -68,6 +68,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     }
   },
   oninit: (vnode) => {
+    vnode.state.lookback = {};
     const subpage = vnode.attrs.topic || 'allProposals';
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
     vnode.state.lookback[subpage] = (returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`])
@@ -94,12 +95,13 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       let topic_id;
 
       // Fetch first page of posts
-      if (!vnode.state.lookback[subpage]) {
+      if (!vnode.state.lookback[subpage]
+        || !vnode.state.lookback[subpage]?._isAMomentObject) {
         vnode.state.lookback[subpage] = moment();
       }
       const args = app.activeCommunityId()
-        ? [null, app.activeCommunityId(), vnode.state.lookback]
-        : [app.activeChainId(), null, vnode.state.lookback];
+        ? [null, app.activeCommunityId(), vnode.state.lookback[subpage]]
+        : [app.activeChainId(), null, vnode.state.lookback[subpage]];
       if (topic) {
         topic_id = app.topics.getByName(topic, app.activeId())?.id;
         if (!topic_id) {
@@ -201,7 +203,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const firstThread = sortedThreads[0];
       const lastThread = sortedThreads[sortedThreads.length - 1];
 
-      vnode.state.lookback = lastThread.createdAt;
+      vnode.state.lookback[subpage] = lastThread.createdAt;
 
       // pinned threads - inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
