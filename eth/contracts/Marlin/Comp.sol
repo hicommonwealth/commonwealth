@@ -7,13 +7,13 @@ contract Comp {
     string public constant name = "Marlin Governance Token";
 
     /// @notice EIP-20 token symbol for this token
-    string public constant symbol = "LIN";
+    string public constant symbol = "mPOND";
 
     /// @notice EIP-20 token decimals for this token
     uint8 public constant decimals = 18;
 
     /// @notice Total number of tokens in circulation
-    uint256 public constant totalSupply = 10000000e18; // 10 million Comp
+    uint256 public constant totalSupply = 1000000e18; // 1 million Comp
 
     /// @notice Allowance amounts on behalf of others
     mapping(address => mapping(address => uint96)) internal allowances;
