@@ -239,14 +239,11 @@ class ThreadsController {
       cutoff_date: cutoffDate.toISOString(),
     };
     if (topic_id) params['topic_id'] = topic_id;
-    console.log(params);
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    console.log(response.result);
     const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
-    console.log({ threads });
     const store = topic_id ? this._topicScopedStore : this._store;
     for (const thread of threads) {
       if (!thread.Address) {

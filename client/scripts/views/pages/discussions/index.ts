@@ -120,14 +120,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
       // Initialize infiniteScroll
       vnode.state.onscroll = _.debounce(async () => {
-        console.log('onscroll state');
-        console.log(vnode.state);
         if (vnode.state.postsDepleted) return;
         const args_ = app.activeCommunityId()
           ? [null, app.activeCommunityId(), vnode.state.lookback[subpage]]
           : [app.activeChainId(), null, vnode.state.lookback[subpage]];
         if (topic_id) args_.push(topic_id);
-        console.log(args_);
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
@@ -208,7 +205,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       // pinned threads - inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
       if (pinnedThreads.length > 0) {
-        debugger
         listing.push(m(PinnedListing, { proposals: pinnedThreads }));
 
         if (getLastUpdate(firstThread) > lastVisited) {

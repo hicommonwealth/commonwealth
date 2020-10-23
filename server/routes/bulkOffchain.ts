@@ -145,7 +145,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       topics: topics.map((c) => c.toJSON()),
       reactions: reactions.map((r) => r.toJSON()),
       admins: admins.map((a) => a.toJSON()),
-      allThreads,
+      threads: allThreads,
     }
   });
 };
