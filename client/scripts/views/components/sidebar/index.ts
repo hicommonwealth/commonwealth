@@ -227,15 +227,15 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || app.chain.class === ChainClass.Moloch);
+        || app.chain.class === ChainClass.Moloch
+        || app.chain.network === ChainNetwork.Marlin);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
 
-    const showMarlinOptions = app.user.activeAccount && app.chain?.class === ChainClass.Marlin;
-    console.log(showMarlinOptions);
-    console.log(app.chain.class);
+    const showMarlinOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Marlin;
+
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
@@ -347,7 +347,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
         showMarlinOptions && m(ListItem, {
           onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MarlinProposal }),
-          label: 'Marlin Proposals',
+          label: 'Create Proposal',
           contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
         })
       ]),
@@ -378,7 +378,7 @@ const ChainStatusModule: m.Component<{}> = {
 const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
   view: (vnode) => {
     const { sidebarTopic } = vnode.attrs;
-    console.log(app.chain);
+
     return [
       m('.MobileSidebarHeader', {
         onclick: (e) => {
