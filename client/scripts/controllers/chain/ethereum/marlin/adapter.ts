@@ -21,7 +21,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   public readonly class = ChainClass.Marlin;
   public chain: EthereumChain;
   public ethAccounts: EthereumAccounts;
-  public accounts: MarlinMembers;
+  public accounts: EthereumAccounts;
   // public governance: MarlinGovernance;
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
   public readonly chainEntities = new ChainEntityController();
@@ -30,7 +30,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     super(meta, app);
     this.chain = new EthereumChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
-    this.accounts = new MarlinMembers(this.app);
+    this.accounts = new EthereumAccounts(this.app);
     // this.governance = new MarlinGovernance(this.app);
   }
 
@@ -73,7 +73,9 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
       api.updateSigner(accounts[0]);
     });
 
-    await this.accounts.init(api, this.chain, this.ethAccounts);
+    // TODO: This was for marlin accounts? maybe not necessary
+    // await this.accounts.init(api, this.chain, this.ethAccounts);
+    await this.accounts.init(this.chain);
     await super.initApi();
   }
 
