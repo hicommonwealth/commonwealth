@@ -36,7 +36,7 @@ module.exports = {
         name: 'Marlin',
         icon_url: '/static/img/protocols/eth.png',
         type: 'dao',
-        network: 'ethereum',
+        network: 'marlin',
         active: true,
       }], { transaction: t });
 
