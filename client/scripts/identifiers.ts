@@ -13,6 +13,7 @@ export enum ProposalType {
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
+  MarlinProposal = 'marlinproposal',
 }
 
 export const proposalSlugToClass = () => {
