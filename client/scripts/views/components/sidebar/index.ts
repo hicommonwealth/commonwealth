@@ -233,6 +233,9 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
 
+    const showMarlinOptions = app.user.activeAccount && app.chain?.class === ChainClass.Marlin;
+    console.log(showMarlinOptions);
+    console.log(app.chain.class);
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
@@ -342,6 +345,11 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Approve tokens',
           contentLeft: m(Icon, { name: Icons.POWER }),
         }),
+        showMarlinOptions && m(ListItem, {
+          onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MarlinProposal }),
+          label: 'Marlin Proposals',
+          contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
+        })
       ]),
     ]);
   }
@@ -370,7 +378,7 @@ const ChainStatusModule: m.Component<{}> = {
 const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
   view: (vnode) => {
     const { sidebarTopic } = vnode.attrs;
-
+    console.log(app.chain);
     return [
       m('.MobileSidebarHeader', {
         onclick: (e) => {
