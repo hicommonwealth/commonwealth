@@ -33,7 +33,7 @@ module.exports = {
       await queryInterface.bulkInsert('Chains', [{
         id: 'marlin',
         symbol: 'LIN',
-        name: 'marlin',
+        name: 'Marlin',
         icon_url: '/static/img/protocols/eth.png',
         type: 'chain',
         network: 'marlin',
