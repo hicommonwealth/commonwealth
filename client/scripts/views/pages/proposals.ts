@@ -1,3 +1,4 @@
+
 import 'pages/proposals.scss';
 
 import m from 'mithril';
@@ -123,8 +124,10 @@ const ProposalsPage: m.Component<{}> = {
         showNewProposalButton: true,
       });
     }
+    console.log(app.chain);
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
+    const onMarlin = app.chain && app.chain.name === ChainNetwork.Marlin;
 
     if (onSubstrate) {
       // Democracy, Council, and Signaling (Edgeware-only) must be loaded to proceed
