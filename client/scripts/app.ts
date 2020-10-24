@@ -255,6 +255,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     app.chain = new Moloch(n, app);
+  } else if (n.chain.network === ChainNetwork.Marlin) {
+    const Marlin = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "marlin-main" */
+      './controllers/chain/ethereum/marlin/adapter'
+    )).default;
+    app.chain = new Marlin(n, app);
   } else {
     throw new Error('Invalid chain');
   }
