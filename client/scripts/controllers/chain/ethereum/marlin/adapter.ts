@@ -56,7 +56,9 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     // TODO: Fix line below to get COMP and GovernorAlpha contract address from meta, not just 'address'
-    const api = new MarlinAPI(this.meta.address, this.meta.address, this.chain.api.currentProvider as any, activeAddress);
+    const compContractAddress = '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f'; // this.meta.address
+    const governorAlphaContractAddress = '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff';
+    const api = new MarlinAPI(this.meta.address, governorAlphaContractAddress, this.chain.api.currentProvider as any, activeAddress);
     await api.init();
 
     if (this.webWallet) {
