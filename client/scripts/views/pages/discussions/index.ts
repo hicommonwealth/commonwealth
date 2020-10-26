@@ -245,7 +245,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted === false);
     const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted === true);
-
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',

@@ -56,6 +56,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         WHERE t.deleted_at IS NULL
           AND t.${communityOptions}
           ${topicOptions}
+          AND t.created_at < :created_at
           AND t.pinned = false
           ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT 20
         ) threads

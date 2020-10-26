@@ -308,12 +308,8 @@ class ThreadsController {
 
   public initialize(initialThreads: any[], reset = true) {
     if (reset) {
-      console.log('reset');
       this._store.clear();
-      console.log(this._store);
     }
-    console.log('new threads');
-    console.log(initialThreads);
     for (const thread of initialThreads) {
       if (!thread.Address) {
         console.error('OffchainThread missing address');
