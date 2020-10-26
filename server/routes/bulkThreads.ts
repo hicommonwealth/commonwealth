@@ -13,7 +13,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
   // Threads
   let threads;
   if (cutoff_date) {
-    const commentOptions = community
+    const communityOptions = community
       ? `community = :community `
       : `chain = :chain `;
 
@@ -21,9 +21,9 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       ? { community: community.id }
       : { chain: chain.id };
 
-    let threadOptions = '';
+    let topicOptions = '';
     if (topic_id) {
-      threadOptions += ` AND topic_id = :topic_id `;
+      topicOptions += `topic_id = :topic_id `;
       replacements['topic_id'] = topic_id;
     }
 
@@ -44,17 +44,19 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           t.chain AS thread_chain, t.version_history, t.read_only, t.body,
           t.url, t.pinned, t.topic_id, t.kind
         FROM "OffchainThreads" t
+        WHERE 
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS comm_created_at
           FROM "OffchainComments"
-          WHERE ${commentOptions}
+          WHERE ${communityOptions}
             AND root_id LIKE 'discussion%'
             AND created_at < :created_at
           GROUP BY root_id
           ) c
         ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
         WHERE t.deleted_at IS NULL
-          ${threadOptions}
+          AND ${communityOptions}
+          AND ${topicOptions}
           AND t.pinned = false
           ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT 20
         ) threads

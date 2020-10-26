@@ -38,9 +38,9 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
   });
 
   // Threads
-  const whereOptions = community
+  const communityOptions = community
     ? `community = :community`
-    : `chain = :chain AND root_id LIKE 'discussion%'`;
+    : `chain = :chain`;
 
   const replacements = community
     ? { community: community.id }
@@ -70,11 +70,13 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       LEFT JOIN (
         SELECT root_id, MAX(created_at) AS comm_created_at
         FROM "OffchainComments"
-        WHERE ${whereOptions}
+        WHERE ${communityOptions}
+        AND root_id LIKE 'discussion%'
         GROUP BY root_id
         ) c
       ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
-      WHERE t.deleted_at IS NULL
+      WHERE ${communityOptions} 
+      AND t.deleted_at IS NULL
       AND t.pinned = false
       ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT ${20 - pinnedThreads.length}
     ) threads
