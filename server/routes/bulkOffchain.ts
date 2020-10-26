@@ -75,7 +75,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         GROUP BY root_id
         ) c
       ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
-      WHERE ${communityOptions} 
+      WHERE t.${communityOptions} 
       AND t.deleted_at IS NULL
       AND t.pinned = false
       ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT ${20 - pinnedThreads.length}
@@ -84,13 +84,18 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     LEFT JOIN "OffchainTopics" topics
     ON threads.topic_id = topics.id`;
 
-  const preprocessedThreads = await models.sequelize.query(query, {
-    replacements,
-    type: QueryTypes.SELECT
-  });
+  let preprocessedThreads;
+  try {
+    preprocessedThreads = await models.sequelize.query(query, {
+      replacements,
+      type: QueryTypes.SELECT
+    });
+  } catch (e) {
+    console.log(e);
+  }
 
   const threads = preprocessedThreads.map((t) => {
-    return ({
+    const data = {
       id: t.thread_id,
       title: t.thread_title,
       url: t.url,
@@ -102,19 +107,22 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       community: t.thread_community,
       chain: t.thread_chain,
       created_at: t.thread_created,
-      topic: {
-        id: t.topic_id,
-        name: t.topic_name,
-        description: t.topic_description,
-        communityId: t.topic_community,
-        chainId: t.topic_chain
-      },
       Address: {
         id: t.addr_id,
         address: t.addr_address,
         chain: t.addr_chain,
       }
-    });
+    };
+    if (t.topic_id) {
+      data['topic'] = {
+        id: t.topic_id,
+        name: t.topic_name,
+        description: t.topic_description,
+        communityId: t.topic_community,
+        chainId: t.topic_chain
+      };
+    }
+    return data;
   });
 
   const allThreads = pinnedThreads.map((t) => t.toJSON()).concat(threads);

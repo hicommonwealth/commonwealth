@@ -23,7 +23,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
     let topicOptions = '';
     if (topic_id) {
-      topicOptions += `topic_id = :topic_id `;
+      topicOptions += `AND t.topic_id = :topic_id `;
       replacements['topic_id'] = topic_id;
     }
 
@@ -44,7 +44,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           t.chain AS thread_chain, t.version_history, t.read_only, t.body,
           t.url, t.pinned, t.topic_id, t.kind
         FROM "OffchainThreads" t
-        WHERE 
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS comm_created_at
           FROM "OffchainComments"
@@ -55,8 +54,8 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           ) c
         ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
         WHERE t.deleted_at IS NULL
-          AND ${communityOptions}
-          AND ${topicOptions}
+          AND t.${communityOptions}
+          ${topicOptions}
           AND t.pinned = false
           ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT 20
         ) threads
@@ -73,8 +72,9 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     } catch (e) {
       console.log(e);
     }
+
     threads = preprocessedThreads.map((t) => {
-      return ({
+      const data = {
         id: t.thread_id,
         title: t.thread_title,
         url: t.url,
@@ -86,19 +86,22 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         community: t.thread_community,
         chain: t.thread_chain,
         created_at: t.thread_created,
-        topic: {
-          id: t.topic_id,
-          name: t.topic_name,
-          description: t.topic_description,
-          communityId: t.topic_community,
-          chainId: t.topic_chain
-        },
         Address: {
           id: t.addr_id,
           address: t.addr_address,
           chain: t.addr_chain,
         }
-      });
+      };
+      if (t.topic_id) {
+        data['topic'] = {
+          id: t.topic_id,
+          name: t.topic_name,
+          description: t.topic_description,
+          communityId: t.topic_community,
+          chainId: t.topic_chain
+        };
+      }
+      return data;
     });
   } else {
     const whereOptions = (community)

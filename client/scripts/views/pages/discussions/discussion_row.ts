@@ -36,7 +36,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       : link('a', discussionLink, proposal.title);
 
     const pinned = proposal.pinned;
-
     const rowSubheader = [
       proposal.readOnly && m('.discussion-locked', [
         m(Tag, {

@@ -188,13 +188,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         .sort(orderDiscussionsbyLastComment)
       : app.threads
         .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((t) => {
-          console.log(app.activeId());
-          console.log(t.community || t.chain);
-          return (t.community || t.chain) === app.activeId();
-        })
         .sort(orderDiscussionsbyLastComment);
-    console.log(allThreads);
     if (allThreads.length) {
       let visitMarkerPlaced = false;
 
