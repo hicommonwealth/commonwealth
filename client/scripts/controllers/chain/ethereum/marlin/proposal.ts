@@ -54,50 +54,50 @@ export class MarlinProposalVote implements IVote<EthereumCoin> {
 //   Gov: MarlinGovernance,
 //   entity: ChainEntity
 // ): IMarlinProposalResponse => {
-  // const startEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.SubmitProposal);
-  // const processEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProcessProposal);
-  // const abortEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.Abort);
-  // if (!startEvent) {
-  //   throw new Error('Proposal start event not found!');
-  // }
-  // const identifier = `${(startEvent.data as MarlinTypes.ISubmitProposal).proposalIndex}`;
-  // const id = identifier;
-  // const details = (startEvent.data as MarlinTypes.ISubmitProposal).details;
-  // const timestamp = `${(startEvent.data as MarlinTypes.ISubmitProposal).startTime}`;
-  // const startingPeriod = (new BN(timestamp, 10)).sub(Gov.summoningTime).div(Gov.periodDuration).toString(10);
-  // const delegateKey = (startEvent.data as MarlinTypes.ISubmitProposal).member;
-  // const applicantAddress = (startEvent.data as MarlinTypes.ISubmitProposal).applicant;
-  // const tokenTribute = (startEvent.data as MarlinTypes.ISubmitProposal).tokenTribute;
-  // const sharesRequested = (startEvent.data as MarlinTypes.ISubmitProposal).sharesRequested;
-  // const processed = !!processEvent;
-  // const proposal: IMarlinProposalResponse = {
-  //   identifier,
-  //   id,
-  //   details,
-  //   timestamp,
-  //   startingPeriod,
-  //   delegateKey,
-  //   applicantAddress,
-  //   tokenTribute,
-  //   sharesRequested,
-  //   processed,
-  //   votes: [],
-  // };
+//   const startEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.SubmitProposal);
+//   const processEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProcessProposal);
+//   const abortEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.Abort);
+//   if (!startEvent) {
+//     throw new Error('Proposal start event not found!');
+//   }
+//   const identifier = `${(startEvent.data as MarlinTypes.ISubmitProposal).proposalIndex}`;
+//   const id = identifier;
+//   const details = (startEvent.data as MarlinTypes.ISubmitProposal).details;
+//   const timestamp = `${(startEvent.data as MarlinTypes.ISubmitProposal).startTime}`;
+//   const startingPeriod = (new BN(timestamp, 10)).sub(Gov.summoningTime).div(Gov.periodDuration).toString(10);
+//   const delegateKey = (startEvent.data as MarlinTypes.ISubmitProposal).member;
+//   const applicantAddress = (startEvent.data as MarlinTypes.ISubmitProposal).applicant;
+//   const tokenTribute = (startEvent.data as MarlinTypes.ISubmitProposal).tokenTribute;
+//   const sharesRequested = (startEvent.data as MarlinTypes.ISubmitProposal).sharesRequested;
+//   const processed = !!processEvent;
+//   const proposal: IMarlinProposalResponse = {
+//     identifier,
+//     id,
+//     details,
+//     timestamp,
+//     startingPeriod,
+//     delegateKey,
+//     applicantAddress,
+//     tokenTribute,
+//     sharesRequested,
+//     processed,
+//     votes: [],
+//   };
 
-  // // optional properties
-  // if (processEvent) {
-  //   proposal.didPass = (processEvent.data as MarlinTypes.IProcessProposal).didPass;
-  //   proposal.aborted = false;
-  //   proposal.status = proposal.didPass ? 'PASSED' : 'FAILED';
-  //   proposal.yesVotes = (processEvent.data as MarlinTypes.IProcessProposal).yesVotes;
-  //   proposal.yesVotes = (processEvent.data as MarlinTypes.IProcessProposal).noVotes;
-  // }
-  // if (abortEvent) {
-  //   proposal.didPass = false;
-  //   proposal.aborted = true;
-  //   proposal.status = 'ABORTED';
-  // }
-  // return proposal;
+//   // optional properties
+//   if (processEvent) {
+//     proposal.didPass = (processEvent.data as MarlinTypes.IProcessProposal).didPass;
+//     proposal.aborted = false;
+//     proposal.status = proposal.didPass ? 'PASSED' : 'FAILED';
+//     proposal.yesVotes = (processEvent.data as MarlinTypes.IProcessProposal).yesVotes;
+//     proposal.yesVotes = (processEvent.data as MarlinTypes.IProcessProposal).noVotes;
+//   }
+//   if (abortEvent) {
+//     proposal.didPass = false;
+//     proposal.aborted = true;
+//     proposal.status = 'ABORTED';
+//   }
+//   return proposal;
 // };
 
 
