@@ -42,7 +42,7 @@ module.exports = {
 
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'marlin',
-        url: 'wss://mainnet.infura.io/ws',
+        url: 'wss://ropsten.infura.io/ws',
         address: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // POND Contract Address
       }], { transaction: t });
 
