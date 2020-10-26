@@ -52,6 +52,12 @@ Proposal,
   }
 
   public async init() {
+
+    // this._totalSharesRequested = new BN((await this._api.Contract.totalSharesRequested()).toString(), 10);
+    // this._totalShares = new BN((await this._api.Contract.totalShares()).toString(), 10);
+    // this._gracePeriod = new BN((await this._api.Contract.gracePeriodLength()).toString(), 10);
+    // this._abortWindow = new BN((await this._api.Contract.abortWindow()).toString(), 10);
+
   }
 
   public deinit() {
