@@ -19,7 +19,7 @@ export default class MarlinAPI {
   private _GovernorAlphaContract: GovernorAlpha;
   private _Provider: Web3Provider;
   private _Signer: JsonRpcSigner;
-  private _tokenContract: Erc20;
+  private _tokenContract: Erc20; // Redundant with CompContract?
 
   public get userAddress() { return this._userAddress; }
   public get compAddress() { return this._CompAddress; }

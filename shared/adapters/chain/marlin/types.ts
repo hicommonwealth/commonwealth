@@ -41,21 +41,23 @@ export interface IMarlinProposalResponse {
   // unique identifier
   id: string;
 
-  // time of submission
-  timestamp: string;
+  proposer: string; // author
+  description: string;
 
-  startingPeriod: string;
+  targets: string[];
+  values: string[];
+  signatures: string[];
+  calldatas: string[];
 
-  // sponsoring address
-  delegateVotes: string;
+  startBlock: number; // TODO: BN?
+  endBlock: number;
+  eta: number; // The timestamp that the proposal will be available for execution, set once the vote succeeds
 
-  // TODO: proposal state
+  forVotes: number;
+  againstVotes: number;
 
+  canceled: boolean;
+  exectued: boolean;
 
-  // list of all votes
-  votes: IMarlinVote[];
-
-  // used if votes cannot be fetched
-  yesVotes?: string;
-  noVotes?: string;
+  // TODO: State
 }

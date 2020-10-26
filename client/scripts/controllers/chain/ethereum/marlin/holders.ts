@@ -47,6 +47,14 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     }
   }
 
+  public async delegate(address: string) {
+    try {
+      await this.api.compContract.delegate(address);
+    } catch (e) {
+      return console.error(e);
+    }
+  }
+
   // returns a Holder immediately given a struct returned from chain
   // public getFromJSON(holder: IMarlinHolder): MarlinHolder {
   //   try {
@@ -66,6 +74,6 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
   public async isSenderDelegate(): Promise<boolean> {
     const sender = this._api.userAddress;
     const delegator = await this._api.compContract.delegates(sender);
-    return (parseInt(delegator, 16) === 0);
+    return (parseInt(delegator, 16) !== 0);
   }
 }
