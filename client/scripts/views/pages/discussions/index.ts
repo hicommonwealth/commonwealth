@@ -211,22 +211,30 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         }
       }
 
-      let count = 0;
-      sortedThreads.forEach((proposal) => {
-        const row = m(DiscussionRow, { proposal });
-        if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
-          listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
-          visitMarkerPlaced = true;
-          count += 1;
-        } else {
-          if (visitMarkerPlaced) {
-            listing[2].children.push(row);
+      const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited;
+      const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited;
+
+      if (noThreadsSeen() || allThreadsSeen()) {
+        listing.push(m('.discussion-group-wrap', sortedThreads
+          .map((proposal) => m(DiscussionRow, { proposal }))));
+      } else {
+        let count = 0;
+        sortedThreads.forEach((proposal) => {
+          const row = m(DiscussionRow, { proposal });
+          if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
+            listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
+            visitMarkerPlaced = true;
+            count += 1;
           } else {
-            listing.push(row);
+            if (visitMarkerPlaced) {
+              listing[2].children.push(row);
+            } else {
+              listing.push(row);
+            }
+            count += 1;
           }
-          count += 1;
-        }
-      });
+        });
+      }
     }
 
     let topicDescription;
