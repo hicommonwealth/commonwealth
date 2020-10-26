@@ -29,12 +29,27 @@ Proposal,
   private _minimumThreshold: BN;
   private _totalSupply: BN;
 
+  private _api: MarlinAPI;
+  // private _Holders: MarlinHolders;
+
+
   // GETTERS
   public get proposalCount() { return this._proposalCount; }
   public get votingPeriodLength() { return this._votingPeriodLength; }
   public get periodDuration() { return this._periodDuration; }
   public get minimumThreshold() { return this._minimumThreshold; }
   public get totalSupply() { return this._totalSupply; }
+
+  public get api() { return this._api; }
+  public get usingServerChainEntities() { return this._usingServerChainEntities; }
+
+
+  // INIT / DEINIT
+  constructor(app: IApp, private _usingServerChainEntities = false) {
+    super(app
+      // , (e) => new MarlinProposal(this._Holders, this, e)
+    );
+  }
 
   public async init() {
   }
