@@ -5,6 +5,8 @@ import { Input, TextArea, Icon, Icons, Switch } from 'construct-ui';
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
+import { confirmationModalWithText } from '../confirm_modal';
 
 export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {
@@ -25,11 +27,26 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
             linkify: false,
             hideAvatar: false,
           }),
-          !isSelf && m(Icon, {
+          m(Icon, {
             name: Icons.X,
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
+              const { adminsAndMods } = app.community
+                ? app.community.meta
+                : app.chain.meta.chain;
+              if (adminsAndMods.length < 2) {
+                notifyError('Communities must have at least one admin.');
+                return;
+              }
+              const userAdminRoles = app.user.getAllRolesInCommunity({ community: app.activeId() })
+                .filter((r) => r.permission === 'admin')
+                .length;
+              if (userAdminRoles < 2) {
+                const query = 'You will lose all admin permissions in this community. Continue?';
+                const confirmed = await confirmationModalWithText(query, 'Yes', 'No');
+                if (!confirmed) return;
+              }
               const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
                 ...chainOrCommObj,
                 new_role: 'member',

@@ -7,7 +7,6 @@ import { RolePermission, Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import WebhookSettingsModal from '../webhook_settings_modal';
 import { pluralize } from 'helpers';
-import { confirmationModalWithText } from '../confirm_modal';
 
 interface IWebhooksFormAttrs {
   webhooks: Webhook[];
@@ -213,29 +212,13 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
           class: 'admin-panel-tab-button',
           label: 'Upgrade Member',
           disabled: (!vnode.state.role || !vnode.state.user),
-          onclick: async () => {
+          onclick: () => {
             const indexOfName = names.indexOf(vnode.state.user);
             const user = noAdmins[indexOfName];
             const newRole = (vnode.state.role === 'Admin') ? 'admin'
               : (vnode.state.role === 'Moderator') ? 'moderator' : '';
             if (!user) return;
             if (!newRole) return;
-            debugger
-            const { adminsAndMods } = app.community
-              ? app.community.meta
-              : app.chain.meta.chain;
-            if (adminsAndMods.length < 2) {
-              notifyError('Communities must have at least one admin.');
-              return;
-            }
-            const userAdminRoles = app.user.getAllRolesInCommunity({ community: app.activeId() })
-              .filter((role) => role.permission === 'admin')
-              .length;
-            if (userAdminRoles < 2) {
-              const query = 'You will lose all admin permissions in this community. Continue?';
-              const confirmed = await confirmationModalWithText(query, 'Yes', 'No');
-              if (!confirmed) return;
-            }
             $.post(`${app.serverUrl()}/upgradeMember`, {
               new_role: newRole,
               address: user.Address.address,
