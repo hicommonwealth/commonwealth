@@ -84,7 +84,6 @@ export const checkForModifications = async (state, modalMsg) => {
 };
 
 export const loadDraft = async (dom, state, draft) => {
-  debugger
   const titleInput = $(dom).find('div.new-thread-form-body input[name=\'new-thread-title\']');
 
   // First we check if the form has been updated, to avoid losing any unsaved form data
