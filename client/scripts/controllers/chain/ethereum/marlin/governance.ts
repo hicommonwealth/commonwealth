@@ -7,7 +7,7 @@ import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
-import { MolochEvents } from '@commonwealth/chain-events';
+// import { MarlinEvents } from '@commonwealth/chain-events';
 
 import { IApp } from 'state';
 
@@ -24,7 +24,7 @@ MarlinProposal
 > {
 //   // MEMBERS
 //   private _proposalCount: BN;
-//   private _votingPeriodLength: BN;
+  private _votingPeriodLength: BN;
 //   private _periodDuration: BN;
 //   private _minimumThreshold: BN;
 //   private _totalSupply: BN;
@@ -35,7 +35,7 @@ MarlinProposal
 
 //   // GETTERS
 //   public get proposalCount() { return this._proposalCount; }
-//   public get votingPeriodLength() { return this._votingPeriodLength; }
+  public get votingPeriodLength() { return this._votingPeriodLength; }
 //   public get periodDuration() { return this._periodDuration; }
 //   public get minimumThreshold() { return this._minimumThreshold; }
 //   public get totalSupply() { return this._totalSupply; }
