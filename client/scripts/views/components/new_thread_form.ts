@@ -84,6 +84,7 @@ export const checkForModifications = async (state, modalMsg) => {
 };
 
 export const loadDraft = async (dom, state, draft) => {
+  debugger
   const titleInput = $(dom).find('div.new-thread-form-body input[name=\'new-thread-title\']');
 
   // First we check if the form has been updated, to avoid losing any unsaved form data
@@ -603,6 +604,10 @@ export const NewThreadForm: m.Component<{
                       try {
                         await app.user.discussionDrafts.delete(draft.id);
                         vnode.state.recentlyDeletedDrafts.push(draft.id);
+                        if (vnode.state.fromDraft === draft.id) {
+                          delete vnode.state.fromDraft;
+                          m.redraw();
+                        }
                       } catch (err) {
                         notifyError(err.message);
                       }
