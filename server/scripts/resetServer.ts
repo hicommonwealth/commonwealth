@@ -268,6 +268,15 @@ const resetServer = (models): Promise<number> => {
           active: true,
           type: 'dao',
         }),
+        models.Chain.create({
+          id: 'marlin',
+          network: 'marlin',
+          symbol: 'Marlin',
+          name: 'Marlin',
+          icon_url: '/static/img/protocols/eth.png',
+          active: true,
+          type: 'dao',
+        }),
       ]);
 
       // Specific chains
@@ -281,6 +290,7 @@ const resetServer = (models): Promise<number> => {
         ethLocal, eth,
         nearLocal, nearTestnet,
         moloch, metacartel, molochLocal,
+        marlin,
       ] = chains;
 
       // Admin roles for specific communities
@@ -482,6 +492,16 @@ const resetServer = (models): Promise<number> => {
               });
             })
           );
+        // } else if (chainSupportedBy(chain, MarlinTypes.EventChains)) {
+        //   return Promise.all(
+        //     MarlinTypes.EventKinds.map((event_name) => {
+        //       return models.ChainEventType.create({
+        //         id: `${chain}-${event_name}`,
+        //         chain,
+        //         event_name,
+        //       });
+        //     })
+        //   );
         } else {
           log.error(`Unknown event chain at reset: ${chain}.`);
         }
