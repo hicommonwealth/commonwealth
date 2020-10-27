@@ -78,7 +78,6 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     // await this.accounts.init(api, this.chain, this.ethAccounts);
     await this.accounts.init(this.chain);
     await super.initApi();
-
     console.log(await api.compContract.balanceOf(api.userAddress)); // Test contract query that throws 'not deployed' error
   }
 
