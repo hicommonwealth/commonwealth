@@ -210,6 +210,8 @@ const CreateInviteModal: m.Component<{
       : communityInfo ? { community: communityInfo }
         : null;
     if (!chainOrCommunityObj) return;
+    console.log(vnode.state.invitedAddressChain);
+    console.log(chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id);
     return m('.CreateInviteModal', [
       m('.compact-modal-title', [
         m('h3', 'Invite members'),
@@ -221,7 +223,8 @@ const CreateInviteModal: m.Component<{
             m(FormLabel, { class: 'chainSelectLabel' }, 'Chain'),
             m(Select, {
               name: 'invitedAddressChain',
-              defaultValue: chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id,
+              defaultValue: vnode.state.invitedAddressChain
+                || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id),
               options: chainInfo
                 ? [{ label: chainInfo.name, value: chainInfo.id, }]
                 : app.config.chains.getAll().map((chain) => ({

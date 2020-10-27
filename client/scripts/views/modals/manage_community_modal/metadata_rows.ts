@@ -5,7 +5,7 @@ import { Input, TextArea, Icon, Icons, Switch } from 'construct-ui';
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
-import { notifyError } from 'client/scripts/controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../confirm_modal';
 
 export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
@@ -32,6 +32,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
+              console.log('35');
               const { adminsAndMods } = app.community
                 ? app.community.meta
                 : app.chain.meta.chain;
@@ -40,9 +41,9 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                 return;
               }
               const userAdminRoles = app.user.getAllRolesInCommunity({ community: app.activeId() })
-                .filter((r) => r.permission === 'admin')
-                .length;
-              if (userAdminRoles < 2) {
+                .filter((r) => r.permission === 'admin');
+              console.log(userAdminRoles);
+              if (userAdminRoles.length < 2) {
                 const query = 'You will lose all admin permissions in this community. Continue?';
                 const confirmed = await confirmationModalWithText(query, 'Yes', 'No');
                 if (!confirmed) return;
