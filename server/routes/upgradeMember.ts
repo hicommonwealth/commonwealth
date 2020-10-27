@@ -50,7 +50,6 @@ const upgradeMember = async (models, req: Request, res: Response, next: NextFunc
     },
   });
   if (!member) return next(new Error(Errors.NoMember));
-  if (requesterIsAdmin.some((r) => member.id === r.id)) return next(new Error(Errors.NoAdminDemotion));
 
   if (ValidRoles.includes(new_role)) {
     member.permission = new_role;
