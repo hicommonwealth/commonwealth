@@ -15,7 +15,7 @@ import { IApp } from 'state';
 import Marlin from './adapter';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
-// import MarlinHolder from './holders';
+import MarlinHolder from './holders';
 
 export default class MarlinGovernance extends ProposalModule<
 MarlinAPI,
@@ -59,13 +59,11 @@ MarlinProposal
     // this._abortWindow = new BN((await this._api.Contract.abortWindow()).toString(), 10);
   }
 
-//   public deinit() {
-//     this.store.clear();
-//   }
+  public deinit() {
+    this.store.clear();
+  }
 
   public createTx(...args: any[]): ITXModalData {
     throw new Error('Method not implemented.');
   }
-
-
 }
