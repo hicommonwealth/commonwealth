@@ -61,6 +61,13 @@ const ManageCommunityModal: m.Component<{}, {
       // Add the missing Address property to the newRole, then splice it into the array.
       newRole.Address = oldRole.Address;
       vnode.state.roleData.splice(vnode.state.roleData.indexOf(oldRole), 1, newRole);
+      const { addAdmin, removeAdmin } = app.community ? app.community.meta : app.chain.meta.chain;
+      if (oldRole.permission === 'admin' || oldRole.permission === 'moderator') {
+        removeAdmin(oldRole);
+      }
+      if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
+        addAdmin(oldRole);
+      }
       m.redraw();
     };
 
