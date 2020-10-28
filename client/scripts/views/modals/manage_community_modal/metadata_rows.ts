@@ -14,6 +14,11 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
     const chainOrCommObj = app.community
       ? { community: app.activeCommunityId() }
       : { chain: app.activeChainId() };
+    console.log(vnode.attrs.roledata);
+    const userAdminRoles = vnode.attrs.roledata.filter((role) => {
+      return role.Address.address === app.user.activeAccount?.address
+        && role.Address.chain === app.user.activeAccount?.chain.id;
+    });
 
     return m('.ManageRoleRow', [
       vnode.attrs.roledata?.map((role) => {
@@ -40,25 +45,22 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                 notifyError('Communities must have at least one admin.');
                 return;
               }
-              const userAdminRoles = app.user.getAllRolesInCommunity({ community: app.activeId() })
-                .filter((r) => r.permission === 'admin');
-              console.log(adminsAndMods);
-              console.log(userAdminRoles);
               if (userAdminRoles.length < 2 && isSelf) {
                 const query = 'You will lose all admin permissions in this community. Continue?';
                 const confirmed = await confirmationModalWithText(query, 'Yes', 'No')();
                 if (!confirmed) return;
               }
-              const options = {
+              const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
+                ...chainOrCommObj,
+                new_role: 'member',
                 address: role.Address.address,
-                community: app.activeCommunityId(),
-                chain: app.activeChainId(),
-                newRole: 'member'
-              };
-              const res = app.user.updateRole(options);
-              console.log(res);
-              // const newRole = res.result;
-              // vnode.attrs.onRoleUpdate(role, newRole);
+                jwt: app.user.jwt,
+              });
+              if (res.status !== 'Success') {
+                throw new Error(`Got unsuccessful status: ${res.status}`);
+              }
+              const newRole = res.result;
+              vnode.attrs.onRoleUpdate(role, newRole);
               // If user loses admin permissions, ensure they instantly lose access to 
               // all relevant UI
               if (userAdminRoles.length < 2 && isSelf) {
