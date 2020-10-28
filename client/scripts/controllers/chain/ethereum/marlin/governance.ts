@@ -15,7 +15,8 @@ import { IApp } from 'state';
 import Marlin from './adapter';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
-import MarlinHolder from './holders';
+// import MarlinHolder from './holders';
+import MarlinHolders from './holders';
 
 export default class MarlinGovernance extends ProposalModule<
 MarlinAPI,
@@ -30,7 +31,7 @@ MarlinProposal
 //   private _totalSupply: BN;
 
   private _api: MarlinAPI;
-//   // private _Holders: MarlinHolders;
+  private _Holders: MarlinHolders;
 
 
 //   // GETTERS
@@ -75,7 +76,7 @@ MarlinProposal
     }
   }
 
-  public async init() {
+  public async init() { // TODO: Initialize all relevant DATA for governance controller, initial fetches.
 
     // this._totalSharesRequested = new BN((await this._api.Contract.totalSharesRequested()).toString(), 10);
     // this._totalShares = new BN((await this._api.Contract.totalShares()).toString(), 10);
