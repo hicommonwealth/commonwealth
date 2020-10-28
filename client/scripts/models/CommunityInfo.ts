@@ -78,6 +78,7 @@ class CommunityInfo {
         return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
       });
       this.setAdmins(roles);
+      return this.adminsAndMods;
     } catch {
       console.log('Failed to fetch admins/mods');
     }
@@ -97,32 +98,6 @@ class CommunityInfo {
         r.is_user_default
       ));
     });
-  }
-
-  public removeAdmin(role) {
-    console.log(this.adminsAndMods);
-    const idx_ = this.adminsAndMods.indexOf(role);
-    console.log(idx_);
-    const existingRole = this.adminsAndMods.filter((r) => {
-      return r.id === role.id;
-    })[0];
-    const idx = this.adminsAndMods.indexOf(existingRole);
-    console.log(idx);
-    this.adminsAndMods.splice(idx, 1);
-    console.log(this.adminsAndMods);
-  }
-
-  public addAdmin(r) {
-    this.adminsAndMods.push(new RoleInfo(
-      r.id,
-      r.address_id,
-      r.Address.address,
-      r.Address.chain,
-      r.chain_id,
-      r.offchain_community_id,
-      r.permission,
-      r.is_user_default
-    ));
   }
 
   public async updateCommunityData({

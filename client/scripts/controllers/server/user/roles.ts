@@ -39,6 +39,10 @@ export default class extends Base {
       address_id: options.address.id,
       ...options,
     }).then((result) => {
+      console.log(result);
+      if (result.status !== 'Success') {
+        throw new Error(`Got unsuccessful status: ${result.status}`);
+      }
       // handle state updates
       if (options.chain) {
         this.removeRole((r) => {
@@ -49,6 +53,30 @@ export default class extends Base {
           return r.offchain_community_id === options.community && r.address_id === options.address.id;
         });
       }
+    });
+  }
+
+  public updateRole(options: { address: AddressInfo, chain?: string, community?: string, newRole: string }): JQueryPromise<void> {
+    // TODO: Change to DELETE /role
+    const { address, chain, community, newRole } = options;
+    return $.post(`${app.serverUrl()}/upgradeMember`, {
+      community,
+      chain,
+      new_role: newRole,
+      address,
+      jwt: app.user.jwt,
+    }).then((result) => {
+      // handle state updates
+      if (options.chain) {
+        this.removeRole((r) => {
+          return r.chain_id === options.chain && r.address_id === options.address.id;
+        });
+      } else {
+        this.removeRole((r) => {
+          return r.offchain_community_id === options.community && r.address_id === options.address.id;
+        });
+      }
+      this.addRole(result.result.member);
     });
   }
 
