@@ -16,6 +16,9 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
   private _api: MarlinAPI;
   private _Chain: EthereumChain;
   private _Accounts: EthereumAccounts;
+  private _UserComp: any;
+
+  public get userComp() { return this._UserComp; }
 
   public get store() { return this._store; }
   public get api() { return this._api; }
@@ -26,6 +29,8 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     // only used to initialize Holder for super call
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
+
+    this._UserComp = await this.api.compContract.balanceOf(this.api.compAddress);
   }
 
   public deinit() {

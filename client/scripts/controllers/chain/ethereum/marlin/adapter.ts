@@ -13,15 +13,14 @@ import { IApp } from 'state';
 
 import MarlinMembers from './holders';
 import MarlinAPI from './api';
-import { bnToHex, hexToNumber, hexToString } from '@polkadot/util';
-import { BigNumber } from 'ethers/utils';
+import MarlinChain from './chain';
 // import MarlinGovernance from './governance';
 // import MarlinProposal from './proposal';
 
 export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Marlin;
-  public chain: EthereumChain;
+  public chain: MarlinChain;
   public ethAccounts: EthereumAccounts;
   public accounts: EthereumAccounts;
   // public governance: MarlinGovernance;
@@ -30,7 +29,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.chain = new EthereumChain(this.app);
+    this.chain = new MarlinChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new EthereumAccounts(this.app);
     // this.governance = new MarlinGovernance(this.app);
@@ -61,6 +60,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     const governorAlphaContractAddress = '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff';
     const api = new MarlinAPI(this.meta.address, governorAlphaContractAddress, this.chain.api.currentProvider as any, activeAddress);
     await api.init();
+    this.chain.marlinApi = api;
 
     if (this.webWallet) {
       await this.webWallet.enable();

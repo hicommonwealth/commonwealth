@@ -21,6 +21,7 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import { Grid, Col, List } from 'construct-ui';
 import moment from 'moment';
@@ -206,6 +207,7 @@ const ProposalsPage: m.Component<{}> = {
       title: 'Proposals',
       showNewProposalButton: true,
     }, [
+      onMarlin && m('.hi', `${(app.chain as Marlin).chain.marlinApi.userComp} ${(app.chain as Marlin).chain.marlinApi.symbol}`),
       onSubstrate && m(SubstrateProposalStats),
       m(Listing, {
         content: activeProposalContent,

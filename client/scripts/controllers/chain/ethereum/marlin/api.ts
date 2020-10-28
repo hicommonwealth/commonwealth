@@ -8,6 +8,7 @@ import { Comp } from 'Comp';
 import { CompFactory } from 'CompFactory';
 import { GovernorAlpha } from 'GovernorAlpha';
 import { GovernorAlphaFactory } from 'GovernorAlphaFactory';
+import { BigNumber } from 'ethers/utils';
 
 export default class MarlinAPI {
   public readonly gasLimit: number = 3000000;
@@ -20,6 +21,8 @@ export default class MarlinAPI {
   private _Provider: Web3Provider;
   private _Signer: JsonRpcSigner;
   private _tokenContract: Erc20; // Redundant with CompContract?
+  private _userComp: BigNumber;
+  private _Symbol: string;
 
   public get userAddress() { return this._userAddress; }
   public get compAddress() { return this._CompAddress; }
@@ -30,6 +33,8 @@ export default class MarlinAPI {
   public get Provider(): Web3Provider { return this._Provider; }
   public get Signer(): JsonRpcSigner { return this._Signer; }
   public get tokenContract() { return this._tokenContract; }
+  public get userComp(): number { return this._userComp.toNumber(); }
+  public get symbol(): string { return this._Symbol; }
 
   constructor(
     compAddress: string,
@@ -57,5 +62,7 @@ export default class MarlinAPI {
     // TODO: Do I need to fetch the token? It's in the Comp API Constructor as CompContract
     const tokenAddress = await this._CompContract.address;
     this._tokenContract = Erc20Factory.connect(tokenAddress, this._Signer);
+    this._userComp = await this._CompContract.balanceOf(this._userAddress);
+    this._Symbol = await this._CompContract.symbol();
   }
 }
