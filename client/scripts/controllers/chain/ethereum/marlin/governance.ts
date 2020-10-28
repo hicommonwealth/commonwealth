@@ -29,7 +29,7 @@ MarlinProposal
 //   private _minimumThreshold: BN;
 //   private _totalSupply: BN;
 
-//   private _api: MarlinAPI;
+  private _api: MarlinAPI;
 //   // private _Holders: MarlinHolders;
 
 
@@ -40,7 +40,7 @@ MarlinProposal
 //   public get minimumThreshold() { return this._minimumThreshold; }
 //   public get totalSupply() { return this._totalSupply; }
 
-//   public get api() { return this._api; }
+  public get api() { return this._api; }
 //   public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
 
@@ -49,6 +49,30 @@ MarlinProposal
     super(app
       // , (e) => new MarlinProposal(this._Holders, this, e)
     );
+  }
+
+  public async state(proposalId: number): Promise<number> {
+    const state = await this._api.governorAlphaContract.state(proposalId);
+    if (state === null) {
+      throw new Error('Failed to get state for proposal');
+    }
+    return state;
+  }
+
+  public async execute(proposalId: number) {
+    const tx = await this._api.governorAlphaContract.execute(proposalId);
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error('Failed to execute proposal');
+    }
+  }
+
+  public async cancel(proposalId: number) {
+    const tx = await this._api.governorAlphaContract.cancel(proposalId);
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error('Failed to cancel proposal');
+    }
   }
 
   public async init() {
