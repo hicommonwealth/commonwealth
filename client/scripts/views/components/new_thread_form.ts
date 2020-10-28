@@ -603,6 +603,10 @@ export const NewThreadForm: m.Component<{
                       try {
                         await app.user.discussionDrafts.delete(draft.id);
                         vnode.state.recentlyDeletedDrafts.push(draft.id);
+                        if (vnode.state.fromDraft === draft.id) {
+                          delete vnode.state.fromDraft;
+                          m.redraw();
+                        }
                       } catch (err) {
                         notifyError(err.message);
                       }
