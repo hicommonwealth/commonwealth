@@ -37,7 +37,6 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
         ? 'Invite Commonwealth user' : selection === 'email' ? 'Invite email' : 'Add',
       onclick: (e) => {
         e.preventDefault();
-        console.log(vnode.attrs);
         const address = invitedAddress;
         const emailAddress = invitedEmail;
         const selectedChain = invitedAddressChain;
@@ -198,7 +197,7 @@ const CreateInviteModal: m.Component<{
   invitedEmail: string;
 }> = {
   oncreate: (vnode) => {
-    vnode.state.invitedAddressChain = 'none';
+    vnode.state.invitedAddressChain = '';
     mixpanel.track('New Invite', {
       'Step No': 1,
       'Step': 'Modal Opened'
@@ -221,7 +220,8 @@ const CreateInviteModal: m.Component<{
             m(FormLabel, { class: 'chainSelectLabel' }, 'Chain'),
             m(Select, {
               name: 'invitedAddressChain',
-              defaultValue: chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id,
+              defaultValue: vnode.state.invitedAddressChain
+                || (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id),
               options: chainInfo
                 ? [{ label: chainInfo.name, value: chainInfo.id, }]
                 : app.config.chains.getAll().map((chain) => ({
