@@ -1,5 +1,6 @@
 import m from 'mithril';
-import { Input, TextArea, Icon, Icons, Switch, Popover, Button } from 'construct-ui';
+import $ from 'jquery';
+import { Input, TextArea, Icon, Icons, Switch } from 'construct-ui';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
@@ -7,7 +8,7 @@ import { AddressInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../confirm_modal';
 
-export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }, { displayWarningPopover }> = {
+export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
     const chainOrCommObj = app.community
@@ -19,8 +20,6 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function },
         const addr = role.Address;
         const isSelf = role.Address.address === app.user.activeAccount?.address
           && role.Address.chain === app.user.activeAccount?.chain.id;
-        const userAdminRoles = app.user.getAllRolesInCommunity({ community: app.activeId() })
-          .filter((r) => r.permission === 'admin');
         return m('.RoleChild', [
           m(User, {
             user: new AddressInfo(addr.id, addr.address, addr.chain, null), //role.Address, // make AddressInfo?
@@ -28,87 +27,40 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function },
             linkify: false,
             hideAvatar: false,
           }),
-          isSelf && userAdminRoles.length < 2
-            ? m(Popover, {
-              closeOnContentClick: true,
-              content: m('.AdminDeletionPopover', [
-                m('h3', 'You will lose all admin privileges within this community. Continue?'),
-                m('.buttons', [
-                  m(Button, {
-                    label: 'Yes',
-                    onclick: async () => {
-                      console.log('Confirmed');
-                      // const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
-                      //   ...chainOrCommObj,
-                      //   new_role: 'member',
-                      //   address: role.Address.address,
-                      //   jwt: app.user.jwt,
-                      // });
-                      // if (res.status !== 'Success') {
-                      //   throw new Error(`Got unsuccessful status: ${res.status}`);
-                      // }
-                      // const newRole = res.result;
-                      // vnode.attrs.onRoleUpdate(role, newRole);
-                    }
-                  }),
-                  m(Button, {
-                    label: 'No'
-                  })
-                ])
-              ]),
-              inline: true,
-              trigger: m(Icon, {
-                name: Icons.X,
-                size: 'xs',
-                class: 'role-x-icon',
-                onclick: async () => {
-                  const { adminsAndMods } = app.community
-                    ? app.community.meta
-                    : app.chain.meta.chain;
-                  if (adminsAndMods.length < 2) {
-                    notifyError('Communities must have at least one admin.');
-                    return;
-                  }
-                  vnode.state.displayWarningPopover = role.id;
-                },
-              }),
-            })
-            : m(Icon, {
-              name: Icons.X,
-              size: 'xs',
-              class: 'role-x-icon',
-              onclick: async () => {
-                const { adminsAndMods } = app.community
-                  ? app.community.meta
-                  : app.chain.meta.chain;
-                if (adminsAndMods.length < 2) {
-                  notifyError('Communities must have at least one admin.');
-                  return;
-                }
-                const userAdminRoles = app.user.getAllRolesInCommunity({ community: app.activeId() })
-                  .filter((r) => r.permission === 'admin');
-                console.log(adminsAndMods);
-                console.log(userAdminRoles);
-                if (userAdminRoles.length < 2) {
-                  vnode.state.displayWarningPopover = role.id;
-                  return;
-                  // const query = 'You will lose all admin permissions in this community. Continue?';
-                  // const confirmed = await confirmationModalWithText(query, 'Yes', 'No');
-                  // if (!confirmed) return;
-                }
-              // const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
-              //   ...chainOrCommObj,
-              //   new_role: 'member',
-              //   address: role.Address.address,
-              //   jwt: app.user.jwt,
-              // });
-              // if (res.status !== 'Success') {
-              //   throw new Error(`Got unsuccessful status: ${res.status}`);
-              // }
-              // const newRole = res.result;
-              // vnode.attrs.onRoleUpdate(role, newRole);
-              },
-            }),
+          m(Icon, {
+            name: Icons.X,
+            size: 'xs',
+            class: 'role-x-icon',
+            onclick: async () => {
+              const { adminsAndMods } = app.community
+                ? app.community.meta
+                : app.chain.meta.chain;
+              if (adminsAndMods.length < 2) {
+                notifyError('Communities must have at least one admin.');
+                return;
+              }
+              const userAdminRoles = app.user.getAllRolesInCommunity({ community: app.activeId() })
+                .filter((r) => r.permission === 'admin');
+              console.log(adminsAndMods);
+              console.log(userAdminRoles);
+              if (userAdminRoles.length < 2) {
+                const query = 'You will lose all admin permissions in this community. Continue?';
+                const confirmed = await confirmationModalWithText(query, 'Yes', 'No')();
+                if (!confirmed) return;
+              }
+              const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
+                ...chainOrCommObj,
+                new_role: 'member',
+                address: role.Address.address,
+                jwt: app.user.jwt,
+              });
+              if (res.status !== 'Success') {
+                throw new Error(`Got unsuccessful status: ${res.status}`);
+              }
+              const newRole = res.result;
+              vnode.attrs.onRoleUpdate(role, newRole);
+            },
+          }),
         ]);
       }),
     ]);
