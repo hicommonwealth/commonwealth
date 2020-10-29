@@ -63,8 +63,10 @@ const ManageCommunityModal: m.Component<{}, {
       const { adminsAndMods } = app.community ? app.community.meta : app.chain.meta.chain;
       if (oldRole.permission === 'admin' || oldRole.permission === 'moderator') {
         const idx = adminsAndMods.findIndex((r) => {
-          return r.address_chain === oldRole.chain && r.address === oldRole.address;
+          console.log(r);
+          return r.id === oldRole.id;
         });
+        console.log(oldRole);
         console.log(idx);
         if (idx) {
           adminsAndMods.splice(idx, 1);

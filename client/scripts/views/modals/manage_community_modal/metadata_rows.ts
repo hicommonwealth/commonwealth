@@ -14,10 +14,10 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
     const chainOrCommObj = app.community
       ? { community: app.activeCommunityId() }
       : { chain: app.activeChainId() };
-    console.log(vnode.attrs.roledata);
-    const userAdminRoles = vnode.attrs.roledata.filter((role) => {
+    const userAdminAndModRoles = vnode.attrs.roledata.filter((role) => {
       return role.Address.address === app.user.activeAccount?.address
-        && role.Address.chain === app.user.activeAccount?.chain.id;
+        && role.Address.chain === app.user.activeAccount?.chain.id
+        && role.permission === 'admin';
     });
 
     return m('.ManageRoleRow', [
@@ -41,12 +41,15 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                 ? app.community.meta
                 : app.chain.meta.chain;
               const adminsAndMods = await communityMeta.getAdminsAndMods(app.activeId());
-              if (adminsAndMods?.length < 2) {
-                notifyError('Communities must have at least one admin.');
-                return;
+              if (role.permission === 'admin') {
+                const admins = (adminsAndMods || []).filter((r) => r.permission === 'admin');
+                if (admins.length < 2) {
+                  notifyError('Communities must have at least one admin.');
+                  return;
+                }
               }
-              if (userAdminRoles.length < 2 && isSelf) {
-                const query = 'You will lose all admin permissions in this community. Continue?';
+              if (userAdminAndModRoles.length < 2 && isSelf) {
+                const query = `You will lose all ${role.permission} permissions in this community. Continue?`;
                 const confirmed = await confirmationModalWithText(query, 'Yes', 'No')();
                 if (!confirmed) return;
               }
@@ -61,9 +64,9 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
               }
               const newRole = res.result;
               vnode.attrs.onRoleUpdate(role, newRole);
-              // If user loses admin permissions, ensure they instantly lose access to 
+              // TODO: If user loses admin permissions, ensure they instantly lose access to
               // all relevant UI
-              if (userAdminRoles.length < 2 && isSelf) {
+              if (userAdminAndModRoles.length < 2 && isSelf) {
                 $('.ManageCommunityModal').trigger('modalforceexit');
               }
             },
