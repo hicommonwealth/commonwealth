@@ -39,7 +39,6 @@ export default class extends Base {
       address_id: options.address.id,
       ...options,
     }).then((result) => {
-      console.log(result);
       if (result.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${result.status}`);
       }
@@ -80,6 +79,7 @@ export default class extends Base {
     const address_id = this.addresses.find((a) => {
       return a.address === account.address && a.chain === account.chain.id;
     })?.id;
+
     return this.roles.find((r) => {
       const addressMatches = r.address_id === address_id;
       const communityMatches = options.chain

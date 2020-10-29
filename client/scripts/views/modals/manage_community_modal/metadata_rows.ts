@@ -38,7 +38,6 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
-              console.log({ roleBelongsToUser });
               const adminsAndMods = await communityMeta.getAdminsAndMods(app.activeId());
               const userAdminsAndMods = adminsAndMods.filter((role_) => {
                 const belongsToUser = !!app.user.addresses
@@ -53,16 +52,13 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                   return;
                 }
               }
-              console.log(userAdminsAndMods);
               const onlyModsRemaining = () => {
                 const modCount = userAdminsAndMods.filter((r) => r.permission === 'moderator').length;
                 const remainingRoleCount = userAdminsAndMods.length - 1;
                 return (modCount === remainingRoleCount);
               };
-              console.log(onlyModsRemaining());
               const isLosingAdminPermissions = (userAdminsAndMods.length === 1 && isSelf)
                 || (roleBelongsToUser && role.permission === 'admin' && onlyModsRemaining());
-              console.log({ isLosingAdminPermissions });
 
               if (isLosingAdminPermissions) {
                 const query = `You will lose all ${role.permission} permissions in this community. Continue?`;
