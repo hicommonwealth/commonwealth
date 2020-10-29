@@ -37,7 +37,6 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
         ? 'Invite Commonwealth user' : selection === 'email' ? 'Invite email' : 'Add',
       onclick: (e) => {
         e.preventDefault();
-        console.log(vnode.attrs);
         const address = invitedAddress;
         const emailAddress = invitedEmail;
         const selectedChain = invitedAddressChain;
@@ -224,8 +223,6 @@ const CreateInviteModal: m.Component<{
       : communityInfo ? { community: communityInfo }
         : null;
     if (!chainOrCommunityObj) return;
-    console.log(vnode.state.invitedAddressChain);
-    console.log(chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id);
     return m('.CreateInviteModal', [
       m('.compact-modal-title', [
         m('h3', 'Invite members'),
