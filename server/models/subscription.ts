@@ -106,6 +106,9 @@ export default (
       ],
     };
 
+    // stop all notification emission if running as listener
+    if (process.env.RUN_AS_LISTENER === 'true') return;
+
     // typeguard function to differentiate between chain event notifications as needed
     const isChainEventData = (
       n: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData
