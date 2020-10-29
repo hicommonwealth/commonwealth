@@ -2,7 +2,6 @@ import 'modals/manage_community_modal.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Dialog, Icon, Icons, ListItem } from 'construct-ui';
 
 import app from 'state';
 import { RoleInfo, RolePermission, Webhook } from 'models';
@@ -61,13 +60,19 @@ const ManageCommunityModal: m.Component<{}, {
       // Add the missing Address property to the newRole, then splice it into the array.
       newRole.Address = oldRole.Address;
       vnode.state.roleData.splice(vnode.state.roleData.indexOf(oldRole), 1, newRole);
-      // const { addAdmin, removeAdmin } = app.community ? app.community.meta : app.chain.meta.chain;
-      // if (oldRole.permission === 'admin' || oldRole.permission === 'moderator') {
-      //   removeAdmin(oldRole);
-      // }
-      // if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
-      //   addAdmin(oldRole);
-      // }
+      const { adminsAndMods } = app.community ? app.community.meta : app.chain.meta.chain;
+      if (oldRole.permission === 'admin' || oldRole.permission === 'moderator') {
+        const idx = adminsAndMods.findIndex((r) => {
+          return r.address_chain === oldRole.chain && r.address === oldRole.address;
+        });
+        console.log(idx);
+        if (idx) {
+          adminsAndMods.splice(idx, 1);
+        }
+      }
+      if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
+        adminsAndMods.push(newRole);
+      }
       m.redraw();
     };
 
