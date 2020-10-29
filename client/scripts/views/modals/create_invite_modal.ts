@@ -6,7 +6,7 @@ import mixpanel from 'mixpanel-browser';
 import { Button, Input, Form, FormGroup, FormLabel, Select } from 'construct-ui';
 
 import app from 'state';
-import { CommunityInfo, ChainInfo } from 'models';
+import { CommunityInfo, ChainInfo, RoleInfo } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 
 interface IInviteButtonAttrs {
@@ -74,13 +74,25 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
           invitedEmail: selection === 'email' ? emailAddress : '',
           auth: true,
           jwt: app.user.jwt,
-        }).then((result) => {
+        }).then((response) => {
           vnode.state.disabled = false;
-          if (result.status === 'Success') {
+          if (response.status === 'Success') {
             successCallback(true);
-            console.log(result);
+            if (postType === '/addMember') {
+              const { result } = response;
+              app.user.addRole(new RoleInfo(
+                result.id,
+                result.address_id,
+                result.address,
+                result.address_chain,
+                result.chain_id,
+                result.offchain_community_id,
+                result.permission,
+                result.is_user_default
+              ));
+            }
           } else {
-            failureCallback(true, result.message);
+            failureCallback(true, response.message);
           }
           m.redraw();
           mixpanel.track('Invite Sent', {
@@ -113,8 +125,9 @@ const CreateInviteLink: m.Component<{
   },
   view: (vnode) => {
     const { chain, community, onChangeHandler } = vnode.attrs;
-    const chainOrCommunityObj = chain ? { chain: chain.id }
-      : { community: community.id }
+    const chainOrCommunityObj = chain
+      ? { chain: chain.id }
+      : { community: community.id };
     return m(Form, { class: 'CreateInviteLink' }, [
       m(FormGroup, { span: 4 }, [
         m(FormLabel, { for: 'uses', }, 'Generate invite link'),

@@ -14,10 +14,9 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
     const chainOrCommObj = app.community
       ? { community: app.activeCommunityId() }
       : { chain: app.activeChainId() };
-    const userAdminAndModRoles = vnode.attrs.roledata.filter((role) => {
-      const belongsToUser = app.user.addresses.filter((addr) => addr.id == (role.address_id || role.Address.id));
-      return (belongsToUser && role.permission === 'admin');
-    });
+    const communityMeta = app.community
+      ? app.community.meta
+      : app.chain.meta.chain;
 
     return m('.ManageRoleRow', [
       vnode.attrs.roledata?.map((role) => {
@@ -40,10 +39,13 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
             class: 'role-x-icon',
             onclick: async () => {
               console.log({ roleBelongsToUser });
-              const communityMeta = app.community
-                ? app.community.meta
-                : app.chain.meta.chain;
               const adminsAndMods = await communityMeta.getAdminsAndMods(app.activeId());
+              const userAdminsAndMods = adminsAndMods.filter((role_) => {
+                const belongsToUser = !!app.user.addresses
+                  .filter((addr_) => addr_.id == role_.address_id)
+                  .length;
+                return (belongsToUser);
+              });
               if (role.permission === 'admin') {
                 const admins = (adminsAndMods || []).filter((r) => r.permission === 'admin');
                 if (admins.length < 2) {
@@ -51,16 +53,14 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                   return;
                 }
               }
-              const a = app;
-              debugger
+              console.log(userAdminsAndMods);
               const onlyModsRemaining = () => {
-                console.log(userAdminAndModRoles);
-                const modCount = userAdminAndModRoles.filter((r) => r.permission === 'moderator').length;
-                const remainingRoleCount = userAdminAndModRoles.length - 1;
+                const modCount = userAdminsAndMods.filter((r) => r.permission === 'moderator').length;
+                const remainingRoleCount = userAdminsAndMods.length - 1;
                 return (modCount === remainingRoleCount);
               };
               console.log(onlyModsRemaining());
-              const isLosingAdminPermissions = (userAdminAndModRoles.length === 1 && isSelf)
+              const isLosingAdminPermissions = (userAdminsAndMods.length === 1 && isSelf)
                 || (roleBelongsToUser && role.permission === 'admin' && onlyModsRemaining());
               console.log({ isLosingAdminPermissions });
 
