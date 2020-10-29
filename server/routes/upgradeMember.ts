@@ -50,10 +50,8 @@ const upgradeMember = async (models, req: Request, res: Response, next: NextFunc
   });
   const requesterAdminAddressIds = requesterAdminRoles.map((r) => r.address_id);
   const isLastAdmin = allCommunityAdmin.length < 2;
-  console.log({ memId: memberAddress.id });
   const adminSelfDemoting = requesterAdminAddressIds.includes(memberAddress.id)
     && new_role !== 'admin';
-  console.log({requesterAdminAddressIds, adminSelfDemoting, isLastAdmin});
   if (isLastAdmin && adminSelfDemoting) {
     return next(new Error(Errors.MustHaveAdmin));
   }

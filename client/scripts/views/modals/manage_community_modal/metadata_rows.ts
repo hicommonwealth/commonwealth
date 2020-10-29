@@ -65,20 +65,27 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                 const confirmed = await confirmationModalWithText(query, 'Yes', 'No')();
                 if (!confirmed) return;
               }
-              const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
-                ...chainOrCommObj,
-                new_role: 'member',
-                address: role.Address.address,
-                jwt: app.user.jwt,
-              });
-              if (res.status !== 'Success') {
-                throw new Error(`Got unsuccessful status: ${res.status}`);
-              }
-              const newRole = res.result;
-              vnode.attrs.onRoleUpdate(role, newRole);
+              try {
+                const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
+                  ...chainOrCommObj,
+                  new_role: 'member',
+                  address: role.Address.address,
+                  jwt: app.user.jwt,
+                });
+                if (res.status !== 'Success') {
+                  console.log(res.status);
+                  notifyError(res.status);
+                  throw new Error(`Got unsuccessful status: ${res.status}`);
+                }
+                const newRole = res.result;
+                vnode.attrs.onRoleUpdate(role, newRole);
 
-              if (isLosingAdminPermissions) {
-                $('.ManageCommunityModal').trigger('modalforceexit');
+                if (isLosingAdminPermissions) {
+                  $('.ManageCommunityModal').trigger('modalforceexit');
+                }
+              } catch (e) {
+                const errMsg = e.responseJSON?.error || 'Failed to alter role.';
+                notifyError(errMsg);
               }
             },
           }),
