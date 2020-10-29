@@ -45,13 +45,13 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                   .length;
                 return (belongsToUser);
               });
-              if (role.permission === 'admin') {
-                const admins = (adminsAndMods || []).filter((r) => r.permission === 'admin');
-                if (admins.length < 2) {
-                  notifyError('Communities must have at least one admin.');
-                  return;
-                }
-              }
+              // if (role.permission === 'admin') {
+              //   const admins = (adminsAndMods || []).filter((r) => r.permission === 'admin');
+              //   if (admins.length < 2) {
+              //     notifyError('Communities must have at least one admin.');
+              //     return;
+              //   }
+              // }
               const onlyModsRemaining = () => {
                 const modCount = userAdminsAndMods.filter((r) => r.permission === 'moderator').length;
                 const remainingRoleCount = userAdminsAndMods.length - 1;
