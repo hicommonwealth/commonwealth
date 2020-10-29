@@ -211,7 +211,7 @@ const CreateInviteModal: m.Component<{
   invitedEmail: string;
 }> = {
   oncreate: (vnode) => {
-    vnode.state.invitedAddressChain = 'none';
+    vnode.state.invitedAddressChain = '';
     mixpanel.track('New Invite', {
       'Step No': 1,
       'Step': 'Modal Opened'
