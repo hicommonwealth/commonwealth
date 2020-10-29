@@ -1,7 +1,7 @@
+/* eslint-disable eqeqeq */
 import m from 'mithril';
 import $ from 'jquery';
 import { Input, TextArea, Icon, Icons, Switch } from 'construct-ui';
-
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
@@ -15,9 +15,8 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
       ? { community: app.activeCommunityId() }
       : { chain: app.activeChainId() };
     const userAdminAndModRoles = vnode.attrs.roledata.filter((role) => {
-      return role.Address.address === app.user.activeAccount?.address
-        && role.Address.chain === app.user.activeAccount?.chain.id
-        && role.permission === 'admin';
+      const belongsToUser = app.user.addresses.filter((addr) => addr.id == (role.address_id || role.Address.id));
+      return (belongsToUser && role.permission === 'admin');
     });
 
     return m('.ManageRoleRow', [
@@ -25,6 +24,9 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
         const addr = role.Address;
         const isSelf = role.Address.address === app.user.activeAccount?.address
           && role.Address.chain === app.user.activeAccount?.chain.id;
+        const roleBelongsToUser = !!app.user.addresses
+          .filter((addr_) => addr_.id == (role.address_id || role.Address.id))
+          .length;
         return m('.RoleChild', [
           m(User, {
             user: new AddressInfo(addr.id, addr.address, addr.chain, null), //role.Address, // make AddressInfo?
@@ -37,6 +39,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
+              console.log({ roleBelongsToUser });
               const communityMeta = app.community
                 ? app.community.meta
                 : app.chain.meta.chain;
@@ -48,7 +51,20 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                   return;
                 }
               }
-              if (userAdminAndModRoles.length < 2 && isSelf) {
+              const a = app;
+              debugger
+              const onlyModsRemaining = () => {
+                console.log(userAdminAndModRoles);
+                const modCount = userAdminAndModRoles.filter((r) => r.permission === 'moderator').length;
+                const remainingRoleCount = userAdminAndModRoles.length - 1;
+                return (modCount === remainingRoleCount);
+              };
+              console.log(onlyModsRemaining());
+              const isLosingAdminPermissions = (userAdminAndModRoles.length === 1 && isSelf)
+                || (roleBelongsToUser && role.permission === 'admin' && onlyModsRemaining());
+              console.log({ isLosingAdminPermissions });
+
+              if (isLosingAdminPermissions) {
                 const query = `You will lose all ${role.permission} permissions in this community. Continue?`;
                 const confirmed = await confirmationModalWithText(query, 'Yes', 'No')();
                 if (!confirmed) return;
@@ -64,9 +80,8 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
               }
               const newRole = res.result;
               vnode.attrs.onRoleUpdate(role, newRole);
-              // TODO: If user loses admin permissions, ensure they instantly lose access to
-              // all relevant UI
-              if (userAdminAndModRoles.length < 2 && isSelf) {
+
+              if (isLosingAdminPermissions) {
                 $('.ManageCommunityModal').trigger('modalforceexit');
               }
             },

@@ -50,7 +50,6 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
     const { entity } = vnode.attrs;
     const activeAddresses = app.recentActivity.getMostActiveUsers(entity);
     // const activeThreads = app.recentActivity.getMostActiveThreads(entity);
-
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
       m(CommunityInfoModule),
       m('.user-activity', [

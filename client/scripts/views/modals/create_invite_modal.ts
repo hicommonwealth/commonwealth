@@ -78,6 +78,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
           vnode.state.disabled = false;
           if (result.status === 'Success') {
             successCallback(true);
+            console.log(result);
           } else {
             failureCallback(true, result.message);
           }
