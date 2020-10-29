@@ -68,7 +68,8 @@ const ManageCommunityModal: m.Component<{}, {
       const { adminsAndMods } = app.community ? app.community.meta : app.chain.meta.chain;
       if (oldRole.permission === 'admin' || oldRole.permission === 'moderator') {
         const idx = adminsAndMods.findIndex(predicate);
-        if (idx) {
+        if (idx !== -1) {
+          console.log('located)');
           adminsAndMods.splice(idx, 1);
         }
       }
