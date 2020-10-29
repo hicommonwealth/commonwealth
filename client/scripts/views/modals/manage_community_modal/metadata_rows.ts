@@ -73,8 +73,6 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                   jwt: app.user.jwt,
                 });
                 if (res.status !== 'Success') {
-                  console.log(res.status);
-                  notifyError(res.status);
                   throw new Error(`Got unsuccessful status: ${res.status}`);
                 }
                 const newRole = res.result;
@@ -83,8 +81,8 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                 if (isLosingAdminPermissions) {
                   $('.ManageCommunityModal').trigger('modalforceexit');
                 }
-              } catch (e) {
-                const errMsg = e.responseJSON?.error || 'Failed to alter role.';
+              } catch (err) {
+                const errMsg = err.responseJSON?.error || 'Failed to alter role.';
                 notifyError(errMsg);
               }
             },
