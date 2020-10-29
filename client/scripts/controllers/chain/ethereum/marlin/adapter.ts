@@ -14,6 +14,7 @@ import { IApp } from 'state';
 import MarlinMembers from './holders';
 import MarlinAPI from './api';
 import MarlinChain from './chain';
+import MarlinGovernance from './governance';
 // import MarlinGovernance from './governance';
 // import MarlinProposal from './proposal';
 
@@ -23,7 +24,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   public chain: MarlinChain;
   public ethAccounts: EthereumAccounts;
   public accounts: EthereumAccounts;
-  // public governance: MarlinGovernance;
+  public governance: MarlinGovernance;
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
   public readonly chainEntities = new ChainEntityController();
 
@@ -32,7 +33,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.chain = new MarlinChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new EthereumAccounts(this.app);
-    // this.governance = new MarlinGovernance(this.app);
+    this.governance = new MarlinGovernance(this.app);
   }
 
   // public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
@@ -82,11 +83,11 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     await super.initApi();
   }
 
-  // public async initData() {
-  //   await this.chain.initEventLoop();
-  //   await this.governance.init(this.accounts.api, this.accounts, !this.usingServerChainEntities);
-  //   await super.initData(this.usingServerChainEntities);
-  // }
+  public async initData() {
+    await this.chain.initEventLoop();
+    await this.governance.init(); // TODO: create/add args?
+    await super.initData(this.usingServerChainEntities);
+  }
 
   public async deinit() {
     await super.deinit();
