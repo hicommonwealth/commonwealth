@@ -65,6 +65,7 @@ export enum TransactionStatus {
 export enum ProposalStatus {
   Passing = 'pass',
   Failing = 'fail',
+  Canceled = 'canceled',
   Passed = 'passed',
   Failed = 'failed',
   None = 'none',
