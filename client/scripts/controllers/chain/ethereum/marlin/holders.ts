@@ -8,9 +8,6 @@ import { AccountsStore } from 'stores';
 import MarlinHolder from './Holder';
 import MarlinAPI from './api';
 
-// TODO: ideally we should store DAO accounts inside the EthereumAccount object, rather
-//   than extending it into a MarlinHolder. But this is our first-pass implementation,
-//   for now.
 export default class MarlinHolders implements IAccountsModule<EthereumCoin, MarlinHolder> {
   protected _store: AccountsStore<MarlinHolder> = new AccountsStore();
   private _api: MarlinAPI;
