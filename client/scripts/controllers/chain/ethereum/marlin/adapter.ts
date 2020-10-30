@@ -15,8 +15,7 @@ import MarlinMembers from './holders';
 import MarlinAPI from './api';
 import MarlinChain from './chain';
 import MarlinGovernance from './governance';
-// import MarlinGovernance from './governance';
-// import MarlinProposal from './proposal';
+import MarlinProposal from './proposal';
 
 export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
