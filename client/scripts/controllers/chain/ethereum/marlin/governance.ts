@@ -18,17 +18,20 @@ import MarlinProposal from './proposal';
 // import MarlinHolder from './holders';
 import MarlinHolders from './holders';
 
+export interface ProposalArgs {
+  targets: string[],
+  values: string[],
+  signatures: string[],
+  calldatas: string[], // TODO: CHECK IF THIS IS RIGHT
+  description: string,
+}
+
 export default class MarlinGovernance extends ProposalModule<
 MarlinAPI,
 IMarlinProposalResponse,
 MarlinProposal
 > {
-//   // MEMBERS
-//   private _proposalCount: BN;
-  // private _votingPeriodLength: BN;
-//   private _periodDuration: BN;
-//   private _minimumThreshold: BN;
-//   private _totalSupply: BN;
+  // MEMBERS // TODO: Holders anything?
 
   // CONSTANTS
   private _quorumVotes: BN;
@@ -44,17 +47,13 @@ MarlinProposal
   // GETTERS
   // Contract Constants
   public get quorumVotes() { return this._quorumVotes; }
-  public 
-
-
-//   public get proposalCount() { return this._proposalCount; }
-  // public get votingPeriodLength() { return this._votingPeriodLength; }
-//   public get periodDuration() { return this._periodDuration; }
-//   public get minimumThreshold() { return this._minimumThreshold; }
-//   public get totalSupply() { return this._totalSupply; }
+  public get proposalThreshold() { return this._proposalThreshold; }
+  public get proposalMaxOperations() { return this._proposalMaxOperations; }
+  public get votingDelay() { return this._votingDelay; }
+  public get votingPeriod() { return this._votingPeriod; }
 
   public get api() { return this._api; }
-//   public get usingServerChainEntities() { return this._usingServerChainEntities; }
+  public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
 
   // INIT / DEINIT
@@ -64,10 +63,32 @@ MarlinProposal
 
   // METHODS
 
+  public async castVote(proposalId: number, support: boolean) {
+    const tx = await this._api.governorAlphaContract.castVote(proposalId, support);
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error(`Failed to cast vote on proposal #${proposalId}`);
+    }
+  }
+
+  // PROPOSE
+
+  public async propose(args: ProposalArgs) {
+    const { targets, values, signatures, calldatas, description } = args;
+    if (!targets || !values || !signatures || !calldatas || !description) return;
+    const tx = await this._api.governorAlphaContract.propose(
+      targets, values, signatures, calldatas, description,
+    );
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error('Failed to execute proposal');
+    }
+  }
+
   public async state(proposalId: number): Promise<number> {
     const state = await this._api.governorAlphaContract.state(proposalId);
     if (state === null) {
-      throw new Error('Failed to get state for proposal');
+      throw new Error(`Failed to get state for proposal #${proposalId}`);
     }
     return state;
   }
@@ -76,7 +97,15 @@ MarlinProposal
     const tx = await this._api.governorAlphaContract.execute(proposalId);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
-      throw new Error('Failed to execute proposal');
+      throw new Error(`Failed to execute proposal #${proposalId}`);
+    }
+  }
+
+  public async queue(proposalId: number) {
+    const tx = await this._api.governorAlphaContract.queue(proposalId);
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error(`Failed to queue proposal #${proposalId}`);
     }
   }
 
@@ -84,7 +113,7 @@ MarlinProposal
     const tx = await this._api.governorAlphaContract.cancel(proposalId);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
-      throw new Error('Failed to cancel proposal');
+      throw new Error(`Failed to cancel proposal #${proposalId}`);
     }
   }
 
