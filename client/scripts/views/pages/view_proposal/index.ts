@@ -506,28 +506,29 @@ const ViewProposalPage: m.Component<{
     }
 
     // load proposal
-    try {
-      vnode.state.proposal = idToProposal(proposalType, proposalId);
-    } catch (e) {
-      // proposal might be loading, if it's not an offchain thread
-      if (proposalType === ProposalType.OffchainThread) {
-        app.threads.fetchThread(Number(proposalId)).then((res) => {
-          vnode.state.proposal = res;
-          m.redraw();
-        });
-      } else {
-        if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
-
-        // check if module is still initializing
-        const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
-        if (!c.disabled && !c.initialized) {
-          if (!c.initializing) loadCmd(proposalType);
+    if (!vnode.state.proposal) {
+      try {
+        vnode.state.proposal = idToProposal(proposalType, proposalId);
+      } catch (e) {
+        // proposal might be loading, if it's not an offchain thread
+        if (proposalType === ProposalType.OffchainThread) {
+          app.threads.fetchThread(Number(proposalId)).then((res) => {
+            vnode.state.proposal = res;
+            m.redraw();
+          });
           return m(PageLoading, { narrow: true, showNewProposalButton: true });
+        } else {
+          if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
+          // check if module is still initializing
+          const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
+          if (!c.disabled && !c.initialized) {
+            if (!c.initializing) loadCmd(proposalType);
+            return m(PageLoading, { narrow: true, showNewProposalButton: true });
+          }
         }
+        // proposal does not exist, 404
+        return m(PageNotFound);
       }
-
-      // proposal does not exist, 404
-      return m(PageNotFound);
     }
     const { proposal } = vnode.state;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {

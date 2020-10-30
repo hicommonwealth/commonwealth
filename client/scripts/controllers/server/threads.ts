@@ -238,7 +238,6 @@ class ThreadsController {
       id,
     };
     const response = await $.get(`${app.serverUrl()}/getThread`, params);
-    console.log(response);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
