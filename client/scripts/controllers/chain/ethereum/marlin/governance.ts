@@ -59,9 +59,7 @@ MarlinProposal
 
   // INIT / DEINIT
   constructor(app: IApp, private _usingServerChainEntities = false) {
-    super(app
-      // , (e) => new MarlinProposal(this._Holders, this, e)
-    );
+    super(app, (e) => new MarlinProposal(this._Holders, this, e));
   }
 
   // METHODS
