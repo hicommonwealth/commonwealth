@@ -233,6 +233,7 @@ class ThreadsController {
 
   public async fetchThread(id) {
     const response = await $.get(`${app.serverUrl()}/getOffchainThread`, { id });
+    console.log(response);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
