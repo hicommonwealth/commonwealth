@@ -16,9 +16,6 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
   private _api: MarlinAPI;
   private _Chain: EthereumChain;
   private _Accounts: EthereumAccounts;
-  private _UserComp: any;
-
-  public get userComp() { return this._UserComp; }
 
   public get store() { return this._store; }
   public get api() { return this._api; }
@@ -29,8 +26,6 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     // only used to initialize Holder for super call
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
-
-    this._UserComp = await this.api.compContract.balanceOf(this.api.compAddress);
   }
 
   public deinit() {
@@ -52,14 +47,6 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     }
   }
 
-  public async delegate(address: string) {
-    try {
-      await this.api.compContract.delegate(address);
-    } catch (e) {
-      return console.error(e);
-    }
-  }
-
   // returns a Holder immediately given a struct returned from chain
   // public getFromJSON(holder: IMarlinHolder): MarlinHolder {
   //   try {
@@ -68,6 +55,14 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
   //     return new MarlinHolder(this.app, this._Chain, this._Accounts, this, holder.id, holder);
   //   }
   // }
+
+  public async senderSetDelegate(address: string) {
+    try {
+      await this.api.compContract.delegate(address);
+    } catch (e) {
+      return console.error(e);
+    }
+  }
 
   public async isSenderHolder(): Promise<boolean> {
     const sender = this._api.userAddress;
