@@ -231,6 +231,14 @@ class ThreadsController {
     });
   }
 
+  public async fetchThread(id) {
+    const response = await $.get(`${app.serverUrl()}/getOffchainThread`, { id });
+    if (response.status !== 'Success') {
+      throw new Error(`Unsuccessful refresh status: ${response.status}`);
+    }
+    return modelFromServer(response.result);
+  }
+
   // loadNextPage returns false if there are no more threads to load
   public async loadNextPage(chainId: string, communityId: string, cutoffDate: moment.Moment, topic_id?: OffchainTopic) {
     const params = {

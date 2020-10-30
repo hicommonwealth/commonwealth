@@ -473,6 +473,7 @@ const ViewProposalPage: m.Component<{
   prefetch: IPrefetch,
   comments,
   viewCount: number,
+  proposal: AnyProposal | OffchainThread
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -505,12 +506,16 @@ const ViewProposalPage: m.Component<{
     }
 
     // load proposal
-    let proposal: AnyProposal;
     try {
-      proposal = idToProposal(proposalType, proposalId);
+      vnode.state.proposal = idToProposal(proposalType, proposalId);
     } catch (e) {
       // proposal might be loading, if it's not an offchain thread
-      if (proposalType !== ProposalType.OffchainThread) {
+      if (proposalType === ProposalType.OffchainThread) {
+        app.threads.fetchThread(Number(proposalId)).then((res) => {
+          vnode.state.proposal = res;
+          m.redraw();
+        });
+      } else {
         if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
 
         // check if module is still initializing
@@ -524,6 +529,7 @@ const ViewProposalPage: m.Component<{
       // proposal does not exist, 404
       return m(PageNotFound);
     }
+    const { proposal } = vnode.state;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
       m.route.set(`/${app.activeId()}/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
         { replace: true });
