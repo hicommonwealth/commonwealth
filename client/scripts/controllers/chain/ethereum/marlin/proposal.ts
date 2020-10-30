@@ -138,7 +138,7 @@ export default class MarlinProposal extends Proposal<
   public get votingUnit() { return VotingUnit.CoinVote; }
 
   public get startingPeriod() { return +this.data.startBlock; }
-  public get votingPeriodEnd() { return this.startingPeriod + +this._Gov.votingPeriodLength; }
+  public get votingPeriodEnd() { return this.startingPeriod + +this._Gov.votingPeriod; }
 
 //   public get state(): MarlinProposalState {
 //     // TODO: Fetch state from proposal api
