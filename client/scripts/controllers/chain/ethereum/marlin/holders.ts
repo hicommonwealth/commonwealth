@@ -7,6 +7,7 @@ import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 import MarlinHolder from './Holder';
 import MarlinAPI from './api';
+import { IMarlinHolder } from 'shared/adapters/chain/marlin/types';
 
 // TODO: ideally we should store DAO accounts inside the EthereumAccount object, rather
 //   than extending it into a MarlinHolder. But this is our first-pass implementation,
@@ -48,13 +49,13 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
   }
 
   // returns a Holder immediately given a struct returned from chain
-  // public getFromJSON(holder: IMarlinHolder): MarlinHolder {
-  //   try {
-  //     return this._store.getByAddress(holder.id);
-  //   } catch (e) {
-  //     return new MarlinHolder(this.app, this._Chain, this._Accounts, this, holder.id, holder);
-  //   }
-  // }
+  public getFromJSON(holder: IMarlinHolder): MarlinHolder {
+    try {
+      return this._store.getByAddress(holder.id);
+    } catch (e) {
+      return new MarlinHolder(this.app, this._Chain, this._Accounts, this, holder.id);
+    }
+  }
 
   public async senderSetDelegate(address: string) {
     try {
