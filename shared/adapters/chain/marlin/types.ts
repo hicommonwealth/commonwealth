@@ -4,7 +4,8 @@
 //  exactly to the format returned by the graphql query.
 
 // Represents all relevant fields of a member of a Moloch DAO
-export interface IMarlinMember {
+export interface IMarlinHolder {
+  // TODO: Fill This OUT!!!
   // address of the member
   id: string;
 
@@ -19,6 +20,7 @@ export interface IMarlinMember {
 }
 
 export interface IMarlinVote {
+  // TODO: FILL THIS OUT!!!!
   // who voted
   delegateAddress: string;
 
@@ -31,7 +33,7 @@ export interface IMarlinVote {
   // 1 = yes, 2 = no, 0 = abstain
   uintVote: number;
 
-  member: IMarlinMember;
+  delegate: IMarlinHolder;
 }
 
 export interface IMarlinProposalResponse {
