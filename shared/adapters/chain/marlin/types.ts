@@ -5,7 +5,6 @@
 
 // Represents all relevant fields of a member of a Moloch DAO
 export interface IMarlinHolder {
-  // TODO: Fill This OUT!!!
   // address of the member
   id: string;
 

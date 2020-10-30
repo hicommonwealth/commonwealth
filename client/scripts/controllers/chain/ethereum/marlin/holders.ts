@@ -1,13 +1,12 @@
 import { IApp } from 'state';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-// import { IMarlinHolder } from 'adapters/chain/marlin/types';
+import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 import MarlinHolder from './Holder';
 import MarlinAPI from './api';
-import { IMarlinHolder } from 'shared/adapters/chain/marlin/types';
 
 // TODO: ideally we should store DAO accounts inside the EthereumAccount object, rather
 //   than extending it into a MarlinHolder. But this is our first-pass implementation,
