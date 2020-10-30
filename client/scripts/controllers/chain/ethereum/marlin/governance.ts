@@ -25,18 +25,30 @@ MarlinProposal
 > {
 //   // MEMBERS
 //   private _proposalCount: BN;
-  private _votingPeriodLength: BN;
+  // private _votingPeriodLength: BN;
 //   private _periodDuration: BN;
 //   private _minimumThreshold: BN;
 //   private _totalSupply: BN;
+
+  // CONSTANTS
+  private _quorumVotes: BN;
+  private _proposalThreshold: BN;
+  private _proposalMaxOperations: BN;
+  private _votingDelay: BN;
+  private _votingPeriod: BN;
 
   private _api: MarlinAPI;
   private _Holders: MarlinHolders;
 
 
-//   // GETTERS
+  // GETTERS
+  // Contract Constants
+  public get quorumVotes() { return this._quorumVotes; }
+  public 
+
+
 //   public get proposalCount() { return this._proposalCount; }
-  public get votingPeriodLength() { return this._votingPeriodLength; }
+  // public get votingPeriodLength() { return this._votingPeriodLength; }
 //   public get periodDuration() { return this._periodDuration; }
 //   public get minimumThreshold() { return this._minimumThreshold; }
 //   public get totalSupply() { return this._totalSupply; }
@@ -45,12 +57,14 @@ MarlinProposal
 //   public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
 
-//   // INIT / DEINIT
+  // INIT / DEINIT
   constructor(app: IApp, private _usingServerChainEntities = false) {
     super(app
       // , (e) => new MarlinProposal(this._Holders, this, e)
     );
   }
+
+  // METHODS
 
   public async state(proposalId: number): Promise<number> {
     const state = await this._api.governorAlphaContract.state(proposalId);
@@ -76,12 +90,12 @@ MarlinProposal
     }
   }
 
-  public async init() { // TODO: Initialize all relevant DATA for governance controller, initial fetches.
-
-    // this._totalSharesRequested = new BN((await this._api.Contract.totalSharesRequested()).toString(), 10);
-    // this._totalShares = new BN((await this._api.Contract.totalShares()).toString(), 10);
-    // this._gracePeriod = new BN((await this._api.Contract.gracePeriodLength()).toString(), 10);
-    // this._abortWindow = new BN((await this._api.Contract.abortWindow()).toString(), 10);
+  public async init() {
+    this._quorumVotes = new BN((await this._api.governorAlphaContract.quorumVotes()).toString(), 10);
+    this._proposalThreshold = new BN((await this._api.governorAlphaContract.proposalThreshold()).toString(), 10);
+    this._proposalMaxOperations = new BN((await this._api.governorAlphaContract.proposalMaxOperations()).toString(), 10);
+    this._votingDelay = new BN((await this._api.governorAlphaContract.votingDelay()).toString(), 10);
+    this._votingPeriod = new BN((await this._api.governorAlphaContract.votingPeriod()).toString(), 10);
   }
 
   public deinit() {
