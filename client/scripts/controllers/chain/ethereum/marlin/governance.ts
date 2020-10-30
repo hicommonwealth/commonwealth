@@ -17,6 +17,7 @@ import MarlinAPI from './api';
 import MarlinProposal from './proposal';
 // import MarlinHolder from './holders';
 import MarlinHolders from './holders';
+import MarlinChain from './chain';
 
 export interface ProposalArgs {
   targets: string[],
@@ -117,7 +118,11 @@ MarlinProposal
     }
   }
 
-  public async init() {
+  public async init(chain: MarlinChain, Holders: MarlinHolders) {
+    const api = chain.marlinApi;
+    this._Holders = Holders;
+    this._api = api;
+
     this._quorumVotes = new BN((await this._api.governorAlphaContract.quorumVotes()).toString(), 10);
     this._proposalThreshold = new BN((await this._api.governorAlphaContract.proposalThreshold()).toString(), 10);
     this._proposalMaxOperations = new BN((await this._api.governorAlphaContract.proposalMaxOperations()).toString(), 10);
