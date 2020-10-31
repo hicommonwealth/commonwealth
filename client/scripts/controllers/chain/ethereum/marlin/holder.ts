@@ -16,11 +16,9 @@ import MarlinHolders from './holders';
 export default class MarlinHolder extends EthereumAccount {
   private _isHolder: boolean;
   private _isDelegate: boolean;
-  // private _delegateKey: string;
 
   private _balance: BehaviorSubject<Comp> = new BehaviorSubject(null);
-  private _highestIndexYesVote: BN;
-  private _tokenTribute: BN; // Not populated
+  private _delegates: BehaviorSubject<Comp> = new BehaviorSubject(null);
 
   private _Holders: MarlinHolders;
 
@@ -46,18 +44,19 @@ export default class MarlinHolder extends EthereumAccount {
   ) {
     super(app, ChainInfo, Accounts, address);
     this._Holders = Holders;
-    // if (data) {
-    //   if (address.toLowerCase() !== data.id.toLowerCase()) {
-    //     throw new Error('member does not correspond with account');
-    //   }
-    //   this._isHolder = true;
-    //   this._balance.next(new MarlinComp(this._Holders.api.compAddress, new BN(data.balances)));
-    //   this._initialized = Promise.resolve(true);
-    // } else {
-    //   this._initialized = new Promise((resolve, reject) => {
-    //     this.refresh().then(() => resolve(true));
-    //   });
-    // }
+    if (data) {
+      if (address.toLowerCase() !== data.id.toLowerCase()) {
+        throw new Error('member does not correspond with account');
+      }
+      this._isHolder = true;
+      this._balance.next(new Comp(this._Holders.api.compAddress, new BN(data.balance)));
+      this._delegates.next(new Comp(this._Holders.api.compAddress, new BN(data.delegates)));
+      this._initialized = Promise.resolve(true);
+    } else {
+      this._initialized = new Promise((resolve, reject) => {
+        this.refresh().then(() => resolve(true));
+      });
+    }
     Holders.store.add(this);
   }
 

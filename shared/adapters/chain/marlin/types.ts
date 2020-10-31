@@ -8,14 +8,11 @@ export interface IMarlinHolder {
   // address of the member
   id: string;
 
-  // address of the member who invited them
-  delegateKey: string;
+  // balance
+  balance: string;
 
-  // number of shares owned by member
-  shares: string;
-
-  // highest proposal index on which the member voted YES
-  highestIndexYesVote?: string;
+  // delegates
+  delegates: string;
 }
 
 export interface IMarlinVote {
