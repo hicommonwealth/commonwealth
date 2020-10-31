@@ -2,7 +2,7 @@ import BN from 'bn.js';
 import moment from 'moment';
 
 // TODO: check MarlinComp name
-import { MarlinComp, EthereumCoin } from 'adapters/chain/ethereum/types';
+import { Comp, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
 
 // import { MarlinTypes } from '@commonwealth/chain-events';
