@@ -30,6 +30,7 @@ export default class MarlinHolder extends EthereumAccount {
     );
   }
 
+
   public get isHolder() { return this._isHolder; }
   public get isDelegate() { return this._isDelegate; }
   public get getbalance() { return this._balance.value; }
