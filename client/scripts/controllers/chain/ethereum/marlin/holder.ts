@@ -62,13 +62,21 @@ export default class MarlinHolder extends EthereumAccount {
   }
 
   public async refresh() {
-    const balance = await this._Holders.api.compContract.balances(this.address);
-    if (!balance.exists) {
-      this._isHolder = false;
-      this._balance.next(new Comp(this._Holders.api.compAddress, new BN(0)));
-    } else {
+    const balance = await this._Holders.api.compContract.balanceOf(this.address);
+    if (!balance.isZero()) {
       this._isHolder = true;
       this._balance.next(new Comp(this._Holders.api.compAddress, new BN(balance.toString())));
+    } else {
+      this._isHolder = false;
+      this._balance.next(new Comp(this._Holders.api.compAddress, new BN(0)));
+    }
+    const delegates = await this._Holders.api.compContract.getCurrentVotes(this.address);
+    if (!delegates.isZero()) {
+      this._isDelegate = true;
+      this._delegates.next(new Comp(this._Holders.api.compAddress, new BN(delegates.toString())));
+    } else {
+      this._isDelegate = false;
+      this._delegates.next(new Comp(this._Holders.api.compAddress, new BN(0)));
     }
   }
 
