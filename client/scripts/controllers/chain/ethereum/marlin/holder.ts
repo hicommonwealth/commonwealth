@@ -12,6 +12,7 @@ import EthereumChain from 'controllers/chain/ethereum/chain';
 
 import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import MarlinHolders from './holders';
+import { BigNumberish } from 'ethers/utils';
 
 export default class MarlinHolder extends EthereumAccount {
   private _isHolder: boolean;
@@ -78,6 +79,11 @@ export default class MarlinHolder extends EthereumAccount {
       this._isDelegate = false;
       this._delegates.next(new Comp(this._Holders.api.compAddress, new BN(0)));
     }
+  }
+
+  public async priorDelegates(blockNumber: number | string) { // TODO: Check this
+    const delegates = await this._Holders.api.compContract.getPriorVotes(this.address, blockNumber);
+    return delegates || 0;
   }
 
   // public async updateDelegateKeyTx(delegateKey: string) {
