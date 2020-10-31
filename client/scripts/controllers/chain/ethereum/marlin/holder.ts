@@ -3,13 +3,14 @@ import { IApp } from 'state';
 import { from, of, Observable, BehaviorSubject } from 'rxjs';
 import { switchMap, first } from 'rxjs/operators';
 
-import { MarlinComp } from 'adapters/chain/ethereum/types';
+import { Comp } from 'adapters/chain/ethereum/types';
 // import { IMarlinHolder } from 'adapters/chain/Marlin/types';
 
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 
+import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import MarlinHolders from './holders';
 
 export default class MarlinHolder extends EthereumAccount {
@@ -17,17 +18,17 @@ export default class MarlinHolder extends EthereumAccount {
   private _isDelegate: boolean;
   // private _delegateKey: string;
 
-  private _balance: BehaviorSubject<MarlinComp> = new BehaviorSubject(null);
+  private _balance: BehaviorSubject<Comp> = new BehaviorSubject(null);
   private _highestIndexYesVote: BN;
   private _tokenTribute: BN; // Not populated
 
   private _Holders: MarlinHolders;
 
-  public get balance(): Observable<MarlinComp> {
+  public get balance(): Observable<Comp> {
     return from(this.initialized).pipe(
       switchMap(() => this.isHolder
         ? this._balance.asObservable()
-        : of(new MarlinComp(this._Holders.api.compAddress, 0)))
+        : of(new Comp(this._Holders.api.compAddress, 0)))
     );
   }
 
@@ -41,7 +42,7 @@ export default class MarlinHolder extends EthereumAccount {
     Accounts: EthereumAccounts,
     Holders: MarlinHolders,
     address: string,
-    // data?: IMarlinHolder
+    data?: IMarlinHolder
   ) {
     super(app, ChainInfo, Accounts, address);
     this._Holders = Holders;
@@ -61,16 +62,14 @@ export default class MarlinHolder extends EthereumAccount {
   }
 
   public async refresh() {
-    // const m = await this._Members.api.Contract.members(this.address);
-    // if (!m.exists) {
-    //   this._isMember = false;
-    //   this._balance.next(new MarlinComp(this._Members.api.contractAddress, new BN(0)));
-    // } else {
-    //   this._isMember = true;
-    //   this._delegateKey = m.delegateKey.toLowerCase();
-    //   this._balance.next(new MarlinComp(this._Members.api.contractAddress, new BN(m.shares.toString())));
-    //   this._highestIndexYesVote = m.highestIndexYesVote ? new BN(m.highestIndexYesVote.toString()) : null;
-    // }
+    const balance = await this._Holders.api.compContract.balances(this.address);
+    if (!balance.exists) {
+      this._isHolder = false;
+      this._balance.next(new Comp(this._Holders.api.compAddress, new BN(0)));
+    } else {
+      this._isHolder = true;
+      this._balance.next(new Comp(this._Holders.api.compAddress, new BN(balance.toString())));
+    }
   }
 
   // public async updateDelegateKeyTx(delegateKey: string) {
