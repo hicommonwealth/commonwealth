@@ -80,6 +80,43 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   }
 };
 
+const MarlinProposalStats: m.Component<{}, {}> = {
+  view: (vnode) => {
+    if (!app.chain) return;
+
+    return m(Grid, {
+      align: 'middle',
+      class: 'stats-container',
+      gutter: 5,
+      justify: 'space-between'
+    }, [
+      m(Col, { span: { xs: 6, md: 3 } }, [
+        m('.stats-tile', [
+          m('.stats-heading', 'Marlin Basics'),
+          m('.stats-tile-figure-major', [
+            `Quorum Votes: ${(app.chain as Marlin).governance?.quorumVotes.toString(10, 10)}`
+          ]),
+          m('.stats-tile-figure-minor', [
+            `Proposal Threshold: ${(app.chain as Marlin).governance?.proposalThreshold.toString(10, 10)}`
+          ]),
+          m('.stats-tile-figure-minor', [
+            `Voting Period Length: ${(app.chain as Marlin).governance.votingPeriod.toString(10, 10)}`,
+          ]),
+        ]),
+      ]),
+      // m(Col, { span: { xs: 6, md: 3 } }, [
+      //   m('.stats-tile', [
+      //     m('.stats-heading', 'Enactment delay'),
+      //     (app.chain as Marlin).democracy.enactmentPeriod
+      //       ? blockperiodToDuration((app.chain as Marlin).democracy.enactmentPeriod).asDays()
+      //       : '--',
+      //     ' days'
+      //   ]),
+      // ]),
+    ]);
+  }
+};
+
 async function loadCmd() {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
@@ -198,6 +235,7 @@ const ProposalsPage: m.Component<{}> = {
       && !inactiveSignalingProposals?.length
       && !inactiveCosmosProposals?.length
       && !inactiveMolochProposals?.length
+      && !inactiveMarlinProposals?.length
       ? [ m('.no-proposals', 'None') ]
       : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
@@ -217,8 +255,8 @@ const ProposalsPage: m.Component<{}> = {
       title: 'Proposals',
       showNewProposalButton: true,
     }, [
-      onMarlin && m('.hi', `${(app.chain as Marlin).chain.marlinApi.userComp} ${(app.chain as Marlin).chain.marlinApi.symbol}`),
       onSubstrate && m(SubstrateProposalStats),
+      onMarlin && m(MarlinProposalStats),
       m(Listing, {
         content: activeProposalContent,
         columnHeaders: ['Active Proposals', 'Comments', 'Likes', 'Updated'],
