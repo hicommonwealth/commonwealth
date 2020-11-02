@@ -10,7 +10,7 @@ export const Errors = {
   NotLoggedIn: 'Not logged in',
   MustBeAdmin: 'Must be an admin to upgrade member',
   NoMember: 'Cannot find member to upgrade',
-  MustHaveAdmin: 'All communities must have at least one admin',
+  MustHaveAdmin: 'Communities must have at least one admin',
 };
 
 const ValidRoles = ['admin', 'moderator', 'member'];

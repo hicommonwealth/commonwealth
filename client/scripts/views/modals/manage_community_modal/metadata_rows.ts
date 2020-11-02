@@ -64,6 +64,10 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                 const query = `You will lose all ${role.permission} permissions in this community. Continue?`;
                 const confirmed = await confirmationModalWithText(query, 'Yes', 'No')();
                 if (!confirmed) return;
+              } else {
+                const query = `Remove this ${role.permission}?`;
+                const confirmed = await confirmationModalWithText(query, 'Yes', 'No')();
+                if (!confirmed) return;
               }
               try {
                 const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
