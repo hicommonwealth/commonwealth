@@ -203,7 +203,9 @@ const ProposalsPage: m.Component<{}> = {
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
+        .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalRow, { proposal })));
+
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
