@@ -37,12 +37,12 @@ export const modelFromServer = (thread) => {
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
-  private _surplusStore = new ProposalStore<OffchainThread>();
-  private _topicScopedStore = new TopicScopedThreadStore();
+  private _listingStore = new ProposalStore<OffchainThread>();
+  private _topicListingStore = new TopicScopedThreadStore();
 
   public get store() { return this._store; }
-  public get topicScopedStore() { return this._topicScopedStore; }
-  public get surplusStore() { return this._surplusStore; }
+  public get listingStore() { return this._listingStore; }
+  public get topicListingStore() { return this._topicListingStore; }
 
   private _initialized = false;
 
@@ -98,7 +98,8 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
-      this._topicScopedStore.add(result);
+      this._listingStore.add(result);
+      this._topicListingStore.add(result);
       app.recentActivity.addThreads([{
         id: response.result.id,
         Address: response.result.Address,
@@ -151,7 +152,11 @@ class ThreadsController {
           this._store.remove(this._store.getByIdentifier(result.id));
         }
         this._store.add(result);
-        this._topicScopedStore.add(result);
+        if (this._listingStore.getByIdentifier(result.id)) {
+          this._listingStore.remove(this._listingStore.getByIdentifier(result.id));
+        }
+        this._listingStore.add(result);
+        this._topicListingStore.add(result);
         return result;
       },
       error: (err) => {
@@ -171,7 +176,8 @@ class ThreadsController {
         'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);
-        _this._topicScopedStore.remove(proposal);
+        _this._listingStore.remove(proposal);
+        _this._topicListingStore.remove(proposal);
         app.recentActivity.removeThread(proposal.id, proposal.community || proposal.chain);
         // Properly removing from recent activity will require comments/threads to have an address_id
         // app.recentActivity.removeAddressActivity([proposal]);
@@ -200,7 +206,11 @@ class ThreadsController {
           this._store.remove(this._store.getByIdentifier(result.id));
         }
         this._store.add(result);
-        this._topicScopedStore.add(result);
+        if (this._listingStore.getByIdentifier(result.id)) {
+          this._listingStore.remove(this._listingStore.getByIdentifier(result.id));
+        }
+        this._listingStore.add(result);
+        this._topicListingStore.add(result);
         return result;
       },
       error: (err) => {
@@ -224,7 +234,11 @@ class ThreadsController {
           this._store.remove(this._store.getByIdentifier(result.id));
         }
         this._store.add(result);
-        this._topicScopedStore.add(result);
+        if (this._listingStore.getByIdentifier(result.id)) {
+          this._listingStore.remove(this._listingStore.getByIdentifier(result.id));
+        }
+        this._listingStore.add(result);
+        this._topicListingStore.add(result);
         return result;
       },
       error: (err) => {
@@ -245,9 +259,9 @@ class ThreadsController {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const thread = modelFromServer(response.result);
-    const existing = this._surplusStore.getByIdentifier(thread.id);
-    if (existing) this._surplusStore.remove(thread);
-    this._surplusStore.add(thread);
+    const existing = this._store.getByIdentifier(thread.id);
+    if (existing) this._store.remove(existing);
+    this._store.add(thread);
     return modelFromServer(response.result);
   }
 
@@ -275,13 +289,13 @@ class ThreadsController {
     const comments = (app.chain)
       ? response.result.comments.filter((comment) => !comment.community)
       : response.result.comments;
-    const store = topicId ? this._topicScopedStore : this._store;
+    const store = topicId ? this._topicListingStore : this._listingStore;
     for (const thread of threads) {
       if (!thread.Address) {
         console.error('OffchainThread missing address');
       }
       if (!topicId) {
-        const existing = this._store.getByIdentifier(thread.id);
+        const existing = this._listingStore.getByIdentifier(thread.id);
         if (existing) {
           store.remove(existing);
         }
@@ -351,14 +365,12 @@ class ThreadsController {
   public initialize(initialThreads: any[], reset = true) {
     if (reset) {
       this._store.clear();
+      this._listingStore.clear();
+      this._topicListingStore.clear();
     }
     for (const thread of initialThreads) {
       if (!thread.Address) {
         console.error('OffchainThread missing address');
-      }
-      const existing = this._store.getByIdentifier(thread.id);
-      if (existing) {
-        this._store.remove(existing);
       }
       try {
         this._store.add(modelFromServer(thread));
@@ -371,7 +383,9 @@ class ThreadsController {
 
   public deinit() {
     this._initialized = false;
-    this.store.clear();
+    this._store.clear();
+    this._listingStore.clear();
+    this._topicListingStore.clear();
   }
 }
 

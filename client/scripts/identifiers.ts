@@ -72,7 +72,7 @@ export const idToProposal = (slug, id) => {
   let proposal = store.getByIdentifier(id);
   // check the topic-scoped thread
   if (slug === 'discussion' && !proposal) {
-    proposal = app.threads.topicScopedStore.getById(id)
+    proposal = app.threads.topicListingStore.getById(id)
       || app.threads.surplusStore.getByIdentifier(id);
   }
   if (!proposal) {

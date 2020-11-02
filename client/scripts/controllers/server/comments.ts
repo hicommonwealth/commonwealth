@@ -185,7 +185,6 @@ class CommentsController {
   }
 
   public async refresh(proposal, chainId: string, communityId: string) {
-    console.log(proposal);
     return new Promise(async (resolve, reject) => {
       try {
         // TODO: Change to GET /comments

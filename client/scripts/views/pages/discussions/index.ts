@@ -188,10 +188,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     let listing = [];
     const allThreads = topic
-      ? app.threads.topicScopedStore.getByCommunityAndTopic(app.activeId(), topic)
+      ? app.threads.topicListingStore.getByCommunityAndTopic(app.activeId(), topic)
         .sort(orderDiscussionsbyLastComment)
       : app.threads
-        .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
+        .listingStore.getAll()
         .sort(orderDiscussionsbyLastComment);
     if (allThreads.length) {
       let visitMarkerPlaced = false;
