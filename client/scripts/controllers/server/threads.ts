@@ -263,7 +263,12 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
+    const threads = (app.chain)
+      ? response.result.threads.filter((thread) => !thread.community)
+      : response.result.threads;
+    const comments = (app.chain)
+      ? response.result.comments.filter((comment) => !comment.community)
+      : response.result.comments;
     const store = topicId ? this._topicScopedStore : this._store;
     for (const thread of threads) {
       if (!thread.Address) {
@@ -277,6 +282,17 @@ class ThreadsController {
       }
       try {
         store.add(modelFromServer(thread));
+      } catch (e) {
+        console.error(e.message);
+      }
+    }
+    for (const comment of comments) {
+      const existing = app.comments.store.getById(comment.id);
+      if (existing) {
+        app.comments.store.remove(existing);
+      }
+      try {
+        app.comments.store.add(comment);
       } catch (e) {
         console.error(e.message);
       }
