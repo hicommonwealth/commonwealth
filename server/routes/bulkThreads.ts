@@ -12,6 +12,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
   const { cutoff_date, topic_id } = req.query;
   // Threads
   let threads;
+  let comments;
   if (cutoff_date) {
     const communityOptions = community
       ? `community = :community `
@@ -74,7 +75,10 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       console.log(e);
     }
 
+    const root_ids = [];
     threads = preprocessedThreads.map((t) => {
+      const root_id = `discussion_${t.thread_id}`;
+      root_ids.push(root_id);
       const data = {
         id: t.thread_id,
         title: t.thread_title,
@@ -104,6 +108,14 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       }
       return data;
     });
+
+    comments = await models.OffchainComments.findAll({
+      where: {
+        id: root_ids
+      },
+      include: [models.Address, models.OffchainAttachment],
+      order: [['created_at', 'DESC']],
+    });
   } else {
     const whereOptions = (community)
       ? { community: community.id, }
@@ -114,9 +126,21 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
       order: [['created_at', 'DESC']],
     });
+
+    comments = await models.OffchainThread.findAll({
+      where: whereOptions,
+      include: [models.Address, models.OffchainAttachment],
+      order: [['created_at', 'DESC']],
+    });
   }
 
-  return res.json({ status: 'Success', result: cutoff_date ? threads : threads.map((c) => c.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: {
+      threads: cutoff_date ? threads : threads.map((t) => t.toJSON()),
+      comments: comments.map((c) => c.toJSON())
+    }
+  });
 };
 
 export default bulkThreads;
