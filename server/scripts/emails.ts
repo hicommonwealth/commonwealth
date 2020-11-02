@@ -158,9 +158,6 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
 };
 
 export const sendImmediateNotificationEmail = async (subscription, emailObject) => {
-  // supress immediate emails if running as listener
-  if (process.env.RUN_AS_LISTENER === 'true') return;
-
   const user = await subscription.getUser();
   if (!emailObject) {
     console.log('attempted to send empty immediate notification email');
