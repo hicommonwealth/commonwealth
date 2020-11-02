@@ -132,7 +132,6 @@ export default class MarlinProposal extends Proposal<
   }
 
   public get author() { return this._Holders.get(this.data.proposer); }
-//   public get applicantAddress() { return this.data.applicantAddress; }
 
   public get votingType() { return VotingType.SimpleYesNoVoting; }
   public get votingUnit() { return VotingUnit.CoinVote; }
@@ -140,10 +139,10 @@ export default class MarlinProposal extends Proposal<
   public get startingPeriod() { return +this.data.startBlock; }
   public get votingPeriodEnd() { return this.startingPeriod + +this._Gov.votingPeriod; }
 
-//   public get state(): MarlinProposalState {
-//     // TODO: Fetch state from proposal api
-//     return MarlinProposalState.Active;
-//   }
+  public async state(): Promise<MarlinProposalState> {
+    const state = await this._Gov.state(this.identifier);
+    return state;
+  }
 
   public get endTime(): ProposalEndTime { // TODO: Get current block and subtract from endBlock * 15s
     return { kind: 'fixed', time: moment.unix(this.data.endBlock) };

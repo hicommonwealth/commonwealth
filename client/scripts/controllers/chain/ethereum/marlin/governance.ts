@@ -17,6 +17,7 @@ import MarlinProposal from './proposal';
 // import MarlinHolder from './holders';
 import MarlinHolders from './holders';
 import MarlinChain from './chain';
+import { BigNumberish } from 'ethers/utils';
 
 export interface ProposalArgs {
   targets: string[],
@@ -85,7 +86,7 @@ MarlinProposal
     }
   }
 
-  public async state(proposalId: number): Promise<number> {
+  public async state(proposalId: BigNumberish): Promise<number> {
     const state = await this._api.governorAlphaContract.state(proposalId);
     if (state === null) {
       throw new Error(`Failed to get state for proposal #${proposalId}`);
