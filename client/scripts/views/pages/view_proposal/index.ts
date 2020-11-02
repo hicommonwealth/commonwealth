@@ -542,6 +542,7 @@ const ViewProposalPage: m.Component<{
         ? app.comments.refresh(proposal, null, app.activeCommunityId())
         : app.comments.refresh(proposal, app.activeChainId(), null))
         .then((result) => {
+          console.log(result);
           vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
           m.redraw();
         }).catch((err) => {

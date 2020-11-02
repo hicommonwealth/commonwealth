@@ -133,7 +133,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
   // Comments
   const comments = await models.OffchainComment.findAll({
     where: {
-      id: root_ids
+      root_id: root_ids
     },
     include: [models.Address, models.OffchainAttachment],
     order: [['created_at', 'DESC']],

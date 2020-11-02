@@ -72,7 +72,8 @@ export const idToProposal = (slug, id) => {
   let proposal = store.getByIdentifier(id);
   // check the topic-scoped thread
   if (slug === 'discussion' && !proposal) {
-    proposal = app.threads.topicScopedStore.getById(id);
+    proposal = app.threads.topicScopedStore.getById(id)
+      || app.threads.surplusStore.getByIdentifier(id);
   }
   if (!proposal) {
     throw new Error(`Proposal missing from store with id ${id}`);

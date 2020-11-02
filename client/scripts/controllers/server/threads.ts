@@ -10,9 +10,9 @@ import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo, OffchainTo
 
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
+import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 export const modelFromServer = (thread) => {
-  console.log(thread);
   const attachments = thread.OffchainAttachments
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
@@ -37,10 +37,12 @@ export const modelFromServer = (thread) => {
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
+  private _surplusStore = new ProposalStore<OffchainThread>();
   private _topicScopedStore = new TopicScopedThreadStore();
 
   public get store() { return this._store; }
   public get topicScopedStore() { return this._topicScopedStore; }
+  public get surplusStore() { return this._surplusStore; }
 
   private _initialized = false;
 
@@ -242,6 +244,10 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
+    const thread = modelFromServer(response.result);
+    const existing = this._surplusStore.getByIdentifier(thread.id);
+    if (existing) this._surplusStore.remove(thread);
+    this._surplusStore.add(thread);
     return modelFromServer(response.result);
   }
 
@@ -292,7 +298,7 @@ class ThreadsController {
         app.comments.store.remove(existing);
       }
       try {
-        app.comments.store.add(comment);
+        app.comments.store.add(modelCommentFromServer(comment));
       } catch (e) {
         console.error(e.message);
       }
@@ -315,7 +321,7 @@ class ThreadsController {
         }
         // Threads that are posted in an offchain community are still linked to a chain / author address,
         // so when we want just chain threads, then we have to filter away those that have a community
-        const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
+        const threads = (app.chain) ? response.result.threads.filter((thread) => !thread.community) : response.result.threads;
 
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address

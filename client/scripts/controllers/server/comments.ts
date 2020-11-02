@@ -185,6 +185,7 @@ class CommentsController {
   }
 
   public async refresh(proposal, chainId: string, communityId: string) {
+    console.log(proposal);
     return new Promise(async (resolve, reject) => {
       try {
         // TODO: Change to GET /comments
@@ -196,19 +197,20 @@ class CommentsController {
         if (response.status !== 'Success') {
           reject(new Error(`Unsuccessful status: ${response.status}`));
         }
-        this._store.clearProposal(proposal);
-        Promise.all(response.result.map(async (comment) => {
+        try {
+          this._store.clearProposal(proposal);
+        } catch (e) {
+          console.log(e);
+        }
+        response.result.forEach((comment) => {
           // TODO: Comments should always have a linked Address
           if (!comment.Address) console.error('Comment missing linked address');
           const model = modelFromServer(comment);
           this._store.add(model);
-          return model;
-        })).then((result) => {
-          resolve(result);
-        }).catch((error) => {
-          reject(error);
         });
+        resolve();
       } catch (err) {
+        console.log(err);
         console.log('Failed to load comments');
         reject(new Error(err.responseJSON?.error ? err.responseJSON.error : 'Error loading comments'));
       }
