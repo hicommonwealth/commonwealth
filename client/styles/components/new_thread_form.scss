@@ -94,7 +94,7 @@
         }
         button[name="submit"], button[name="submission"] {
             margin-right: 12px;
-            margin-bottom: 8px;
+            // no margin-bottom here because it breaks button alignment
         }
         .error-message {
             @include error-text;
