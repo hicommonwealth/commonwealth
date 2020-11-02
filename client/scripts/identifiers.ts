@@ -69,9 +69,15 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
 
 export const idToProposal = (slug, id) => {
   const store = proposalSlugToStore(slug);
-  const proposal = store.getByIdentifier(id);
+  let proposal = store.getByIdentifier(id);
+  // check the topic-scoped thread
+  if (slug === 'discussion' && !proposal) {
+    console.log('PULLING FROM TSS');
+    proposal = app.threads.topicScopedStore.getById(id);
+    console.log(proposal);
+  }
   if (!proposal) {
-    throw new Error(`invalid id: ${id}`);
+    throw new Error(`Proposal missing from store with id ${id}`);
   } else {
     return proposal;
   }

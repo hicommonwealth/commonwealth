@@ -5,7 +5,6 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const getThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
 
   let thread;
@@ -20,9 +19,9 @@ const getThread = async (models, req: Request, res: Response, next: NextFunction
     console.log(e);
   }
 
-  console.log(thread);
-
-  return res.json({ status: 'Success', result: thread.toJSON() });
+  return thread
+    ? res.json({ status: 'Success', result: thread.toJSON() })
+    : res.json({ status: 'Failure' });
 };
 
 export default getThread;
