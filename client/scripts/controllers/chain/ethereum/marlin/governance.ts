@@ -12,7 +12,6 @@ import { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 
-import Marlin from './adapter';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
 // import MarlinHolder from './holders';
