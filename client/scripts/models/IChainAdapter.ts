@@ -102,8 +102,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public deinitServer() {
     this._serverLoaded = false;
     this.app.threads.deinit();
-    this.app.reactions.deinit();
     this.app.comments.deinit();
+    this.app.reactions.deinit();
     if (this.chainEntities) {
       this.chainEntities.deinit();
     }
