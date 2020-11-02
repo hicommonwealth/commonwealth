@@ -69,6 +69,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   },
   oninit: (vnode) => {
     vnode.state.lookback = {};
+    // TODO: This will become a problem if anyone creates a topic named allProposals
     const subpage = vnode.attrs.topic || 'allProposals';
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
     vnode.state.lookback[subpage] = (returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`])
@@ -263,7 +264,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               m(ProposalsLoadingRow),
             ])
             : emptyTopic
-              // TODO: Ensure that this doesn't get shown on first pass
+              // TODO: Ensure that this doesn't get shown on first render
               ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
               : m(Listing, {
                 content: listing,

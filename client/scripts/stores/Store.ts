@@ -10,8 +10,6 @@ abstract class Store<T> {
     const index = eqFn ? this._store.findIndex(eqFn) : this._store.indexOf(item);
     if (index === -1) {
       console.error('Attempting to remove an object that was not found in the store:');
-      console.log(item);
-      console.log(this._store);
       return this;
     }
     this._store.splice(index, 1);

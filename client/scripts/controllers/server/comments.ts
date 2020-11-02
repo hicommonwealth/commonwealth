@@ -196,11 +196,7 @@ class CommentsController {
         if (response.status !== 'Success') {
           reject(new Error(`Unsuccessful status: ${response.status}`));
         }
-        try {
-          this._store.clearProposal(proposal);
-        } catch (e) {
-          console.log(e);
-        }
+        this._store.clearProposal(proposal);
         response.result.forEach((comment) => {
           // TODO: Comments should always have a linked Address
           if (!comment.Address) console.error('Comment missing linked address');
@@ -209,7 +205,6 @@ class CommentsController {
         });
         resolve();
       } catch (err) {
-        console.log(err);
         console.log('Failed to load comments');
         reject(new Error(err.responseJSON?.error ? err.responseJSON.error : 'Error loading comments'));
       }

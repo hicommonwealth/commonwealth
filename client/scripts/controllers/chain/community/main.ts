@@ -37,6 +37,7 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     this._serverLoaded = false;
     this.app.threads.deinit();
     this.app.reactions.deinit();
+    this.app.comments.deinit();
     console.log('Community stopped.');
   }
 }

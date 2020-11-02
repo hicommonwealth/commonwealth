@@ -39,6 +39,7 @@ class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
   private _listingStore = new ProposalStore<OffchainThread>();
   private _topicListingStore = new TopicScopedThreadStore();
+  // TODO: Merge topic- and listingStore; use topic ids instead of names to prevent k/v issues
 
   public get store() { return this._store; }
   public get listingStore() { return this._listingStore; }
