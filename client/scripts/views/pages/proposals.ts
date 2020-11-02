@@ -157,18 +157,23 @@ const ProposalsPage: m.Component<{}> = {
     const activeMolochProposals = onMoloch
       && (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
+    const activeMarlinProposals = onMarlin
+      && (app.chain as Marlin).governance.store.getAll().filter((p) => !p.completed)
+        .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
 
     const activeProposalContent = !activeDemocracyProposals?.length
       && !activeCouncilProposals?.length
       && !activeSignalingProposals?.length
       && !activeCosmosProposals?.length
       && !activeMolochProposals?.length
+      && !activeMarlinProposals?.length
       ? [ m('.no-proposals', 'None') ]
       : (activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
+        .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((activeMarlinProposals || []).map((proposal) => m(ProposalRow, { proposal })));
 
     // inactive proposals
     const inactiveDemocracyProposals = onSubstrate
@@ -184,6 +189,9 @@ const ProposalsPage: m.Component<{}> = {
     const inactiveMolochProposals = onMoloch
       && (app.chain as Moloch).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
+    const inactiveMarlinProposals = onMarlin
+      && (app.chain as Marlin).governance.store.getAll().filter((p) => p.completed)
+        .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
 
     const inactiveProposalContent = !inactiveDemocracyProposals?.length
       && !inactiveCouncilProposals?.length
