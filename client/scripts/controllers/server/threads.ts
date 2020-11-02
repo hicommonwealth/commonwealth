@@ -289,19 +289,24 @@ class ThreadsController {
     const comments = (app.chain)
       ? response.result.comments.filter((comment) => !comment.community)
       : response.result.comments;
-    const store = topicId ? this._topicListingStore : this._listingStore;
     for (const thread of threads) {
+      const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
         console.error('OffchainThread missing address');
       }
-      if (!topicId) {
-        const existing = this._listingStore.getByIdentifier(thread.id);
-        if (existing) {
-          store.remove(existing);
-        }
-      }
       try {
-        store.add(modelFromServer(thread));
+        if (topicId) {
+          if (this._topicListingStore.getById(thread.id)) {
+            this._topicListingStore.remove(this._topicListingStore.getById(thread.id));
+          }
+          this._topicListingStore.add(modeledThread);
+        } else {
+          if (this._listingStore.getByIdentifier(thread.id)) {
+            this._listingStore.remove(this._listingStore.getByIdentifier(thread.id));
+          }
+          this._listingStore.add(modeledThread);
+        }
+        this._store.add(modeledThread);
       } catch (e) {
         console.error(e.message);
       }
@@ -366,14 +371,15 @@ class ThreadsController {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
-      this._topicListingStore.clear();
     }
     for (const thread of initialThreads) {
+      const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
         console.error('OffchainThread missing address');
       }
       try {
-        this._store.add(modelFromServer(thread));
+        this._store.add(modeledThread);
+        this._listingStore.add(modeledThread);
       } catch (e) {
         console.error(e.message);
       }

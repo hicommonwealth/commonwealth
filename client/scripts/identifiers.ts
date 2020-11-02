@@ -69,12 +69,7 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
 
 export const idToProposal = (slug, id) => {
   const store = proposalSlugToStore(slug);
-  let proposal = store.getByIdentifier(id);
-  // check the topic-scoped thread
-  if (slug === 'discussion' && !proposal) {
-    proposal = app.threads.topicListingStore.getById(id)
-      || app.threads.surplusStore.getByIdentifier(id);
-  }
+  const proposal = store.getByIdentifier(id);
   if (!proposal) {
     throw new Error(`Proposal missing from store with id ${id}`);
   } else {
