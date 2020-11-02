@@ -16,6 +16,7 @@ import MarlinChain from './chain';
 import MarlinGovernance from './governance';
 import MarlinProposal from './proposal';
 import MarlinHolders from './holders';
+import moment from 'moment';
 
 export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
@@ -79,6 +80,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     // TODO: This was for marlin accounts? maybe not necessary
     // await this.accounts.init(api, this.chain, this.ethAccounts);
     // await this.accounts.init(this.chain);
+    this.block.height = await api.Provider.getBlockNumber();
     await super.initApi();
   }
 
