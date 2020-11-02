@@ -89,8 +89,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       });
     }
 
-    const { threads, reactions, topics, admins } = response.result;
+    const { threads, comments, reactions, topics, admins } = response.result;
     this.app.threads.initialize(threads, true);
+    this.app.comments.initialize(comments, true);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
     this.meta.chain.setAdmins(admins);

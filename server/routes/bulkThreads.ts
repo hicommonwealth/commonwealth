@@ -109,7 +109,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       return data;
     });
 
-    comments = await models.OffchainComments.findAll({
+    comments = await models.OffchainComment.findAll({
       where: {
         id: root_ids
       },
@@ -127,7 +127,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       order: [['created_at', 'DESC']],
     });
 
-    comments = await models.OffchainThread.findAll({
+    comments = await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],

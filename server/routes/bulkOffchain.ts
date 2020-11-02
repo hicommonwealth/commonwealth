@@ -94,7 +94,10 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     console.log(e);
   }
 
+  const root_ids = [];
   const threads = preprocessedThreads.map((t) => {
+    const root_id = `discussion_${t.thread_id}`;
+    root_ids.push(root_id);
     const data = {
       id: t.thread_id,
       title: t.thread_title,
@@ -127,6 +130,15 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
 
   const allThreads = pinnedThreads.map((t) => t.toJSON()).concat(threads);
 
+  // Comments
+  const comments = await models.OffchainComment.findAll({
+    where: {
+      id: root_ids
+    },
+    include: [models.Address, models.OffchainAttachment],
+    order: [['created_at', 'DESC']],
+  });
+
   // Reactions
   const reactions = await models.OffchainReaction.findAll({
     where: community
@@ -152,9 +164,10 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
   return res.json({
     status: 'Success',
     result: {
-      topics: topics.map((c) => c.toJSON()),
+      topics: topics.map((t) => t.toJSON()),
       reactions: reactions.map((r) => r.toJSON()),
       admins: admins.map((a) => a.toJSON()),
+      comments: comments.map((c) => c.toJSON()),
       threads: allThreads,
     }
   });
