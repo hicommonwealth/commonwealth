@@ -245,24 +245,30 @@ class ThreadsController {
   }
 
   // loadNextPage returns false if there are no more threads to load
-  public async loadNextPage(chainId: string, communityId: string, cutoffDate: moment.Moment, topic_id?: OffchainTopic) {
+  public async loadNextPage(options: {
+    chainId: string,
+    communityId: string,
+    cutoffDate: moment.Moment,
+    topicId?: OffchainTopic
+  }) {
+    const { chainId, communityId, cutoffDate, topicId } = options;
     const params = {
       chain: chainId,
       community: communityId,
       cutoff_date: cutoffDate.toISOString(),
     };
-    if (topic_id) params['topic_id'] = topic_id;
+    if (topicId) params['topic_id'] = topicId;
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const threads = (app.chain) ? response.result.filter((thread) => !thread.community) : response.result;
-    const store = topic_id ? this._topicScopedStore : this._store;
+    const store = topicId ? this._topicScopedStore : this._store;
     for (const thread of threads) {
       if (!thread.Address) {
         console.error('OffchainThread missing address');
       }
-      if (!topic_id) {
+      if (!topicId) {
         const existing = this._store.getByIdentifier(thread.id);
         if (existing) {
           store.remove(existing);

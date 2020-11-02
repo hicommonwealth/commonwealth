@@ -92,28 +92,30 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     if (!vnode.state.topicInitialized[subpage]) {
       vnode.state.postsDepleted = false;
       $(window).off('scroll');
-      let topic_id;
 
       // Fetch first page of posts
       if (!vnode.state.lookback[subpage]
         || !vnode.state.lookback[subpage]?._isAMomentObject) {
         vnode.state.lookback[subpage] = moment();
       }
-      const args = app.activeCommunityId()
-        ? [null, app.activeCommunityId(), vnode.state.lookback[subpage]]
-        : [app.activeChainId(), null, vnode.state.lookback[subpage]];
+      let topicId;
       if (topic) {
-        topic_id = app.topics.getByName(topic, app.activeId())?.id;
-        if (!topic_id) {
+        topicId = app.topics.getByName(topic, app.activeId())?.id;
+        if (!topicId) {
           notifyError('Cannot fetch posts: Improperly configured topics.');
           return m(EmptyTopicPlaceholder, {
             communityName: app.activeId(),
             topicName: topic
           });
         }
-        args.push(topic_id);
       }
-      (<any>app.threads.loadNextPage)(...args).then((morePostsRemaining) => {
+      const options = {
+        chainId: app.activeChainId(),
+        communityId: app.activeCommunityId(),
+        cutoffDate: vnode.state.lookback[subpage],
+        topicId,
+      };
+      app.threads.loadNextPage(options).then((morePostsRemaining) => {
         if (!morePostsRemaining) vnode.state.postsDepleted = true;
         m.redraw();
       });
@@ -121,14 +123,16 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       // Initialize infiniteScroll
       vnode.state.onscroll = _.debounce(async () => {
         if (vnode.state.postsDepleted) return;
-        const args_ = app.activeCommunityId()
-          ? [null, app.activeCommunityId(), vnode.state.lookback[subpage]]
-          : [app.activeChainId(), null, vnode.state.lookback[subpage]];
-        if (topic_id) args_.push(topic_id);
+        const options_ = {
+          chainId: app.activeChainId(),
+          communityId: app.activeCommunityId(),
+          cutoffDate: vnode.state.lookback[subpage],
+          topicId,
+        };
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
-          const morePostsRemaining = await (<any>app.threads.loadNextPage)(...args_);
+          const morePostsRemaining = await app.threads.loadNextPage(options_);
           if (!morePostsRemaining) vnode.state.postsDepleted = true;
           m.redraw();
         }
