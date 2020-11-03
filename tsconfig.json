@@ -7,6 +7,10 @@
     "allowSyntheticDefaultImports": true,
     "outDir": "./dist",
     "baseUrl": "./src",
+    "paths": {
+      "@polkadot/api/augment": ["./node_modules/@edgeware/node-types/interfaces/augment-api.d.ts"],
+      "@polkadot/types/augment": ["./node_modules/@edgeware/node-types/interfaces/augment-types.d.ts"],
+    },
     "declaration": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,

@@ -81,7 +81,11 @@ console.log(`Connecting to ${network} on url ${url}...`)
 if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
   SubstrateEvents.createApi(url, spec).then(async (api) => {
     const fetcher = new SubstrateEvents.StorageFetcher(api);
-    await fetcher.fetch();
+    try {
+      await fetcher.fetch();
+    } catch (err) {
+      console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
+    }
     SubstrateEvents.subscribeEvents({
       chain: network,
       api,
