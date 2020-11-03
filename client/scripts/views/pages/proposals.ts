@@ -104,15 +104,6 @@ const MarlinProposalStats: m.Component<{}, {}> = {
           ]),
         ]),
       ]),
-      // m(Col, { span: { xs: 6, md: 3 } }, [
-      //   m('.stats-tile', [
-      //     m('.stats-heading', 'Enactment delay'),
-      //     (app.chain as Marlin).democracy.enactmentPeriod
-      //       ? blockperiodToDuration((app.chain as Marlin).democracy.enactmentPeriod).asDays()
-      //       : '--',
-      //     ' days'
-      //   ]),
-      // ]),
     ]);
   }
 };
