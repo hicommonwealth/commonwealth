@@ -1,4 +1,3 @@
-/* eslint-disable eqeqeq */
 import m from 'mithril';
 import $ from 'jquery';
 import { Input, TextArea, Icon, Icons, Switch } from 'construct-ui';
@@ -24,7 +23,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
         const isSelf = role.Address.address === app.user.activeAccount?.address
           && role.Address.chain === app.user.activeAccount?.chain.id;
         const roleBelongsToUser = !!app.user.addresses
-          .filter((addr_) => addr_.id == (role.address_id || role.Address.id))
+          .filter((addr_) => addr_.id === (role.address_id || role.Address.id))
           .length;
         return m('.RoleChild', [
           m(User, {
@@ -41,7 +40,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
               const adminsAndMods = await communityMeta.getAdminsAndMods(app.activeId());
               const userAdminsAndMods = adminsAndMods.filter((role_) => {
                 const belongsToUser = !!app.user.addresses
-                  .filter((addr_) => addr_.id == role_.address_id)
+                  .filter((addr_) => addr_.id === role_.address_id)
                   .length;
                 return (belongsToUser);
               });
