@@ -91,9 +91,10 @@
                 // suppress button group styling
                 display: none !important;
             }
+            border-right: 1px #d8dee0 solid;
         }
         > .cui-button:nth-child(1) {
-            border-right: 1px #d8dee0 solid;
+            border-left: none;
         }
     }
 }
