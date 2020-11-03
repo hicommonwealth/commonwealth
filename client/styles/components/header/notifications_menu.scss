@@ -1,7 +1,9 @@
 @import 'client/styles/shared';
 
 .NotificationsMenuButton {
-    padding: 0 10px !important;
+    padding: 0 !important;
+    width: 38px;
+    text-align: center;
 
     .notification-count {
         background: $negative-bg-color;
