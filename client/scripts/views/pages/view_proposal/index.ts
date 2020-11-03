@@ -473,7 +473,8 @@ const ViewProposalPage: m.Component<{
   prefetch: IPrefetch,
   comments,
   viewCount: number,
-  proposal: AnyProposal | OffchainThread
+  proposal: AnyProposal | OffchainThread,
+  threadFetched,
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -512,10 +513,13 @@ const ViewProposalPage: m.Component<{
       } catch (e) {
         // proposal might be loading, if it's not an offchain thread
         if (proposalType === ProposalType.OffchainThread) {
-          app.threads.fetchThread(Number(proposalId)).then((res) => {
-            vnode.state.proposal = res;
-            m.redraw();
-          });
+          if (!vnode.state.threadFetched) {
+            app.threads.fetchThread(Number(proposalId)).then((res) => {
+              vnode.state.proposal = res;
+              m.redraw();
+            });
+            vnode.state.threadFetched = true;
+          }
           return m(PageLoading, { narrow: true, showNewProposalButton: true });
         } else {
           if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });

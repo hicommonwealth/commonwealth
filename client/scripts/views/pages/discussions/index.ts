@@ -26,6 +26,7 @@ import DiscussionRow from './discussion_row';
 interface IDiscussionPageState {
   lookback?: { [community: string]: moment.Moment} ;
   postsDepleted: { [community: string]: boolean };
+  topicInitialized: { [community: string]: boolean };
   lastSubpage: string;
   lastVisitedUpdated?: boolean;
   onscroll: any;
@@ -70,6 +71,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   oninit: (vnode) => {
     vnode.state.lookback = {};
     vnode.state.postsDepleted = {};
+    vnode.state.topicInitialized = {};
     // TODO: This will become a problem if anyone creates a topic named allProposals
     const subpage = vnode.attrs.topic || 'allProposals';
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
@@ -90,7 +92,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     if (newSubpage) {
       $(window).off('scroll');
 
-      // Fetch first page of posts
       if (!vnode.state.lookback[subpage]
         || !vnode.state.lookback[subpage]?._isAMomentObject) {
         vnode.state.lookback[subpage] = moment();
@@ -100,37 +101,41 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       if (topic) {
         topicId = app.topics.getByName(topic, app.activeId())?.id;
         if (!topicId) {
-          notifyError('Cannot fetch posts: Improperly configured topics.');
+          notifyError('Cannot fetch posts: Improperly configured topic.');
           return m(EmptyTopicPlaceholder, {
             communityName: app.activeId(),
             topicName: topic
           });
         }
       }
+
+      // cutoffDate is the furthest date, back in the forum history, that has been fetched
+      // and stored for a given community subpage. It is used in the loadNextPage threads ctrlr
+      // function as the query cutoff, fetching only threads older than it.
       const options = {
         chainId: app.activeChainId(),
         communityId: app.activeCommunityId(),
         cutoffDate: vnode.state.lookback[subpage],
         topicId,
       };
-      app.threads.loadNextPage(options).then((morePostsRemaining) => {
-        if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
-        m.redraw();
-      });
+
+      if (!vnode.state.topicInitialized[subpage]) {
+        // Fetch first page of posts
+        app.threads.loadNextPage(options).then((morePostsRemaining) => {
+          if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
+          m.redraw();
+        });
+        vnode.state.topicInitialized[subpage] = true;
+      }
 
       // Initialize infiniteScroll
       vnode.state.onscroll = _.debounce(async () => {
         if (vnode.state.postsDepleted[subpage]) return;
-        const options_ = {
-          chainId: app.activeChainId(),
-          communityId: app.activeCommunityId(),
-          cutoffDate: vnode.state.lookback[subpage],
-          topicId,
-        };
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
-          const morePostsRemaining = await app.threads.loadNextPage(options_);
+          options.cutoffDate = vnode.state.lookback[subpage];
+          const morePostsRemaining = await app.threads.loadNextPage(options);
           if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
           m.redraw();
         }
