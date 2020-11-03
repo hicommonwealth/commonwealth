@@ -78,6 +78,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
 
     // TODO: This was for marlin accounts? maybe not necessary
     await this.accounts.init(api, this.chain, this.ethAccounts);
+    console.log('accounts:', this.accounts);
     this.block.height = await api.Provider.getBlockNumber();
     await super.initApi();
   }
