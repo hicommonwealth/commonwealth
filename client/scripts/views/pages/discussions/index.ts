@@ -23,6 +23,8 @@ import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
+export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
+
 interface IDiscussionPageState {
   lookback?: { [community: string]: moment.Moment} ;
   postsDepleted: { [community: string]: boolean };
@@ -73,7 +75,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     vnode.state.postsDepleted = {};
     vnode.state.topicInitialized = {};
     // TODO: This will become a problem if anyone creates a topic named allProposals
-    const subpage = vnode.attrs.topic || 'allProposals';
+    const subpage = vnode.attrs.topic || ALL_PROPOSALS_KEY;
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
     vnode.state.lookback[subpage] = (returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`])
       ? localStorage[`${app.activeId()}-lookback-${subpage}`]
@@ -85,7 +87,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return;
-    const subpage = topic || 'allProposals';
+    const subpage = topic || ALL_PROPOSALS_KEY;
 
     const newSubpage = subpage !== vnode.state.lastSubpage;
 
@@ -197,11 +199,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     };
 
     let listing = [];
-    const allThreads = topic
-      ? app.threads.topicListingStore.getByCommunityAndTopic(app.activeId(), topic)
-        .sort(orderDiscussionsbyLastComment)
-      : app.threads.listingStore.getAll()
-        .sort(orderDiscussionsbyLastComment);
+    const allThreads = app.threads.topicListingStore
+      .getByCommunityAndTopic(app.activeId(), subpage)
+      .sort(orderDiscussionsbyLastComment);
+
     if (allThreads.length) {
       let visitMarkerPlaced = false;
 

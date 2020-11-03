@@ -37,12 +37,9 @@ export const modelFromServer = (thread) => {
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
-  private _listingStore = new ProposalStore<OffchainThread>();
   private _topicListingStore = new TopicScopedThreadStore();
-  // TODO: Merge topic- and listingStore; use topic ids instead of names to prevent k/v issues
 
   public get store() { return this._store; }
-  public get listingStore() { return this._listingStore; }
   public get topicListingStore() { return this._topicListingStore; }
 
   private _initialized = false;
@@ -99,8 +96,9 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
-      this._listingStore.add(result);
-      this._topicListingStore.add(result);
+      // New posts are added to both the topic and allProposals sub-store
+      const storeOptions = { allProposals: true, exclusive: false };
+      this._topicListingStore.add(result, storeOptions);
       app.recentActivity.addThreads([{
         id: response.result.id,
         Address: response.result.Address,
@@ -149,15 +147,9 @@ class ThreadsController {
       },
       success: (response) => {
         const result = modelFromServer(response.result);
-        if (this._store.getByIdentifier(result.id)) {
-          this._store.remove(this._store.getByIdentifier(result.id));
-        }
-        this._store.add(result);
-        if (this._listingStore.getByIdentifier(result.id)) {
-          this._listingStore.remove(this._listingStore.getByIdentifier(result.id));
-        }
-        this._listingStore.add(result);
-        this._topicListingStore.add(result);
+        // Post edits propagate to all thread stores
+        this._store.update(result);
+        this._topicListingStore.update(result);
         return result;
       },
       error: (err) => {
@@ -176,9 +168,9 @@ class ThreadsController {
         'jwt': app.user.jwt,
         'thread_id': proposal.id,
       }).then((result) => {
-        _this.store.remove(proposal);
-        _this._listingStore.remove(proposal);
-        _this._topicListingStore.remove(proposal);
+        // Deleted posts are removed from all stores containing them
+        this.store.remove(proposal);
+        this._topicListingStore.remove(proposal);
         app.recentActivity.removeThread(proposal.id, proposal.community || proposal.chain);
         // Properly removing from recent activity will require comments/threads to have an address_id
         // app.recentActivity.removeAddressActivity([proposal]);
@@ -203,15 +195,9 @@ class ThreadsController {
       },
       success: (response) => {
         const result = modelFromServer(response.result);
-        if (this._store.getByIdentifier(result.id)) {
-          this._store.remove(this._store.getByIdentifier(result.id));
-        }
-        this._store.add(result);
-        if (this._listingStore.getByIdentifier(result.id)) {
-          this._listingStore.remove(this._listingStore.getByIdentifier(result.id));
-        }
-        this._listingStore.add(result);
-        this._topicListingStore.add(result);
+        // Post edits propagate to all thread stores
+        this._store.update(result);
+        this._topicListingStore.update(result);
         return result;
       },
       error: (err) => {
@@ -231,15 +217,9 @@ class ThreadsController {
       },
       success: (response) => {
         const result = modelFromServer(response.result);
-        if (this._store.getByIdentifier(result.id)) {
-          this._store.remove(this._store.getByIdentifier(result.id));
-        }
-        this._store.add(result);
-        if (this._listingStore.getByIdentifier(result.id)) {
-          this._listingStore.remove(this._listingStore.getByIdentifier(result.id));
-        }
-        this._listingStore.add(result);
-        this._topicListingStore.add(result);
+        // Post edits propagate to all thread stores
+        this._store.update(result);
+        this._topicListingStore.update(result);
         return result;
       },
       error: (err) => {
@@ -262,7 +242,7 @@ class ThreadsController {
     const thread = modelFromServer(response.result);
     const existing = this._store.getByIdentifier(thread.id);
     if (existing) this._store.remove(existing);
-    this._store.add(thread);
+    this._store.update(thread);
     return modelFromServer(response.result);
   }
 
@@ -271,13 +251,16 @@ class ThreadsController {
     chainId: string,
     communityId: string,
     cutoffDate: moment.Moment,
+    pageSize?: number,
     topicId?: OffchainTopic
-  }) {
+  }) : Promise<boolean> {
     const { chainId, communityId, cutoffDate, topicId } = options;
+    const pageSize = options.pageSize || 20;
     const params = {
       chain: chainId,
       community: communityId,
       cutoff_date: cutoffDate.toISOString(),
+      page_size: pageSize,
     };
     if (topicId) params['topic_id'] = topicId;
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
@@ -296,18 +279,12 @@ class ThreadsController {
         console.error('OffchainThread missing address');
       }
       try {
-        if (topicId) {
-          if (this._topicListingStore.getById(thread.id)) {
-            this._topicListingStore.remove(this._topicListingStore.getById(thread.id));
-          }
-          this._topicListingStore.add(modeledThread);
-        } else {
-          if (this._listingStore.getByIdentifier(thread.id)) {
-            this._listingStore.remove(this._listingStore.getByIdentifier(thread.id));
-          }
-          this._listingStore.add(modeledThread);
-        }
+        const storeOptions = {
+          allProposals: !topicId,
+          exclusive: true
+        };
         this._store.add(modeledThread);
+        this._topicListingStore.add(modeledThread, storeOptions);
       } catch (e) {
         console.error(e.message);
       }
@@ -325,11 +302,12 @@ class ThreadsController {
     }
 
     // Each bulkThreads call that is passed a cutoff_date param limits its query to
-    // the most recent 20 posts before that date. If it returns less than 20 posts, the
-    // relevant query is exhausted. By returning a boolean, discussion listings can ascertain
-    // whether they should continue calling the loadNextPage fn on scroll, or else notify the 
-    // user that all relevant listing threads have been exhausted.
-    return !(threads.length < 20);
+    // the most recent X posts before that date. That count, X, is determined by the pageSize param.
+    // If a query returns less than X posts, it is 'exhausted'; there are no more db entries that match
+    // the call's params. By returning a boolean, the discussion listing can determine whether
+    // it should continue calling the loadNextPage fn on scroll, or else notify the user that all
+    // relevant listing threads have been exhausted.
+    return !(threads.length < pageSize);
   }
 
   public refreshAll(chainId: string, communityId: string, reset = false) {
@@ -397,7 +375,6 @@ class ThreadsController {
   public deinit() {
     this._initialized = false;
     this._store.clear();
-    this._listingStore.clear();
     this._topicListingStore.clear();
   }
 }

@@ -9,7 +9,7 @@ abstract class Store<T> {
   public remove(item: T, eqFn?: (a: T) => boolean): Store<T> {
     const index = eqFn ? this._store.findIndex(eqFn) : this._store.indexOf(item);
     if (index === -1) {
-      console.error('Attempting to remove an object that was not found in the store:');
+      console.error('Attempting to remove an object that was not found in the store');
       return this;
     }
     this._store.splice(index, 1);
