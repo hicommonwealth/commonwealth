@@ -25,9 +25,9 @@ import DiscussionRow from './discussion_row';
 
 interface IDiscussionPageState {
   lookback?: { [community: string]: moment.Moment} ;
-  postsDepleted?: boolean;
+  postsDepleted: { [community: string]: boolean };
+  lastSubpage: string;
   lastVisitedUpdated?: boolean;
-  topicInitialized: any;
   onscroll: any;
 }
 
@@ -69,6 +69,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   },
   oninit: (vnode) => {
     vnode.state.lookback = {};
+    vnode.state.postsDepleted = {};
     // TODO: This will become a problem if anyone creates a topic named allProposals
     const subpage = vnode.attrs.topic || 'allProposals';
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
@@ -77,21 +78,16 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       : vnode.state.lookback[subpage]?._isAMomentObject
         ? vnode.state.lookback[subpage]
         : moment();
-    vnode.state.topicInitialized = {};
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
+    if (!activeEntity) return;
     const subpage = topic || 'allProposals';
 
-    // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading, {
-      title: topic || 'Discussions',
-      showNewProposalButton: true,
-    });
+    const newSubpage = subpage !== vnode.state.lastSubpage;
 
-    if (!vnode.state.topicInitialized[subpage]) {
-      vnode.state.postsDepleted = false;
+    if (newSubpage) {
       $(window).off('scroll');
 
       // Fetch first page of posts
@@ -99,6 +95,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         || !vnode.state.lookback[subpage]?._isAMomentObject) {
         vnode.state.lookback[subpage] = moment();
       }
+
       let topicId;
       if (topic) {
         topicId = app.topics.getByName(topic, app.activeId())?.id;
@@ -117,13 +114,13 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         topicId,
       };
       app.threads.loadNextPage(options).then((morePostsRemaining) => {
-        if (!morePostsRemaining) vnode.state.postsDepleted = true;
+        if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
         m.redraw();
       });
 
       // Initialize infiniteScroll
       vnode.state.onscroll = _.debounce(async () => {
-        if (vnode.state.postsDepleted) return;
+        if (vnode.state.postsDepleted[subpage]) return;
         const options_ = {
           chainId: app.activeChainId(),
           communityId: app.activeCommunityId(),
@@ -134,15 +131,22 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
           const morePostsRemaining = await app.threads.loadNextPage(options_);
-          if (!morePostsRemaining) vnode.state.postsDepleted = true;
+          if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
           m.redraw();
         }
       }, 400);
 
       $(window).on('scroll', vnode.state.onscroll);
 
-      vnode.state.topicInitialized[subpage] = true;
+      vnode.state.lastSubpage = subpage;
     }
+
+
+    // add chain compatibility (node info?)
+    if (!activeEntity?.serverLoaded) return m(PageLoading, {
+      title: topic || 'Discussions',
+      showNewProposalButton: true,
+    });
 
     localStorage[`${app.activeId()}-lookback-${subpage}`] = vnode.state.lookback[subpage];
 
@@ -247,8 +251,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       topicDescription = topicObject?.description;
     }
 
-    const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted === false);
-    const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted === true);
+    const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
+    const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true);
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',
@@ -278,14 +282,14 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
                 menuCarat: true,
               }),
           // TODO: Incorporate infinite scroll into generic Listing component
-          (allThreads.length && vnode.state.postsDepleted)
+          (allThreads.length && vnode.state.postsDepleted[subpage])
             ? m('.infinite-scroll-reached-end', [
               `Showing ${allThreads.length} of ${pluralize(allThreads.length, 'thread')}`,
               (topic ? ` under the topic '${topic}'` : '')
             ])
             : (allThreads.length)
               ? m('.infinite-scroll-spinner-wrap', [
-                m(Spinner, { active: !vnode.state.postsDepleted })
+                m(Spinner, { active: !vnode.state.postsDepleted[subpage] })
               ])
               : null
         ])
