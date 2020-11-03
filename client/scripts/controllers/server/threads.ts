@@ -323,6 +323,12 @@ class ThreadsController {
         console.error(e.message);
       }
     }
+
+    // Each bulkThreads call that is passed a cutoff_date param limits its query to
+    // the most recent 20 posts before that date. If it returns less than 20 posts, the
+    // relevant query is exhausted. By returning a boolean, discussion listings can ascertain
+    // whether they should continue calling the loadNextPage fn on scroll, or else notify the 
+    // user that all relevant listing threads have been exhausted.
     return !(threads.length < 20);
   }
 
