@@ -12,7 +12,6 @@ import EthereumChain from 'controllers/chain/ethereum/chain';
 
 import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import MarlinHolders from './holders';
-import { BigNumberish } from 'ethers/utils';
 
 export default class MarlinHolder extends EthereumAccount {
   private _isHolder: boolean;
@@ -23,13 +22,13 @@ export default class MarlinHolder extends EthereumAccount {
 
   private _Holders: MarlinHolders;
 
-  public get balance(): Observable<Comp> {
-    return from(this.initialized).pipe(
-      switchMap(() => this.isHolder
-        ? this._balance.asObservable()
-        : of(new Comp(this._Holders.api.compAddress, 0)))
-    );
-  }
+  // public get balance(): Observable<Comp> {
+  //   return from(this.initialized).pipe(
+  //     switchMap(() => this.isHolder
+  //       ? this._balance.asObservable()
+  //       : of(new Comp(this._Holders.api.compAddress, 0)))
+  //   );
+  // }
 
 
   public get isHolder() { return this._isHolder; }
