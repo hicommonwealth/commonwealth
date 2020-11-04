@@ -40,6 +40,7 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     try {
       return this._store.getByAddress(address);
     } catch (e) {
+      console.log('holders', this._Accounts);
       return new MarlinHolder(this.app, this._Chain, this._Accounts, this, address);
     }
   }

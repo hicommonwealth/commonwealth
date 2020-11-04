@@ -1,5 +1,5 @@
 // import { MarlinTypes } from '@commonwealth/chain-events';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import { Comp, EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
