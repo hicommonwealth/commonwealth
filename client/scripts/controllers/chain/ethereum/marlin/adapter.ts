@@ -50,6 +50,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   // }
 
   public async initApi() {
+    console.log('initAPI');
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
