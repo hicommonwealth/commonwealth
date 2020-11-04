@@ -63,11 +63,16 @@
         }
     }
     .cui-list-item {
-        padding: 4px 20px 4px 24px;
+        padding: 4px 10px;
+        margin: 0 14px;
+        border-radius: 4px;
         border: none;
         user-select: none;
         &.cui-selected {
             color: #111;
+        }
+        &:hover {
+            background: $background-color-light-hover;
         }
         .CommunityLabel {
             min-width: 200px;
@@ -90,7 +95,7 @@
         }
         .CommunityLabel .community-name-row {
             position: relative;
-            top: -3px;
+            top: -1px;
         }
     }
     .cui-list-item.select-list-back-home {
