@@ -137,7 +137,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     };
 
     let listing = [];
-    const allThreads = app.threads.topicListingStore
+    const allThreads = app.threads.listingStore
       .getByCommunityAndTopic(app.activeId(), subpage)
       .sort(orderDiscussionsbyLastComment);
 

@@ -35,12 +35,23 @@ export const modelFromServer = (thread) => {
   );
 };
 
+/*
+
+Threads are stored in two stores. One store, the listingStore, is responsible for all posts
+rendered in the forum/community discussions listing (pages/discussions/index.ts). It organizes
+threads first by community, then by topic or "subpage," using the const ALL_PROPOSALS_KEY to
+store non-topic-sorted threads for the main discussion listing. The relevant sub-store, for a
+given discussion listing, can be accessed via getStoreByCommunityAndTopic, again passing
+ALL_PROPOSALS_KEY for all proposals.
+
+*/
+
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
-  private _topicListingStore = new TopicScopedThreadStore();
+  private _listingStore = new TopicScopedThreadStore();
 
   public get store() { return this._store; }
-  public get topicListingStore() { return this._topicListingStore; }
+  public get listingStore() { return this._listingStore; }
 
   private _initialized = false;
 
@@ -98,7 +109,7 @@ class ThreadsController {
       this._store.add(result);
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
-      this._topicListingStore.add(result, storeOptions);
+      this._listingStore.add(result, storeOptions);
       app.recentActivity.addThreads([{
         id: response.result.id,
         Address: response.result.Address,
@@ -149,7 +160,7 @@ class ThreadsController {
         const result = modelFromServer(response.result);
         // Post edits propagate to all thread stores
         this._store.update(result);
-        this._topicListingStore.update(result);
+        this._listingStore.update(result);
         return result;
       },
       error: (err) => {
@@ -170,7 +181,7 @@ class ThreadsController {
       }).then((result) => {
         // Deleted posts are removed from all stores containing them
         this.store.remove(proposal);
-        this._topicListingStore.remove(proposal);
+        this._listingStore.remove(proposal);
         app.recentActivity.removeThread(proposal.id, proposal.community || proposal.chain);
         // Properly removing from recent activity will require comments/threads to have an address_id
         // app.recentActivity.removeAddressActivity([proposal]);
@@ -197,7 +208,7 @@ class ThreadsController {
         const result = modelFromServer(response.result);
         // Post edits propagate to all thread stores
         this._store.update(result);
-        this._topicListingStore.update(result);
+        this._listingStore.update(result);
         return result;
       },
       error: (err) => {
@@ -219,7 +230,7 @@ class ThreadsController {
         const result = modelFromServer(response.result);
         // Post edits propagate to all thread stores
         this._store.update(result);
-        this._topicListingStore.update(result);
+        this._listingStore.update(result);
         return result;
       },
       error: (err) => {
@@ -279,7 +290,7 @@ class ThreadsController {
           exclusive: true
         };
         this._store.add(modeledThread);
-        this._topicListingStore.add(modeledThread, storeOptions);
+        this._listingStore.add(modeledThread, storeOptions);
       } catch (e) {
         console.error(e.message);
       }
@@ -350,7 +361,7 @@ class ThreadsController {
   public initialize(initialThreads: any[], reset = true) {
     if (reset) {
       this._store.clear();
-      this._topicListingStore.clear();
+      this._listingStore.clear();
     }
     for (const thread of initialThreads) {
       const modeledThread = modelFromServer(thread);
@@ -361,7 +372,7 @@ class ThreadsController {
         this._store.add(modeledThread);
         // Initialization only populates AllProposals and pinned
         const options = { allProposals: true, exclusive: !modeledThread.pinned };
-        this._topicListingStore.add(modeledThread, options);
+        this._listingStore.add(modeledThread, options);
       } catch (e) {
         console.error(e.message);
       }
@@ -372,7 +383,7 @@ class ThreadsController {
   public deinit() {
     this._initialized = false;
     this._store.clear();
-    this._topicListingStore.clear();
+    this._listingStore.clear();
   }
 }
 

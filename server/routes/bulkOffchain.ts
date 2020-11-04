@@ -72,6 +72,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         FROM "OffchainComments"
         WHERE ${communityOptions}
         AND root_id LIKE 'discussion%'
+        AND deleted_at IS NULL
         GROUP BY root_id
         ) c
       ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id

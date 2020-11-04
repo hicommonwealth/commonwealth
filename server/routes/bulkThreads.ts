@@ -51,6 +51,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           WHERE ${communityOptions}
             AND root_id LIKE 'discussion%'
             AND created_at < :created_at
+            AND deleted_at IS NULL
           GROUP BY root_id
           ) c
         ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
