@@ -45,7 +45,7 @@ given discussion listing, can be accessed via getStoreByCommunityAndTopic, again
 ALL_PROPOSALS_KEY for all proposals.
 
 The second store, "store", is a standard ProposalStore. All fetched threads are added to it,
-regardless of whether they belong on a given listing. 
+regardless of whether they belong on a given listing.
 
 Threads are fetched in several ways depending on context. On chain or community initialization,
 /bulkOffchain is called directly from the init page (bypassing the threads controller) and
@@ -282,7 +282,10 @@ class ThreadsController {
     topicId?: OffchainTopic
   }) : Promise<boolean> {
     const { chainId, communityId, cutoffDate, topicId } = options;
-    const pageSize = options.pageSize || 20;
+    // pageSize can not exceed 50
+    const pageSize = options.pageSize
+      ? Math.min(options.pageSize, 50)
+      : 20;
     const params = {
       chain: chainId,
       community: communityId,
