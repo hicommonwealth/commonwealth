@@ -355,7 +355,7 @@ class ThreadsController {
   public initialize(initialThreads: any[], reset = true) {
     if (reset) {
       this._store.clear();
-      this._listingStore.clear();
+      this._topicListingStore.clear();
     }
     for (const thread of initialThreads) {
       const modeledThread = modelFromServer(thread);
@@ -364,7 +364,9 @@ class ThreadsController {
       }
       try {
         this._store.add(modeledThread);
-        this._listingStore.add(modeledThread);
+        // Only initialize the main, 'All Proposals' index
+        const options = { allProposals: true, exclusive: true };
+        this._topicListingStore.add(modeledThread, options);
       } catch (e) {
         console.error(e.message);
       }
