@@ -26,6 +26,8 @@ import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/subs
 import { SubstrateCollectiveProposal } from 'client/scripts/controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substrate/democracy_proposal';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
+import MarlinProposal, { MarlinProposalState, MarlinProposalVote } from 'controllers/chain/ethereum/marlin/proposal';
+
 import { Icon, Icons, Grid, Col } from 'construct-ui';
 import ReactionButton, { ReactionType } from './reaction_button';
 import ListingRow from './listing_row';
