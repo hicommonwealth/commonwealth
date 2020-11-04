@@ -4,7 +4,6 @@ import { from, of, Observable, BehaviorSubject } from 'rxjs';
 import { switchMap, first } from 'rxjs/operators';
 
 import { Comp } from 'adapters/chain/ethereum/types';
-// import { IMarlinHolder } from 'adapters/chain/Marlin/types';
 
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumAccount from 'controllers/chain/ethereum/account';
