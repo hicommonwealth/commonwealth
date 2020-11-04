@@ -44,6 +44,9 @@ export const proposalSlugToClass = () => {
   if (app.chain.class === ChainClass.Moloch) {
     mmap.set('molochproposal', (app.chain as any).governance);
   }
+  if (app.chain.class === ChainClass.Marlin) {
+    mmap.set('marlinproposal', (app.chain as any).governance);
+  }
   return mmap;
 };
 
@@ -65,7 +68,8 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['treasuryproposal', 'Treasury Proposal'],
   ['discussion', 'Discussion Thread'],
   ['cosmosproposal', 'Cosmos Proposal'],
-  ['molochproposal', 'Moloch Proposal']
+  ['molochproposal', 'Moloch Proposal'],
+  ['marlinproposal', 'Marlin Proposal']
 ]);
 
 export const idToProposal = (slug, id) => {
