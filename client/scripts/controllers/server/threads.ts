@@ -267,9 +267,11 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
+    console.log(response.result.threads.length);
     const threads = (app.chain)
       ? response.result.threads.filter((thread) => !thread.community)
       : response.result.threads;
+    console.log(threads.length);
     const comments = (app.chain)
       ? response.result.comments.filter((comment) => !comment.community)
       : response.result.comments;
@@ -364,8 +366,8 @@ class ThreadsController {
       }
       try {
         this._store.add(modeledThread);
-        // Only initialize the main, 'All Proposals' index
-        const options = { allProposals: true, exclusive: true };
+        // Initialization only populates AllProposals and pinned
+        const options = { allProposals: true, exclusive: !modeledThread.pinned };
         this._topicListingStore.add(modeledThread, options);
       } catch (e) {
         console.error(e.message);

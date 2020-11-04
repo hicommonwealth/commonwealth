@@ -74,7 +74,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     vnode.state.lookback = {};
     vnode.state.postsDepleted = {};
     vnode.state.topicInitialized = {};
-    // TODO: This will become a problem if anyone creates a topic named allProposals
+    vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = true;
     const subpage = vnode.attrs.topic || ALL_PROPOSALS_KEY;
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
     vnode.state.lookback[subpage] = (returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`])
@@ -89,73 +89,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     if (!activeEntity) return;
     const subpage = topic || ALL_PROPOSALS_KEY;
 
-    const newSubpage = subpage !== vnode.state.lastSubpage;
-
-    if (newSubpage) {
-      $(window).off('scroll');
-
-      if (!vnode.state.lookback[subpage]
-        || !vnode.state.lookback[subpage]?._isAMomentObject) {
-        vnode.state.lookback[subpage] = moment();
-      }
-
-      let topicId;
-      if (topic) {
-        topicId = app.topics.getByName(topic, app.activeId())?.id;
-        if (!topicId) {
-          notifyError('Cannot fetch posts: Improperly configured topic.');
-          return m(EmptyTopicPlaceholder, {
-            communityName: app.activeId(),
-            topicName: topic
-          });
-        }
-      }
-
-      // cutoffDate is the furthest date, back in the forum history, that has been fetched
-      // and stored for a given community subpage. It is used in the loadNextPage threads ctrlr
-      // function as the query cutoff, fetching only threads older than it.
-      const options = {
-        chainId: app.activeChainId(),
-        communityId: app.activeCommunityId(),
-        cutoffDate: vnode.state.lookback[subpage],
-        topicId,
-      };
-
-      if (!vnode.state.topicInitialized[subpage]) {
-        // Fetch first page of posts
-        app.threads.loadNextPage(options).then((morePostsRemaining) => {
-          if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
-          m.redraw();
-        });
-        vnode.state.topicInitialized[subpage] = true;
-      }
-
-      // Initialize infiniteScroll
-      vnode.state.onscroll = _.debounce(async () => {
-        if (vnode.state.postsDepleted[subpage]) return;
-        const scrollHeight = $(document).height();
-        const scrollPos = $(window).height() + $(window).scrollTop();
-        if (scrollPos > (scrollHeight - 400)) {
-          options.cutoffDate = vnode.state.lookback[subpage];
-          const morePostsRemaining = await app.threads.loadNextPage(options);
-          if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
-          m.redraw();
-        }
-      }, 400);
-
-      $(window).on('scroll', vnode.state.onscroll);
-
-      vnode.state.lastSubpage = subpage;
-    }
-
-
     // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading, {
       title: topic || 'Discussions',
       showNewProposalButton: true,
     });
-
-    localStorage[`${app.activeId()}-lookback-${subpage}`] = vnode.state.lookback[subpage];
 
     const activeNode = app.chain?.meta;
     const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
@@ -203,22 +141,25 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       .getByCommunityAndTopic(app.activeId(), subpage)
       .sort(orderDiscussionsbyLastComment);
 
-    if (allThreads.length) {
-      let visitMarkerPlaced = false;
-
-      // normal threads
-      const sortedThreads = allThreads.filter((t) => !t.pinned);
-
-      const firstThread = sortedThreads[0];
-      const lastThread = sortedThreads[sortedThreads.length - 1];
-
-      vnode.state.lookback[subpage] = lastThread.createdAt;
-
+    if (allThreads.length > 0) {
       // pinned threads - inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
       if (pinnedThreads.length > 0) {
         listing.push(m(PinnedListing, { proposals: pinnedThreads }));
+      }
+    }
 
+    const sortedThreads = allThreads.filter((t) => !t.pinned);
+
+    const firstThread = sortedThreads[0];
+    const lastThread = sortedThreads[sortedThreads.length - 1];
+
+    if (sortedThreads.length > 0) {
+      let visitMarkerPlaced = false;
+      vnode.state.lookback[subpage] = moment(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
+      console.log(vnode.state.lookback);
+
+      if (allThreads.length > sortedThreads.length) {
         if (firstThread && getLastUpdate(firstThread) > lastVisited) {
           listing.push(getLastSeenDivider(false));
         }
@@ -250,6 +191,65 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       }
     }
 
+    const newSubpage = subpage !== vnode.state.lastSubpage;
+
+    if (newSubpage) {
+      $(window).off('scroll');
+
+      let topicId;
+      if (topic) {
+        topicId = app.topics.getByName(topic, app.activeId())?.id;
+        if (!topicId) {
+          return m(EmptyTopicPlaceholder, {
+            communityName: app.activeId(),
+            topicName: topic
+          });
+        }
+      }
+
+      if (!vnode.state.lookback[subpage]
+        || !vnode.state.lookback[subpage]?._isAMomentObject) {
+        vnode.state.lookback[subpage] = moment();
+      }
+
+      // cutoffDate is the furthest date, back in the forum history, that has been fetched
+      // and stored for a given community subpage. It is used in the loadNextPage threads ctrlr
+      // function as the query cutoff, fetching only threads older than it.
+      const options = {
+        chainId: app.activeChainId(),
+        communityId: app.activeCommunityId(),
+        cutoffDate: vnode.state.lookback[subpage],
+        topicId,
+      };
+
+      if (!vnode.state.topicInitialized[subpage]) {
+        // Fetch first page of posts
+        app.threads.loadNextPage(options).then((morePostsRemaining) => {
+          if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
+          m.redraw();
+        });
+        vnode.state.topicInitialized[subpage] = true;
+      }
+
+      // Initialize infiniteScroll
+      vnode.state.onscroll = _.debounce(async () => {
+        if (vnode.state.postsDepleted[subpage]) return;
+        const scrollHeight = $(document).height();
+        const scrollPos = $(window).height() + $(window).scrollTop();
+        if (scrollPos > (scrollHeight - 400)) {
+          options.cutoffDate = vnode.state.lookback[subpage];
+          const morePostsRemaining = await app.threads.loadNextPage(options);
+          if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
+          console.log(vnode.state);
+          m.redraw();
+        }
+      }, 400);
+
+      $(window).on('scroll', vnode.state.onscroll);
+
+      vnode.state.lastSubpage = subpage;
+    }
+
     let topicDescription;
     if (topic && app.activeId()) {
       const topics = app.topics.getByCommunity(app.activeId());
@@ -257,6 +257,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       topicDescription = topicObject?.description;
     }
 
+    localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, vnode.state.lookback[subpage]);
     const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
     const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true);
     return m(Sublayout, {
