@@ -267,14 +267,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    console.log(response.result.threads.length);
-    const threads = (app.chain)
-      ? response.result.threads.filter((thread) => !thread.community)
-      : response.result.threads;
-    console.log(threads.length);
-    const comments = (app.chain)
-      ? response.result.comments.filter((comment) => !comment.community)
-      : response.result.comments;
+    const { threads, comments } = response.result;
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -327,7 +320,7 @@ class ThreadsController {
         }
         // Threads that are posted in an offchain community are still linked to a chain / author address,
         // so when we want just chain threads, then we have to filter away those that have a community
-        const threads = (app.chain) ? response.result.threads.filter((thread) => !thread.community) : response.result.threads;
+        const { threads } = response.result;
 
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
