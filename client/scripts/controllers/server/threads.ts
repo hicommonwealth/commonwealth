@@ -44,6 +44,22 @@ store non-topic-sorted threads for the main discussion listing. The relevant sub
 given discussion listing, can be accessed via getStoreByCommunityAndTopic, again passing
 ALL_PROPOSALS_KEY for all proposals.
 
+The second store, "store", is a standard ProposalStore. All fetched threads are added to it,
+regardless of whether they belong on a given listing. 
+
+Threads are fetched in several ways depending on context. On chain or community initialization,
+/bulkOffchain is called directly from the init page (bypassing the threads controller) and
+fetching the most recent 20 posts for that chain/community (including pinned posts). As a user
+scrolls through the discussions listing, the onscroll listener continuously calls the controller
+fn loadNextPage, passing a "cutoff date"—the date of the least recently active thread thus far
+rendered on the listing—and receiving the next page worth of threads (typically the next 20).
+
+When a user navigates to a proposal page that has not been fetched through these bulk calls,
+the proposal component calls the controller fetchThread fn, which fetches an individual thread
+by an id, then returns it after addinig it to threads.store. These threads are *not* added
+to the listingStore, since they do not belong in the listing component, and their presence
+would break the listingStore's careful chronology.
+
 */
 
 class ThreadsController {
