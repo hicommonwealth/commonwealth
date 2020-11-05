@@ -79,6 +79,7 @@ export enum VotingType {
   MultiOptionVoting = 'multioption',
   None = 'none',
   MolochYesNo = 'moloch',
+  MarlinYesNo = 'marlin',
 }
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',
