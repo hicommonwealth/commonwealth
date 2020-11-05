@@ -89,29 +89,29 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.ProposalVotingResults', [
-        m('.results-cell', 'Voted yes'),
-        m('.results-cell', 'Voted no'),
+        m('.results-header', 'Voted yes'),
+        m('.results-header', 'Voted no'),
         m('.results-cell', showVotes(votes.filter((v) => v.choice === true))),
         m('.results-cell', showVotes(votes.filter((v) => v.choice === false))),
       ]);
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       return m('.ProposalVotingResults', [
-        m('.results-cell', 'Voted yes'),
-        m('.results-cell', 'Voted no'),
+        m('.results-header', 'Voted yes'),
+        m('.results-header', 'Voted no'),
         m('.results-cell', showVotes(votes.filter((v) => v.choice === MolochVote.YES))),
         m('.results-cell', showVotes(votes.filter((v) => v.choice === MolochVote.NO)))
       ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       return m('.ProposalVotingResults', [
-        m('.results-cell', 'Voted yes'),
-        m('.results-cell', 'Voted no'),
+        m('.results-header', 'Voted yes'),
+        m('.results-header', 'Voted no'),
         m('.results-cell', showVotes(votes.filter((v) => v.choice === true))),
         m('.results-cell', showVotes(votes.filter((v) => v.choice === false))),
       ]);
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       return m('.ProposalVotingResults', [
-        m('.results-cell', 'Voted yes'),
-        m('.results-cell', 'Voted no'),
+        m('.results-header', 'Voted yes'),
+        m('.results-header', 'Voted no'),
         m('.results-cell', showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.YES))),
         m('.results-cell', showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.NO
           || v.choice === CosmosVoteChoice.VETO))),
