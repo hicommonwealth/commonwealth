@@ -89,105 +89,34 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.ProposalVotingResults', [
-        m(Table, {
-          bordered: false,
-          interactive: false,
-          striped: false
-        }, [
-          m('tr', [
-            m('th', 'Voted yes'),
-            m('th', 'Voted no')
-          ]),
-          m('tr', [
-            m('td', showVotes(votes.filter((v) => v.choice === true))),
-            m('td', showVotes(votes.filter((v) => v.choice === false)))
-          ])
-        ])
-        // m(Tabs, [{
-        //   name: 'Voters',
-        //   content: showVotes(votes)
-        // }, {
-        //   name: 'Yes',
-        //   content: showVotes(votes.filter((v) => v.choice === true))
-        // }, {
-        //   name: 'No',
-        //   content: showVotes(votes.filter((v) => v.choice === false)),
-        // }]),
+        m('.results-cell', 'Voted yes'),
+        m('.results-cell', 'Voted no'),
+        m('.results-cell', showVotes(votes.filter((v) => v.choice === true))),
+        m('.results-cell', showVotes(votes.filter((v) => v.choice === false))),
       ]);
-    } else if (proposal.votingType === VotingType.MolochYesNo) { // TODO: merge with above
+    } else if (proposal.votingType === VotingType.MolochYesNo) {
       return m('.ProposalVotingResults', [
-        m(Table, {
-          bordered: false,
-          interactive: false,
-          striped: false
-        }, [
-          m('tr', [
-            m('th', 'Voted yes'),
-            m('th', 'Voted no')
-          ]),
-          m('tr', [
-            m('td', showVotes(votes.filter((v) => v.choice === MolochVote.YES))),
-            m('td', showVotes(votes.filter((v) => v.choice === MolochVote.NO)))
-          ])
-        ])
-        // m(Tabs, [{
-        //   name: 'Voters',
-        //   content: showVotes(votes)
-        // }, {
-        //   name: 'Yes',
-        //   content: showVotes(votes.filter((v) => v.choice === MolochVote.YES))
-        // }, {
-        //   name: 'No',
-        //   content: showVotes(votes.filter((v) => v.choice === MolochVote.NO)),
-        // }]),
+        m('.results-cell', 'Voted yes'),
+        m('.results-cell', 'Voted no'),
+        m('.results-cell', showVotes(votes.filter((v) => v.choice === MolochVote.YES))),
+        m('.results-cell', showVotes(votes.filter((v) => v.choice === MolochVote.NO)))
       ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       return m('.ProposalVotingResults', [
-        m(Table, {
-          bordered: false,
-          interactive: false,
-          striped: false
-        }, [
-          m('tr', [
-            m('th', 'Voted yes'),
-            m('th', 'Voted no')
-          ]),
-          m('tr', [
-            m('td', showVotes(votes.filter((v) => v.choice === true))),
-            m('td', showVotes(votes.filter((v) => v.choice === false)))
-          ])
-        ])
-        // m(Tabs, [{
-        //   name: 'Voters',
-        //   content: showVotes(votes)
-        // }, {
-        //   name: 'Yes',
-        //   content: showVotes(votes.filter((v) => v.choice === true))
-        // }, {
-        //   name: 'No',
-        //   content: showVotes(votes.filter((v) => v.choice === false)),
-        // }]),
+        m('.results-cell', 'Voted yes'),
+        m('.results-cell', 'Voted no'),
+        m('.results-cell', showVotes(votes.filter((v) => v.choice === true))),
+        m('.results-cell', showVotes(votes.filter((v) => v.choice === false))),
       ]);
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       return m('.ProposalVotingResults', [
-        m(Tabs, [{
-          name: 'Voters',
-          content: showVotes(votes)
-        }, {
-          name: 'Yes',
-          content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.YES))
-        }, {
-          name: 'No',
-          content: showVotes(
-            votes.filter((v) => v.choice === CosmosVoteChoice.NO || v.choice === CosmosVoteChoice.VETO)
-          )
-        }, {
-          name: 'Abstain',
-          content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN))
-        }, {
-          name: 'Veto',
-          content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.VETO)),
-        }]),
+        m('.results-cell', 'Voted yes'),
+        m('.results-cell', 'Voted no'),
+        m('.results-cell', showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.YES))),
+        m('.results-cell', showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.NO
+          || v.choice === CosmosVoteChoice.VETO))),
+        m('.results-cell', showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN))),
+        m('.results-cell', showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.VETO))),
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting
                && proposal instanceof CosmosProposal) {
