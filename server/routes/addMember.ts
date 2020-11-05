@@ -6,7 +6,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  InvalidCommunity: 'Invalid community',
+  InvalidCommunity: 'Invalid community or chain',
   NeedAddress: 'Must provide address to add',
   MustBeAdmin: 'Must be an admin/mod to invite new members',
   AddressNotFound: 'Address not found',
@@ -15,12 +15,13 @@ export const Errors = {
 
 const addMember = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  if (!community) return next(new Error(Errors.InvalidCommunity));
+  if (!community && !chain) return next(new Error(Errors.InvalidCommunity));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));
-
+  const chainOrCommunity = chain ? { chain_id: chain.id } : { offchain_community_id: community.id }
+  
   // check that either invitesEnabled === true, or the user is an admin or mod
-  if (!community.invitesEnabled) {
+  if ((community && !community.invitesEnabled) || chain) {
     const adminAddress = await models.Address.findOne({
       where: {
         address: req.body.address,
@@ -30,7 +31,7 @@ const addMember = async (models, req: Request, res: Response, next: NextFunction
     const requesterIsAdminOrMod = await models.Role.findAll({
       where: {
         address_id: adminAddress.id,
-        offchain_community_id: community.id,
+        ...chainOrCommunity,
         permission: ['admin', 'moderator'],
       },
     });
@@ -47,7 +48,7 @@ const addMember = async (models, req: Request, res: Response, next: NextFunction
   const existingRole = await models.Role.findOne({
     where: {
       address_id: existingAddress.id,
-      offchain_community_id: community.id,
+      ...chainOrCommunity,
     },
   });
 
@@ -55,7 +56,8 @@ const addMember = async (models, req: Request, res: Response, next: NextFunction
 
   const role = await models.Role.create({
     address_id: existingAddress.id,
-    offchain_community_id: community.id,
+    // offchain_community_id: community.id,
+    ...chainOrCommunity,
     permission: 'member',
   });
 

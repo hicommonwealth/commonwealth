@@ -1,6 +1,7 @@
 @import 'client/styles/shared';
 
 .HomepageCommunityCards {
+    position: relative;
     .ChainIcon {
         margin-bottom: 10px;
     }
@@ -13,44 +14,82 @@
         font-size: 16px;
         color: #999;
     }
-    .home-card {
-        float: left;
-        width: calc(33% - 30px);
-        @include md-max {
-            width: calc(50% - 30px);
-            max-width: none;
-        }
-        @include xs-max {
-            width: 100%;
-        }
-        margin-right: 30px;
-        margin-bottom: 30px;
-        padding: 30px 34px;
-        height: 265px;
-        h3 {
-            flex: 1;
-            font-weight: 500;
-            margin: 0 0 7px;
-            // white-space: nowrap;
-            // text-overflow: ellipse;
-            // overflow: hidden;
-        }
-        .card-description {
-            margin: 0 0 16px;
-            line-height: 1.25;
-            height: 68px;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
+    .communities-list,
+    .other-list {
+        width: calc(100% + 40px);
+        margin-right: -40px;
+        @include sm-max {
+            width: initial;
+            margin-right: 0;
         }
     }
-    .new-threads {
-        display: inline-block;
-        line-height: 1.2;
-        padding: 3px 8px 2px;
-        color: $positive-bg-color;
-        border: 1px solid $positive-bg-color;
-        border-radius: 9999px;
+    .other-list {
+        .home-card {
+            text-align: center;
+        }
+    }
+    .home-card {
+        box-sizing: border-box;
+        float: left;
+        width: calc(50% - 40px);
+        max-width: none;
+        margin-right: 30px;
+        margin-bottom: 30px;
+        @include sm-max {
+            width: 100%;
+            margin-right: 0;
+        }
+        padding: 20px 24px 16px;
+        border-radius: 6px;
+        display: flex;
+
+        .card-left {
+            padding-right: 20px;
+            padding-top: 1px;
+        }
+        .card-right {
+            flex: 1;
+            .card-right-top {
+                display: flex;
+            }
+            h3 {
+                flex: 1;
+                font-size: 19px;
+                font-weight: 500;
+                margin: 0 0 6px;
+                line-height: 1.1;
+                white-space: nowrap;
+                text-overflow: ellipse;
+                overflow: hidden;
+            }
+            .chain-new {
+                margin: -4px 0;
+                margin-right: -8px;
+            }
+            .card-description {
+                margin: 0;
+                line-height: 1.25;
+                height: 64px;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+            }
+            .recent-activity {
+                margin-top: 12px;
+                color: $text-color-light;
+                height: 24px;
+                .recent-threads {
+                    margin-bottom: 4px;
+                }
+            }
+        }
+
+        p.action {
+            margin: 10px 0;
+        }
+        .cui-button {
+            margin: 8px 0 1px;
+        }
     }
 }

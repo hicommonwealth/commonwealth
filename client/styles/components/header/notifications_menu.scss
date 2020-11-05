@@ -1,22 +1,35 @@
 @import 'client/styles/shared';
 
 .NotificationsMenuButton {
-    @include xs-max {
-        padding: 0 11px !important;
+    padding: 0 !important;
+    width: 38px;
+    text-align: center;
+
+    .notification-count {
+        background: $negative-bg-color;
+        border-radius: 9999px;
+        padding: 1px 7px;
+        text-align: center;
+        color: #fff;
+    }
+
+    @include sm-max {
+        .cui-button-label {
+            overflow: visible;
+            position: relative;
+            top: -2px !important;
+        }
     }
     .cui-icon {
         margin-right: 0 !important;
         position: relative;
         top: -1px;
-        @include xs-max {
-            top: 0;
+        @include sm-max {
+            top: 1px;
         }
     }
-    .notification-count {
-        position: relative;
-        top: 1px;
-    }
     &.has-notifications {
+        padding: 0 7px !important;
         .cui-icon {
             display: none;
         }
@@ -44,13 +57,13 @@
         }
     }
     .cui-menu {
-        max-width: 342px;
+        max-width: 340px;
         margin: 0;
         padding: 0;
         background: none;
         overflow: hidden;
         @include xs-max {
-            max-width: calc(100vw - 20px);
+            max-width: calc(100vw - 24px);
         }
     }
     .cui-popover-arrow {
@@ -63,22 +76,27 @@
         list-style: none;
         text-align: center;
         padding-top: 230px;
-        color: #546e7d;
+        color: #111;
         font-weight: 500;
     }
     .NotificationButtons {
         .cui-button {
             margin: 0;
-            border-radius: 0;
-            border-top: 1px #d8dee0 solid;
+            border-radius: 0 !important;
+            border-top: 1px #d8dee0 solid !important;
             height: 44px;
             .cui-button-label {
                 text-align: center;
                 color: #333;
             }
-        }
-        .cui-button:nth-child(1) {
+            &:after {
+                // suppress button group styling
+                display: none !important;
+            }
             border-right: 1px #d8dee0 solid;
+        }
+        > .cui-button:nth-child(1) {
+            border-left: none;
         }
     }
 }

@@ -13,11 +13,11 @@ export interface OffchainThreadAttributes {
   body?: string;
   kind: string;
   url?: string;
-  topic_id: number;
+  topic_id?: number;
   pinned?: boolean;
   chain?: string;
   community?: string;
-  private?: boolean;
+
   read_only?: boolean;
   version_history?: string[];
   created_at?: Date;
@@ -50,11 +50,10 @@ export default (
     body: { type: dataTypes.TEXT, allowNull: true },
     kind: { type: dataTypes.TEXT, allowNull: false },
     url: { type: dataTypes.TEXT, allowNull: true },
-    topic_id: { type: dataTypes.INTEGER, allowNull: false },
+    topic_id: { type: dataTypes.INTEGER, allowNull: true },
     pinned: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     chain: { type: dataTypes.STRING, allowNull: true },
     community: { type: dataTypes.STRING, allowNull: true },
-    private: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     read_only: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
@@ -84,12 +83,6 @@ export default (
     models.OffchainThread.belongsToMany(models.Role, {
       through: 'read_only_roles_threads',
       as: 'read_only_roles',
-      foreignKey: 'thread_id',
-      otherKey: 'id',
-    });
-    models.OffchainThread.belongsToMany(models.Role, {
-      through: 'private_thread_roles',
-      as: 'private_roles',
       foreignKey: 'thread_id',
       otherKey: 'id',
     });

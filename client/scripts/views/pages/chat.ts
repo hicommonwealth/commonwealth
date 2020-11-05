@@ -1,5 +1,4 @@
-/*
-import 'components/community_chat.scss';
+import 'pages/chat.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
@@ -8,8 +7,12 @@ import moment from 'moment-twitter';
 
 import { link, isSameAccount } from 'helpers';
 import app from 'state';
+import { WebsocketMessageType } from 'types';
+
+import { AddressInfo } from 'models';
 import ChatController from 'controllers/server/socket/chat';
 import User from 'views/components/widgets/user';
+import Sublayout from 'views/sublayout';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import PageLoading from 'views/pages/loading';
@@ -20,8 +23,6 @@ const TYPING_INDICATOR_OUTGOING_FREQUENCY = 1000;
 const TYPING_INDICATOR_INCOMING_PERSISTENCE = 2000;
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
-// websocket purpose
-const SOCKET_PURPOSE = 'chat';
 
 const formatTimestampForChat = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
@@ -37,20 +38,22 @@ interface IAttrs {
 
 interface IState {
   collapsed: boolean;
-  oninput: CallableFunction;
+  oninput: CallableFunction | boolean;
   outgoingTypingInputHandler: CallableFunction;
-  chat: IChat;
+  chat: {
+    isConnected;
+    initializeScrollback;
+    send;
+    sendTypingIndicator;
+    addListener;
+  };
   messages: any[];
   typing?: boolean;
   typingTimeout: any;
   loaded: boolean;
 }
 
-interface IChat {
-  isConnected?: boolean;
-}
-
-const Chat = {
+const Chat: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     vnode.state.collapsed = !!localStorage.getItem('cwChatCollapsed');
 
@@ -58,10 +61,10 @@ const Chat = {
     const scrollToChatBottom = () => {
       // Use a synchronous redraw, or otherwise it may not happen in time for us to read the correct scrollHeight
       m.redraw.sync();
-      const scroller = $(vnode.dom).find('.chat-messages')[0];
+      const scroller = $((vnode as any).dom).find('.chat-messages')[0];
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
-    const onIncomingMessage = (text, author, author_chain, timestamp?) => {
+    const onIncomingMessage = (text, author, author_chain, timestamp?) => { // timestamp is used for scrollback only
       const sender = { address: author, chain: author_chain };
       vnode.state.messages.push({ sender, text, timestamp: timestamp || moment() });
       vnode.state.typing = false;
@@ -78,15 +81,16 @@ const Chat = {
     };
     const server = CHAT_SERVER.startsWith('localhost') ? `ws://${CHAT_SERVER}` : `wss://${CHAT_SERVER}`;
     const chatRoomUrl = `${server}/?room=${vnode.attrs.room}`;
-    vnode.state.chat = new ChatController(chatRoomUrl, SOCKET_PURPOSE, app.user.jwt, (connected) => {
+    vnode.state.chat = new ChatController(chatRoomUrl, app.user.jwt, (connected) => {
       if (connected) {
         vnode.state.messages = [];
         vnode.state.chat.initializeScrollback(app.user.jwt);
         scrollToChatBottom();
       }
     });
-    vnode.state.chat.addListener(onIncomingMessage);
-    vnode.state.chat.addTypingListener(onIncomingTypingIndicator);
+    vnode.state.chat.addListener(WebsocketMessageType.Message, onIncomingMessage);
+    vnode.state.chat.addListener(WebsocketMessageType.Typing, onIncomingTypingIndicator);
+    vnode.state.chat.addListener(WebsocketMessageType.InitializeScrollback, onIncomingMessage);
     vnode.state.messages = [];
     vnode.state.outgoingTypingInputHandler = _.throttle((e) => {
       if (!vnode.state.chat.isConnected) return;
@@ -117,7 +121,7 @@ const Chat = {
         groupedMessages.length === 0 && vnode.state.chat.isConnected
           && m('.chat-message-placeholder', 'No messages yet'),
         groupedMessages.map((grp) => m('.chat-message-group', [
-          m(User, { user: [grp.sender.address, grp.sender.chain], linkify: true }),
+          m(User, { user: new AddressInfo(null, grp.sender.address, grp.sender.chain, null), linkify: true }),
           m('.chat-message-group-timestamp', formatTimestampForChat(grp.messages[0].timestamp)),
           m('.clear'),
           grp.messages.map((msg) => m('.chat-message-text', [
@@ -151,8 +155,10 @@ const Chat = {
                     e.preventDefault();
                     if (!vnode.state.chat.isConnected) return;
                     const $textarea = $(e.target).closest('form').find('textarea.ResizableTextarea');
-                    const message = $textarea.val();
-                    vnode.state.chat.send('message', message, app.chain.meta.chain.id, app.user.activeAccount.address, app.user.jwt);
+                    const message = JSON.stringify({ text: $textarea.val() });
+                    vnode.state.chat.send(
+                      'message', message, app.chain.meta.chain.id, app.user.activeAccount.address, app.user.jwt
+                    );
                     vnode.state.oninput = false; // HACK: clear the typing debounce
                     $textarea.val('');
                   }
@@ -178,5 +184,4 @@ const ChatPage = {
   },
 };
 
-export default CommunityChatOuter;
-*/
+export default ChatPage;

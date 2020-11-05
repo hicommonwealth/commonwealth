@@ -17,11 +17,10 @@ import { notifyInfo } from 'controllers/app/notifications';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import { TextInputFormField, TextareaFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import SendingFrom from 'views/components/sending_from';
-import { ChainClass } from 'models';
+import { ChainClass, ChainNetwork } from 'models';
+import Substrate from 'controllers/chain/substrate/main';
 
 export interface ISignalingPageState {
   voteOutcomes: any[];
@@ -34,6 +33,17 @@ export interface ISignalingPageState {
 export interface IBinaryOptionState {
   first: string | number;
   second: string | number;
+}
+
+async function loadCmd() {
+  if (!app || !app.chain || !app.chain.loaded) {
+    throw new Error('secondary loading cmd called before chain load');
+  }
+  if (app.chain.network !== ChainNetwork.Edgeware) {
+    return;
+  }
+  const chain = (app.chain as Substrate);
+  await chain.signaling.init(chain.chain, chain.accounts);
 }
 
 export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
@@ -49,15 +59,19 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) {
       m.route.set(`/${app.activeChainId()}/login`, {}, { replace: true });
-      return m(PageLoading);
+      return m(PageLoading, { showNewProposalButton: true });
     }
     if (!app.chain || !app.chain.loaded) {
-      return m(PageLoading);
+      return m(PageLoading, { showNewProposalButton: true });
     }
     if (app.chain && app.chain.class !== ChainClass.Edgeware) {
       notifyInfo('Can only create signaling proposals on Edgeware');
       m.route.set(`/${app.activeChainId()}/discussions`);
       return;
+    }
+    if (!(app.chain as Substrate).signaling.disabled && !(app.chain as Substrate).signaling.initialized) {
+      if (!(app.chain as Substrate).signaling.initializing) loadCmd();
+      return m(PageLoading);
     }
 
     const author = app.user.activeAccount;
@@ -103,16 +117,17 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
 
     return m(Sublayout, {
       class: 'NewSignalingPage',
+      title: 'New Signaling Proposal',
+      showNewProposalButton: true,
     }, [
       m('.forum-container', [
-        m('h2.page-title', 'New Signaling Proposal'),
         m(Grid, [
           m(Col, { span }, [
             !app.user.activeAccount
               ? m(Callout, {
                 icon: Icons.ALERT_TRIANGLE,
                 intent: 'primary',
-                content: 'Link an address to create a signaling proposal.'
+                content: 'Connect an address to create a signaling proposal.'
               })
               : m(Callout, {
                 icon: Icons.INFO,
@@ -131,7 +146,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                   placeholder: 'Ask a question...',
                   disabled: !author,
                   autocomplete: 'off',
-                  onchange: (e) => {
+                  oninput: (e) => {
                     vnode.state.form.title = (e.target as any).value;
                   }
                 }),
@@ -141,7 +156,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                   name: 'description',
                   placeholder: 'Add a description',
                   disabled: !author,
-                  onchange: (e) => {
+                  oninput: (e) => {
                     vnode.state.form.description = (e.target as any).value;
                   },
                 }),
@@ -175,7 +190,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                   }),
                 ]),
                 vnode.state.voteOutcomes.map((outcome, index) => m(FormGroup, [ m(Input, {
-                  value: outcome,
+                  defaultValue: outcome,
                   disabled: !app.user.activeAccount || vnode.state.voteType === 'binary',
                   contentLeft: m(Tag, { label: `Option ${index + 1}` })
                 }) ])),

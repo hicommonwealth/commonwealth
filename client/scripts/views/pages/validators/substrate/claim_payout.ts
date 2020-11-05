@@ -45,7 +45,7 @@ const NominatorForm: m.Component<{}, IClaimPayoutState> = {
           try {
             vnode.state.validators = validators
             .split(',')
-            .map((v) => (app.chain as Substrate).accounts.fromAddress(v)); 
+            .map((v) => (app.chain as Substrate).accounts.fromAddress(v));
           } catch (error) {
             vnode.state.error = error;
           }
@@ -91,14 +91,15 @@ const ClaimPayoutModal = makeDynamicComponent<{ account }, IClaimPayoutModalStat
   }),
   view: (vnode) => {
     const { stakingLedger } = vnode.state.dynamic;
+    const { account } = vnode.attrs;
     const isValidator = false;
-    const payoutsForm = (isValidator) ? ValidatorForm : NominatorForm
+    const payoutsForm = (isValidator) ? ValidatorForm : NominatorForm;
     return m('.ClaimPayoutModal', [
       m('.compact-modal-title', [
         m('h3', [
           'Claim payout for ',
-          m(User, { user: vnode.attrs.account }),
-          `(${formatAddressShort(vnode.attrs.account.address)})`,
+          m(User, { user: account }),
+          `(${formatAddressShort(account.address, account.chain)})`,
         ]),
       ]),
       m('.compact-modal-body', (!stakingLedger) ? [

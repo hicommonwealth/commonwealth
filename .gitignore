@@ -1,5 +1,6 @@
 .DS_Store
 *.pyc
+/report.*.json
 /venv
 /build
 /eth/build

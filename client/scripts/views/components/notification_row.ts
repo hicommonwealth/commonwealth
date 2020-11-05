@@ -8,21 +8,25 @@ import app from 'state';
 import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
 import { Notification, AddressInfo } from 'models';
+import { pluralize } from 'helpers';
 import { IPostNotificationData } from 'shared/types';
 
-import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
+import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel } from '@commonwealth/chain-events';
+import {
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy
+} from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import UserGallery from './widgets/user_gallery';
+import { Icon, Icons } from 'construct-ui';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
-    decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true });
+    decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
   } catch (e) {
     let doc = decodeURIComponent(comment_text);
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
@@ -30,7 +34,7 @@ const getCommentPreview = (comment_text) => {
     Array.from(matches).forEach((match) => {
       doc = doc.replace(match[0], match[1]);
     });
-    decoded_comment_text = m(MarkdownFormattedText, { doc: doc.slice(0, 140), hideFormatting: true });
+    decoded_comment_text = m(MarkdownFormattedText, { doc: doc.slice(0, 140), hideFormatting: true, collapse: true });
   }
   return decoded_comment_text;
 };
@@ -53,7 +57,11 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
+  const actorName = m(User, {
+    user: new AddressInfo(null, author_address, author_chain, null),
+    hideAvatar: true,
+    hideIdentityIcon: true,
+  });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -63,13 +71,11 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   } else if (category === NotificationCategories.NewThread) {
     notificationHeader = m('span', [ actorName, ' created a new thread ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
-    notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', community_name) ])
-      : m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title || community_name) ]);
+    notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ' reacted 👍 to your post ', m('span.commented-obj', decoded_title) ])
-      : m('span', [ actorName, ' reacted 👍 to your comment in ', m('span.commented-obj', decoded_title || community_name) ]);
+      ? m('span', [ actorName, ' liked the post ', m('span.commented-obj', decoded_title) ])
+      : m('span', [ actorName, ' liked your comment in ', m('span.commented-obj', decoded_title || community_name) ]);
   }
   const pseudoProposal = {
     id: root_id,
@@ -116,23 +122,62 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
+  const actorName = m(User, {
+    user: new AddressInfo(null, author_address, author_chain, null),
+    hideAvatar: true,
+    hideIdentityIcon: true,
+  });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
     notificationHeader = parent_comment_id
-      ? m('span', [ actorName, ` and ${length} others commented on `, m('span.commented-obj', decoded_title) ])
-      : m('span', [ actorName, ` and ${length} others responded in `, m('span.commented-obj', decoded_title) ]);
+      ? m('span', [
+        actorName,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
+        ' commented on ',
+        m('span.commented-obj', decoded_title)
+      ])
+      : m('span', [
+        actorName,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
+        ' responded in ',
+        m('span.commented-obj', decoded_title)
+      ]);
   } else if (category === NotificationCategories.NewThread) {
-    notificationHeader = m('span', [ actorName, ` and ${length} others created new threads in `, m('span.commented-obj', community_name) ]);
+    notificationHeader = m('span', [
+      actorName,
+      length > 0 && ` and ${pluralize(length, 'other')}`,
+      ' created new threads in ',
+      m('span.commented-obj', community_name)
+    ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ` and ${length} others mentioned you in `, m('span.commented-obj', community_name) ])
-      : m('span', [ actorName, ` and ${length} others mentioned you in `, m('span.commented-obj', decoded_title || community_name) ]);
+      ? m('span', [
+        actorName,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
+        ' mentioned you in ',
+        m('span.commented-obj', community_name)
+      ])
+      : m('span', [
+        actorName,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
+        ' mentioned you in ',
+        m('span.commented-obj', decoded_title || community_name)
+      ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ` and ${length} others reacted 👍 to your post `, m('span.commented-obj', decoded_title) ])
-      : m('span', [ actorName, ` and ${length} others reacted 👍 to your comment in `, m('span.commented-obj', decoded_title || community_name) ]);
+      ? m('span', [
+        actorName,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
+        ' liked the post ',
+        m('span.commented-obj', decoded_title)
+      ])
+      : m('span', [
+        actorName,
+        length > 0 && ` and ${pluralize(length, 'other')}`,
+        ' liked your comment in ',
+        m('span.commented-obj', decoded_title || community_name)
+      ]);
   }
   const pseudoProposal = {
     id: root_id,
@@ -140,9 +185,15 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     chain: chain_id,
     community: community_id,
   };
-  const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = (category === NotificationCategories.NewThread) ? (getCommunityUrl as any)(community_id || chain_id) : (getProposalUrl as any)(...args);
-  const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
+  const args = comment_id
+    ? [root_type, pseudoProposal, { id: comment_id }]
+    : [root_type, pseudoProposal];
+  const path = category === NotificationCategories.NewThread
+    ? (getCommunityUrl as any)(community_id || chain_id)
+    : (getProposalUrl as any)(...args);
+  const pageJump = comment_id
+    ? () => jumpHighlightComment(comment_id)
+    : () => jumpHighlightComment('parent');
 
   return ({
     authorInfo,
@@ -154,30 +205,40 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
   });
 };
 
-const NotificationRow: m.Component<{ notifications: Notification[] }, {
+const NotificationRow: m.Component<{
+  notifications: Notification[],
+  onListPage?: boolean,
+}, {
   Labeler: any,
   MolochTypes: any,
   SubstrateTypes: any,
+  scrollOrStop: boolean;
 }> = {
+  oncreate: (vnode) => {
+    if (m.route.param('id') && vnode.attrs.onListPage
+      && m.route.param('id') === vnode.attrs.notifications[0].id.toString()
+    ) {
+      vnode.state.scrollOrStop = true;
+    }
+  },
   view: (vnode) => {
     const { notifications } = vnode.attrs;
     const notification = notifications[0];
     const { category } = notifications[0].subscription;
-
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
       const chainId = notification.chainEvent.type.chain;
-      const chainName = app.config.chains.getById(chainId).name;
+      const chainName = app.config.chains.getById(chainId)?.name;
       let label: IEventLabel;
-      if (SubstrateTypes.EventChains.includes(chainId)) {
+      if (chainSupportedBy(chainId, SubstrateTypes.EventChains)) {
         label = SubstrateEvents.Label(
           notification.chainEvent.blockNumber,
           chainId,
           notification.chainEvent.data,
         );
-      } else if (MolochTypes.EventChains.includes(chainId)) {
+      } else if (chainSupportedBy(chainId, MolochTypes.EventChains)) {
         label = MolochEvents.Label(
           notification.chainEvent.blockNumber,
           chainId,
@@ -188,9 +249,18 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       }
       m.redraw();
 
+      if (vnode.state.scrollOrStop) {
+        setTimeout(() => {
+          document.getElementById(m.route.param('id')).scrollIntoView();
+        }, 1);
+        vnode.state.scrollOrStop = false;
+      }
+
       if (!label) {
         return m('li.NotificationRow', {
           class: notification.isRead ? '' : 'unread',
+          key: notification.id,
+          id: notification.id,
         }, [
           m('.comment-body', [
             m('.comment-body-top', 'Loading...'),
@@ -199,17 +269,30 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       }
       return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
+        key: notification.id,
+        id: notification.id,
         onclick: async () => {
+          if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
           app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          if (!label.linkUrl) return;
-          await m.route.set(label.linkUrl);
+          await m.route.set(`/${app.activeId() || 'edgeware'}/notificationsList?id=${notification.id}`);
           m.redraw.sync();
         },
       }, [
         m('.comment-body', [
-          m('.comment-body-top', `${label.heading} on ${chainName}`),
+          m('.comment-body-top.chain-event-notification-top', [
+            `${label.heading} on ${chainName}`,
+            !vnode.attrs.onListPage && m(Icon, {
+              name: Icons.X,
+              onclick: (e) => {
+                e.preventDefault();
+                vnode.state.scrollOrStop = true;
+                app.user.notifications.clear([notification]);
+                m.redraw();
+              },
+            })
+          ]),
           m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
           m('.comment-body-excerpt', label.label),
         ]),
@@ -228,6 +311,8 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       } = getBatchNotificationFields(category, notificationData);
       return m('li.NotificationRow', {
         class: notifications[0].isRead ? '' : 'unread',
+        key: notification.id,
+        id: notification.id,
         onclick: async () => {
           const notificationArray: Notification[] = [];
           app.user.notifications.markAsRead(notifications).then(() => m.redraw());
@@ -238,15 +323,20 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       }, [
         authorInfo.length === 1
           ? m(User, {
-            user: new AddressInfo(null, (authorInfo[0] as [string, string])[1], (authorInfo[0] as [string, string])[0], null),
+            user: new AddressInfo(
+              null,
+              (authorInfo[0] as [string, string])[1],
+              (authorInfo[0] as [string, string])[0],
+              null
+            ),
             avatarOnly: true,
             avatarSize: 26,
-            tooltip: true,
+            popover: true,
           })
           : m(UserGallery, {
             users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
             avatarSize: 26,
-            tooltip: true,
+            popover: true,
           }),
         m('.comment-body', [
           m('.comment-body-title', notificationHeader),

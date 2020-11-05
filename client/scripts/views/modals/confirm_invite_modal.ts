@@ -4,11 +4,13 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 import mixpanel from 'mixpanel-browser';
+import { Button } from 'construct-ui';
 
 import { orderAccountsByAddress } from 'helpers';
-
-import User from 'views/components/widgets/user';
+import { notifyError } from 'controllers/app/notifications';
+import User, { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
 
 const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
   view: (vnode) => {
@@ -26,7 +28,15 @@ const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
   },
 };
 
-const ConfirmInviteModal = {
+const ConfirmInviteModal: m.Component<{}, {
+  invites;
+  location;
+  isComplete;
+  selectedAddress;
+  addresses;
+  accepted;
+  rejected;
+}> = {
   oninit: (vnode) => {
     vnode.state.invites = app.config.invites;
     vnode.state.location = 0;
@@ -34,6 +44,7 @@ const ConfirmInviteModal = {
     vnode.state.selectedAddress = null;
     vnode.state.addresses = app.user.addresses;
     vnode.state.accepted = [];
+    vnode.state.rejected = [];
   },
   oncreate: (vnode) => {
     mixpanel.track('Accepting Invite', {
@@ -51,13 +62,13 @@ const ConfirmInviteModal = {
           vnode.state.selectedAddress = account.address;
         },
       }, [
-        m(User, { user: account, linkify: false, avatarSize: 16 })
+        m(UserBlock, { user: account })
       ]);
     };
 
     const invites = vnode.state.invites;
     let addresses;
-    if (vnode.state.accepted.length === invites.length) {
+    if (vnode.state.accepted.length + vnode.state.rejected.length === invites.length) {
       vnode.state.isComplete = true;
     } else {
       addresses = (vnode.state.addresses || [])
@@ -85,79 +96,81 @@ const ConfirmInviteModal = {
             m('span.icon-lock.community-block-top'),
             m('.community-block-bottom', `commonwealth.im/${invites[vnode.state.location].community_id}`)
           ]),
-          vnode.state.accepted.includes(vnode.state.location) ? [
-            m('h4', 'You\'ve already accepted this invite!')
-          ] : [
-            addresses.length > 0
-              && m('p', 'Accept the invite with any of your addresses:'),
-            addresses,
-            addresses.length > 0
-              && m('button.formular-button-primary.submit', {
-                disabled: vnode.state.accepted.includes(vnode.state.location) || !vnode.state.selectedAddress,
-                onclick: (e) => {
-                  e.preventDefault();
-                  if (vnode.state.selectedAddress) {
-                    app.user.acceptInvite({
-                      address: vnode.state.selectedAddress,
-                      inviteCode: invites[vnode.state.location].id
-                    }).then(() => {
+          vnode.state.accepted.includes(vnode.state.location) ? m('h4', 'You\'ve accepted this invite!')
+            : vnode.state.rejected.includes(vnode.state.location) ? m('h4', 'You\'ve already deleted this invite!') : [
+              addresses.length > 0
+                && m('p', 'Accept the invite with any of your addresses:'),
+              addresses,
+              addresses.length > 0
+                && m(Button, {
+                  class: 'submit',
+                  intent: 'primary',
+                  disabled: vnode.state.accepted.includes(vnode.state.location) || !vnode.state.selectedAddress,
+                  onclick: (e) => {
+                    e.preventDefault();
+                    if (vnode.state.selectedAddress) {
+                      app.user.acceptInvite({
+                        address: vnode.state.selectedAddress,
+                        inviteCode: invites[vnode.state.location].id
+                      }).then(() => {
+                        app.config.invites = app.config.invites.filter(
+                          (invite) => invite.community_name !== invites[vnode.state.location].community_name
+                        );
+                        vnode.state.accepted.push(vnode.state.location);
+                        vnode.state.selectedAddress = null;
+                        m.redraw();
+                        mixpanel.track('Address Selected', {
+                          'Step': 'Address Selected for Invite',
+                        });
+                      }, (err) => {
+                        notifyError('Error accepting invite');
+                      });
+                    }
+                  },
+                  label: 'Accept invite',
+                }),
+              addresses.length > 0
+                && m(Button, {
+                  class: 'reject',
+                  intent: 'negative',
+                  disabled: vnode.state.accepted.includes(vnode.state.location),
+                  onclick: async (e) => {
+                    e.preventDefault();
+                    const confirmed = await confirmationModalWithText('Really delete this invite?')();
+                    if (!confirmed) return;
+                    $.post(`${app.serverUrl()}/acceptInvite`, {
+                      inviteCode: invites[vnode.state.location].id,
+                      reject: true,
+                      jwt: app.user.jwt,
+                    }).then((result) => {
                       app.config.invites = app.config.invites.filter(
                         (invite) => invite.community_name !== invites[vnode.state.location].community_name
                       );
-                      vnode.state.accepted.push(vnode.state.location);
+                      vnode.state.rejected.push(vnode.state.location);
                       vnode.state.selectedAddress = null;
                       m.redraw();
-                      mixpanel.track('Address Selected', {
-                        'Step': 'Address Selected for Invite',
-                      });
                     }, (err) => {
-                      console.error('Error accepting invite');
+                      notifyError('Error deleting invite.');
                     });
-                  }
-                }
-              }, 'Accept invite'),
-            addresses.length > 0
-              && m('p', 'Or, reject the invite (you will need to be invited again to join the community):'),
-            addresses.length > 0
-              && m('button.formular-button-negative.reject', {
-                disabled: vnode.state.accepted.includes(vnode.state.location),
+                  },
+                  label: 'Delete invite'
+                }),
+              addresses.length === 0
+                && m('.no-accounts', 'You must connect an address to join this community.'),
+              addresses.length === 0
+              && m('a.btn.add-account', {
+                href: '#',
                 onclick: (e) => {
                   e.preventDefault();
-                  $.post(`${app.serverUrl()}/acceptInvite`, {
-                    inviteCode: invites[vnode.state.location].id,
-                    reject: true,
-                    jwt: app.user.jwt,
-                  }).then((result) => {
-                    app.config.invites = app.config.invites.filter(
-                      (invite) => invite.community_name !== invites[vnode.state.location].community_name
-                    );
-                    vnode.state.accepted.push(vnode.state.location);
-                    vnode.state.selectedAddress = null;
-                    m.redraw();
-                    mixpanel.track('Address Selected', {
-                      'Step': 'Address Selected for Invite',
-                    });
-                  }, (err) => {
-                    console.error('Error accepting invite.');
+                  app.modals.lazyCreate('link_new_address_modal', {
+                    successCallback: () => {
+                      // TODO XX: set membership
+                      $(e.target).trigger('modalexit');
+                    }
                   });
                 }
-              }, 'Reject invite'),
-            addresses.length === 0
-              && m('.no-accounts', 'You must link a new address to join this community.'),
-            addresses.length === 0
-            && m('a.btn.add-account', {
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.lazyCreate('link_new_address_modal', {
-                  successCallback: () => {
-                    // TODO XX: set membership
-                    $(vnode.dom).trigger('modalexit');
-                  }
-                });
-              }
-            }, `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
-          ],
+              }, 'Connect a new address'),
+            ],
         ])
         : m('.compact-modal-body', [
           m('div', [

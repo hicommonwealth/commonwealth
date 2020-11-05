@@ -1,4 +1,4 @@
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
 import { Request, Response, NextFunction } from 'express';
 import {
   PROFILE_BIO_MAX_CHARS,
@@ -90,7 +90,7 @@ const updateProfile = async (
 
     // new profiles on substrate chains get added to the identity cache
     // to be fetched on a timer job
-    if (!req.body.skipChainFetch && SubstrateTypes.EventChains.includes(req.body.chain)) {
+    if (!req.body.skipChainFetch && chainSupportedBy(req.body.chain, SubstrateTypes.EventChains)) {
       await identityFetchCache.add(req.body.chain, req.body.address);
     }
   }

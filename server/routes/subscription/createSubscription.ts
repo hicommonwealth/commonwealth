@@ -45,14 +45,15 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       }
       break;
     }
-    case 'new-comment-creation' || 'new-reaction': {
+    case 'new-comment-creation':
+    case 'new-reaction': {
       if (p_entity === 'discussion') {
         const thread = await models.OffchainThread.findOne({ where: { id: Number(p_id), } });
         if (!thread) return next(new Error(Errors.NoThread));
-        if (thread.chain) {
-          obj = { offchain_thread_id: Number(p_id), chain_id: thread.chain, };
-        } else if (thread.community) {
+        if (thread.community) {
           obj = { offchain_thread_id: Number(p_id), community_id: thread.community, };
+        } else if (thread.chain) {
+          obj = { offchain_thread_id: Number(p_id), chain_id: thread.chain, };
         }
       } else if (p_entity === 'comment') {
         const comment = await models.OffchainComment.findOne({ where: { id: Number(p_id), } });

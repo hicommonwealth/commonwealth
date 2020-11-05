@@ -6,7 +6,6 @@ import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 
 import app from 'state';
-import { inputModalWithText } from 'views/modals/input_modal';
 
 // import User from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';

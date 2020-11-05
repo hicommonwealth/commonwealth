@@ -2,7 +2,8 @@ import 'modals/update_delegate_modal.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { TextInputFormField } from 'views/components/forms';
+import { FormLabel, FormGroup, Input, Button } from 'construct-ui';
+
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -23,20 +24,21 @@ const UpdateDelegateModal: m.Component<IAttrs, IState> = {
     return m('.UpdateDelegateModal', [
       m('.header', 'Update Delegate'),
       m('.compact-modal-body', [
-        m(TextInputFormField, {
-          title: 'Delegate Key',
-          subtitle: 'Update your selected delegate.',
-          options: {
+        m(FormGroup, [
+          m(FormLabel, 'Delegate Key (update your selected delegate)'),
+          m(Input, {
             value: vnode.state.newDelegateKey,
             oncreate: (vvnode) => {
               $(vvnode.dom).focus();
+            },
+            oninput: (e) => {
+              const result = (e.target as any).value;
+              vnode.state.newDelegateKey = result;
             }
-          },
-          callback: (val) => {
-            vnode.state.newDelegateKey = val.toString();
-          }
-        }),
-        m('button', {
+          }),
+        ]),
+        m(Button, {
+          intent: 'primary',
           type: 'submit',
           onclick: (e) => {
             e.preventDefault();
@@ -46,8 +48,9 @@ const UpdateDelegateModal: m.Component<IAttrs, IState> = {
                 m.redraw();
               })
               .catch((err) => notifyError(err.toString()));
-          }
-        }, 'Update Delegate'),
+          },
+          label: 'Update Delegate'
+        }),
       ]),
     ]);
   }

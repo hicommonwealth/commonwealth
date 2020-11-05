@@ -5,7 +5,7 @@ import $ from 'jquery';
 import { Button, Form, FormGroup, TextArea } from 'construct-ui';
 import app from 'state';
 
-const FeedbackModal = {
+const FeedbackModal: m.Component<{}, { sending, error, success }> = {
   view: (vnode) => {
     return m('.FeedbackModal', [
       m('.compact-modal-title', [
@@ -23,13 +23,13 @@ const FeedbackModal = {
           ]),
           m(FormGroup, [
             m(Button, {
-              class: vnode.state.sending ? 'disabled' : '',
+              disabled: vnode.state.sending,
               intent: 'primary',
               loading: vnode.state.sending,
               label: 'Send feedback',
               onclick: (e) => {
                 e.preventDefault();
-                const $text = $(vnode.dom).find('textarea');
+                const $text = $(e.target).closest('.FeedbackModal').find('textarea');
                 const text = $text.val();
                 const url = document.location.href;
                 vnode.state.sending = true;

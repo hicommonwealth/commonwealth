@@ -4,22 +4,21 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import EthereumChain from 'controllers/chain/ethereum/chain';
-import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent, NodeInfo } from 'models';
+import { ChainBase, ChainClass, IChainAdapter, NodeInfo } from 'models';
 
 import { setActiveAccount } from 'controllers/app/login';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
+import MolochChain from './chain';
 import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
-import MolochProposal from './proposal';
 
 export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Moloch;
-  public chain: EthereumChain;
+  public chain: MolochChain;
   public ethAccounts: EthereumAccounts;
   public accounts: MolochMembers;
   public governance: MolochGovernance;
@@ -28,24 +27,10 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.chain = new EthereumChain(this.app);
+    this.chain = new MolochChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new MolochMembers(this.app);
-    this.governance = new MolochGovernance(this.app);
-  }
-
-  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
-    switch (entity.type) {
-      case MolochTypes.EntityKind.Proposal: {
-        const constructorFunc = (e: ChainEntity) => new MolochProposal(this.accounts, this.governance, e);
-        this.governance.updateProposal(constructorFunc, entity, event);
-        break;
-      }
-      default: {
-        console.error('Received invalid substrate chain entity!');
-        break;
-      }
-    }
+    this.governance = new MolochGovernance(this.app, !this.usingServerChainEntities);
   }
 
   public async initApi() {
@@ -57,18 +42,19 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     const api = new MolochAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
     await api.init();
+    this.chain.molochApi = api;
 
     if (this.webWallet) {
       await this.webWallet.enable();
-      await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
+      await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
         const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        setActiveAccount(updatedAddress);
+        await setActiveAccount(updatedAddress);
       });
     }
 
-    await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
+    await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
       const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-      setActiveAccount(updatedAddress);
+      await setActiveAccount(updatedAddress);
       api.updateSigner(accounts[0]);
     });
 
@@ -78,7 +64,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
 
   public async initData() {
     await this.chain.initEventLoop();
-    await this.governance.init(this.accounts.api, this.accounts, !this.usingServerChainEntities);
+    await this.governance.init(this.chain, this.accounts);
     await super.initData(this.usingServerChainEntities);
   }
 

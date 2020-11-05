@@ -2,7 +2,7 @@ import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
 
-import { Button, Icon, Icons, Tag, MenuItem } from 'construct-ui';
+import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
 
 import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
 import { proposalSlugToFriendlyName } from 'identifiers';
@@ -32,7 +32,10 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
     if (!(proposal instanceof OffchainThread)) return;
     if (proposal.kind !== OffchainThreadKind.Link) return;
     return m('.ProposalHeaderExternalLink', [
-      externalLink('a.external-link', proposal.url, [ extractDomain(proposal.url), m.trust(' &rarr;') ]),
+      externalLink('a.external-link', proposal.url, [
+        extractDomain(proposal.url),
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
     ]);
   }
 };
@@ -104,6 +107,35 @@ export const ProposalHeaderViewCount: m.Component<{ viewCount: number }> = {
   }
 };
 
+export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyProposal, parentState }> = {
+  oninit: (vnode) => {
+    vnode.attrs.parentState.updatedTitle = vnode.attrs.item.title;
+  },
+  view: (vnode) => {
+    const { item, parentState } = vnode.attrs;
+    if (!item) return;
+    const isThread = item instanceof OffchainThread;
+    const body = item instanceof OffchainComment
+      ? item.text
+      : (item instanceof OffchainThread
+        ? item.body
+        : null);
+    if (!body) return;
+
+    return m(Input, {
+      size: 'lg',
+      name: 'edit-thread-title',
+      autocomplete: 'off',
+      oninput: (e) => {
+        const { value } = (e as any).target;
+        parentState.updatedTitle = value;
+      },
+      defaultValue: parentState.updatedTitle,
+      tabindex: 1,
+    });
+  }
+};
+
 export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -117,24 +149,10 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
           e.preventDefault();
           app.threads.setPrivacy({
             threadId: proposal.id,
-            privacy: null,
             readOnly: !proposal.readOnly,
           }).then(() => m.redraw());
         },
         label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
-      }),
-      // privacy toggle, show only if thread is private
-      (proposal as OffchainThread).privacy && m(MenuItem, {
-        class: 'privacy-to-public-toggle',
-        onclick: (e) => {
-          e.preventDefault();
-          app.threads.setPrivacy({
-            threadId: proposal.id,
-            privacy: false,
-            readOnly: null,
-          }).then(() => m.redraw());
-        },
-        label: 'Reveal to public',
       }),
     ];
   }

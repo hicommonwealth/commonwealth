@@ -1,14 +1,17 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
 import moment from 'moment-twitter';
-import { ProposalStore, TopicStore } from 'stores';
-import { OffchainThread, OffchainAttachment, CommunityInfo } from 'models';
-
+import m from 'mithril';
 import $ from 'jquery';
-import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
 
-const modelFromServer = (thread) => {
+import app from 'state';
+import { ProposalStore } from 'stores';
+import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo } from 'models';
+
+import { notifyError } from 'controllers/app/notifications';
+import { updateLastVisited } from 'controllers/app/login';
+
+export const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
@@ -23,7 +26,6 @@ const modelFromServer = (thread) => {
     thread.version_history,
     thread.community,
     thread.chain,
-    thread.private,
     thread.read_only,
     decodeURIComponent(thread.body),
     thread.url,
@@ -64,7 +66,6 @@ class ThreadsController {
     url?: string,
     attachments?: string[],
     mentions?: string[],
-    privacy?: boolean,
     readOnly?: boolean
   ) {
     const timestamp = moment();
@@ -87,12 +88,27 @@ class ThreadsController {
         'topic_name': topicName,
         'topic_id': topicId,
         'url': url,
-        'privacy': privacy,
         'readOnly': readOnly,
         'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+      app.recentActivity.addThreads([{
+        id: response.result.id,
+        Address: response.result.Address,
+        title: response.result.title,
+        created_at: response.result.created_at,
+        community: response.result.community,
+        chain: response.result.chain,
+        topic: response.result.topic,
+        pinned: response.result.pinned,
+        url: response.result.pinned
+      }]);
+      app.recentActivity.addAddressesFromActivity([response.result]);
+      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+      updateLastVisited(app.activeCommunityId()
+        ? (activeEntity.meta as CommunityInfo)
+        : (activeEntity.meta as NodeInfo).chain, true);
       return result;
     } catch (err) {
       console.log('Failed to create thread');
@@ -104,9 +120,11 @@ class ThreadsController {
   public async edit(
     proposal: OffchainThread,
     body?: string,
+    title?: string,
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
+    const newTitle = title || proposal.title;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
     await $.ajax({
@@ -116,6 +134,7 @@ class ThreadsController {
         'thread_id': proposal.id,
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
+        'title': newTitle,
         'version_history': versionHistory,
         'attachments[]': attachments,
         'jwt': app.user.jwt
@@ -145,6 +164,10 @@ class ThreadsController {
         'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);
+        app.recentActivity.removeThread(proposal.id, proposal.community || proposal.chain);
+        // Properly removing from recent activity will require comments/threads to have an address_id
+        // app.recentActivity.removeAddressActivity([proposal]);
+        m.redraw();
         resolve(result);
       }).catch((e) => {
         console.error(e);
@@ -154,14 +177,13 @@ class ThreadsController {
     });
   }
 
-  public async setPrivacy(args: { threadId: number, privacy: boolean, readOnly: boolean, }) {
+  public async setPrivacy(args: { threadId: number, readOnly: boolean, }) {
     return $.ajax({
       url: `${app.serverUrl()}/setPrivacy`,
       type: 'POST',
       data: {
         'jwt': app.user.jwt,
         'thread_id': args.threadId,
-        'privacy': args.privacy,
         'read_only': args.readOnly,
       },
       success: (response) => {
@@ -173,7 +195,7 @@ class ThreadsController {
         return result;
       },
       error: (err) => {
-        notifyError('Could not update thread privacy');
+        notifyError('Could not update thread read_only');
         console.error(err);
       },
     });
@@ -242,6 +264,28 @@ class ThreadsController {
           ? err.responseJSON.error
           : 'Error loading offchain discussions');
       });
+  }
+
+  public initialize(initialThreads: any[], reset = true) {
+    if (reset) {
+      this._store.clear();
+    }
+
+    for (const thread of initialThreads) {
+      if (!thread.Address) {
+        console.error('OffchainThread missing address');
+      }
+      const existing = this._store.getByIdentifier(thread.id);
+      if (existing) {
+        this._store.remove(existing);
+      }
+      try {
+        this._store.add(modelFromServer(thread));
+      } catch (e) {
+        console.error(e.message);
+      }
+    }
+    this._initialized = true;
   }
 
   public deinit() {

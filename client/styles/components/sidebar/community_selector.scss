@@ -1,13 +1,33 @@
 @import 'client/styles/shared';
 
+.CommunityLabel {
+    .visible-sm {
+        display: none;
+        @include sm-max {
+            display: block;
+        }
+    }
+}
+
 .CommunitySelector {
     button.cui-button {
         border: none !important;
         border-radius: 0 !important;
     }
+    .title-selector .ChainIcon {
+        position: relative;
+        top: 2px;
+    }
+    .title-selector .CommunityIcon .community-icon span {
+        font-size: 12px;
+    }
 }
 
 .CommunitySelectList {
+    left: $quick-switcher-width - 4px !important;
+    @include sm-max {
+        left: 0 !important;
+    }
     .cui-popover-content {
         max-height: 100vh;
         overflow-y: auto;
@@ -18,8 +38,10 @@
         }
     }
     .cui-menu {
-        max-width: 300px;
-        width: 300px;
+        background: $background-color-light;
+        border: none;
+        max-width: 360px;
+        width: 360px;
         padding: 20px 0;
         @include xs-max {
             max-width: 100%;
@@ -41,19 +63,44 @@
         }
     }
     .cui-list-item {
-        padding: 4px 20px 4px 24px;
+        padding: 4px 10px;
+        margin: 0 14px;
+        border-radius: 4px;
         border: none;
         user-select: none;
         &.cui-selected {
             color: #111;
         }
+        &:hover {
+            background: $background-color-light-hover;
+        }
+        .CommunityLabel {
+            min-width: 200px;
+        }
+        .cui-list-item-content-right {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            .User {
+                position: relative;
+                top: 2px;
+                margin-left: 4px;
+            }
+            .star-icon {
+                display: inline-block;
+                position: relative;
+                top: -2px;
+                margin-left: 10px;
+            }
+        }
         .CommunityLabel .community-name-row {
             position: relative;
-            top: -2px;
+            top: -1px;
         }
     }
     .cui-list-item.select-list-back-home {
-        margin: 15px 0;
+        margin-top: 15px;
+        margin-bottom: 15px;
         font-size: 16px;
     }
 

@@ -2,10 +2,6 @@
 @import 'client/styles/shared';
 
 .UserGallery {
-    .User {
-        margin-top: 5px;
-        margin-right: -16px;
-    }
     .overflow-users-wrap {
         @include circledAvatar();
         display: inline-block;
@@ -16,6 +12,18 @@
         .overflow-users {
             text-align: center;
             color: white;
+        }
+    }
+}
+
+.HomepageCommunityCards {
+    .UserGallery {
+        .User {
+            margin-top: 5px;
+            margin-right: -8px;
+        }
+        .overflow-users {
+            font-size: 13.5px;
         }
     }
 }

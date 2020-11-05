@@ -18,7 +18,7 @@ import {
   Table
 } from 'construct-ui';
 
-const ComponentKit = {
+const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
   view: (vnode) => {
     return m('.ComponentKit', [
       m('style', '.ComponentKit > * { margin: 20px; }\n .ComponentKit > .gallery > * { margin-right: 20px; }'),
@@ -349,7 +349,7 @@ const ComponentKit = {
 
       // list
       m('div', [
-        m(List, [ 'List item 1', 'List item 2', 'List item 3', 'List item 4' ].map(item => m(ListItem, {
+        m(List, [ 'List item 1', 'List item 2', 'List item 3', 'List item 4' ].map((item) => m(ListItem, {
           contentLeft: m(Icon, { name: Icons.LINK }),
           contentRight: m(PopoverMenu, {
             closeOnContentClick: true,

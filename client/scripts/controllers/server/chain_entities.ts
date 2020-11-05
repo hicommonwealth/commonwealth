@@ -1,7 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import { get } from 'lib/util';
 import { ChainEntityStore } from 'stores';
-import { ChainEntity, ChainEvent, ChainEventType, IChainAdapter } from 'models';
+import { ChainEntity, ChainEvent, ChainEventType, IChainAdapter, IChainModule, ProposalModule } from 'models';
+import app from 'state';
 import {
   CWEvent,
   eventToEntity,
@@ -9,7 +10,8 @@ import {
   IStorageFetcher,
   IEventProcessor,
   IEventSubscriber,
-  SubstrateTypes
+  SubstrateTypes,
+  IChainEntityKind,
 } from '@commonwealth/chain-events';
 
 export enum EntityRefreshOption {
@@ -18,10 +20,23 @@ export enum EntityRefreshOption {
   Nothing = 'nothing',
 }
 
+const get = (route, args, callback) => {
+  return $.get(app.serverUrl() + route, args).then((resp) => {
+    if (resp.status === 'Success') {
+      callback(resp.result);
+    } else {
+      console.error(resp);
+    }
+  }).catch((e) => console.error(e));
+};
+
+type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void
+
 class ChainEntityController {
   private _store: ChainEntityStore = new ChainEntityStore();
   public get store() { return this._store; }
   private _subscriber: IEventSubscriber<any, any>;
+  private _handlers: { [t: string]: EntityHandler[] } = {};
 
   public constructor() {
     // do nothing
@@ -29,12 +44,19 @@ class ChainEntityController {
 
   public getPreimage(hash: string) {
     const preimage = this.store.getByType(SubstrateTypes.EntityKind.DemocracyPreimage)
-      .find((preimageEntity) => preimageEntity.typeId === hash);
+      .find((preimageEntity) => {
+        return preimageEntity.typeId === hash && preimageEntity.chainEvents.length > 0;
+      });
     if (preimage) {
       const notedEvent = preimage.chainEvents.find(
         (event) => event.data.kind === SubstrateTypes.EventKind.PreimageNoted
       );
-      return (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
+      if (notedEvent && notedEvent.data) {
+        const result = (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
+        return result;
+      } else {
+        return null;
+      }
     } else {
       return null;
     }
@@ -48,6 +70,7 @@ class ChainEntityController {
       entity = existingEntity;
     }
     entity.addEvent(event);
+    this.emitUpdate(entity, event);
   }
 
   public refresh(chain: string, refreshOption: EntityRefreshOption) {
@@ -66,6 +89,7 @@ class ChainEntityController {
   }
 
   public deinit() {
+    this.clearEntityHandlers();
     this.store.clear();
     if (this._subscriber) {
       this._subscriber.unsubscribe();
@@ -99,24 +123,61 @@ class ChainEntityController {
     return [ entity, event ];
   }
 
-  public async subscribeEntities<Api, RawEvent>(
-    chainAdapter: IChainAdapter<any, any>,
-    fetcher: IStorageFetcher<Api>,
-    subscriber: IEventSubscriber<Api, RawEvent>,
-    processor: IEventProcessor<Api, RawEvent>,
-  ) {
-    const chain = chainAdapter.meta.chain.id;
-    this._subscriber = subscriber;
+  public async fetchEntities<T extends CWEvent>(
+    chain: string,
+    proposalModule: ProposalModule<any, any, any>,
+    fetch: () => Promise<T[]>,
+    eventSortFn?: (a: CWEvent, b: CWEvent) => number,
+  ): Promise<T[]> {
     // get existing events
-    const existingEvents = await fetcher.fetch();
+    let existingEvents;
+    try {
+      existingEvents = await fetch();
+    } catch (e) {
+      console.error(`Chain entity fetch failed: ${e.message}`);
+      return [];
+    }
+    if (eventSortFn) existingEvents.sort(eventSortFn);
     // eslint-disable-next-line no-restricted-syntax
     for (const cwEvent of existingEvents) {
       const result = this._handleCWEvent(chain, cwEvent);
       if (result) {
         const [ entity, event ] = result;
-        chainAdapter.handleEntityUpdate(entity, event);
+        proposalModule.updateProposal(entity, event);
       }
     }
+    return existingEvents;
+  }
+
+  public registerEntityHandler(type: IChainEntityKind, fn: EntityHandler) {
+    if (!this._handlers[type]) {
+      this._handlers[type] = [ fn ];
+    } else {
+      this._handlers[type].push(fn);
+    }
+  }
+
+  public clearEntityHandlers(): void {
+    this._handlers = {};
+  }
+
+  public emitUpdate(entity: ChainEntity, event: ChainEvent): void {
+    const handlers = this._handlers[entity.type];
+    if (!handlers) {
+      console.log(`No handler for entity type ${entity.type}, ignoring.`);
+      return;
+    }
+    for (const handler of handlers) {
+      handler(entity, event);
+    }
+  }
+
+  public async subscribeEntities<Api, RawEvent>(
+    chain: string,
+    subscriber: IEventSubscriber<Api, RawEvent>,
+    processor: IEventProcessor<Api, RawEvent>,
+  ): Promise<void> {
+    this._subscriber = subscriber;
 
     // kick off subscription to future events
     // TODO: handle unsubscribing
@@ -128,7 +189,7 @@ class ChainEntityController {
         const result = this._handleCWEvent(chain, cwEvent);
         if (result) {
           const [ entity, event ] = result;
-          chainAdapter.handleEntityUpdate(entity, event);
+          this.emitUpdate(entity, event);
         }
       }
     });

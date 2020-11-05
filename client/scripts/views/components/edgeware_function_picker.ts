@@ -1,8 +1,10 @@
 import m from 'mithril';
-import { DropdownFormField, TextInputFormField } from 'views/components/forms';
-import app from 'state';
-import Substrate from 'controllers/chain/substrate/main';
+import { Button, Input, FormLabel, FormGroup } from 'construct-ui';
 import { blake2AsHex } from '@polkadot/util-crypto';
+
+import app from 'state';
+import { DropdownFormField } from 'views/components/forms';
+import Substrate from 'controllers/chain/substrate/main';
 
 const EdgewareFunctionPicker = {
   form: { module: '', function: '', args: [] },
@@ -63,51 +65,55 @@ const EdgewareFunctionPicker = {
       ]),
       m('div', argumentInputs.map(({ name, type }, index) => {
         if (`${type}` === 'Compact<BalanceOf>') {
-          return m(TextInputFormField, {
-            options: {
-              name: `${name} (${app.chain.currency})`,
+          return m(FormGroup, [
+            m(FormLabel, `${name} (${app.chain.currency})`),
+            m(Input, {
               placeholder: `${name} (${app.chain.currency})`,
-            },
-            callback: (result) => {
-              vnode.state.form.args[index] = app.chain.chain.coins(parseFloat(result), true);
-              m.redraw();
-            },
-          });
+              oninput: (e) => {
+                const result = (e.target as any).value;
+                vnode.state.form.args[index] = app.chain.chain.coins(parseFloat(result), true);
+                m.redraw(); // TODO: why is this needed?
+              }
+            })
+          ]);
         }
 
         if ((`${type}`).match(/Vec<[A-Za-z]+>/)) {
-          return m(TextInputFormField, {
-            options: {
-              name: `${name} (${type})`,
+          return m(FormGroup, [
+            m(FormLabel, `${name} (${type})`),
+            m(Input, {
               placeholder: `${name} (${type})`,
-            },
-            callback: (result) => {
-              vnode.state.form.args[index] = result.split(',').map((str) => str.trim());
-              m.redraw();
-            },
-          });
+              oninput: (e) => {
+                const result = (e.target as any).value;
+                vnode.state.form.args[index] = result.split(',').map((str) => str.trim());
+                m.redraw(); // TODO: why is this needed?
+              },
+            }),
+          ]);
         }
 
-        return m(TextInputFormField, {
-          options: {
-            name: `${name}`,
+        return m(FormGroup, [
+          m(FormLabel, `${name}`),
+          m(Input, {
             placeholder: `${name} (${type})`,
-          },
-          callback: (result) => {
-            vnode.state.form.args[index] = result;
-            m.redraw();
-          },
-        });
+            oninput: (e) => {
+              const result = (e.target as any).value;
+              vnode.state.form.args[index] = result;
+              m.redraw(); // TODO: why is this needed?
+            }
+          }),
+        ]);
       })),
-      m(TextInputFormField, {
-        title: 'Proposal Hash',
-        options: {
+
+      m(FormGroup, [
+        m(FormLabel, 'Proposal Hash'),
+        m(Input, {
           disabled: true,
           value: (EdgewareFunctionPicker.getMethod())
             ? blake2AsHex(EdgewareFunctionPicker.getMethod().method.toHex())
             : '',
-        },
-      }),
+        }),
+      ]),
     ]);
   }
 };

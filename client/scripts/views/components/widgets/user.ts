@@ -4,7 +4,7 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import { formatAddressShort, link } from 'helpers';
-import { Tooltip, Tag, Icon, Icons } from 'construct-ui';
+import { Tooltip, Tag, Icon, Icons, Popover } from 'construct-ui';
 
 import app from 'state';
 import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
@@ -13,12 +13,12 @@ import { formatToSize } from '../../../../../shared/helpers';
 const User: m.Component<{
   user: Account<any> | AddressInfo;
   avatarSize?: number;
-  avatarOnly?: boolean; // avatarOnly overrides most other properties
+  avatarOnly?: boolean; // overrides most other properties
   hideAvatar?: boolean;
   hideIdentityIcon?: boolean; // only applies to substrate identities
   linkify?: boolean;
   onclick?: any;
-  tooltip?: boolean;
+  popover?: boolean;
   showRole?: boolean;
 }, {
   identityWidgetLoading: boolean;
@@ -26,7 +26,7 @@ const User: m.Component<{
 }> = {
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
-    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip, showRole } = vnode.attrs;
+    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, popover, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
@@ -34,7 +34,11 @@ const User: m.Component<{
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
-    const adminsAndMods =      app.chain ? app.chain.meta.chain.adminsAndMods : app.community ? app.community.meta.adminsAndMods : [];
+    const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id);
+
+    const adminsAndMods = app.chain
+      ? app.chain.meta.chain.adminsAndMods
+      : app.community ? app.community.meta.adminsAndMods : [];
 
     if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !vnode.state.IdentityWidget) {
       vnode.state.identityWidgetLoading = true;
@@ -45,6 +49,7 @@ const User: m.Component<{
       ).then((mod) => {
         vnode.state.IdentityWidget = mod.default;
         vnode.state.identityWidgetLoading = false;
+        m.redraw();
       });
     }
 
@@ -53,15 +58,18 @@ const User: m.Component<{
       const address = vnode.attrs.user.address;
       if (!chainId || !address) return;
       // only load account if it's possible to, using the current chain
-      if (app.chain?.loaded && app.chain.id === chainId) {
+      if (app.chain && app.chain.id === chainId) {
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
       role = adminsAndMods.find((r) => r.address === address && r.address_chain === chainId);
     } else {
       account = vnode.attrs.user;
-      profile = app.profiles.getProfile(account.chain.id, account.address);
-      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain == account.chain.id);
+      // TODO: we should remove this, since account should always be of type Account,
+      // but we currently inject objects of type 'any' on the profile page
+      const chainId = typeof account.chain === 'string' ? account.chain : account.chain.id;
+      profile = account.profile;
+      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === chainId);
     }
     const roleTag = role ? m(Tag, {
       class: 'role-tag',
@@ -88,21 +96,22 @@ const User: m.Component<{
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
+        (app.chain && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
           // substrate name
-          ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
+          ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon, addrShort }) : [
             // non-substrate name
             linkify
-              ? link(`a.user-display-name${
-                (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-              profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-              profile ? formatToSize(profile.displayName.toString(), 13) : '--',)
-              : m('a.user-display-name.username', profile ? formatToSize(profile.displayName.toString(), 13) : '--')
+              ? link('a.user-display-name.username',
+                profile
+                  ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+                  : 'javascript:',
+                profile ? profile.name : addrShort)
+              : m('a.user-display-name.username', profile ? profile.name : addrShort)
           ],
         showRole && roleTag,
       ]);
 
-    const tooltipPopover = m('.UserTooltip', {
+    const userPopover = m('.UserPopover', {
       onclick: (e) => {
         e.stopPropagation();
       }
@@ -114,19 +123,27 @@ const User: m.Component<{
             : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
-          ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
+        (app.chain && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
+          ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort })
           : link(`a.user-display-name${
-            (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-          profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-          profile ? profile.displayName : '--',)
+            (profile && profile.name !== 'Anonymous') ? '.username' : '.anonymous'}`,
+          profile
+            ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+            : 'javascript:',
+          profile ? profile.name : addrShort)
       ]),
-      m('.user-address', formatAddressShort(profile.address)),
+      profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
       showRole && roleTag,
     ]);
 
-    return tooltip
-      ? m(Tooltip, { content: tooltipPopover, hoverOpenDelay: 1000, trigger: userFinal, key: profile?.address || '-' })
+    return popover
+      ? m(Popover, {
+        interactionType: 'hover',
+        content: userPopover,
+        trigger: userFinal,
+        closeOnContentClick: true,
+        key: profile?.address || '-'
+      })
       : userFinal;
   }
 };
@@ -134,13 +151,13 @@ const User: m.Component<{
 export const UserBlock: m.Component<{
   user: Account<any> | AddressInfo,
   hideIdentityIcon?: boolean,
-  tooltip?: boolean,
+  popover?: boolean,
   showRole?: boolean,
   selected?: boolean,
   compact?: boolean,
 }> = {
   view: (vnode) => {
-    const { user, hideIdentityIcon, tooltip, showRole, selected, compact } = vnode.attrs;
+    const { user, hideIdentityIcon, popover, showRole, selected, compact } = vnode.attrs;
 
     let profile;
     if (user instanceof AddressInfo) {
@@ -158,7 +175,7 @@ export const UserBlock: m.Component<{
           user,
           avatarOnly: true,
           avatarSize: 28,
-          tooltip,
+          popover,
         }),
         // TODO: this is weird...symbol display should not depend on user being an Account
         user.chain instanceof ChainInfo && m('.user-block-symbol', user.chain.symbol),
@@ -169,14 +186,14 @@ export const UserBlock: m.Component<{
             user,
             hideAvatar: true,
             hideIdentityIcon,
-            tooltip,
+            popover,
             showRole,
           }),
         ]),
         m('.user-block-address', {
           class: profile?.address ? '' : 'no-address',
         }, [
-          profile?.address && formatAddressShort(profile.address),
+          profile?.address && formatAddressShort(profile.address, profile.chain),
         ]),
       ]),
       m('.user-block-right', [

@@ -4,10 +4,12 @@ import m from 'mithril';
 import { Button, Icon, Icons, List, ListItem, SelectList } from 'construct-ui';
 
 import app from 'state';
-import { ChainInfo, CommunityInfo } from 'models';
+import { AddressInfo, ChainInfo, CommunityInfo, RoleInfo } from 'models';
+import { SwitchIcon } from 'helpers';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
+import User, { UserBlock } from '../widgets/user';
 
 export const getSelectableCommunities = () => {
   return (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
@@ -74,7 +76,7 @@ const CommunityLabel: m.Component<{
     ]);
 
     return m('.CommunityLabel.CommunityLabelPlaceholder', [
-      m('span.community-name', 'Commonwealth'),
+      m('.visible-sm', 'Commonwealth')
     ]);
   }
 };
@@ -98,7 +100,7 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const CommunitySelector = {
+const CommunitySelector: m.Component<{}> = {
   view: (vnode) => {
     const selectableCommunities = getSelectableCommunities();
     const currentIndex = selectableCommunities.findIndex((item) => {
@@ -106,7 +108,102 @@ const CommunitySelector = {
       if (item instanceof CommunityInfo) return app.activeCommunityId() === item.id;
       return false;
     });
-    const currentCommunity = selectableCommunities[currentIndex];
+
+    const isInCommunity = (item) => {
+      if (item instanceof ChainInfo) {
+        return app.user.getAllRolesInCommunity({ chain: item.id }).length > 0;
+      } else if (item instanceof CommunityInfo) {
+        return app.user.getAllRolesInCommunity({ community: item.id }).length > 0;
+      } else {
+        return false;
+      }
+    };
+    const joinedCommunities = allCommunities.filter((c) => isInCommunity(c));
+    const unjoinedCommunities = allCommunities.filter((c) => !isInCommunity(c));
+
+    const renderCommunity = (item) => {
+      const roles: RoleInfo[] = [];
+      if (item instanceof CommunityInfo) {
+        roles.push(...app.user.getAllRolesInCommunity({ community: item.id }));
+      } else if (item instanceof ChainInfo) {
+        roles.push(...app.user.getAllRolesInCommunity({ chain: item.id }));
+      }
+
+      const profile = (roles[0]?.address_chain)
+        ? app.profiles.getProfile(roles[0].address_chain, roles[0].address)
+        : null;
+
+      return item instanceof ChainInfo
+        ? m(ListItem, {
+          class: app.communities.isStarred(item.id, null) ? 'starred' : '',
+          label: m(CommunityLabel, { chain: item }),
+          selected: app.activeChainId() === item.id,
+          onclick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            m.route.set(item.id ? `/${item.id}` : '/');
+          },
+          contentRight: app.isLoggedIn()
+            && roles.length > 0
+            && m('.community-star-toggle', {
+              onclick: async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                await app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+                m.redraw();
+              }
+            }, [
+              roles.map((role) => {
+                return m(User, {
+                  avatarSize: 18,
+                  avatarOnly: true,
+                  user: new AddressInfo(null, role.address, role.address_chain, null),
+                });
+              }),
+              m('.star-icon', [
+                m(Icon, { name: Icons.STAR, key: item.id, }),
+              ]),
+            ]),
+        })
+        : item instanceof CommunityInfo
+          ? m(ListItem, {
+            class: app.communities.isStarred(null, item.id) ? 'starred' : '',
+            label: m(CommunityLabel, { community: item }),
+            selected: app.activeCommunityId() === item.id,
+            onclick: () => {
+              m.route.set(item.id ? `/${item.id}` : '/');
+            },
+            contentRight: app.isLoggedIn()
+              && roles.length > 0
+              && m('.community-star-toggle', {
+                onclick: async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  await app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                  m.redraw();
+                },
+              }, [
+                roles.map((role) => {
+                  return m(User, {
+                    avatarSize: 18,
+                    avatarOnly: true,
+                    user: new AddressInfo(null, role.address, role.address_chain, null),
+                  });
+                }),
+                m('.star-icon', [
+                  m(Icon, { name: Icons.STAR, key: item.id, }),
+                ]),
+              ]),
+          })
+          : m.route.get() !== '/'
+            ? m(ListItem, {
+              class: 'select-list-back-home',
+              label: '« Back home',
+              onclick: () => {
+                m.route.set(item.id ? `/${item.id}` : '/');
+              },
+            }) : null;
+    };
 
     return m('.CommunitySelector', [
       m('.title-selector', [
@@ -164,7 +261,6 @@ const CommunitySelector = {
             inline: true,
           },
           trigger: m(Button, {
-            basic: true,
             label: [
               currentCommunity instanceof CommunityInfo
                 ? m(CommunityLabel, { community: currentCommunity })
@@ -172,7 +268,18 @@ const CommunitySelector = {
               m(Icon, { name: Icons.MENU, size: 'sm' }),
             ],
           }),
-        }),
+          class: 'CommunitySelectList',
+          content: [
+            app.isLoggedIn() && [
+              m('h4', 'You\'re a member of'),
+              joinedCommunities.map(renderCommunity),
+              joinedCommunities.length === 0 && m('.community-placeholder', 'None'),
+              m('h4', 'Other communities'),
+            ],
+            unjoinedCommunities.map(renderCommunity),
+            renderCommunity('home'),
+          ],
+        })
       ]),
     ]);
   }

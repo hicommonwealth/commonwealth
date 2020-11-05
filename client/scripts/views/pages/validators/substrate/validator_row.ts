@@ -106,13 +106,20 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
             }
           }, `${formatCoin(app.chain.chain.coins(+vnode.attrs.otherTotal), true)}   (${nominatorsList.length})`)],
       ]),
-      m('td.val-commission', `${commission.toFixed(2)}%`),
-      m('td.val-points', vnode.attrs.eraPoints || '0'),
-      m('td.val-apr', `${apr.toFixed(2)}%`),
-      // m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
-      m('td.val-rewards', vnode.attrs.rewardStats?.count),
-      m('td.val-slashes', vnode.attrs.slashesStats?.count),
-      m('td.val-offenses', vnode.attrs.offencesStats?.count),
+      // m('td.val-age', '--'),
+      // m('td.val-action', [
+      //   m(Button, {
+      //     class: 'nominate-validator',
+      //     intent: 'primary',
+      //     disabled: !app.user.activeAccount,
+      //     onclick: (e) => {
+      //       e.preventDefault();
+      //       vnode.state.isNominating = !vnode.state.isNominating;
+      //       vnode.attrs.onChangeHandler(vnode.attrs.stash);
+      //     },
+      //     label: vnode.state.isNominating ? 'Un-Nominate' : 'Nominate'
+      //   }),
+      // ]),
     ]);
   }
 });

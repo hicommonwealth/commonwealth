@@ -6,8 +6,9 @@ import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
 import { CommentsStore } from 'stores';
-import { OffchainComment, OffchainAttachment, IUniqueId, AnyProposal, OffchainThread, AddressInfo } from 'models';
+import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
+import { updateLastVisited } from '../app/login';
 // tslint:disable: object-literal-key-quotes
 
 export enum CommentParent {
@@ -20,18 +21,24 @@ export enum CommentRefreshOption {
   LoadProposalComments = 'LoadProposalComments',
 }
 
-const modelFromServer = (comment) => {
+export const modelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
-  const proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+
+  let proposal;
+  try {
+    proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+  } catch (e) {
+    // no proposal
+  }
+
   return new OffchainComment(
     comment.chain,
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
     comment.version_history,
     attachments,
-    proposal,
     comment.id,
     moment(comment.created_at),
     comment.child_comments,
@@ -113,6 +120,11 @@ class CommentsController {
       });
       const { result } = res;
       this._store.add(modelFromServer(result));
+      app.recentActivity.addAddressesFromActivity([result]);
+      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+      updateLastVisited(app.activeCommunityId()
+        ? (activeEntity.meta as CommunityInfo)
+        : (activeEntity.meta as NodeInfo).chain, true);
       // update childComments of parent, if necessary
       if (result.parent_id) {
         const parent = this._store.getById(+result.parent_id);
@@ -157,6 +169,27 @@ class CommentsController {
     }
   }
 
+  public async delete(comment) {
+    const _this = this;
+    return new Promise((resolve, reject) => {
+      // TODO: Change to DELETE /comment
+      $.post(`${app.serverUrl()}/deleteComment`, {
+        jwt: app.user.jwt,
+        comment_id: comment.id,
+      }).then((result) => {
+        const existing = this._store.getById(comment.id);
+        this._store.remove(existing);
+        // Properly removing from recent activity will require comments/threads to have an address_id
+        // app.recentActivity.removeAddressActivity([comment]);
+        resolve(result);
+      }).catch((e) => {
+        console.error(e);
+        notifyError('Could not delete comment');
+        reject(e);
+      });
+    });
+  }
+
   public async refresh(proposal, chainId: string, communityId: string) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -185,25 +218,6 @@ class CommentsController {
         console.log('Failed to load comments');
         reject(new Error(err.responseJSON?.error ? err.responseJSON.error : 'Error loading comments'));
       }
-    });
-  }
-
-  public async delete(comment) {
-    const _this = this;
-    return new Promise((resolve, reject) => {
-      // TODO: Change to DELETE /comment
-      $.post(`${app.serverUrl()}/deleteComment`, {
-        jwt: app.user.jwt,
-        comment_id: comment.id,
-      }).then((result) => {
-        const existing = this._store.getById(comment.id);
-        this._store.remove(existing);
-        resolve(result);
-      }).catch((e) => {
-        console.error(e);
-        notifyError('Could not delete comment');
-        reject(e);
-      });
     });
   }
 
@@ -248,6 +262,26 @@ class CommentsController {
         : 'Error loading comments');
     }
   }
+
+  public initialize(initialComments, reset = true) {
+    if (reset) {
+      this._store.clear();
+    }
+    initialComments.forEach((comment) => {
+      if (!comment.Address) {
+        console.error('Comment missing linked address');
+      }
+      const existing = this._store.getById(comment.id);
+      if (existing) {
+        this._store.remove(existing);
+      }
+      try {
+        this._store.add(modelFromServer(comment));
+      } catch (e) {
+        // Comment is on an object that was deleted or unavailable
+      }
+    });
+  };
 
   public deinit() {
     this.store.clear();

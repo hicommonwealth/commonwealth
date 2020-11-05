@@ -1,0 +1,14 @@
+@import 'client/styles/shared';
+
+.RightSidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: $sidebar-width;
+    background: $background-color-light;
+
+    @include md-max {
+        display: none;
+    }
+}

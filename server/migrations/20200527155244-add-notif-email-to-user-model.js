@@ -13,7 +13,7 @@ module.exports = {
       'emailNotificationInterval',
       {
         type: DataTypes.ENUM,
-        values: ['daily', 'weekly', 'monthly', 'never'],
+        values: ['daily', 'never'],
         allowNull: false,
         defaultValue: 'never',
       }
@@ -21,17 +21,7 @@ module.exports = {
   },
 
   down: async (queryInterface, DataTypes) => {
-    await queryInterface.removeColumn(
-      'Users',
-      'emailNotificationInterval',
-      {
-        type: DataTypes.ENUM,
-        values: ['daily', 'weekly', 'monthly', 'never'],
-        allowNull: true,
-        defaultValue: null,
-      }
-    );
-
+    await queryInterface.removeColumn('Users', 'emailNotificationInterval');
     await queryInterface.sequelize.query('DROP TYPE "enum_Users_emailNotificationInterval";');
   },
 };

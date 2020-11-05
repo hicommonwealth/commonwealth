@@ -2,6 +2,7 @@ import 'components/empty_topic_placeholder.scss';
 
 import m from 'mithril';
 import { Button, Icon, Icons } from 'construct-ui';
+import app from 'state';
 import NewProposalButton from 'views/components/new_proposal_button';
 
 const EmptyTopicPlaceholder: m.Component<{ topicName?: string, communityName?: string }> = {
@@ -18,7 +19,8 @@ const EmptyTopicPlaceholder: m.Component<{ topicName?: string, communityName?: s
           ? [ m('strong', topicName), ' topic!' ]
           : [ m('strong', communityName), ' community!' ]
       ]),
-      m('p', 'There are no posts here yet.'),
+      m('p', 'There are no threads here yet.'),
+      !app.isLoggedIn() && m('p', 'Log in to create a new thread.'),
       m(NewProposalButton, { fluid: false, threadOnly: true }),
     ]);
   }

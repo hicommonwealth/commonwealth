@@ -269,7 +269,7 @@ describe('Update Community/Chain Tests', () => {
         .post('/api/updateCommunity')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: offchainCommunity.id, github, });
-        expect(res.body.error).to.be.equal(CommunityError.InvalidGithub)
+      expect(res.body.error).to.be.equal(CommunityError.InvalidGithub)
     });
 
     it('should update telegram', async () => {

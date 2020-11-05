@@ -4,6 +4,7 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import app from 'state';
+import { Button, Input } from 'construct-ui';
 
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { formatCoin } from 'adapters/currency';
@@ -11,12 +12,11 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import { MultipleButtonSelectorFormField } from 'views/components/forms';
-import SendingFrom from 'views/components/sending_from';
 import User from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 
-const CouncilVotingModal = {
+const CouncilVotingModal: m.Component<{ candidates }, { votes, error, phragmenStakeAmount }> = {
   view: (vnode) => {
     const author = app.user.activeAccount;
     const candidates = vnode.attrs.candidates || [];
@@ -25,6 +25,7 @@ const CouncilVotingModal = {
 
     // get currently set approvals
     const currentVote = (app.chain as Substrate).phragmenElections.activeElection.getVotes(author);
+    const currentStake = (currentVote[0]) ? currentVote[0].stake.inDollars : 0;
     const currentApprovals = (currentVote && currentVote.length > 0 && currentVote[0].votes) || [];
     const hasApprovals = currentApprovals.length > 0;
     const defaultSelection = candidates
@@ -53,7 +54,7 @@ const CouncilVotingModal = {
       const voteAccts: string[] = vnode.state.votes;
       const voteObj = new PhragmenElectionVote(app.user.activeAccount as SubstrateAccount, voteAccts, stake);
       createTXModal((app.chain as Substrate).phragmenElections.activeElection.submitVoteTx(voteObj)).then(() => {
-        $(vnode.dom).trigger('modalforceexit');
+        $(e.target).trigger('modalforceexit');
       }, (err) => {
         if (err) vnode.state.error = err;
         m.redraw();
@@ -77,11 +78,16 @@ const CouncilVotingModal = {
             'voting for withdraws their candidacies). Once inactive, anyone can evict your voter record and claim ',
             'your bond.'
           ]),
-          m('input[type="text"]', {
+          m(Input, {
             class: 'phragmen-vote-amount',
             name: 'amount',
+            fluid: true,
+            defaultValue: String(currentStake),
             placeholder: 'Amount to lock',
             autocomplete: 'off',
+            oncreate: () => {
+              vnode.state.phragmenStakeAmount = app.chain.chain.coins(parseFloat(String(currentStake)), true);
+            },
             oninput: (e) => {
               vnode.state.phragmenStakeAmount = app.chain.chain.coins(parseFloat(e.target.value), true);
             }
@@ -103,25 +109,31 @@ const CouncilVotingModal = {
         ])
       ]),
       m('.compact-modal-actions', [
-        m('button', {
+        m(Button, {
           type: 'submit',
           onclick: submitVote,
-        }, hasApprovals ? 'Update vote' : 'Submit vote'),
-        hasApprovals && m('button.retract-vote.formular-button-negative', {
-          href: '#',
+          fluid: true,
+          label: hasApprovals ? 'Update vote' : 'Submit vote',
+          intent: 'primary',
+        }),
+        hasApprovals && m(Button, {
+          class: 'retract-vote',
+          intent: 'negative',
+          fluid: true,
+          style: 'margin-top: 10px;',
           onclick: (e) => {
             e.preventDefault();
             const account = app.user.activeAccount as SubstrateAccount;
             createTXModal((app.chain as Substrate).phragmenElections.activeElection.removeVoterTx(account))
               .then(() => {
-                $(vnode.dom).trigger('modalforceexit');
+                $(e.target).trigger('modalforceexit');
               }, (err) => {
                 if (err) vnode.state.error = err;
                 m.redraw();
               });
-          }
-        }, 'Retract vote'),
-        m(SendingFrom, { author, showBalance: true }),
+          },
+          label: 'Retract vote'
+        }),
       ]),
     ]);
   }

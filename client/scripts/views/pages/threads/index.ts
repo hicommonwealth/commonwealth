@@ -6,6 +6,7 @@ import app from 'state';
 import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { re_weburl } from '../../../lib/url-validation';
 import { updateLastVisited } from '../../../controllers/app/login';
+import { notifyError } from '../../../controllers/app/notifications';
 
 enum NewThreadErrors {
   NoBody = 'Thread body cannot be blank',
@@ -28,7 +29,7 @@ export const parseMentionsForServer = (text, isMarkdown) => {
   const regexp = RegExp('\\[\\@.+?\\]\\(.+?\\)', 'g');
   if (isMarkdown) {
     const matches = text.match(regexp);
-    if (matches && matches.length) {
+    if (matches && matches.length > 0) {
       return matches.map((match) => {
         const chunks = match.slice(0, match.length - 1).split('/');
         const refIdx = chunks.indexOf('account');
@@ -37,7 +38,9 @@ export const parseMentionsForServer = (text, isMarkdown) => {
     }
   } else {
     return text.ops
-      .filter((op) => op.attributes?.link?.length && op.insert?.slice(0, 1) === '@')
+      .filter((op) => {
+        return op.attributes?.link?.length > 0 && typeof op.insert === 'string' && op.insert?.slice(0, 1) === '@';
+      })
       .map((op) => {
         const chunks = op.attributes.link.split('/');
         const refIdx = chunks.indexOf('account');
@@ -88,6 +91,7 @@ export const saveDraft = async (
         attachments
       );
     } catch (err) {
+      notifyError(err);
       throw new Error(err);
     }
     mixpanel.track('Save discussion draft', {
@@ -102,9 +106,12 @@ export const newThread = async (
   quillEditorState,
   author,
   kind = OffchainThreadKind.Forum,
-  privacy?: boolean,
   readOnly?: boolean
 ) => {
+  const topics = app.chain
+    ? app.chain.meta.chain.topics
+    : app.community.meta.topics;
+
   if (kind === OffchainThreadKind.Forum) {
     if (!form.threadTitle) {
       throw new Error(NewThreadErrors.NoTitle);
@@ -118,7 +125,7 @@ export const newThread = async (
       throw new Error(NewThreadErrors.NoUrl);
     }
   }
-  if (!form.topicName) {
+  if (!form.topicName && topics.length > 0) {
     throw new Error(NewThreadErrors.NoTopic);
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
@@ -141,14 +148,6 @@ export const newThread = async (
   const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
-  // const $textarea = $(vnode.dom).find('.DropzoneTextarea textarea');
-  // const unescapedText = '' + $textarea.val();
-  // const attachments = vnode.state.files ?
-  //   vnode.state.files.map((f) => f.uploadURL && f.uploadURL.replace(/\?.*/, '')) : [];
-  // if (!unescapedText.trim() && !attachments) {
-  //   return vnode.state.error = 'Description or attachments are required.';
-  //   throw new Error();
-  // }
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
 
@@ -166,7 +165,6 @@ export const newThread = async (
       url,
       attachments,
       mentions,
-      privacy,
       readOnly,
     );
   } catch (e) {
@@ -181,15 +179,17 @@ export const newThread = async (
   await app.user.notifications.refresh();
   m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
 
-  try {
-    const topicNames = Array.isArray(activeEntity?.meta?.topics)
-      ? activeEntity.meta.topics.map((t) => t.name)
-      : [];
-    if (!topicNames.includes(result.topic.name)) {
-      activeEntity.meta.topics.push(result.topic);
+  if (result.topic) {
+    try {
+      const topicNames = Array.isArray(activeEntity?.meta?.topics)
+        ? activeEntity.meta.topics.map((t) => t.name)
+        : [];
+      if (!topicNames.includes(result.topic.name)) {
+        activeEntity.meta.topics.push(result.topic);
+      }
+    } catch (e) {
+      console.log(`Error adding new topic to ${activeEntity}.`);
     }
-  } catch (e) {
-    console.log(`Error adding new topic to ${activeEntity}.`);
   }
 
   mixpanel.track('Create Thread', {

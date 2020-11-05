@@ -30,7 +30,7 @@ const VoterRow: m.Component<IVoterRowAttrs> = {
             user: account,
             avatarOnly: true,
             avatarSize: 36,
-            tooltip: true,
+            popover: true,
           }),
         ]),
         m('.proposal-pre-mobile', [
@@ -38,7 +38,7 @@ const VoterRow: m.Component<IVoterRowAttrs> = {
             user: account,
             avatarOnly: true,
             avatarSize: 16,
-            tooltip: true,
+            popover: true,
           }),
         ]),
       ]),
@@ -50,14 +50,14 @@ const VoterRow: m.Component<IVoterRowAttrs> = {
               m(User, {
                 user: account,
                 hideAvatar: true,
-                tooltip: true,
+                popover: true,
               }),
             ]),
             m('.proposal-user-mobile', [
               m(User, {
                 user: account,
                 hideAvatar: true,
-                tooltip: true,
+                popover: true,
               }),
             ]),
           ]),
@@ -80,11 +80,11 @@ interface IViewVotersModalAttrs {
 
 const ViewVotersModal: m.Component<IViewVotersModalAttrs> = {
   view: (vnode) => {
-    const { address } = vnode.attrs.account;
+    const { address, chain } = vnode.attrs.account;
 
     return m('.ViewVotersModal', [
       m('.compact-modal-title', [
-        m('h3', `Voters for ${formatAddressShort(address)}`),
+        m('h3', `Voters for ${formatAddressShort(address, chain.id)}`),
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [

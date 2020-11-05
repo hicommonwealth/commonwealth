@@ -23,6 +23,7 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
     href: target,
     onclick: (e) => {
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+      if (e.target.target === '_blank') return;
       e.preventDefault();
       e.stopPropagation();
       if (window.location.href.split('?')[0] === target.split('?')[0]) {
@@ -113,6 +114,14 @@ export function byAscendingCreationDate(a, b) {
   return +a.createdAt - +b.createdAt;
 }
 
+export function byDescendingUpdatedDate(a, b) {
+  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt)
+}
+
+export function byAscendingUpdatedDate(a, b) {
+  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt)
+}
+
 export function orderAccountsByAddress(a, b) {
   return a.address < b.address ? -1
     : a.address > b.address ? 1 : 0;
@@ -125,7 +134,7 @@ export function isSameAccount(a, b) {
 /*
  * formatters
  */
-export function pluralize(num : number, str : string) {
+export function pluralize(num: number, str: string) {
   if (str.endsWith('y')) {
     return `${num} ${str.slice(0, str.length - 1)}${(num === 1) ? 'y' : 'ies'}`;
   } else if (str.endsWith('ss')) {
@@ -135,7 +144,7 @@ export function pluralize(num : number, str : string) {
   }
 }
 
-export function articlize(str : string) {
+export function articlize(str: string) {
   if (str.trimLeft().match(/^[aeiouAEIOU]/)) {
     return `an ${str.trimLeft()}`;
   } else {
@@ -143,13 +152,13 @@ export function articlize(str : string) {
   }
 }
 
-export function slugify(str : string) {
+export function slugify(str: string) {
   // remove any character that isn't a alphanumeric character or a
   // space, and then replace any sequence of spaces with dashes
   return str.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 }
 
-export function formatAsTitleCase(str : string) {
+export function formatAsTitleCase(str: string) {
   return str.toLowerCase().split(' ').map((word) => {
     return word.replace(word[0], word[0].toUpperCase());
   }).join(' ');
@@ -171,7 +180,7 @@ export function formatLastUpdated(timestamp) {
 };
 
 // duplicated in adapters/currency.ts
-export function formatNumberLong(num : number) {
+export function formatNumberLong(num: number) {
   // format small numbers with decimals, large numbers with commas
   if (num === 0) return '0';
   if (num < 0.000001) return num.toFixed(20).replace(/0*$/, '');
@@ -180,14 +189,14 @@ export function formatNumberLong(num : number) {
   return nf.format(num);
 }
 
-export function formatPercentShort(num : number) {
+export function formatPercentShort(num: number) {
   if (num === 0) return '0%';
   if (num === 1) return '100%';
   if (num > 1) return '100%+';
   return `${(num * 100).toFixed(1)}%`;
 }
 
-export function formatDuration(duration : moment.Duration, includeSeconds = true) {
+export function formatDuration(duration: moment.Duration, includeSeconds = true) {
   const days = Math.floor(duration.asDays());
   return [
     (days) ? (`${days}d `) : '',
@@ -197,18 +206,21 @@ export function formatDuration(duration : moment.Duration, includeSeconds = true
   ].join('');
 }
 
-export function formatAddressShort(addr : string) {
-  if (!addr) return;
-  if (addr.length < 16) return addr;
-  return `${addr.slice(0, 5)}…`;
+export function formatAddressShort(address: string, chain: string) {
+  if (!address) return;
+  if (chain === 'near') {
+    return `@${address}`;
+  } else {
+    return `${address.slice(0, 5)}…`;
+  }
 }
 
-export function formatProposalHashShort(hash : string) {
+export function formatProposalHashShort(hash: string) {
   if (!hash) return;
   return hash.slice(0, 8);
 }
 
-export function renderMultilineText(text : string) {
+export function renderMultilineText(text: string) {
   if (!text) return;
   const paragraphs = text.split('\n')
     .map((p) => p.trim())
@@ -221,18 +233,18 @@ export function renderMultilineText(text : string) {
  * blocknum helpers
  */
 
-export function blocknumToTime(blocknum : number): moment.Moment {
+export function blocknumToTime(blocknum: number): moment.Moment {
   const currentBlocknum = app.chain.block.height;
   const blocktime = app.chain.block.duration;
   const lastBlockTime: moment.Moment = app.chain.block.lastTime.clone();
   return lastBlockTime.add((blocknum - currentBlocknum) * blocktime, 'seconds');
 }
 
-export function blocknumToDuration(blocknum : number) {
+export function blocknumToDuration(blocknum: number) {
   return moment.duration(blocknumToTime(blocknum).diff(moment()));
 }
 
-export function blockperiodToDuration(blocknum : number) {
+export function blockperiodToDuration(blocknum: number) {
   return moment.duration(blocknum * app.chain.block.duration, 'seconds');
 }
 
