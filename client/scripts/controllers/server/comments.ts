@@ -25,14 +25,20 @@ export const modelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
-  const proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+
+  let proposal;
+  try {
+    proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+  } catch (e) {
+    // no proposal
+  }
+
   return new OffchainComment(
     comment.chain,
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
     comment.version_history,
     attachments,
-    proposal,
     comment.id,
     moment(comment.created_at),
     comment.child_comments,
