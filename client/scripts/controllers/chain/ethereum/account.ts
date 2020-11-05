@@ -106,7 +106,6 @@ export default class EthereumAccount extends Account<EthereumCoin> {
     super(app, app.chain.meta.chain, address.toLowerCase());
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
-    console.log('ACCOUNTS', Accounts);
     this._Accounts.store.add(this);
   }
 

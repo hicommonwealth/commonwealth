@@ -62,7 +62,7 @@ export default class MarlinHolder extends EthereumAccount {
   }
 
   public async refresh() {
-    const balance = await this._Holders.api.compContract.balanceOf(this.address);
+    const balance = await this._Holders.api.compContract?.balanceOf(this.address);
     if (!balance.isZero()) {
       this._isHolder = true;
       this._balance.next(new Comp(this._Holders.api.compAddress, new BN(balance.toString())));
@@ -87,6 +87,7 @@ export default class MarlinHolder extends EthereumAccount {
 
   public async balanceOf() {
     const balance = await this._Holders.api.compContract.balanceOf(this.address);
+    console.log('balanceOf Marlin Accounts', balance);
     if (!balance.isZero()) {
       this._isHolder = true;
       this._balance.next(new Comp(this._Holders.api.compAddress, new BN(balance.toString())));

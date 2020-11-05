@@ -21,8 +21,10 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Marlin;
   public chain: MarlinChain;
-  public ethAccounts: EthereumAccounts;
-  public accounts: MarlinHolders;
+  // public ethAccounts: EthereumAccounts;
+  // public accounts: MarlinHolders;
+  public accounts: EthereumAccounts;
+  public marlinAccounts:  MarlinHolders;
   public governance: MarlinGovernance;
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
   public readonly chainEntities = new ChainEntityController();
@@ -30,9 +32,10 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
     this.chain = new MarlinChain(this.app);
-    this.ethAccounts = new EthereumAccounts(this.app);
-    this.accounts = new MarlinHolders(this.app, this.chain, this.ethAccounts);
+    this.accounts = new EthereumAccounts(this.app);
+    this.marlinAccounts = new MarlinHolders(this.app, this.chain, this.accounts);
     this.governance = new MarlinGovernance(this.app);
+    this.accounts.init(this.chain);
   }
 
   // public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
@@ -50,10 +53,10 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   // }
 
   public async initApi() {
-    console.log('initAPI');
+    console.log('Marlin initApi()');
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
-    await this.ethAccounts.init(this.chain);
+    // await this.ethAccounts.init(this.chain);
     await this.webWallet.enable();
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
@@ -77,23 +80,26 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
       api.updateSigner(accounts[0]);
     });
 
-    // TODO: This was for marlin accounts? maybe not necessary
-    await this.accounts.init(api);
-    console.log('accounts:', this.accounts);
-    this.block.height = await api.Provider.getBlockNumber();
+    await this.marlinAccounts.init(api);
+    this.block.height = await api.Provider.getBlockNumber(); // TODO: Fix the global eth block height setting
     await super.initApi();
+
+    setTimeout(() => console.log(this.marlinAccounts), 5000);
   }
 
   public async initData() {
+    console.log('Marlin initData()');
     await this.chain.initEventLoop();
-    await this.governance.init(this.chain, this.accounts); // TODO: create/add args?
+    await this.governance.init(this.chain, this.marlinAccounts);
     await super.initData(this.usingServerChainEntities);
   }
 
   public async deinit() {
+    console.log('Marlin deinit()');
     await super.deinit();
     this.governance.deinit();
-    this.ethAccounts.deinit();
+    // this.ethAccounts.deinit();
+    this.marlinAccounts.deinit(); //
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();

@@ -12,12 +12,12 @@ import { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 
+import { BigNumberish } from 'ethers/utils';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
 // import MarlinHolder from './holders';
 import MarlinHolders from './holders';
 import MarlinChain from './chain';
-import { BigNumberish } from 'ethers/utils';
 
 export interface ProposalArgs {
   targets: string[],
