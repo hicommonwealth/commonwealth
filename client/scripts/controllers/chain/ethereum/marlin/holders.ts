@@ -7,22 +7,22 @@ import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 import MarlinHolder from './Holder';
 import MarlinAPI from './api';
+import MarlinChain from './chain';
 
 export default class MarlinHolders implements IAccountsModule<EthereumCoin, MarlinHolder> {
   protected _store: AccountsStore<MarlinHolder> = new AccountsStore();
   private _api: MarlinAPI;
-  private _Chain: EthereumChain;
+  private _Chain: MarlinChain;
   private _Accounts: EthereumAccounts;
 
   public get store() { return this._store; }
   public get api() { return this._api; }
 
-  public async init(api: MarlinAPI, ChainInfo: EthereumChain, Accounts: EthereumAccounts) {
+  public async init(api: MarlinAPI,
+    //  ChainInfo: EthereumChain, Accounts: EthereumAccounts
+     ) {
     this._api = api;
 
-    // only used to initialize Holder for super call
-    this._Chain = ChainInfo;
-    this._Accounts = Accounts;
   }
 
   public deinit() {
@@ -32,8 +32,11 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
   private _app: IApp;
   public get app() { return this._app; }
 
-  constructor(app: IApp) {
+  constructor(app: IApp, ChainInfo: MarlinChain, Accounts: EthereumAccounts) {
     this._app = app;
+    // only used to initialize Holder for super call
+    this._Chain = ChainInfo;
+    this._Accounts = Accounts;
   }
 
   public get(address: string) {

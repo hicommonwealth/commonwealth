@@ -31,7 +31,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     super(meta, app);
     this.chain = new MarlinChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
-    this.accounts = new MarlinHolders(this.app);
+    this.accounts = new MarlinHolders(this.app, this.chain, this.ethAccounts);
     this.governance = new MarlinGovernance(this.app);
   }
 
@@ -78,7 +78,9 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     });
 
     // TODO: This was for marlin accounts? maybe not necessary
-    await this.accounts.init(api, this.chain, this.ethAccounts);
+    await this.accounts.init(api,
+      //  this.chain, this.ethAccounts
+       );
     console.log('accounts:', this.accounts);
     this.block.height = await api.Provider.getBlockNumber();
     await super.initApi();
