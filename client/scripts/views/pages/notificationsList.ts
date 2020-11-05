@@ -43,9 +43,10 @@ const NotificationsPage: m.Component<{}> = {
           }),
           m(Popover, {
             content: [
-              m('p', 'Are you sure?'),
+              m('div', { style: 'margin-bottom: 10px' }, 'Are you sure?'),
               m(Button, {
                 label: 'Confirm',
+                fluid: true,
                 onclick: async (e) => {
                   e.preventDefault();
                   const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);
@@ -55,8 +56,9 @@ const NotificationsPage: m.Component<{}> = {
               })
             ],
             trigger: m(Button, {
-              label: 'Remove all chain events',
+              label: 'Clear chain events',
             }),
+            transitionDuration: 0,
             closeOnContentClick: true,
             closeOnEscapeKey: true,
             onClosed: () => { m.redraw(); },

@@ -33,6 +33,25 @@ $discussion-meta-padding: 18px;
                     margin-right: 6px;
                 }
             }
+            .mobile-comment-count {
+                display: none;
+                color: $text-color-light;
+                margin-left: 12px;
+                @include xs-max {
+                    display: block;
+                }
+                .cui-icon svg {
+                    position: relative;
+                    top: -1px;
+                    stroke: $text-color-light;
+                    opacity: 0.84;
+                    margin-right: 4px;
+                    height: 14px;
+                    width: 14px;
+                    min-height: 14px;
+                    min-height: 14px;
+                }
+            }
             .discussion-link {
                 color: $text-color-light;
                 margin-right: 12px;
