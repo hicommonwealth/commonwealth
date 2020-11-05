@@ -20,6 +20,8 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+import MarlinHolder from 'controllers/chain/ethereum/marlin/holder';
+import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 
 import {
   DropdownFormField,
@@ -63,6 +65,8 @@ const NewProposalForm = {
     let hasThreshold : boolean;
     // moloch proposal
     let hasMolochFields : boolean;
+    // marlin proposal
+    let hasMarlinFields : boolean;
     // data loaded
     let dataLoaded : boolean = true;
 
@@ -106,6 +110,8 @@ const NewProposalForm = {
       dataLoaded = !!(app.chain as Cosmos).governance;
     } else if (proposalTypeEnum === ProposalType.MolochProposal) {
       hasMolochFields = true;
+    } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
+      hasMarlinFields = true;
     } else {
       return m('.NewProposalForm', 'Invalid proposal type');
     }
@@ -271,6 +277,12 @@ const NewProposalForm = {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
         return;
+      } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
+        // TODO: check that applicant is valid ETH address in hex
+        if (!vnode.state.applicantAddress) throw new Error('Invalid applicant address');
+        // check delegates to be number
+        if (!vnode.state.description) throw new Error('Invalid description');
+        // TODO: Create Proposal via WebTx
       } else {
         mixpanel.track('Create Thread', {
           'Step No': 2,
@@ -314,6 +326,7 @@ const NewProposalForm = {
 
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
 
+    // TODO: Add Marlin Fields to NewProposalForm
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
         m(Col, [
