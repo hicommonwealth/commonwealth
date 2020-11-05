@@ -154,7 +154,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             && m('.proposal-body-link', m(ProposalHeaderExternalLink, { proposal })),
         ]),
       ]),
-      m(ProposalVotingResults, { proposal }),
       proposal instanceof OffchainThread && m('.proposal-content', [
         (commentCount > 0 || app.user.activeAccount) && m('.thread-connector'),
         m('.proposal-content-left', [

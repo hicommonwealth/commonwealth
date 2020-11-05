@@ -89,10 +89,14 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.ProposalVotingResults', [
-        m(Table, [
+        m(Table, {
+          bordered: false,
+          interactive: false,
+          striped: false
+        }, [
           m('tr', [
-            m('th', 'Yes'),
-            m('th', 'No')
+            m('th', 'Voted yes'),
+            m('th', 'Voted no')
           ]),
           m('tr', [
             m('td', showVotes(votes.filter((v) => v.choice === true))),
@@ -112,29 +116,57 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
       ]);
     } else if (proposal.votingType === VotingType.MolochYesNo) { // TODO: merge with above
       return m('.ProposalVotingResults', [
-        m(Tabs, [{
-          name: 'Voters',
-          content: showVotes(votes)
-        }, {
-          name: 'Yes',
-          content: showVotes(votes.filter((v) => v.choice === MolochVote.YES))
-        }, {
-          name: 'No',
-          content: showVotes(votes.filter((v) => v.choice === MolochVote.NO)),
-        }]),
+        m(Table, {
+          bordered: false,
+          interactive: false,
+          striped: false
+        }, [
+          m('tr', [
+            m('th', 'Voted yes'),
+            m('th', 'Voted no')
+          ]),
+          m('tr', [
+            m('td', showVotes(votes.filter((v) => v.choice === MolochVote.YES))),
+            m('td', showVotes(votes.filter((v) => v.choice === MolochVote.NO)))
+          ])
+        ])
+        // m(Tabs, [{
+        //   name: 'Voters',
+        //   content: showVotes(votes)
+        // }, {
+        //   name: 'Yes',
+        //   content: showVotes(votes.filter((v) => v.choice === MolochVote.YES))
+        // }, {
+        //   name: 'No',
+        //   content: showVotes(votes.filter((v) => v.choice === MolochVote.NO)),
+        // }]),
       ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       return m('.ProposalVotingResults', [
-        m(Tabs, [{
-          name: 'Voters',
-          content: showVotes(votes)
-        }, {
-          name: 'Yes',
-          content: showVotes(votes.filter((v) => v.choice === true))
-        }, {
-          name: 'No',
-          content: showVotes(votes.filter((v) => v.choice === false)),
-        }]),
+        m(Table, {
+          bordered: false,
+          interactive: false,
+          striped: false
+        }, [
+          m('tr', [
+            m('th', 'Voted yes'),
+            m('th', 'Voted no')
+          ]),
+          m('tr', [
+            m('td', showVotes(votes.filter((v) => v.choice === true))),
+            m('td', showVotes(votes.filter((v) => v.choice === false)))
+          ])
+        ])
+        // m(Tabs, [{
+        //   name: 'Voters',
+        //   content: showVotes(votes)
+        // }, {
+        //   name: 'Yes',
+        //   content: showVotes(votes.filter((v) => v.choice === true))
+        // }, {
+        //   name: 'No',
+        //   content: showVotes(votes.filter((v) => v.choice === false)),
+        // }]),
       ]);
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       return m('.ProposalVotingResults', [
