@@ -8,7 +8,6 @@ class OffchainComment<T extends IUniqueId> {
   public readonly author: string;
   public readonly text: string;
   public readonly attachments: OffchainAttachment[];
-  // public readonly proposal: T;
   public readonly id: number;
   public readonly createdAt: moment.Moment;
   public readonly community?: string;
@@ -24,7 +23,6 @@ class OffchainComment<T extends IUniqueId> {
     text,
     versionHistory,
     attachments,
-    proposal,
     id,
     createdAt,
     childComments = [],
@@ -38,7 +36,6 @@ class OffchainComment<T extends IUniqueId> {
     this.text = text;
     this.versionHistory = versionHistory;
     this.attachments = attachments;
-    this.proposal = proposal;
     this.id = id;
     this.createdAt = createdAt;
     this.childComments = childComments;

@@ -39,7 +39,6 @@ export const modelFromServer = (comment) => {
     decodeURIComponent(comment.text),
     comment.version_history,
     attachments,
-    proposal,
     comment.id,
     moment(comment.created_at),
     comment.child_comments,
