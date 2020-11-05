@@ -64,6 +64,7 @@ class ChainInfo {
         return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
       });
       this.setAdmins(roles);
+      return this.adminsAndMods;
     } catch {
       console.log('Failed to fetch admins/mods');
     }

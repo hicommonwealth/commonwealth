@@ -10,7 +10,7 @@ export const Errors = {
   NotLoggedIn: 'Not logged in',
   MustBeAdmin: 'Must be an admin to upgrade member',
   NoMember: 'Cannot find member to upgrade',
-  NoAdminDemotion: 'Cannot remove yourself as admin',
+  MustHaveAdmin: 'Communities must have at least one admin',
 };
 
 const ValidRoles = ['admin', 'moderator', 'member'];
@@ -26,22 +26,35 @@ const upgradeMember = async (models, req: Request, res: Response, next: NextFunc
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
   const requesterAddresses = await req.user.getAddresses();
   const requesterAddressIds = requesterAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
-  const requesterIsAdmin = await models.Role.findAll({
+  const requesterAdminRoles = await models.Role.findAll({
     where: {
       ...chainOrCommObj,
       address_id: { [Op.in]: requesterAddressIds },
       permission: 'admin',
     },
   });
-  if (requesterIsAdmin.length < 1) return next(new Error(Errors.MustBeAdmin));
+  if (requesterAdminRoles.length < 1) return next(new Error(Errors.MustBeAdmin));
 
   const memberAddress = await models.Address.findOne({
     where: {
       address,
     },
   });
-
   if (!memberAddress) return next(new Error(Errors.InvalidAddress));
+
+  const allCommunityAdmin = await models.Role.findAll({
+    where: {
+      ...chainOrCommObj,
+      permission: 'admin',
+    },
+  });
+  const requesterAdminAddressIds = requesterAdminRoles.map((r) => r.address_id);
+  const isLastAdmin = allCommunityAdmin.length < 2;
+  const adminSelfDemoting = requesterAdminAddressIds.includes(memberAddress.id)
+    && new_role !== 'admin';
+  if (isLastAdmin && adminSelfDemoting) {
+    return next(new Error(Errors.MustHaveAdmin));
+  }
 
   const member = await models.Role.findOne({
     where: {
@@ -50,7 +63,6 @@ const upgradeMember = async (models, req: Request, res: Response, next: NextFunc
     },
   });
   if (!member) return next(new Error(Errors.NoMember));
-  if (requesterIsAdmin.some((r) => member.id === r.id)) return next(new Error(Errors.NoAdminDemotion));
 
   if (ValidRoles.includes(new_role)) {
     member.permission = new_role;
