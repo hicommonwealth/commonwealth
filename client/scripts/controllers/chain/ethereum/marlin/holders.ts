@@ -18,11 +18,8 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
   public get store() { return this._store; }
   public get api() { return this._api; }
 
-  public async init(api: MarlinAPI,
-    //  ChainInfo: EthereumChain, Accounts: EthereumAccounts
-     ) {
+  public async init(api: MarlinAPI) {
     this._api = api;
-
   }
 
   public deinit() {

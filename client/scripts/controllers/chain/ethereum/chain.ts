@@ -72,6 +72,15 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
           this.app.chain.networkStatus = ApiStatus.Disconnected;
           return reject(error);
         }
+      } else if (node.url) {
+        try {
+          const provider = new Web3.providers.WebsocketProvider(node.url);
+          this._api = new Web3(provider);
+        } catch (error) {
+          console.log('Could not connect to Ethereum using remote node');
+          this.app.chain.networkStatus = ApiStatus.Disconnected;
+          return reject(error);
+        }
       } else if ((window as any).ethereum) {
         // Dapp browsers
         try {
@@ -93,15 +102,9 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
           return reject(error);
         }
       } else {
-        // Non-dapp browsers, use Infura -> https://infura.io/docs/ethereum/wss/introduction
-        try {
-          const provider = new Web3.providers.WebsocketProvider(node.url);
-          this._api = new Web3(provider);
-        } catch (error) {
-          console.log('Could not connect to Ethereum using remote node');
-          this.app.chain.networkStatus = ApiStatus.Disconnected;
-          return reject(error);
-        }
+        console.log('Could not connect to Ethereum');
+        this.app.chain.networkStatus = ApiStatus.Disconnected;
+        return reject(new Error('No more options to connect to Ethereum'));
       }
       this._api.eth.net.isListening()
         .then((isListening) => {

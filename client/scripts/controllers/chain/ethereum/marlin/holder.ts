@@ -11,6 +11,7 @@ import EthereumChain from 'controllers/chain/ethereum/chain';
 
 import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import MarlinHolders from './holders';
+import MarlinChain from './chain';
 
 export default class MarlinHolder extends EthereumAccount {
   private _isHolder: boolean;
@@ -36,7 +37,7 @@ export default class MarlinHolder extends EthereumAccount {
 
   constructor(
     app: IApp,
-    ChainInfo: EthereumChain,
+    ChainInfo: MarlinChain,
     Accounts: EthereumAccounts,
     Holders: MarlinHolders,
     address: string,
