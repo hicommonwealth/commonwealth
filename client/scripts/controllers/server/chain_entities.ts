@@ -178,17 +178,17 @@ class ChainEntityController {
     // kick off subscription to future events
     // TODO: handle unsubscribing
     console.log('Subscribing to chain events.');
-    subscriber.subscribe(async (block) => {
-      const incomingEvents = await processor.process(block);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const cwEvent of incomingEvents) {
-        const result = this._handleCWEvent(chain, cwEvent);
-        if (result) {
-          const [ entity, event ] = result;
-          this.emitUpdate(entity, event);
-        }
-      }
-    });
+    // subscriber.subscribe(async (block) => {
+    //   const incomingEvents = await processor.process(block);
+    //   // eslint-disable-next-line no-restricted-syntax
+    //   for (const cwEvent of incomingEvents) {
+    //     const result = this._handleCWEvent(chain, cwEvent);
+    //     if (result) {
+    //       const [ entity, event ] = result;
+    //       this.emitUpdate(entity, event);
+    //     }
+    //   }
+    // });
   }
 }
 

@@ -13,6 +13,7 @@ import { first } from 'rxjs/operators';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
+import { Table } from 'construct-ui';
 
 const signalingVoteToString = (v: VoteOutcome): string => {
   const outcomeArray = v.toU8a();
@@ -88,16 +89,26 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.ProposalVotingResults', [
-        m(Tabs, [{
-          name: 'Voters',
-          content: showVotes(votes)
-        }, {
-          name: 'Yes',
-          content: showVotes(votes.filter((v) => v.choice === true))
-        }, {
-          name: 'No',
-          content: showVotes(votes.filter((v) => v.choice === false)),
-        }]),
+        m(Table, [
+          m('tr', [
+            m('th', 'Yes'),
+            m('th', 'No')
+          ]),
+          m('tr', [
+            m('td', showVotes(votes.filter((v) => v.choice === true))),
+            m('td', showVotes(votes.filter((v) => v.choice === false)))
+          ])
+        ])
+        // m(Tabs, [{
+        //   name: 'Voters',
+        //   content: showVotes(votes)
+        // }, {
+        //   name: 'Yes',
+        //   content: showVotes(votes.filter((v) => v.choice === true))
+        // }, {
+        //   name: 'No',
+        //   content: showVotes(votes.filter((v) => v.choice === false)),
+        // }]),
       ]);
     } else if (proposal.votingType === VotingType.MolochYesNo) { // TODO: merge with above
       return m('.ProposalVotingResults', [

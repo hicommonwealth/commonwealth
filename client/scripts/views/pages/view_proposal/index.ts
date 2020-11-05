@@ -154,6 +154,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             && m('.proposal-body-link', m(ProposalHeaderExternalLink, { proposal })),
         ]),
       ]),
+      m(ProposalVotingResults, { proposal }),
       proposal instanceof OffchainThread && m('.proposal-content', [
         (commentCount > 0 || app.user.activeAccount) && m('.thread-connector'),
         m('.proposal-content-left', [
@@ -436,7 +437,6 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
 
     return m('.ProposalSidebar.forum-container.proposal-sidebar', [
       m(ProposalVotingActions, { proposal }),
-      m(ProposalVotingResults, { proposal }),
     ]);
   }
 };
@@ -699,8 +699,11 @@ const ViewProposalPage: m.Component<{
       }),
       !(proposal instanceof OffchainThread) && m('.proposal-mobile-sidebar', [
         m(ProposalVotingActions, { proposal }),
-        m(ProposalVotingResults, { proposal }),
+        // m(ProposalVotingResults, { proposal }),
       ]),
+      // TODO: Ensure hidden on mobile
+      !(proposal instanceof OffchainThread)
+        && m(ProposalVotingResults, { proposal }),
       m(ProposalComments, {
         proposal,
         comments,
