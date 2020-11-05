@@ -13,6 +13,7 @@ import { first } from 'rxjs/operators';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
+import { MarlinProposalVote, MarlinVote } from 'controllers/chain/ethereum/marlin/proposal';
 
 const signalingVoteToString = (v: VoteOutcome): string => {
   const outcomeArray = v.toU8a();
@@ -64,9 +65,14 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
                 m('.vote-choice', vote.choice.toString()),
                 balance && m('.vote-balance', balanceStr),
               ])
-                : m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                ]);
+                : vote instanceof MarlinProposalVote ? m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  m('.vote-choice', vote.choice.toString()),
+                  balance && m('.vote-balance', balanceStr),
+                ])
+                  : m('.vote', [
+                    m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                  ]);
         }
       );
 
@@ -110,6 +116,19 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
         }, {
           name: 'No',
           content: showVotes(votes.filter((v) => v.choice === MolochVote.NO)),
+        }]),
+      ]);
+    } else if (proposal.votingType === VotingType.MarlinYesNo) {
+      return m('.ProposalVotingResults', [
+        m(Tabs, [{
+          name: 'Voters',
+          content: showVotes(votes)
+        }, {
+          name: 'Yes',
+          content: showVotes(votes.filter((v) => v.choice === MarlinVote.YES))
+        }, {
+          name: 'No',
+          content: showVotes(votes.filter((v) => v.choice === MarlinVote.NO)),
         }]),
       ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
