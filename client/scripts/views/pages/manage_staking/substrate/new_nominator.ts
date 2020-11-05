@@ -112,7 +112,7 @@ const NewNominator = makeDynamicComponent<NewNominatorAttrs, NewNominatorState>(
     return m('.NewNominator.manage-staking', [
       m('.compact-modal-title.center-lg', [
         m('h5', [ `Step ${model.step} of ${MAX_STEP}` ]),
-        m('h3', [ 'Setup Nominator' ]),
+        m('h3.modal-title', [ 'Setup Nominator' ]),
       ]),
       m('.compact-modal-body',
         model.step === MIN_STEP
@@ -120,7 +120,7 @@ const NewNominator = makeDynamicComponent<NewNominatorAttrs, NewNominatorState>(
           m(Bond, {
             onChange: model.onBondedChange
           }),
-          m('div.center-lg.padding-t-10', [
+          m('div.center-lg.padding-t-10.button-row', [
             m('button.cui-button.cui-align-center.cui-primary', {
               disabled: model.error,
               onclick: model.next,
@@ -132,7 +132,7 @@ const NewNominator = makeDynamicComponent<NewNominatorAttrs, NewNominatorState>(
           m(Nominate, {
             onChange: model.onNominateChange
           }),
-          m('div.center-lg.padding-t-10', [
+          m('div.center-lg.padding-t-10.button-row', [
             !model.txSuccess
             && m('button.cui-button.cui-align-center.cui-primary', {
               disabled: !model.nominates.length,
