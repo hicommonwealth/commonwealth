@@ -85,7 +85,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
         })
       ]);
     } else {
-      console.log('PULLING FROM WRONG PLACE')
       response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
         chain: this.id,
         community: null,

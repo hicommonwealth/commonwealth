@@ -157,7 +157,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     if (sortedThreads.length > 0) {
       let visitMarkerPlaced = false;
       vnode.state.lookback[subpage] = moment(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
-      console.log(vnode.state.lookback);
 
       if (allThreads.length > sortedThreads.length) {
         if (firstThread && getLastUpdate(firstThread) > lastVisited) {
@@ -240,7 +239,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           options.cutoffDate = vnode.state.lookback[subpage];
           const morePostsRemaining = await app.threads.loadNextPage(options);
           if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
-          console.log(vnode.state);
           m.redraw();
         }
       }, 400);
