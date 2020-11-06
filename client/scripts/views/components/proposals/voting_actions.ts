@@ -271,7 +271,9 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => { onModalClose(); m.redraw(); })
           .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else if (proposal instanceof MarlinProposal) {
-        // TODO: Cancel Marlin VOTE here
+        proposal.cancelTx()
+          .then(() => { onModalClose(); m.redraw(); })
+          .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else {
         throw new Error('Invalid proposal type');
       }
@@ -434,8 +436,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       canVote = false;
     } else if (proposal instanceof MolochProposal && proposal.state !== MolochProposalState.Voting) {
       canVote = false;
-    // } else if (proposal instanceof MarlinProposal && proposal.state !== MarlinProposalState.Active) {
-    //   canVote = false; // TODO: Fix proposal.state function above to not return promise
+    } else if (proposal instanceof MarlinProposal /* && proposal.state() !== MarlinProposalState.Active */) {
+      canVote = false; // TODO: Fix proposal.state function above to not return promise
     } else if (hasVotedForAnyChoice) {
       // enable re-voting for particular types
       if (proposal instanceof SubstratePhragmenElection
@@ -522,7 +524,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       }),
     ]);
     // moloch: cancel
-    const cancelButton = (proposal.votingType === VotingType.MolochYesNo) && m('.veto-button', [
+    const cancelButton = (proposal.votingType === VotingType.MolochYesNo) ? m('.veto-button', [
       m(Button, {
         intent: 'negative',
         disabled: !((proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed)
@@ -531,7 +533,16 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         label: (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel',
         compact: true,
       }),
-    ]);
+    ]) : (proposal.votingType === VotingType.MarlinYesNo) ? m('.veto-button', [
+      m(Button, {
+        intent: 'negative',
+        disabled: (proposal as MarlinProposal).isCanceled
+          || votingModalOpen,
+        onclick: cancelProposal,
+        label: (proposal as MarlinProposal).isCanceled ? 'Cancelled' : 'Cancel',
+        compact: true,
+      }),
+    ]) : null;
     // V2 only: moloch: sponsor
     // const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
     //  m(Button, {
@@ -599,6 +610,10 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         [ m('.button-row', [yesButton, noButton, /* sponsorButton, */processButton, cancelButton]),
           m(ProposalExtensions, { proposal }) ]
       ];
+    } else if (proposal.votingType === VotingType.MarlinYesNo) {
+      votingActionObj = [
+        m('.button-row', [yesButton, noButton, /** executeButton, queueButton, */ cancelButton])
+      ]
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else if (proposal.votingType === VotingType.None) {
