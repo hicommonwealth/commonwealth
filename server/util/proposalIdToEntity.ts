@@ -28,6 +28,10 @@ export default async function (models, chain: string, identifier: string) {
     case 'molochproposal': {
       return findEntity(MolochTypes.EntityKind.Proposal.toString());
     }
+    // TODO: Uncomment when importing MarlinTypes
+    // case 'marlinproposal': {
+    //   return findEntity(MarlinTypes.EntityKind.Proposal.toString());
+    // }
     // TODO: cosmosproposal
     // ignore council elections -- no commenting on them
     default: {
