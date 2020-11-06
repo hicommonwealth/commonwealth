@@ -25,8 +25,8 @@ import MarlinAPI from './api';
 import MarlinGovernance from './governance';
 
 export enum MarlinVote {
-  YES = 'Yes',
-  NO = 'No'
+  YES = 1,
+  NO = 0
 }
 
 export enum MarlinProposalState {
@@ -217,41 +217,29 @@ export default class MarlinProposal extends Proposal<
     return true;
   }
 
-//   public canCancel(currentUser: MarlinHolder) {
-//   }
+  // web wallet TX only
+  public async submitVoteWebTx(vote: MarlinProposalVote) {
+    if (!(await this._Holders.isSenderDelegate())) {
+      throw new Error('sender must be valid delegate');
+    }
 
-//   // web wallet TX only
-//   public async submitVoteWebTx(vote: MarlinProposalVote) {
-//     if (!(await this._Holders.isSenderDelegate())) {
-//       throw new Error('sender must be valid delegate');
-//     }
+    if (await this.state() !== MarlinProposalState.Active) {
+      throw new Error('proposal not in active period');
+    }
 
-//     if (this.state !== MarlinProposalState.Active) {
-//       throw new Error('proposal not in active period');
-//     }
-
-//     const prevVote = await this._Gov.api.governorAlpha.getMemberProposalVote(
-//       this._Gov.api.userAddress,
-//       this.data.identifier
-//     );
-//     if (prevVote === 1 || prevVote === 2) {
-//       throw new Error('user previously voted on proposal');
-//     }
-
-//     const tx = await this._Gov.api.governorAlpha.submitVote(
-//       this.data.identifier,
-//       vote.choice === MarlinVote.YES ? 1 : vote.choice === MarlinVote.NO ? 2 : 0,
-//       { gasLimit: this._Gov.api.gasLimit },
-//     );
-//     const txReceipt = await tx.wait();
-//     if (txReceipt.status !== 1) {
-//       throw new Error('failed to submit vote');
-//     }
-//     return txReceipt;
-//   }
+    const tx = await this._Gov.api.governorAlphaContract.castVote(
+      this.data.identifier,
+      !!vote.choice,
+      { gasLimit: this._Gov.api.gasLimit },
+    );
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error('failed to submit vote');
+    }
+    return txReceipt;
+  }
 
   public submitVoteTx(): ITXModalData {
     throw new Error('not implemented');
   }
-
 }

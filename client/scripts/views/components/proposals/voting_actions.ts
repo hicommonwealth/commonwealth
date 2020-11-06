@@ -210,6 +210,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof MarlinProposal) {
         // TODO: Implement YES VOTE HERE
+        proposal.submitVoteTx();
       } else if (proposal instanceof SubstratePhragmenElection) {
         throw new Error('Unimplemented proposal type - use election voting modal');
       } else {
