@@ -209,8 +209,9 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof MarlinProposal) {
-        // TODO: Implement YES VOTE HERE
-        proposal.submitVoteTx();
+        proposal.submitVoteWebTx(new MarlinProposalVote(user, MarlinVote.YES))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
         throw new Error('Unimplemented proposal type - use election voting modal');
       } else {
@@ -245,7 +246,9 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
       } else if (proposal instanceof MarlinProposal) {
-        // TODO: Implement NO VOTE HERE
+        proposal.submitVoteWebTx(new MarlinProposalVote(user, MarlinVote.NO))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else {
         throw new Error('Invalid proposal type');
       }
