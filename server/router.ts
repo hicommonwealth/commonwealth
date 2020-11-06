@@ -22,6 +22,7 @@ import createComment from './routes/createComment';
 import editComment from './routes/editComment';
 import deleteComment from './routes/deleteComment';
 import viewComments from './routes/viewComments';
+import bulkComments from './routes/bulkComments';
 import createReaction from './routes/createReaction';
 import deleteReaction from './routes/deleteReaction';
 import viewReactions from './routes/viewReactions';
@@ -172,6 +173,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/deleteComment', passport.authenticate('jwt', { session: false }), deleteComment.bind(this, models));
   // TODO: Change to GET /comments
   router.get('/viewComments', viewComments.bind(this, models));
+  router.get('/bulkComments', bulkComments.bind(this, models));
 
   // offchain topics
   // TODO: Change to POST /topic
