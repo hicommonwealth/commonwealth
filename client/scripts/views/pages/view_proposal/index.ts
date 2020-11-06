@@ -517,6 +517,9 @@ const ViewProposalPage: m.Component<{
             app.threads.fetchThread(Number(proposalId)).then((res) => {
               vnode.state.proposal = res;
               m.redraw();
+            }).catch((err) => {
+              notifyError('Thread not found');
+              return m(PageNotFound);
             });
             vnode.state.threadFetched = true;
           }

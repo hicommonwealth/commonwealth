@@ -264,13 +264,13 @@ class ThreadsController {
     };
     const response = await $.get(`${app.serverUrl()}/getThread`, params);
     if (response.status !== 'Success') {
-      throw new Error(`Unsuccessful refresh status: ${response.status}`);
+      throw new Error(`Cannot fetch thread: ${response.status}`);
     }
     const thread = modelFromServer(response.result);
     const existing = this._store.getByIdentifier(thread.id);
     if (existing) this._store.remove(existing);
     this._store.update(thread);
-    return modelFromServer(response.result);
+    return thread;
   }
 
   // loadNextPage returns false if there are no more threads to load
