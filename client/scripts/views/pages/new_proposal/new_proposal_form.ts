@@ -278,10 +278,30 @@ const NewProposalForm = {
           .catch((err) => notifyError(err.toString()));
         return;
       } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
-        // TODO: check that applicant is valid ETH address in hex
-        if (!vnode.state.applicantAddress) throw new Error('Invalid applicant address');
-        // check delegates to be number
+        vnode.state.proposer = app.user?.activeAccount?.address;
+        if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
         if (!vnode.state.description) throw new Error('Invalid description');
+        if (!vnode.state.targets) throw new Error('No targets');
+        if (!vnode.state.values) throw new Error('No values');
+        if (!vnode.state.signatures) throw new Error('No signatures');
+        if (!vnode.state.calldatas) throw new Error('No calldatas');
+        const targetsArray = vnode.state.targets.split(',');
+        const valuesArray = vnode.state.values.split(',');
+        const calldatasArray = vnode.state.calldatas.split(',');
+        const signaturesArray = vnode.state.signatures.split(',');
+        if (targetsArray.length !== valuesArray.length
+          && valuesArray.length !== calldatasArray.length
+          && calldatasArray.length !== signaturesArray.length)
+          throw new Error('Array lengths do not match');
+        const details = {
+          targets: targetsArray.toString(),
+          values: valuesArray.toString(),
+          signatures: signaturesArray.toString(),
+          calldatas: calldatasArray.toString(),
+          description: vnode.state.description,
+        };
+        (app.chain as Marlin).governance.propose(details);
+
         // TODO: Create Proposal via WebTx
       } else {
         mixpanel.track('Create Thread', {
