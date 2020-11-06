@@ -83,8 +83,6 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.marlinAccounts.init(api);
     this.block.height = await api.Provider.getBlockNumber(); // TODO: Fix the global eth block height setting
     await super.initApi();
-
-    setTimeout(() => console.log(this.marlinAccounts), 5000);
   }
 
   public async initData() {
