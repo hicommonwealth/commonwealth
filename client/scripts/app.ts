@@ -262,7 +262,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     app.chain = new Marlin(n, app);
-    // app.chain.initApi();
   } else {
     throw new Error('Invalid chain');
   }
