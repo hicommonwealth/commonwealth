@@ -615,6 +615,76 @@ const NewProposalForm = {
               }),
             ]),
           ],
+          hasMarlinFields && [
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Targets'),
+              m(Input, {
+                name: 'description',
+                placeholder: 'Proposal Targets',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.targets = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Values'),
+              m(Input, {
+                name: 'description',
+                placeholder: 'Proposal Values',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.values = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Calldatas'),
+              m(Input, {
+                name: 'description',
+                placeholder: 'Proposal Calldatas',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.calldatas = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Signatures'),
+              m(Input, {
+                name: 'description',
+                placeholder: 'Proposal Signatures',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.signatures = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposer (you)'),
+              m(Input, {
+                name: 'proposer',
+                value: `${app.user.activeAccount.address}`,
+                disabled: true,
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Description'),
+              m(Input, {
+                name: 'description',
+                placeholder: 'Proposal Description',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ],
           m(FormGroup, [
             m(Button, {
               disabled: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
