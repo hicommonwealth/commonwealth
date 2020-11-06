@@ -217,6 +217,22 @@ export default class MarlinProposal extends Proposal<
     return true;
   }
 
+  public async cancelTx() {
+    if (this.isCanceled) {
+      throw new Error('proposal already canceled');
+    }
+
+    const tx = await this._Gov.api.governorAlphaContract.cancel(
+      this.data.identifier,
+      { gasLimit: this._Gov.api.gasLimit }
+    );
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error('failed to canceled proposal');
+    }
+    return txReceipt;
+  }
+
   // web wallet TX only
   public async submitVoteWebTx(vote: MarlinProposalVote) {
     if (!(await this._Holders.isSenderDelegate())) {
