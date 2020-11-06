@@ -1,4 +1,6 @@
-import { SubstrateTypes, MolochTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes, MolochTypes,
+// MarlinTypes
+} from '@commonwealth/chain-events';
 
 // this function takes an "old style" identifier such as treasuryproposal_4 and attempts
 // fetch the corresponding chain entity from the database
