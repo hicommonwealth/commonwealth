@@ -12,12 +12,13 @@ import { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 
-import { BigNumberish } from 'ethers/utils';
+import { BigNumber, BigNumberish } from 'ethers/utils';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
 // import MarlinHolder from './holders';
 import MarlinHolders from './holders';
 import MarlinChain from './chain';
+import { BN_THOUSAND } from '@polkadot/util';
 
 export interface ProposalArgs {
   targets: string[],
@@ -78,7 +79,10 @@ MarlinProposal
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !signatures || !calldatas || !description) return;
     if (!(await this._Holders.isSenderDelegate())) throw new Error('sender must be valid delegate');
-    // Delegate threshold?
+    // BN comparison with BigNumber needs fixing
+    // if (this.proposalThreshold < await this._Holders.get(this._api.userAddress).priorDelegates(this._api.Provider.blockNumber)) {
+    //   throw new Error('sender must have requisite delegates');
+    // }
     if (parseInt(await this._api.userAddress, 16) === 0) {
       throw new Error('applicant cannot be 0');
     }
