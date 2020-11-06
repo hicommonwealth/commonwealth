@@ -160,7 +160,7 @@ export default class MarlinProposal extends Proposal<
 
   public get author() { return this._Holders.get(this.data.proposer); }
 
-  public get votingType() { return VotingType.SimpleYesNoVoting; }
+  public get votingType() { return VotingType.MarlinYesNo; }
   public get votingUnit() { return VotingUnit.CoinVote; }
 
   public get startingPeriod() { return +this.data.startBlock; }
