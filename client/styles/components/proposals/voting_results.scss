@@ -2,14 +2,20 @@
 
 .ProposalVotingResults {
     margin: 0 24px;
-    display: grid;
-    grid-gap: 20px 40px;
-    grid-template-columns: auto auto;
+    display: flex;
     background-color: $background-color-light;
     margin-top: 25px;
     padding: 12px 20px 13px;
+    flex-wrap: wrap;
     .results-header {
         font-weight: 500;
+    }
+    .results-cell:nth-child(odd), .results-header:nth-child(odd) {
+        margin-right: 15px;
+    }
+    .results-header, .results-cell {
+        flex: 1;
+        min-width: calc(50% - 15px);
     }
     .vote {
         display: flex;
