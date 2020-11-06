@@ -77,6 +77,12 @@ MarlinProposal
   public async propose(args: ProposalArgs) {
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !signatures || !calldatas || !description) return;
+    if (!(await this._Holders.isSenderDelegate())) throw new Error('sender must be valid delegate');
+    // Delegate threshold?
+    if (parseInt(await this._api.userAddress, 16) === 0) {
+      throw new Error('applicant cannot be 0');
+    }
+
     const tx = await this._api.governorAlphaContract.propose(
       targets, values, signatures, calldatas, description,
     );
