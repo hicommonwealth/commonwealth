@@ -128,6 +128,7 @@ MarlinProposal
     this._proposalMaxOperations = new BN((await this._api.governorAlphaContract.proposalMaxOperations()).toString(), 10);
     this._votingDelay = new BN((await this._api.governorAlphaContract.votingDelay()).toString(), 10);
     this._votingPeriod = new BN((await this._api.governorAlphaContract.votingPeriod()).toString(), 10);
+    this._initialized = true;
   }
 
   public deinit() {
