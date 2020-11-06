@@ -54,9 +54,52 @@ const backportEntityToAdapter = (
   Gov: MarlinGovernance,
   entity: ChainEntity
 ): IMarlinProposalResponse => {
-  // TODO: Get information from @chain-events for MarlinTypes first
-  // const identifier = `${(startEvent.data as MarlinTypes.ISubmitProposal).proposalIndex}`;
+  // TODO: Uncomment when Chain-events is being imported
+  // const startEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalCreated);
+  // const canceledEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalCanceled);
+  // const executedEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalExecuted);
+  // const voteEvents = entity.chainEvents.filter((e) => e.data.kind === MarlinTypes.EventKind.VoteCast);
+  // if (!startEvent) {
+  //   throw new Error('Proposal start event not found!');
+  // }
+
+  // const identifier = `${(startEvent.data as MarlinTypes.IProposalCreated).id}`;
   // const id = identifier;
+  // const proposer = `${(startEvent.data as MarlinTypes.IProposalCreated).proposer}`;
+  // const description = `${(startEvent.data as MarlinTypes.IProposalCreated).description}`;
+  // const targets = (startEvent.data as MarlinTypes.IProposalCreated).targets;
+  // const values = (startEvent.data as MarlinTypes.IProposalCreated).values;
+  // const signatures = (startEvent.data as MarlinTypes.IProposalCreated).signatures;
+  // const calldatas = (startEvent.data as MarlinTypes.IProposalCreated).calldatas;
+  // const startBlock = (startEvent.data as MarlinTypes.IProposalCreated).startBlock;
+  // const endBlock = (startEvent.data as MarlinTypes.IProposalCreated).endBlock;
+  // const eta = null;
+
+  // const voteReducer = (acc, vote) => acc + vote.votes.toNumber();
+  // const forVotesArray = voteEvents.filter((e) => e.data.support);
+  // const forVotes = forVotesArray.reduce(voteReducer, 0);
+  // const againstVotesArray = voteEvents.filter((e) => !e.data.support);
+  // const againstVotes = againstVotesArray.reduce(voteReducer, 0);
+  // const canceled = !!canceledEvent;
+  // const executed = !!executedEvent;
+
+  // const proposal: IMarlinProposalResponse = {
+  //   identifier,
+  //   id,
+  //   proposer,
+  //   description,
+  //   targets,
+  //   values,
+  //   signatures,
+  //   calldatas,
+  //   startBlock,
+  //   endBlock,
+  //   eta,
+  //   forVotes,
+  //   againstVotes,
+  //   canceled,
+  //   executed,
+  // };
 
   const proposal: IMarlinProposalResponse = {
     identifier: null,
@@ -73,22 +116,9 @@ const backportEntityToAdapter = (
     forVotes: null,
     againstVotes: null,
     canceled: null,
-    exectued: null,
+    executed: null,
   };
 
-  // optional properties
-  // if (processEvent) {
-  //   proposal.didPass = (processEvent.data as MarlinTypes.IProcessProposal).didPass;
-  //   proposal.aborted = false;
-  //   proposal.status = proposal.didPass ? 'PASSED' : 'FAILED';
-  //   proposal.yesVotes = (processEvent.data as MarlinTypes.IProcessProposal).yesVotes;
-  //   proposal.yesVotes = (processEvent.data as MarlinTypes.IProcessProposal).noVotes;
-  // }
-  // if (abortEvent) {
-  //   proposal.didPass = false;
-  //   proposal.aborted = true;
-  //   proposal.status = 'ABORTED';
-  // }
   return proposal;
 };
 
@@ -171,11 +201,11 @@ export default class MarlinProposal extends Proposal<
     super('marlinproposal', backportEntityToAdapter(Gov, entity));
 
     this._Holders = Holders;
-    // this._Gov = Gov;
+    this._Gov = Gov;
 
     entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
     this._initialized.next(true);
-    // this._Gov.store.add(this);
+    this._Gov.store.add(this);
   }
 
   public update(e: ChainEvent) {

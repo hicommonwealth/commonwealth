@@ -55,7 +55,7 @@ export interface IMarlinProposalResponse {
   againstVotes: number;
 
   canceled: boolean;
-  exectued: boolean;
+  executed: boolean;
 
   // TODO: State
 }
