@@ -102,9 +102,6 @@ export default class MarlinProposal extends Proposal<
   private _Holders: MarlinHolders;
   private _Gov: MarlinGovernance;
 
-//   private _yesVotes: number = 0;
-//   private _noVotes: number = 0;
-
   public get shortIdentifier() { return `MarlinProposal-${this.data.identifier}`; }
   public get title(): string {
     try {
@@ -157,29 +154,11 @@ export default class MarlinProposal extends Proposal<
   }
 
   public get support() {
-    // Since BNs only represent integers, we multiply the numerator by some value P
-    // then perform division (P * yes) / (yes + no), which equals P * support, where
-    // support is from 0 to 1. We then convert that value to a float (since it should be <= P),
-    // and divide the result by P to obtain the support value between 0 and 1.
-    //
-    // The entire process can be summarized as: support = float((P * yes) / (yes + n)) / P,
-    // where "yes" and "no" are integers.
-    const PRECISION = 1000;
-    // const voters = new BN(this._yesVotes).add(new BN(this._noVotes));
-    // if (voters.isZero()) return 0;
-    // const pctYes = new BN(this._yesVotes).muln(PRECISION).div(voters);
-    // return pctYes.toNumber() / PRECISION;
     return 0;
   }
 
   public get turnout() {
-    // see support call for explanation of precision usage
-    // const PRECISION = 1000;
-    // const votes = new BN(this._yesVotes).add(new BN(this._noVotes));
-    // if (this._Gov.totalShares.isZero()) return 0;
-    // const pctTurnout = votes.muln(PRECISION).div(this._Gov.totalShares);
-    // return pctTurnout.toNumber() / PRECISION;
-    return 0;
+    return null;
   }
 
   constructor(
