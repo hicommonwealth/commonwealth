@@ -1,5 +1,4 @@
 import BN from 'bn.js';
-import EthDater from 'ethereum-block-by-date';
 
 import { ProposalModule, ITXModalData, ChainEntity, IChainModule } from 'models';
 
