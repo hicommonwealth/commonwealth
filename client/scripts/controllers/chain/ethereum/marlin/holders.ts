@@ -80,10 +80,9 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     return !m.isZero();
   }
 
-  // TODO: Check how contract returns delegates amount
   public async isSenderDelegate(): Promise<boolean> {
     const sender = this._api.userAddress;
     const delegator = await this._api.compContract.delegates(sender);
-    return (parseInt(delegator, 16) !== 0);
+    return delegator === sender;
   }
 }
