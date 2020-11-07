@@ -5,7 +5,6 @@ import { ProposalModule, ITXModalData, ChainEntity, IChainModule } from 'models'
 
 import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
-import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 // import { MarlinEvents } from '@commonwealth/chain-events';
 
@@ -15,10 +14,8 @@ import { IApp } from 'state';
 import { BigNumber, BigNumberish } from 'ethers/utils';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
-// import MarlinHolder from './holders';
 import MarlinHolders from './holders';
 import MarlinChain from './chain';
-import { BN_THOUSAND } from '@polkadot/util';
 
 export interface ProposalArgs {
   targets: string[],
