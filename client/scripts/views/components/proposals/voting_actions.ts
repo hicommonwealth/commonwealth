@@ -566,8 +566,6 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       })
     ]);
 
-    // TODO: Marlin Buttons HERE
-
     let votingActionObj;
     if (proposal.votingType === VotingType.SimpleYesNoVoting && !(proposal instanceof EdgewareSignalingProposal)) {
       votingActionObj = [
