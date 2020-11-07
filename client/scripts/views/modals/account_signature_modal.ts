@@ -6,7 +6,6 @@ import app from 'state';
 
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
-import SubkeyInstructions from 'views/components/subkey_instructions';
 import { Account, ChainBase } from 'models';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
