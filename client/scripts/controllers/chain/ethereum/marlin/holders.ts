@@ -42,7 +42,6 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
 
   constructor(app: IApp, ChainInfo: MarlinChain, Accounts: EthereumAccounts) {
     this._app = app;
-    // only used to initialize Holder for super call
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
   }

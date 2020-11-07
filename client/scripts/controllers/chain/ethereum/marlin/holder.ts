@@ -12,6 +12,7 @@ import EthereumChain from 'controllers/chain/ethereum/chain';
 import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import MarlinHolders from './holders';
 import MarlinChain from './chain';
+import { bnToBn } from '@polkadot/util';
 
 export default class MarlinHolder extends EthereumAccount {
   private _isHolder: boolean;
@@ -80,8 +81,8 @@ export default class MarlinHolder extends EthereumAccount {
     }
   }
 
-  public async priorDelegates(blockNumber: number | string) { // TODO: Check this
-    const delegates = await this._Holders.api.compContract.getPriorVotes(this.address, blockNumber);
+  public async priorDelegates(blockNumber: number | string) {
+    const delegates = new BN((await this._Holders.api.compContract.getPriorVotes(this.address, blockNumber)).toString(), 10);
     return delegates || 0;
   }
 
