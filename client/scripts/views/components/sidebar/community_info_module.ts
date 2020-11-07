@@ -5,8 +5,6 @@ import m from 'mithril';
 import app from 'state';
 import { Button, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
 
-import ManageCommunityModal from 'views/modals/manage_community_modal';
-
 const removeUrlPrefix = (url) => {
   return url.replace(/^https?:\/\//, '');
 };
@@ -28,14 +26,6 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
     return m('.CommunityInfoModule.SidebarModule', [
       m('.community-name', [
         m('.community-name-text', name),
-        isAdmin && m('.community-info-action', {
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.create({ modal: ManageCommunityModal });
-          }
-        }, [
-          m(Icon, { name: Icons.SETTINGS }),
-        ]),
       ]),
       m('.community-description', description),
       website && m('.community-info', [

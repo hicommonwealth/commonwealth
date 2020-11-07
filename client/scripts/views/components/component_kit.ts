@@ -18,7 +18,7 @@ import {
   Table
 } from 'construct-ui';
 
-const ComponentKit = {
+const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
   view: (vnode) => {
     return m('.ComponentKit', [
       m('style', '.ComponentKit > * { margin: 20px; }\n .ComponentKit > .gallery > * { margin-right: 20px; }'),

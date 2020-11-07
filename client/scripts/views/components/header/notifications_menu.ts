@@ -4,14 +4,19 @@ import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import app from 'state';
 
-import { PopoverMenu, Button, Icon, Icons, ButtonGroup } from 'construct-ui';
+import { Popover, PopoverMenu, Button, Icon, Icons, ButtonGroup } from 'construct-ui';
 import NotificationRow from 'views/components/notification_row';
 import { Notification } from 'models';
+import { pluralize } from 'helpers';
 import { sortNotifications } from 'helpers/notifications';
 
-const NotificationButtons: m.Component = {
+const MAX_NOTIFS = 40; // limit number of notifications shown
+
+const NotificationButtons: m.Component<{}> = {
   view: (vnode) => {
     const notifications = app.user.notifications.notifications;
+    const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);
+
     return m(ButtonGroup, {
       class: 'NotificationButtons',
       fluid: true,
@@ -30,6 +35,32 @@ const NotificationButtons: m.Component = {
         onclick: () => (app.activeChainId() || app.activeCommunityId())
           ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationsList`)
           : m.route.set('/notificationsList'),
+      }),
+      m(Popover, {
+        content: [
+          m('div', { style: 'margin-bottom: 10px' }, [
+            `Clear ${pluralize(chainEventNotifications.length, 'chain event notification')}?`
+          ]),
+          m(Button, {
+            label: 'Confirm',
+            fluid: true,
+            disabled: chainEventNotifications.length === 0,
+            onclick: async (e) => {
+              e.preventDefault();
+              const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);
+              if (chainEventNotifications.length === 0) return;
+              app.user.notifications.clear(chainEventNotifications).then(() => m.redraw());
+            }
+          })
+        ],
+        trigger: m(Button, {
+          disabled: chainEventNotifications.length === 0,
+          label: 'Clear events',
+        }),
+        transitionDuration: 0,
+        closeOnContentClick: true,
+        closeOnEscapeKey: true,
+        onClosed: () => { m.redraw(); },
       }),
     ]);
   }
@@ -59,7 +90,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
       }),
       position: 'bottom-end',
       inline: true,
-      closeOnContentClick: true,
+      closeOnContentClick: false,
       menuAttrs: {
         align: 'left',
       },
@@ -69,7 +100,8 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
           notifications.length > 0
             ? m(Infinite, {
               maxPages: 1, // prevents rollover/repeat
-              pageData: () => sortedNotifications,
+              pageData: () => sortedNotifications.slice(0, MAX_NOTIFS), // limit the number of rows shown here
+              key: notifications.length,
               item: (data, opts, index) => {
                 return m(NotificationRow, { notifications: data });
               },

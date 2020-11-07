@@ -12,24 +12,26 @@ import { pluralize } from 'helpers';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/main';
-
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
-import DiscussionRow from 'views/pages/discussions/discussion_row';
 import Listing from 'views/pages/listing';
 
+import { notifyError } from 'controllers/app/notifications';
 import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
+import DiscussionRow from './discussion_row';
+
+export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
 interface IDiscussionPageState {
-  lookback?: number;
-  postsDepleted?: boolean;
+  lookback?: { [community: string]: moment.Moment} ;
+  postsDepleted: { [community: string]: boolean };
+  topicInitialized: { [community: string]: boolean };
+  lastSubpage: string;
   lastVisitedUpdated?: boolean;
-  defaultLookback: number;
+  onscroll: any;
 }
 
 const getLastUpdate = (proposal) => {
@@ -67,41 +69,31 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       app.user.unseenPosts[app.activeId()]['activePosts'] = 0;
       app.user.unseenPosts[app.activeId()]['threads'] = 0;
     }
-
-    // Infinite Scroll
-    const onscroll = _.debounce(() => {
-      const scrollHeight = $(document).height();
-      const scrollPos = $(window).height() + $(window).scrollTop();
-      if (scrollPos > (scrollHeight - 400)) {
-        if (!vnode.state.postsDepleted) {
-          vnode.state.lookback += vnode.state.defaultLookback;
-          m.redraw();
-        }
-      }
-    }, 400);
-    $(window).on('scroll', onscroll);
   },
   oninit: (vnode) => {
-    // determine lookback length
-    vnode.state.defaultLookback = 20;
-
+    vnode.state.lookback = {};
+    vnode.state.postsDepleted = {};
+    vnode.state.topicInitialized = {};
+    vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = true;
+    const subpage = vnode.attrs.topic || ALL_PROPOSALS_KEY;
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
-    vnode.state.lookback = (returningFromThread && localStorage[`${app.activeId()}-lookback`])
-      ? Number(localStorage[`${app.activeId()}-lookback`])
-      : Number.isInteger(vnode.state.lookback)
-        ? vnode.state.lookback
-        : vnode.state.defaultLookback;
+    vnode.state.lookback[subpage] = (returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`])
+      ? localStorage[`${app.activeId()}-lookback-${subpage}`]
+      : vnode.state.lookback[subpage]?._isAMomentObject
+        ? vnode.state.lookback[subpage]
+        : moment();
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
+    if (!activeEntity) return;
+    const subpage = topic || ALL_PROPOSALS_KEY;
+
     // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading, {
       title: topic || 'Discussions',
       showNewProposalButton: true,
     });
-
-    localStorage[`${app.activeId()}-lookback`] = vnode.state.lookback;
 
     const activeNode = app.chain?.meta;
     const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
@@ -111,8 +103,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     const communityName = selectedNode
       ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
-    const communityDescription = selectedNode
-      ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
 
     const allLastVisited = (typeof app.user.lastVisited === 'string')
       ? JSON.parse(app.user.lastVisited)
@@ -147,30 +137,29 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     };
 
     let listing = [];
-    const allThreads = topic
-      ? app.threads
-        .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.topic && thread.topic.name === topic)
-        .sort(orderDiscussionsbyLastComment)
-      : app.threads
-        .getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .sort(orderDiscussionsbyLastComment);
+    const allThreads = app.threads.listingStore
+      .getByCommunityAndTopic(app.activeId(), subpage)
+      .sort(orderDiscussionsbyLastComment);
 
-    if (allThreads.length) {
-      let visitMarkerPlaced = false;
-
-      // normal threads
-      const sortedThreads = allThreads.filter((t) => !t.pinned);
-
-      const firstThread = sortedThreads[0];
-      const lastThread = sortedThreads[sortedThreads.length - 1];
-
+    if (allThreads.length > 0) {
       // pinned threads - inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
       if (pinnedThreads.length > 0) {
         listing.push(m(PinnedListing, { proposals: pinnedThreads }));
+      }
+    }
 
-        if (getLastUpdate(firstThread) > lastVisited) {
+    const sortedThreads = allThreads.filter((t) => !t.pinned);
+
+    const firstThread = sortedThreads[0];
+    const lastThread = sortedThreads[sortedThreads.length - 1];
+
+    if (sortedThreads.length > 0) {
+      let visitMarkerPlaced = false;
+      vnode.state.lookback[subpage] = moment(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
+
+      if (allThreads.length > sortedThreads.length) {
+        if (firstThread && getLastUpdate(firstThread) > lastVisited) {
           listing.push(getLastSeenDivider(false));
         }
       }
@@ -178,16 +167,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       const allThreadsSeen = () => firstThread && getLastUpdate(firstThread) < lastVisited;
       const noThreadsSeen = () => lastThread && getLastUpdate(lastThread) > lastVisited;
 
-      const visibleThreads = sortedThreads.slice(0, vnode.state.lookback);
-      vnode.state.postsDepleted = (visibleThreads.length < vnode.state.lookback);
-
       if (noThreadsSeen() || allThreadsSeen()) {
         listing.push(m('.discussion-group-wrap', sortedThreads
-          .slice(0, vnode.state.lookback)
           .map((proposal) => m(DiscussionRow, { proposal }))));
       } else {
         let count = 0;
-        sortedThreads.slice(0, vnode.state.lookback).forEach((proposal) => {
+        sortedThreads.forEach((proposal) => {
           const row = m(DiscussionRow, { proposal });
           if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
             listing = [m('.discussion-group-wrap', listing), getLastSeenDivider(), m('.discussion-group-wrap', [row])];
@@ -205,6 +190,64 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       }
     }
 
+    const newSubpage = subpage !== vnode.state.lastSubpage;
+
+    if (newSubpage) {
+      $(window).off('scroll');
+
+      let topicId;
+      if (topic) {
+        topicId = app.topics.getByName(topic, app.activeId())?.id;
+        if (!topicId) {
+          return m(EmptyTopicPlaceholder, {
+            communityName: app.activeId(),
+            topicName: topic
+          });
+        }
+      }
+
+      if (!vnode.state.lookback[subpage]
+        || !vnode.state.lookback[subpage]?._isAMomentObject) {
+        vnode.state.lookback[subpage] = moment();
+      }
+
+      // cutoffDate is the furthest date, back in the forum history, that has been fetched
+      // and stored for a given community subpage. It is used in the loadNextPage threads ctrlr
+      // function as the query cutoff, fetching only threads older than it.
+      const options = {
+        chainId: app.activeChainId(),
+        communityId: app.activeCommunityId(),
+        cutoffDate: vnode.state.lookback[subpage],
+        topicId,
+      };
+
+      if (!vnode.state.topicInitialized[subpage]) {
+        // Fetch first page of posts
+        app.threads.loadNextPage(options).then((morePostsRemaining) => {
+          if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
+          m.redraw();
+        });
+        vnode.state.topicInitialized[subpage] = true;
+      }
+
+      // Initialize infiniteScroll
+      vnode.state.onscroll = _.debounce(async () => {
+        if (vnode.state.postsDepleted[subpage]) return;
+        const scrollHeight = $(document).height();
+        const scrollPos = $(window).height() + $(window).scrollTop();
+        if (scrollPos > (scrollHeight - 400)) {
+          options.cutoffDate = vnode.state.lookback[subpage];
+          const morePostsRemaining = await app.threads.loadNextPage(options);
+          if (!morePostsRemaining) vnode.state.postsDepleted[subpage] = true;
+          m.redraw();
+        }
+      }, 400);
+
+      $(window).on('scroll', vnode.state.onscroll);
+
+      vnode.state.lastSubpage = subpage;
+    }
+
     let topicDescription;
     if (topic && app.activeId()) {
       const topics = app.topics.getByCommunity(app.activeId());
@@ -212,6 +255,9 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       topicDescription = topicObject?.description;
     }
 
+    localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, vnode.state.lookback[subpage]);
+    const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
+    const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true);
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',
@@ -222,11 +268,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       (app.chain || app.community) && [
         m('.discussions-main', [
           // m(InlineThreadComposer),
-          (!activeEntity || !activeEntity.serverLoaded)
+          (!activeEntity || !activeEntity.serverLoaded || stillFetching)
             ? m('.discussions-main', [
               m(ProposalsLoadingRow),
             ])
-            : allThreads.length === 0
+            : emptyTopic
+              // TODO: Ensure that this doesn't get shown on first render
               ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
               : m(Listing, {
                 content: listing,
@@ -240,20 +287,20 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
                 menuCarat: true,
               }),
           // TODO: Incorporate infinite scroll into generic Listing component
-          (allThreads.length && vnode.state.postsDepleted)
+          (allThreads.length && vnode.state.postsDepleted[subpage])
             ? m('.infinite-scroll-reached-end', [
               `Showing ${allThreads.length} of ${pluralize(allThreads.length, 'thread')}`,
               (topic ? ` under the topic '${topic}'` : '')
             ])
             : (allThreads.length)
               ? m('.infinite-scroll-spinner-wrap', [
-                m(Spinner, { active: !vnode.state.postsDepleted })
+                m(Spinner, { active: !vnode.state.postsDepleted[subpage] })
               ])
               : null
         ])
       ]
     ]);
-  },
+  }
 };
 
 export default DiscussionsPage;

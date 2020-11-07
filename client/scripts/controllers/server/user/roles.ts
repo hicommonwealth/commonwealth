@@ -39,6 +39,9 @@ export default class extends Base {
       address_id: options.address.id,
       ...options,
     }).then((result) => {
+      if (result.status !== 'Success') {
+        throw new Error(`Got unsuccessful status: ${result.status}`);
+      }
       // handle state updates
       if (options.chain) {
         this.removeRole((r) => {

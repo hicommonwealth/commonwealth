@@ -39,8 +39,8 @@
             width: 100%;
             margin-right: 0;
         }
-        padding: 20px 24px;
-        border-radius: 8px;
+        padding: 20px 24px 16px;
+        border-radius: 6px;
         display: flex;
 
         .card-left {
@@ -78,7 +78,7 @@
             .recent-activity {
                 margin-top: 12px;
                 color: $text-color-light;
-                height: 52px;
+                height: 24px;
                 .recent-threads {
                     margin-bottom: 4px;
                 }

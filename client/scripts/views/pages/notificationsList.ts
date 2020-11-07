@@ -2,14 +2,14 @@ import 'pages/notificationsList.scss';
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
-import { Button, ButtonGroup } from 'construct-ui';
+import { Button, ButtonGroup, Popover } from 'construct-ui';
 
 import app from 'state';
 import { sortNotifications } from 'helpers/notifications';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
 
-const NotificationsPage = {
+const NotificationsPage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) {
       return m('div', 'Must be logged in to view notifications.');
@@ -41,14 +41,37 @@ const NotificationsPage = {
               app.user.notifications.markAsRead(notifications).then(() => m.redraw());
             }
           }),
+          m(Popover, {
+            content: [
+              m('div', { style: 'margin-bottom: 10px' }, 'Are you sure?'),
+              m(Button, {
+                label: 'Confirm',
+                fluid: true,
+                onclick: async (e) => {
+                  e.preventDefault();
+                  const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);
+                  if (chainEventNotifications.length === 0) return;
+                  app.user.notifications.clear(chainEventNotifications).then(() => m.redraw());
+                }
+              })
+            ],
+            trigger: m(Button, {
+              label: 'Clear chain events',
+            }),
+            transitionDuration: 0,
+            closeOnContentClick: true,
+            closeOnEscapeKey: true,
+            onClosed: () => { m.redraw(); },
+          }),
         ]),
         m('.NotificationsList', [
           sortedNotifications.length > 0
             ? m(Infinite, {
               maxPages: 1, // prevents rollover/repeat
+              key: sortedNotifications.length,
               pageData: () => sortedNotifications,
               item: (data, opts, index) => {
-                return m(NotificationRow, { notifications: data });
+                return m(NotificationRow, { notifications: data, onListPage: true, });
               },
             })
             : m('.no-notifications', 'No Notifications'),

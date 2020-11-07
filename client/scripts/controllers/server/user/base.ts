@@ -94,11 +94,14 @@ export default class {
   public setJWT(JWT: string): void { this._setJWT(JWT); }
 
   public setRoles(roles = []): void {
+    const roleIds = this.roles.map((r) => r.id);
     roles.forEach((role) => {
-      role.address = role.Address.address;
-      role.address_chain = role.Address.chain;
-      delete role.Address;
-      this._roles.push(role);
+      if (!roleIds.includes(role.id)) {
+        role.address = role.Address.address;
+        role.address_chain = role.Address.chain;
+        delete role.Address;
+        this._roles.push(role);
+      }
     });
   }
   public addRole(role: RoleInfo): void {

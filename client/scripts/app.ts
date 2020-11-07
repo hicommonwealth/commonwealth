@@ -459,6 +459,7 @@ $(() => {
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
+    '/:scope/communityStats':    importRoute('views/pages/stats', { scoped: true, deferChain: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
 
     '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),

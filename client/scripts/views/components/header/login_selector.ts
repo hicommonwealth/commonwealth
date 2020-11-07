@@ -20,6 +20,7 @@ import CreateInviteModal from 'views/modals/create_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
+import ManageCommunityModal from 'views/modals/manage_community_modal';
 import { setActiveAccount } from 'controllers/app/login';
 
 const CommunityLabel: m.Component<{
@@ -124,6 +125,11 @@ const LoginSelector: m.Component<{ small?: boolean }, {
       chain: app.activeChainId(),
       community: app.activeCommunityId()
     });
+    const isAdminOrMod = isAdmin || app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    });
 
     const activeAccountsByRole = app.user.getActiveAccountsByRole();
     const nAccountsWithoutRole = activeAccountsByRole.filter(([account, role], index) => !role).length;
@@ -188,13 +194,30 @@ const LoginSelector: m.Component<{ small?: boolean }, {
               onclick: (e) => {
                 e.preventDefault();
                 const data = app.activeCommunityId()
-                  ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain }
+                  ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain };
                 app.modals.create({
                   modal: CreateInviteModal,
                   data,
                 });
               },
               label: 'Invite members',
+            }),
+            isAdmin && m(MenuItem, {
+              class: 'manage-community',
+              align: 'left',
+              basic: true,
+              onclick: (e) => {
+                e.preventDefault();
+                app.modals.create({ modal: ManageCommunityModal });
+              },
+              label: 'Manage community'
+            }),
+            isAdminOrMod && m(MenuItem, {
+              class: 'view-stats',
+              align: 'left',
+              basic: true,
+              onclick: (e) => m.route.set(`/${app.activeId() || 'edgeware'}/communityStats`),
+              label: 'View community stats',
             }),
           ],
         ]),

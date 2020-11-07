@@ -9,7 +9,7 @@
         flex: 1;
         max-width: calc(100% - 100px);
         &.logged-in {
-            max-width: calc(100% - 202px);
+            max-width: calc(100% - 242px);
         }
     }
     .mobile-sidebar-left {
@@ -136,6 +136,12 @@
         .ChainIcon, .CommunityIcon {
             opacity: 1;
         }
+    }
+}
+
+.SidebarQuickSwitcherItemTooltip.cui-popover.cui-tooltip {
+    .cui-popover-content {
+        padding: 8px 10px;
     }
 }
 

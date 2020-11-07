@@ -12,6 +12,7 @@ import {
   IPostNotificationData, NotificationCategories,
   DynamicTemplate, IChainEventNotificationData
 } from '../../shared/types';
+import { capitalize } from 'lodash';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -39,7 +40,8 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
     }
     if (!chainEventLabel) return;
 
-    const subject = `${chainEventLabel.heading} event on ${notification_data.chainEventType?.chain}`;
+    const subject = (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
+      + `${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
 
     return {
       from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -51,8 +53,9 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
         notification: {
           chainId: notification_data.chainEventType?.chain,
           blockNumber: notification_data.chainEvent?.blockNumber,
-          label: chainEventLabel.heading,
-          path: `https://commonwealth.im${chainEventLabel.linkUrl}`,
+          subject,
+          label: subject,
+          path: null,
         }
       }
     };
@@ -65,7 +68,7 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
       from: 'Commonwealth <no-reply@commonwealth.im>',
       to: null,
       bcc: null,
-      subject: emailSubjectLine,
+      subject: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '') + emailSubjectLine,
       templateId: DynamicTemplate.ImmediateEmailNotification,
       dynamic_template_data: {
         notification: {
@@ -149,7 +152,8 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
     templateId: DynamicTemplate.BatchNotifications,
     dynamic_template_data: {
       notifications: emailObjArray,
-      subject: `${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
+      subject: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
+        + `${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
       user: user.email,
     },
   };

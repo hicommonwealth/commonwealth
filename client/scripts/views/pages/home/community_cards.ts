@@ -22,9 +22,9 @@ const getNewTag = (labelCount = null) => {
   ]);
 };
 
-const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedChains: string[] }> = {
+const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
   view: (vnode) => {
-    const { chain, nodeList, justJoinedChains } = vnode.attrs;
+    const { chain, nodeList } = vnode.attrs;
     const { unseenPosts } = app.user;
     const chainInfo = app.config.chains.getById(chain);
     const visitedChain = !!unseenPosts[chain];
@@ -49,7 +49,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
           app.user.isMember({
             account: app.user.activeAccount,
             chain,
-          }) && justJoinedChains.indexOf(chain) === -1 && [
+          }) && [
             app.isLoggedIn() && !visitedChain && getNewTag(),
             updatedThreads > 0 && getNewTag(updatedThreads),
           ],
@@ -67,9 +67,9 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[], justJoinedC
   }
 };
 
-const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunities: string[] }> = {
+const CommunityCard : m.Component<{ community: CommunityInfo }> = {
   view: (vnode) => {
-    const { justJoinedCommunities, community } = vnode.attrs;
+    const { community } = vnode.attrs;
     const { unseenPosts } = app.user;
     const visitedCommunity = !!unseenPosts[community.id];
     const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
@@ -94,7 +94,6 @@ const CommunityCard : m.Component<{ community: CommunityInfo, justJoinedCommunit
             community.privacyEnabled && m('span.icon-lock'),
           ]),
           app.user.isMember({ account: app.user.activeAccount, community: community.id })
-            && justJoinedCommunities.indexOf(community.id) === -1
             && [
               app.isLoggedIn() && !visitedCommunity && getNewTag(),
               updatedThreads > 0 && getNewTag(updatedThreads),
@@ -170,13 +169,8 @@ const NewCommunityCard: m.Component<{}> = {
   }
 };
 
-const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], justJoinedCommunities: string[] }> = {
-  oninit: (vnode) => {
-    vnode.state.justJoinedChains = [];
-    vnode.state.justJoinedCommunities = [];
-  },
+const HomepageCommunityCards: m.Component<{}, {}> = {
   view: (vnode) => {
-    const { justJoinedChains, justJoinedCommunities } = vnode.state;
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
       if (chains[n.chain.id]) {
@@ -186,67 +180,26 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains: string[], just
       }
     });
 
-    let myChains;
-    let myCommunities;
-    let otherChains;
-    let otherCommunities;
-    if (!app.isLoggedIn()) {
-      myChains = [];
-      myCommunities = [];
-      otherChains = Object.entries(chains);
-      otherCommunities = app.config.communities.getAll();
-    } else {
-      myChains = Object.entries(chains).filter(([c, nodeList]) => {
-        return app.user.isMember({ account: app.user.activeAccount, chain: c })
-          && vnode.state.justJoinedChains.indexOf(c) === -1;
-      });
-      myCommunities = app.config.communities.getAll().filter((c) => {
-        return app.user.isMember({ account: app.user.activeAccount, community: c.id })
-          && vnode.state.justJoinedCommunities.indexOf(c.id) === -1;
-      });
-      otherChains = Object.entries(chains).filter(([c, nodeList]) => {
-        return !app.user.isMember({ account: app.user.activeAccount, chain: c })
-          || vnode.state.justJoinedChains.indexOf(c) !== -1;
-      });
-      otherCommunities = app.config.communities.getAll().filter((c) => {
-        return c.visible && (
-          !app.user.isMember({ account: app.user.activeAccount, community: c.id })
-            || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
-      });
-    }
+    const myChains: any = Object.entries(chains);
+    const myCommunities: any = app.config.communities.getAll();
 
-    const sortedMemberChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
+    const sortedChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
       const threadCountA = app.recentActivity.getThreadsByCommunity(Array.isArray(a) ? a[0] : a.id).length;
       const threadCountB = app.recentActivity.getThreadsByCommunity(Array.isArray(b) ? b[0] : b.id).length;
       return (threadCountB - threadCountA);
     }).map((entity) => {
       if (Array.isArray(entity)) {
         const [chain, nodeList]: [string, any] = entity as any;
-        return  m(ChainCard, { chain, nodeList, justJoinedChains });
+        return  m(ChainCard, { chain, nodeList });
       } else if (entity.id) {
-        return m(CommunityCard, { community: entity, justJoinedCommunities });
-      }
-      return null;
-    });
-
-    const sortedOtherChainsAndCommunities = otherChains.concat(otherCommunities).sort((a, b) => {
-      const threadCountA = app.recentActivity.getThreadsByCommunity(Array.isArray(a) ? a[0] : a.id).length;
-      const threadCountB = app.recentActivity.getThreadsByCommunity(Array.isArray(b) ? b[0] : b.id).length;
-      return (threadCountB - threadCountA);
-    }).map((entity) => {
-      if (Array.isArray(entity)) {
-        const [chain, nodeList]: [string, any] = entity as any;
-        return  m(ChainCard, { chain, nodeList, justJoinedChains });
-      } else if (entity.id) {
-        return m(CommunityCard, { community: entity, justJoinedCommunities });
+        return m(CommunityCard, { community: entity });
       }
       return null;
     });
 
     return m('.HomepageCommunityCards', [
       m('.communities-list', [
-        sortedMemberChainsAndCommunities,
-        sortedOtherChainsAndCommunities,
+        sortedChainsAndCommunities,
         m('.clear'),
       ]),
       m('.other-list', [

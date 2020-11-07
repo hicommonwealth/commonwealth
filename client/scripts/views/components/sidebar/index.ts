@@ -23,7 +23,41 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
 import CommunitySelector, { CommunityLabel } from './community_selector';
 
-const SidebarQuickSwitcher = {
+const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
+  view: (vnode) => {
+    const { item, size } = vnode.attrs;
+
+    return m('.SidebarQuickSwitcherItem', {
+      key: `${item instanceof ChainInfo ? 'chain' : 'community'}-${item.id}`
+    }, [
+      m(Tooltip, {
+        hoverOpenDelay: 350,
+        hoverCloseDelay: 0,
+        transitionDuration: 0,
+        position: 'right',
+        content: m('.quick-switcher-option-text', item.name),
+        class: 'SidebarQuickSwitcherItemTooltip',
+        trigger: m('.quick-switcher-option', {
+          class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
+            || (item instanceof CommunityInfo && item.id === app?.community?.id)
+            ? ' active' : '',
+        }, item instanceof ChainInfo
+          ? m(ChainIcon, {
+            size,
+            chain: item,
+            onclick: link ? (() => m.route.set(`/${item.id}`)) : null
+          }) : item instanceof CommunityInfo
+            ? m(CommunityIcon, {
+              size,
+              community: item,
+              onclick: link ? (() => m.route.set(`/${item.id}`)) : null
+            }) : null),
+      }),
+    ]);
+  }
+};
+
+const SidebarQuickSwitcher: m.Component<{}> = {
   view: (vnode) => {
     const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
       .concat(app.config.chains.getAll())
@@ -43,28 +77,7 @@ const SidebarQuickSwitcher = {
 
     const size = 36;
     return m('.SidebarQuickSwitcher', [
-      quickSwitcherCommunities.map((item) => m(Tooltip, {
-        hoverOpenDelay: 0,
-        hoverCloseDelay: 0,
-        transitionDuration: 0,
-        position: 'right',
-        content: m('.quick-switcher-option-text', item.name),
-        trigger: m('.quick-switcher-option', {
-          class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
-            || (item instanceof CommunityInfo && item.id === app?.community?.id)
-            ? ' active' : '',
-        }, item instanceof ChainInfo
-          ? m(ChainIcon, {
-            size,
-            chain: item,
-            onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-          }) : item instanceof CommunityInfo
-            ? m(CommunityIcon, {
-              size,
-              community: item,
-              onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-            }) : null),
-      })),
+      quickSwitcherCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
     ]);
   }
 };
@@ -109,7 +122,7 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
       label: [
         name,
       ],
-      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
+      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
         || (sidebarTopic && sidebarTopic === id),
       onclick: (e) => {
         e.preventDefault();
@@ -155,7 +168,9 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
             }),
         }),
         m(ListItem, {
-          active: onDiscussionsPage(m.route.get()) && !sidebarTopic,
+          active: onDiscussionsPage(m.route.get())
+            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true)
+            && !sidebarTopic,
           label: 'All Discussions',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
