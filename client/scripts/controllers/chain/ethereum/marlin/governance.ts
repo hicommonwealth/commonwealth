@@ -80,9 +80,9 @@ MarlinProposal
     if (!targets || !values || !signatures || !calldatas || !description) return;
     if (!(await this._Holders.isSenderDelegate())) throw new Error('sender must be valid delegate');
     // BN comparison with BigNumber needs fixing
-    // if (this.proposalThreshold < await this._Holders.get(this._api.userAddress).priorDelegates(this._api.Provider.blockNumber)) {
-    //   throw new Error('sender must have requisite delegates');
-    // }
+    if (this.proposalThreshold < await this._Holders.get(this._api.userAddress).priorDelegates(this._api.Provider.blockNumber)) {
+      throw new Error('sender must have requisite delegates');
+    }
     if (parseInt(await this._api.userAddress, 16) === 0) {
       throw new Error('applicant cannot be 0');
     }
