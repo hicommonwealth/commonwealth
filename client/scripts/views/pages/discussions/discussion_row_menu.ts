@@ -6,7 +6,7 @@ import app from 'state';
 import { NotificationCategories } from 'types';
 import { OffchainThread, OffchainTopic } from 'models';
 import TopicEditor from 'views/components/topic_editor';
-import { MenuItem, PopoverMenu, Icon, Icons } from 'construct-ui';
+import { MenuItem, PopoverMenu, Icon, Icons, MenuDivider } from 'construct-ui';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }> = {
@@ -81,18 +81,20 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;
 
-    const canEditThread = app.user.activeAccount
-      && (app.user.isRoleOfCommunity({
-        role: 'admin',
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      })
-      || app.user.isRoleOfCommunity({
-        role: 'moderator',
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      })
-      || proposal.author === app.user.activeAccount.address);
+    const hasAdminPermissions = app.user.activeAccount
+    && (app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    })
+    || app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    }));
+
+    const isAuthor = app.user.activeAccount
+      && (proposal.author === app.user.activeAccount.address);
 
     return m('.DiscussionRowMenu', {
       onclick: (e) => {

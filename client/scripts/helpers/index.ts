@@ -115,11 +115,11 @@ export function byAscendingCreationDate(a, b) {
 }
 
 export function byDescendingUpdatedDate(a, b) {
-  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt)
+  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt);
 }
 
 export function byAscendingUpdatedDate(a, b) {
-  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt)
+  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt);
 }
 
 export function orderAccountsByAddress(a, b) {
@@ -177,7 +177,7 @@ export function formatLastUpdated(timestamp) {
       .replace(' hours', 'h')
       .replace(' hour', 'h');
   }
-};
+}
 
 // duplicated in adapters/currency.ts
 export function formatNumberLong(num: number) {

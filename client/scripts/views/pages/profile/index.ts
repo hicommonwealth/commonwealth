@@ -13,12 +13,14 @@ import PageNotFound from 'views/pages/404';
 import { makeDynamicComponent } from 'models/mithril';
 import Substrate from 'controllers/chain/substrate/main';
 import { ApiRx } from '@polkadot/api';
-import { ValidatorStats } from './validator_profile_stats';
-import chartComponent from '../../components/chart';
-import lineModel from './graph_models/linemodel';
-
-
+import PageLoading from 'views/pages/loading';
+import Tabs from 'views/components/widgets/tabs';
 import { decodeAddress } from '@polkadot/keyring';
+import ProfileContent from './profile_content';
+import ProfileBio from './profile_bio';
+import lineModel from './graph_models/linemodel';
+import chartComponent from '../../components/chart';
+import { ValidatorStats } from './validator_profile_stats';
 import ProfileHeader from './profile_header';
 
 // Global bucket const
@@ -226,7 +228,8 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
           vnode.state.loaded = true;
           vnode.state.loading = false;
           m.redraw();
-          if (!vnode.state.account) throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          if (!vnode.state.account) throw new Error((err.responseJSON && err.responseJSON.error)
+            ? err.responseJSON.error
             : 'Failed to find profile');
         }
       });
@@ -312,6 +315,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       ]),
     ]);
   },
-});
+};
 
 export default ProfilePage;

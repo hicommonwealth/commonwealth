@@ -54,6 +54,7 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
+  staking: StakingController;
 
   recentActivity: RecentActivityController;
 
@@ -105,6 +106,7 @@ const app: IApp = {
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
+  staking: new StakingController(),
 
   recentActivity: new RecentActivityController(),
 

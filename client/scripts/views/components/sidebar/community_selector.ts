@@ -1,35 +1,18 @@
 import 'components/sidebar/community_selector.scss';
 
 import m from 'mithril';
-import { Button, Icon, Icons, List, ListItem, SelectList } from 'construct-ui';
+import { Button, Icon, Icons, List, ListItem, PopoverMenu, MenuItem } from 'construct-ui';
 
 import app from 'state';
 import { AddressInfo, ChainInfo, CommunityInfo, RoleInfo } from 'models';
-import { SwitchIcon } from 'helpers';
+// client/scripts/helpers/index.ts
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
+import { SwitchIcon } from '../../../helpers';
 import User, { UserBlock } from '../widgets/user';
 
-export const getSelectableCommunities = () => {
-  return (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
-    .concat(app.config.chains.getAll())
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .sort((a, b) => {
-      // sort starred communities at top
-      if (a instanceof ChainInfo && app.communities.isStarred(a.id, null)) return -1;
-      if (a instanceof CommunityInfo && app.communities.isStarred(null, a.id)) return -1;
-      return 0;
-    })
-    .filter((item) => {
-      // only show chains with nodes
-      return (item instanceof ChainInfo)
-        ? app.config.nodes.getByChain(item.id)?.length
-        : true;
-    });
-};
-
-const CommunityLabel: m.Component<{
+export const CommunityLabel: m.Component<{
   chain?: ChainInfo,
   community?: CommunityInfo,
   showStatus?: boolean,
@@ -41,7 +24,7 @@ const CommunityLabel: m.Component<{
     if (chain) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(ChainIcon, {
-          size: 24,
+          size: 18,
           chain,
           onclick: link ? (() => m.route.set(`/${chain.id}`)) : null
         }),
@@ -51,14 +34,13 @@ const CommunityLabel: m.Component<{
           m('span.community-name', chain.name),
           showStatus === true && m(ChainStatusIndicator, { hideLabel: true }),
         ]),
-        m('.community-id', `/${chain.id}`),
       ]),
     ]);
 
     if (community) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(CommunityIcon, {
-          size: 24,
+          size: 18,
           community,
           onclick: link ? (() => m.route.set(`/${community.id}`)) : null
         }),
@@ -71,7 +53,6 @@ const CommunityLabel: m.Component<{
             !community.privacyEnabled && m('span.icon-globe'),
           ],
         ]),
-        m('.community-id', `/${community.id}`),
       ]),
     ]);
 
@@ -102,8 +83,23 @@ export const CurrentCommunityLabel: m.Component<{}> = {
 
 const CommunitySelector: m.Component<{}> = {
   view: (vnode) => {
-    const selectableCommunities = getSelectableCommunities();
-    const currentIndex = selectableCommunities.findIndex((item) => {
+    const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
+      .concat(app.config.chains.getAll())
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => {
+        // sort starred communities at top
+        if (a instanceof ChainInfo && app.communities.isStarred(a.id, null)) return -1;
+        if (a instanceof CommunityInfo && app.communities.isStarred(null, a.id)) return -1;
+        return 0;
+      })
+      .filter((item) => {
+        // only show chains with nodes
+        return (item instanceof ChainInfo)
+          ? app.config.nodes.getByChain(item.id)?.length
+          : true;
+      });
+
+    const currentCommunity = allCommunities.find((item) => {
       if (item instanceof ChainInfo) return app.activeChainId() === item.id;
       if (item instanceof CommunityInfo) return app.activeCommunityId() === item.id;
       return false;
@@ -207,65 +203,15 @@ const CommunitySelector: m.Component<{}> = {
 
     return m('.CommunitySelector', [
       m('.title-selector', [
-        m(SelectList, {
-          closeOnSelect: true,
-          class: 'CommunitySelectList',
-          items: (selectableCommunities as any).concat('home'),
-          activeIndex: currentIndex,
-          itemRender: (item) => {
-            return item instanceof ChainInfo
-              ? m(ListItem, {
-                class: app.communities.isStarred(item.id, null) ? 'starred' : '',
-                label: m(CommunityLabel, { chain: item }),
-                selected: app.activeChainId() === item.id,
-                contentRight: app.isLoggedIn() && app.user.isMember({
-                  account: app.user.activeAccount,
-                  chain: item.id
-                }) && m('.community-star-toggle', {
-                  onclick: (e) => {
-                    app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
-                  }
-                }, [
-                  m(Icon, { name: Icons.STAR }),
-                ]),
-              })
-              : item instanceof CommunityInfo
-                ? m(ListItem, {
-                  class: app.communities.isStarred(null, item.id) ? 'starred' : '',
-                  label: m(CommunityLabel, { community: item }),
-                  selected: app.activeCommunityId() === item.id,
-                  contentRight: app.isLoggedIn() && app.user.isMember({
-                    account: app.user.activeAccount,
-                    community: item.id
-                  }) && m('.community-star-toggle', {
-                    onclick: (e) => {
-                      app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
-                    },
-                  }, [
-                    m(Icon, { name: Icons.STAR }),
-                  ]),
-                })
-                : m.route.get() !== '/'
-                  ? m(ListItem, {
-                    class: 'select-list-back-home',
-                    label: 'Back to home',
-                  }) : m('div');
-          },
-          onSelect: (item: any) => {
-            m.route.set(item.id ? `/${item.id}` : '/');
-          },
-          filterable: false,
-          checkmark: false,
-          popoverAttrs: {
-            hasArrow: false,
-            inline: true,
-          },
+        m(PopoverMenu, {
+          transitionDuration: 0,
+          hasArrow: false,
+          inline: true,
           trigger: m(Button, {
             label: [
               currentCommunity instanceof CommunityInfo
                 ? m(CommunityLabel, { community: currentCommunity })
                 : m(CommunityLabel, { chain: currentCommunity }),
-              m(Icon, { name: Icons.MENU, size: 'sm' }),
             ],
           }),
           class: 'CommunitySelectList',

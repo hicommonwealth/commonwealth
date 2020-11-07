@@ -10,7 +10,6 @@ import {
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
-import { link } from 'helpers';
 import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
@@ -20,6 +19,7 @@ import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { link } from '../../../helpers';
 
 import CommunitySelector, { CommunityLabel } from './community_selector';
 

@@ -20,16 +20,6 @@ export enum EntityRefreshOption {
   Nothing = 'nothing',
 }
 
-const get = (route, args, callback) => {
-  return $.get(app.serverUrl() + route, args).then((resp) => {
-    if (resp.status === 'Success') {
-      callback(resp.result);
-    } else {
-      console.error(resp);
-    }
-  }).catch((e) => console.error(e));
-};
-
 type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void
 
 class ChainEntityController {

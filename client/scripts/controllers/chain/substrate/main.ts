@@ -13,6 +13,7 @@ import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateIdentities from './identities';
 import SubstrateChain from './shared';
 import EdgewareSignaling from '../edgeware/signaling';
+import StakingController from '../../server/staking';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;

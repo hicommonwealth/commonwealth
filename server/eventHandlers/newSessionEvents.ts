@@ -18,22 +18,22 @@ export default class extends IEventHandler {
     if (event.data.kind !== SubstrateTypes.EventKind.NewSession) {
       return dbEvent;
     }
-    const newSessionEventData = event.data
+    const newSessionEventData = event.data;
 
     // 2) Get relevant data from DB for processing and updating back to database.
     // merging up the active and waiting validators into the one list.
-    let newValidators = []; 
+    const newValidators = [];
     newSessionEventData.active.forEach((validator: any) => {
       newValidators[validator] = {
         state: 'Active',
         visited: false
-      }
+      };
     });
     newSessionEventData.waiting.forEach((validator: any) => {
       newValidators[validator] = {
         state: 'Waiting',
         visited: false
-      }
+      };
     });
 
     // Directly mark all validators as "Inactive" in the database those are not in new-session's active and waiting list.
@@ -49,14 +49,14 @@ export default class extends IEventHandler {
     );
 
     // Get all the records for all validators from database those are in new-session's active and waiting list.
-    const existingValidators= await this._models.Validator.findAll({
+    const existingValidators = await this._models.Validator.findAll({
       where: {
         stash: {
           [Op.in]: Object.keys(newValidators)
         }
       }
     });
-    let allValidators = JSON.parse(JSON.stringify(existingValidators));
+    const allValidators = JSON.parse(JSON.stringify(existingValidators));
 
     // update existing validators with new state and other details of all validators.
     allValidators.forEach((validator: any) => {
@@ -73,7 +73,7 @@ export default class extends IEventHandler {
       }
     });
 
-    // 3) Add new validators entries with their details 
+    // 3) Add new validators entries with their details
     Object.keys(newValidators).filter((validatorKey) => !newValidators[validatorKey].visited).forEach((stashId) => {
       const validatorsInfo = newSessionEventData.validatorInfo[stashId];
       const newValidatorEntry = {
@@ -85,7 +85,7 @@ export default class extends IEventHandler {
         lastUpdate: event.blockNumber.toString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      }
+      };
       allValidators.push(newValidatorEntry);
     });
 
@@ -95,14 +95,14 @@ export default class extends IEventHandler {
     }));
 
     // 5) Create new Historical validator statistics record for new validators.
-    let newValidatorForHistoricalStats = [];
-    for (let validator of Object.keys(newSessionEventData.activeExposures)) {
+    const newValidatorForHistoricalStats = [];
+    for (const validator of Object.keys(newSessionEventData.activeExposures)) {
       const exposure = newSessionEventData.activeExposures[validator];
 
       const validatorEntry = {
         name: null,
         stash: validator,
-        exposure: exposure,
+        exposure,
         block: event.blockNumber.toString(),
         commissionPer: newSessionEventData.validatorInfo[validator].commissionPer,
         eraPoints: newSessionEventData.validatorInfo[validator].eraPoints,
@@ -120,11 +120,11 @@ export default class extends IEventHandler {
         updated_at: new Date().toISOString(),
       };
       newValidatorForHistoricalStats.push(validatorEntry);
-    };
+    }
 
     // 4) Add validators records HistoricalValidatorStatistic in table.
     await Promise.all(allValidators.map((row: any) => {
-      return this._models.HistoricalValidatorStatistic.create( row, {ignoreDuplicates: true} );
+      return this._models.HistoricalValidatorStatistic.create(row, { ignoreDuplicates: true });
     }));
 
     return dbEvent;

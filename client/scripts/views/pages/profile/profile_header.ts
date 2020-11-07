@@ -8,7 +8,7 @@ import { Unsubscribable } from 'rxjs';
 import { initChain } from 'app';
 import app from 'state';
 
-import { formatAddressShort, isSameAccount } from 'helpers';
+// client/scripts/helpers/index
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
@@ -17,6 +17,8 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PageLoading from 'views/pages/loading';
+import validatorIdentity from '../validators/substrate/validator_identity';
+import { formatAddressShort, isSameAccount } from '../../../helpers';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);

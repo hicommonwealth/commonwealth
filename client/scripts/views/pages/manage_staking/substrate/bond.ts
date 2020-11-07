@@ -28,7 +28,7 @@ class Controller {
         user: item,
         hideAvatar: true,
         hideIdentityIcon: true,
-        tooltip: true,
+        // tooltip: true,
         showRole: true,
       })),
       label:  m('span.controller', [

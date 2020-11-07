@@ -50,6 +50,9 @@ export const EdgewareChainNotificationTypes = {
   VotingDelegation: [
     'edgeware-vote-delegated',
   ],
+  Vote: [
+    'edgeware-vote-delegated',
+  ],
 };
 
 export const PolkadotChainNotificationTypes = {
@@ -96,6 +99,9 @@ export const PolkadotChainNotificationTypes = {
   VotingDelegation: [
     'polkadot-vote-delegated',
   ],
+  Vote: [
+    'polkadot-vote-delegated',
+  ],
 };
 
 export const KusamaChainNotificationTypes = {
@@ -140,6 +146,9 @@ export const KusamaChainNotificationTypes = {
     'kusama-unbonded',
   ],
   VotingDelegation: [
+    'kusama-vote-delegated',
+  ],
+  Vote: [
     'kusama-vote-delegated',
   ],
 };
