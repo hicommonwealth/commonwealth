@@ -105,21 +105,22 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
     console.log(proposal.votingType);
     if (proposal instanceof EdgewareSignalingProposal) {
       return m('.ProposalVotingResults', [
-        m(Tabs, [{
-          name: 'Voters',
-          content: m(VoteListing, { proposal, votes })
-        }].concat(
-          proposal.data.choices.map((outcome) => {
-            return {
-              name: signalingVoteToString(outcome),
-              content: m(VoteListing, {
-                proposal,
-                votes: votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))
-              }),
-            };
-          })
-        ))
-      ]);
+        [ m('results-header', 'Voters'),
+          m('.results-cell', [
+            m(VoteListing, { proposal, votes })
+          ])
+        ]
+      ].concat(proposal.data.choices.map((outcome) => {
+        return ([
+          m('.results-header', signalingVoteToString(outcome)),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))
+            })
+          ])
+        ]);
+      })));
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.ProposalVotingResults', [
         m('.results-header', 'Voted yes'),
