@@ -32,9 +32,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public get serverLoaded() { return this._serverLoaded; }
 
   private async _postModuleLoad(listenEvents = false): Promise<void> {
-    await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.LoadProposalComments);
-    // await this.app.reactions.refreshAll(this.id, null, false);
-
     // attach listener for entity update events
     if (listenEvents) {
       this.app.socket.addListener(
@@ -74,8 +71,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
         ? EntityRefreshOption.AllEntities
         : EntityRefreshOption.CompletedEntities;
 
-      [unused, response] = await Promise.all([
+      [unused, unused, response] = await Promise.all([
         this.chainEntities.refresh(this.meta.chain.id, refresh),
+        this.app.comments.refreshAll(
+          this.meta.chain.id,
+          null,
+          CommentRefreshOption.LoadProposalComments
+        ),
         $.get(`${this.app.serverUrl()}/bulkOffchain`, {
           chain: this.id,
           community: null,
@@ -92,7 +94,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
     const { threads, comments, reactions, topics, admins } = response.result;
     this.app.threads.initialize(threads, true);
-    this.app.comments.initialize(comments, true);
+    this.app.comments.initialize(comments, false);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
     this.meta.chain.setAdmins(admins);

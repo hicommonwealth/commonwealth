@@ -76,7 +76,7 @@ export const idToProposal = (slug, id) => {
   const store = proposalSlugToStore(slug);
   const proposal = store.getByIdentifier(id);
   if (!proposal) {
-    throw new Error(`invalid id: ${id}`);
+    throw new Error(`Proposal missing from store with id ${id}`);
   } else {
     return proposal;
   }
