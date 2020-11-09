@@ -13,7 +13,6 @@ import { first } from 'rxjs/operators';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
-import { Table } from 'construct-ui';
 
 const signalingVoteToString = (v: VoteOutcome): string => {
   const outcomeArray = v.toU8a();
@@ -27,58 +26,75 @@ const VoteListing: m.Component<{
   votes : Array<IVote<any>>,
   amount?: boolean,
   weight?: boolean
+}, {
+  expanded?: boolean,
 }> = {
   view: (vnode) => {
     const { proposal, votes, amount, weight } = vnode.attrs;
     const balanceWeighted = proposal.votingUnit === VotingUnit.CoinVote
       || proposal.votingUnit === VotingUnit.ConvictionCoinVote;
-    return (votes.length === 0)
-      ? m('.no-votes', 'No votes')
-      : votes.map(
-        (vote) => {
-          console.log(vote);
-          let balanceStr = '--';
-          let balance;
-          if (balanceWeighted && !(vote instanceof CosmosVote)) {
-            vote.account.balance.pipe(first()).toPromise().then((b) => {
-              balance = b;
-              balanceStr = formatCoin(b, true);
-            });
-          }
-          console.log(vote instanceof SignalingVote);
-          console.log(vote instanceof BinaryVote);
-          console.log(vote instanceof DepositVote);
-          console.log(vote instanceof CosmosVote);
-          console.log(vote instanceof MolochProposalVote);
-          return vote instanceof SignalingVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-            m('.vote-choice', signalingVoteToString(vote.choices[0])),
-            balanceWeighted && balance && m('.vote-balance', balanceStr),
-          ]) : vote instanceof BinaryVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-            balanceWeighted && balance && m('.vote-balance', balanceStr),
-            m('.vote-weight', vote.weight && `${vote.weight}x`),
-          ]) : vote instanceof DepositVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-            m('.vote-deposit', formatCoin(vote.deposit, true)),
-          ])
-            : vote instanceof CosmosVote ? m('.vote', [
+    const displayedVotes = vnode.state.expanded
+      ? votes
+      : votes.slice(0, 3);
+
+    return m('.VoteListing', [
+      (displayedVotes.length === 0)
+        ? m('.no-votes', 'No votes')
+        : displayedVotes.map(
+          (vote) => {
+            console.log(vote);
+            let balanceStr = '--';
+            let balance;
+            if (balanceWeighted && !(vote instanceof CosmosVote)) {
+              vote.account.balance.pipe(first()).toPromise().then((b) => {
+                balance = b;
+                balanceStr = formatCoin(b, true);
+              });
+            }
+            console.log(vote instanceof SignalingVote);
+            console.log(vote instanceof BinaryVote);
+            console.log(vote instanceof DepositVote);
+            console.log(vote instanceof CosmosVote);
+            console.log(vote instanceof MolochProposalVote);
+            return vote instanceof SignalingVote ? m('.vote', [
               m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-              m('.vote-choice', vote.choice.toString()),
-              // balanceWeighted && balance && m('.vote-balance', balanceStr),
+              m('.vote-choice', signalingVoteToString(vote.choices[0])),
+              balanceWeighted && balance && m('.vote-balance', balanceStr),
+            ]) : vote instanceof BinaryVote ? m('.vote', [
+              m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+              balanceWeighted && balance && m('.vote-balance', balanceStr),
+              m('.vote-weight', vote.weight && `${vote.weight}x`),
+            ]) : vote instanceof DepositVote ? m('.vote', [
+              m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+              m('.vote-deposit', formatCoin(vote.deposit, true)),
             ])
-              : vote instanceof MolochProposalVote ? m('.vote', [
-                m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+              : vote instanceof CosmosVote ? m('.vote', [
+                m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
                 m('.vote-choice', vote.choice.toString()),
-                balance && m('.vote-balance', balanceStr),
+                // balanceWeighted && balance && m('.vote-balance', balanceStr),
               ])
-                : m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                ]);
+                : vote instanceof MolochProposalVote ? m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  m('.vote-choice', vote.choice.toString()),
+                  balance && m('.vote-balance', balanceStr),
+                ])
+                  : m('.vote', [
+                    m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                  ]);
+          }
+        ),
+      !vnode.state.expanded
+      && votes.length > 3
+      && m('a.expand-listing-button', {
+        href: '#',
+        onclick: (e) => {
+          e.preventDefault();
+          vnode.state.expanded = true;
         }
-      );
+      }, `${votes.length - 3} more`)
+    ]);
   }
-}
+};
 
 const ProposalVotingResults: m.Component<{ proposal }> = {
   view: (vnode) => {
