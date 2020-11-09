@@ -56,6 +56,14 @@ export interface Block {
   versionName: string;
 }
 
+export interface Validator {
+  commissionPer: number;
+  controllerId: AccountId;
+  rewardDestination: string;
+  nextSessionIds: string;
+  eraPoints: number;
+}
+
 // Used for grouping EventKinds together for archival purposes
 export enum EntityKind {
   DemocracyProposal = 'democracy-proposal',
@@ -181,6 +189,7 @@ export interface INewSession extends IEvent {
   waiting: Array<AccountId>;
   sessionIndex: number;
   currentEra?: number;
+  validatorInfo: { [key: string]: Validator },
 }
 
 
@@ -537,8 +546,8 @@ export type IEventData =
   | ISomeOffline
   | IAllGood
   | IOffence
-// eslint-disable-next-line semi-style
-;
+  // eslint-disable-next-line semi-style
+  ;
 
 export const EventKinds: EventKind[] = Object.values(EventKind);
 

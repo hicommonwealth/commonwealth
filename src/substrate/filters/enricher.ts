@@ -2,8 +2,11 @@ import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
-  ReferendumInfo, SessionIndex, ValidatorId, Exposure, EraIndex, AuthorityId, IdentificationTuple
+  ReferendumInfo, SessionIndex, ValidatorId, Exposure, EraIndex, AuthorityId, IdentificationTuple,
+  EraRewardPoints
 } from '@polkadot/types/interfaces';
+import { DeriveStakingElected } from '@polkadot/api-derive/types';
+import BN from 'bn.js';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
@@ -99,29 +102,45 @@ export async function Enrich(
        * Session Events
        */
       case EventKind.NewSession: {
-        const [ sessionIndex ] = event.data as unknown as [ SessionIndex ] & Codec
+        const [sessionIndex] = event.data as unknown as [SessionIndex] & Codec
         const validators = await api.derive.staking.validators();
-        const currentEra = (await api.query.staking.currentEra<Option<EraIndex>>()).unwrap();
-        let active : Array<ValidatorId>
-        let waiting : Array<ValidatorId>
+        const electedInfo: DeriveStakingElected = await api.derive.staking.electedInfo() as any; // validator preferences for getting commision
+        const validatorEraPoints: EraRewardPoints = await api.query.staking.currentPoints() as EraRewardPoints;
+        const currentEra = (Number)(await api.query.staking.currentEra<Option<EraIndex>>());
+        const eraPointsIndividual = validatorEraPoints.individual;
+        let active: Array<ValidatorId>
+        let waiting: Array<ValidatorId>
+        const validatorInfo = {};
+        electedInfo.info.forEach(async ({ accountId, controllerId, validatorPrefs, rewardDestination }) => {
+          const commissionPer = (Number)(validatorPrefs.commission || new BN(0)) / 10_000_000;
+          const key = accountId.toString();
+          validatorInfo[key] = {}
+          validatorInfo[key] = {
+            commissionPer,
+            controllerId,
+            rewardDestination,
+            nextSessionIds: await (await api.query.session.nextKeys(key)).toString(),
+            eraPoints: Number(eraPointsIndividual[key])
+          };
+        });
         // erasStakers(EraIndex, AccountId): Exposure -> api.query.staking.erasStakers // KUSAMA
         // stakers(AccountId): Exposure -> api.query.staking.stakers // EDGEWARE
         const stakersCall = (api.query.staking.stakers)
           ? api.query.staking.stakers
           : api.query.staking.erasStakers;
         const stakersCallArgs = (account) => (api.query.staking.stakers)
-        ? [account]
-        : [currentEra as EraIndex, account];
-        let activeExposures : {[key: string]: any} = {}
+          ? [account]
+          : [currentEra as unknown as EraIndex, account];
+        let activeExposures: { [key: string]: any } = {}
         if (validators && currentEra) { // if currentEra isn't empty
           active = validators.validators;
           waiting = validators.nextElected;
           await Promise.all(active.map(async (validator) => {
             const tmp_exposure = (await stakersCall(...stakersCallArgs(validator))) as Exposure;
             const exposure = {
-              own: tmp_exposure.own.toString(),
-              total: tmp_exposure.total.toString(),
-              other: tmp_exposure.others.toString(),
+              own: tmp_exposure.own,
+              total: tmp_exposure.total,
+              others: tmp_exposure.others
             }
             activeExposures[validator.toString()] = exposure;
           }));
@@ -133,7 +152,8 @@ export async function Enrich(
             active: active?.map((v) => v.toString()),
             waiting: waiting?.map((v) => v.toString()),
             sessionIndex: +sessionIndex,
-            currentEra: +currentEra
+            currentEra: +currentEra,
+            validatorInfo,
           }
         }
       }
