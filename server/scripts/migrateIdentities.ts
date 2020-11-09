@@ -50,7 +50,8 @@ export default async function (models, chain?: string): Promise<void> {
     const nodeUrl = constructSubstrateUrl(node.url);
     const api = await SubstrateEvents.createApi(
       nodeUrl,
-      node.chain.includes('edgeware') ? Mainnet : {},
+      node.chain.includes('edgeware') ? Mainnet.types : {},
+      node.chain.includes('edgeware') ? Mainnet.typesAlias : {},
     );
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     const identityEvents = await fetcher.fetchIdentities(addresses);
