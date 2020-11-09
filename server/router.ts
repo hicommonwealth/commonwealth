@@ -69,6 +69,7 @@ import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
 import bulkThreads from './routes/bulkThreads';
+import getThread from './routes/getThread';
 import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
@@ -148,6 +149,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
+  router.get('/getThread', getThread.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
 
@@ -171,7 +173,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/deleteComment', passport.authenticate('jwt', { session: false }), deleteComment.bind(this, models));
   // TODO: Change to GET /comments
   router.get('/viewComments', viewComments.bind(this, models));
-  // TODO: Change to GET /comments
   router.get('/bulkComments', bulkComments.bind(this, models));
 
   // offchain topics
