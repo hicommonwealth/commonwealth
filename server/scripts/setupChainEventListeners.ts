@@ -91,7 +91,7 @@ const setupChainEventListeners = async (
     const offenceHandler = new OffenceHandler(models, node.chain);
     const heartbeatHandler = new HeartbeatHandler(models, node.chain);
     const identityHandler = new IdentityHandler(models, node.chain);
-    const handlers: IEventHandler[] = [ storageHandler, 
+    const handlers: IEventHandler[] = [ storageHandler,
       notificationHandler,
       entityArchivalHandler,
       newSessionHandler,
@@ -110,7 +110,8 @@ const setupChainEventListeners = async (
       const nodeUrl = constructSubstrateUrl(node.url);
       const api = await SubstrateEvents.createApi(
         nodeUrl,
-        node.chain.includes('edgeware') ? Mainnet : {},
+        node.chain.includes('edgeware') ? Mainnet.types : {},
+        node.chain.includes('edgeware') ? Mainnet.typesAlias : {},
       );
       subscriber = await SubstrateEvents.subscribeEvents({
         chain: node.chain,
