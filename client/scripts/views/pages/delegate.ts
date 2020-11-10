@@ -57,16 +57,15 @@ const DelegatePage: m.Component<{}> = {
 
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
+      if (app.chain?.network !== ChainNetwork.Marlin) {
+        return m(PageNotFound, {
+          title: 'Delegate page for Marlin only!'
+        });
+      }
       return m(PageLoading, {
         message: 'Connecting to chain (may take up to 10s)...',
         title: 'Proposals',
         showNewProposalButton: true,
-      });
-    }
-
-    if (app.chain?.network !== ChainNetwork.Marlin) {
-      return m(PageNotFound, {
-        title: 'Delegate page for Marlin only!'
       });
     }
 
