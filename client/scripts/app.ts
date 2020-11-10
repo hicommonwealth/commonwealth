@@ -460,6 +460,7 @@ $(() => {
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
     '/:scope/council':           importRoute('views/pages/council/index', { scoped: true }),
+    '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
     '/:scope/new/signaling':     importRoute('views/pages/new_signaling', { scoped: true }),
