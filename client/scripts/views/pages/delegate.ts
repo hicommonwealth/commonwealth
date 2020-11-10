@@ -33,13 +33,15 @@ interface IDelegateForm {
   address: string,
 }
 
-const DelegateForm: m.Component<{}, { form: IDelegateForm, }> = {
+const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, }> = {
   oninit: (vnode) => {
     vnode.state.form = {
       address: '',
     };
+    vnode.state.loading = false;
   },
   view: (vnode) => {
+    const { form, loading } = vnode.state;
     return m(Form, { class: 'DelegateForm' }, [
       m(Grid, [
         m(Col, [
@@ -60,12 +62,18 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, }> = {
           ]),
           m(FormLabel, [
             m(Button, {
-              disabled: vnode.state.form.address === '',
+              disabled: form.address === '' || loading,
               intent: 'primary',
               label: 'Delegate!',
-              onclick: (e) => {
+              onclick: async (e) => {
                 e.preventDefault();
+                vnode.state.loading = true;
                 console.log('HELLO????');
+                if ((app.chain as Marlin).apiInitialized) {
+                  await (app.chain as Marlin).marlinAccounts.senderSetDelegate(vnode.state.form.address);
+                }
+                vnode.state.loading = false;
+                m.redraw();
               },
               type: 'submit',
             }),
