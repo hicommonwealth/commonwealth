@@ -106,7 +106,7 @@ export async function Enrich(
         const validators = await api.derive.staking.validators();
         const electedInfo: DeriveStakingElected = await api.derive.staking.electedInfo() as any; // validator preferences for getting commision
         const validatorEraPoints: EraRewardPoints = await api.query.staking.currentPoints() as EraRewardPoints;
-        const currentEra = (Number)(await api.query.staking.currentEra<Option<EraIndex>>());
+        const currentEra = (Number)(await (await api.query.staking.currentEra<Option<EraIndex>>()).unwrap());
         const eraPointsIndividual = validatorEraPoints.individual;
         let active: Array<ValidatorId>
         let waiting: Array<ValidatorId>

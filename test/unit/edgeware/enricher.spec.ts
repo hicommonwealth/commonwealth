@@ -7,6 +7,7 @@ import {
 } from '@polkadot/types/interfaces';
 import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types';
 import { Vec, bool, Data, TypeRegistry, Option } from '@polkadot/types';
+import { Codec } from '@polkadot/types/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
@@ -301,7 +302,8 @@ const api = constructFakeApi({
     };
     return validators[AccountId];
   },
-  currentEra: async () => new BN(12),
+  // currentEra: async () => new BN(12) as unknown as Option<BN & Codec>,
+  currentEra: async () => constructOption( new BN(12) as unknown as BN & Codec),  
   currentIndex: async () => new BN(12),
   concurrentReportsIndex: async () => [ '0x00' ] as unknown as Vec<ReportIdOf>,
   'reports.multi': async () => offenceDetails as unknown as Option<OffenceDetails>[],
