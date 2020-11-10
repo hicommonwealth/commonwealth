@@ -70,7 +70,9 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, }> 
                 vnode.state.loading = true;
                 console.log('HELLO????');
                 if ((app.chain as Marlin).apiInitialized) {
-                  await (app.chain as Marlin).marlinAccounts.senderSetDelegate(vnode.state.form.address);
+                  await (app.chain as Marlin).marlinAccounts.senderSetDelegate(vnode.state.form.address)
+                    .then(() => { notifySuccess(`Successfully delegated to ${vnode.state.form.address}`); })
+                    .catch((err) => { notifyFailure(`${err.message}`); });
                 }
                 vnode.state.loading = false;
                 m.redraw();

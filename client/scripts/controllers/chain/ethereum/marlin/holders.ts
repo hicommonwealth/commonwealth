@@ -69,7 +69,8 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     try {
       await this.api.compContract.delegate(address);
     } catch (e) {
-      return console.error(e);
+      console.error(e);
+      throw new Error(e);
     }
   }
 
