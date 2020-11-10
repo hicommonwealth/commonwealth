@@ -22,6 +22,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
 import moment from 'moment';
@@ -72,7 +73,7 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, }> 
                 if ((app.chain as Marlin).apiInitialized) {
                   await (app.chain as Marlin).marlinAccounts.senderSetDelegate(vnode.state.form.address)
                     .then(() => { notifySuccess(`Successfully delegated to ${vnode.state.form.address}`); })
-                    .catch((err) => { notifyFailure(`${err.message}`); });
+                    .catch((err) => { notifyError(`${err.message}`); });
                 }
                 vnode.state.loading = false;
                 m.redraw();
