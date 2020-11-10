@@ -66,7 +66,7 @@ export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiti
   view: (vnode) => {
     return m('.ViewNominatorsModal', [
       m('.compact-modal-title', [
-        m('h3', `Nominators for ${formatAddressShort(vnode.attrs.validatorAddr)}`),
+        m('h3', `Nominators for ${formatAddressShort(vnode.attrs.validatorAddr, null)}`), // TODO: provide chain
       ]),
       m('.compact-modal-body', [
         m('table.modal-table', [
@@ -97,13 +97,13 @@ export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiti
           }),
         ])
       ]),
-      m(".row.button-row",m(".col-xs-12.button-col",m(Button, {
+      m('.row.button-row', m('.col-xs-12.button-col', m(Button, {
         label: 'Dismiss',
         class: 'modal_dismissBtn',
         href: '#',
         onclick: (e) => {
           e.preventDefault();
-          app.modals.getList().forEach((m)=>app.modals.remove(m));
+          app.modals.getList().forEach((k) => app.modals.remove(k));
         }
       })))
     ]);
@@ -170,7 +170,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   }
 });
 
-const ValidatorPage: m.Component = {
+const ValidatorPage : m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ValidatorPage' });
   },

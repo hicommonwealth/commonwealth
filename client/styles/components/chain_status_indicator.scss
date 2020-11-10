@@ -1,13 +1,9 @@
-.ChainStatusIndicator {
+@import 'client/styles/shared';
 
-    &:hover {
-        border-bottom-color: transparent;
-        background: initial;
-        cursor: initial;
-    }
+.ChainStatusIndicator {
     .status {
         display: inline-block;
-        color: #999;
+        color: #777;
         &:before {
             display: inline-block;
             content: " ";
@@ -17,7 +13,7 @@
             width: 8px;
             border-radius: 4px;
             // position
-            margin-right: 2px;
+            margin-right: 7px;
         }
         &.connecting:before {
             background: #ffa200;

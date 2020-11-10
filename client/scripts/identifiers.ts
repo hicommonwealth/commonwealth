@@ -1,6 +1,7 @@
-import { StorageModule, ChainBase, ChainClass } from 'models';
+import { StorageModule, ChainBase, ChainClass, ProposalModule } from 'models';
 import { ProposalStore } from 'stores';
 import app from './state';
+import ThreadsController from './controllers/server/threads';
 
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
@@ -21,7 +22,7 @@ export const proposalSlugToClass = () => {
     ]);
   }
 
-  const mmap = new Map<string, StorageModule>([
+  const mmap = new Map<string, ProposalModule<any, any, any> | ThreadsController>([
     ['discussion', app.threads],
   ]);
   if (app.chain.base === ChainBase.Substrate) {
@@ -70,7 +71,7 @@ export const idToProposal = (slug, id) => {
   const store = proposalSlugToStore(slug);
   const proposal = store.getByIdentifier(id);
   if (!proposal) {
-    throw new Error(`invalid id: ${id}`);
+    throw new Error(`Proposal missing from store with id ${id}`);
   } else {
     return proposal;
   }

@@ -21,13 +21,13 @@ const SettingsPage: m.Component<{}> = {
   view: (vnode) => {
     if (app.loginStatusLoaded() && !app.isLoggedIn()) {
       m.route.set('/', {}, { replace: true });
-      return;
+      return m(PageLoading);
     }
     if (!app.loginStatusLoaded()) return m(PageLoading);
 
     return m(Sublayout, {
       class: 'SettingsPage',
-      title: 'Settings',
+      title: 'Login & Address Settings',
     }, [
       m('br'),
       m(EmailWell, { github: true }),

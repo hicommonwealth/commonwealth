@@ -98,6 +98,8 @@ export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
   }
 
   public get coinWeight(): Coin {
+    // handle case where an invalid vote was pushed on chain
+    if (this.weight === undefined) return new Coin(this.balance.denom, 0);
     return this.weight < 1
       ? new Coin(this.balance.denom, this.balance.divn(1 / this.weight))
       : new Coin(this.balance.denom, this.balance.muln(this.weight));
@@ -177,7 +179,7 @@ export class SubstrateDemocracyReferendum
     // see if preimage exists and populate data if it does
     const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
-      this._title = `${preimage.section}.${preimage.method}(${preimage.args.join(', ')})`;
+      this._title = formatCall(preimage);
     } else {
       this._title = `Referendum #${this.data.index}`;
     }
@@ -348,46 +350,41 @@ export class SubstrateDemocracyReferendum
 
   // TRANSACTIONS
   // TODO: allow the user to enter how much balance they want to vote with
-  public async submitVoteTx(vote: BinaryVote<SubstrateCoin>) {
+  public async submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
     let srmlVote;
     const conviction = convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index;
-    if (this._Democracy.isRedesignLogic) {
-      // fake the arg to compute balance
-      const balance = await (vote.account as SubstrateAccount).freeBalance.pipe(first()).toPromise();
 
-      // "AccountVote" type, for kusama
-      // we don't support "Split" votes right now
-      srmlVote = {
-        Standard: {
-          vote: {
-            aye: vote.choice,
-            conviction,
-          },
-          balance: balance.asBN,
-        }
-      };
+    // fake the arg to compute balance
+    const balance = await (vote.account as SubstrateAccount).freeBalance.pipe(first()).toPromise();
 
-      // even though voting balance is specifiable, we pre-populate the voting balance as "all funds"
-      //   to align with old voting behavior -- we should change this soon.
-      // TODO: move this computation out into the view as needed, to prepopulate field
-      const fees = await this._Chain.computeFees(
-        vote.account.address,
-        (api: ApiRx) => api.tx.democracy.vote(this.data.index, srmlVote)
-      );
+    // "AccountVote" type, for kusama
+    // we don't support "Split" votes right now
+    srmlVote = {
+      Standard: {
+        vote: {
+          aye: vote.choice,
+          conviction,
+        },
+        balance: balance.asBN,
+      }
+    };
 
-      srmlVote.Standard.balance = balance.sub(fees).toString();
-    } else {
-      // "Vote" type, for edgeware
-      srmlVote = {
-        aye: vote.choice,
-        conviction,
-      };
-    }
+    // even though voting balance is specifiable, we pre-populate the voting balance as "all funds"
+    //   to align with old voting behavior -- we should change this soon.
+    // TODO: move this computation out into the view as needed, to prepopulate field
+    const fees = await this._Chain.computeFees(
+      vote.account.address,
+      (api: ApiRx) => api.tx.democracy.vote(this.data.index, srmlVote)
+    );
+
+    srmlVote.Standard.balance = balance.sub(fees).toString();
+
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
       (api: ApiRx) => api.tx.democracy.vote(this.data.index, srmlVote),
       'submitDemocracyVote',
-      this.title
+      this.title,
+      cb
     );
   }
 

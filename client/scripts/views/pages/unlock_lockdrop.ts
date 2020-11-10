@@ -5,6 +5,9 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { stat } from 'fs';
 import Web3 from 'web3';
+import { Button, Input } from 'construct-ui';
+
+import Sublayout from 'views/sublayout';
 import {
   getLockStorage,
   setupWeb3Provider,
@@ -12,7 +15,6 @@ import {
   formatNumber,
   getParticipationSummary,
 } from '../stats/stats_helpers';
-import Sublayout from 'views/sublayout';
 
 const LockdropV1 = '0x1b75b90e60070d37cfa9d87affd124bb345bf70a';
 const LockdropV2 = '0xfec6f679e32d45e22736ad09dfdf6e3368704e31';
@@ -149,7 +151,8 @@ const LockContractComponent = {
         Math.round(Number(unlockTime || unlockTimeMinutes)),
         ' minutes'
       ]),
-      m('button.formular-button-primary', {
+      m(Button, {
+        intent: 'primary',
         onclick: async (e) => {
           e.preventDefault();
           vnode.state.error = null;
@@ -170,8 +173,9 @@ const LockContractComponent = {
             vnode.state.error = err.toString();
           }
           m.redraw();
-        }
-      }, 'Unlock'),
+        },
+        label: 'Unlock'
+      }),
       vnode.state.error && m('.error-message', vnode.state.error),
     ]);
   }
@@ -205,8 +209,10 @@ const UnlockPage = {
               m('.caption', [
                 'Select lockdrop contract'
               ]),
-              m('input#LOCKDROP_CONTRACT_ADDRESS', {
+              m(Input, {
+                id: 'LOCKDROP_CONTRACT_ADDRESS',
                 type: 'text',
+                fluid: true,
                 value: state.contract === 'LockdropV1' ? LockdropV1 : LockdropV2,
                 readonly: 'readonly',
                 disabled: true,
@@ -222,8 +228,10 @@ const UnlockPage = {
               m('.caption', [
                 'Enter the address you locked from'
               ]),
-              m('input#LOCKDROP_USER_ADDRESS', {
+              m(Input, {
+                id: 'LOCKDROP_USER_ADDRESS',
                 type: 'text',
+                fluid: true,
                 placeholder: 'Enter an ETH address: 0x1234...',
                 value: state.user,
                 oninput: (e) => {
@@ -237,7 +245,8 @@ const UnlockPage = {
             m('.form-left', [
               m('.lock-user-contracts', (state.locks.length > 0)
                 ? state.locks.map((data) => m(LockContractComponent, { data }))
-                : m('button', {
+                : m(Button, {
+                  intent: 'primary',
                   onclick: async () => {
                     vnode.state.error = null;
                     if (!state.user) {
@@ -246,6 +255,8 @@ const UnlockPage = {
                       return;
                     }
                     try {
+                      vnode.state.error = 'Please unlock Metamask (a web wallet is now required for unlocking)';
+                      m.redraw();
                       const results : any[] = await fetchUnlocks();
                       if (results.length === 0) {
                         vnode.state.error = 'No locks from this address';
@@ -254,8 +265,9 @@ const UnlockPage = {
                       vnode.state.error = e.toString();
                     }
                     m.redraw();
-                  }
-                }, 'Get locks')),
+                  },
+                  label: 'Get locks'
+                })),
               vnode.state.error && m('.error-message', vnode.state.error),
             ]),
           ]),

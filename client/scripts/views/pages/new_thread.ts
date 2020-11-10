@@ -10,7 +10,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { NewThreadForm } from '../components/new_thread_form';
 
-const NewThreadPage: m.Component = {
+const NewThreadPage: m.Component<{}> = {
   oncreate: (vnode: VnodeDOM) => {
     mixpanel.track('PageVisit', { 'Page Name': 'NewThreadPage' });
   },
@@ -24,13 +24,16 @@ const NewThreadPage: m.Component = {
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading);
 
+    const hasTopics = !!(app.community?.meta.topics.length || app.chain?.meta.topics.length);
+
     return m(Sublayout, {
       class: 'NewThreadPage',
       title: 'New Thread',
     }, [
       m('.forum-container', [
         m(NewThreadForm, {
-          isModal: false
+          isModal: false,
+          hasTopics
         }),
       ]),
     ]);

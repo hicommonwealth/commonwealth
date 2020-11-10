@@ -47,12 +47,15 @@ export const EdgewareChainNotificationTypes = {
     'edgeware-slash',
     'edgeware-unbonded',
   ],
+  VotingDelegation: [
+    'edgeware-vote-delegated',
+  ],
   Vote: [
     'edgeware-vote-delegated',
   ],
 };
 
-export const PolkdotChainNotificationTypes = {
+export const PolkadotChainNotificationTypes = {
   Council: [
     'polkadot-collective-approved',
     'polkadot-collective-disapproved',
@@ -82,24 +85,19 @@ export const PolkdotChainNotificationTypes = {
     'polkadot-preimage-reaped',
     'polkadot-preimage-used',
   ],
-  // Signaling: [
-  //     'polkadot-signaling-commit-started',
-  //     'polkadot-signaling-new-proposal',
-  //     'polkadot-signaling-voting-completed',
-  //     'polkadot-signaling-voting-started',
-  // ],
-  // Treasury: [
-  //     'polkadot-treasury-awarded',
-  //     'polkadot-treasury-proposed',
-  //     'polkadot-treasury-rejected',
-  //     'polkadot-treasury-reward-minting',
-  //     'polkadot-treasury-reward-minting-v2'
-  // ],
+  Treasury: [
+    'polkadot-treasury-awarded',
+    'polkadot-treasury-proposed',
+    'polkadot-treasury-rejected',
+  ],
   Validator: [
     'polkadot-bonded',
     'polkadot-reward',
     'polkadot-slash',
     'polkadot-unbonded',
+  ],
+  VotingDelegation: [
+    'polkadot-vote-delegated',
   ],
   Vote: [
     'polkadot-vote-delegated',
@@ -136,26 +134,67 @@ export const KusamaChainNotificationTypes = {
     'kusama-preimage-reaped',
     'kusama-preimage-used',
   ],
-  // Signaling: [
-  //     'kusama-signaling-commit-started',
-  //     'kusama-signaling-new-proposal',
-  //     'kusama-signaling-voting-completed',
-  //     'kusama-signaling-voting-started',
-  // ],
-  // Treasury: [
-  //     'kusama-treasury-awarded',
-  //     'kusama-treasury-proposed',
-  //     'kusama-treasury-rejected',
-  //     'kusama-treasury-reward-minting',
-  //     'kusama-treasury-reward-minting-v2'
-  // ],
+  Treasury: [
+    'kusama-treasury-awarded',
+    'kusama-treasury-proposed',
+    'kusama-treasury-rejected',
+  ],
   Validator: [
     'kusama-bonded',
     'kusama-reward',
     'kusama-slash',
     'kusama-unbonded',
   ],
+  VotingDelegation: [
+    'kusama-vote-delegated',
+  ],
   Vote: [
     'kusama-vote-delegated',
+  ],
+};
+
+export const KulupuChainNotificationTypes = {
+  Council: [
+    'kulupu-collective-approved',
+    'kulupu-collective-disapproved',
+    'kulupu-collective-executed',
+    'kulupu-collective-member-executed',
+    'kulupu-collective-proposed',
+    'kulupu-collective-voted',
+    'kulupu-election-candidacy-submitted',
+    'kulupu-election-empty-term',
+    'kulupu-election-member-kicked',
+    'kulupu-election-member-renounced',
+    'kulupu-election-new-term',
+  ],
+  Democracy: [
+    'kulupu-democracy-cancelled',
+    'kulupu-democracy-executed',
+    'kulupu-democracy-not-passed',
+    'kulupu-democracy-passed',
+    'kulupu-democracy-proposed',
+    'kulupu-democracy-started',
+    'kulupu-democracy-tabled',
+  ],
+  Preimage: [
+    'kulupu-preimage-invalid',
+    'kulupu-preimage-missing',
+    'kulupu-preimage-noted',
+    'kulupu-preimage-reaped',
+    'kulupu-preimage-used',
+  ],
+  Treasury: [
+    'kulupu-treasury-awarded',
+    'kulupu-treasury-proposed',
+    'kulupu-treasury-rejected',
+  ],
+  Validator: [
+    'kulupu-bonded',
+    'kulupu-reward',
+    'kulupu-slash',
+    'kulupu-unbonded',
+  ],
+  VotingDelegation: [
+    'kulupu-vote-delegated',
   ],
 };

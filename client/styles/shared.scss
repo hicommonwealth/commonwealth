@@ -3,7 +3,7 @@
 @import 'mixins/dragula';
 
 $fonts: Metric, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-$monospace-fonts: 'iA Writer Duospace', monospace;
+$monospace-fonts: "Courier New", Courier, monospace;
 
 $base-bg-color:     #ffffff;
 $primary-bg-color:  #4f62bd;
@@ -32,12 +32,13 @@ $text-color-medium: #777;               // medium text on any background
 $text-color-dark: #222;                 // black text on any background
 
 $form-border-color: #c5cdd1;
-$form-active-color: #08c;
+$form-border-color-light: lighten(#c5cdd1, 12%);
 
 $positive-text-color: $positive-bg-color;
 $negative-text-color: $negative-bg-color;
 
 $sidebar-width: 230px;
+$quick-switcher-width: 64px;
 $layout-max-width: 970px;
 
 // forum listing components
@@ -63,7 +64,7 @@ $listing-right-flex: 3;
     outline: none;
     box-shadow: none;
     &:focus {
-        border-color: $form-active-color;
+        border-color: $theme-focus-border;
     }
 }
 

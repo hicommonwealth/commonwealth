@@ -2,7 +2,7 @@ import { IApp } from 'state';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';
 import { ProposalStore } from '../stores';
-import { IVote, ITXModalData } from './interfaces';
+import { IVote, ITXModalData, IChainModule, IAccountsModule } from './interfaces';
 import Proposal from './Proposal';
 import StorageModule from './StorageModule';
 import ChainEntity from './ChainEntity';
@@ -16,33 +16,41 @@ export abstract class ProposalModule<
 > extends StorageModule {
   public readonly store = new ProposalStore<ProposalT>();
 
+  protected _disabled: boolean = false;
+  public get disabled() { return this._disabled; }
+  public disable() { this._disabled = true; }
+
+  protected _initializing: boolean = false;
+  public get initializing() { return this._initializing; }
   protected _initialized: boolean = false;
   public get initialized() { return this._initialized; }
 
   private _app: IApp;
   public get app() { return this._app; }
 
-  protected _entityConstructor(constructorFunc: (e: ChainEntity) => ProposalT, entity: ChainEntity): ProposalT {
+  protected _entityConstructor(entity: ChainEntity): ProposalT {
     try {
-      return constructorFunc(entity);
+      return this._constructorFunc(entity);
     } catch (e) {
       console.error('failed to construct proposal from entity: ', entity);
     }
   }
 
-  public updateProposal(constructorFunc: (e: ChainEntity) => ProposalT, entity: ChainEntity, event: ChainEvent): void {
+  public updateProposal(entity: ChainEntity, event: ChainEvent): void {
     const proposal = this.store.getByIdentifier(entity.typeId);
     if (!proposal) {
-      this._entityConstructor(constructorFunc, entity);
+      this._entityConstructor(entity);
     } else {
       proposal.update(event);
     }
   }
 
-  constructor(app: IApp) {
+  constructor(app: IApp, protected _constructorFunc?: (e: ChainEntity) => ProposalT) {
     super();
     this._app = app;
   }
+
+  public abstract async init(chain: IChainModule<any, any>, accounts: IAccountsModule<any, any>): Promise<void>;
 
   public deinit() {
     this._initialized = false;

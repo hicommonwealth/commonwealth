@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
-import { urlHasValidHTTPPrefix } from '../../shared/helpers';
+import { urlHasValidHTTPPrefix } from '../../shared/utils';
 
 const log = factory.getLogger(formatFilename(__filename));
 

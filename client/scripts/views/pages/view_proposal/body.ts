@@ -31,6 +31,14 @@ export enum GlobalStatus {
   Set = 'set'
 }
 
+const clearEditingLocalStorage = (item, isThread: boolean) => {
+  if (isThread) {
+    localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
+  } else {
+    localStorage.removeItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+  }
+};
+
 export const activeQuillEditorHasText = () => {
   // TODO: Better lookup than document.getElementsByClassName[0]
   // TODO: This should also check whether the Quill editor has changed, rather than whether it has text
@@ -51,7 +59,7 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
     return m('.ProposalBodyAvatar', [
       m(User, {
         user: author,
-        tooltip: true,
+        popover: true,
         avatarOnly: true,
         avatarSize: 40,
       }),
@@ -67,14 +75,14 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
 
     const author : Account<any> = (item instanceof OffchainThread || item instanceof OffchainComment)
       ? (app.community
-         ? app.community.accounts.get(item.author, item.authorChain)
-         : app.chain.accounts.get(item.author))
+        ? app.community.accounts.get(item.author, item.authorChain)
+        : app.chain.accounts.get(item.author))
       : item.author;
 
     return m('.ProposalBodyAuthor', [
       m(User, {
         user: author,
-        tooltip: true,
+        popover: true,
         linkify: true,
         hideAvatar: true,
       }),
@@ -151,11 +159,11 @@ export const ProposalBodyReplyMenuItem: m.Component<{
     if (!item) return;
 
     return m(MenuItem, {
-      label: 'Reply',
+      label: 'Comment',
       onclick: async (e) => {
         e.preventDefault();
         if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
-          const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
+          const confirmed = await confirmationModalWithText('Unsent comments will be lost. Continue?')();
           if (!confirmed) return;
         }
         getSetGlobalReplyStatus(GlobalStatus.Set, item.id);
@@ -250,7 +258,10 @@ export const ProposalBodyDelete: m.Component<{ item: OffchainThread | OffchainCo
   }
 };
 
-export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | OffchainComment<any>, refresh?: Function, }> = {
+export const ProposalBodyDeleteMenuItem: m.Component<{
+  item: OffchainThread | OffchainComment<any>,
+  refresh?: Function,
+}> = {
   view: (vnode) => {
     const { item, refresh } = vnode.attrs;
     if (!item) return;
@@ -275,9 +286,9 @@ export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | Of
   }
 };
 
-export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, parentState }> = {
+export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStatus, parentState }> = {
   view: (vnode) => {
-    const { getSetGlobalEditingStatus, parentState } = vnode.attrs;
+    const { item, getSetGlobalEditingStatus, parentState } = vnode.attrs;
 
     return m('.ProposalBodyCancelEdit', [
       m(Button, {
@@ -297,6 +308,7 @@ export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, pa
           if (!confirmed) return;
           parentState.editing = false;
           getSetGlobalEditingStatus(GlobalStatus.Set, false);
+          clearEditingLocalStorage(item, item instanceof OffchainThread);
           m.redraw();
         }
       }, 'Cancel')
@@ -330,10 +342,11 @@ export const ProposalBodySaveEdit: m.Component<{
             : JSON.stringify(parentState.quillEditorState.editor.getContents());
           parentState.saving = true;
           if (item instanceof OffchainThread) {
-            app.threads.edit(item, itemText).then(() => {
+            app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {
               m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;
+              clearEditingLocalStorage(item, true);
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               m.redraw();
               // TODO: set notification bar for 'thread edited' (?)
@@ -342,6 +355,7 @@ export const ProposalBodySaveEdit: m.Component<{
             app.comments.edit(item, itemText).then((c) => {
               parentState.editing = false;
               parentState.saving = false;
+              clearEditingLocalStorage(item, false);
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               callback();
             });
@@ -371,12 +385,35 @@ export const ProposalBodyText: m.Component<{ item: AnyProposal | OffchainThread 
         : item.description);
     if (!body) return;
 
+    const getPlaceholder = () => {
+      if (!(item instanceof OffchainThread)) return;
+      const author : Account<any> = app.community
+        ? app.community.accounts.get(item.author, item.authorChain)
+        : app.chain ? app.chain.accounts.get(item.author) : null;
+
+      return m('.ProposalBodyText.proposal-body-placeholder', [
+        author ? [
+          m(User, { user: author, hideAvatar: true, hideIdentityIcon: true }),
+          ' created this thread'
+        ] : [
+          'Created this thread'
+        ]
+      ]);
+    };
+
     return m('.ProposalBodyText', (() => {
       try {
         const doc = JSON.parse(body);
         if (!doc.ops) throw new Error();
+        if (doc.ops.length === 1 && doc.ops[0] && typeof doc.ops[0].insert === 'string'
+            && doc.ops[0].insert.trim() === '') {
+          return getPlaceholder();
+        }
         return m(QuillFormattedText, { doc });
       } catch (e) {
+        if (body.toString().trim() === '') {
+          return getPlaceholder();
+        }
         return m(MarkdownFormattedText, { doc: body });
       }
     })());
@@ -409,17 +446,44 @@ export const ProposalBodyAttachments: m.Component<{ item: OffchainThread | Offch
   }
 };
 
-export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainComment<any>, parentState }> = {
+export const ProposalBodyEditor: m.Component<{
+  item: OffchainThread | OffchainComment<any>,
+  parentState
+},  {
+  restoreEdits: boolean,
+  savedEdits: string
+} > = {
+  oninit: async (vnode) => {
+    const { item } = vnode.attrs;
+    const isThread = item instanceof OffchainThread;
+    vnode.state.savedEdits = isThread
+      ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
+      : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+    if (vnode.state.savedEdits) {
+      const modalMsg = 'Previous changes found. Restore edits?';
+      vnode.state.restoreEdits = await confirmationModalWithText(modalMsg, 'Yes', 'No')();
+      clearEditingLocalStorage(item, isThread);
+      m.redraw();
+    }
+  },
   view: (vnode) => {
     const { item, parentState } = vnode.attrs;
+    const { restoreEdits, savedEdits } = vnode.state;
+
     if (!item) return;
     const isThread = item instanceof OffchainThread;
-    const body = item instanceof OffchainComment
-      ? item.text
-      : (item instanceof OffchainThread
-        ? item.body
-        : null);
+    const body = (restoreEdits && savedEdits)
+      ? savedEdits
+      : item instanceof OffchainComment
+        ? (item as OffchainComment<any>).text
+        : item instanceof OffchainThread
+          ? (item as OffchainThread).body
+          : null;
+
     if (!body) return;
+    if (savedEdits && (restoreEdits === undefined)) {
+      return m(QuillEditor);
+    }
 
     return m('.ProposalBodyEditor', [
       m(QuillEditor, {
@@ -437,8 +501,9 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
         },
         tabindex: 1,
         theme: 'snow',
-        editorNamespace: document.location.pathname
-          + (isThread ? `-editing-comment-${item.id}` : '-editing-thread'),
+        editorNamespace: isThread
+          ? `edit-thread-${item.id}`
+          : `edit-comment-${item.id}`,
       })
     ]);
   }

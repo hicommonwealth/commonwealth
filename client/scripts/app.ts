@@ -3,26 +3,25 @@ import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
-import 'nprogress.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import NProgress from 'lib/nprogress';
 import { FocusManager } from 'construct-ui';
-
-import app, { ApiStatus, LoginState } from 'state';
-
-import { Layout, LoadingLayout } from 'views/layout';
-import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment-twitter';
 import mixpanel from 'mixpanel-browser';
 
+import app, { ApiStatus, LoginState } from 'state';
+import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
+
+import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
-import Community from './controllers/chain/community/main';
-import WebsocketController from './controllers/server/socket/index';
-import ConfirmInviteModal from './views/modals/confirm_invite_modal';
+import Community from 'controllers/chain/community/main';
+import WebsocketController from 'controllers/server/socket/index';
+
+import { Layout, LoadingLayout } from 'views/layout';
+import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import LoginModal from 'views/modals/login_modal';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -64,6 +63,11 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
 
+      // add recentActivity
+      const { recentThreads, recentComments } = data;
+      app.recentActivity.addThreads(recentThreads, true);
+      app.recentActivity.addAddressesFromActivity(recentThreads.concat(recentComments), true);
+
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
@@ -99,18 +103,35 @@ export async function deinitChainOrCommunity() {
 }
 
 export function handleInviteLinkRedirect() {
-  if (m.route.param('invitemessage')) {
+  const inviteMessage = m.route.param('invitemessage');
+  if (inviteMessage) {
     mixpanel.track('Invite Link Used', {
       'Step No': 1,
-      'Step': m.route.param('invitemessage'),
+      'Step': inviteMessage,
     });
-    if (m.route.param('invitemessage') === 'failure') {
+    if (inviteMessage === 'failure' && m.route.param('message') === 'Must be logged in to accept invites') {
+      notifyInfo('Log in to join a community with an invite link');
+      app.modals.create({ modal: LoginModal });
+    } else if (inviteMessage === 'failure') {
       const message = m.route.param('message');
       notifyError(message);
-    } else if (m.route.param('invitemessage') === 'success') {
+    } else if (inviteMessage === 'success') {
+      if (app.config.invites.length === 0) return;
       app.modals.create({ modal: ConfirmInviteModal });
     } else {
-      notifyError('Hmmmm... URL not constructed properly');
+      notifyError('Unexpected error with invite link');
+    }
+  }
+}
+
+export function handleUpdateEmailConfirmation() {
+  if (m.route.param('confirmation')) {
+    mixpanel.track('Update Email Verification Redirect', {
+      'Step No': 1,
+      'Step': m.route.param('confirmation'),
+    });
+    if (m.route.param('confirmation') === 'success') {
+      notifySuccess('Email confirmed!');
     }
   }
 }
@@ -129,7 +150,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
   console.log(`${c.name.toUpperCase()} started.`);
 
   // Initialize available addresses
-  updateActiveAddresses();
+  await updateActiveAddresses();
 
   // Redraw with community fully loaded
   m.redraw();
@@ -159,6 +180,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
 
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
+  app.chainPreloading = true;
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
@@ -183,6 +205,27 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
       './controllers/chain/polkadot/main'
     )).default;
     app.chain = new Polkadot(n, app);
+  } else if (n.chain.network === ChainNetwork.Kulupu) {
+    const Kulupu = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "kulupu-main" */
+      './controllers/chain/kulupu/main'
+    )).default;
+    app.chain = new Kulupu(n, app);
+  } else if (n.chain.network === ChainNetwork.Plasm) {
+    const Plasm = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "plasm-main" */
+      './controllers/chain/plasm/main'
+    )).default;
+    app.chain = new Plasm(n, app);
+  } else if (n.chain.network === ChainNetwork.Stafi) {
+    const Stafi = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "stafi-main" */
+      './controllers/chain/stafi/main'
+    )).default;
+    app.chain = new Stafi(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */
@@ -204,6 +247,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
       './controllers/chain/near/main'
     )).default;
     app.chain = new Near(n, app);
+    app.chain.initApi(); // required for loading NearAccounts
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
@@ -214,13 +258,14 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   } else {
     throw new Error('Invalid chain');
   }
+  app.chainPreloading = false;
   app.chain.deferred = deferred;
 
   // Load server data without initializing modules/chain connection.
   await app.chain.initServer();
 
   // Instantiate active addresses before chain fully loads
-  updateActiveAddresses(n.chain);
+  await updateActiveAddresses(n.chain);
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
@@ -253,7 +298,7 @@ export async function initChain(): Promise<void> {
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
-  updateActiveAddresses(n.chain);
+  await updateActiveAddresses(n.chain);
 
   // Finish redraw to remove loading dialog
   m.redraw();
@@ -270,17 +315,20 @@ export function initCommunity(communityId: string): Promise<void> {
 
 // set up route navigation
 m.route.prefix = '';
-export const updateRoute = m.route.set;
+const _updateRoute = m.route.set;
+export const updateRoute = (...args) => {
+  app._lastNavigatedBack = false;
+  app._lastNavigatedFrom = m.route.get();
+  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
+};
 m.route.set = (...args) => {
   // set app params that maintain global state for:
   // - whether the user last clicked the back button
   // - the last page the user was on
   app._lastNavigatedBack = false;
   app._lastNavigatedFrom = m.route.get();
-  // show nprogress bar if moving between pages, or otherwise changing url
-  if ((!args[2] || (args[2] && args[2].replace !== true)) && args[0] !== m.route.get()) NProgress.start();
   // update route
-  if (args[0] !== m.route.get()) updateRoute.apply(this, args);
+  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
   // reset scroll position
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
@@ -335,12 +383,12 @@ $(() => {
 
   interface RouteAttrs {
     scoped: string | boolean;
+    hideSidebar?: boolean;
     deferChain?: boolean;
   }
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
-      console.log('onmatch called, for:', path);
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -348,10 +396,8 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      const { scoped } = attrs;
+      const { scoped, hideSidebar } = attrs;
       let deferChain = attrs.deferChain;
-      console.log('render called, for:', path);
-      NProgress.done();
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -360,14 +406,13 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      return m(Layout, { scope, deferChain }, [ vnode ]);
+      return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });
 
@@ -379,7 +424,7 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false }),
+    '/':                         importRoute('views/pages/home', { scoped: false, hideSidebar: true }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
@@ -387,11 +432,10 @@ $(() => {
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
-    '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/notificationSettings':    redirectRoute(() => '/edgeware/notificationSettings'),
-    '/:scope/notificationSettings': importRoute('views/pages/subscriptions/notificationSettings', { scoped: true }),
-    '/chainEventSettings':    redirectRoute(() => '/edgeware/chainEventSettings'),
-    '/:scope/chainEventSettings': importRoute('views/pages/subscriptions/chainEventSettings', { scoped: true }),
+    '/notifications':            redirectRoute(() => '/edgeware/notifications'),
+    '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
+    '/notificationsList':        redirectRoute(() => '/edgeware/notificationsList'),
+    '/:scope/notificationsList': importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
@@ -403,8 +447,10 @@ $(() => {
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
+    '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
+    '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
+    '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
     '/:scope/council':           importRoute('views/pages/council/index', { scoped: true }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
@@ -413,6 +459,7 @@ $(() => {
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
+    '/:scope/communityStats':    importRoute('views/pages/stats', { scoped: true, deferChain: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
     '/:scope/stakingCalculator': importRoute('views/pages/staking_calculator/staking_calculator', { scoped: true }),
 
@@ -487,7 +534,7 @@ $(() => {
     }
   }
   if (m.route.param('loggedin')) {
-    notifySuccess('Logged in');
+    notifySuccess('Logged in!');
   } else if (m.route.param('loginerror')) {
     notifyError('Could not log in');
     console.error(m.route.param('loginerror'));
@@ -508,29 +555,15 @@ $(() => {
         app.user.discussionDrafts.refreshAll().then(() => m.redraw());
       }
 
-      let wsUrl = app.serverUrl();
-      if (app.serverUrl().indexOf('https')) {
-        wsUrl = wsUrl.replace('https', 'ws');
-      }
-
-      if (app.serverUrl().indexOf('http') !== -1) {
-        wsUrl = wsUrl.replace('http', 'ws');
-      }
-
-      if (app.serverUrl().indexOf('/api') !== -1) {
-        wsUrl = wsUrl.replace('/api', '');
-      }
-
-      if (app.serverUrl().indexOf('://') === -1) {
-        if (wsUrl.length === 0) {
-          wsUrl = 'ws://localhost:8080';
-        } else {
-          wsUrl = `ws://${app.serverUrl()}`;
-        }
-      }
-
       handleInviteLinkRedirect();
 
+      // If the user updates their email
+      handleUpdateEmailConfirmation();
+
+      // subscribe to notifications
+      const wsUrl = document.location.origin
+        .replace('http://', 'ws://')
+        .replace('https://', 'wss://');
       app.socket = new WebsocketController(wsUrl, jwt, null);
       if (app.loginState === LoginState.LoggedIn) {
         app.socket.addListener(

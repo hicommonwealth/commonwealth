@@ -3,7 +3,7 @@ import 'modals/login_modal.scss';
 import m from 'mithril';
 import Login from 'views/components/login';
 
-const LoginModal = {
+const LoginModal: m.Component<{}> = {
   view: (vnode) => {
     return m('.LoginModal', [
       m('.compact-modal-title', [

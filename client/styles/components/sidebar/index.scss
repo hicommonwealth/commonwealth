@@ -4,24 +4,40 @@
     // only content styles here. layout styles are in layout.scss
     background: $background-color-light;
     border-bottom: 1px solid $background-color-border;
-    .mobile-sidebar-left {
-        padding: 13px 0;
+
+    .mobile-sidebar-center {
         flex: 1;
-        > .community-label {
-            display: inline-block;
+        max-width: calc(100% - 100px);
+        &.logged-in {
+            max-width: calc(100% - 242px);
         }
+    }
+    .mobile-sidebar-left {
+        padding-left: 6px !important;
+    }
+    .mobile-sidebar-right {
+        padding-right: 13px !important;
+    }
+
+    // TODO: split this up so CSS classes aren't duplicated
+    .mobile-sidebar-left,
+    .mobile-sidebar-center,
+    .mobile-sidebar-right {
+        padding: 13px 0;
         .CommunitySelector .cui-button {
+            width: 100%;
             padding: 0 14px;
             background: #fff;
             overflow: hidden;
+            border: 1px solid #c5cdd1 !important;
+            border-radius: 4px !important;
             .cui-icon-menu {
                 display: none;
             }
         }
         > .MobileNewProposalButton,
         > .cui-button,
-        > .cui-overlay,
-        > .LoginSelector {
+        > .cui-overlay {
             display: inline-block;
         }
         > .LoginSelector > .cui-button > .cui-button-label > * {
@@ -31,10 +47,7 @@
         > .MobileNewProposalButton,
         > .community-label,
         > .LoginSelector {
-            margin-left: 7px;
-        }
-        > .cui-button:first-child {
-            margin-left: 12px;
+            margin-left: 9px;
         }
         > .cui-button .cui-button-label {
             display: inline-block;
@@ -42,6 +55,9 @@
             top: 2px;
         }
         @include sm-max {
+            .MobileNewProposalButton .cui-button {
+                padding: 0 12px;
+            }
             .cui-button.mobile-sidebar-trigger {
                 padding-left: 12px;
                 padding-right: 12px;
@@ -53,13 +69,87 @@
             .community-label .CommunityLabel .community-label-left {
                 padding-right: 8px;
             }
+            .LoginSelector {
+                // responsive logged-in state
+                .User {
+                    position: relative;
+                    top: -1px;
+                }
+                .user-avatar {
+                    margin-right: 0;
+                }
+                .user-display-name {
+                    display: none;
+                }
+                .LoginSelectorMenu .user-display-name {
+                    display: inline;
+                }
+                .cui-tag.role-tag {
+                    display: none;
+                }
+                .cui-button-label .cui-icon-user {
+                    margin-right: 0;
+                }
+                .hidden-sm {
+                    display: none !important;
+                }
+                // responsive logged-out state
+                .login-selector-user .cui-button {
+                    padding-left: 12px;
+                    padding-right: 12px;
+                }
+                .login-selector-user .cui-icon-user {
+                    margin-right: 0;
+                }
+                .login-selector-user .cui-button-label {
+                    display: none;
+                }
+            }
         }
+    }
+}
+
+.hidden-sidebar .SidebarQuickSwitcher {
+    display: none;
+}
+.SidebarQuickSwitcher {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 18px 14px;
+    width: $quick-switcher-width;
+    background: $background-color-border;
+    z-index: 3;
+    @include sm-max {
+        display: none;
+    }
+    .ChainIcon, .CommunityIcon {
+        cursor: pointer;
+        margin-bottom: 11px;
+        opacity: 0.3;
+        &:hover {
+            opacity: 0.33;
+        }
+    }
+    .quick-switcher-option.active {
+        .ChainIcon, .CommunityIcon {
+            opacity: 1;
+        }
+    }
+}
+
+.SidebarQuickSwitcherItemTooltip.cui-popover.cui-tooltip {
+    .cui-popover-content {
+        padding: 8px 10px;
     }
 }
 
 .Sidebar {
     z-index: 2;
     @include sm-max {
+        max-height: calc(100vh - 60px); // $mobile-sidebar-height
+        overflow-y: scroll;
         .SidebarHeader {
             display: none;
         }
@@ -101,10 +191,9 @@
             user-select: none;
             background: transparent;
             .cui-list-item {
-                // small adjustments to .cui-lg list
-                font-size: 18px;
+                font-size: 17px;
                 font-weight: 500;
-                padding: 3px 12px 4px;
+                padding: 3px 12px;
                 border-radius: 4px;
                 border: none;
                 white-space: nowrap;
@@ -120,9 +209,8 @@
                     margin-top: 8px;
                     white-space: initial;
                 }
-                .proposal-topic-icon {
-                    position: relative;
-                    top: -1px;
+                .cui-list-item-content-left {
+                    padding-right: 10px;
                 }
                 .cui-list-item-content-left .cui-icon svg {
                     stroke: $text-color-lighter;
@@ -171,8 +259,7 @@
         }
     }
 
-
-    .TopicsModule {
+    .OffchainNavigationModule {
         > .cui-list {
             .cui-list.more-topics-list {
                 border-top: 1px solid $background-color-light-hover;
@@ -184,12 +271,12 @@
         }
 
         // tag icons
-        .cui-list-item {
+        .topic-row.cui-list-item {
             @include proposal-topic-inline;
         }
-        .cui-list .cui-list-item-content-left {
-            padding-left: 4px !important;
-            padding-right: 12px !important;
+        .cui-list .topic-row.cui-list-item .cui-list-item-content-left {
+            padding-left: 3px !important;
+            padding-right: 8px !important;
         }
         .proposal-topic-icon {
             margin-right: 0;
@@ -198,19 +285,34 @@
     }
 }
 
-.cui-popover.sidebar-edit-topic .cui-menu,
-.cui-popover.sidebar-add-topic .cui-menu {
-    padding: 4px 0;
-}
+.MobileSidebarHeader,
+.Sidebar {
+    .ChainStatusModule {
+        position: absolute;
+        bottom: 14px;
+        left: 15px;
+        margin-bottom: 0 !important;
+        width: calc(100% - 34px);
+        max-width: calc(100% - 34px);
+        height: 72px;
+        @include sm-max {
+            position: relative;
+            bottom: initial;
+        }
 
-.cui-popover.sidebar-edit-topic .cui-menu,
-.cui-popover.sidebar-add-topic .cui-menu {
-    padding: 4px 0;
-}
-
-.cui-popover.sidebar-edit-topic .cui-menu,
-.cui-popover.sidebar-add-topic .cui-menu {
-    padding: 4px 0;
+        // background
+        background: $background-color-light-hover;
+        padding: 16px 18px;
+        border-radius: 4px;
+        line-height: 1.2;
+        font-size: 0.94rem;
+        .chain-url {
+            margin-bottom: 2px;
+        }
+        .chain-deferred {
+            color: #777;
+        }
+    }
 }
 
 .cui-popover.sidebar-edit-topic .cui-menu,

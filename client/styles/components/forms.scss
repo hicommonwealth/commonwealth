@@ -30,7 +30,6 @@
         top: 1px;
     }
 }
-.ButtonSelectorFormField,
 .MultipleButtonSelectorFormField {
     .form-group {
         margin-bottom: 19px;
@@ -38,12 +37,5 @@
     .form-field.buttons button {
         display: inline-block;
         margin: 3px;
-    }
-    .form-field.buttons button.active {
-        color: #fff;
-        background-color: #08c;
-        border-color: transparent;
-        outline: none;
-        box-shadow: none;
     }
 }

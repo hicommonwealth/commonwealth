@@ -1,7 +1,7 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import { IEventHandler, CWEvent } from '@commonwealth/chain-events';
+import { IEventHandler, CWEvent, IChainEventKind } from '@commonwealth/chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -10,6 +10,7 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _chain: string,
+    private readonly _excludedEvents: IChainEventKind[] = [],
   ) {
     super();
   }
@@ -19,6 +20,11 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent) {
     log.trace(`Received event: ${JSON.stringify(event, null, 2)}`);
+    if (this._excludedEvents.includes(event.data.kind)) {
+      log.trace('Skipping event!');
+      return;
+    }
+
     // locate event type and add event to database
     const dbEventType = await this._models.ChainEventType.findOne({ where: {
       chain: this._chain,

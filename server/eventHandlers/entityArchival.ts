@@ -72,14 +72,23 @@ export default class extends IEventHandler {
         // which requires marking them completed.
         completed = true;
       }
-      const dbEntity = await this._models.ChainEntity.create({
-        type: type.toString(), type_id, chain: this._chain, completed
+      const [ dbEntity, created ] = await this._models.ChainEntity.findOrCreate({
+        where: { type: type.toString(), type_id, chain: this._chain, completed },
+        default: { },
       });
-      log.trace(`Created db entity, ${type.toString()}: ${type_id}.`);
+      if (created) {
+        log.info(`Created db entity, ${type.toString()}: ${type_id}.`);
+      } else {
+        log.info(`Found duplicate db entity,  ${type.toString()}: ${type_id}.`);
+      }
 
-      dbEvent.entity_id = dbEntity.id;
-      await dbEvent.save();
-      await this._wssSend(dbEntity, dbEvent);
+      if (dbEvent.entity_id !== dbEntity.id) {
+        dbEvent.entity_id = dbEntity.id;
+        await dbEvent.save();
+        await this._wssSend(dbEntity, dbEvent);
+      } else {
+        log.info('Db Event is already linked to entity! Doing nothing.');
+      }
 
       // TODO: create thread?
       return dbEvent;
@@ -95,7 +104,7 @@ export default class extends IEventHandler {
         log.error(`no relevant db entity found for ${type}: ${type_id}`);
         return;
       }
-      log.trace(`Updated db entity, ${type}: ${type_id}.`);
+      log.info(`Updated db entity, ${type}: ${type_id}.`);
 
       // link ChainEvent to entity
       dbEvent.entity_id = dbEntity.id;
@@ -113,7 +122,7 @@ export default class extends IEventHandler {
 
     const entity = eventToEntity(event.data.kind);
     if (!entity) {
-      log.trace(`no archival action needed for event of kind ${event.data.kind.toString()}`);
+      log.info(`no archival action needed for event of kind ${event.data.kind.toString()}`);
       return dbEvent;
     }
     const [ entityKind, updateType ] = entity;

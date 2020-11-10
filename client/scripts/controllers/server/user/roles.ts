@@ -39,6 +39,9 @@ export default class extends Base {
       address_id: options.address.id,
       ...options,
     }).then((result) => {
+      if (result.status !== 'Success') {
+        throw new Error(`Got unsuccessful status: ${result.status}`);
+      }
       // handle state updates
       if (options.chain) {
         this.removeRole((r) => {
@@ -278,7 +281,6 @@ export default class extends Base {
     const roles = this.roles.filter((role) => addressinfo
       ? role.address_id === addressinfo.id
       : true);
-
     if (options.chain) {
       return roles.map((r) => r.chain_id).indexOf(options.chain) !== -1;
     } else if (options.community) {

@@ -44,7 +44,8 @@ const Login: m.Component<{}, {
             onclick: (e) => {
               e.preventDefault();
               e.stopPropagation();
-              const email = $(e.target).closest('.Login').find('[name="email"]').val().toString();
+              const email = $(e.target).closest('.Login').find('[name="email"]').val()
+                .toString();
               const path = m.route.get();
               if (!email) return;
               vnode.state.disabled = true;

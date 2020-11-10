@@ -16,6 +16,8 @@ import {
 } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
 
+import QuillFormattedText from 'views/components/quill_formatted_text';
+import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
 import User from 'views/components/widgets/user';
@@ -121,31 +123,6 @@ export const getSupportText = (proposal: AnyProposal) => {
   }
 };
 
-export const getProposalPieChart = (proposal) => typeof proposal.support === 'number'
-  ? m(ProposalPieChart, {
-    id: `CHART_${proposal.shortIdentifier}`,
-    getData: () => ({
-      chartValues: [ proposal.support, 1 - proposal.support ].reverse(),
-      chartLabels: [ 'Yes', 'No' ].reverse(),
-      chartColors: [ '#1db955', '#d0021b' ].reverse(),
-      formatter: (d, index) => [formatPercentShort(d)],
-    })
-  })
-  : m(ProposalPieChart, {
-    id: `CHART_${proposal.shortIdentifier}`,
-    getData: () => ({
-      chartValues: [
-        // add a small amount so the voted slice always shows up
-        proposal.support.inDollars / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
-        ((app.chain as Substrate).chain.totalbalance.inDollars - proposal.support.inDollars)
-            / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
-      ].reverse(),
-      chartLabels: [ 'Voted', 'Not yet voted' ].reverse(),
-      chartColors: [ '#0088cc', '#dddddd' ].reverse(),
-      formatter: (d, index) => [ `${Math.round((d - 0.004) * 10000000) / 100000}%` ],
-    })
-  });
-
 interface IPieChartAttrs {
   id?: string;
   getData: () => {
@@ -207,6 +184,31 @@ const ProposalPieChart: m.Component<IPieChartAttrs, IPieChartState> = {
   }
 };
 
+export const getProposalPieChart = (proposal) => typeof proposal.support === 'number'
+  ? m(ProposalPieChart, {
+    id: `CHART_${proposal.shortIdentifier}`,
+    getData: () => ({
+      chartValues: [ proposal.support, 1 - proposal.support ].reverse(),
+      chartLabels: [ 'Yes', 'No' ].reverse(),
+      chartColors: [ '#1db955', '#d0021b' ].reverse(),
+      formatter: (d, index) => [formatPercentShort(d)],
+    })
+  })
+  : m(ProposalPieChart, {
+    id: `CHART_${proposal.shortIdentifier}`,
+    getData: () => ({
+      chartValues: [
+        // add a small amount so the voted slice always shows up
+        proposal.support.inDollars / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
+        ((app.chain as Substrate).chain.totalbalance.inDollars - proposal.support.inDollars)
+            / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
+      ].reverse(),
+      chartLabels: [ 'Voted', 'Not yet voted' ].reverse(),
+      chartColors: [ '#0088cc', '#dddddd' ].reverse(),
+      formatter: (d, index) => [ `${Math.round((d - 0.004) * 10000000) / 100000}%` ],
+    })
+  });
+
 interface IRowAttrs {
   proposal: AnyProposal;
 }
@@ -216,8 +218,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
     const proposal = vnode.attrs.proposal;
     const { author, createdAt, slug, identifier, title } = proposal;
     const nComments = app.comments.nComments(proposal);
-    const authorComment = author ? app.comments.getByProposal(proposal).sort(byAscendingCreationDate)
-      .find((comment) => comment.author === author.address) : null;
+    const firstComment = app.comments.getByProposal(proposal).sort(byAscendingCreationDate)[0];
 
     // TODO XXX: Show requirement for referenda
     const hasRequirement = false;
@@ -266,9 +267,28 @@ const ProposalRow: m.Component<IRowAttrs> = {
           ])
           : null;
 
+    const rowComments = m('.proposal-row-comments', !firstComment ? [
+      'No comments yet'
+    ] : [
+      m(User, {
+        hideIdentityIcon: true,
+        user: new AddressInfo(null, firstComment.author, firstComment.authorChain, null)
+      }),
+      ':',
+      (() => {
+        try {
+          const doc = JSON.parse(firstComment.text);
+          if (!doc.ops) throw new Error();
+          return m(QuillFormattedText, { doc, collapse: true, hideFormatting: true });
+        } catch (e) {
+          return m(MarkdownFormattedText, { doc: firstComment.text, collapse: true, hideFormatting: true });
+        }
+      })(),
+    ]);
+
     const rowMetadata = [
       m(UserGallery, {
-        tooltip: true,
+        popover: true,
         avatarSize: 24,
         users: app.comments.uniqueCommenters(proposal)
       }),
@@ -289,13 +309,14 @@ const ProposalRow: m.Component<IRowAttrs> = {
         class: 'ProposalRow',
         contentLeft: {
           header: rowHeader,
-          subheader: rowSubheader,
+          subheader: m('.proposal-row-sub', [rowSubheader, rowComments]),
         },
         contentRight: rowMetadata,
         rightColSpacing: [4, 4, 4],
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
+          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
           m.route.set(proposalLink);
         },
       })
@@ -306,6 +327,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
+          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
           m.route.set(proposalLink);
         },
       }, [
@@ -330,7 +352,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
                   null
                 ),
                 hideAvatar: true,
-                tooltip: true,
+                popover: true,
               }),
             ]),
             m('.treasury-row-metadata .treasury-user-mobile', [
@@ -342,7 +364,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
                   null
                 ),
                 hideAvatar: true,
-                tooltip: true,
+                popover: true,
               }),
             ]),
           ])

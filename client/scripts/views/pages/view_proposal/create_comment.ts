@@ -124,10 +124,10 @@ const CreateComment: m.Component<{
       class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
     }, [
       m('.create-comment-avatar', [
-        m(User, { user: author, tooltip: true, avatarOnly: true, avatarSize: 36 }),
+        m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 36 }),
       ]),
       m('.create-comment-body', [
-        m(User, { user: author, tooltip: true, hideAvatar: true }),
+        m(User, { user: author, popover: true, hideAvatar: true }),
         (rootProposal instanceof OffchainThread && rootProposal.readOnly)
           ? m(Callout, {
             intent: 'primary',
@@ -140,7 +140,10 @@ const CreateComment: m.Component<{
                 vnode.state.quillEditorState = state;
               },
               editorNamespace: `${document.location.pathname}-commenting`,
-              onkeyboardSubmit: submitComment,
+              onkeyboardSubmit: () => {
+                submitComment();
+                m.redraw(); // ensure button is disabled
+              },
               tabindex: vnode.attrs.tabindex,
             }),
             m('.form-bottom', [
@@ -152,7 +155,7 @@ const CreateComment: m.Component<{
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
                   ? 'Uploading...'
-                  : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
+                  : parentType === CommentParent.Proposal ? 'Post comment' : 'Reply to comment'
               }),
               cancellable
                 && m(Button, {

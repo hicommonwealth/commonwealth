@@ -15,7 +15,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import PageError from 'views/pages/error';
 import {
-  EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkdotChainNotificationTypes
+  EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkadotChainNotificationTypes
 } from 'helpers/chain_notification_types';
 
 
@@ -166,12 +166,12 @@ const KusamaChainEvents: m.Component = {
 const PolkadotChainEvents: m.Component = {
   view: (vnode) => {
     return [
-      m(EventSubscriptionTypeRow, { title: 'Council events', notificationTypeArray: PolkdotChainNotificationTypes.Council, }),
-      m(EventSubscriptionTypeRow, { title: 'Democracy events', notificationTypeArray: PolkdotChainNotificationTypes.Democracy, }),
-      m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: PolkdotChainNotificationTypes.Preimage, }),
+      m(EventSubscriptionTypeRow, { title: 'Council events', notificationTypeArray: PolkadotChainNotificationTypes.Council, }),
+      m(EventSubscriptionTypeRow, { title: 'Democracy events', notificationTypeArray: PolkadotChainNotificationTypes.Democracy, }),
+      m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
       // m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: PolkdotChainNotificationTypes.Treasury, }),
-      m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: PolkdotChainNotificationTypes.Validator, }),
-      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: PolkdotChainNotificationTypes.Vote, }),
+      m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: PolkadotChainNotificationTypes.Validator, }),
+      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: PolkadotChainNotificationTypes.Vote, }),
     ];
   }
 };

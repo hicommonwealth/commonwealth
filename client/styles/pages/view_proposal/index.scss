@@ -1,6 +1,5 @@
 @import 'client/styles/shared';
 
-$discussion-inner-padding: 37px;
 $discussion-outer-padding: 60px;
 $discussion-separator-padding: 30px; // padding around horizontal rule between header and body
 $discussion-meta-padding: 12px; // padding between comment meta & comment content
@@ -67,6 +66,10 @@ $discussion-title-font-size: 1.45rem;
         }
         .proposal-top-left {
             flex: 1;
+            .cui-input {
+                width: 70%;
+                padding-bottom: 10px;
+            }
         }
         .proposal-content {
             display: flex;
@@ -78,7 +81,6 @@ $discussion-title-font-size: 1.45rem;
         .proposal-content-right {
             flex: 1;
             margin-left: $discussion-comment-padding;
-            margin-right: $discussion-outer-padding;
             @include xs-max {
                 margin-right: 10px;
             }
@@ -106,15 +108,30 @@ $discussion-title-font-size: 1.45rem;
             }
         }
         .ProposalHeaderExternalLink {
-            margin-top: 5px;
+            margin-top: 18px;
             font-weight: 500;
             a:link,
             a:visited {
+                display: block;
+                padding: 10px 15px;
+                border-radius: 6px;
+                background: $background-color-light;
                 color: $theme-base-color;
-                text-decoration: none;
+                text-decoration: none !important;
+            }
+            svg {
+                stroke: $theme-base-color;
+                position: relative;
+                top: -1px;
+                margin-left: 5px;
+                $size: 14px;
+                height: $size;
+                width: $size;
+                min-height: $size;
+                min-width: $size;
             }
             a:hover {
-                text-decoration: underline;
+                background: darken($background-color-light, 1%);
             }
         }
     }
@@ -201,7 +218,7 @@ $discussion-title-font-size: 1.45rem;
     .ProposalBodyCancelEdit,
     .ProposalBodySaveEdit {
         margin-right: 12px;
-        margin-top: 17px;
+        margin-top: 14px;
     }
     .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
         stroke: #999;
@@ -211,6 +228,11 @@ $discussion-title-font-size: 1.45rem;
     }
     .ProposalBodyReaction {
         display: inline-block;
+    }
+    .ProposalBodyText.proposal-body-placeholder {
+        &, .User .user-display-name {
+            color: #999;
+        }
     }
 
     .comments-error {

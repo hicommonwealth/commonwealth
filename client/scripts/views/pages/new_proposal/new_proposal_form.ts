@@ -3,12 +3,12 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
+import { Input, TextArea, Form, FormLabel, FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
-import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
+import { ITXModalData, ProposalModule, ChainBase, ChainClass, OffchainThreadKind } from 'models';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
@@ -22,14 +22,13 @@ import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 
 import {
-  TextInputFormField,
-  TextareaFormField,
   DropdownFormField,
   RadioSelectorFormField
 } from 'views/components/forms';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
+import ErrorPage from 'views/pages/error';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -45,6 +44,7 @@ const NewProposalForm = {
 
     if (!author) return m('div', 'Must be logged in');
     if (!callback) return m('div', 'Must have callback');
+    if (app.chain?.class === ChainClass.Plasm) return m('div', 'Unsupported network');
 
     let hasCouncilMotionChooser : boolean;
     let hasAction : boolean;
@@ -65,6 +65,7 @@ const NewProposalForm = {
     let hasMolochFields : boolean;
     // data loaded
     let dataLoaded : boolean = true;
+
     if (proposalTypeEnum === ProposalType.SubstrateDemocracyProposal) {
       hasAction = true;
       hasToggle = true;
@@ -126,11 +127,12 @@ const NewProposalForm = {
         app.threads.create(
           author.address,
           OffchainThreadKind.Forum,
+          app.activeChainId(),
+          app.activeCommunityId(),
+          vnode.state.form.title,
           vnode.state.form.topicName,
           vnode.state.form.topicId,
-          vnode.state.form.title,
           vnode.state.form.description,
-          vnode.state.form.categoryId,
         ).then(done)
           .then(() => { m.redraw(); })
           .catch((err) => { console.error(err); });
@@ -178,14 +180,17 @@ const NewProposalForm = {
         if (!vnode.state.threshold) throw new Error('Invalid threshold');
         const threshold = vnode.state.threshold;
         if (vnode.state.councilMotionType === 'createExternalProposal') {
-          args = [author, threshold, EdgewareFunctionPicker.getMethod()];
-          createFunc = ([a, t, m]) => (app.chain as Substrate).council.createExternalProposal(a, t, m);
+          args = [author, threshold, EdgewareFunctionPicker.getMethod(),
+            EdgewareFunctionPicker.getMethod().encodedLength];
+          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposal(a, t, m, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalMajority') {
-          args = [author, threshold, EdgewareFunctionPicker.getMethod()];
-          createFunc = ([a, t, m]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, m);
+          args = [author, threshold, EdgewareFunctionPicker.getMethod(),
+            EdgewareFunctionPicker.getMethod().encodedLength];
+          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, m, l);
         } else if (vnode.state.councilMotionType === 'createExternalProposalDefault') {
-          args = [author, threshold, EdgewareFunctionPicker.getMethod()];
-          createFunc = ([a, t, m]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, m);
+          args = [author, threshold, EdgewareFunctionPicker.getMethod(),
+            EdgewareFunctionPicker.getMethod().encodedLength];
+          createFunc = ([a, t, m, l]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, m, l);
         } else if (vnode.state.councilMotionType === 'createFastTrack') {
           args = [author, threshold, vnode.state.nextExternalProposalHash,
             vnode.state.votingPeriod, vnode.state.enactmentDelay];
@@ -279,15 +284,6 @@ const NewProposalForm = {
         .then(done);
     };
 
-    // construct-ui grid options
-    const span = {
-      xs: 12,
-      sm: 12,
-      md: 11,
-      lg: 10,
-      xl: 8,
-    };
-
     // default state options
     const motions = SubstrateCollectiveProposal.motions;
     if (!vnode.state.councilMotionType) {
@@ -302,9 +298,15 @@ const NewProposalForm = {
     const asCosmos = (app.chain as Cosmos);
 
     if (!dataLoaded) {
+      if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
+        return m(ErrorPage, {
+          message: 'Chain connection timed out.',
+          title: 'Proposals',
+        });
+      }
       return m(Spinner, {
         fill: true,
-        message: 'Proposal loading...',
+        message: 'Connecting to chain...',
         size: 'xl',
         style: 'visibility: visible; opacity: 1;'
       });
@@ -312,9 +314,9 @@ const NewProposalForm = {
 
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
 
-    return m('.NewProposalForm', [
+    return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
-        m(Col, { span }, [
+        m(Col, [
           vnode.state.error && m('.error', vnode.state.error.message),
           hasCouncilMotionChooser && [
             m(DropdownFormField, {
@@ -323,7 +325,6 @@ const NewProposalForm = {
                 (m_) => ({ name: 'councilMotionType', value: m_.name, label: m_.label })
               ),
               callback: (result) => {
-                if (vnode.state.councilMotionType === result) return;
                 vnode.state.councilMotionType = result;
                 vnode.state.councilMotionDescription = motions.find((m_) => m_.name === result).description;
                 m.redraw();
@@ -337,7 +338,8 @@ const NewProposalForm = {
           hasTopics
             && m(TopicSelector, {
               topics: app.topics.getByCommunity(app.activeId()),
-              featuredTopics: app.topics.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+              featuredTopics: app.topics.getByCommunity(app.activeId())
+                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
               updateFormData: (topicName: string, topicId?: number) => {
                 vnode.state.form.topicName = topicName;
                 vnode.state.form.topicId = topicId;
@@ -345,60 +347,68 @@ const NewProposalForm = {
               tabindex: 3,
             }),
           hasTitleAndDescription && [
-            m(TextInputFormField, {
-              options: {
-                name: 'title',
-                placeholder: 'Enter a title',
-                autofocus: true,
-              },
-              callback: (result) => {
-                if (vnode.state.form.title === result) return;
-                vnode.state.form.title = result;
-                m.redraw();
-              },
-            }),
-            m(TextareaFormField, {
-              options: {
-                name: 'description',
-                placeholder: 'Enter a description',
-              },
-              callback: (result) => {
-                if (vnode.state.form.description === result) return;
-                vnode.state.form.description = result;
-                m.redraw();
-              },
-            }),
+            m(FormGroup, [
+              m(FormLabel, 'Title'),
+              m(Input, {
+                options: {
+                  name: 'title',
+                  placeholder: 'Enter a title',
+                  autofocus: true,
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.form.title = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Description'),
+              m(TextArea, {
+                options: {
+                  name: 'description',
+                  placeholder: 'Enter a description',
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.form.description === result) return;
+                  vnode.state.form.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
           ],
           hasBeneficiaryAndAmount && [
-            m(TextInputFormField, {
-              title: 'Beneficiary',
-              options: {
+            m(FormGroup, [
+              m(FormLabel, 'Beneficiary'),
+              m(Input, {
                 name: 'beneficiary',
                 placeholder: 'Beneficiary of treasury proposal',
+                defaultValue: author.address,
                 oncreate: (vvnode) => {
-                  $(vvnode.dom).val(author.address);
                   vnode.state.form.beneficiary = author.address;
-                }
-              },
-              callback: (result) => {
-                if (vnode.state.form.beneficiary === result) return;
-                vnode.state.form.beneficiary = result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Amount (EDG)',
-              options: {
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.form.beneficiary = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, `Amount (${app.chain.chain.denom})`),
+              m(Input, {
                 name: 'amount',
                 autofocus: true,
                 placeholder: 'Amount of treasury proposal',
-              },
-              callback: (result) => {
-                if (vnode.state.form.amount === app.chain.chain.coins(parseFloat(result), true)) return;
-                vnode.state.form.amount = app.chain.chain.coins(parseFloat(result), true);
-                m.redraw();
-              },
-            }),
+                autocomplete: 'off',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.form.amount = app.chain.chain.coins(parseFloat(result), true);
+                  m.redraw();
+                },
+              })
+            ]),
             m('p', [
               'Bond: ',
               app.chain.chain.coins(
@@ -436,50 +446,51 @@ const NewProposalForm = {
             }),
           ],
           hasDepositChooser && [
-            m(TextInputFormField, {
-              title: `Deposit (${app.chain.base === ChainBase.Substrate
+            m(FormGroup, [
+              m(FormLabel, `Deposit (${app.chain.base === ChainBase.Substrate
                 ? app.chain.currency
-                : (app.chain as Cosmos).governance.minDeposit.denom})`,
-              options: {
+                : (app.chain as Cosmos).governance.minDeposit.denom})`),
+              m(Input, {
                 name: 'deposit',
                 placeholder: `Min: ${app.chain.base === ChainBase.Substrate
                   ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
                   : +(app.chain as Cosmos).governance.minDeposit}`,
-                oncreate: (vnode_) => $(vnode_.dom).val(app.chain.base === ChainBase.Substrate
+                oncreate: (vvnode) => $(vvnode.dom).val(app.chain.base === ChainBase.Substrate
                   ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
                   : +(app.chain as Cosmos).governance.minDeposit),
-              },
-              callback: (result) => {
-                vnode.state.deposit = parseFloat(result);
-                m.redraw();
-              },
-            }),
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.deposit = parseFloat(result);
+                  m.redraw();
+                },
+              })
+            ]),
           ],
           hasVotingPeriodAndDelaySelector && [
-            m(TextInputFormField, {
-              title: 'Voting Period',
-              options: {
+            m(FormGroup, [
+              m(FormLabel, 'Voting Period'),
+              m(Input, {
                 name: 'voting_period',
                 placeholder: 'Blocks (minimum enforced)',
-              },
-              callback: (result) => {
-                if (vnode.state.votingPeriod === +result) return;
-                vnode.state.votingPeriod = +result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Enactment Delay',
-              options: {
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.votingPeriod = +result;
+                  m.redraw();
+                },
+              })
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Enactment Delay'),
+              m(Input, {
                 name: 'enactment_delay',
                 placeholder: 'Blocks (minimum enforced)',
-              },
-              callback: (result) => {
-                if (vnode.state.enactmentDelay === +result) return;
-                vnode.state.enactmentDelay = +result;
-                m.redraw();
-              },
-            }),
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.enactmentDelay = +result;
+                  m.redraw();
+                },
+              })
+            ]),
           ],
           hasReferendumSelector
             && m(DropdownFormField, {
@@ -488,7 +499,6 @@ const NewProposalForm = {
                 (r) => ({ name: 'referendum', value: r.identifier, label: `${r.shortIdentifier}: ${r.title}` })
               ),
               callback: (result) => {
-                if (vnode.state.referendumId === result) return;
                 vnode.state.referendumId = result;
                 m.redraw();
               },
@@ -502,7 +512,6 @@ const NewProposalForm = {
                 label: `${(app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(0, 8)}...`,
               }] : [],
               callback: (result) => {
-                if (vnode.state.nextExternalProposalHash === result) return;
                 vnode.state.nextExternalProposalHash = result;
                 m.redraw();
               },
@@ -513,94 +522,90 @@ const NewProposalForm = {
               (r) => ({ name: 'external_proposal', value: r.identifier, label: r.shortIdentifier })
             ),
             callback: (result) => {
-              if (vnode.state.treasuryProposalIndex === result) return;
               vnode.state.treasuryProposalIndex = result;
               m.redraw();
             },
           }),
           hasThreshold && [
-            m(TextInputFormField, {
-              title: 'Threshold',
-              options: {
+            m(FormGroup, [
+              m(FormLabel, 'Threshold'),
+              m(Input, {
                 name: 'threshold',
                 placeholder: 'How many members must vote yes to execute?',
-              },
-              callback: (result) => {
-                if (vnode.state.threshold === +result) return;
-                vnode.state.threshold = +result;
-                m.redraw();
-              },
-            }),
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.threshold = +result;
+                  m.redraw();
+                },
+              })
+            ]),
           ],
           hasMolochFields && [
-            m(TextInputFormField, {
-              title: 'Applicant Address',
-              subtitle: 'The person who will get Moloch shares.',
-              options: {
+            m(FormGroup, [
+              m(FormLabel, 'Applicant Address (will receive Moloch shares)'),
+              m(Input, {
                 name: 'applicant_address',
                 placeholder: 'Applicant Address',
-              },
-              callback: (result) => {
-                if (vnode.state.applicantAddress === result) return;
-                vnode.state.applicantAddress = result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Token Tribute',
-              subtitle: 'The amount the applicant is offering Moloch, must pre-approve tokens.',
-              options: {
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.applicantAddress = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Token Tribute (offered to Moloch, must be pre-approved for transfer)'),
+              m(Input, {
                 name: 'token_tribute',
                 placeholder: 'Tribute in tokens',
-              },
-              callback: (result) => {
-                if (vnode.state.tokenTribute === +result) return;
-                vnode.state.tokenTribute = +result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Shares Requested',
-              subtitle: 'The number of shares that the applicant will get in return for the tribute',
-              options: {
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.tokenTribute = +result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Shares Requested'),
+              m(Input, {
                 name: 'shares_requested',
                 placeholder: 'Moloch shares requested',
-              },
-              callback: (result) => {
-                if (vnode.state.sharesRequested === +result) return;
-                vnode.state.sharesRequested = +result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Title',
-              options: {
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.sharesRequested = +result;
+                  m.redraw();
+                },
+              })
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Title'),
+              m(Input, {
                 name: 'title',
                 placeholder: 'Proposal Title',
-              },
-              callback: (result) => {
-                if (vnode.state.title === result) return;
-                vnode.state.title = result;
-                m.redraw();
-              },
-            }),
-            m(TextInputFormField, {
-              title: 'Description',
-              options: {
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.title = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Description'),
+              m(Input, {
                 name: 'description',
                 placeholder: 'Proposal Description',
-              },
-              callback: (result) => {
-                if (vnode.state.description === result) return;
-                vnode.state.description = result;
-                m.redraw();
-              },
-            }),
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
           ],
           m(FormGroup, [
             m(Button, {
-              class: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
-                && !(author as SubstrateAccount).isCouncillor) ? 'disabled' : '',
+              disabled: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
+                && !(author as SubstrateAccount).isCouncillor),
               intent: 'primary',
               label: proposalTypeEnum === ProposalType.OffchainThread
                 ? 'Create thread'

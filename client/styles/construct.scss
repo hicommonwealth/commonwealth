@@ -99,9 +99,9 @@ $cui-base-bg-color-active:        darken(#EAEAEC, 6.5%);
 $cui-base-gradient:               linear-gradient(180deg, $cui-base-bg-color 10.5%, darken($cui-base-bg-color, 1%) 100%) !default;
 $cui-base-gradient-hover:         linear-gradient(180deg, $cui-base-bg-color 10.5%, darken($cui-base-bg-color, 2.5%) 100%) !default;
 $cui-base-gradient-active:        linear-gradient(180deg, $cui-base-bg-color 10.5%, darken($cui-base-bg-color, 3.5%) 100%) !default;
-$cui-base-border-color:           #EAEAEC;
-$cui-base-border-color-hover:     darken(#EAEAEC, 3.5%);
-$cui-base-border-color-active:    darken(#EAEAEC, 4.5%);
+$cui-base-border-color:           #c5cdd1;
+$cui-base-border-color-hover:     darken($cui-base-border-color, 3.5%);
+$cui-base-border-color-active:    darken($cui-base-border-color, 4.5%);
 $cui-base-box-shadow:             none;
 $cui-base-box-shadow-active:      inset 0px 4px 5px shade($blue-grey50, 12.5%);
 
@@ -206,6 +206,14 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
             background: #EAEAEC;
             color: $cui-base-text-color;
         }
+    }
+}
+
+// set text color on active buttons
+.cui-button.cui-primary,
+.cui-button-group.cui-primary .cui-button {
+    a {
+        color: #fff;
     }
 }
 

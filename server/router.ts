@@ -34,8 +34,8 @@ import getValidatorGroup from './routes/getValidatorGroup';
 import getChainStake from './routes/getChainStake';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
+import communityStats from './routes/communityStats';
 import viewCount from './routes/viewCount';
-import updateUserEmailInterval from './routes/updateUserEmailInterval';
 import updateEmail from './routes/updateEmail';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
@@ -48,6 +48,7 @@ import disableImmediateEmails from './routes/subscription/disableImmediateEmails
 import viewNotifications from './routes/viewNotifications';
 import markNotificationsRead from './routes/markNotificationsRead';
 import clearReadNotifications from './routes/clearReadNotifications';
+import clearNotifications from './routes/clearNotifications';
 import bulkMembers from './routes/bulkMembers';
 import bulkAddresses from './routes/bulkAddresses';
 import createInvite from './routes/createInvite';
@@ -77,6 +78,7 @@ import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
 import bulkThreads from './routes/bulkThreads';
+import getThread from './routes/getThread';
 import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
@@ -97,10 +99,12 @@ import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import setPrivacy from './routes/setPrivacy';
 import pinThread from './routes/pinThread';
+import bulkOffchain from './routes/bulkOffchain';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
 import createWebhook from './routes/webhooks/createWebhook';
+import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
@@ -146,6 +150,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/deleteCommunity', passport.authenticate('jwt', { session: false }), deleteCommunity.bind(this, models));
   // TODO: Change to PUT /community
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));
+  router.get('/communityStats', passport.authenticate('jwt', { session: false }), communityStats.bind(this, models));
 
   // offchain threads
   // TODO: Change to POST /thread
@@ -156,6 +161,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
+  router.get('/getThread', getThread.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
 
@@ -168,6 +174,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.delete('/drafts', passport.authenticate('jwt', { session: false }), deleteDraft.bind(this, models));
   router.patch('/drafts', passport.authenticate('jwt', { session: false }), editDraft.bind(this, models));
 
+  router.get('/bulkOffchain', bulkOffchain.bind(this, models));
+
   // offchain comments
   // TODO: Change to POST /comment
   router.post('/createComment', passport.authenticate('jwt', { session: false }), createComment.bind(this, models));
@@ -177,7 +185,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/deleteComment', passport.authenticate('jwt', { session: false }), deleteComment.bind(this, models));
   // TODO: Change to GET /comments
   router.get('/viewComments', viewComments.bind(this, models));
-  // TODO: Change to GET /comments
   router.get('/bulkComments', bulkComments.bind(this, models));
 
   // offchain topics
@@ -235,8 +242,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/upgradeMember', passport.authenticate('jwt', { session: false }), upgradeMember.bind(this, models));
 
   // user model update
-  // TODO: Change to PUT /userEmailInterval
-  router.post('/updateUserEmailInterval', passport.authenticate('jwt', { session: false }), updateUserEmailInterval.bind(this, models));
   // TODO: Change to PUT /email
   router.post('/updateEmail', passport.authenticate('jwt', { session: false }), updateEmail.bind(this, models));
 
@@ -247,6 +252,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // third-party webhooks
   // TODO: Change to POST /webhook
   router.post('/createWebhook', passport.authenticate('jwt', { session: false }), createWebhook.bind(this, models));
+  router.post('/updateWebhook', passport.authenticate('jwt', { session: false }), updateWebhook.bind(this, models));
   // TODO: Change to DELETE /webhook
   router.post('/deleteWebhook', passport.authenticate('jwt', { session: false }), deleteWebhook.bind(this, models));
   // TODO: Change to GET /webhooks
@@ -302,6 +308,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to DELETE /notificationsRead
   router.post('/clearReadNotifications', passport.authenticate('jwt', { session: false }),
     clearReadNotifications.bind(this, models));
+  router.post('/clearNotifications', passport.authenticate('jwt', { session: false }),
+    clearNotifications.bind(this, models));
   // TODO: Change to PUT /immediateEmails
   router.post('/enableImmediateEmails', passport.authenticate('jwt', { session: false }),
     enableImmediateEmails.bind(this, models));

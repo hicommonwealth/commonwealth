@@ -4,9 +4,9 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export const redirectWithLoginSuccess = (res, email, path?, newAcct = false) => {
+export const redirectWithLoginSuccess = (res, email, path?, confirmation?, newAcct = false) => {
   // Returns new if we are creating a new account
-  const url = SERVER_URL + `/?loggedin=true` + `&email=${email}` + `&new=${newAcct}` + (path ? `&path=${encodeURIComponent(path)}` : '');
+  const url = `${SERVER_URL}/?loggedin=true&email=${email}&new=${newAcct}${path ? `&path=${encodeURIComponent(path)}` : ''}${confirmation ? '&confirmation=success' : ''}`;
   return res.redirect(url);
 };
 
@@ -24,6 +24,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
 
   const token = req.query.token;
   const email = req.query.email;
+  const confirmation = req.query.confirmation;
   if (!token) {
     return redirectWithLoginError(res, 'Missing token');
   }
@@ -65,7 +66,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
         existingUser.emailVerified = true;
         await existingUser.save();
       }
-      return redirectWithLoginSuccess(res, email, tokenObj.redirect_path);
+      return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation);
     });
   } else if (previousUser && !previousUser.email) {
     // If the user is an partly-logged-in state, but the email is new, just set that user's email.
@@ -74,7 +75,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
     await previousUser.save();
     req.login(previousUser, (err) => {
       if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
-      return redirectWithLoginSuccess(res, email, tokenObj.redirect_path);
+      return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation);
     });
   } else {
     // If the user isn't in a partly-logged-in state, create a new user
@@ -93,7 +94,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
 
     req.login(newUser, (err) => {
       if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
-      return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, true);
+      return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation, true);
     });
   }
 };

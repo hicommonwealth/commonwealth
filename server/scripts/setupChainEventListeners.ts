@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
-  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents
+  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
 import { Mainnet } from '@edgeware/node-types';
 
@@ -75,7 +75,12 @@ const setupChainEventListeners = async (
 
   log.info('Setting up event listeners...');
   const subscribers = await Promise.all(nodes.map(async (node) => {
-    const storageHandler = new EventStorageHandler(models, node.chain);
+    const excludedEvents = [
+      SubstrateTypes.EventKind.Reward,
+      SubstrateTypes.EventKind.TreasuryRewardMinting,
+      SubstrateTypes.EventKind.TreasuryRewardMintingV2,
+    ];
+    const storageHandler = new EventStorageHandler(models, node.chain, excludedEvents);
     const notificationHandler = new EventNotificationHandler(models, wss);
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
     const newSessionHandler = new NewSessionHandler(models);
@@ -98,15 +103,14 @@ const setupChainEventListeners = async (
       heartbeatHandler
     ];
     let subscriber: IEventSubscriber<any, any>;
-    if (SubstrateTypes.EventChains.includes(node.chain)) {
+    if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
       // only handle identities on substrate chains
       handlers.push(identityHandler);
 
       const nodeUrl = constructSubstrateUrl(node.url);
       const api = await SubstrateEvents.createApi(
         nodeUrl,
-        node.chain.includes('edgeware') ? Mainnet.types : {},
-        node.chain.includes('edgeware') ? Mainnet.typesAlias : {},
+        node.chain.includes('edgeware') ? Mainnet : {},
       );
       subscriber = await SubstrateEvents.subscribeEvents({
         chain: node.chain,
@@ -115,7 +119,7 @@ const setupChainEventListeners = async (
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
       });
-    } else if (MolochTypes.EventChains.includes(node.chain)) {
+    } else if (chainSupportedBy(node.chain, MolochTypes.EventChains)) {
       const contractVersion = 1;
       const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
       subscriber = await MolochEvents.subscribeEvents({

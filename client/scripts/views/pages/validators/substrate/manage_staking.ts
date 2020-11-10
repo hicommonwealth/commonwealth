@@ -65,7 +65,7 @@ const ManageStakingModal = makeDynamicComponent<{ account }, IManageStakingModal
         m('h3', [
           'Manage Staking for ',
           m(User, { user: vnode.attrs.account }),
-          `(${formatAddressShort(vnode.attrs.account.address)})`,
+          `(${formatAddressShort(vnode.attrs.account.address, vnode.attrs.account.chain)})`,
         ]),
       ]),
       m('.compact-modal-body', (!exposures || !validators) ? [

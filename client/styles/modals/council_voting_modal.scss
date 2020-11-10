@@ -8,19 +8,11 @@
         }
         .MultipleButtonSelectorFormField button {
             width: 100%;
-        }
-        .MultipleButtonSelectorFormField a.user-display-name {
-            color: #111;
-        }
-        .MultipleButtonSelectorFormField .active a.user-display-name {
-            color: #fff;
+            margin: 3px 0 !important;
         }
     }
     input[type="text"].phragmen-vote-amount {
         margin-top: 24px;
-    }
-    .retract-vote {
-        margin-left: 10px;
     }
     .no-candidates {
         margin: 20px 0;

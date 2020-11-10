@@ -20,7 +20,7 @@ export const Errors = {
 const createThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { topic_name, topic_id, title, body, kind, url, privacy, readOnly } = req.body;
+  const { topic_name, topic_id, title, body, kind, url, readOnly } = req.body;
 
   const mentions = typeof req.body['mentions[]'] === 'string'
     ? [req.body['mentions[]']]
@@ -73,7 +73,6 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     version_history: versionHistory,
     kind,
     url,
-    private: privacy,
     read_only: readOnly,
   } : {
     chain: chain.id,
@@ -83,7 +82,6 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     version_history: versionHistory,
     kind,
     url,
-    private: privacy || false,
     read_only: readOnly || false,
   };
 
@@ -105,7 +103,9 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       return next(err);
     }
   } else {
-    return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
+    if ((community || chain).topics.length > 0) {
+      return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
+    }
   }
 
   let thread;
@@ -150,7 +150,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     return next(err);
   }
 
-  // auto-subscribe thread creator to replies & reactions
+  // auto-subscribe thread creator to comments & reactions
   try {
     await models.Subscription.create({
       subscriber_id: req.user.id,
@@ -173,7 +173,28 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   } catch (err) {
     return next(new Error(err));
   }
+  // auto-subscribe NewThread subscribers to NewComment as well
+  // findOrCreate because redundant creation if author is also subscribed to NewThreads
   const location = finalThread.community || finalThread.chain;
+  const subscribers = await models.Subscription.findAll({
+    where: {
+      category_id: NotificationCategories.NewThread,
+      object_id: location,
+    }
+  });
+  await Promise.all(subscribers.map((s) => {
+    return models.Subscription.findOrCreate({
+      where: {
+        subscriber_id: s.subscriber_id,
+        category_id: NotificationCategories.NewComment,
+        object_id: `discussion_${finalThread.id}`,
+        offchain_thread_id: finalThread.id,
+        community_id: finalThread.community || null,
+        chain_id: finalThread.chain || null,
+        is_active: true,
+      },
+    });
+  }));
   // dispatch notifications to subscribers of the given chain/community
   await models.Subscription.emitNotifications(
     models,
@@ -184,6 +205,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       root_id: Number(finalThread.id),
       root_type: ProposalType.OffchainThread,
       root_title: finalThread.title,
+      comment_text: finalThread.body,
       chain_id: finalThread.chain,
       community_id: finalThread.community,
       author_address: finalThread.Address.address,
@@ -191,11 +213,13 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     },
     {
       user: finalThread.Address.address,
+      author_chain: finalThread.Address.chain,
       url: getProposalUrl('discussion', finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,
       chain: finalThread.chain,
       community: finalThread.community,
+      body: finalThread.body,
     },
     req.wss,
     [ finalThread.Address.address ],
@@ -247,10 +271,20 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
         root_id: Number(finalThread.id),
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
+        comment_text: finalThread.body,
         chain_id: finalThread.chain,
         community_id: finalThread.community,
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.chain,
+      },
+      {
+        user: finalThread.Address.address,
+        url: getProposalUrl('discussion', finalThread),
+        title: req.body.title,
+        bodyUrl: req.body.url,
+        chain: finalThread.chain,
+        community: finalThread.community,
+        body: finalThread.body,
       },
       req.wss,
       [ finalThread.Address.address ],

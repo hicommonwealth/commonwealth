@@ -1,53 +1,53 @@
 import 'layout.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
-import { EmptyState, Icons } from 'construct-ui';
 
 import { initChain, initCommunity, deinitChainOrCommunity, selectNode } from 'app';
 import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
-import PageNotFound from 'views/pages/404';
-import Sidebar from 'views/components/sidebar';
+
+import Sublayout from 'views/sublayout';
 import { AppModals } from 'views/modal';
 import AppToasts from 'views/toast';
-import { featherIcon } from 'helpers';
+import PageNotFound from 'views/pages/404';
 
 const CHAIN_LOADING_TIMEOUT = 3000;
 
-export const LoadingLayout: m.Component<{}> = {
+export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
   view: (vnode) => {
-    return m('.Layout.LoadingLayout.mithril-app', [
-      m(Sidebar),
-      m('.layout-container', [
-        m('.LoadingLayout'),
-      ]),
+    const { hideSidebar } = vnode.attrs;
+    return m('.Layout.LoadingLayout.mithril-app', {
+      class: hideSidebar ? 'hidden-sidebar' : ''
+    }, [
+      hideSidebar && m('.home-gradient'),
+      m(Sublayout, { loadingLayout: true }),
       m(AppModals),
       m(AppToasts),
     ]);
   }
 };
 
-export const Layout: m.Component<{ scope: string, deferChain?: boolean }, { loadingScope, deferred }> = {
+export const Layout: m.Component<{
+  scope: string,
+  hideSidebar?: boolean,
+  deferChain?: boolean,
+}, {
+  loadingScope,
+  deferred
+}> = {
   view: (vnode) => {
-    const { scope, deferChain } = vnode.attrs;
+    const { scope, deferChain, hideSidebar } = vnode.attrs;
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
     const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
     if (app.loadingError) {
-      return m('.Layout.mithril-app', [
-        m(Sidebar),
-        m('.layout-container', [
-          m(EmptyState, {
-            fill: true,
-            icon: Icons.X,
-            content: [
-              m('p', `Application error: ${app.loadingError}`),
-              m('p', 'Please try again at another time'),
-            ],
-            style: 'color: #546e7b;'
-          }),
-        ]),
+      return m('.Layout.mithril-app', {
+        class: hideSidebar ? 'hidden-sidebar' : ''
+      }, [
+        hideSidebar && m('.home-gradient'),
+        m(Sublayout, { errorLayout: [
+          m('p', `Application error: ${app.loadingError}`),
+          m('p', 'Please try again at another time'),
+        ] }),
         m(AppModals),
         m(AppToasts),
       ]);
@@ -57,11 +57,11 @@ export const Layout: m.Component<{ scope: string, deferChain?: boolean }, { load
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
-      return m('.Layout.mithril-app', [
-        m(Sidebar),
-        m('.layout-container', [
-          m(PageNotFound)
-        ]),
+      return m('.Layout.mithril-app', {
+        class: hideSidebar ? 'hidden-sidebar' : ''
+      }, [
+        hideSidebar && m('.home-gradient'),
+        m(PageNotFound),
         m(AppModals),
         m(AppToasts),
       ]);
@@ -95,11 +95,11 @@ export const Layout: m.Component<{ scope: string, deferChain?: boolean }, { load
       return m(LoadingLayout);
     }
 
-    return m('.Layout.mithril-app', [
-      m(Sidebar),
-      m('.layout-container', [
-        vnode.children
-      ]),
+    return m('.Layout.mithril-app', {
+      class: hideSidebar ? 'hidden-sidebar' : ''
+    }, [
+      hideSidebar && m('.home-gradient'),
+      vnode.children,
       m(AppModals),
       m(AppToasts),
     ]);

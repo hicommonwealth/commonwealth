@@ -2,7 +2,7 @@
 
 .Sublayout {
     display: block;
-    padding: 0 32px;
+    padding: 0 48px;
     @include sm-max {
         padding: 0 26px;
     }
@@ -23,7 +23,6 @@
         &.sublayout-grid-col-wide {
         }
     }
-
     .sublayout-header {
         display: flex;
         @include sm-max {
@@ -31,6 +30,9 @@
         }
         margin-top: 28px;
         margin-bottom: 8px;
+        &.no-title {
+            // margin-bottom: -60px;
+        }
         .sublayout-header-left {
             flex: 3;
             h4.sublayout-header-heading {

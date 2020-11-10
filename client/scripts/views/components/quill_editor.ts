@@ -10,6 +10,7 @@ import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import QuillMention from 'quill-mention';
 
 import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PreviewModal from 'views/modals/preview_modal';
 import { detectURL } from 'views/pages/threads/index';
@@ -447,19 +448,28 @@ const instantiateEditor = (
     },
     // Don't boldface, italicize, or underline text when hotkeys are pressed in Markdown mode
     'bold': {
-      key: 'B',
+      key: 'b',
       shortKey: true,
-      handler: (range, context) => !isMarkdownMode()
+      handler: (range, context) => {
+        if (!isMarkdownMode()) quill.format('bold', !context.format.bold, Quill.sources.USER);
+        return false;
+      }
     },
     'italic': {
-      key: 'I',
+      key: 'i',
       shortKey: true,
-      handler: (range, context) => !isMarkdownMode()
+      handler: (range, context) => {
+        if (!isMarkdownMode()) quill.format('italic', !context.format.italic, Quill.sources.USER);
+        return false;
+      }
     },
     'underline': {
-      key: 'U',
+      key: 'u',
       shortKey: true,
-      handler: (range, context) => !isMarkdownMode()
+      handler: (range, context) => {
+        if (!isMarkdownMode()) quill.format('underline', !context.format.underline, Quill.sources.USER);
+        return false;
+      }
     }
   };
 
@@ -531,12 +541,20 @@ const instantiateEditor = (
 
   const imageHandler = async (imageDataUrl, type) => {
     if (!type) type = 'image/png';
+
+    // HACK: remove base64 format image, since an uploaded one will be inserted
+    quill.deleteText(quill.getSelection().index - 1, 1);
+
     const file = dataURLtoFile(imageDataUrl, type);
-    const response = await uploadImg(file);
-    if (typeof response === 'string' && detectURL(response)) {
-      const index = (quill.getSelection() || {}).index || quill.getLength();
-      if (index) quill.insertEmbed(index, 'image', response, 'user');
-    }
+    uploadImg(file).then((response) => {
+      if (typeof response === 'string' && detectURL(response)) {
+        const index = (quill.getSelection() || {}).index || quill.getLength();
+        if (index) quill.insertEmbed(index, 'image', response, 'user');
+      }
+    }).catch((err) => {
+      notifyError('Failed to upload image');
+      console.log(err);
+    });
   };
 
   // const searchRoles = async () => {
@@ -561,7 +579,7 @@ const instantiateEditor = (
     modules: {
       toolbar: hasFormats ? ([[{ header: 1 }, { header: 2 }]] as any).concat([
         ['bold', 'italic', 'strike', 'code-block'],
-        [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }, 'blockquote', 'link', 'image', 'preview'],
+        [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }, 'blockquote', 'link', 'preview'],
       ]) : false,
       imageDropAndPaste: {
         handler: imageHandler
@@ -770,7 +788,6 @@ interface IQuillEditorAttrs {
   theme?: string;
   onkeyboardSubmit?;
   editorNamespace: string;
-  onkeyup?;
 }
 
 interface IQuillEditorState {
@@ -797,14 +814,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     }
   },
   onremove: (vnode) => {
-    const { editor, markdownMode } = vnode.state;
-    const { editorNamespace } = vnode.attrs;
-    const body = markdownMode
-      ? editor?.getText()
-      : JSON.stringify(editor?.getContents());
-    if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
-      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
-    }
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
     }
@@ -816,7 +825,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
-
     if (!contentsDoc
       && !vnode.state.markdownMode
       && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {

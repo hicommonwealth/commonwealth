@@ -1,3 +1,4 @@
+export { default as AbridgedThread } from './AbridgedThread';
 export { default as Account } from './Account';
 export { default as AddressInfo } from './AddressInfo';
 export { default as ChainInfo } from './ChainInfo';
@@ -28,6 +29,7 @@ export { default as ChainEventType } from './ChainEventType';
 export { default as ChainEvent } from './ChainEvent';
 export { default as ChainEntity } from './ChainEntity';
 export { default as StarredCommunity } from './StarredCommunity';
+export { default as Webhook } from './Webhook';
 
 export { DepositVote, BinaryVote } from './votes';
 

@@ -94,10 +94,14 @@ export default class {
   public setJWT(JWT: string): void { this._setJWT(JWT); }
 
   public setRoles(roles = []): void {
+    const roleIds = this.roles.map((r) => r.id);
     roles.forEach((role) => {
-      role.address = role.Address.address;
-      delete role.Address;
-      this._roles.push(role);
+      if (!roleIds.includes(role.id)) {
+        role.address = role.Address.address;
+        role.address_chain = role.Address.chain;
+        delete role.Address;
+        this._roles.push(role);
+      }
     });
   }
   public addRole(role: RoleInfo): void {
@@ -153,11 +157,12 @@ export default class {
   public setStarredCommunities(star: StarredCommunity[]): void { this._setStarredCommunities(star); }
   public addStarredCommunity(star: StarredCommunity): void { this._starredCommunities.push(star); }
   public removeStarredCommunity(star: StarredCommunity): void {
-    this._starredCommunities.splice(this._starredCommunities.findIndex((s) => (
-      s.user_id === star.user_id
-      && s.chain === star.chain
-      && s.community === star.community
-    ), 1));
+    const index = this._starredCommunities.findIndex((s) => (
+      s.chain
+        ? (s.user_id === star.user_id && s.chain === star.chain)
+        : (s.user_id === star.user_id && s.community === star.community)
+    ));
+    this._starredCommunities.splice(index, 1);
   }
 
 

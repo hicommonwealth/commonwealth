@@ -2,15 +2,8 @@
 
 .EditIdentityModal {
     width: 620px;
-    .header {
-        background-color: black;
-        color: white;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        padding-left: 32px;
-        font-size: 19px;
-        font-weight: 500;
+    @include sm-max {
+        width: initial;
     }
     .form {
         padding: 20px 32px 32px;

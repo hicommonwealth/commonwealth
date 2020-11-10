@@ -57,7 +57,22 @@ $text-size-item-meta: 17px;
             text-overflow: ellipsis;
         }
         .row-subheader {
-
+            .proposal-row-sub {
+            }
+            .proposal-row-comments {
+                display: flex;
+                margin-top: 8px;
+                color: $text-color-light;
+                .QuillFormattedText, .MarkdownFormattedText {
+                    max-width: 220px;
+                    @include xl-min {
+                        max-width: 280px;
+                    }
+                    position: relative;
+                    top: -2px;
+                    margin-left: 6px;
+                }
+            }
         }
     }
     .row-right {
@@ -113,4 +128,3 @@ $text-size-item-meta: 17px;
         }
     }
 }
-

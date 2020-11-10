@@ -91,12 +91,13 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         placeholder: 'Add a description (optional)',
         tabindex: 2,
         theme: 'bubble',
-        editorNamespace: `${app.activeId()}-new-link-inline`,
+        editorNamespace: 'new-link-inline',
         onkeyboardSubmit: createLink,
       }),
       m(TopicSelector, {
         topics: app.topics.getByCommunity(app.activeId()),
-        featuredTopics: app.topics.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+        featuredTopics: app.topics.getByCommunity(app.activeId())
+          .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
         updateFormData: (topicName: string, topicId?: number) => {
           vnode.state.form.topicName = topicName;
           vnode.state.form.topicId = topicId;
@@ -106,7 +107,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
       m('.bottom-panel', [
         m('.actions', [
           m(Button, {
-            class: !author || formDataIncomplete(vnode.state) ? 'disabled' : '',
+            disabled: !author || !!formDataIncomplete(vnode.state),
             type: 'submit',
             intent: 'primary',
             onclick: createLink,
@@ -114,7 +115,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
             label: 'Create thread'
           }),
           m(Button, {
-            class: !author ? 'disabled' : '',
+            disabled: !author,
             type: 'cancel',
             onclick: closeComposer,
             basic: true,
@@ -140,7 +141,6 @@ interface ITextPostAttrs {
 
 interface ITextPostState {
   readOnly: boolean;
-  privacy: boolean;
   topics: string[];
   uploadsInProgress: number;
   closed: boolean;
@@ -151,7 +151,6 @@ interface ITextPostState {
 
 const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
   oninit: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
-    vnode.state.privacy = false;
     vnode.state.readOnly = false;
   },
   view: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
@@ -166,8 +165,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
       if (e) e.preventDefault();
       const { form, quillEditorState } = vnode.state;
       const readOnly = vnode.state.readOnly || false;
-      const privacy = vnode.state.privacy || false;
-      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, privacy, readOnly);
+      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, readOnly);
       m.redraw();
     };
 
@@ -185,7 +183,8 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
       }),
       m(TopicSelector, {
         topics: app.topics.getByCommunity(app.activeId()),
-        featuredTopics: app.topics.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+        featuredTopics: app.topics.getByCommunity(app.activeId())
+          .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
         updateFormData: (topicName: string, topicId?: number) => {
           vnode.state.form.topicName = topicName;
           vnode.state.form.topicId = topicId;
@@ -195,7 +194,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
       m('.bottom-panel', [
         m('.actions', [
           m(Button, {
-            class: !author || formDataIncomplete(vnode.state) ? 'disabled' : '',
+            disabled: !author || !!formDataIncomplete(vnode.state),
             type: 'submit',
             intent: 'primary',
             onclick: createThread,
@@ -203,7 +202,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             label: 'Create thread'
           }),
           m(Button, {
-            class: !author ? 'disabled' : '',
+            disabled: !author,
             type: 'cancel',
             onclick: closeComposer,
             basic: true,
@@ -216,22 +215,11 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
               name: 'properties',
               value: 'public',
               id: 'public-thread',
-              checked: (vnode.state.readOnly === false && vnode.state.privacy === false),
+              checked: (vnode.state.readOnly === false),
               onclick: () => {
                 vnode.state.readOnly = false;
-                vnode.state.privacy = false;
               },
               label: 'Public',
-            }),
-            m(Radio, {
-              name: 'properties',
-              value: 'private',
-              id: 'private-thread',
-              onclick: () => {
-                vnode.state.readOnly = false;
-                vnode.state.privacy = true;
-              },
-              label: 'Private (Only admins/mods)',
             }),
             m(Radio, {
               name: 'properties',
@@ -239,7 +227,6 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
               id: 'read-only',
               onclick: () => {
                 vnode.state.readOnly = true;
-                vnode.state.privacy = false;
               },
               label: 'Read-Only',
             }),

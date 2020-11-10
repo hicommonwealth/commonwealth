@@ -1,107 +1,27 @@
 /* eslint-disable no-restricted-syntax */
+
 import 'components/quill_formatted_text.scss';
 
 import m from 'mithril';
 import { Icon, Icons } from 'construct-ui';
 import { loadScript } from 'helpers';
+import { preprocessQuillDeltaForRendering } from '../../../../shared/utils';
 
-interface IQuillJSON {
-  ops: IQuillOps[];
-}
-
-interface IQuillOps {
-  insert: string;
-  attributes: string;
-}
-
-// Truncate a Quill document to the first `length` characters.
-//
-// If non-text elements are in the document, they will remain by
-// default.
-export const sliceQuill = (json: IQuillJSON, length: number) => {
-  let count = 0;
-  const completeObjects = [];
-  const truncatedObj = [];
-  for (const ele of json.ops) {
-    if (count >= length) break;
-    const text = ele.insert;
-    if (count + text.length > length) {
-      const fullText = text;
-      ele.insert = `${text.slice(0, length - count)}\n`;
-      truncatedObj.push(ele);
-      count += fullText.length;
-    } else {
-      completeObjects.push(ele);
-      count += text.length;
-    }
-  }
-  return ({ ops: completeObjects.concat(truncatedObj) });
-};
-
-const preprocessQuillDeltaForRendering = (nodes) => {
-  // split up nodes at line boundaries
-  const lines = [];
-  for (const node of nodes) {
-    if (typeof node.insert === 'string') {
-      node.insert.match(/[^\n]+\n?|\n/g).forEach((line) => {
-        lines.push({ attributes: node.attributes, insert: line });
-      });
-    } else {
-      lines.push(node);
-    }
-  }
-  // group nodes under parents
-  const result = [];
-  let parent = { children: [], attributes: undefined };
-  for (const node of lines) {
-    if (typeof node.insert === 'string' && node.insert.endsWith('\n')) {
-      parent.attributes = node.attributes;
-      // concatenate code-block node parents together, keeping newlines
-      if (result.length > 0 && result[result.length - 1].attributes && parent.attributes
-                 && parent.attributes['code-block'] && result[result.length - 1].attributes['code-block']) {
-        parent.children.push({ insert: node.insert });
-        result[result.length - 1].children = result[result.length - 1].children.concat(parent.children);
-      } else {
-        parent.children.push({ insert: node.insert });
-        result.push(parent);
-      }
-      parent = { children: [], attributes: undefined };
-    } else {
-      parent.children.push(node);
-    }
-  }
-  // If there was no \n at the end of the document, we need to push whatever remains in `parent`
-  // onto the result. This may happen if we are rendering a truncated Quill document
-  if (parent.children.length > 0) {
-    result.push(parent);
-  }
-
-  // trim empty newlines at end of document
-  while (result.length
-         && result[result.length - 1].children.length === 1
-         && typeof result[result.length - 1].children[0].insert === 'string'
-         && result[result.length - 1].children[0].insert === '\n'
-         && result[result.length - 1].children[0].attributes === undefined) {
-    result.pop();
-  }
-
-  return result;
-};
-
-const renderQuillDelta = (delta, hideFormatting = false) => {
+const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
 
   // first, concatenate parent nodes for <ul> and <ol> into groups
   const groups = [];
   preprocessQuillDeltaForRendering(delta.ops).forEach((parent) => {
-    // if the last parent was a <ul> or <ol> with the same attributes.list,
+    // if the last parent was a <ul> or <ol> with the same attributes.list and indentation,
     // concatenate the current parent's children onto the last instead
     if (groups.length !== 0
         && groups[groups.length - 1].parents[0].attributes
         && parent.attributes?.list
         && groups[groups.length - 1].parents[0].attributes.list
-        && parent.attributes.list === groups[groups.length - 1].parents[0].attributes.list) {
+        && parent.attributes.list === groups[groups.length - 1].parents[0].attributes.list
+        && parent.attributes.indent === groups[groups.length - 1].parents[0].attributes.indent) {
       groups[groups.length - 1].parents.push(parent);
     } else if (parent.attributes && parent.attributes.list) {
       groups.push({ listtype: parent.attributes.list, parents: [parent] });
@@ -111,26 +31,34 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
   });
 
   // then, render each group
-
-  const getGroupTag = (group) => group.listtype === 'bullet' ? 'ul'
-    : group.listtype === 'ordered'      ? 'ol'
-      : (group.listtype === 'checked' || group.listtype === 'unchecked') ? 'ul.checklist'
-        : 'div';
-  const getParentTag = (parent) => parent.attributes && parent.attributes.list === 'bullet' ? 'li'
-    : parent.attributes && parent.attributes.list === 'ordered' ? 'li'
-      : parent.attributes && parent.attributes.list === 'checked' ? 'li.checked'
-        : parent.attributes && parent.attributes.list === 'unchecked' ? 'li.unchecked'
-          : 'div';
-  return hideFormatting
+  const getGroupTag = (group) => {
+    if (collapse) return 'span';
+    if (group.listtype === 'bullet') return 'ul';
+    if (group.listtype === 'ordered') return 'ol';
+    if (group.listtype === 'checked' || group.listtype === 'unchecked') return 'ul.checklist';
+    return 'div';
+  };
+  const getParentTag = (parent) => {
+    if (collapse) return 'span';
+    if (parent.attributes?.list === 'bullet') return 'li';
+    if (parent.attributes?.list === 'ordered') return 'li';
+    if (parent.attributes?.list === 'checked') return 'li.checked';
+    if (parent.attributes?.list === 'unchecked') return 'li.unchecked';
+    return 'div';
+  };
+  return (hideFormatting || collapse)
     ? groups.map((group) => {
-      return m(`${getGroupTag(group)}.hidden-formatting`, group.parents.map((parent) => {
+      const wrapGroup = (content) => {
+        return m(`${getGroupTag(group)}.hidden-formatting`, content);
+      };
+      return wrapGroup(group.parents.map((parent) => {
         return m(`${getParentTag(parent)}.hidden-formatting-inner`, [
           parent.children.map((child) => {
             if (child.insert?.mention)
               return m('span.mention', child.insert.mention.denotationChar + child.insert.mention.value);
-            if (child.insert?.image) return m(Icon, { name: Icons.IMAGE });
-            if (child.insert?.twitter) return m(Icon, { name: Icons.IMAGE });
-            if (child.insert?.video) return m(Icon, { name: Icons.IMAGE });
+            if (child.insert?.image) return;
+            if (child.insert?.twitter) return;
+            if (child.insert?.video) return;
             if (child.attributes?.link) return m('a', {
               href: child.attributes.link,
               target: '_blank',
@@ -144,7 +72,20 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
     })
     : groups.map((group) => {
       const groupTag = getGroupTag(group);
-      return m(groupTag, group.parents.map((parent) => {
+      const wrapGroup = (content) => {
+        const additionalIndentLevels = group.listtype && group.parents && group.parents[0]
+          && group.parents[0].attributes.indent;
+        if (!additionalIndentLevels) return m(groupTag, content);
+
+        switch (additionalIndentLevels) {
+          case 1: return m(groupTag, m(groupTag, content));
+          case 2: return m(groupTag, m(groupTag, m(groupTag, content)));
+          case 3: return m(groupTag, m(groupTag, m(groupTag, m(groupTag, content))));
+          case 4: return m(groupTag, m(groupTag, m(groupTag, m(groupTag, m(groupTag, content)))));
+          default: return m(groupTag, m(groupTag, m(groupTag, m(groupTag, m(groupTag, content)))));
+        }
+      };
+      return wrapGroup(group.parents.map((parent) => {
         // render empty parent nodes as .between-paragraphs
         if (!parent.attributes && parent.children.length === 1 && parent.children[0].insert === '\n') {
           return m('.between-paragraphs');
@@ -199,7 +140,7 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
           if (child.insert?.mention) {
             result = m('span.mention', {
               onclick: (e) => {
-                //alert(child.insert.mention.id)
+                // alert(child.insert.mention.id)
               }
             }, child.insert.mention.denotationChar + child.insert.mention.value);
           } else if (child.attributes?.link) {
@@ -250,11 +191,12 @@ const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapse? }> = {
     const { doc, hideFormatting, collapse } = vnode.attrs;
 
     return m('.QuillFormattedText', {
+      class: collapse ? 'collapsed' : '',
       oncreate: (vvnode) => {
         if (!(<any>window).twttr) loadScript('//platform.twitter.com/widgets.js')
           .then(() => { console.log('Twitter Widgets loaded'); });
       }
-    }, renderQuillDelta(doc, hideFormatting));
+    }, renderQuillDelta(doc, hideFormatting, collapse));
   }
 };
 

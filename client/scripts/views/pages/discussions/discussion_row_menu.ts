@@ -6,33 +6,37 @@ import app from 'state';
 import { NotificationCategories } from 'types';
 import { OffchainThread, OffchainTopic } from 'models';
 import TopicEditor from 'views/components/topic_editor';
-import { MenuItem, PopoverMenu, Icon, Icons } from 'construct-ui';
+import { MenuItem, PopoverMenu, Icon, Icons, MenuDivider } from 'construct-ui';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
-    const notificationSubscription = app.user.notifications.subscriptions
-      .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
+
+    const commentSubscription = app.user.notifications.subscriptions
+      .find((v) => v.objectId === proposal.uniqueIdentifier && v.category === NotificationCategories.NewComment);
+
+    const reactionSubscription = app.user.notifications.subscriptions
+      .find((v) => v.objectId === proposal.uniqueIdentifier && v.category === NotificationCategories.NewReaction);
+
+    const bothActive = (commentSubscription?.isActive && reactionSubscription?.isActive);
 
     return m(MenuItem, {
-      onclick: (e) => {
+      onclick: async (e) => {
         e.preventDefault();
-        if (notificationSubscription && notificationSubscription.isActive) {
-          app.user.notifications.disableSubscriptions([notificationSubscription]).then(() => {
-            m.redraw();
-          });
-        } else if (notificationSubscription) { // subscription, but not active
-          app.user.notifications.enableSubscriptions([notificationSubscription]).then(() => {
-            m.redraw();
-          });
+        if (!commentSubscription || !reactionSubscription) {
+          await Promise.all([
+            app.user.notifications.subscribe(NotificationCategories.NewReaction, proposal.uniqueIdentifier),
+            app.user.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier),
+          ]);
+        } else if (bothActive) {
+          await app.user.notifications.disableSubscriptions([commentSubscription, reactionSubscription]);
         } else {
-          app.user.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier).then(() => {
-            m.redraw();
-          });
+          await app.user.notifications.enableSubscriptions([commentSubscription, reactionSubscription]);
         }
+        m.redraw();
       },
-      label: notificationSubscription?.isActive ? 'Turn off notifications' : 'Turn on notifications',
+      label: (bothActive) ? 'Turn off notifications' : 'Turn on notifications',
     });
   },
 };
@@ -62,7 +66,7 @@ export const TopicEditorButton: m.Component<{ openTopicEditor: Function }, { isO
     return m('.TopicEditorButton', [
       m(MenuItem, {
         fluid: true,
-        label: 'Move to another topic',
+        label: 'Edit topic',
         onclick: (e) => {
           e.preventDefault();
           openTopicEditor();
@@ -77,18 +81,20 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;
 
-    const canEditThread = app.user.activeAccount
-      && (app.user.isRoleOfCommunity({
-        role: 'admin',
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      })
-      || app.user.isRoleOfCommunity({
-        role: 'moderator',
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      })
-      || proposal.author === app.user.activeAccount.address);
+    const hasAdminPermissions = app.user.activeAccount
+    && (app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    })
+    || app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    }));
+
+    const isAuthor = app.user.activeAccount
+      && (proposal.author === app.user.activeAccount.address);
 
     return m('.DiscussionRowMenu', {
       onclick: (e) => {
@@ -103,21 +109,31 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
         closeOnContentClick: true,
         menuAttrs: {},
         content: [
-          canEditThread && m(TopicEditorButton, { openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; } }),
-          canEditThread && m(ThreadDeletionButton, { proposal }),
-          canEditThread && m(MenuItem, {
+          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
+          m(ThreadSubscriptionButton, { proposal }),
+          hasAdminPermissions && m(MenuDivider),
+          hasAdminPermissions && m(MenuItem, {
+            class: 'pin-thread-toggle',
+            onclick: (e) => {
+              e.preventDefault();
+              app.threads.pin({ proposal }).then(() => m.redraw());
+            },
+            label: proposal.pinned ? 'Unpin thread' : 'Pin thread',
+          }),
+          hasAdminPermissions && m(MenuItem, {
             class: 'read-only-toggle',
             onclick: (e) => {
               e.preventDefault();
               app.threads.setPrivacy({
                 threadId: proposal.id,
-                privacy: null,
                 readOnly: !proposal.readOnly,
               }).then(() => m.redraw());
             },
             label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
           }),
-          m(ThreadSubscriptionButton, { proposal }),
+          hasAdminPermissions && m(TopicEditorButton, {
+            openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; }
+          }),
         ],
         inline: true,
         trigger: m(Icon, {

@@ -21,7 +21,7 @@ const signalingVoteToString = (v: VoteOutcome): string => {
   return u8aToString(outcomeArray.slice(0, sliceEnd));
 };
 
-const ProposalVotingResults = {
+const ProposalVotingResults: m.Component<{ proposal }> = {
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
     const votes = proposal.getVotes();
@@ -29,9 +29,9 @@ const ProposalVotingResults = {
       || proposal.votingUnit === VotingUnit.ConvictionCoinVote;
 
     // TODO: fix up this function for cosmos votes
-    const showVotes = (votes : Array<IVote<any>>) => votes.length === 0
+    const showVotes = (votes2 : Array<IVote<any>>) => votes.length === 0
       ? m('.no-votes', 'No votes')
-      : votes.map(
+      : votes2.map(
         (vote) => {
           let balanceStr = '--';
           let balance;
@@ -42,20 +42,20 @@ const ProposalVotingResults = {
             });
           }
           return vote instanceof SignalingVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+            m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
             m('.vote-choice', signalingVoteToString(vote.choices[0])),
             balanceWeighted && balance && m('.vote-balance', balanceStr),
           ]) : vote instanceof BinaryVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+            m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
             m('.vote-choice', vote.choice ? 'yes' : 'no'),
             balanceWeighted && balance && m('.vote-balance', balanceStr),
             m('.vote-weight', vote.weight && `${vote.weight}x`),
           ]) : vote instanceof DepositVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+            m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
             m('.vote-deposit', formatCoin(vote.deposit, true)),
           ])
             : vote instanceof CosmosVote ? m('.vote', [
-              m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+              m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
               m('.vote-choice', vote.choice.toString()),
               // balanceWeighted && balance && m('.vote-balance', balanceStr),
             ])
@@ -65,7 +65,7 @@ const ProposalVotingResults = {
                 balance && m('.vote-balance', balanceStr),
               ])
                 : m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
                 ]);
         }
       );
@@ -79,7 +79,9 @@ const ProposalVotingResults = {
           proposal.data.choices.map((outcome) => {
             return {
               name: signalingVoteToString(outcome),
-              content: showVotes(votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))),
+              content: showVotes(
+                votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))
+              ),
             };
           })
         ))
@@ -133,7 +135,9 @@ const ProposalVotingResults = {
           content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.YES))
         }, {
           name: 'No',
-          content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.NO || v.choice === CosmosVoteChoice.VETO))
+          content: showVotes(
+            votes.filter((v) => v.choice === CosmosVoteChoice.NO || v.choice === CosmosVoteChoice.VETO)
+          )
         }, {
           name: 'Abstain',
           content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN))

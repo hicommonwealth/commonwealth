@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .NotificationRow {
     display: flex;
     flex-direction: column;
@@ -12,12 +14,25 @@
     &.unread {
         background: #ffffe0;
     }
+    > .User {
+        width: min-content;
+    }
     > .User,
     > .UserGallery {
         margin-bottom: 10px;
     }
+    > .UserGallery .User {
+        margin-right: 4px;
+    }
     .comment-body {
         flex: 1;
+        .chain-event-notification-top {
+            display: flex;
+            justify-content: space-between;
+            .cui-icon-action svg:hover {
+                color: $negative-bg-color;
+            }
+        }
     }
     .comment-body-title {
         .User .user-display-name,

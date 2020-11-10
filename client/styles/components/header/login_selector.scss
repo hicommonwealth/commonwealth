@@ -7,6 +7,9 @@
     font-weight: 400;
     align-items: center;
 
+    &.CommunityLabelPlaceholder {
+        font-weight: 500;
+    }
     .site-brand {
         font-size: 16px;
         font-weight: 500;
@@ -45,23 +48,20 @@
 }
 
 .LoginSelector {
-    > button.cui-button .cui-icon {
-        display: none;
+    button.cui-button .cui-icon:last-child {
+        position: relative;
+        top: -2px;
     }
-    @include xs-max {
-        .hidden-xs {
-            display: none !important;
-        }
-        > button.cui-button {
-            padding: 0 13px;
-            .cui-icon {
-                display: block;
-                margin-left: -3px;
-                margin-right: -3px;
-                position: relative;
-                top: -1px;
-            }
-        }
+    button.cui-button {
+        padding: 0 10px;
+    }
+    button.cui-button.login-selector-right {
+        flex: initial !important;
+        border-radius: 0 4px 4px 0 !important;
+        margin-right: 0 !important;
+    }
+    button.cui-button.login-selector-right:first-child {
+        border-radius: 4px !important;
     }
 }
 
@@ -69,6 +69,7 @@
     .cui-popover-content {
         padding: 0;
         .cui-menu.LoginSelectorMenu {
+            min-width: 260px;
             border: none;
             .cui-menu-item.cui-button.switch-user {
                 height: 40px;

@@ -56,7 +56,7 @@ export class Coin extends BN {
       try {
         // BN only accepts integers, so we have to use JavaScript math here
         nBn = inDollars
-          ? dollar.mul(new BN(`${n}`))
+          ? dollar.muln(n)
           : new BN(`${n}`);
       } catch (e) {
         throw new Error(`Invalid balance: ${JSON.stringify(e)}`);

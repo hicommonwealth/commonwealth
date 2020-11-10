@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
 .VotingActions {
-    margin: 20px 0;
+    margin: 20px;
     .button-row {
         margin: 0 -5px;
     }
@@ -30,7 +30,7 @@
 }
 
 .CannotVote {
-    margin: 20px 0;
+    margin: 20px;
     .proposal-voting-box-text {
     }
     .proposal-voting-box-action button {
@@ -40,12 +40,5 @@
 }
 
 .ProposalExtensions {
-    border: 1px solid $background-color-light;
-    padding: 20px 28px 24px;
     margin: 24px 0;
-    button {
-        display: block;
-        width: 100%;
-        margin-top: 15px;
-    }
 }

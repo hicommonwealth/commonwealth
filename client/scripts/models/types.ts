@@ -19,7 +19,10 @@ export enum ChainBase {
 export enum ChainNetwork {
   Edgeware = 'edgeware',
   Kusama = 'kusama',
+  Kulupu = 'kulupu',
   Polkadot = 'polkadot',
+  Plasm = 'plasm',
+  Stafi = 'stafi',
   Cosmos = 'cosmos',
   Ethereum = 'ethereum',
   NEAR = 'near',
@@ -27,11 +30,14 @@ export enum ChainNetwork {
   Metacartel = 'metacartel',
 }
 
+// TODO: this should be deprecated, and replaced with ChainNetwork in most instances
 export enum ChainClass {
   Edgeware = 'edgeware',
   Kusama = 'kusama',
+  Kulupu = 'kulupu',
   Polkadot = 'polkadot',
-  Supernova = 'supernova',
+  Plasm = 'plasm',
+  Stafi = 'stafi',
   CosmosHub = 'cosmos-hub',
   Gaia13k = 'gaia-13k',
   Ethereum = 'ethereum',
@@ -39,6 +45,7 @@ export enum ChainClass {
   Moloch = 'moloch',
 }
 
+// TODO: this is inconsistently used
 export enum OffchainThreadKind {
   Forum = 'forum',
   Link = 'link',

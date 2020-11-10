@@ -2,19 +2,28 @@
 
 .NewThreadForm {
     display: flex;
-    max-width: 600px;
-    &.has-drafts {
+    &.is-modal {
+        max-width: 680px;
+    }
+    &.is-modal.has-drafts {
         max-width: 810px;
     }
 
     .cui-form-group {
         margin-bottom: 15px;
     }
+
     .ql-editor {
-        min-height: 160px;
+        min-height: calc(100vh - 360px);
+        @include xs-max {
+            min-height: calc(100vh - 440px);
+        }
     }
-    &.link-post .ql-editor {
-        min-height: 105px;
+    &.is-modal .ql-editor {
+        min-height: 170px;
+    }
+    &.is-modal.link-post .ql-editor {
+        min-height: 119px;
     }
     @include xs-max {
         .ql-editor {
@@ -31,6 +40,12 @@
         }
     }
 
+    .new-thread-form-body {
+        max-width: 100%;
+    }
+    &.has-drafts .new-thread-form-body {
+        max-width: calc(100% - 205px);
+    }
     .new-thread-form-body {
         padding-bottom: 24px;
         flex: 9;
@@ -69,16 +84,17 @@
             }
             // space between title and topic
             .topic-selection-drop-menu {
-                margin-left: 12px;
+                margin-right: 12px;
                 width: calc(100% - 12px);
                 @include xs-max {
-                    margin-left: 0;
+                    margin-right: 0;
                     width: 100%;
                 }
             }
         }
         button[name="submit"], button[name="submission"] {
             margin-right: 12px;
+            // no margin-bottom here because it breaks button alignment
         }
         .error-message {
             @include error-text;
@@ -137,10 +153,7 @@
                         line-height: 1.25;
                         opacity: 0.4;
                     }
-                    display: -webkit-box;
-                    -webkit-box-orient: vertical;
-                    -webkit-line-clamp: 2;
-                    overflow: hidden;
+                    max-width: 150px;
                 }
                 .discussion-draft-actions {
                     margin-top: 7px;

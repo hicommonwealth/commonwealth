@@ -5,9 +5,10 @@ import {
   ICommunityAdapter,
   NotificationCategory,
 } from 'models';
+import { ReplaySubject } from 'rxjs';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
-import { ReplaySubject } from 'rxjs';
+import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
@@ -16,7 +17,7 @@ import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import ChainEventsController from './controllers/server/chain_events';
-import ChainEntityController from './controllers/server/chain_entities';
+// import ChainEntityController from './controllers/server/chain_entities';
 import UserController from './controllers/server/user/index';
 import StakingController from './controllers/server/staking';
 export enum ApiStatus {
@@ -31,11 +32,17 @@ export const enum LoginState {
   LoggedIn = 'logged_in',
 }
 
+interface IRecentActivity {
+  activeAddresses;
+  activeThreads;
+}
+
 export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
   community: ICommunityAdapter<any, any>;
 
+  chainPreloading: boolean;
   chainAdapterReady: ReplaySubject<boolean>;
   chainModuleReady: ReplaySubject<boolean>;
 
@@ -48,6 +55,9 @@ export interface IApp {
   communities: CommunitiesController;
   user: UserController;
   staking: StakingController;
+
+  recentActivity: RecentActivityController;
+
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
   activeCommunityId(): string;
@@ -84,6 +94,7 @@ const app: IApp = {
   chain: null,
   community: null,
 
+  chainPreloading: false,
   chainAdapterReady: new ReplaySubject(1),
   chainModuleReady: new ReplaySubject(1),
 
@@ -96,6 +107,9 @@ const app: IApp = {
   communities: new CommunitiesController(),
   user: new UserController(),
   staking: new StakingController(),
+
+  recentActivity: new RecentActivityController(),
+
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),

@@ -89,7 +89,7 @@ async function onclickoverlay(spec, confirmExit, exitCallback) {
   }
 }
 
-const Modal = {
+const Modal: m.Component<{ spec }> = {
   view: (vnode) => {
     const spec = vnode.attrs.spec;
     const completeCallback = spec.completeCallback || (() => undefined);
@@ -112,18 +112,18 @@ const Modal = {
   },
 };
 
-export const CompactModalExitButton = {
+export const CompactModalExitButton: m.Component<{}> = {
   view: (vnode) => {
     return m('.CompactModalExitButton', {
       onclick: (e) => {
         e.preventDefault();
-        $(vnode.dom).trigger('modalexit');
+        $(e.target).trigger('modalexit');
       }
     }, symbols.times);
   }
 };
 
-export const AppModals = {
+export const AppModals: m.Component<{}, { escapeHandler }> = {
   oncreate: (vnode) => {
     vnode.state.escapeHandler = (e) => {
       if (e.keyCode !== 27) return;
@@ -134,26 +134,6 @@ export const AppModals = {
   },
   onremove: (vnode) => {
     $(document).off('keyup', vnode.state.escapeHandler);
-  },
-  onupdate: (vnode) => {
-    if (app.modals.getList().length > 0 && !vnode.state.modalOpenSet) {
-      vnode.state.modalOpenSet = true;
-      $('body').addClass('modal-open');
-
-      // fix scrolling
-      // https://css-tricks.com/prevent-page-scrolling-when-a-modal-is-open/
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${window.scrollY}px`;
-    } else if (app.modals.getList().length === 0 && vnode.state.modalOpenSet) {
-      vnode.state.modalOpenSet = false;
-      $('body').removeClass('modal-open');
-
-      // unfix scrolling
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
-    }
   },
   view: (vnode) => {
     return app.modals.getList().map((spec) => m(Modal, { spec, key: spec.id || '-' }, m(spec.modal, spec.data)));

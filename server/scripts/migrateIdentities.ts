@@ -6,7 +6,7 @@
  */
 
 import _ from 'underscore';
-import { SubstrateTypes, SubstrateEvents } from '@commonwealth/chain-events';
+import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
 import { Mainnet } from '@edgeware/node-types';
 import { OffchainProfileInstance } from '../models/offchain_profile';
 import IdentityEventHandler from '../eventHandlers/identity';
@@ -17,7 +17,11 @@ const log = factory.getLogger(formatFilename(__filename));
 export default async function (models, chain?: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
   log.info('Fetching node info for identity migrations...');
-  const chains = !chain ? SubstrateTypes.EventChains : [ chain ];
+  if (chain && !chainSupportedBy(chain, SubstrateTypes.EventChains)) {
+    throw new Error('unsupported chain');
+  }
+  const chains = !chain ? SubstrateTypes.EventChains.concat() : [ chain ];
+
   // query one node for each supported chain
   const nodes = (await Promise.all(chains.map((c) => {
     return models.ChainNode.findOne({ where: { chain: c } });
@@ -46,8 +50,7 @@ export default async function (models, chain?: string): Promise<void> {
     const nodeUrl = constructSubstrateUrl(node.url);
     const api = await SubstrateEvents.createApi(
       nodeUrl,
-      node.chain.includes('edgeware') ? Mainnet.types : {},
-      node.chain.includes('edgeware') ? Mainnet.typesAlias : {},
+      node.chain.includes('edgeware') ? Mainnet : {},
     );
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     const identityEvents = await fetcher.fetchIdentities(addresses);
