@@ -114,7 +114,6 @@ export async function Enrich(
         electedInfo.info.forEach(async ({ accountId, controllerId, validatorPrefs, rewardDestination }) => {
           const commissionPer = (Number)(validatorPrefs.commission || new BN(0)) / 10_000_000;
           const key = accountId.toString();
-          validatorInfo[key] = {}
           validatorInfo[key] = {
             commissionPer,
             controllerId,
