@@ -23,7 +23,7 @@ import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
-import { Grid, Col, List } from 'construct-ui';
+import { Grid, Col, List, Form, FormGroup, FormLabel, Input } from 'construct-ui';
 import moment from 'moment';
 import Listing from './listing';
 import ErrorPage from './error';
@@ -45,10 +45,37 @@ async function loadCmd() {
   ]);
 }
 
-const DelegateForm: m.Component<{}> = {
+interface IDelegateForm {
+  address: string,
+}
+
+const DelegateForm: m.Component<{}, { form: IDelegateForm, }> = {
+  oninit: (vnode) => {
+    vnode.state.form = {
+      address: null,
+    };
+  },
   view: (vnode) => {
-    return m('.DelegateForm', [
-      'hi',
+    return m(Form, { class: 'DelegateForm' }, [
+      m(Grid, [
+        m(Col, [
+          m(FormGroup, [
+            m(FormLabel, 'Address to Delegate to:'),
+            m(Input, {
+              options: {
+                name: 'address',
+                placeholder: 'Paste address you want to delegate to',
+                autofocus: true,
+              },
+              oninput: (e) => {
+                const result = (e.target as any).value;
+                vnode.state.form.address = result;
+                m.redraw();
+              }
+            })
+          ])
+        ])
+      ])
     ]);
   }
 };
@@ -59,12 +86,13 @@ const DelegatePage: m.Component<{}> = {
     if (!app.chain || !app.chain.loaded) {
       if (app.chain?.network !== ChainNetwork.Marlin) {
         return m(PageNotFound, {
-          title: 'Delegate page for Marlin only!'
+          title: 'Delegate Page',
+          message: 'Delegate page for Marlin only!'
         });
       }
       return m(PageLoading, {
         message: 'Connecting to chain (may take up to 10s)...',
-        title: 'Proposals',
+        title: 'Delegate',
         showNewProposalButton: true,
       });
     }
@@ -75,9 +103,7 @@ const DelegatePage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       m('.forum-container', [
-        m(DelegateForm, {
-
-        }),
+        m(DelegateForm, {}),
       ]),
     ]);
   }
