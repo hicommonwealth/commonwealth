@@ -23,27 +23,11 @@ import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
-import { Grid, Col, List, Form, FormGroup, FormLabel, Input } from 'construct-ui';
+import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
 import moment from 'moment';
 import Listing from './listing';
 import ErrorPage from './error';
 import PageNotFound from './404';
-
-async function loadCmd() {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
-  }
-  const chain = (app.chain as Substrate);
-  await Promise.all([
-    chain.council.init(chain.chain, chain.accounts),
-    chain.signaling.init(chain.chain, chain.accounts),
-    chain.democracyProposals.init(chain.chain, chain.accounts),
-    chain.democracy.init(chain.chain, chain.accounts),
-  ]);
-}
 
 interface IDelegateForm {
   address: string,
@@ -52,7 +36,7 @@ interface IDelegateForm {
 const DelegateForm: m.Component<{}, { form: IDelegateForm, }> = {
   oninit: (vnode) => {
     vnode.state.form = {
-      address: null,
+      address: '',
     };
   },
   view: (vnode) => {
@@ -60,12 +44,12 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, }> = {
       m(Grid, [
         m(Col, [
           m(FormGroup, [
-            m(FormLabel, 'Address to Delegate to:'),
+            m(FormLabel, `Address to Delegate to (your address: ${app.user.activeAccount.address}):`),
             m(Input, {
               options: {
                 name: 'address',
                 placeholder: 'Paste address you want to delegate to',
-                autofocus: true,
+                defaultValue: 'hello',
               },
               oninput: (e) => {
                 const result = (e.target as any).value;
@@ -73,34 +57,43 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, }> = {
                 m.redraw();
               }
             })
-          ])
-        ])
-      ])
+          ]),
+          m(FormLabel, [
+            m(Button, {
+              disabled: vnode.state.form.address === '',
+              intent: 'primary',
+              label: 'Delegate!',
+              onclick: (e) => {
+                e.preventDefault();
+                console.log('HELLO????');
+              },
+              type: 'submit',
+            }),
+          ]),
+        ]),
+      ]),
     ]);
   }
 };
 
 const DelegatePage: m.Component<{}> = {
-
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
-      if (app.chain?.network !== ChainNetwork.Marlin) {
+      if (app.chain?.network !== ChainNetwork.Marlin || !app.isLoggedIn()) {
         return m(PageNotFound, {
           title: 'Delegate Page',
-          message: 'Delegate page for Marlin only!'
+          message: 'Delegate page for Marlin users only!'
         });
       }
       return m(PageLoading, {
         message: 'Connecting to chain (may take up to 10s)...',
         title: 'Delegate',
-        showNewProposalButton: true,
       });
     }
 
     return m(Sublayout, {
       class: 'DelegatePage',
       title: 'Delegate',
-      showNewProposalButton: true,
     }, [
       m('.forum-container', [
         m(DelegateForm, {}),
