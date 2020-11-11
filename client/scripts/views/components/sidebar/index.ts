@@ -349,7 +349,12 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MarlinProposal }),
           label: 'Create Proposal',
           contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
-        })
+        }),
+        showMarlinOptions && m(ListItem, {
+          onclick: (e) => m.route.set(`/${app.activeChainId()}/delegate`),
+          label: 'Delegate COMP/LIN',
+          contentLeft: m(Icon, { name: Icons.FLAG }),
+        }),
       ]),
     ]);
   }
