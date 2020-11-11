@@ -90,7 +90,7 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, }> 
 const DelegatePage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
-      if (app.chain?.network !== ChainNetwork.Marlin || !app.isLoggedIn()) {
+      if (app.chain.network !== ChainNetwork.Marlin) {
         return m(PageNotFound, {
           title: 'Delegate Page',
           message: 'Delegate page for Marlin users only!'
