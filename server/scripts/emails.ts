@@ -2,7 +2,8 @@ import Sequelize from 'sequelize';
 import moment from 'moment';
 import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents,
-  IEventLabel, IEventTitle, IChainEventData, chainSupportedBy
+  IEventLabel, IEventTitle, IChainEventData, chainSupportedBy,
+  // MarlinTypes, MarlinEvents
 } from '@commonwealth/chain-events';
 
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
@@ -37,6 +38,12 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
         notification_data.chainEventType?.chain,
         (notification_data as IChainEventNotificationData).chainEvent.event_data,
       );
+    // } else if (MarlinTypes.EventChains.includes(notification_data.chainEventType?.chain)) {
+    //   chainEventLabel = MarlinEvents.Label(
+    //     notification_data.chainEvent?.blockNumber,
+    //     notification_data.chainEventType?.chain,
+    //     (notification_data as IChainEventNotificationData).chainEvent.event_data,
+    //   );
     }
     if (!chainEventLabel) return;
 
