@@ -74,6 +74,16 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     }
   }
 
+  public async senderGetDelegate(): Promise<string> {
+    const sender = this._api.userAddress;
+    try {
+      return this._api.compContract.delegates(sender);
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  }
+
   public async isSenderHolder(): Promise<boolean> {
     const sender = this._api.userAddress;
     const m = await this._api.compContract.balances(sender);
