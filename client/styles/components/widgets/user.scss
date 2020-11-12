@@ -53,8 +53,9 @@
     display: inline-block;
     white-space: nowrap;
     a {
-        text-decoration: none;
-        color: initial;
+        &, &:link, &:visited {
+            color: inherit;
+        }
     }
     .user-avatar {
         @include bareAvatar();
