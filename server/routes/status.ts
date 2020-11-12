@@ -45,27 +45,19 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
-  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
-
-  const publicThreadCount = {};
-  await Promise.all(publicCommunities.concat(chains).map(async (c) => {
-    const chainOrCommunity = c.default_chain ? { community: c.id } : { chain: c.id };
-    console.log(chainOrCommunity);
-    const { count, threads } = await models.OffchainThread.findAndCountAll({
-      where: {
-        chainOrCommunity,
-        updated_at: {
-          [Op.gt]: thirtyDaysAgo
-        }
-      },
-    });
-    console.log(count);
-    publicThreadCount[c.id] = count;
-  }));
-  console.log(publicThreadCount);
+  // TODO: CHANGE BACK TO TRUE 30 DAYS INSTEAD OF 90 FOR LATESTDUMP
+  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30 * 3);
   const { user } = req;
 
   if (!user) {
+    const threadCount = {};
+    await Promise.all(publicCommunities.concat(chains).map(async (c) => {
+      const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
+      if (c.default_chain) where['community'] = c.id;
+      else where['chain'] = c.id;
+      const { count, threads } = await models.OffchainThread.findAndCountAll({ where });
+      threadCount[c.id] = count;
+    }));
     return res.json({
       chains,
       nodes,
@@ -73,7 +65,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       contractCategories,
       communities: publicCommunities,
       notificationCategories,
-      recentThreads: publicThreadCount,
+      recentThreads: threadCount,
       loggedIn: false,
     });
   }
@@ -121,18 +113,13 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   });
   const allCommunities : any = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
-  const allThreadCount = {};
+  const threadCount = {};
   await Promise.all(allCommunities.concat(chains).map(async (c) => {
-    const chainOrCommunity = c.default_chain ? { community: c.id } : { chain: c.id };
-    const { count, threads } = await models.OffchainThread.findAndCountAll({
-      where: {
-        chainOrCommunity,
-        updated_at: {
-          [Op.gt]: thirtyDaysAgo
-        }
-      },
-    });
-    allThreadCount[c.id] = count;
+    const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
+    if (c.default_chain) where['community'] = c.id;
+    else where['chain'] = c.id;
+    const { count, threads } = await models.OffchainThread.findAndCountAll({ where });
+    threadCount[c.id] = count;
   }));
 
   // get starred communities for user
@@ -201,7 +188,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     offchainTopics,
     contractCategories,
     notificationCategories,
-    recentThreads: allThreadCount,
+    recentThreads: threadCount,
     roles,
     invites,
     loggedIn: true,

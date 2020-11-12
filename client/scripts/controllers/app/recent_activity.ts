@@ -38,6 +38,7 @@ export const modelAbridgedThreadFromServer = (thread: IAbridgedThreadFromServer)
 class RecentActivityController {
   private _threadsStore = new ActiveThreadsStore();
   private _addressStore = new ActiveAddressesStore();
+  private _communityThreadCount = {};
 
   public get threadsStore() { return this._threadsStore; }
   public get addressStore() { return this._addressStore; }
@@ -45,6 +46,14 @@ class RecentActivityController {
   private _initialized = false;
 
   public get initialized() { return this._initialized; }
+
+  public setCommunityThreadCounts(community: string, count: number) {
+    this._communityThreadCount[community] = count;
+  }
+
+  public getCommunityThreadCount(community: string) {
+    return this._communityThreadCount[community];
+  }
 
   public addThreads(threads: IAbridgedThreadFromServer[], clear?: boolean) {
     if (clear) this._threadsStore.clearThreads();
