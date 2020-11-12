@@ -49,8 +49,9 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
 
   const publicThreadCount = {};
   await Promise.all(publicCommunities.concat(chains).map(async (c) => {
-    const chainOrCommunity = c.defaultChain ? { community: c.id } : { chain: c.id };
-    const recentThreads = await models.OffchainThread.findAndCountAll({
+    const chainOrCommunity = c.default_chain ? { community: c.id } : { chain: c.id };
+    console.log(chainOrCommunity);
+    const { count, threads } = await models.OffchainThread.findAndCountAll({
       where: {
         chainOrCommunity,
         updated_at: {
@@ -58,9 +59,10 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
         }
       },
     });
-    publicThreadCount[c.id] = recentThreads;
+    console.log(count);
+    publicThreadCount[c.id] = count;
   }));
-
+  console.log(publicThreadCount);
   const { user } = req;
 
   if (!user) {
@@ -121,8 +123,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
 
   const allThreadCount = {};
   await Promise.all(allCommunities.concat(chains).map(async (c) => {
-    const chainOrCommunity = c.defaultChain ? { community: c.id } : { chain: c.id };
-    const recentThreads = await models.OffchainThread.findAndCountAll({
+    const chainOrCommunity = c.default_chain ? { community: c.id } : { chain: c.id };
+    const { count, threads } = await models.OffchainThread.findAndCountAll({
       where: {
         chainOrCommunity,
         updated_at: {
@@ -130,7 +132,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
         }
       },
     });
-    allThreadCount[c.id] = recentThreads;
+    allThreadCount[c.id] = count;
   }));
 
   // get starred communities for user

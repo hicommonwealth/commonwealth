@@ -64,9 +64,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.invites = data.invites;
 
       // add recentActivity
-      const { recentThreads, recentComments } = data;
-      app.recentActivity.addThreads(recentThreads, true);
-      app.recentActivity.addAddressesFromActivity(recentThreads.concat(recentComments), true);
+      const { recentThreads } = data;
+      console.log(recentThreads);
 
       // update the login status
       updateActiveUser(data.user);
