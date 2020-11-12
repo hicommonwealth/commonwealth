@@ -30,6 +30,36 @@ import Listing from './listing';
 import ErrorPage from './error';
 import PageNotFound from './404';
 
+const getDelegate = async (vnode) => {
+  vnode.state.currentDelegate = await (app.chain as Marlin).marlinAccounts.senderGetDelegate();
+};
+
+const DelegateStats: m.Component<{}, {currentDelegate: string, }> = {
+  oninit: (vnode) => {
+    vnode.state.currentDelegate = null;
+    getDelegate(vnode).then(() => m.redraw());
+  },
+  view: (vnode) => {
+    if (!app.chain) return;
+
+    return m(Grid, {
+      align: 'middle',
+      class: 'stats-container',
+      gutter: 5,
+      justify: 'space-between'
+    }, [
+      m(Col, { span: { xs: 6, md: 3 } }, [
+        m('.stats-tile', [
+          m('.stats-heading', 'Current Delegate'),
+          vnode.state.currentDelegate
+            ? m('.stats-tile-figure-minor', vnode.state.currentDelegate)
+            : '--',
+        ]),
+      ]),
+    ]);
+  }
+};
+
 interface IDelegateForm {
   address: string,
 }
@@ -107,6 +137,7 @@ const DelegatePage: m.Component<{}> = {
       title: 'Delegate',
     }, [
       m('.forum-container', [
+        m(DelegateStats),
         m(DelegateForm, {}),
       ]),
     ]);

@@ -8,6 +8,7 @@ import { AccountsStore } from 'stores';
 import MarlinHolder from './Holder';
 import MarlinAPI from './api';
 import MarlinChain from './chain';
+import BN from 'bn.js';
 
 export default class MarlinHolders implements IAccountsModule<EthereumCoin, MarlinHolder> {
   protected _store: AccountsStore<MarlinHolder> = new AccountsStore();
@@ -77,7 +78,9 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
   public async senderGetDelegate(): Promise<string> {
     const sender = this._api.userAddress;
     try {
-      return this._api.compContract.delegates(sender);
+      const delegate = await this._api.compContract.delegates(sender);
+      const zeroAddress = '0x0000000000000000000000000000000000000000';
+      return delegate === zeroAddress ? null : delegate;
     } catch (err) {
       console.error(err);
       return null;
