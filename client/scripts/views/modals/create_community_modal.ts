@@ -131,6 +131,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 false,
                 result.result.invitesEnabled,
                 result.result.privacyEnabled,
+                true,
                 result.featured_topics,
                 result.topics,
               );
