@@ -58,12 +58,10 @@ class RecentActivityController {
 
   public setMostActiveUsers(users) {
     this._activeUsers = users.map((user) => {
-      console.log(user);
       const { count } = user;
       const { chain, address, name, headline, bio, avatarUrl } = user.info;
       const info = new Profile(chain, address);
       info.initialize(name, headline, bio, avatarUrl);
-      console.log(info);
       return ({ info, count });
     });
   }
