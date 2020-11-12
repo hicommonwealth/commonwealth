@@ -141,6 +141,8 @@ const User: m.Component<{
         content: userPopover,
         trigger: userFinal,
         closeOnContentClick: true,
+        transitionDuration: 0,
+        hoverOpenDelay: 500,
         key: profile?.address || '-'
       })
       : userFinal;

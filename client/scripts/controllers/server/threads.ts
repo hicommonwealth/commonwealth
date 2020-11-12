@@ -12,6 +12,9 @@ import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
+export const DEFAULT_PAGE_SIZE = 20;
+export const MAX_PAGE_SIZE = 50;
+
 export const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
@@ -284,8 +287,8 @@ class ThreadsController {
     const { chainId, communityId, cutoffDate, topicId } = options;
     // pageSize can not exceed 50
     const pageSize = options.pageSize
-      ? Math.min(options.pageSize, 50)
-      : 20;
+      ? Math.min(options.pageSize, MAX_PAGE_SIZE)
+      : DEFAULT_PAGE_SIZE;
     const params = {
       chain: chainId,
       community: communityId,

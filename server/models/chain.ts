@@ -20,6 +20,7 @@ export interface ChainAttributes {
   symbol: string;
   network: string;
   icon_url: string;
+  collapsed_on_homepage: boolean;
   active: boolean;
   type: string;
 
@@ -60,6 +61,7 @@ export default (
     network: { type: dataTypes.STRING, allowNull: false },
     icon_url: { type: dataTypes.STRING },
     active: { type: dataTypes.BOOLEAN },
+    collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     type: { type: dataTypes.STRING, allowNull: false },
   }, {
     timestamps: false,
