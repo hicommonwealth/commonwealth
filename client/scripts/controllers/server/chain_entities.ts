@@ -132,7 +132,13 @@ class ChainEntityController {
     eventSortFn?: (a: CWEvent, b: CWEvent) => number,
   ): Promise<T[]> {
     // get existing events
-    const existingEvents = await fetch();
+    let existingEvents;
+    try {
+      existingEvents = await fetch();
+    } catch (e) {
+      console.error(`Chain entity fetch failed: ${e.message}`);
+      return [];
+    }
     if (eventSortFn) existingEvents.sort(eventSortFn);
     // eslint-disable-next-line no-restricted-syntax
     for (const cwEvent of existingEvents) {
