@@ -162,6 +162,29 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     order: [['created_at', 'DESC']],
   });
 
+  // Most active users
+  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
+  const activeUsers = {};
+  const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
+  if (community) where['community'] = community.id;
+  else where['chain'] = chain.id;
+
+  const monthlyComments = await models.OffchainComment.findAll({ where, include: [ models.Address ] });
+  const monthlyThreads = await models.OffchainThread.findAll({ where, include: [ models.Address ] });
+
+  monthlyComments.concat(monthlyThreads).forEach((post) => {
+    if (!post.Address) return;
+    const addr = post.Address.address;
+    if (activeUsers[addr]) activeUsers[addr]['count'] += 1;
+    else activeUsers[addr] = {
+      info: post.Address,
+      count: 1,
+    };
+  });
+  const mostActiveUsers = Object.values(activeUsers).sort((a, b) => {
+    return ((b as any).count - (a as any).count);
+  }).slice(0, 3);
+
   return res.json({
     status: 'Success',
     result: {
@@ -170,6 +193,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       admins: admins.map((a) => a.toJSON()),
       comments: comments.map((c) => c.toJSON()),
       threads: allThreads,
+      activeUsers: mostActiveUsers,
     }
   });
 };
