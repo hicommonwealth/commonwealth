@@ -77,7 +77,7 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, }> 
       m(Grid, [
         m(Col, [
           m(FormGroup, [
-            m(FormLabel, `Address to Delegate to (your address: ${app.user.activeAccount.address}):`),
+            m(FormLabel, `Address to Delegate to (your address is: ${app.user.activeAccount.address}):`),
             m(Input, {
               options: {
                 name: 'address',
