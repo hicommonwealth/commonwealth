@@ -16,7 +16,8 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy,
+  // MarlinEvents
 } from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import UserGallery from './widgets/user_gallery';
@@ -244,6 +245,12 @@ const NotificationRow: m.Component<{
           chainId,
           notification.chainEvent.data,
         );
+      // } else if (chainSupportedBy(chainId, MarlinTypes.EventChains)) {
+      //   label = MarlinEvents.Label(
+      //     notification.chainEvent.blockNumber,
+      //     chainId,
+      //     notification.chainEvent.data,
+      //   )
       } else {
         throw new Error(`invalid notification chain: ${chainId}`);
       }
