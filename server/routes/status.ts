@@ -45,8 +45,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
-  // TODO: CHANGE BACK TO TRUE 30 DAYS INSTEAD OF 90 FOR LATESTDUMP
-  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30 * 3);
+
+  const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
   const { user } = req;
 
   if (!user) {
