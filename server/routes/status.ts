@@ -46,52 +46,20 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     models.NotificationCategory.findAll(),
   ]);
   const thirtyDaysAgo = new Date((new Date() as any) - 1000 * 24 * 60 * 60 * 30);
-  const recentThreads = await models.OffchainThread.findAll({
-    attributes: ['id', 'title', 'url', 'created_at', 'chain', 'community'],
-    where: {
-      [Op.or]: [
-        {
-          chain: {
-            [Op.in]: chains.map((c) => c.id),
-          }
-        },
-        {
-          community: {
-            [Op.in]: publicCommunities.map((c) => c.id),
-          }
-        }
-      ],
-      updated_at: {
-        [Op.gt]: thirtyDaysAgo
-      }
-    },
-    include: {
-      model: models.Address,
-    }
-  });
 
-  const recentComments = await models.OffchainComment.findAll({
-    where: {
-      [Op.or]: [
-        {
-          chain: {
-            [Op.in]: chains.map((c) => c.id),
-          }
-        },
-        {
-          community: {
-            [Op.in]: publicCommunities.map((c) => c.id),
-          }
+  const publicThreadCount = {};
+  await Promise.all(publicCommunities.concat(chains).map(async (c) => {
+    const chainOrCommunity = c.defaultChain ? { community: c.id } : { chain: c.id };
+    const recentThreads = await models.OffchainThread.findAndCountAll({
+      where: {
+        chainOrCommunity,
+        updated_at: {
+          [Op.gt]: thirtyDaysAgo
         }
-      ],
-      updated_at: {
-        [Op.gt]: thirtyDaysAgo
-      }
-    },
-    include: {
-      model: models.Address,
-    }
-  });
+      },
+    });
+    publicThreadCount[c.id] = recentThreads;
+  }));
 
   const { user } = req;
 
@@ -103,8 +71,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       contractCategories,
       communities: publicCommunities,
       notificationCategories,
-      recentThreads,
-      recentComments,
+      recentThreads: publicThreadCount,
       loggedIn: false,
     });
   }
@@ -150,54 +117,21 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       as: 'topics',
     }],
   });
-  const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
+  const allCommunities : any = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
-  const recentThreads_ = await models.OffchainThread.findAll({
-    attributes: ['id', 'title', 'url', 'created_at', 'chain', 'community'],
-    where: {
-      [Op.or]: [
-        {
-          chain: {
-            [Op.in]: chains.map((c) => c.id),
-          }
-        },
-        {
-          community: {
-            [Op.in]: allCommunities.map((c) => (c as any).id),
-          }
+  const allThreadCount = {};
+  await Promise.all(allCommunities.concat(chains).map(async (c) => {
+    const chainOrCommunity = c.defaultChain ? { community: c.id } : { chain: c.id };
+    const recentThreads = await models.OffchainThread.findAndCountAll({
+      where: {
+        chainOrCommunity,
+        updated_at: {
+          [Op.gt]: thirtyDaysAgo
         }
-      ],
-      updated_at: {
-        [Op.gt]: thirtyDaysAgo
-      }
-    },
-    include: {
-      model: models.Address,
-    }
-  });
-
-  const recentComments_ = await models.OffchainComment.findAll({
-    where: {
-      [Op.or]: [
-        {
-          chain: {
-            [Op.in]: chains.map((c) => c.id),
-          }
-        },
-        {
-          community: {
-            [Op.in]: allCommunities.map((c) => (c as any).id),
-          }
-        }
-      ],
-      updated_at: {
-        [Op.gt]: thirtyDaysAgo
-      }
-    },
-    include: {
-      model: models.Address,
-    }
-  });
+      },
+    });
+    allThreadCount[c.id] = recentThreads;
+  }));
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
@@ -265,8 +199,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     offchainTopics,
     contractCategories,
     notificationCategories,
-    recentThreads: recentThreads_,
-    recentComments: recentComments_,
+    recentThreads: allThreadCount,
     roles,
     invites,
     loggedIn: true,
