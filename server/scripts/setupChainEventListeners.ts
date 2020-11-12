@@ -2,7 +2,8 @@ import WebSocket from 'ws';
 import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
-  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy
+  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
+  // MarlinTypes, MarlinEvents,
 } from '@commonwealth/chain-events';
 import { Mainnet } from '@edgeware/node-types';
 
@@ -106,6 +107,17 @@ const setupChainEventListeners = async (
         api,
         contractVersion,
       });
+    // } else if (chainSupportedBy(node.chain, MarlinTypes.EventChains)) {
+    //   const contractVersion = 1;
+    //   const api = await MarlinEvents.createApi(node.url, contractVersion, node.address);
+    //   subscriber = await MarlinEvents.subscribeEvents({
+    //     chain: node.chain,
+    //     handlers,
+    //     skipCatchup,
+    //     discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+    //     api,
+    //     contractVersion,
+    //   });
     }
 
     // hook for clean exit
