@@ -48,7 +48,7 @@ export const MostActiveThread: m.Component<{ thread: AbridgedThread }> = {
 export const ListingSidebar: m.Component<{ entity: string }> = {
   view: (vnode) => {
     const { entity } = vnode.attrs;
-    const activeAddresses = app.recentActivity.getMostActiveUsers(entity);
+    const activeAddresses = app.recentActivity.getMostActiveUsers();
     // const activeThreads = app.recentActivity.getMostActiveThreads(entity);
 
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
