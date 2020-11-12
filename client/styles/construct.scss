@@ -177,6 +177,13 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
     box-sizing: border-box; // fix switch sizing
 }
 
+// button link fixes
+button, .cui-button {
+    a:hover {
+        text-decoration: inherit;
+    }
+}
+
 // button color fixes
 .cui-button {
     // adjust label position on xl buttons

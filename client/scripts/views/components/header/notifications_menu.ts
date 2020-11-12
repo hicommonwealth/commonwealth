@@ -83,7 +83,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
         class: `NotificationsMenuButton ${unreadNotifications > 0 ? 'has-notifications' : 'no-notifications'}`,
         label: [
           m(Icon, { name: Icons.BELL }),
-          m('.notification-count', unreadNotifications),
+          m('.notification-count', unreadNotifications > 9 ? '∞' : unreadNotifications),
         ],
         size: small ? 'sm' : 'default',
         compact: true,

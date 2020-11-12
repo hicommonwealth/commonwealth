@@ -243,6 +243,16 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         }
       }, 400);
 
+      // Trigger a scroll event after this render cycle
+      // NOTE: If the window is resized to increase its height, we may
+      // get stuck in a state where the user cannot scroll and thus
+      // new posts can never be loaded.
+      setTimeout(() => {
+        if ($('.DiscussionsPage').height() < $(document).height()) {
+          $(window).trigger('scroll');
+        }
+      }, 0);
+
       $(window).on('scroll', vnode.state.onscroll);
 
       vnode.state.lastSubpage = subpage;
