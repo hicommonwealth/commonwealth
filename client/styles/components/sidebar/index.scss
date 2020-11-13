@@ -294,21 +294,13 @@
         margin-bottom: 0 !important;
         width: calc(100% - 34px);
         max-width: calc(100% - 34px);
-        height: 72px;
         @include sm-max {
             position: relative;
             bottom: initial;
         }
 
         // background
-        background: $background-color-light-hover;
-        padding: 16px 18px;
-        border-radius: 4px;
-        line-height: 1.2;
         font-size: 0.94rem;
-        .chain-url {
-            margin-bottom: 2px;
-        }
         .chain-deferred {
             color: #777;
         }

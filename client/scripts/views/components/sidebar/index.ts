@@ -8,10 +8,13 @@ import {
   Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner
 } from 'construct-ui';
 
+import { DropdownFormField } from 'views/components/forms';
+import { selectNode, initChain } from 'app';
+
 import app from 'state';
 import { ProposalType } from 'identifiers';
 import { link } from 'helpers';
-import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo } from 'models';
+import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo, NodeInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
@@ -352,7 +355,7 @@ const ChainStatusModule: m.Component<{}> = {
     const url = app.chain?.meta?.url;
     if (!url) return;
 
-    const formattedUrl = url
+    const formatUrl = (u) => u
       .replace('ws://', '')
       .replace('wss://', '')
       .replace('http://', '')
@@ -360,8 +363,31 @@ const ChainStatusModule: m.Component<{}> = {
       .split('/')[0]
       .split(':')[0];
 
+    const nodes = (app.chain && app.chain.meta ? [] : [{
+      name: 'node',
+      label: 'Select a node',
+      value: undefined,
+      selected: true,
+      chainId: undefined,
+    }]).concat(app.config.nodes.getAll().map((n) => ({
+      name: 'node',
+      label: formatUrl(n.url),
+      value: n.id,
+      selected: app.chain && app.chain.meta && n.url === app.chain.meta.url && n.chain === app.chain.meta.chain,
+      chainId: n.chain.id,
+    })));
+
     return m('.ChainStatusModule', [
-      m('.chain-url', formattedUrl),
+      app.activeChainId() && m(DropdownFormField, {
+        name: 'node',
+        choices: nodes.filter((node) => node.chainId === app.activeChainId()),
+        callback: async (result) => {
+          const n: NodeInfo = app.config.nodes.getById(result);
+          await selectNode(n);
+          await initChain();
+          m.route.set(`/${n.chain.id}/settings`);
+        },
+      }),
       app.chain.deferred ? m('.chain-deferred', 'Ready to connect') : m(ChainStatusIndicator),
     ]);
   }
