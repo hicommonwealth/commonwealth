@@ -95,6 +95,9 @@
                 display: none !important;
             }
             border-right: 1px #d8dee0 solid;
+            &:last-child {
+                border-right: none;
+            }
         }
         > .cui-button:nth-child(1) {
             border-left: none;
