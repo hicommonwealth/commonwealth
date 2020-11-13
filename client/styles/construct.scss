@@ -132,6 +132,8 @@ $cui-negative-border-color:        $cui-negative-bg-color;
 $cui-negative-border-color-hover:  $cui-negative-bg-color-hover;
 $cui-negative-border-color-active: $cui-negative-bg-color-active;
 
+$cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
+
 @import 'construct-ui/src/utils/focus-manager/index.scss';
 @import 'construct-ui/src/components/index.scss';
 
@@ -152,6 +154,13 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
     top: 4px;
 }
 
+
+.cui-popover-content {
+    border-color: $cui-popover-arrow-border-color;
+}
+.cui-menu .cui-menu-divider {
+    border-color: lighten($cui-popover-arrow-border-color, 2%);
+}
 
 .cui-button {
     font-weight: $cui-font-weight-bold !important; // fix weight

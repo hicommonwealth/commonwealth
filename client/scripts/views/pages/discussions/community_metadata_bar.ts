@@ -1,4 +1,4 @@
-import 'pages/discussions/sidebar.scss';
+import 'pages/discussions/community_metadata_bar.scss';
 
 import { slugify } from 'helpers';
 import m from 'mithril';
@@ -86,3 +86,44 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
     ]);
   }
 };
+
+const CommunityMetadataBar: m.Component<{ entity: string }> = {
+  view: (vnode) => {
+    const activeAddresses = app.recentActivity.getMostActiveUsers();
+    // const activeThreads = app.recentActivity.getMostActiveThreads(entity);
+    // available: thread.title, thread.address, thread.authorChain, ...
+    //   m.route.set(`/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-${slugify(thread.title)}`);
+    return m('.CommunityMetadataBar', [
+      activeAddresses.length > 0
+      && m('.user-activity', [
+        m('.user-activity-header', 'Active members'),
+        m('.active-members', activeAddresses.map((user) => {
+          return m(User, {
+            user: user.info,
+            avatarSize: 24,
+            avatarOnly: true,
+            linkify: true,
+            popover: true,
+          });
+          // TODO: show user.count
+        })),
+      ]),
+      m('.admins-mods', [
+        m('.admins-mods-header', 'Admins and mods'),
+        (app.chain || app.community) && m('.active-members', [
+          (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((role) => {
+            return m(User, {
+              user: new AddressInfo(null, role.address, role.address_chain, null),
+              avatarSize: 24,
+              avatarOnly: true,
+              linkify: true,
+              popover: true,
+            });
+          }),
+        ]),
+      ]),
+    ]);
+  }
+};
+
+export default CommunityMetadataBar;

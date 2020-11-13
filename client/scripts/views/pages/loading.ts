@@ -18,7 +18,6 @@ const LoadingPage: m.Component<{
       class: 'LoadingPage',
       title,
       showNewProposalButton,
-      rightSidebar: narrow ? [] : null,
     }, [
       m(Spinner, {
         fill: true,

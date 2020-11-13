@@ -1,8 +1,11 @@
 @import 'client/styles/shared';
-@import 'client/styles/components/right_sidebar';
 
-.ListingSidebar {
-    margin: 10px 20px;
+.CommunityMetadataBar {
+    display: flex;
+    margin: 10px 0;
+    padding: 16px 20px;
+    border-radius: 4px;
+    background: $background-color-light;
 
     .user-activity-header,
     .forum-activity-header,

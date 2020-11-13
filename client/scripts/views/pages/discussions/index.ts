@@ -12,6 +12,7 @@ import { pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
+import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
@@ -19,7 +20,7 @@ import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import Listing from 'views/pages/listing';
 
 import { DEFAULT_PAGE_SIZE } from 'controllers/server/threads';
-import { ListingSidebar } from './sidebar';
+import CommunityMetadataBar from './community_metadata_bar';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
@@ -206,7 +207,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             class: 'DiscussionsPage',
             title: topic || 'Discussions',
             showNewProposalButton: true,
-            rightSidebar: m(ListingSidebar, { entity: app.activeId() })
           }, [
             m(EmptyTopicPlaceholder, {
               communityName: app.activeId(),
@@ -286,10 +286,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       title: topic || 'Discussions',
       description: topicDescription,
       showNewProposalButton: true,
-      rightSidebar: m(ListingSidebar, { entity: app.activeId() })
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
+          m(CommunityMetadataBar),
           (!activeEntity || !activeEntity.serverLoaded || stillFetching)
             ? m('.discussions-main', [
               m(ProposalsLoadingRow),
