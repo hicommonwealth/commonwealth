@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner
+  Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner, Select
 } from 'construct-ui';
 
 import { DropdownFormField } from 'views/components/forms';
@@ -367,21 +367,22 @@ const ChainStatusModule: m.Component<{}> = {
       name: 'node',
       label: 'Select a node',
       value: undefined,
-      selected: true,
+      // selected: true,
       chainId: undefined,
     }]).concat(app.config.nodes.getAll().map((n) => ({
       name: 'node',
       label: formatUrl(n.url),
       value: n.id,
-      selected: app.chain && app.chain.meta && n.url === app.chain.meta.url && n.chain === app.chain.meta.chain,
+      // selected: app.chain && app.chain.meta && n.url === app.chain.meta.url && n.chain === app.chain.meta.chain,
       chainId: n.chain.id,
     })));
 
     return m('.ChainStatusModule', [
-      app.activeChainId() && m(DropdownFormField, {
+      app.activeChainId() && m(Select, {
         name: 'node',
-        choices: nodes.filter((node) => node.chainId === app.activeChainId()),
-        callback: async (result) => {
+        rounded: true,
+        options: nodes.filter((node) => node.chainId === app.activeChainId()),
+        onSelect: async (result) => {
           const n: NodeInfo = app.config.nodes.getById(result);
           await selectNode(n);
           await initChain();
