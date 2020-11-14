@@ -1,6 +1,6 @@
 @import 'client/styles/shared';
 
-.ProposalsPage, .TreasuryPage, .ReferendaPage {
+.ProposalsPage, .TreasuryPage, .ReferendaPage, .DelegatePage {
     padding-bottom: 36px;
     .sublayout-body {
         flex-direction: column;
@@ -20,7 +20,7 @@
             font-weight: 500;
         }
     }
-    .Listing {
+    .Listing, .DelegateForm {
         margin-top: 20px;
     }
     .no-proposals {
