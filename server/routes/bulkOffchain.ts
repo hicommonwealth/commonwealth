@@ -129,7 +129,10 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     return data;
   });
 
-  const allThreads = pinnedThreads.map((t) => t.toJSON()).concat(threads);
+  const allThreads = pinnedThreads.map((t) => {
+    root_ids.push(`discussion_${t.id}`);
+    return t.toJSON();
+  }).concat(threads);
 
   // Comments
   const comments = await models.OffchainComment.findAll({
