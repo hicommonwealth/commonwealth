@@ -304,6 +304,37 @@
         .chain-deferred {
             color: #777;
         }
+
+        // form stuff
+        .form-group {
+            margin-bottom: 0;
+            select {
+                width: 100%;
+                border-color: #ddd;
+                border-radius: 2px;
+                padding: 5px 6px;
+            }
+            .chain-status-main {
+                width: calc(100% - 28px);
+            }
+        }
+        .cui-button-group {
+            position: relative;
+            width: 100%;
+        }
+        .cui-button-label {
+            font-weight: 400;
+            text-align: left;
+            width: 100%;
+            position: relative;
+            left: -2px;
+        }
+        .cui-icon svg {
+            min-width: 12px;
+            min-height: 12px;
+            width: 12px;
+            height: 12px;
+        }
     }
 }
 
