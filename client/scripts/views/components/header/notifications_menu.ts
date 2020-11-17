@@ -38,16 +38,13 @@ const NotificationButtons: m.Component<{}> = {
       }),
       m(Popover, {
         content: [
-          m('div', { style: 'margin-bottom: 10px' }, [
-            `Clear ${pluralize(chainEventNotifications.length, 'chain event notification')}?`
-          ]),
+          m('div', { style: 'margin-bottom: 10px' }, 'Clear chain event notifications?'),
           m(Button, {
             label: 'Confirm',
             fluid: true,
             disabled: chainEventNotifications.length === 0,
             onclick: async (e) => {
               e.preventDefault();
-              const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);
               if (chainEventNotifications.length === 0) return;
               app.user.notifications.clear(chainEventNotifications).then(() => m.redraw());
             }
@@ -83,7 +80,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
         class: `NotificationsMenuButton ${unreadNotifications > 0 ? 'has-notifications' : 'no-notifications'}`,
         label: [
           m(Icon, { name: Icons.BELL }),
-          m('.notification-count', unreadNotifications),
+          m('.notification-count', unreadNotifications > 9 ? '∞' : unreadNotifications),
         ],
         size: small ? 'sm' : 'default',
         compact: true,

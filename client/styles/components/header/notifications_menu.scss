@@ -8,9 +8,10 @@
     .notification-count {
         background: $negative-bg-color;
         border-radius: 9999px;
-        padding: 1px 7px;
+        padding: 1px 6px;
         text-align: center;
         color: #fff;
+        font-size: 97%;
     }
 
     @include sm-max {
@@ -94,6 +95,9 @@
                 display: none !important;
             }
             border-right: 1px #d8dee0 solid;
+            &:last-child {
+                border-right: none;
+            }
         }
         > .cui-button:nth-child(1) {
             border-left: none;

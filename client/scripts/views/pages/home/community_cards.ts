@@ -29,7 +29,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
     const chainInfo = app.config.chains.getById(chain);
     const visitedChain = !!unseenPosts[chain];
     const updatedThreads = unseenPosts[chain]?.activePosts || 0;
-    const monthlyThreads = app.recentActivity.getThreadsByCommunity(chain);
+    const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(chain);
 
     return m(Card, {
       elevation: 1,
@@ -56,9 +56,9 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
         ]),
         m('p.card-description', chainInfo.description),
         // if no recently active threads, hide this module altogether
-        m('.recent-activity', !!monthlyThreads.length && [
+        m('.recent-activity', !!monthlyThreadCount && [
           m('.recent-threads', [
-            pluralize(monthlyThreads.length, 'thread'),
+            pluralize(monthlyThreadCount, 'thread'),
             ' this month',
           ]),
         ])
@@ -73,7 +73,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
     const { unseenPosts } = app.user;
     const visitedCommunity = !!unseenPosts[community.id];
     const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
-    const monthlyThreads = app.recentActivity.getThreadsByCommunity(community.id);
+    const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(community.id);
 
     return m(Card, {
       elevation: 1,
@@ -101,9 +101,9 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
         ]),
         m('p.card-description', community.description),
         // if no recently active threads, hide this module altogether
-        m('.recent-activity', !!monthlyThreads.length && [
+        m('.recent-activity', !!monthlyThreadCount && [
           m('.recent-threads', [
-            pluralize(monthlyThreads.length, 'thread'),
+            pluralize(monthlyThreadCount, 'thread'),
             ' this month',
           ]),
         ])
@@ -184,8 +184,8 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
     const myCommunities: any = app.config.communities.getAll();
 
     const sortedChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
-      const threadCountA = app.recentActivity.getThreadsByCommunity(Array.isArray(a) ? a[0] : a.id).length;
-      const threadCountB = app.recentActivity.getThreadsByCommunity(Array.isArray(b) ? b[0] : b.id).length;
+      const threadCountA = app.recentActivity.getCommunityThreadCount(Array.isArray(a) ? a[0] : a.id);
+      const threadCountB = app.recentActivity.getCommunityThreadCount(Array.isArray(b) ? b[0] : b.id);
       return (threadCountB - threadCountA);
     }).map((entity) => {
       if (Array.isArray(entity)) {

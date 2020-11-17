@@ -121,7 +121,6 @@ class CommentsController {
       });
       const { result } = res;
       this._store.add(modelFromServer(result));
-      app.recentActivity.addAddressesFromActivity([result]);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
@@ -180,8 +179,6 @@ class CommentsController {
       }).then((result) => {
         const existing = this._store.getById(comment.id);
         this._store.remove(existing);
-        // Properly removing from recent activity will require comments/threads to have an address_id
-        // app.recentActivity.removeAddressActivity([comment]);
         resolve(result);
       }).catch((e) => {
         console.error(e);
