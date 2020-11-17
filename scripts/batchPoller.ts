@@ -1,5 +1,9 @@
 import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
+import { LogGroupControlSettings } from 'typescript-logging';
 import { chainSupportedBy, SubstrateEvents, EventSupportingChains, SubstrateTypes } from '../dist/index';
+import { factoryControl } from '../dist/logging';
+
+factoryControl.change({ group: 'all', logLevel: 'Info' } as LogGroupControlSettings);
 
 const args = process.argv.slice(2);
 const chain = args[0] || 'edgeware';
@@ -27,11 +31,20 @@ if (chainSupportedBy(chain, SubstrateEvents.Types.EventChains)) {
     const poller = new SubstrateEvents.Poller(api);
     const results = [];
     const CHUNK_SIZE = 1000;
-    const END_BLOCK = latestBlock - (latestBlock % CHUNK_SIZE);
-    for (let block = CHUNK_SIZE; block <= END_BLOCK; block += CHUNK_SIZE) {
+
+    // iterate over all blocks in chunks, from smallest to largest, and place in result array
+    for (let block = CHUNK_SIZE; block <= latestBlock; block += CHUNK_SIZE) {
       try {
-        const chunk = await poller.poll({ startBlock: block - CHUNK_SIZE, endBlock: block }, CHUNK_SIZE);
-        // TODO: do something with chunk
+        const chunk = await poller.poll({
+          startBlock: block - CHUNK_SIZE,
+          endBlock: Math.min(block, latestBlock)
+        }, CHUNK_SIZE);
+        // TODO: do something with chunk array
+
+        // the final query will be smaller than CHUNK_SIZE, otherwise a shortened length means pruning took place
+        if (chunk.length < CHUNK_SIZE && block < latestBlock) {
+          throw new Error('Found pruned headers, must query archival node');
+        }
         console.log(`Fetched blocks ${chunk[0].header.number} to ${chunk[CHUNK_SIZE - 1].header.number}.`);
         results.push(...chunk);
       } catch (err) {
