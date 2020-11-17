@@ -18,7 +18,7 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
    * @param startBlock first block to fetch
    * @param endBlock last block to fetch, omit to fetch to latest
    */
-  public async poll(range: IDisconnectedRange): Promise<Block[]> {
+  public async poll(range: IDisconnectedRange, maxRange = 500): Promise<Block[]> {
     // discover current block if no end block provided
     if (!range.endBlock) {
       const header = await this._api.rpc.chain.getHeader();
@@ -29,9 +29,9 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
       log.error(`End of range (${range.endBlock}) <= start (${range.startBlock})! No blocks to fetch.`);
       return;
     }
-    if ((range.endBlock - range.startBlock) > 500) {
-      log.info(`Attempting to poll ${range.endBlock - range.startBlock} blocks, reducing query size.`);
-      range.startBlock = range.endBlock - 500;
+    if ((range.endBlock - range.startBlock) > maxRange) {
+      log.info(`Attempting to poll ${range.endBlock - range.startBlock} blocks, reducing query size to ${maxRange}.`);
+      range.startBlock = range.endBlock - maxRange;
     }
 
     // discover current version

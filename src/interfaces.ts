@@ -102,7 +102,7 @@ export abstract class IEventPoller<Api, RawEvent> {
   ) { }
 
   // throws on error
-  public abstract async poll(range: IDisconnectedRange): Promise<RawEvent[]>;
+  public abstract async poll(range: IDisconnectedRange, maxRange?: number): Promise<RawEvent[]>;
 }
 
 // a set of labels used to display notifications
