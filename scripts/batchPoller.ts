@@ -2,11 +2,11 @@ import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
 import { ApiPromise } from '@polkadot/api';
 import { LogGroupControlSettings } from 'typescript-logging';
 import {
-  chainSupportedBy, SubstrateEvents, EventSupportingChains, SubstrateTypes, IEventHandler, IDisconnectedRange
+  chainSupportedBy, SubstrateEvents, EventSupportingChains, IEventHandler, IDisconnectedRange, CWEvent
 } from '../dist/index';
 import { factoryControl } from '../dist/logging';
 
-export async function batchQuery(api: ApiPromise, eventHandlers: IEventHandler<SubstrateTypes.IEventData>[], fullRange?: IDisconnectedRange) {
+export async function batchQuery(api: ApiPromise, eventHandlers: IEventHandler<CWEvent>[], fullRange?: IDisconnectedRange) {
   // turn off debug logging for poller -- it's annoying
   factoryControl.change({ group: 'all', logLevel: 'Info' } as LogGroupControlSettings);
 
@@ -70,6 +70,12 @@ export async function batchQuery(api: ApiPromise, eventHandlers: IEventHandler<S
   }
 }
 
+class StandaloneEventHandler extends IEventHandler {
+  public async handle(event: CWEvent): Promise<any> {
+    console.log(`Received event: ${JSON.stringify(event, null, 2)}`);
+  }
+}
+
 function main() {
   const args = process.argv.slice(2);
   const chain = args[0] || 'edgeware';
@@ -93,7 +99,7 @@ function main() {
       : chain === 'edgeware-testnet' ? Beresheet
         : chain === 'edgeware' ? Mainnet : {};
     SubstrateEvents.createApi(url, spec).then(async (api) => {
-      await batchQuery(api, []); // TODO: event handler
+      await batchQuery(api, [ new StandaloneEventHandler() ]);
       process.exit(0);
     });
   }
