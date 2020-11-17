@@ -105,119 +105,147 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
     console.log(proposal.votingType);
     if (proposal instanceof EdgewareSignalingProposal) {
       return m('.ProposalVotingResults', [
-        [ m('results-header', 'Voters'),
-          m('.results-cell', [
-            m(VoteListing, { proposal, votes })
-          ])
-        ]
-      ].concat(proposal.data.choices.map((outcome) => {
-        return ([
-          m('.results-header', signalingVoteToString(outcome)),
+        proposal.data.choices.map((outcome) => {
+          return m('.results-column', [
+            m('.results-header', signalingVoteToString(outcome)),
+            m('.results-cell', [
+              m(VoteListing, {
+                proposal,
+                votes: votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))
+              })
+            ])
+          ]);
+        }),
+      ]);
+    } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
+      return m('.ProposalVotingResults', [
+        m('.results-column', [
+          m('.results-header', 'Voted yes'),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))
-            })
-          ])
-        ]);
-      })));
-    } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
-      return m('.ProposalVotingResults', [
-        m('.results-header', 'Voted yes'),
-        m('.results-header', 'Voted no'),
-        m('.results-cell', [
-          m(VoteListing, {
-            proposal,
-            votes: votes.filter((v) => v.choice === true) })
+              votes: votes.filter((v) => v.choice === true) })
+          ]),
         ]),
-        m('.results-cell', [
-          m(VoteListing, {
-            proposal,
-            votes: votes.filter((v) => v.choice === false) })
-        ]),
+        m('.results-column', [
+          m('.results-header', 'Voted no'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === false) })
+          ]),
+        ])
       ]);
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       return m('.ProposalVotingResults', [
-        m('.results-header', 'Voted yes'),
-        m('.results-header', 'Voted no'),
-        m('.results-cell', [
-          m(VoteListing, {
-            proposal,
-            votes: votes.filter((v) => v.choice === MolochVote.YES)
-          })
+        m('.results-column', [
+          m('.results-header', 'Voted yes'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === MolochVote.YES)
+            })
+          ]),
         ]),
-        m('.results-cell', [
-          m(VoteListing, {
-            proposal,
-            votes: votes.filter((v) => v.choice === MolochVote.NO)
-          })
-        ]),
+        m('.results-column', [
+          m('.results-header', 'Voted no'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === MolochVote.NO)
+            })
+          ]),
+        ])
       ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       return m('.ProposalVotingResults', [
-        m('.results-header', 'Voted yes'),
-        m('.results-header', 'Voted no'),
-        m('.results-cell', [
-          m(VoteListing, {
-            proposal,
-            votes: votes.filter((v) => v.choice === true),
-            amount: true,
-            weight: true
-          })
+        m('.results-column', [
+          m('.results-header', 'Voted yes'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === true),
+              amount: true,
+              weight: true
+            })
+          ]),
         ]),
-        m('.results-cell', [
-          m(VoteListing, {
-            proposal,
-            votes: votes.filter((v) => v.choice === false),
-            amount: true,
-            weight: true
-          })
-        ]),
+        m('.results-column', [
+          m('.results-header', 'Voted no'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === false),
+              amount: true,
+              weight: true
+            })
+          ]),
+        ])
       ]);
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       return m('.ProposalVotingResults', [
-        m('.results-header', 'Voted yes'),
-        m('.results-header', 'Voted no'),
-        m('.results-cell', [
-          m(VoteListing, {
-            proposal,
-            votes: votes.filter((v) => v.choice === CosmosVoteChoice.YES)
-          })
+        m('.results-column', [
+          m('.results-header', 'Voted yes'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === CosmosVoteChoice.YES)
+            })
+          ]),
         ]),
-        m('.results-cell', [
-          m(VoteListing, {
-            proposal,
-            votes: votes.filter((v) => v.choice === CosmosVoteChoice.NO)
-          })
+        m('.results-column', [
+          m('.results-header', 'Voted no'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === CosmosVoteChoice.NO)
+            })
+          ]),
         ]),
-        m('.results-cell', [
-          m(VoteListing, {
-            proposal,
-            votes: votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN)
-          })
+        m('.results-column', [
+          m('.results-header', 'Voted abstain'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN)
+            })
+          ]),
         ]),
-        m('.results-cell', [
-          m(VoteListing, {
-            proposal,
-            votes: votes.filter((v) => v.choice === CosmosVoteChoice.VETO)
-          })
-        ]),
+        m('.results-column', [
+          m('.results-header', 'Voted veto'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === CosmosVoteChoice.VETO)
+            })
+          ]),
+        ])
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting
                && proposal instanceof CosmosProposal) {
       // special case for cosmos proposals in deposit stage
       return m('.ProposalVotingResults', [
-        m(VoteListing, {
-          proposal,
-          votes: proposal.depositorsAsVotes
-        })
+        m('.results-column', [
+          m('.results-header', 'Voted to approve'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: proposal.depositorsAsVotes
+            })
+          ]),
+        ]),
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
       return m('.ProposalVotingResults', [
-        m(VoteListing, {
-          proposal,
-          votes
-        })
+        m('.results-column', [
+          m('.results-header', 'Voted to approve'),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes
+            })
+          ]),
+        ]),
       ]);
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       // to be implemented

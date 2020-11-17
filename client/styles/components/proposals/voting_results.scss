@@ -5,17 +5,26 @@
     display: flex;
     background-color: $background-color-light;
     margin-top: 25px;
-    padding: 12px 20px 13px;
     flex-wrap: wrap;
-    .results-header {
-        font-weight: 500;
-    }
-    .results-cell:nth-child(odd), .results-header:nth-child(odd) {
-        margin-right: 15px;
-    }
-    .results-header, .results-cell {
+    .results-column {
+        display: flex;
+        flex-direction: column;
         flex: 1;
-        min-width: calc(50% - 15px);
+        padding: 12px 20px 13px;
+        min-width: 50%;
+        .results-header {
+            font-weight: 500;
+        }
+        .results-cell:nth-child(odd), .results-header:nth-child(odd) {
+            margin-right: 15px;
+        }
+        .results-header, .results-cell {
+            flex: 1;
+            min-width: calc(50% - 15px);
+        }
+    }
+    .results-column:nth-child(even) {
+        border-left: 1px solid lightgray;
     }
     .vote {
         display: flex;
