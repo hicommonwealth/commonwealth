@@ -2,11 +2,16 @@ import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
 import { ApiPromise } from '@polkadot/api';
 import { LogGroupControlSettings } from 'typescript-logging';
 import {
-  chainSupportedBy, SubstrateEvents, EventSupportingChains, IEventHandler, IDisconnectedRange, CWEvent
+  chainSupportedBy, SubstrateEvents, EventSupportingChains, IEventHandler, IDisconnectedRange, CWEvent, SubstrateTypes
 } from '../dist/index';
 import { factoryControl } from '../dist/logging';
 
-export async function batchQuery(api: ApiPromise, eventHandlers: IEventHandler<CWEvent>[], fullRange?: IDisconnectedRange) {
+export async function batchQuery(
+  api: ApiPromise,
+  eventHandlers: IEventHandler<CWEvent>[],
+  fullRange?: IDisconnectedRange,
+  aggregateFirst = false, // fetch all blocks before running processor function
+) {
   // turn off debug logging for poller -- it's annoying
   factoryControl.change({ group: 'all', logLevel: 'Info' } as LogGroupControlSettings);
 
@@ -19,6 +24,29 @@ export async function batchQuery(api: ApiPromise, eventHandlers: IEventHandler<C
     };
   } else if (!fullRange.endBlock) {
     fullRange.endBlock = latestBlock;
+  }
+
+  const processBlocksFn = async (blocks: SubstrateTypes.Block[]) => {
+    // process all blocks
+    const processor = new SubstrateEvents.Processor(api);
+    for (const block of blocks) {
+      // retrieve events from block
+      const events = await processor.process(block);
+
+      // send all events through event-handlers in sequence
+      await Promise.all(events.map(async (event) => {
+        let prevResult = null;
+        for (const handler of eventHandlers) {
+          try {
+            // pass result of last handler into next one (chaining db events)
+            prevResult = await handler.handle(event, prevResult);
+          } catch (err) {
+            console.error(`Event handle failure: ${err.message}`);
+            break;
+          }
+        }
+      }));
+    }
   }
 
   // TODO: configure chunk size
@@ -40,33 +68,20 @@ export async function batchQuery(api: ApiPromise, eventHandlers: IEventHandler<C
       }
       console.log(`Fetched blocks ${chunk[0].header.number} to ${chunk[CHUNK_SIZE - 1].header.number}.`);
 
-      // compile chunks into results
-      results.push(...chunk);
+      if (aggregateFirst) {
+        // compile chunks into results
+        results.push(...chunk);
+      } else {
+        // process chunk immediately, and do not aggregate
+        await processBlocksFn(chunk);
+      }
     } catch (err) {
       console.error(`Failed to fetch blocks ${block - CHUNK_SIZE}-${block}: ${err.message}.`);
       // TODO: exit if desired
     }
   }
-
-  // process all blocks
-  const processor = new SubstrateEvents.Processor(api);
-  for (const block of results) {
-    // retrieve events from block
-    const events = await processor.process(block);
-
-    // send all events through event-handlers in sequence
-    await Promise.all(events.map(async (event) => {
-      let prevResult = null;
-      for (const handler of eventHandlers) {
-        try {
-          // pass result of last handler into next one (chaining db events)
-          prevResult = await handler.handle(event, prevResult);
-        } catch (err) {
-          console.error(`Event handle failure: ${err.message}`);
-          break;
-        }
-      }
-    }));
+  if (aggregateFirst) {
+    await processBlocksFn(results);
   }
 }
 
