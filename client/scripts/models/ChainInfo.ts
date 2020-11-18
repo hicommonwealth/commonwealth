@@ -15,6 +15,7 @@ class ChainInfo {
   public chat: string;
   public telegram: string;
   public github: string;
+  public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
@@ -22,7 +23,7 @@ class ChainInfo {
 
   constructor(
     id, network, symbol, name, iconUrl, description, website, chat, telegram,
-    github, featuredTopics, topics, adminsAndMods?
+    github, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
     this.network = network;
@@ -34,6 +35,7 @@ class ChainInfo {
     this.chat = chat;
     this.telegram = telegram;
     this.github = github;
+    this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
@@ -51,6 +53,7 @@ class ChainInfo {
       json.chat,
       json.telegram,
       json.github,
+      json.collapsed_on_homepage,
       json.featured_topics,
       json.topics,
       json.adminsAndMods,

@@ -473,6 +473,8 @@ const ViewProposalPage: m.Component<{
   prefetch: IPrefetch,
   comments,
   viewCount: number,
+  proposal: AnyProposal | OffchainThread,
+  threadFetched,
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -505,25 +507,37 @@ const ViewProposalPage: m.Component<{
     }
 
     // load proposal
-    let proposal: AnyProposal;
-    try {
-      proposal = idToProposal(proposalType, proposalId);
-    } catch (e) {
-      // proposal might be loading, if it's not an offchain thread
-      if (proposalType !== ProposalType.OffchainThread) {
-        if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
-
-        // check if module is still initializing
-        const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
-        if (!c.disabled && !c.initialized) {
-          if (!c.initializing) loadCmd(proposalType);
+    if (!vnode.state.proposal) {
+      try {
+        vnode.state.proposal = idToProposal(proposalType, proposalId);
+      } catch (e) {
+        // proposal might be loading, if it's not an offchain thread
+        if (proposalType === ProposalType.OffchainThread) {
+          if (!vnode.state.threadFetched) {
+            app.threads.fetchThread(Number(proposalId)).then((res) => {
+              vnode.state.proposal = res;
+              m.redraw();
+            }).catch((err) => {
+              notifyError('Thread not found');
+              return m(PageNotFound);
+            });
+            vnode.state.threadFetched = true;
+          }
           return m(PageLoading, { narrow: true, showNewProposalButton: true });
+        } else {
+          if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
+          // check if module is still initializing
+          const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
+          if (!c.disabled && !c.initialized) {
+            if (!c.initializing) loadCmd(proposalType);
+            return m(PageLoading, { narrow: true, showNewProposalButton: true });
+          }
         }
+        // proposal does not exist, 404
+        return m(PageNotFound);
       }
-
-      // proposal does not exist, 404
-      return m(PageNotFound);
     }
+    const { proposal } = vnode.state;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
       m.route.set(`/${app.activeId()}/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
         { replace: true });

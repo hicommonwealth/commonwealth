@@ -25,7 +25,14 @@ export const modelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
-  const proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+
+  let proposal;
+  try {
+    proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+  } catch (e) {
+    // no proposal
+  }
+
   return new OffchainComment(
     comment.chain,
     comment?.Address?.address || comment.author,
@@ -114,7 +121,6 @@ class CommentsController {
       });
       const { result } = res;
       this._store.add(modelFromServer(result));
-      app.recentActivity.addAddressesFromActivity([result]);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
@@ -173,8 +179,6 @@ class CommentsController {
       }).then((result) => {
         const existing = this._store.getById(comment.id);
         this._store.remove(existing);
-        // Properly removing from recent activity will require comments/threads to have an address_id
-        // app.recentActivity.removeAddressActivity([comment]);
         resolve(result);
       }).catch((e) => {
         console.error(e);
@@ -197,17 +201,13 @@ class CommentsController {
           reject(new Error(`Unsuccessful status: ${response.status}`));
         }
         this._store.clearProposal(proposal);
-        Promise.all(response.result.map(async (comment) => {
+        response.result.forEach((comment) => {
           // TODO: Comments should always have a linked Address
           if (!comment.Address) console.error('Comment missing linked address');
           const model = modelFromServer(comment);
           this._store.add(model);
-          return model;
-        })).then((result) => {
-          resolve(result);
-        }).catch((error) => {
-          reject(error);
         });
+        resolve();
       } catch (err) {
         console.log('Failed to load comments');
         reject(new Error(err.responseJSON?.error ? err.responseJSON.error : 'Error loading comments'));

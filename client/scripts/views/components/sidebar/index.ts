@@ -31,7 +31,7 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
       key: `${item instanceof ChainInfo ? 'chain' : 'community'}-${item.id}`
     }, [
       m(Tooltip, {
-        hoverOpenDelay: 350,
+        hoverOpenDelay: 500,
         hoverCloseDelay: 0,
         transitionDuration: 0,
         position: 'right',

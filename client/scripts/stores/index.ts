@@ -10,6 +10,7 @@ export { default as ProposalStore } from './ProposalStore';
 export { default as ReactionStore } from './ReactionStore';
 export { default as Store } from './Store';
 export { default as TopicStore } from './TopicStore';
+export { default as TopicScopedThreadStore } from './TopicScopedThreadStore';
 export { default as ChainEntityStore } from './ChainEntityStore';
 export { default as PersistentStore } from './PersistentStore';
 
