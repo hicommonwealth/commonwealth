@@ -1,10 +1,8 @@
 import m from 'mithril';
 import _ from 'lodash';
-import { Button } from 'construct-ui';
-
 import { OffchainThread, Account } from 'models';
-import { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
+import { UserContent } from '.';
 import ProfileProposal from './profile_proposal';
 
 const ProfileContent: m.Component<{ account: Account<any>, type: UserContent, content: any}, { count: number }> = {
@@ -49,15 +47,12 @@ const ProfileContent: m.Component<{ account: Account<any>, type: UserContent, co
        || (type === UserContent.Threads && proposals.length > 10 && vnode.state.count < proposals.length)
        || (type === UserContent.Comments && comments.length > 10 && vnode.state.count < comments.length))
         && m('.btn-wrap', [
-          m(Button, {
-            intent: 'primary',
-            fluid: true,
+          m('a.btn', {
             onclick: (e) => {
               e.preventDefault();
               vnode.state.count += 10;
-            },
-            label: 'Load more'
-          })
+            }
+          }, 'Load more')
         ])
     ]);
   }
