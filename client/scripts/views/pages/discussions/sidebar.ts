@@ -11,6 +11,7 @@ import CommunityInfoModule from 'views/components/sidebar/community_info_module'
 export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: number }, {}> = {
   view: (vnode) => {
     const { user, activityCount } = vnode.attrs;
+    // const profile = app.profiles.getProfile(user.chainId, user.address);
     return m('.MostActiveUser', [
       m(User, {
         user,
@@ -47,18 +48,17 @@ export const MostActiveThread: m.Component<{ thread: AbridgedThread }> = {
 
 export const ListingSidebar: m.Component<{ entity: string }> = {
   view: (vnode) => {
-    const { entity } = vnode.attrs;
-    const activeAddresses = app.recentActivity.getMostActiveUsers(entity);
+    const activeAddresses = app.recentActivity.getMostActiveUsers();
     // const activeThreads = app.recentActivity.getMostActiveThreads(entity);
-
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
       m(CommunityInfoModule),
-      m('.user-activity', [
+      activeAddresses.length > 0
+      && m('.user-activity', [
         m('.user-activity-header', 'Active members'),
         m('.active-members', activeAddresses.map((user) => {
           return m(MostActiveUser, {
-            user: user.addressInfo,
-            activityCount: user.postCount
+            user: user.info,
+            activityCount: user.count
           });
         })),
       ]),

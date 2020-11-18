@@ -36,7 +36,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       : link('a', discussionLink, proposal.title);
 
     const pinned = proposal.pinned;
-
     const rowSubheader = [
       proposal.readOnly && m('.discussion-locked', [
         m(Tag, {
@@ -59,6 +58,10 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         popover: true,
         hideAvatar: true,
       }),
+      m('.mobile-comment-count', [
+        m(Icon, { name: Icons.MESSAGE_SQUARE }),
+        app.comments.nComments(proposal),
+      ]),
     ];
 
     const rowExcerpt = showExcerpt

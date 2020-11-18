@@ -1,14 +1,17 @@
 @import 'client/styles/shared';
 
 .NotificationsMenuButton {
-    padding: 0 10px !important;
+    padding: 0 !important;
+    width: 38px;
+    text-align: center;
 
     .notification-count {
         background: $negative-bg-color;
         border-radius: 9999px;
-        padding: 1px 7px;
+        padding: 1px 6px;
         text-align: center;
         color: #fff;
+        font-size: 97%;
     }
 
     @include sm-max {
@@ -91,9 +94,13 @@
                 // suppress button group styling
                 display: none !important;
             }
+            border-right: 1px #d8dee0 solid;
+            &:last-child {
+                border-right: none;
+            }
         }
         > .cui-button:nth-child(1) {
-            border-right: 1px #d8dee0 solid;
+            border-left: none;
         }
     }
 }

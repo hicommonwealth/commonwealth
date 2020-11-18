@@ -4,14 +4,19 @@ import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import app from 'state';
 
-import { PopoverMenu, Button, Icon, Icons, ButtonGroup } from 'construct-ui';
+import { Popover, PopoverMenu, Button, Icon, Icons, ButtonGroup } from 'construct-ui';
 import NotificationRow from 'views/components/notification_row';
 import { Notification } from 'models';
+import { pluralize } from 'helpers';
 import { sortNotifications } from 'helpers/notifications';
+
+const MAX_NOTIFS = 40; // limit number of notifications shown
 
 const NotificationButtons: m.Component<{}> = {
   view: (vnode) => {
     const notifications = app.user.notifications.notifications;
+    const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);
+
     return m(ButtonGroup, {
       class: 'NotificationButtons',
       fluid: true,
@@ -30,6 +35,29 @@ const NotificationButtons: m.Component<{}> = {
         onclick: () => (app.activeChainId() || app.activeCommunityId())
           ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationsList`)
           : m.route.set('/notificationsList'),
+      }),
+      m(Popover, {
+        content: [
+          m('div', { style: 'margin-bottom: 10px' }, 'Clear chain event notifications?'),
+          m(Button, {
+            label: 'Confirm',
+            fluid: true,
+            disabled: chainEventNotifications.length === 0,
+            onclick: async (e) => {
+              e.preventDefault();
+              if (chainEventNotifications.length === 0) return;
+              app.user.notifications.clear(chainEventNotifications).then(() => m.redraw());
+            }
+          })
+        ],
+        trigger: m(Button, {
+          disabled: chainEventNotifications.length === 0,
+          label: 'Clear events',
+        }),
+        transitionDuration: 0,
+        closeOnContentClick: true,
+        closeOnEscapeKey: true,
+        onClosed: () => { m.redraw(); },
       }),
     ]);
   }
@@ -52,7 +80,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
         class: `NotificationsMenuButton ${unreadNotifications > 0 ? 'has-notifications' : 'no-notifications'}`,
         label: [
           m(Icon, { name: Icons.BELL }),
-          m('.notification-count', unreadNotifications),
+          m('.notification-count', unreadNotifications > 9 ? '∞' : unreadNotifications),
         ],
         size: small ? 'sm' : 'default',
         compact: true,
@@ -69,7 +97,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
           notifications.length > 0
             ? m(Infinite, {
               maxPages: 1, // prevents rollover/repeat
-              pageData: () => sortedNotifications.slice(0, 80), // limit the number of rows shown here
+              pageData: () => sortedNotifications.slice(0, MAX_NOTIFS), // limit the number of rows shown here
               key: notifications.length,
               item: (data, opts, index) => {
                 return m(NotificationRow, { notifications: data });

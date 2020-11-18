@@ -7,7 +7,7 @@ import { formatAddressShort, link } from 'helpers';
 import { Tooltip, Tag, Icon, Icons, Popover } from 'construct-ui';
 
 import app from 'state';
-import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
+import { Account, AddressInfo, ChainInfo, ChainBase, Profile } from 'models';
 
 const User: m.Component<{
   user: Account<any> | AddressInfo;
@@ -62,6 +62,9 @@ const User: m.Component<{
       }
       profile = app.profiles.getProfile(chainId, address);
       role = adminsAndMods.find((r) => r.address === address && r.address_chain === chainId);
+    } else if (vnode.attrs.user instanceof Profile) {
+      profile = vnode.attrs.user;
+      role = adminsAndMods.find((r) => r.address === profile.address && r.address_chain === profile.chain);
     } else {
       account = vnode.attrs.user;
       // TODO: we should remove this, since account should always be of type Account,
@@ -141,6 +144,8 @@ const User: m.Component<{
         content: userPopover,
         trigger: userFinal,
         closeOnContentClick: true,
+        transitionDuration: 0,
+        hoverOpenDelay: 500,
         key: profile?.address || '-'
       })
       : userFinal;
