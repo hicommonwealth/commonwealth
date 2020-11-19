@@ -278,8 +278,6 @@ const NotificationRow: m.Component<{
           notificationArray.push(notification);
           await app.user.notifications.markAsRead(notificationArray).then(() => { console.log('279'); return m.redraw(); });
           await m.route.set(`/${app.activeId() || 'edgeware'}/notificationsList?id=${notification.id}`);
-          console.log(m.route.get());
-          console.log('281');
           m.redraw.sync();
         },
       }, [
@@ -317,16 +315,9 @@ const NotificationRow: m.Component<{
         key: notification.id,
         id: notification.id,
         onclick: async () => {
-          const notificationArray: Notification[] = [];
-          // await app.user.notifications.markAsRead(notifications).then(() => { console.log('321'); return m.redraw(); });
-          // console.log('322'); console.log(path);
-          m.route.set(path);
-          // await m.route.set('/edgeware/proposal/discussion/:identifier', { identifier: 634 });
-          console.log('323');
-          console.log(m.route.get());
-          m.redraw.sync();
-          // TODO: ensure notifs close
-          // if (pageJump) setTimeout(() => pageJump(), 1);
+          await app.user.notifications.markAsRead(notifications);
+          m.route.set(path)
+          if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
         authorInfo.length === 1

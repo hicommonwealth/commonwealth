@@ -509,6 +509,7 @@ const ViewProposalPage: m.Component<{
 
     // load proposal
     if (!vnode.state.proposal || Number(vnode.state.proposal.identifier) !== Number(proposalId)) {
+      debugger
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
       } catch (e) {
