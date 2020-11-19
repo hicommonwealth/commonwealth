@@ -11,7 +11,7 @@ module.exports = {
 
       // add hash to all events
       const events = await queryInterface.sequelize.query(
-        'SELECT * FROM "ChainEvents"',
+        'SELECT * FROM "ChainEvents" WHERE "chain_event_type_id" NOT LIKE \'%reward\' AND  "chain_event_type_id" NOT LIKE \'%bonded\' AND  "chain_event_type_id" NOT LIKE \'%slash\'',
         { transaction: t },
       );
       let i = 0;

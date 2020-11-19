@@ -99,6 +99,38 @@ describe('Event Storage Handler Tests', () => {
     assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
   });
 
+  it('should create duplicate events for skipped type', async () => {
+    const event: CWEvent = {
+      blockNumber: 11,
+      data: {
+        kind: SubstrateTypes.EventKind.Unbonded,
+        stash: 'a',
+        amount: '1000',
+        controller: 'c',
+      }
+    };
+
+    const eventHandler = new StorageHandler(models, 'edgeware', [], [ SubstrateTypes.EventKind.Unbonded ]);
+    // process event
+    const dbEvent = await eventHandler.handle(event);
+    const dbEvent2 = await eventHandler.handle(event);
+
+    // expect results
+    assert.deepEqual(dbEvent.event_data, event.data);
+    assert.deepEqual(dbEvent2.event_data, event.data);
+    const chainEvents = await models['ChainEvent'].findAll({
+      where: {
+        chain_event_type_id: 'edgeware-unbonded',
+        block_number: 11,
+      }
+    });
+    assert.lengthOf(chainEvents, 2);
+    assert.sameDeepMembers(
+      chainEvents.map((c) => c.toJSON()),
+      [ dbEvent, dbEvent2 ].map((c) => c.toJSON()),
+    );
+  });
+
   it('should not create db event for duplicates', async () => {
     // setup
     const event: CWEvent = {

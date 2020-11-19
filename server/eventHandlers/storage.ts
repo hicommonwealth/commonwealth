@@ -12,6 +12,12 @@ export default class extends IEventHandler {
     private readonly _models,
     private readonly _chain: string,
     private readonly _excludedEvents: IChainEventKind[] = [],
+    private readonly _skipDuplicateChecksFor: IChainEventKind[] = [
+      SubstrateTypes.EventKind.Bonded,
+      SubstrateTypes.EventKind.Unbonded,
+      SubstrateTypes.EventKind.Reward,
+      SubstrateTypes.EventKind.Slash,
+    ],
   ) {
     super();
   }
@@ -42,14 +48,17 @@ export default class extends IEventHandler {
       return;
     }
 
-    // check for duplicate event
-    const dataHash = Hash(event.data);
-    const exists = await this._models.ChainEvent.findOne({
-      where: { hash: dataHash },
-    });
-    if (exists) {
-      log.error(`Received duplicate event: ${JSON.stringify(event)}`);
-      return;
+    // check for duplicate event if needed
+    let hash: string;
+    if (!this._skipDuplicateChecksFor.includes(event.data.kind)) {
+      hash = Hash(event.data);
+      const exists = await this._models.ChainEvent.findOne({
+        where: { hash },
+      });
+      if (exists) {
+        log.error(`Received duplicate event: ${JSON.stringify(event)}`);
+        return;
+      }
     }
 
     // locate event type and add event to database
@@ -65,12 +74,21 @@ export default class extends IEventHandler {
     }
 
     // create event in db
-    const dbEvent = await this._models.ChainEvent.create({
-      chain_event_type_id: dbEventType.id,
-      block_number: event.blockNumber,
-      event_data: event.data,
-      hash: dataHash,
-    });
+    let dbEvent;
+    if (hash) {
+      dbEvent = await this._models.ChainEvent.create({
+        chain_event_type_id: dbEventType.id,
+        block_number: event.blockNumber,
+        event_data: event.data,
+        hash,
+      });
+    } else {
+      dbEvent = await this._models.ChainEvent.create({
+        chain_event_type_id: dbEventType.id,
+        block_number: event.blockNumber,
+        event_data: event.data,
+      });
+    }
 
     return dbEvent;
   }
