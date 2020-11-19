@@ -4,6 +4,7 @@
 import {
   IEventHandler, CWEvent, eventToEntity, entityToFieldName, IChainEventData
 } from '@commonwealth/chain-events';
+import Hash from 'object-hash';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -40,6 +41,7 @@ export default class extends IEventHandler {
       } });
       if (existingEvent) {
         existingEvent.event_data = event.data;
+        existingEvent.hash = Hash(event.data);
         await existingEvent.save();
         log.trace('Existing event found and migrated successfully!');
         return existingEvent;
@@ -49,6 +51,7 @@ export default class extends IEventHandler {
           chain_event_type_id: dbEventType.id,
           block_number: event.blockNumber,
           event_data: event.data,
+          hash: Hash(event.data),
         });
       }
     };

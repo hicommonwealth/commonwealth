@@ -3,6 +3,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
+import Hash from 'object-hash';
 
 import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
 
@@ -84,11 +85,14 @@ describe('Edgeware Migration Event Handler Tests', () => {
     };
 
     const oldDbEvent = await setupDbEvent(legacyEvent);
+    assert.deepEqual(oldDbEvent.hash, Hash(legacyEvent.data));
+
     const eventHandler = new MigrationHandler(models, 'edgeware');
 
     // process event
     const dbEvent = await eventHandler.handle(currentEvent);
     assert.deepEqual(dbEvent.event_data, currentEvent.data);
+    assert.deepEqual(dbEvent.hash, Hash(dbEvent.event_data));
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
         chain_event_type_id: 'edgeware-preimage-noted',
