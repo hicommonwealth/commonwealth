@@ -305,13 +305,13 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
             contentRight: [], // TODO
           }),
         // validators (substrate and cosmos only)
-        // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-        //   m(ListItem, {
-        //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
-        //     active: onValidatorsPage(m.route.get()),
-        //     label: 'Validators',
-        //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
-        //   }),
+        !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
+          m(ListItem, {
+            contentLeft: m(Icon, { name: Icons.SHARE_2 }),
+            active: onValidatorsPage(m.route.get()),
+            label: 'Validators',
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
+          }),
         showMolochMemberOptions && m(ListItem, {
           onclick: (e) => {
             m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
