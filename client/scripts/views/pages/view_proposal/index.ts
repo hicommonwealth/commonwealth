@@ -488,6 +488,7 @@ const ViewProposalPage: m.Component<{
   },
   view: (vnode) => {
     const { identifier, type } = vnode.attrs;
+    console.log({ identifier, type });
     if (typeof identifier !== 'string') return m(PageNotFound);
     if (!vnode.state.prefetch || !vnode.state.prefetch[identifier]) {
       vnode.state.prefetch = {};
@@ -507,7 +508,7 @@ const ViewProposalPage: m.Component<{
     }
 
     // load proposal
-    if (!vnode.state.proposal) {
+    if (!vnode.state.proposal || Number(vnode.state.proposal.identifier) !== Number(proposalId)) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
       } catch (e) {

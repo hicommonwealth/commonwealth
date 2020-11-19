@@ -276,8 +276,10 @@ const NotificationRow: m.Component<{
           if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
-          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          await app.user.notifications.markAsRead(notificationArray).then(() => { console.log('279'); return m.redraw(); });
           await m.route.set(`/${app.activeId() || 'edgeware'}/notificationsList?id=${notification.id}`);
+          console.log(m.route.get());
+          console.log('281');
           m.redraw.sync();
         },
       }, [
@@ -316,10 +318,15 @@ const NotificationRow: m.Component<{
         id: notification.id,
         onclick: async () => {
           const notificationArray: Notification[] = [];
-          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
-          await m.route.set(path);
+          // await app.user.notifications.markAsRead(notifications).then(() => { console.log('321'); return m.redraw(); });
+          // console.log('322'); console.log(path);
+          m.route.set(path);
+          // await m.route.set('/edgeware/proposal/discussion/:identifier', { identifier: 634 });
+          console.log('323');
+          console.log(m.route.get());
           m.redraw.sync();
-          if (pageJump) setTimeout(() => pageJump(), 1);
+          // TODO: ensure notifs close
+          // if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
         authorInfo.length === 1
