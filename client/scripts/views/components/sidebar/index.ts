@@ -247,6 +247,9 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
+    const onManageStakingPage = (p) => p.startsWith(`/${app.activeChainId()}/manageStaking`);
+    const onStakingCalculatorPage = (p) => p.startsWith(`/${app.activeChainId()}/stakingCalculator`);
+
     if (onNotificationsPage(m.route.get())) return;
 
     return m('.OnchainNavigationModule.SidebarModule', [
@@ -342,6 +345,28 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Approve tokens',
           contentLeft: m(Icon, { name: Icons.POWER }),
         }),
+        (app.community || app.chain)
+        && m('h4', 'Staking'),
+        // validators (substrate and cosmos only)
+        !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+        && [
+          m(ListItem, {
+            active: onValidatorsPage(m.route.get()),
+            label: 'Validators',
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
+            contentLeft: m(Icon, { name: Icons.BOX }),
+          }),
+          m(ListItem, {
+            active: onManageStakingPage(m.route.get()),
+            label: 'Manage Staking',
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/manageStaking`),
+          }),
+          m(ListItem, {
+            active: onStakingCalculatorPage(m.route.get()),
+            label: 'Staking Calculator',
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/stakingCalculator`),
+          })
+        ]
       ]),
     ]);
   }

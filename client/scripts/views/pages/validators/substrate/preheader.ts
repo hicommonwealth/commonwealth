@@ -17,11 +17,12 @@ interface IPreHeaderState {
     sessionInfo: DeriveSessionProgress;
     globalStatistics: any,
     sender: SubstrateAccount,
-    validators: IValidators;
   },
 }
 
 interface IPreHeaderAttrs {
+  validators: IValidators;
+  valCount: Number;
   sender: SubstrateAccount;
   annualPercentRate: ICommissionInfo;
 }
@@ -36,12 +37,11 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
     sessionInfo: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.sessionInfo
       : null
   }),
-  view: vnode => {
+  view: (vnode) => {
     const nominators: string[] = [];
     const stDynamic = vnode.state.dynamic;
     let sessionInfo,
@@ -56,28 +56,27 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       eraProgress: any,
       isEpoch: any;
     let waiting: number = 0;
-    let totalStaked = undefined;
+    let totalStaked;
     let hasClaimablePayouts = false;
     sessionInfo = globalStatistics = sender = validators = {};
     currentEra = currentIndex = sessionLength = sessionProgress = 0;
 
     if (stDynamic.globalStatistics) {
       globalStatistics = stDynamic.globalStatistics;
-      waiting = globalStatistics.waiting;
     }
 
-    if (app.chain && stDynamic && stDynamic.sessionInfo && stDynamic.globalStatistics && stDynamic.validators) {
+    if (app.chain && stDynamic && stDynamic.sessionInfo && stDynamic.globalStatistics) {
       sessionInfo = stDynamic.sessionInfo;
 
       sender = vnode.state.dynamic.sender;
-      validators = stDynamic.validators;
+      validators = vnode.attrs.validators;
       currentEra = sessionInfo.currentEra;
       currentIndex = sessionInfo.currentIndex;
       sessionLength = sessionInfo.sessionLength;
       sessionProgress = sessionInfo.sessionProgress;
       eraLength = sessionInfo.eraLength;
-      eraProgress = sessionInfo.eraProgress
-      isEpoch = sessionInfo.isEpoch
+      eraProgress = sessionInfo.eraProgress;
+      isEpoch = sessionInfo.isEpoch;
 
       totalStaked = (app.chain as Substrate).chain.coins(globalStatistics.totalStaked);
     }
@@ -102,15 +101,25 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           }
         });
     }
+
+    let valCount = globalStatistics.elected
+      ? `${globalStatistics?.elected}/${globalStatistics?.count}`
+      : `${Object.keys(validators).length}/${vnode.attrs.valCount}`;
+    let waitingCt;
+
+    if (validators) {
+      waitingCt = Object.keys(validators).filter((v) => !validators[v].isElected && !validators[v].toBeElected).length;
+    }
+
     return m('div.validator-preheader-container', [
       m('.validators-preheader', [
         m('.validators-preheader-item', [
           m('h3', 'Validators'),
-          m('.preheader-item-text', globalStatistics.elected ? `${globalStatistics?.elected}/${globalStatistics?.count}` : '--/--'),
+          m('.preheader-item-text', valCount),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Waiting'),
-          waiting ? m('.preheader-item-text', `${waiting}`) : m('spinner', itemLoadingSpinner()),
+          m('.preheader-item-text', `${waitingCt}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Nominators'),
