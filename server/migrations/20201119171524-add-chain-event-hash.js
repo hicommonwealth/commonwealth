@@ -1,6 +1,6 @@
 'use strict';
 
-const Hash = require('object-hash');
+const Hash = require('../util/chainEventHash');
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -15,12 +15,12 @@ module.exports = {
         { transaction: t },
       );
       let i = 0;
-      for (const { event_data, id } of events[0]) {
+      for (const { event_data, id, block_number } of events[0]) {
         if (!(i % 500)) {
           console.log(`Updated ${i} events of ${events[0].length}...`);
         }
         i++;
-        const hash = Hash(event_data);
+        const hash = Hash({ data: event_data, blockNumber: block_number });
         await queryInterface.bulkUpdate('ChainEvents', {
           id,
         }, {

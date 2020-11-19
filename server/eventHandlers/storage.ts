@@ -2,7 +2,7 @@
  * Generic handler that stores the event in the database.
  */
 import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/chain-events';
-import Hash from 'object-hash';
+import Hash from '../util/chainEventHash';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -51,7 +51,7 @@ export default class extends IEventHandler {
     // check for duplicate event if needed
     let hash: string;
     if (!this._skipDuplicateChecksFor.includes(event.data.kind)) {
-      hash = Hash(event.data);
+      hash = Hash(event);
       const exists = await this._models.ChainEvent.findOne({
         where: { hash },
       });

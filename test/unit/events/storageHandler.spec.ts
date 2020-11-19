@@ -3,12 +3,12 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import Hash from 'object-hash';
 
 import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
+import Hash from '../../../server/util/chainEventHash';
 import StorageHandler from '../../../server/eventHandlers/storage';
 
 chai.use(chaiHttp);
@@ -39,7 +39,7 @@ describe('Event Storage Handler Tests', () => {
 
     // expect results
     assert.deepEqual(dbEvent.event_data, event.data);
-    assert.deepEqual(dbEvent.hash, Hash(event.data));
+    assert.deepEqual(dbEvent.hash, Hash(event));
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
         chain_event_type_id: 'edgeware-democracy-started',
