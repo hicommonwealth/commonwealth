@@ -54,6 +54,49 @@ describe('Event Storage Handler Tests', () => {
     assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
   });
 
+  it('should truncate long preimage args', async () => {
+    // setup
+    const event: CWEvent<SubstrateTypes.IPreimageNoted> = {
+      blockNumber: 10,
+      data: {
+        kind: SubstrateTypes.EventKind.PreimageNoted,
+        proposalHash: 'hash',
+        noter: 'n',
+        preimage: {
+          method: 'm',
+          section: 's',
+          args: ['0x123456789012345678901234567890123456789012345678901234567890'],
+        }
+      }
+    };
+    const truncatedData: SubstrateTypes.IPreimageNoted = {
+      kind: SubstrateTypes.EventKind.PreimageNoted,
+      proposalHash: 'hash',
+      noter: 'n',
+      preimage: {
+        method: 'm',
+        section: 's',
+        args: ['0x12345678901234567890123456789…'],
+      }
+    };
+
+    const eventHandler = new StorageHandler(models, 'edgeware');
+
+    // process event
+    const dbEvent = await eventHandler.handle(event);
+
+    // expect results
+    assert.deepEqual(dbEvent.event_data, truncatedData);
+    const chainEvents = await models['ChainEvent'].findAll({
+      where: {
+        chain_event_type_id: 'edgeware-preimage-noted',
+        block_number: 10,
+      }
+    });
+    assert.lengthOf(chainEvents, 1);
+    assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
+  });
+
   it('should not create db event for duplicates', async () => {
     // setup
     const event: CWEvent = {
