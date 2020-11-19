@@ -8,7 +8,6 @@ import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
-import Hash from '../../../server/util/chainEventHash';
 import StorageHandler from '../../../server/eventHandlers/storage';
 
 chai.use(chaiHttp);
@@ -39,7 +38,6 @@ describe('Event Storage Handler Tests', () => {
 
     // expect results
     assert.deepEqual(dbEvent.event_data, event.data);
-    assert.deepEqual(dbEvent.hash, Hash(event));
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
         chain_event_type_id: 'edgeware-democracy-started',
@@ -97,76 +95,6 @@ describe('Event Storage Handler Tests', () => {
     });
     assert.lengthOf(chainEvents, 1);
     assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
-  });
-
-  it('should create duplicate events for skipped type', async () => {
-    const event: CWEvent = {
-      blockNumber: 11,
-      data: {
-        kind: SubstrateTypes.EventKind.Unbonded,
-        stash: 'a',
-        amount: '1000',
-        controller: 'c',
-      }
-    };
-
-    const eventHandler = new StorageHandler(models, 'edgeware', [], [ SubstrateTypes.EventKind.Unbonded ]);
-    // process event
-    const dbEvent = await eventHandler.handle(event);
-    const dbEvent2 = await eventHandler.handle(event);
-
-    // expect results
-    assert.deepEqual(dbEvent.event_data, event.data);
-    assert.deepEqual(dbEvent2.event_data, event.data);
-    const chainEvents = await models['ChainEvent'].findAll({
-      where: {
-        chain_event_type_id: 'edgeware-unbonded',
-        block_number: 11,
-      }
-    });
-    assert.lengthOf(chainEvents, 2);
-    assert.sameDeepMembers(
-      chainEvents.map((c) => c.toJSON()),
-      [ dbEvent, dbEvent2 ].map((c) => c.toJSON()),
-    );
-  });
-
-  it('should not create db event for duplicates', async () => {
-    // setup
-    const event: CWEvent = {
-      blockNumber: 11,
-      data: {
-        kind: SubstrateTypes.EventKind.DemocracyStarted,
-        referendumIndex: 1,
-        endBlock: 100,
-        proposalHash: 'hash2',
-        voteThreshold: 'Supermajorityapproval',
-      }
-    };
-
-    const eventHandler = new StorageHandler(models, 'edgeware');
-
-    // process event
-    const dbEvent = await eventHandler.handle(event);
-    const dbEvent2 = await eventHandler.handle(event);
-
-    // expect results
-    assert.isUndefined(dbEvent2);
-    assert.deepEqual(dbEvent.event_data, event.data);
-    const chainEvents = await models['ChainEvent'].findAll({
-      where: {
-        chain_event_type_id: 'edgeware-democracy-started',
-        block_number: 11,
-      }
-    });
-    assert.lengthOf(chainEvents, 1);
-    assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
-
-    const dbEventType = await dbEvent.getChainEventType();
-    const chainEventType = await models['ChainEventType'].findOne({
-      where : { id: 'edgeware-democracy-started' }
-    });
-    assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
   });
 
   it('should not create chain event for unknown event type', async () => {

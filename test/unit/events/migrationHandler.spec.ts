@@ -8,7 +8,6 @@ import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
-import Hash from '../../../server/util/chainEventHash';
 import StorageHandler from '../../../server/eventHandlers/storage';
 import MigrationHandler from '../../../server/eventHandlers/migration';
 
@@ -85,14 +84,11 @@ describe('Edgeware Migration Event Handler Tests', () => {
     };
 
     const oldDbEvent = await setupDbEvent(legacyEvent);
-    assert.deepEqual(oldDbEvent.hash, Hash(legacyEvent));
-
     const eventHandler = new MigrationHandler(models, 'edgeware');
 
     // process event
     const dbEvent = await eventHandler.handle(currentEvent);
     assert.deepEqual(dbEvent.event_data, currentEvent.data);
-    assert.deepEqual(dbEvent.hash, Hash(currentEvent));
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
         chain_event_type_id: 'edgeware-preimage-noted',
