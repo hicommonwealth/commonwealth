@@ -276,7 +276,7 @@ const NotificationRow: m.Component<{
           if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
-          await app.user.notifications.markAsRead(notificationArray).then(() => { console.log('279'); return m.redraw(); });
+          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
           await m.route.set(`/${app.activeId() || 'edgeware'}/notificationsList?id=${notification.id}`);
           m.redraw.sync();
         },
@@ -315,8 +315,8 @@ const NotificationRow: m.Component<{
         key: notification.id,
         id: notification.id,
         onclick: async () => {
-          await app.user.notifications.markAsRead(notifications);
-          m.route.set(path)
+          app.user.notifications.markAsRead(notifications);
+          await m.route.set(path);
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
