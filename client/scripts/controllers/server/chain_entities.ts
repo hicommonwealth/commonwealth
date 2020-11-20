@@ -64,17 +64,6 @@ class ChainEntityController {
     }
   }
 
-  public update(entity: ChainEntity, event: ChainEvent) {
-    const existingEntity = this.store.get(entity);
-    if (!existingEntity) {
-      this._store.add(entity);
-    } else {
-      entity = existingEntity;
-    }
-    entity.addEvent(event);
-    this.emitUpdate(entity, event);
-  }
-
   public refresh(chain: string, refreshOption: EntityRefreshOption) {
     if (refreshOption === EntityRefreshOption.Nothing) return;
     const options: any = { chain };
@@ -99,58 +88,6 @@ class ChainEntityController {
     }
   }
 
-  // handle a single incoming chain event emitted from client connection with node
-  private _handleCWEvent(chain: string, cwEvent: CWEvent): [ ChainEntity, ChainEvent ] {
-    // immediately return if no entity involved, event unrelated to proposals/etc
-    const eventEntity = eventToEntity(cwEvent.data.kind);
-    if (!eventEntity) return;
-    const [ entityKind ] = eventEntity;
-
-    // create event type
-    const eventType = new ChainEventType(
-      `${chain}-${cwEvent.data.kind.toString()}`,
-      chain,
-      cwEvent.data.kind.toString()
-    );
-
-    // create event
-    const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
-
-    // create entity
-    const fieldName = entityToFieldName(entityKind);
-    if (!fieldName) return;
-    const fieldValue = event.data[fieldName];
-    const entity = new ChainEntity(chain, entityKind, fieldValue.toString(), []);
-    this.update(entity, event);
-    return [ entity, event ];
-  }
-
-  public async fetchEntities<T extends CWEvent>(
-    chain: string,
-    proposalModule: ProposalModule<any, any, any>,
-    fetch: () => Promise<T[]>,
-    eventSortFn?: (a: CWEvent, b: CWEvent) => number,
-  ): Promise<T[]> {
-    // get existing events
-    let existingEvents;
-    try {
-      existingEvents = await fetch();
-    } catch (e) {
-      console.error(`Chain entity fetch failed: ${e.message}`);
-      return [];
-    }
-    if (eventSortFn) existingEvents.sort(eventSortFn);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const cwEvent of existingEvents) {
-      const result = this._handleCWEvent(chain, cwEvent);
-      if (result) {
-        const [ entity, event ] = result;
-        proposalModule.updateProposal(entity, event);
-      }
-    }
-    return existingEvents;
-  }
-
   public registerEntityHandler(type: IChainEntityKind, fn: EntityHandler) {
     if (!this._handlers[type]) {
       this._handlers[type] = [ fn ];
@@ -163,15 +100,68 @@ class ChainEntityController {
     this._handlers = {};
   }
 
-  public emitUpdate(entity: ChainEntity, event: ChainEvent): void {
-    const handlers = this._handlers[entity.type];
-    if (!handlers) {
-      console.log(`No handler for entity type ${entity.type}, ignoring.`);
+  private _handleEvents(chain: string, events: CWEvent[]) {
+    for (const cwEvent of events) {
+      // immediately return if no entity involved, event unrelated to proposals/etc
+      const eventEntity = eventToEntity(cwEvent.data.kind);
+      if (!eventEntity) return;
+      const [ entityKind ] = eventEntity;
+
+      // create event type
+      const eventType = new ChainEventType(
+        `${chain}-${cwEvent.data.kind.toString()}`,
+        chain,
+        cwEvent.data.kind.toString()
+      );
+
+      // create event
+      const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
+
+      // create entity
+      const fieldName = entityToFieldName(entityKind);
+      if (!fieldName) return;
+      const fieldValue = event.data[fieldName];
+      let entity = new ChainEntity(chain, entityKind, fieldValue.toString(), []);
+
+      // update entity against store
+      const existingEntity = this.store.get(entity);
+      if (!existingEntity) {
+        this._store.add(entity);
+      } else {
+        entity = existingEntity;
+      }
+      entity.addEvent(event);
+
+      // emit update to handlers
+      const handlers = this._handlers[entity.type];
+      if (!handlers) {
+        console.log(`No handler for entity type ${entity.type}, ignoring.`);
+        return;
+      }
+      for (const handler of handlers) {
+        handler(entity, event);
+      }
+      return [ entity, event ];
+    }
+  }
+
+  public async fetchEntities<T extends CWEvent>(
+    chain: string,
+    proposalModule: ProposalModule<any, any, any>,
+    fetch: () => Promise<T[]>,
+    eventSortFn?: (a: CWEvent, b: CWEvent) => number,
+  ): Promise<T[]> {
+    // get existing events
+    let existingEvents: T[];
+    try {
+      existingEvents = await fetch();
+    } catch (e) {
+      console.error(`Chain entity fetch failed: ${e.message}`);
       return;
     }
-    for (const handler of handlers) {
-      handler(entity, event);
-    }
+    if (eventSortFn) existingEvents.sort(eventSortFn);
+    this._handleEvents(chain, existingEvents);
+    return existingEvents;
   }
 
   public async subscribeEntities<Api, RawEvent>(
@@ -186,14 +176,7 @@ class ChainEntityController {
     console.log('Subscribing to chain events.');
     subscriber.subscribe(async (block) => {
       const incomingEvents = await processor.process(block);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const cwEvent of incomingEvents) {
-        const result = this._handleCWEvent(chain, cwEvent);
-        if (result) {
-          const [ entity, event ] = result;
-          this.emitUpdate(entity, event);
-        }
-      }
+      this._handleEvents(chain, incomingEvents);
     });
   }
 }

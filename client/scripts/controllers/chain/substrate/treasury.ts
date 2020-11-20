@@ -92,18 +92,18 @@ class SubstrateTreasury extends ProposalModule<
             });
         });
 
+        // register new chain-event handlers
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.TreasuryProposal, (entity, event) => {
+            this.updateProposal(entity, event);
+          }
+        );
+
         // fetch proposals from chain
         await this.app.chain.chainEntities.fetchEntities(
           this.app.chain.id,
           this,
           () => this._Chain.fetcher.fetchTreasuryProposals(this.app.chain.block.height)
-        );
-
-        // register new chain-event handlers
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.TreasuryProposal, (entity, event) => {
-            if (this.initialized) this.updateProposal(entity, event);
-          }
         );
 
         this._initialized = true;
