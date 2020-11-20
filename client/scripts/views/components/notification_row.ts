@@ -18,9 +18,9 @@ import User from 'views/components/widgets/user';
 import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy
 } from '@commonwealth/chain-events';
+import { Icon, Icons } from 'construct-ui';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import UserGallery from './widgets/user_gallery';
-import { Icon, Icons } from 'construct-ui';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;

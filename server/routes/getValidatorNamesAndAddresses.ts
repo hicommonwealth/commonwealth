@@ -8,7 +8,6 @@ const getValidatorNamesAndAddresses = async (models, req: Request, res: Response
     const validators = await models.Validator.findAll({
       attributes: ['stash', 'state'],
     });
-    // console.log(validators, "validators")
 
     const validatorAddresses = validators.map((obj) => {
       return {
@@ -16,7 +15,6 @@ const getValidatorNamesAndAddresses = async (models, req: Request, res: Response
         state: obj.state
       };
     });
-    // console.log(validatorAddresses, "validatorAddresses");
     // fetch address of validators
     const profile = await models.OffchainProfile.findAll({
       attributes: ['data'],
@@ -44,13 +42,12 @@ const getValidatorNamesAndAddresses = async (models, req: Request, res: Response
     });
 
     // set names of corresponding addresses in validators
-    for (const profile of profileData) {
+    for (const _profile of profileData) {
       for (const address of validatorAddresses) {
-        // console.log("profile ", profile)
-        if (profile.address === address.stash) {
+        if (_profile.address === address.stash) {
           await models.Validator.update(
             {
-              name: profile.name
+              name: _profile.name
             },
             {
               where: {

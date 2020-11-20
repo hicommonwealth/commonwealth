@@ -60,7 +60,7 @@ export default (yMax?, yMin?, yStepSize?) => {
               fontSize: 10,
               fontStyle: 'normal',
               fontWeight: 500,
-              //lineHeight: 120,
+              // lineHeight: 120,
               letterSpacing: -0.5,
               // stepSize: 1,
               // min: 0,

@@ -153,10 +153,9 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
       m('td', {
         class: bold ? 'bold' : null,
       }, [
-        (label) ? label
-          : (subscriptions?.length > 1)
-            ? batchLabel(subscriptions)
-            : singleLabel(subscriptions[0]),
+        (label) || ((subscriptions?.length > 1)
+          ? batchLabel(subscriptions)
+          : singleLabel(subscriptions[0])),
       ]),
       m('td', [
         m(Checkbox, {

@@ -1,6 +1,6 @@
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { NotificationCategories } from '../../shared/types';
 
 export const Errors = {

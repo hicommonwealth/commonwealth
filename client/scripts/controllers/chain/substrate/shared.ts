@@ -387,7 +387,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           resolve();
         });
       },
-        (err) => reject(new Error(err)));
+      (err) => reject(new Error(err)));
     });
   }
 
@@ -480,9 +480,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         }
       });
     },
-      (err: string) => {
-        console.error(`Failed to get chain events: ${err}`);
-      });
+    (err: string) => {
+      console.error(`Failed to get chain events: ${err}`);
+    });
     this._eventsInitialized = true;
   }
 

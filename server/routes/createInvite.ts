@@ -26,7 +26,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
   }
   if (req.body.invitedAddress && req.body.invitedEmail) {
     return next(new Error(Errors.NoEmailAndAddress));
-  } 
+  }
 
   const chainOrCommObj = chain
     ? { chain_id: chain.id }
@@ -89,7 +89,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
 
   const inviteChainOrCommObj = chain
     ? { chain_id: chain.id, community_name: chain.name }
-    : { community_id: community.id, community_name: community.name }
+    : { community_id: community.id, community_name: community.name };
 
   const previousInvite = await models.InviteCode.findOne({
     where: {

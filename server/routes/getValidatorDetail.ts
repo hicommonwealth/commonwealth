@@ -6,7 +6,7 @@ import { Op } from 'sequelize';
 const getValidatorDetail = async (models, req: Request, res: Response, next: NextFunction) => {
   console.log(req.query, 'query');
   let validators: any = [];
-  let where: any = { state: req.query?.state ? req.query?.state : 'Active' };
+  const where: any = { state: req.query?.state ? req.query?.state : 'Active' };
 
   // serarch by name or address
   if (req.query?.validatorStashes?.length) {

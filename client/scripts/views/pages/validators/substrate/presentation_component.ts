@@ -55,7 +55,6 @@ const model = {
   extraOp: [],
   constValidators: [],
   async onSearchHandler(value?: string) {
-
     console.log('value ', value);
     // if search option is provided
     if (value) {
@@ -65,20 +64,20 @@ const model = {
       let mapNamesAddress = [];
       const temp = [...model.profile];
       if (model.state === 'Active') {
-        mapNamesAddress = temp.filter(row => row.state === 'Active')
+        mapNamesAddress = temp.filter((row) => row.state === 'Active');
       } else {
-        mapNamesAddress = temp.filter(row => row.state === 'Waiting');
+        mapNamesAddress = temp.filter((row) => row.state === 'Waiting');
       }
-      mapNamesAddress = mapNamesAddress.map(ele => { return { name: ele.name, address: ele.address } });
-      for (let i of mapNamesAddress) {
+      mapNamesAddress = mapNamesAddress.map((ele) => { return { name: ele.name, address: ele.address }; });
+      for (const i of mapNamesAddress) {
         model.extraOp = [...model.extraOp, i.name, i.address];
       }
-      let validators = [];
+      const validators = [];
       value = value.toLowerCase();
 
-      //fetch from already fetched list
+      // fetch from already fetched list
       // console.log(" model.constValidators ", model.constValidators)
-      model.constValidators.forEach((ele => {
+      model.constValidators.forEach(((ele) => {
         if ((ele.name?.toLowerCase().includes(value) || ele.stash.toLowerCase().includes(value)) && ele.state === model.state) {
           validators.push(ele);
         }
@@ -108,8 +107,7 @@ const model = {
       }
       // console.log("fetched")
       result.validators = validators;
-      m.redraw()
-      return;
+      m.redraw();
     }
   },
   // model.currentPage < Math.ceil(model.total[model.currentTab] / model.perPage
@@ -122,7 +120,7 @@ const model = {
     let validators: any = [];
 
     prevIndex = nextIndex;
-    nextIndex = nextIndex + pageSize;
+    nextIndex += pageSize;
 
     model.prevIndex = prevIndex;
     model.nextIndex = nextIndex;
@@ -130,8 +128,7 @@ const model = {
     validatorStashes = validatorStashes.slice(prevIndex, nextIndex);
 
     // 0console.log(validatorStashes.slice(prevIndex, nextIndex), "new fetched")
-    if (validatorStashes.length)
-    {
+    if (validatorStashes.length) {
       // console.log("prevIndex", prevIndex)
       // console.log("nextIndex", nextIndex);
       // console.log("validatorStashes", validatorStashes);
@@ -142,28 +139,27 @@ const model = {
 
       console.log(validators?.validators, '--------onChange---------');
       result.validators = [...result.validators, ...validators?.validators];
-      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
+      result.validators = result.validators.filter((v, i, a) => a.findIndex((t) => (t.stash === v.stash)) === i);
       model.constValidators = [...result.validators, ...model.constValidators];
-      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
-      setTimeout(()=>{
+      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex((t) => (t.stash === v.stash)) === i);
+      setTimeout(() => {
         model.isLoadingData = false;
         m.redraw();
-      },2000);
+      }, 2000);
     }
     model.scroll = false;
   },
   async onSearch() {
     let validatorStashes: any = [];
     let validators: any = [];
-    let { prevIndex, nextIndex } = model;
+    const { prevIndex, nextIndex } = model;
 
     if (model.state === 'Active') {
       if (!model.activeStashes?.length) {
         result.validators = [];
         model.searchIsOn = true;
       } else validatorStashes = model.activeStashes;
-    }
-    else {
+    } else {
       if (!model.waitingStashes?.length) {
         result.validators = [];
         model.searchIsOn = true;
@@ -176,13 +172,13 @@ const model = {
       m.redraw();
       validators = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(prevIndex, nextIndex + pageSize));
       result.validators = [...result.validators, ...validators?.validators];
-      result.validators = result.validators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
+      result.validators = result.validators.filter((v, i, a) => a.findIndex((t) => (t.stash === v.stash)) === i);
       model.constValidators = [...result.validators, ...model.constValidators];
-      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
-      setTimeout(()=>{
+      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex((t) => (t.stash === v.stash)) === i);
+      setTimeout(() => {
         model.isLoadingData = false;
         m.redraw();
-      },2000);
+      }, 2000);
     }
   },
   async refresh() {
@@ -193,8 +189,7 @@ const model = {
         result.validators = [];
         model.searchIsOn = true;
       } else validatorStashes = model.activeStashes;
-    }
-    else {
+    } else {
       if (!model.waitingStashes?.length) {
         result.validators = [];
         model.searchIsOn = true;
@@ -211,7 +206,7 @@ const model = {
       model.isLoadingData = true;
       m.redraw();
       result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(model.prevIndex, model.nextIndex));
-      result.validators.forEach((e)=>{
+      result.validators.forEach((e) => {
         e.exposure = e.HistoricalValidatorStatistics[0]?.exposure;
         e.commissionPer = e.HistoricalValidatorStatistics[0]?.commissionPer;
         e.apr = e.HistoricalValidatorStatistics[0]?.apr;
@@ -221,14 +216,13 @@ const model = {
         e.offencesStats = e.HistoricalValidatorStatistics[0]?.offencesStats;
         e.hasMessage = e.HistoricalValidatorStatistics[0]?.hasMessage;
         e.isOnline = e.HistoricalValidatorStatistics[0]?.isOnline;
-      }); 
+      });
       model.constValidators = [...result.validators, ...model.constValidators];
-      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex(t => (t.stash === v.stash)) === i);
-      setTimeout(()=>{
+      model.constValidators = model.constValidators.filter((v, i, a) => a.findIndex((t) => (t.stash === v.stash)) === i);
+      setTimeout(() => {
         model.isLoadingData = false;
         m.redraw();
-      },2000);
-      
+      }, 2000);
     }
   },
   sortIcon(key: string) {
@@ -248,7 +242,7 @@ const model = {
       window.scrollTo(0, 0);
       model.scroll = false;
       console.log('state ', model.state);
-      model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address)
+      model.activeStashes = model.profile.filter((row) => row.state === 'Active').map((addr) => addr.address);
       model.refresh();
       m.redraw();
     }
@@ -258,7 +252,7 @@ const model = {
       window.scrollTo(0, 0);
       model.scroll = false;
       console.log('state ', model.state);
-      model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
+      model.waitingStashes = model.profile.filter((row) => row.state === 'Waiting').map((addr) => addr.address);
       model.refresh();
       m.redraw();
     }
@@ -303,12 +297,12 @@ export const PresentationComponent_ = {
     // console.log("profile ======", model.profile);
     // console.log("prevIndex", model.prevIndex);
     // console.log("nextIndex", model.nextIndex);
-    model.activeStashes = model.profile.filter(row => row.state === 'Active').map((addr) => addr.address);
-    model.waitingStashes = model.profile.filter(row => row.state === 'Waiting').map((addr) => addr.address);
+    model.activeStashes = model.profile.filter((row) => row.state === 'Active').map((addr) => addr.address);
+    model.waitingStashes = model.profile.filter((row) => row.state === 'Waiting').map((addr) => addr.address);
     model.refresh();
   },
   view: (vnode) => {
-    let { changeSort, reset, sortAsc, sortIcon, sortKey, onSearchHandler } = model;
+    const { changeSort, reset, sortAsc, sortIcon, sortKey, onSearchHandler } = model;
     if (!result.validators.length && vnode.attrs.validators) {
       result.validators = Object.keys(vnode.attrs.validators)
         .map((v) => ({ ...vnode.attrs.validators[v], stash: v }));
@@ -335,7 +329,7 @@ export const PresentationComponent_ = {
     // result.validators = result.validators?.sort((val1, val2) => val2?.exposure - val1?.exposure);
 
 
-    //onscroll fetch next N record
+    // onscroll fetch next N record
 
     // let cont: any = $("table.validators-table");
     model.scroll = false;
@@ -442,7 +436,7 @@ export const PresentationComponent_ = {
               const blockCount = validator.blockCount;
               const hasMessage = validator?.hasMessage;
               const isOnline = validator?.isOnline;
-              const otherTotal = chain.chain.coins(Number(validator.exposure?.total) - validator.exposure?.own) ;
+              const otherTotal = chain.chain.coins(Number(validator.exposure?.total) - validator.exposure?.own);
               const commission = validator?.commissionPer;
               const apr = validator?.apr;
               const name = validator?.name;
@@ -496,7 +490,7 @@ export const PresentationComponent_ = {
           m('th.val-waiting-commission', 'Commission'),
           m('th.val-action', ''),
         ]), m('table.validators-table', [
-          result.validators.filter(v => !v.toBeElected && !v.isElected).map((validator) => {
+          result.validators.filter((v) => !v.toBeElected && !v.isElected).map((validator) => {
             const stash = validator.stash;
             const controller = validator.controller;
             const eraPoints = validator.eraPoints;
@@ -527,7 +521,7 @@ export const PresentationComponent_ = {
           m('th.val-block-number', 'Block #'),
           m('th.val-block-hash', 'Hash'),
           m('th.val-block-author', 'Author')
-        ]),m('table.validators-table', [
+        ]), m('table.validators-table', [
           lastHeaders.map((lastHeader) => {
             if (!lastHeader)
               return null;

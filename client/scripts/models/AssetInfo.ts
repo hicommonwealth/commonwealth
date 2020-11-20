@@ -1,4 +1,4 @@
-import {ChainConstant} from './ChainConstant'
+import { ChainConstant } from './ChainConstant';
 
 export class AssetInfo {
     name: string
@@ -10,6 +10,6 @@ export class AssetInfo {
     commission: number
     rewardFrequencyMinutes: number
     totalSupply: number
-    //staked : number
-    //totalStaked: number
-  }
+    // staked : number
+    // totalStaked: number
+}

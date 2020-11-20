@@ -5,10 +5,10 @@ import { sequelize } from '../database';
 const uptimePercent = (noOfTrues: number, noOfFalse: number, currentEventType: number) => {
   /*
     This formula is used to calculate the uptime percentage of the validators based on previous sessions' uptime.
-    upTimePercentage = ((No. isOnline True(s) + Current Execution Mode [1 for AllGood, 0 for SomeOffline]) / 
+    upTimePercentage = ((No. isOnline True(s) + Current Execution Mode [1 for AllGood, 0 for SomeOffline]) /
                         (No. isOnline True(s) + No. isOnline False(s) - 1 + 1)) * 100
   */
-  let upTimePercentage = (((noOfTrues + currentEventType) / (noOfTrues + noOfFalse - 1 + 1)) * 100)
+  const upTimePercentage = (((noOfTrues + currentEventType) / (noOfTrues + noOfFalse - 1 + 1)) * 100)
     .toFixed(2);
 
   return upTimePercentage;
@@ -31,7 +31,7 @@ export default class extends IEventHandler {
       return dbEvent;
     }
     const imOnlineEventData = event.data;
-    
+
     // 2) Get relevant data from DB for processing.
     /*
       This query will return the last created record for validators in 'HistoricalValidatorStatistic' table and return the data for each validator with there onlineCount and offlineCount counts iff any.
@@ -52,21 +52,21 @@ export default class extends IEventHandler {
       WHERE  validatorQuery.row_number = 1
   `;
     const [validators, metadata] = await sequelize.query(rawQuery);
-    let validatorsList = JSON.parse(JSON.stringify(validators));
+    const validatorsList = JSON.parse(JSON.stringify(validators));
 
     // 3) Modify uptime for validators.
     switch (imOnlineEventData.kind) {
       case SubstrateTypes.EventKind.AllGood: {
         validatorsList.forEach((validator: any) => {
           validator.uptime = uptimePercent(Number(validator.onlineCount), Number(validator.offlineCount), 1).toString();  // 1 for AllGood event
-          validator.isOnline = true
+          validator.isOnline = true;
         });
-        break;  
+        break;
       }
       case SubstrateTypes.EventKind.SomeOffline: {
         validatorsList.forEach((validator: any) => {
           validator.uptime = uptimePercent(Number(validator.onlineCount), Number(validator.offlineCount), 0).toString();  // 0 for SomeOffline event
-          validator.isOnline = false
+          validator.isOnline = false;
         });
         break;
       }
@@ -88,7 +88,7 @@ export default class extends IEventHandler {
     // 4) create/update event data in database.
     // await this._models.HistoricalValidatorStatistic.bulkCreate( validatorsList, {ignoreDuplicates: true} );
     await Promise.all(validatorsList.map((row: any) => {
-      return this._models.HistoricalValidatorStatistic.create( row );
+      return this._models.HistoricalValidatorStatistic.create(row);
     }));
 
     return dbEvent;

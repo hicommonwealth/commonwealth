@@ -11,18 +11,18 @@ interface ImOnlineAttrs {
 
 const ImOnline: m.Component<ImOnlineAttrs, {}> = {
   view: (vnode) => {
-    return m("span.im-online-icons", [
-        vnode.attrs.isOnline &&
-          m(Tooltip, {
-            trigger: m(Icon, { name: Icons.WIFI, size: "sm" }),
-            content: m("div", "Validator is Online!"),
+    return m('span.im-online-icons', [
+      vnode.attrs.isOnline
+          && m(Tooltip, {
+            trigger: m(Icon, { name: Icons.WIFI, size: 'sm' }),
+            content: m('div', 'Validator is Online!'),
           }),
-        vnode.attrs.hasMessage &&
-          m(Tooltip, {
-            trigger: m(Icon, { name: Icons.MESSAGE_SQUARE, size: "sm" }),
-            content: m("div", "New Message!"),
+      vnode.attrs.hasMessage
+          && m(Tooltip, {
+            trigger: m(Icon, { name: Icons.MESSAGE_SQUARE, size: 'sm' }),
+            content: m('div', 'New Message!'),
           }),
-      ]);
+    ]);
   },
 };
 

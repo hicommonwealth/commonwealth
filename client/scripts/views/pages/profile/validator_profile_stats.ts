@@ -64,9 +64,9 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
         elevation: 0,
         class: 'home-card',
         fluid: true
-      }, [ // Dummy Data for now TODOO: Change it to provide real data
+      }, [
         m('div.profile-stats-row1.row', [
-          m('.total-apr', // TODOO: Integrate real data here.
+          m('.total-apr',
             m('.data-row-block',
               m('.profile-header-block',
                 'APR')),

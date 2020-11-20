@@ -1,6 +1,6 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
-import { computeEventStats } from './computeStats'
 import Sequelize from 'sequelize';
+import { computeEventStats } from './computeStats';
 const Op = Sequelize.Op;
 
 
@@ -46,7 +46,7 @@ export default class extends IEventHandler {
 
     // 2) Get relevant data from DB for processing.
     // Check for the stash id whether it is in validator table or not.
-    let validatorStash = "";
+    let validatorStash = '';
     let newExposure;
 
     const validatorRecord = await this._models.Validator.findOne({
@@ -54,35 +54,34 @@ export default class extends IEventHandler {
         [Op.and]: [{ stash: newSlashEventData.validator }, { state: 'Active' }]
       },
     });
-    let validator = JSON.parse(JSON.stringify(validatorRecord));
+    const validator = JSON.parse(JSON.stringify(validatorRecord));
 
-    if (validator){
+    if (validator) {
       validatorStash = validator.stash;
     } else {
-      let activeExposures = sessionEvent.activeExposures;
-      let slashedNominators = {};
+      const activeExposures = sessionEvent.activeExposures;
+      const slashedNominators = {};
 
-      for (let valid of Object.keys(activeExposures)) {
-        activeExposures[valid].other.forEach(nominator => {
-          if (nominator.who === newSlashEventData.validator){
+      for (const valid of Object.keys(activeExposures)) {
+        activeExposures[valid].other.forEach((nominator) => {
+          if (nominator.who === newSlashEventData.validator) {
             slashedNominators[valid] = activeExposures[valid];
           }
-        })
+        });
       }
 
-      if (Object.keys(slashedNominators).length === 1){
+      if (Object.keys(slashedNominators).length === 1) {
         validatorStash = Object.keys(slashedNominators)[0];
         newExposure = slashedNominators[validatorStash];
-        newExposure.total = (Number(newExposure.total) - Number(newSlashEventData.amount)).toString()
-  
-        newExposure.other.map((nominator) =>{
-          if (nominator.who === newSlashEventData.validator){
-            nominator.value = (Number(nominator.value) - Number(newSlashEventData.amount))
+        newExposure.total = (Number(newExposure.total) - Number(newSlashEventData.amount)).toString();
+
+        newExposure.other.map((nominator) => {
+          if (nominator.who === newSlashEventData.validator) {
+            nominator.value = (Number(nominator.value) - Number(newSlashEventData.amount));
             return nominator;
           }
-        })
-
-      } else if (Object.keys(slashedNominators).length > 1){
+        });
+      } else if (Object.keys(slashedNominators).length > 1) {
         // pass
         // TODO: once finalized how we'll apply slash on the validator's exposure then modify the logic based to decided criteria.
         // Multiple nominators presence need to be computed based on final discussion.
@@ -99,12 +98,12 @@ export default class extends IEventHandler {
       ]
     });
 
-    if (!latestValidatorStats){
+    if (!latestValidatorStats) {
       return dbEvent;
     }
-    let latestValidator = JSON.parse(JSON.stringify(latestValidatorStats));
+    const latestValidator = JSON.parse(JSON.stringify(latestValidatorStats));
 
-    if ( newExposure ) {
+    if (newExposure) {
       latestValidator.exposure = newExposure;
     } else {
       latestValidator.exposure.own = (Number(latestValidator.exposure.own) - Number(newSlashEventData.amount)).toString();
@@ -113,7 +112,7 @@ export default class extends IEventHandler {
 
     // Added Last 30 days Slash count and averages for a validator.
     const [slashStatsSum, slashStatsAvg, slashStatsCount] = await computeEventStats(this._chain, newSlashEventData.kind, newSlashEventData.validator, 30);
-    validator.slashesStats = { count: slashStatsCount, sum:slashStatsSum, avg: slashStatsAvg }
+    validator.slashesStats = { count: slashStatsCount, sum:slashStatsSum, avg: slashStatsAvg };
 
     // 3) Modify exposures for validators based of slash balance.
     latestValidator.block = event.blockNumber.toString();
@@ -124,7 +123,7 @@ export default class extends IEventHandler {
     delete latestValidator.id;
 
     // 4) create/update event data in database.
-    await this._models.HistoricalValidatorStatistic.create( latestValidator );
+    await this._models.HistoricalValidatorStatistic.create(latestValidator);
 
     return dbEvent;
   }

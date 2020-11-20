@@ -58,7 +58,7 @@ import getRewards from './routes/getRewards';
 import getSlashes from './routes/getSlashes';
 import { getTotalStakeOverTime, getOwnStakeOverTime, getOtherStakeOverTime, getNominatorsOverTime }
   from './routes/getExposureOverTime';
-import getImOnline from './routes/getImOnline'
+import getImOnline from './routes/getImOnline';
 import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
@@ -114,7 +114,7 @@ import bulkEntities from './routes/bulkEntities';
 
 import getGlobalStatistics from './routes/getGlobalStatistics';
 import getValidatorDetail from './routes/getValidatorDetail';
-import getValidatorNamesAndAddresses from './routes/getValidatorNamesAndAddresses'
+import getValidatorNamesAndAddresses from './routes/getValidatorNamesAndAddresses';
 function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
@@ -355,7 +355,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/getValidatorDetail/', getValidatorDetail.bind(this, models));
   router.get('/getValidatorDetail/:state', getValidatorDetail.bind(this, models));
   router.get('/getGlobalStatistics', getGlobalStatistics.bind(this, models));
-
 
 
   app.use('/api', router);

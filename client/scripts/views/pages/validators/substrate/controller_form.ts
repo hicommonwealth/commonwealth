@@ -25,7 +25,7 @@ const ControllerForm: m.Component<{ stashes, stashAccount }, {}> = {
         m('h5', 'Free'),
         m('.stash-stat-text', [
           // XXX: this needs to be fixed!
-          m('.stash-balance', app.chain.chain.coins(0/*balance*/).format(true)),
+          m('.stash-balance', app.chain.chain.coins(0/* balance */).format(true)),
         ]),
       ]),
       m('.clear'),

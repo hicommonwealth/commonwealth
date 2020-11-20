@@ -49,7 +49,7 @@ const getFilteredContent = (content, address) => {
         : content.notificationCategory === NotificationCategories.NewReaction ? 'Reaction on: '
           : 'Activity on: ';
     const notificationExcerpt = (() => {
-      let bodytext = decodeURIComponent(content.body);
+      const bodytext = decodeURIComponent(content.body);
       try {
         // parse and use quill document
         const doc = JSON.parse(bodytext);
@@ -113,8 +113,8 @@ const send = async (models, content: WebhookContent) => {
           format: 'mrkdwn',
         } : {
           type: 'section',
-          text: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
-            + `${notificationTitlePrefix}<${actedOnLink}|${actedOn}>`
+          text: `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+          }${notificationTitlePrefix}<${actedOnLink}|${actedOn}>`
             + `\n> ${notificationExcerpt.split('\n').join('\n> ')}`,
           format: 'mrkdwn',
         });

@@ -170,7 +170,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
     const onModalClose = () => {
       vnode.state.votingModalOpen = false;
       m.redraw();
-    }
+    };
 
     const voteYes = async (e) => {
       e.preventDefault();
@@ -297,7 +297,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => { onModalClose(); m.redraw(); })
           .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else {
-        onModalClose()
+        onModalClose();
         throw new Error('Invalid proposal type');
       }
     };

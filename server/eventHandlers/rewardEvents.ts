@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
 import BN from 'bn.js';
-import { computeEventStats, getAPR } from './computeStats'
+import { computeEventStats, getAPR } from './computeStats';
 
 
 export default class extends IEventHandler {
@@ -64,12 +64,12 @@ export default class extends IEventHandler {
     if (!latestValidatorStat) {
       return dbEvent;
     }
-    
-    let validator = JSON.parse(JSON.stringify(latestValidatorStat));
+
+    const validator = JSON.parse(JSON.stringify(latestValidatorStat));
 
     // Added Last 30 days Rewards count and averages for a validator.
     const [rewardsStatsSum, rewardsStatsAvg, rewardsStatsCount] = await computeEventStats(this._chain, newRewardEventData.kind, validator.stash, 30);
-    validator.rewardsStats = { count: rewardsStatsCount, sum: rewardsStatsSum, avg: rewardsStatsAvg }
+    validator.rewardsStats = { count: rewardsStatsCount, sum: rewardsStatsSum, avg: rewardsStatsAvg };
 
     // 3) Modify exposures for validators based of reward amount.
     // Getting updated validator info from the new-session event data related to rewards calculation (e.g. exposure(s) for each validator, commissionPer, eraPoints, rewardDestination)
@@ -79,9 +79,9 @@ export default class extends IEventHandler {
     // Check from the validator preferences whether the reward will be added to the own's exposure or not.
     if (activeValidatorsInfo.rewardDestination === 'Staked') {
       // Rewards amount calculation for the current validator. Reference: https://github.com/hicommonwealth/commonwealth/blob/staking-ui/client/scripts/controllers/chain/substrate/staking.ts#L468-L472
-      const commission = ( Number(activeValidatorsInfo.commissionPer) / 10_000_000 ) / 100; // Calculate commission percentage value
+      const commission = (Number(activeValidatorsInfo.commissionPer) / 10_000_000) / 100; // Calculate commission percentage value
       const firstReward = new BN(newRewardEventData.amount.toString()).muln(Number(commission)).divn(100);
-      const secondReward = newExposure.own.toBn().mul( (new BN(newRewardEventData.amount.toString())).sub(firstReward) ).div(newExposure.total.toBn() || new BN(1));
+      const secondReward = newExposure.own.toBn().mul((new BN(newRewardEventData.amount.toString())).sub(firstReward)).div(newExposure.total.toBn() || new BN(1));
       const totalReward = firstReward.add(secondReward);
 
       newExposure.own = (newExposure.own + totalReward).toString();
@@ -98,9 +98,8 @@ export default class extends IEventHandler {
     delete validator.id;
 
     // 4) create/update event data in database.
-    await this._models.HistoricalValidatorStatistic.create( validator );
+    await this._models.HistoricalValidatorStatistic.create(validator);
 
     return dbEvent;
   }
 }
-

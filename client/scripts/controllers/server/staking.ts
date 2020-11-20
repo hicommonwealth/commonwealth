@@ -79,7 +79,6 @@ class StakingController {
       }, resolve);
     });
   }
-
 }
 
 export default StakingController;

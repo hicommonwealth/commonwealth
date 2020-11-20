@@ -70,7 +70,7 @@ const createInviteLink = async (models, req, res, next) => {
   const inviteLink = await models.InviteLink.create({
     id: inviteId,
     // community_id: community.id,
-    ... chainOrCommunityObj,
+    ...chainOrCommunityObj,
     creator_id: req.user.id,
     active: true,
     multi_use: uses,

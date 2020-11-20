@@ -1,6 +1,6 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
-import { computeEventStats } from './computeStats'
-import {sequelize} from '../database'
+import { computeEventStats } from './computeStats';
+import { sequelize } from '../database';
 
 
 export default class extends IEventHandler {
@@ -30,16 +30,15 @@ export default class extends IEventHandler {
         WHERE stash IN ('${newOffenceEventData.offenders.join("','")}')
       ) as q
       WHERE row_number = 1
-    ` 
+    `;
     const [validators, metadata] = await sequelize.query(rawQuery);
-    let validatorsList = JSON.parse(JSON.stringify(validators));
+    const validatorsList = JSON.parse(JSON.stringify(validators));
 
     // 3) Modify new offences related information for validators
     validatorsList.forEach(async (validator: any) => {
-
       // Added Last 30 days Offences count for a validator.
       const [offenceStatsSum, offenceStatsAvg, offenceStatsCount] = await computeEventStats(this._chain, newOffenceEventData.kind, validator.stash, 30);
-      validator.offencesStats = {count: offenceStatsCount }
+      validator.offencesStats = { count: offenceStatsCount };
 
       validator.block = event.blockNumber.toString();
       validator.eventType = newOffenceEventData.kind;
@@ -51,8 +50,8 @@ export default class extends IEventHandler {
 
     // 4) create and update event details in db
     // await this._models.HistoricalValidatorStatistic.bulkCreate( validatorsList, {ignoreDuplicates: true} );
-    await Promise.all(validatorsList.map( (row: any) => {
-      return this._models.HistoricalValidatorStatistic.create( row );
+    await Promise.all(validatorsList.map((row: any) => {
+      return this._models.HistoricalValidatorStatistic.create(row);
     }));
     return dbEvent;
   }

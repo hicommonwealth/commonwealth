@@ -55,7 +55,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       eraLength: any,
       eraProgress: any,
       isEpoch: any;
-    let waiting: number = 0;
+    const waiting: number = 0;
     let totalStaked;
     let hasClaimablePayouts = false;
     sessionInfo = globalStatistics = sender = validators = {};
@@ -102,7 +102,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         });
     }
 
-    let valCount = globalStatistics.elected
+    const valCount = globalStatistics.elected
       ? `${globalStatistics?.elected}/${globalStatistics?.count}`
       : `${Object.keys(validators).length}/${vnode.attrs.valCount}`;
     let waitingCt;
@@ -123,8 +123,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Nominators'),
-          globalStatistics.nominators ?
-            m('.preheader-item-text', `${globalStatistics?.nominators}`) : m('spinner', itemLoadingSpinner()),
+          globalStatistics.nominators
+            ? m('.preheader-item-text', `${globalStatistics?.nominators}`) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Offences'),
@@ -136,11 +136,11 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         ]),
         (isEpoch
           && sessionProgress && m(CardSummary, {
-            title: 'Epoch',
-            total: sessionLength,
-            value: sessionProgress,
-            currentBlock: formatNumber(currentIndex)
-          })),
+          title: 'Epoch',
+          total: sessionLength,
+          value: sessionProgress,
+          currentBlock: formatNumber(currentIndex)
+        })),
         eraProgress
         && m(CardSummary, {
           title: 'Era',
@@ -150,13 +150,13 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         }),
         m('.validators-preheader-item', [
           m('h3', 'Est. APR'),
-          globalStatistics.aprPercentage ?
-            m('.preheader-item-text', `${globalStatistics?.aprPercentage?.toFixed(2)}%`) : m('spinner', itemLoadingSpinner()),
+          globalStatistics.aprPercentage
+            ? m('.preheader-item-text', `${globalStatistics?.aprPercentage?.toFixed(2)}%`) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Supply'),
-          totalbalance ?
-            m('.preheader-item-text', totalbalance?.format(true)) : m('spinner', itemLoadingSpinner()),
+          totalbalance
+            ? m('.preheader-item-text', totalbalance?.format(true)) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Staked'),
@@ -164,8 +164,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Staked'),
-          stakedPercentage ?
-            m('.preheader-item-text', stakedPercentage) : m('spinner', itemLoadingSpinner()),
+          stakedPercentage
+            ? m('.preheader-item-text', stakedPercentage) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Manage Staking'),
@@ -181,7 +181,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                   data: { account: sender }
                 });
               },
-              disabled: !app.user.activeAccount 
+              disabled: !app.user.activeAccount
             })
           ]),
         ]),
@@ -214,19 +214,19 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                 createTXModal((nominators.length === 0)
                   ? sender.chillTx()
                   : sender.nominateTx(nominators)).then(() => {
-                    // vnode.attrs.sending = false;
-                    m.redraw();
-                  }, () => {
-                    // vnode.attrs.sending = false;
-                    m.redraw();
-                  });
+                  // vnode.attrs.sending = false;
+                  m.redraw();
+                }, () => {
+                  // vnode.attrs.sending = false;
+                  m.redraw();
+                });
               },
-              disabled: !app.user.activeAccount 
+              disabled: !app.user.activeAccount
             })
           ]),
         ])
       ]),
-    ])
+    ]);
   }
 });
 

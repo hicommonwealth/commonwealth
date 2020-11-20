@@ -1,4 +1,4 @@
-import { ChainInfo, CommunityInfo } from ".";
+import { ChainInfo, CommunityInfo } from '.';
 
 class Webhook {
   public readonly id: number;
@@ -16,7 +16,7 @@ class Webhook {
     this.chain_id = chain_id;
     this.offchain_community_id = offchain_community_id;
     this.Chain = chain;
-    this.OffchainCommunity = offchainCommunity
+    this.OffchainCommunity = offchainCommunity;
   }
 
   public static fromJSON(json) {

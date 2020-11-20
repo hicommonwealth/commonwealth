@@ -31,7 +31,7 @@ export default class extends IEventHandler {
     if (!latestValidators) {
       return dbEvent;
     }
-    let validator = JSON.parse(JSON.stringify(latestValidators));
+    const validator = JSON.parse(JSON.stringify(latestValidators));
 
     // 3) Modify exposures for validators.
     switch (bondEventData.kind) {
@@ -56,9 +56,8 @@ export default class extends IEventHandler {
     delete validator.id;
 
     // 4) create/update event data in database.
-    await this._models.HistoricalValidatorStatistic.create( validator );
+    await this._models.HistoricalValidatorStatistic.create(validator);
 
     return dbEvent;
   }
 }
-

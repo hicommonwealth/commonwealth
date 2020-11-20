@@ -5,8 +5,8 @@ import { Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, R
 import app from 'state';
 import { RolePermission, Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import WebhookSettingsModal from '../webhook_settings_modal';
 import { pluralize } from 'helpers';
+import WebhookSettingsModal from '../webhook_settings_modal';
 
 interface IWebhooksFormAttrs {
   webhooks: Webhook[];
@@ -85,7 +85,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                 : null;
             return m(ListItem, {
               contentLeft: [
-                m('.top', { style: `display: 'block';`}, webhook.url),
+                m('.top', { style: 'display: \'block\';' }, webhook.url),
                 m('.bottom', [
                   label && m(Tag, { label }),
                   m(Button, {
@@ -103,7 +103,6 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                           }
                         }
                       });
-                      return;
                     }
                   }),
                   m(Tag, { label: pluralize(webhook.categories.length, 'event') }),

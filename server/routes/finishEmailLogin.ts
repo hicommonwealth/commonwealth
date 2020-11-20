@@ -11,7 +11,7 @@ export const redirectWithLoginSuccess = (res, email, path?, confirmation?, newAc
 };
 
 export const redirectWithLoginError = (res, message) => {
-  const url = SERVER_URL + `/?loggedin=false&loginerror=${encodeURIComponent(message)}`;
+  const url = `${SERVER_URL}/?loggedin=false&loginerror=${encodeURIComponent(message)}`;
   return res.redirect(url);
 };
 import { Request, Response, NextFunction } from 'express';
@@ -48,12 +48,12 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
 
   if (existingUser) {
     req.login(existingUser, async (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
+      if (err) return redirectWithLoginError(res, `Could not log in with user at ${email}`);
       // If the user is currently in a partly-logged-in state, merge their
       // social accounts over to the newly found user
       if (previousUser && previousUser.id !== existingUser.id) {
         const [oldSocialAccounts, oldAddresses,
-               newSocialAccounts, newAddresses] = await Promise.all([
+          newSocialAccounts, newAddresses] = await Promise.all([
           previousUser.getSocialAccounts(),
           previousUser.getAddresses().filter((address) => !!address.verified),
           existingUser.getSocialAccounts(),
@@ -74,7 +74,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
     previousUser.emailVerified = true;
     await previousUser.save();
     req.login(previousUser, (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
+      if (err) return redirectWithLoginError(res, `Could not log in with user at ${email}`);
       return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation);
     });
   } else {
@@ -93,7 +93,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
     });
 
     req.login(newUser, (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
+      if (err) return redirectWithLoginError(res, `Could not log in with user at ${email}`);
       return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation, true);
     });
   }

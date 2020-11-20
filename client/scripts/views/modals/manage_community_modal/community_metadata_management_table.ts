@@ -133,7 +133,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           $(e.target).trigger('modalexit');
         } catch (err) {
           notifyError(err.responseJSON?.error || 'Community update failed');
-
         }
       },
     }),

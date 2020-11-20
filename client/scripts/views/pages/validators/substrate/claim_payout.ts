@@ -22,7 +22,7 @@ interface IClaimPayoutState {
   validators?: any[];
   sending: boolean;
   error: any;
-};
+}
 
 const NominatorForm: m.Component<{}, IClaimPayoutState> = {
   view: (vnode) => {
@@ -44,8 +44,8 @@ const NominatorForm: m.Component<{}, IClaimPayoutState> = {
         onChangeHandler: (validators) => {
           try {
             vnode.state.validators = validators
-            .split(',')
-            .map((v) => (app.chain as Substrate).accounts.fromAddress(v));
+              .split(',')
+              .map((v) => (app.chain as Substrate).accounts.fromAddress(v));
           } catch (error) {
             vnode.state.error = error;
           }

@@ -5,6 +5,7 @@ import {
   IEventLabel, IEventTitle, IChainEventData, chainSupportedBy
 } from '@commonwealth/chain-events';
 
+import { capitalize } from 'lodash';
 import { SENDGRID_API_KEY, SERVER_URL } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
@@ -12,7 +13,6 @@ import {
   IPostNotificationData, NotificationCategories,
   DynamicTemplate, IChainEventNotificationData
 } from '../../shared/types';
-import { capitalize } from 'lodash';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -40,8 +40,8 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
     }
     if (!chainEventLabel) return;
 
-    const subject = (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
-      + `${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
+    const subject = `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+    }${chainEventLabel.heading} event on ${capitalize(notification_data.chainEventType?.chain)}`;
 
     return {
       from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -122,7 +122,7 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
         label: label.heading,
         path: `https://commonwealth.im${label.linkUrl}`,
         createdAt,
-      }
+      };
     } else {
       const notification_data = JSON.parse(n.notification_data);
       const [
@@ -152,8 +152,8 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
     templateId: DynamicTemplate.BatchNotifications,
     dynamic_template_data: {
       notifications: emailObjArray,
-      subject: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
-        + `${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
+      subject: `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+      }${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
       user: user.email,
     },
   };

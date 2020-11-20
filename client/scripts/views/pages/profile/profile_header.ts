@@ -16,10 +16,9 @@ import User from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { getMaxListeners } from 'superagent';
+import { formatToSize } from 'helpers';
 import { ValidatorHeaderStats } from './validator_header_stats';
 import validatorIdentity from '../validators/substrate/validator_identity';
-
-import { formatToSize } from '../../../../../shared/helpers';
 
 
 function capitalizeFirstLetter(string) {

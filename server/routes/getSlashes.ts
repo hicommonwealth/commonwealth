@@ -13,7 +13,6 @@ interface IEventData {
 
 
 export async function getSlashesFunc(models, req, next: NextFunction) {
-
   const { chain, stash } = req.query;
   const { startDate, endDate } = req.query;
   const validators: { [key: string]: { [block: string]: any } } = {};

@@ -3,12 +3,11 @@ import 'components/widgets/user.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { formatAddressShort, link } from 'helpers';
+import { formatAddressShort, link, formatToSize } from 'helpers';
 import { Tooltip, Tag, Icon, Icons, Popover } from 'construct-ui';
 
 import app from 'state';
 import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
-import { formatToSize } from '../../../../../shared/helpers';
 
 const User: m.Component<{
   user: Account<any> | AddressInfo;

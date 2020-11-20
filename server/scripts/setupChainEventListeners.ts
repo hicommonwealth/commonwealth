@@ -91,7 +91,7 @@ const setupChainEventListeners = async (
     const offenceHandler = new OffenceHandler(models, node.chain);
     const heartbeatHandler = new HeartbeatHandler(models, node.chain);
     const identityHandler = new IdentityHandler(models, node.chain);
-    const handlers: IEventHandler[] = [ storageHandler, 
+    const handlers: IEventHandler[] = [ storageHandler,
       notificationHandler,
       entityArchivalHandler,
       newSessionHandler,

@@ -10,4 +10,3 @@ export interface ChainConstants {
     symbol: string;
     const: ChainConstant;
 }
-

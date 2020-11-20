@@ -376,8 +376,6 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
         m(ProfileHeader, { account }),
         // Quick stats for a validator section
         m(ValidatorStats, { address: account.address, account, apiResponse: vnode.state.apiResponse }),
-        // m('.row.row-narrow.forum-row', [
-        // m('.col-xs-12', [
         m('.row.graph-row', [
           // TOTAL STAKE OVER TIME
           totalStakeGraph && totalStakeGraph.blocks[0] !== -9 ? (totalStakeGraph.blocks.length ? m(chartComponent, {
@@ -533,8 +531,6 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
             })))]),
 
         ])
-        // ]),
-        // ]),
       ]),
     ]);
   },

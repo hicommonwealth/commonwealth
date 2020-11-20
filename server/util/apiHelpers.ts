@@ -42,7 +42,7 @@ export const successResponse = (obj = {}) => {
  */
 const errorResponse = (statusCode, message) => {
   return {
-    statusCode: statusCode,
+    statusCode,
     object: { error: message }
   };
 };

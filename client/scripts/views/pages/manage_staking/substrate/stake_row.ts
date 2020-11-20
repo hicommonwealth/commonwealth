@@ -152,26 +152,6 @@ const StakeRow = makeDynamicComponent<StakeRowAttrs, IStakeRowState>({
               onclick: (e) => model.onSetNominators(e, controllerId, stashId)
             })
           })))),
-      // m('td.val-settings',
-      //   m('span.right',
-      //     m(PopoverMenu, {
-      //       overlayClass: 'manage-staking-settings',
-      //       content: [
-      //         m(MenuItem, { label: 'Bond more funds' }),
-      //         m(MenuItem, { label: 'Unbond funds' }),
-      //         m(MenuItem, { label: 'Withdraw unbonded funds' }),
-      //         m(MenuDivider),
-      //         m(MenuItem, { label: 'Change controller account' }),
-      //         m(MenuItem, { label: 'Change reward destination' }),
-      //         m(MenuItem, { label: 'Change validator preferences' }),
-      //         m(MenuDivider),
-      //         m(MenuItem, { label: 'Change session keys' }),
-      //         m(MenuItem, { label: 'Set nominees' }),
-      //         m(MenuItem, { label: 'Inject session keys (advanced)' }),
-      //       ],
-      //       menuAttrs: { size: 'xs' },
-      //       trigger: m(Icon, { name: Icons.SETTINGS, size: 'lg' })
-      //     })))
     ]);
   }
 });

@@ -23,7 +23,7 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
     where: { id: chain }
   });
 
-  let where: any = {
+  const where: any = {
     chain_event_type_id: `${chain}-offences-offence`
   };
 
@@ -68,12 +68,12 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
   return res.json({
     status: 'Success',
     result: {
-      elected: elected,
+      elected,
       count: result.rows.length,
-      waiting: waiting,
+      waiting,
       nominators: nominators.length,
-      totalStaked: totalStaked,
-      offences: offences,
+      totalStaked,
+      offences,
       aprPercentage: apr / elected
     }
   });

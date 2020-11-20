@@ -38,8 +38,8 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
     const isCurrUser = req.user && (existingAddress.user_id === req.user.id);
     // if owned by someone else, generate a token but don't replace user until verification
     // if you own it, or if it's unverified, associate with address immediately
-    const updatedId = (req.user && ((!existingAddress.verified && isExpired) || isDisowned || isCurrUser)) ?
-      req.user.id : null;
+    const updatedId = (req.user && ((!existingAddress.verified && isExpired) || isDisowned || isCurrUser))
+      ? req.user.id : null;
     const updatedObj = await models.Address.updateWithToken(existingAddress, updatedId, req.body.keytype);
     return res.json({ status: 'Success', result: updatedObj.toJSON() });
   } else {

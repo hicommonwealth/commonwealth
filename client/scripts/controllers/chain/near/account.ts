@@ -120,7 +120,7 @@ export class NearAccount extends Account<NearToken> {
     return new Promise(async (resolve) => {
       this._keyPair = await this._Accounts.keyStore.getKey(this._Chain.api.connection.networkId, this.address);
       // if a keypair is found, return
-      if (!!this._keyPair) {
+      if (this._keyPair) {
         return resolve(!!this._keyPair);
       }
       // otherwise, call updateKeypair again with a delay
@@ -148,7 +148,8 @@ export class NearAccount extends Account<NearToken> {
       const isValid = nacl.sign.detached.verify(
         Buffer.from(message),
         Buffer.from(sigObj, 'base64'),
-        Buffer.from(publicKey, 'base64'));
+        Buffer.from(publicKey, 'base64')
+      );
       return isValid;
     } catch (e) {
       console.error('Signature validation error: ', e);

@@ -54,8 +54,6 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
 
     return m('div.identity',
       m('div.row', [
-        // m(`span.identity-icon${clsName}`, ''),
-        // TODOO: plan is to get the commented values  from vnode.attrs that is being called from profile_header
         m('div.validator-profile-imonline-icons', validators && m(ImOnline, {
           toBeElected: (validators[vnode.attrs.stash] ? validators[vnode.attrs.stash].toBeElected : false),
           isOnline: (validators[vnode.attrs.stash] ? validators[vnode.attrs.stash].isOnline : false),

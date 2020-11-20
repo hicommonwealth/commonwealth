@@ -116,11 +116,11 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     ? [MAINNET_LOCKDROP_ORIG, MAINNET_LOCKDROP]
     : [ROPSTEN_LOCKDROP];
 
-  const locks = await Promise.all(contracts.map(async c => {
+  const locks = await Promise.all(contracts.map(async (c) => {
     // eslint-disable-next-line no-return-await
     return await fetchLocks(network, address, c);
   }));
-  const signals = await Promise.all(contracts.map(async c => {
+  const signals = await Promise.all(contracts.map(async (c) => {
     // eslint-disable-next-line no-return-await
     return await fetchSignals(network, address, c);
   }));
