@@ -315,10 +315,8 @@ const NotificationRow: m.Component<{
         key: notification.id,
         id: notification.id,
         onclick: async () => {
-          const notificationArray: Notification[] = [];
-          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
+          app.user.notifications.markAsRead(notifications);
           await m.route.set(path);
-          m.redraw.sync();
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
