@@ -122,12 +122,14 @@ const createNotificationDigestEmailObject = async (user, notifications, models) 
         label: label.heading,
         path: `https://commonwealth.im${label.linkUrl}`,
         createdAt,
-      }
+      };
     } else {
       const notification_data = JSON.parse(n.notification_data);
       const [
         emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath
       ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
+
+      if (actionCopy === null) return; // don't return notification object if object no-longer exists
 
       let createdAt = moment(n.created_at).fromNow();
       if (createdAt === 'a day ago') createdAt = `${moment(Date.now()).diff(n.created_at, 'hours')} hours ago`;
