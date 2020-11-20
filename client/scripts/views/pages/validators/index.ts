@@ -59,6 +59,7 @@ export interface IValidatorPageState {
     validators: IValidators | { [address: string]: ICosmosValidator };
     lastHeader: HeaderExtended,
     annualPercentRate: ICommissionInfo;
+    valCount: Number;
   };
 }
 
@@ -114,7 +115,8 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-
+    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
+    valCount: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validatorCount : null,
     currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
     currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
     activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,
@@ -138,9 +140,14 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
         vComponents = [
           m(SubstratePreHeader, {
             sender: app.user.activeAccount as SubstrateAccount,
-            annualPercentRate: vnode.state.dynamic.annualPercentRate
+            annualPercentRate: vnode.state.dynamic.annualPercentRate,
+            validators: vnode.state.dynamic.validators as IValidators,
+            valCount: vnode.state.dynamic.valCount,
           }),
-          m(SubstratePresentationComponent)
+          m(SubstratePresentationComponent, {
+            validators: vnode.state.dynamic.validators as IValidators,
+            valCount: vnode.state.dynamic.valCount,
+          })
 
         ];
         break;
@@ -149,10 +156,14 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
         vComponents = [
           m(SubstratePreHeader, {
             sender: app.user.activeAccount as SubstrateAccount,
-            annualPercentRate: vnode.state.dynamic.annualPercentRate
+            annualPercentRate: vnode.state.dynamic.annualPercentRate,
+            validators: vnode.state.dynamic.validators as IValidators,
+            valCount: vnode.state.dynamic.valCount,
           }),
-          m(SubstratePresentationComponent)
-
+          m(SubstratePresentationComponent, {
+            validators: vnode.state.dynamic.validators as IValidators,
+            valCount: vnode.state.dynamic.valCount,
+          })
         ];
         break;
       }

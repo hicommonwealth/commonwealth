@@ -465,6 +465,7 @@ class SubstrateStaking implements StorageModule {
         const data = {};
         const n = 1000000000;
         const validatorRewards: ICommissionInfo = {};
+        if (!rewards.validators) return validatorRewards;
         accounts.forEach((account, index) => {
           let key = account.toString();
           const exposure = exposures[index];

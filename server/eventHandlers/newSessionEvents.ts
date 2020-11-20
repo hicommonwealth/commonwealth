@@ -61,7 +61,7 @@ export default class extends IEventHandler {
     // update existing validators with new state and other details of all validators.
     allValidators.forEach((validator: any) => {
       const stashId = newValidators[validator.stash];
-      const validatorsInfo = newSessionEventData.validatorInfo[stashId];
+      const validatorsInfo = (newSessionEventData as any).validatorInfo[stashId];
       validator.updated_at = new Date().toISOString();
 
       if (stashId) {
@@ -75,7 +75,7 @@ export default class extends IEventHandler {
 
     // 3) Add new validators entries with their details
     Object.keys(newValidators).filter((validatorKey) => !newValidators[validatorKey].visited).forEach((stashId) => {
-      const validatorsInfo = newSessionEventData.validatorInfo[stashId];
+      const validatorsInfo = (newSessionEventData as any).validatorInfo[stashId];
       const newValidatorEntry = {
         name: null,
         stash: stashId,
@@ -104,8 +104,8 @@ export default class extends IEventHandler {
         stash: validator,
         exposure,
         block: event.blockNumber.toString(),
-        commissionPer: newSessionEventData.validatorInfo[validator].commissionPer,
-        eraPoints: newSessionEventData.validatorInfo[validator].eraPoints,
+        commissionPer: (newSessionEventData as any).validatorInfo[validator].commissionPer,
+        eraPoints: (newSessionEventData as any).validatorInfo[validator].eraPoints,
         eventType: newSessionEventData.kind,
         apr: 0, // to be computed later on for first time validator.
         uptime: 0,
