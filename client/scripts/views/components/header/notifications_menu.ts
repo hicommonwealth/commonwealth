@@ -87,7 +87,8 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
       }),
       position: 'bottom-end',
       inline: true,
-      closeOnContentClick: false,
+      closeOnContentClick: true,
+      closeOnOutsideClick: true,
       menuAttrs: {
         align: 'left',
       },

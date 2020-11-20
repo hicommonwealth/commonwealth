@@ -56,6 +56,21 @@ class SubstrateDemocracy extends ProposalModule<
         this._emergencyVotingPeriod = +(api.consts.democracy.emergencyVotingPeriod as BlockNumber);
         this._preimageByteDeposit = this._Chain.coins(api.consts.democracy.preimageByteDeposit);
 
+        // register chain-event handlers
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.DemocracyReferendum, (entity, event) => {
+            this.updateProposal(entity, event);
+          }
+        );
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
+            if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
+              const referendum = this.getByHash(entity.typeId);
+              if (referendum) referendum.update(event);
+            }
+          }
+        );
+
         // fetch referenda from chain
         const events = await this.app.chain.chainEntities.fetchEntities(
           this.app.chain.id,
@@ -67,21 +82,6 @@ class SubstrateDemocracy extends ProposalModule<
           this.app.chain.id,
           this,
           () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
-        );
-        // register new chain-event handlers
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
-            if (!this.initialized) return;
-            if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
-              const referendum = this.getByHash(entity.typeId);
-              if (referendum) referendum.update(event);
-            }
-          }
-        );
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.DemocracyReferendum, (entity, event) => {
-            if (this.initialized) this.updateProposal(entity, event);
-          }
         );
 
         this._initialized = true;
