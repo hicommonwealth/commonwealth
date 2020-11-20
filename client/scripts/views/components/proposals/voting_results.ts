@@ -28,7 +28,13 @@ const VoteListing: m.Component<{
   weight?: boolean
 }, {
   expanded?: boolean,
+  balancesCache,
+  balancesCacheInitialized,
 }> = {
+  oninit: (vnode) => {
+    vnode.state.balancesCache = {};
+    vnode.state.balancesCacheInitialized = {};
+  },
   view: (vnode) => {
     const { proposal, votes, amount, weight } = vnode.attrs;
     const balanceWeighted = proposal.votingUnit === VotingUnit.CoinVote
@@ -42,22 +48,33 @@ const VoteListing: m.Component<{
         ? m('.no-votes', 'No votes')
         : displayedVotes.map(
           (vote) => {
-            let balanceStr = '--';
             let balance;
             if (balanceWeighted && !(vote instanceof CosmosVote)) {
-              vote.account.balance.pipe(first()).toPromise().then((b) => {
-                balance = b;
-                balanceStr = formatCoin(b, true);
-              });
+              // fetch and display balances
+              if (vnode.state.balancesCache[vote.account.address]) {
+                balance = vnode.state.balancesCache[vote.account.address];
+              } else if (vnode.state.balancesCacheInitialized[vote.account.address]) {
+                // do nothing, fetch already in progress
+                balance = '--';
+              } else {
+                // fetch balance and store in cache
+                vnode.state.balancesCacheInitialized[vote.account.address] = true;
+                vote.account.balance.pipe(first()).toPromise().then((b) => {
+                  balance = b;
+                  vnode.state.balancesCache[vote.account.address] = formatCoin(b, true);
+                  m.redraw();
+                });
+                balance = '--';
+              }
             }
             return vote instanceof SignalingVote ? m('.vote', [
               m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
               m('.vote-choice', signalingVoteToString(vote.choices[0])),
-              (balanceWeighted && balance) && m('.vote-balance', balanceStr),
+              (balanceWeighted && balance) && m('.vote-balance', balance),
             ]) : vote instanceof BinaryVote ? m('.vote', [
               m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
               (balanceWeighted && balance)
-                ? m('.vote-balance', balanceStr)
+                ? m('.vote-balance', balance)
                 : m('.vote-balance', (vote as BinaryVote<any>).amount),
               m('.vote-weight', vote.weight && `${vote.weight}x`),
             ]) : vote instanceof DepositVote ? m('.vote', [
@@ -67,12 +84,12 @@ const VoteListing: m.Component<{
               : vote instanceof CosmosVote ? m('.vote', [
                 m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
                 m('.vote-choice', vote.choice.toString()),
-                // (balanceWeighted && balance) && m('.vote-balance', balanceStr),
+                // (balanceWeighted && balance) && m('.vote-balance', balance),
               ])
                 : vote instanceof MolochProposalVote ? m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true })),
                   m('.vote-choice', vote.choice.toString()),
-                  balance && m('.vote-balance', balanceStr),
+                  balance && m('.vote-balance', balance),
                 ])
                   : m('.vote', [
                     m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
@@ -115,26 +132,28 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.ProposalVotingResults', [
         m('.results-column', [
-          m('.results-header', 'Voted yes'),
+          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === true).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === true) })
+              votes: votes.filter((v) => v.choice === true)
+            })
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', 'Voted no'),
+          m('.results-header', `Voted no (${votes.filter((v) => v.choice === false).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === false) })
+              votes: votes.filter((v) => v.choice === false)
+            })
           ]),
         ])
       ]);
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       return m('.ProposalVotingResults', [
         m('.results-column', [
-          m('.results-header', 'Voted yes'),
+          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === MolochVote.YES).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -143,7 +162,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', 'Voted no'),
+          m('.results-header', `Voted no (${votes.filter((v) => v.choice === MolochVote.NO).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -155,7 +174,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       return m('.ProposalVotingResults', [
         m('.results-column', [
-          m('.results-header', 'Voted yes'),
+          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === true).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -166,7 +185,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', 'Voted no'),
+          m('.results-header', `Voted no (${votes.filter((v) => v.choice === false).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -180,7 +199,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       return m('.ProposalVotingResults', [
         m('.results-column', [
-          m('.results-header', 'Voted yes'),
+          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === CosmosVoteChoice.YES).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -189,7 +208,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', 'Voted no'),
+          m('.results-header', `Voted no (${votes.filter((v) => v.choice === CosmosVoteChoice.NO).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -198,7 +217,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', 'Voted abstain'),
+          m('.results-header', `Voted abstain (${votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -207,7 +226,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', 'Voted veto'),
+          m('.results-header', `Voted veto (${votes.filter((v) => v.choice === CosmosVoteChoice.VETO).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -221,7 +240,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
       // special case for cosmos proposals in deposit stage
       return m('.ProposalVotingResults', [
         m('.results-column', [
-          m('.results-header', 'Voted to approve'),
+          m('.results-header', `Voted to approve ${proposal.depositorsAsVotes.length}`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
@@ -233,7 +252,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
       return m('.ProposalVotingResults', [
         m('.results-column', [
-          m('.results-header', 'Voted to approve'),
+          m('.results-header', `Voted to approve ${votes.length}`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
