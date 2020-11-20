@@ -42,7 +42,6 @@ const VoteListing: m.Component<{
         ? m('.no-votes', 'No votes')
         : displayedVotes.map(
           (vote) => {
-            console.log(vote);
             let balanceStr = '--';
             let balance;
             if (balanceWeighted && !(vote instanceof CosmosVote)) {
@@ -51,18 +50,13 @@ const VoteListing: m.Component<{
                 balanceStr = formatCoin(b, true);
               });
             }
-            console.log(vote instanceof SignalingVote);
-            console.log(vote instanceof BinaryVote);
-            console.log(vote instanceof DepositVote);
-            console.log(vote instanceof CosmosVote);
-            console.log(vote instanceof MolochProposalVote);
             return vote instanceof SignalingVote ? m('.vote', [
               m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
               m('.vote-choice', signalingVoteToString(vote.choices[0])),
               balanceWeighted && balance && m('.vote-balance', balanceStr),
             ]) : vote instanceof BinaryVote ? m('.vote', [
               m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-              balanceWeighted && balance && m('.vote-balance', balanceStr),
+              balanceWeighted && balance ? m('.vote-balance', balanceStr) : m('.vote-balance', (vote as BinaryVote<any>).amount),
               m('.vote-weight', vote.weight && `${vote.weight}x`),
             ]) : vote instanceof DepositVote ? m('.vote', [
               m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
@@ -102,7 +96,6 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
     const votes = proposal.getVotes();
 
     // TODO: fix up this function for cosmos votes
-    console.log(proposal.votingType);
     if (proposal instanceof EdgewareSignalingProposal) {
       return m('.ProposalVotingResults', [
         proposal.data.choices.map((outcome) => {
