@@ -408,7 +408,7 @@ export const NewThreadForm: m.Component<{
                       clearLocalStorage(PostType.Link);
                     }, 0);
                   } else {
-                    clearLocalStorage(PostType.Discussion);
+                    clearLocalStorage(PostType.Link);
                   }
                 } catch (err) {
                   vnode.state.saving = false;
