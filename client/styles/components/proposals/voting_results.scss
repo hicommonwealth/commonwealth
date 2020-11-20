@@ -1,34 +1,32 @@
 @import 'client/styles/shared';
 
 .ProposalVotingResults {
-    margin: 0 24px;
     display: flex;
     background-color: $background-color-light;
     margin-top: 25px;
     flex-wrap: wrap;
+    border-radius: 3px;
+
     .results-column {
         display: flex;
         flex-direction: column;
         flex: 1;
-        padding: 12px 20px 13px;
+        padding: 18px 26px 20px;
         min-width: 50%;
         .results-header {
             font-weight: 500;
-        }
-        .results-cell:nth-child(odd), .results-header:nth-child(odd) {
-            margin-right: 15px;
+            margin-bottom: 8px;
         }
         .results-header, .results-cell {
-            flex: 1;
             min-width: calc(50% - 15px);
         }
     }
     .results-column:nth-child(even) {
-        border-left: 1px solid lightgray;
+        border-left: 1px solid $background-color-light-hover;
     }
     .vote {
         display: flex;
-        margin: 4px 0;
+        margin-bottom: 4px;
         .vote-voter {
             flex: 1;
         }
@@ -49,7 +47,6 @@
     }
     .no-votes {
         color: #aaa;
-        margin: 10px 0;
     }
     .expand-listing-button {
         color: #aaa;

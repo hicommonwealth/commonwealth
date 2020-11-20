@@ -53,10 +53,12 @@ const VoteListing: m.Component<{
             return vote instanceof SignalingVote ? m('.vote', [
               m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
               m('.vote-choice', signalingVoteToString(vote.choices[0])),
-              balanceWeighted && balance && m('.vote-balance', balanceStr),
+              (balanceWeighted && balance) && m('.vote-balance', balanceStr),
             ]) : vote instanceof BinaryVote ? m('.vote', [
               m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-              balanceWeighted && balance ? m('.vote-balance', balanceStr) : m('.vote-balance', (vote as BinaryVote<any>).amount),
+              (balanceWeighted && balance)
+                ? m('.vote-balance', balanceStr)
+                : m('.vote-balance', (vote as BinaryVote<any>).amount),
               m('.vote-weight', vote.weight && `${vote.weight}x`),
             ]) : vote instanceof DepositVote ? m('.vote', [
               m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
@@ -65,7 +67,7 @@ const VoteListing: m.Component<{
               : vote instanceof CosmosVote ? m('.vote', [
                 m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
                 m('.vote-choice', vote.choice.toString()),
-                // balanceWeighted && balance && m('.vote-balance', balanceStr),
+                // (balanceWeighted && balance) && m('.vote-balance', balanceStr),
               ])
                 : vote instanceof MolochProposalVote ? m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true })),
