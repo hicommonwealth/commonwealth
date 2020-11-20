@@ -712,9 +712,7 @@ const ViewProposalPage: m.Component<{
       }),
       !(proposal instanceof OffchainThread) && m('.proposal-mobile-sidebar', [
         m(ProposalVotingActions, { proposal }),
-        // m(ProposalVotingResults, { proposal }),
       ]),
-      // TODO: Ensure hidden on mobile
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingResults, { proposal }),
       m(ProposalComments, {
