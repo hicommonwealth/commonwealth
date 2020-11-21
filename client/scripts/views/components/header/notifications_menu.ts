@@ -80,14 +80,18 @@ const NotificationsMenu: m.Component<{ small?: boolean }> = {
         class: `NotificationsMenuButton ${unreadNotifications > 0 ? 'has-notifications' : 'no-notifications'}`,
         label: [
           m(Icon, { name: Icons.BELL }),
-          m('.notification-count', unreadNotifications > 9 ? '∞' : unreadNotifications),
+          m('.notification-count', [
+            m('span.hidden-xs', unreadNotifications),
+            m('span.visible-xs', unreadNotifications > 9 ? '∞' : unreadNotifications),
+          ]),
         ],
         size: small ? 'sm' : 'default',
         compact: true,
       }),
       position: 'bottom-end',
       inline: true,
-      closeOnContentClick: false,
+      closeOnContentClick: true,
+      closeOnOutsideClick: true,
       menuAttrs: {
         align: 'left',
       },

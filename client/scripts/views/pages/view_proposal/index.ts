@@ -436,7 +436,6 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
 
     return m('.ProposalSidebar.forum-container.proposal-sidebar', [
       m(ProposalVotingActions, { proposal }),
-      m(ProposalVotingResults, { proposal }),
     ]);
   }
 };
@@ -507,7 +506,7 @@ const ViewProposalPage: m.Component<{
     }
 
     // load proposal
-    if (!vnode.state.proposal) {
+    if (!vnode.state.proposal || Number(vnode.state.proposal.identifier) !== Number(proposalId)) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
       } catch (e) {
@@ -713,8 +712,9 @@ const ViewProposalPage: m.Component<{
       }),
       !(proposal instanceof OffchainThread) && m('.proposal-mobile-sidebar', [
         m(ProposalVotingActions, { proposal }),
-        m(ProposalVotingResults, { proposal }),
       ]),
+      !(proposal instanceof OffchainThread)
+        && m(ProposalVotingResults, { proposal }),
       m(ProposalComments, {
         proposal,
         comments,

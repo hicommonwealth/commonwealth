@@ -48,20 +48,20 @@ class SubstrateCollective extends ProposalModule<
 
     return new Promise((resolve, reject) => {
       this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
+        // register new chain-event handlers
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.CollectiveProposal, (entity, event) => {
+            if ((event.data as any).collectiveName === this.moduleName) {
+              this.updateProposal(entity, event);
+            }
+          }
+        );
+
         // fetch proposals from chain
         await this.app.chain.chainEntities.fetchEntities(
           this.app.chain.id,
           this,
           () => this._Chain.fetcher.fetchCollectiveProposals(this.moduleName, this.app.chain.block.height)
-        );
-
-        // register new chain-event handlers
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.CollectiveProposal, (entity, event) => {
-            if (this.initialized && (event.data as any).collectiveName === this.moduleName) {
-              this.updateProposal(entity, event);
-            }
-          }
         );
 
         await new Promise((memberResolve) => {
