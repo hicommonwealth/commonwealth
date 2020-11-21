@@ -44,7 +44,7 @@ const NotificationsPage: m.Component<{}> = {
           }),
           m(Popover, {
             content: [
-              m('div', { style: 'margin-bottom: 10px' }, 'Clear chain event notifications?'),
+              m('div', { style: 'margin-bottom: 10px' }, 'Clear chain events?'),
               m(Button, {
                 label: 'Confirm',
                 fluid: true,
