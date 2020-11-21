@@ -378,38 +378,38 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
     })));
 
     return m('.ChainStatusModule', [
-      // app.activeChainId() && m(DropdownFormField, {
-      //   name: 'node',
-      //   choices: nodes.filter((node) => node.chainId === app.activeChainId()),
-      //   callback: async (result) => {
-      //     const n: NodeInfo = app.config.nodes.getById(result);
-      //     vnode.state.initializing = true;
-      //     await selectNode(n);
-      //     await initChain();
-      //     vnode.state.initializing = false;
-      //     m.redraw();
-      //   },
-      // }),
-      m(ButtonGroup, [
-        m(Button, {
-          size: 'sm',
-          class: 'chain-status-main',
-          disabled: vnode.state.initializing,
-          label: vnode.state.initializing ? 'Connecting...' : app.chain.deferred
-            ? 'Ready to connect' : m(ChainStatusIndicator)
-        }),
-        app.chain.networkStatus !== ApiStatus.Connected && m(Button, {
-          size: 'sm',
-          iconLeft: vnode.state.initializing ? null : Icons.PLAY,
-          disabled: vnode.state.initializing,
+      m(PopoverMenu, {
+        content: app.chain.deferred ? m(MenuItem, {
+          label: 'Connect to chain',
           onclick: async () => {
             vnode.state.initializing = true;
             await initChain();
             vnode.state.initializing = false;
             m.redraw();
           }
+        }) : nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
+          return m(MenuItem, {
+            label: 'hi',
+            onclick: async (e) => {
+              vnode.state.initializing = true;
+              const n: NodeInfo = app.config.nodes.getById(node.value);
+              if (!n) return;
+              await selectNode(n);
+              await initChain();
+              vnode.state.initializing = false;
+              m.redraw();
+            }
+          });
         }),
-      ]),
+        trigger: m(Button, {
+          size: 'sm',
+          class: 'chain-status-main',
+          disabled: vnode.state.initializing,
+          label: vnode.state.initializing
+            ? 'Connecting...' : app.chain.deferred
+            ? 'Ready to connect' : m(ChainStatusIndicator),
+        }),
+      }),
     ]);
   }
 };
