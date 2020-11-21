@@ -462,8 +462,10 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
         },
       }, [
         m('.SidebarHeader', m(CommunitySelector)),
-        (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
-        (app.chain || app.community) && m(OnchainNavigationModule),
+        m('.sidebar-content', [ // container for overflow scrolling
+          (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
+          (app.chain || app.community) && m(OnchainNavigationModule),
+        ]),
         app.chain && m(ChainStatusModule),
       ])
     ];
