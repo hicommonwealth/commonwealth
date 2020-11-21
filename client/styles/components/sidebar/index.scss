@@ -289,11 +289,11 @@
 .Sidebar {
     .ChainStatusModule {
         position: absolute;
-        bottom: 14px;
-        left: 15px;
+        bottom: 16px;
+        left: 30px;
         margin-bottom: 0 !important;
-        width: calc(100% - 34px);
-        max-width: calc(100% - 34px);
+        width: calc(100% - 60px);
+        max-width: calc(100% - 60px);
         @include sm-max {
             position: relative;
             bottom: initial;
@@ -324,10 +324,8 @@
         }
         .cui-button-label {
             font-weight: 400;
-            text-align: left;
+            text-align: center;
             width: 100%;
-            position: relative;
-            left: -2px;
         }
         .cui-icon svg {
             min-width: 12px;

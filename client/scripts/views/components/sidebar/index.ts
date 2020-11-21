@@ -379,8 +379,12 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
 
     return m('.ChainStatusModule', [
       m(PopoverMenu, {
+        transitionDuration: 0,
+        closeOnContentClick: true,
+        closeOnOutsideClick: true,
         content: app.chain.deferred ? m(MenuItem, {
           label: 'Connect to chain',
+          size: 'sm',
           onclick: async () => {
             vnode.state.initializing = true;
             await initChain();
@@ -389,7 +393,8 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
           }
         }) : nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
           return m(MenuItem, {
-            label: 'hi',
+            label: node.label,
+            size: 'sm',
             onclick: async (e) => {
               vnode.state.initializing = true;
               const n: NodeInfo = app.config.nodes.getById(node.value);
@@ -404,9 +409,9 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
         trigger: m(Button, {
           size: 'sm',
           class: 'chain-status-main',
+          fluid: true,
           disabled: vnode.state.initializing,
-          label: vnode.state.initializing
-            ? 'Connecting...' : app.chain.deferred
+          label: vnode.state.initializing ? 'Connecting...' : app.chain.deferred
             ? 'Ready to connect' : m(ChainStatusIndicator),
         }),
       }),
