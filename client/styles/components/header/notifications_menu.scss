@@ -2,7 +2,10 @@
 
 .NotificationsMenuButton {
     padding: 0 !important;
-    width: 38px;
+    min-width: 38px;
+    @include xs-max {
+        width: 38px;
+    }
     text-align: center;
 
     .notification-count {
@@ -38,6 +41,18 @@
     &.no-notifications {
         .notification-count {
             display: none;
+        }
+    }
+    .notification-count {
+        .visible-xs {
+            @include sm-min {
+                display: none;
+            }
+        }
+        .hidden-xs {
+            @include xs-max {
+                display: none;
+            }
         }
     }
 }

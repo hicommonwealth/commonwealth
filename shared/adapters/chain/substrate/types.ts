@@ -12,7 +12,7 @@ export function formatCall(c: Call | { section: string, method: string, args: st
     if (!v) return '[unknown]';
     const vStr = v.toString();
     if (vStr.length < 16) return vStr;
-    return `${vStr.slice(0, 5)}…${vStr.slice(vStr.length - 3)}`;
+    return `${vStr.slice(0, 15)}…`;
   }).join(', ');
 
   // finish format

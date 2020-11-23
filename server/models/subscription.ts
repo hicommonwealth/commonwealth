@@ -216,7 +216,7 @@ export default (
   Subscription.associate = (models) => {
     models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
-    models.Subscription.hasMany(models.Notification);
+    models.Subscription.hasMany(models.Notification, { onDelete: 'cascade' });
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainCommunity, { foreignKey: 'community_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });

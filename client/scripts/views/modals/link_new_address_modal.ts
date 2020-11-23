@@ -716,7 +716,9 @@ const LinkNewAddressModal: m.Component<{
 
 // inject confirmExit property
 LinkNewAddressModal['confirmExit'] = confirmationModalWithText(
-  app.isLoggedIn() ? 'Cancel connecting new address?' : 'Cancel log in?'
+  app.isLoggedIn() ? 'Cancel connecting new address?' : 'Cancel log in?',
+  'Yes',
+  'No'
 );
 
 export default LinkNewAddressModal;

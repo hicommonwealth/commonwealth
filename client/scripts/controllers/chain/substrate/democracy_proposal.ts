@@ -8,6 +8,7 @@ import { ITuple } from '@polkadot/types/types';
 import { AccountId, BalanceOf } from '@polkadot/types/interfaces';
 import { isFunction } from '@polkadot/util';
 import { ISubstrateDemocracyProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
+import { formatProposalHashShort } from 'helpers';
 import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
@@ -119,7 +120,7 @@ class SubstrateDemocracyProposal extends Proposal<
       this._section = preimage.section;
       this._title = formatCall(preimage);
     } else {
-      this._title = eventData.proposalHash;
+      this._title = `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
     }
 
     entity.chainEvents.forEach((e) => this.update(e));

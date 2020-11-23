@@ -180,6 +180,18 @@ const LoginSelector: m.Component<{ small?: boolean }, {
               }),
             })),
             activeAddressesWithRole.length > 0 && m(MenuDivider),
+            activeAddressesWithRole.length > 0 && app.user.activeAccount && app.activeId() && m(MenuItem, {
+              onclick: () => {
+                const pf = app.user.activeAccount.profile;
+                if (pf) {
+                  m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain}`);
+                } else {
+                  const a = app.user.activeAccount;
+                  m.route.set(`/${app.activeId()}/account/${a.address}?base=${a.chain}`);
+                }
+              },
+              label: 'Edit profile',
+            }),
             !isPrivateCommunity && m(MenuItem, {
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
@@ -187,6 +199,7 @@ const LoginSelector: m.Component<{ small?: boolean }, {
               label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
                 : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
             }),
+            (app.community?.meta.invitesEnabled || isAdminOrMod) && m(MenuDivider),
             (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
               class: 'invite-user',
               align: 'left',

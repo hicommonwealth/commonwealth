@@ -41,10 +41,10 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   const authorPath = `https://commonwealth.im/${author_chain}/account/${author_address}?base=${author_chain}`;
 
   // action and community
-  const actionCopy = ((category_id === NotificationCategories.NewComment) ? 'commented on'
+  const actionCopy = (([NotificationCategories.NewComment, NotificationCategories.CommentEdit].includes(category_id)) ? 'commented on'
     : (category_id === NotificationCategories.NewMention) ? 'mentioned you in the thread'
-      : (category_id === NotificationCategories.NewThread) ? 'created a new thread'
-        : '');
+      : [NotificationCategories.ThreadEdit, NotificationCategories.NewThread].includes(category_id) ? 'created a new thread'
+        : null);
   const objectCopy = decodeURIComponent(root_title).trim();
   const communityObject = chain_id
     ? await models.Chain.findOne({ where: { id: chain_id } })

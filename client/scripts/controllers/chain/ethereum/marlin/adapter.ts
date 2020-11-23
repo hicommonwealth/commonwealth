@@ -89,7 +89,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     console.log('Marlin initData()');
     await this.chain.initEventLoop();
     await this.governance.init(this.chain, this.marlinAccounts);
-    await super.initData(this.usingServerChainEntities);
+    await super.initData();
   }
 
   public async deinit() {
