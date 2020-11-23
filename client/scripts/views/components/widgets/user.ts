@@ -10,7 +10,7 @@ import app from 'state';
 import { Account, AddressInfo, ChainInfo, ChainBase, Profile } from 'models';
 
 const User: m.Component<{
-  user: Account<any> | AddressInfo;
+  user: Account<any> | AddressInfo | Profile;
   avatarSize?: number;
   avatarOnly?: boolean; // overrides most other properties
   hideAvatar?: boolean;
