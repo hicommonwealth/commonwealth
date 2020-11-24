@@ -7,7 +7,6 @@ import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 
 import app from 'state';
-import { uniqueIdToProposal } from 'identifiers';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
@@ -250,6 +249,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       }).length > 0;
 
     let isUnjoinedJoinableAddress;
+    let unjoinedJoinableAddressInfo;
     if (!onOwnProfile && !onLinkedProfile) {
       const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
       const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
@@ -261,10 +261,13 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
           }).length === 0;
         })
         : null;
-      isUnjoinedJoinableAddress = unjoinedJoinableAddresses.filter((addr) => {
+      unjoinedJoinableAddressInfo = unjoinedJoinableAddresses.filter((addr) => {
         return addr.id === account.id;
-      }).length > 0;
+      });
+      isUnjoinedJoinableAddress = unjoinedJoinableAddressInfo.length > 0;
     }
+
+    console.log(account);
 
     return m(Sublayout, {
       class: 'ProfilePage',
@@ -272,7 +275,10 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     }, [
       m('.forum-container-alt', [
         isUnjoinedJoinableAddress
-        && m(ProfileBanner),
+        && m(ProfileBanner, {
+          account,
+          addressInfo: unjoinedJoinableAddressInfo
+        }),
         m(ProfileHeader, {
           account,
           setIdentity,
