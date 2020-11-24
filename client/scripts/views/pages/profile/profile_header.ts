@@ -69,10 +69,11 @@ export interface IProfileHeaderAttrs {
   account;
   setIdentity: boolean;
   refreshCallback: Function;
+  onLinkedProfile: boolean;
+  onOwnProfile: boolean;
 }
 
 export interface IProfileHeaderState {
-  onLinkedProfile: boolean;
   subscription: Unsubscribable | null;
   identity: SubstrateIdentity | null;
   copied: boolean;
@@ -81,23 +82,10 @@ export interface IProfileHeaderState {
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
-    const { account, refreshCallback } = vnode.attrs;
-    const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
-      ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
-      : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
-
+    const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
 
-    const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
-      && app.user.activeAccounts.filter((account_) => {
-        return app.user.getRoleInCommunity({
-          account: account_,
-          chain: app.activeChainId(),
-        });
-      }).filter((account_) => {
-        return account_.address === account.address;
-      }).length > 0;
-
+    console.log({ onLinkedProfile, onOwnProfile });
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;

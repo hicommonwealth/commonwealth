@@ -152,6 +152,10 @@
     }
 }
 
+.ProfileBanner {
+    display: flex;
+}
+
 .ProfileHeader {
     @include profile-module;
     padding: 0 0 8px;

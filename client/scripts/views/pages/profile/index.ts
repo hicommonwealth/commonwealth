@@ -19,6 +19,7 @@ import { decodeAddress } from '@polkadot/keyring';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
+import ProfileBanner from './profile_banner';
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -218,6 +219,11 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       m.redraw();
     }
 
+    console.log(account);
+    console.log(app.user.activeAccounts);
+    console.log(app.user.getJoinableAddresses({ chain: app.activeChainId(), community: app.activeCommunityId() }));
+    const belongsToUser = false;
+
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
     // TODO: search for signaling proposals ->
     // Commented-out lines from previous version which included signaling proposals in proposals var:
@@ -235,14 +241,30 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
+    const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
+      ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
+      : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
+    const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
+      && app.user.activeAccounts.filter((account_) => {
+        return app.user.getRoleInCommunity({
+          account: account_,
+          chain: app.activeChainId(),
+        });
+      }).filter((account_) => {
+        return account_.address === account.address;
+      }).length > 0;
     return m(Sublayout, {
       class: 'ProfilePage',
       showNewProposalButton: true,
     }, [
       m('.forum-container-alt', [
+        belongsToUser
+        && m(ProfileBanner),
         m(ProfileHeader, {
           account,
           setIdentity,
+          onOwnProfile,
+          onLinkedProfile,
           refreshCallback: () => { vnode.state.refreshProfile = true; },
         }),
         m('.row.row-narrow.forum-row', [
