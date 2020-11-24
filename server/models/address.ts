@@ -111,7 +111,8 @@ export default (
   ): Promise<AddressInstance> => {
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
-    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype });
+    const last_active = new Date();
+    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype, last_active });
   };
 
   // Update an existing address' verification token
@@ -128,6 +129,8 @@ export default (
     address.keytype = keytype;
     address.verification_token = verification_token;
     address.verification_token_expires = verification_token_expires;
+    address.last_active = new Date();
+
     return address.save();
   };
 
@@ -245,6 +248,8 @@ export default (
       log.error(`invalid network: ${chain.network}`);
       isValid = false;
     }
+
+    addressModel.last_active = new Date();
 
     if (isValid && user_id === null) {
       // mark the address as verified, and if it doesn't have an associated user, create a new user
