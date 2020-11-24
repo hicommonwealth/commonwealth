@@ -1,11 +1,10 @@
 import m from 'mithril';
 import app from 'state';
 import { Button } from 'construct-ui';
-import { notifyError, notifySuccess } from 'client/scripts/controllers/app/notifications';
-import { setActiveAccount } from 'client/scripts/controllers/app/login';
-import { formatAddressShort } from 'client/scripts/helpers';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { setActiveAccount } from 'controllers/app/login';
+import { formatAddressShort } from 'helpers';
 import { Account } from 'models';
-
 
 const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: any }, { loading: boolean }> = {
   view: (vnode) => {
@@ -37,6 +36,7 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: any }, { 
       m('.banner-text', 'This address is already in your keychain.'),
       m(Button, {
         label: 'Join community',
+        intent: 'primary',
         disabled: vnode.state.loading,
         onclick: (e) => {
           e.preventDefault();

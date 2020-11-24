@@ -154,13 +154,25 @@
 
 .ProfileBanner {
     display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border: 1px solid $form-border-color-light;
+    box-shadow: 0px 0px 1px 1px $form-border-color-light;
+    margin-top: 24px;
+    .banner-text {
+        margin-right: 5px;
+    }
+    button {
+        margin-left: 5px;
+    }
 }
 
 .ProfileHeader {
     @include profile-module;
     padding: 0 0 8px;
     padding: 0 24px !important;
-    margin-top: 36px;
+    margin-top: 12px;
 
     .cover {
         width: calc(100% + 24px * 2);
