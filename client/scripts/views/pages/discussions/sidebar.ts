@@ -11,10 +11,10 @@ import CommunityInfoModule from 'views/components/sidebar/community_info_module'
 export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: number }, {}> = {
   view: (vnode) => {
     const { user, activityCount } = vnode.attrs;
-    const profile = app.profiles.getProfile(user.chain, user.address);
+    // const profile = app.profiles.getProfile(user.chain, user.address);
     return m('.MostActiveUser', [
       m(User, {
-        user: profile,
+        user,
         avatarSize: 24,
         linkify: true,
         popover: true,

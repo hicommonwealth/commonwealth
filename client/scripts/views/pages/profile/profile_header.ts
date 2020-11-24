@@ -85,7 +85,6 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
 
-    console.log({ onLinkedProfile, onOwnProfile });
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
