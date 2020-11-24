@@ -219,11 +219,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       m.redraw();
     }
 
-    console.log(account);
-    console.log(app.user.activeAccounts);
-    console.log(app.user.getJoinableAddresses({ chain: app.activeChainId(), community: app.activeCommunityId() }));
-    const belongsToUser = false;
-
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
     // TODO: search for signaling proposals ->
     // Commented-out lines from previous version which included signaling proposals in proposals var:
@@ -253,12 +248,30 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       }).filter((account_) => {
         return account_.address === account.address;
       }).length > 0;
+
+    let isUnjoinedJoinableAddress;
+    if (!onOwnProfile && !onLinkedProfile) {
+      const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
+      const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
+      const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
+      const unjoinedJoinableAddresses = (joinableAddresses.length > communityRoles.length)
+        ? joinableAddresses.filter((addr) => {
+          return communityRoles.filter((role) => {
+            return role.address_id === addr.id;
+          }).length === 0;
+        })
+        : null;
+      isUnjoinedJoinableAddress = unjoinedJoinableAddresses.filter((addr) => {
+        return addr.id === account.id;
+      }).length > 0;
+    }
+
     return m(Sublayout, {
       class: 'ProfilePage',
       showNewProposalButton: true,
     }, [
       m('.forum-container-alt', [
-        belongsToUser
+        isUnjoinedJoinableAddress
         && m(ProfileBanner),
         m(ProfileHeader, {
           account,
