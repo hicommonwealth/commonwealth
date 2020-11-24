@@ -93,6 +93,50 @@ const threadModelFromServer = (thread) => {
   );
 };
 
+const getProfileStatus = (account) => {
+  const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
+    ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
+    : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
+  const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
+    && app.user.activeAccounts.filter((account_) => {
+      return app.user.getRoleInCommunity({
+        account: account_,
+        chain: app.activeChainId(),
+      });
+    }).filter((account_) => {
+      return account_.address === account.address;
+    }).length > 0;
+
+  let isUnjoinedJoinableAddress;
+  let currentAddressInfo;
+  if (!onOwnProfile && !onLinkedProfile) {
+    const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
+    const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
+    const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
+    const unjoinedJoinableAddresses = (joinableAddresses.length > communityRoles.length)
+      ? joinableAddresses.filter((addr) => {
+        return communityRoles.filter((role) => {
+          return role.address_id === addr.id;
+        }).length === 0;
+      })
+      : null;
+    const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
+      return addr.id === account.id;
+    });
+    isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
+    if (unjoinedJoinableAddresses) {
+      currentAddressInfo = currentAddressInfoArray[0];
+    }
+  }
+
+  return ({
+    onOwnProfile,
+    onLinkedProfile,
+    displayBanner: isUnjoinedJoinableAddress,
+    currentAddressInfo
+  });
+};
+
 export enum UserContent {
   All = 'all',
   Threads = 'threads',
@@ -235,49 +279,15 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
-    const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
-      ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
-      : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
-    const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
-      && app.user.activeAccounts.filter((account_) => {
-        return app.user.getRoleInCommunity({
-          account: account_,
-          chain: app.activeChainId(),
-        });
-      }).filter((account_) => {
-        return account_.address === account.address;
-      }).length > 0;
 
-    let isUnjoinedJoinableAddress;
-    let currentAddressInfo;
-    if (!onOwnProfile && !onLinkedProfile) {
-      const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
-      const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
-      const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
-      const unjoinedJoinableAddresses = (joinableAddresses.length > communityRoles.length)
-        ? joinableAddresses.filter((addr) => {
-          return communityRoles.filter((role) => {
-            return role.address_id === addr.id;
-          }).length === 0;
-        })
-        : null;
-      const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
-        return addr.id === account.id;
-      });
-      isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
-      if (unjoinedJoinableAddresses) {
-        currentAddressInfo = currentAddressInfoArray[0];
-      }
-    }
-
-    console.log(account);
+    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
 
     return m(Sublayout, {
       class: 'ProfilePage',
       showNewProposalButton: true,
     }, [
       m('.forum-container-alt', [
-        isUnjoinedJoinableAddress
+        displayBanner
         && m(ProfileBanner, {
           account,
           addressInfo: currentAddressInfo
