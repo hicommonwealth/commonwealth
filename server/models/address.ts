@@ -36,6 +36,7 @@ export interface AddressAttributes {
   verified?: Date;
   keytype?: string;
   name?: string;
+  last_active?: Date;
   created_at?: Date;
   updated_at?: Date;
   user_id?: number;
@@ -89,6 +90,7 @@ export default (
     verified:                   { type: dataTypes.DATE, allowNull: true },
     keytype:                    { type: dataTypes.STRING, allowNull: true },
     name:                       { type: dataTypes.STRING, allowNull: true },
+    last_active:                 { type: dataTypes.DATE, allowNull: true },
     created_at:                 { type: dataTypes.DATE, allowNull: false },
     updated_at:                 { type: dataTypes.DATE, allowNull: false },
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
