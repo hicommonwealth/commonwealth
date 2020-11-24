@@ -4,9 +4,9 @@ import { Button } from 'construct-ui';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { formatAddressShort } from 'helpers';
-import { Account } from 'models';
+import { Account, AddressInfo } from 'models';
 
-const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: any }, { loading: boolean }> = {
+const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressInfo }, { loading: boolean }> = {
   view: (vnode) => {
     const { account, addressInfo } = vnode.attrs;
 
@@ -38,10 +38,7 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: any }, { 
         label: 'Join community',
         intent: 'primary',
         disabled: vnode.state.loading,
-        onclick: (e) => {
-          e.preventDefault();
-          createRole.bind(this);
-        }
+        onclick: createRole.bind(this),
       })
     ]);
   }

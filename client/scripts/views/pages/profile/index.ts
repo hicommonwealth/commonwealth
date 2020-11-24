@@ -249,7 +249,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
       }).length > 0;
 
     let isUnjoinedJoinableAddress;
-    let unjoinedJoinableAddressInfo;
+    let currentAddressInfo;
     if (!onOwnProfile && !onLinkedProfile) {
       const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
       const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
@@ -261,10 +261,13 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
           }).length === 0;
         })
         : null;
-      unjoinedJoinableAddressInfo = unjoinedJoinableAddresses.filter((addr) => {
+      const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
         return addr.id === account.id;
       });
-      isUnjoinedJoinableAddress = unjoinedJoinableAddressInfo.length > 0;
+      isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
+      if (unjoinedJoinableAddresses) {
+        currentAddressInfo = currentAddressInfoArray[0];
+      }
     }
 
     console.log(account);
@@ -277,7 +280,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         isUnjoinedJoinableAddress
         && m(ProfileBanner, {
           account,
-          addressInfo: unjoinedJoinableAddressInfo
+          addressInfo: currentAddressInfo
         }),
         m(ProfileHeader, {
           account,
