@@ -149,10 +149,11 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
                 profileData.headline,
                 profileData.bio,
                 profileData.avatarUrl,
-                a.OffchainProfile.judgements
+                a.OffchainProfile.judgements,
+                a.last_active
               );
             } else {
-              profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
+              profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl, a.last_active);
             }
           } else {
             profile.initializeEmpty();

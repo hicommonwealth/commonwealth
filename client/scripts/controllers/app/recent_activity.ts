@@ -61,7 +61,7 @@ class RecentActivityController {
       const { count } = user;
       const { chain, address, name, headline, bio, avatarUrl } = user.info;
       const info = new Profile(chain, address);
-      info.initialize(name, headline, bio, avatarUrl);
+      info.initialize(name, headline, bio, avatarUrl, null);
       return ({ info, count });
     });
   }
