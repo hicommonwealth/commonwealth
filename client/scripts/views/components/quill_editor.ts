@@ -293,12 +293,16 @@ const instantiateEditor = (
         addrSpan.innerText = addr.chain === 'near' ? addr.address : `${addr.address.slice(0, 6)}...`;
         addrSpan.className = 'ql-mention-addr';
 
+        const lastActiveSpan = document.createElement('span');
+        lastActiveSpan.innerText = profile.lastActive?.toString() || null;
+
         const textWrap = document.createElement('div');
         textWrap.className = 'ql-mention-text-wrap';
 
         node.appendChild(avatar);
         textWrap.appendChild(nameSpan);
         textWrap.appendChild(addrSpan);
+        textWrap.appendChild(lastActiveSpan);
         node.appendChild(textWrap);
 
         return ({
