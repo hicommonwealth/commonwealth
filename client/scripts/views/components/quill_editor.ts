@@ -295,6 +295,7 @@ const instantiateEditor = (
 
         const lastActiveSpan = document.createElement('span');
         lastActiveSpan.innerText = profile.lastActive?.toString() || null;
+        lastActiveSpan.className = 'ql-mention-la';
 
         const textWrap = document.createElement('div');
         textWrap.className = 'ql-mention-text-wrap';
