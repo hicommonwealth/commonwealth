@@ -90,7 +90,7 @@ export default (
     verified:                   { type: dataTypes.DATE, allowNull: true },
     keytype:                    { type: dataTypes.STRING, allowNull: true },
     name:                       { type: dataTypes.STRING, allowNull: true },
-    last_active:                 { type: dataTypes.DATE, allowNull: true },
+    last_active:                { type: dataTypes.DATE, allowNull: true },
     created_at:                 { type: dataTypes.DATE, allowNull: false },
     updated_at:                 { type: dataTypes.DATE, allowNull: false },
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
@@ -265,14 +265,13 @@ export default (
         });
         addressModel.user_id = user.id;
       }
-      await addressModel.save();
     } else if (isValid) {
       // mark the address as verified
       addressModel.verification_token_expires = null;
       addressModel.verified = new Date();
       addressModel.user_id = user_id;
-      await addressModel.save();
     }
+    await addressModel.save();
     return isValid;
   };
 

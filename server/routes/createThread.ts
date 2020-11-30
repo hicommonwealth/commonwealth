@@ -291,6 +291,10 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     );
   }));
 
+  // update author.last_active (no await)
+  author.last_active = new Date();
+  author.save();
+
   return res.json({ status: 'Success', result: finalThread.toJSON() });
 };
 
