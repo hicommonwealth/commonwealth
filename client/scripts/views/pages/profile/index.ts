@@ -107,6 +107,8 @@ const getProfileStatus = (account) => {
       return account_.address === account.address;
     }).length > 0;
 
+  // if the profile that we are visiting is in app.activeAddresses() but not the current active address,
+  // then display the ProfileBanner
   let isUnjoinedJoinableAddress;
   let currentAddressInfo;
   if (!onOwnProfile && !onLinkedProfile) {
