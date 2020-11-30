@@ -7,7 +7,6 @@ import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 
 import app from 'state';
-import { uniqueIdToProposal } from 'identifiers';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
@@ -19,6 +18,7 @@ import { decodeAddress } from '@polkadot/keyring';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
+import ProfileBanner from './profile_banner';
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -91,6 +91,54 @@ const threadModelFromServer = (thread) => {
     thread.Address.chain,
     thread.pinned,
   );
+};
+
+const getProfileStatus = (account) => {
+  const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
+    ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
+    : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
+  const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
+    && app.user.activeAccounts.filter((account_) => {
+      return app.user.getRoleInCommunity({
+        account: account_,
+        chain: app.activeChainId(),
+      });
+    }).filter((account_) => {
+      return account_.address === account.address;
+    }).length > 0;
+
+  // if the profile that we are visiting is in app.activeAddresses() but not the current active address,
+  // then display the ProfileBanner
+  // TODO: display the banner if the current address is in app.activeAddresses() and *is* a member of the
+  // community (this will require alternate copy on the banner)
+  let isUnjoinedJoinableAddress;
+  let currentAddressInfo;
+  if (!onOwnProfile && !onLinkedProfile) {
+    const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
+    const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
+    const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
+    const unjoinedJoinableAddresses = (joinableAddresses.length > communityRoles.length)
+      ? joinableAddresses.filter((addr) => {
+        return communityRoles.filter((role) => {
+          return role.address_id === addr.id;
+        }).length === 0;
+      })
+      : null;
+    const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
+      return addr.id === account.id;
+    });
+    isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
+    if (unjoinedJoinableAddresses) {
+      currentAddressInfo = currentAddressInfoArray[0];
+    }
+  }
+
+  return ({
+    onOwnProfile,
+    onLinkedProfile,
+    displayBanner: isUnjoinedJoinableAddress,
+    currentAddressInfo
+  });
 };
 
 export enum UserContent {
@@ -236,14 +284,24 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
+
+    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
+
     return m(Sublayout, {
       class: 'ProfilePage',
       showNewProposalButton: true,
     }, [
       m('.forum-container-alt', [
+        displayBanner
+        && m(ProfileBanner, {
+          account,
+          addressInfo: currentAddressInfo
+        }),
         m(ProfileHeader, {
           account,
           setIdentity,
+          onOwnProfile,
+          onLinkedProfile,
           refreshCallback: () => { vnode.state.refreshProfile = true; },
         }),
         m('.row.row-narrow.forum-row', [
