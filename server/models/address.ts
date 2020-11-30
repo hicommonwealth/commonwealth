@@ -36,6 +36,7 @@ export interface AddressAttributes {
   verified?: Date;
   keytype?: string;
   name?: string;
+  last_active?: Date;
   created_at?: Date;
   updated_at?: Date;
   user_id?: number;
@@ -89,6 +90,7 @@ export default (
     verified:                   { type: dataTypes.DATE, allowNull: true },
     keytype:                    { type: dataTypes.STRING, allowNull: true },
     name:                       { type: dataTypes.STRING, allowNull: true },
+    last_active:                { type: dataTypes.DATE, allowNull: true },
     created_at:                 { type: dataTypes.DATE, allowNull: false },
     updated_at:                 { type: dataTypes.DATE, allowNull: false },
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
@@ -109,7 +111,8 @@ export default (
   ): Promise<AddressInstance> => {
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
-    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype });
+    const last_active = new Date();
+    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype, last_active });
   };
 
   // Update an existing address' verification token
@@ -126,6 +129,8 @@ export default (
     address.keytype = keytype;
     address.verification_token = verification_token;
     address.verification_token_expires = verification_token_expires;
+    address.last_active = new Date();
+
     return address.save();
   };
 
@@ -245,6 +250,8 @@ export default (
       isValid = false;
     }
 
+    addressModel.last_active = new Date();
+
     if (isValid && user_id === null) {
       // mark the address as verified, and if it doesn't have an associated user, create a new user
       addressModel.verification_token_expires = null;
@@ -259,14 +266,13 @@ export default (
         });
         addressModel.user_id = user.id;
       }
-      await addressModel.save();
     } else if (isValid) {
       // mark the address as verified
       addressModel.verification_token_expires = null;
       addressModel.verified = new Date();
       addressModel.user_id = user_id;
-      await addressModel.save();
     }
+    await addressModel.save();
     return isValid;
   };
 

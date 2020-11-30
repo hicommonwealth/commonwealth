@@ -85,12 +85,13 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       req.wss,
       [ finalThread.Address.address ],
     );
+    // TODO: dispatch notifications for new mention(s)
+    // TODO: update author.last_active
+
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
     return next(new Error(e));
   }
-
-  // Todo: dispatch notifications conditional on a new mention
 };
 
 export default editThread;
