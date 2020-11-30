@@ -11,6 +11,7 @@ class Profile {
   private _initialized: boolean;
   private _judgements: { [registrar: string]: string } = {};
   private _isOnchain: boolean = false;
+  private _lastActive: Date;
   get name() { return this._name; }
   get headline() { return this._headline; }
   get bio() { return this._bio; }
@@ -18,6 +19,7 @@ class Profile {
   get initialized() { return this._initialized; }
   get judgements() { return this._judgements; }
   get isOnchain() { return this._isOnchain; }
+  get lastActive() { return this._lastActive; }
 
   public readonly chain: string;
   public readonly address: string;
@@ -31,7 +33,7 @@ class Profile {
     this._initialized = true;
   }
 
-  public initializeWithChain(name, headline, bio, avatarUrl, judgements) {
+  public initializeWithChain(name, headline, bio, avatarUrl, judgements, lastActive) {
     this._initialized = true;
     this._isOnchain = true;
     this._name = name;
@@ -39,14 +41,16 @@ class Profile {
     this._bio = bio;
     this._avatarUrl = avatarUrl;
     this._judgements = judgements;
+    this._lastActive = lastActive;
   }
 
-  public initialize(name, headline, bio, avatarUrl) {
+  public initialize(name, headline, bio, avatarUrl, lastActive) {
     this._initialized = true;
     this._name = name;
     this._headline = headline;
     this._bio = bio;
     this._avatarUrl = avatarUrl;
+    this._lastActive = lastActive;
   }
 
   get displayName() : string {

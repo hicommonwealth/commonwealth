@@ -333,6 +333,10 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     }));
   }
 
+  // update author.last_active (no await)
+  author.last_active = new Date();
+  author.save();
+
   return res.json({ status: 'Success', result: finalComment.toJSON() });
 };
 
