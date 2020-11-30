@@ -88,10 +88,11 @@ class ProfilesController {
             name, headline, bio, avatarUrl,
           } = JSON.parse(profileData.data);
           const lastActive = profileData.Address.last_active;
-          if (lastActive) console.log('has last Active', profile);
           // ignore off-chain name if substrate id exists
           if (profileData.identity) {
-            profile.initializeWithChain(profileData.identity, headline, bio, avatarUrl, profileData.judgements, lastActive);
+            profile.initializeWithChain(
+              profileData.identity, headline, bio, avatarUrl, profileData.judgements, lastActive
+            );
           } else {
             profile.initialize(name, headline, bio, avatarUrl, lastActive);
           }
