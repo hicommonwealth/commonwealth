@@ -79,6 +79,21 @@ class SubstrateDemocracyProposals extends ProposalModule<
         this._launchPeriod = +(api.consts.democracy.launchPeriod as BlockNumber);
         this._cooloffPeriod = +(api.consts.democracy.cooloffPeriod as BlockNumber);
 
+        // register new chain-event handlers
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.DemocracyProposal, (entity, event) => {
+            this.updateProposal(entity, event);
+          }
+        );
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
+            if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
+              const proposal = this.getByHash(entity.typeId);
+              if (proposal) proposal.update(event);
+            }
+          }
+        );
+
         // fetch proposals from chain
         const events = await this.app.chain.chainEntities.fetchEntities(
           this.app.chain.id,
@@ -90,21 +105,6 @@ class SubstrateDemocracyProposals extends ProposalModule<
           this.app.chain.id,
           this,
           () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
-        );
-        // register new chain-event handlers
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
-            if (!this.initialized) return;
-            if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
-              const proposal = this.getByHash(entity.typeId);
-              if (proposal) proposal.update(event);
-            }
-          }
-        );
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.DemocracyProposal, (entity, event) => {
-            if (this.initialized) this.updateProposal(entity, event);
-          }
         );
 
         // TODO: add preimage to get name of nextExternal

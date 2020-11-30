@@ -217,7 +217,7 @@ export function formatAddressShort(address: string, chain: string) {
 
 export function formatProposalHashShort(hash: string) {
   if (!hash) return;
-  return hash.slice(0, 8);
+  return `${hash.slice(0, 8)}…`;
 }
 
 export function renderMultilineText(text: string) {

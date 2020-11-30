@@ -1,8 +1,12 @@
 import 'components/sidebar/notification_row.scss';
 
+import { Icon, Icons } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
-import moment from 'moment';
+import moment from 'moment-twitter';
+import {
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy
+} from '@commonwealth/chain-events';
 
 import app from 'state';
 import { NotificationCategories } from 'types';
@@ -15,12 +19,9 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy
-} from '@commonwealth/chain-events';
+import UserGallery from 'views/components/widgets/user_gallery';
+
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
-import UserGallery from './widgets/user_gallery';
-import { Icon, Icons } from 'construct-ui';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -314,10 +315,8 @@ const NotificationRow: m.Component<{
         key: notification.id,
         id: notification.id,
         onclick: async () => {
-          const notificationArray: Notification[] = [];
-          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
+          app.user.notifications.markAsRead(notifications);
           await m.route.set(path);
-          m.redraw.sync();
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
@@ -343,7 +342,7 @@ const NotificationRow: m.Component<{
           notificationBody
             && category !== `${NotificationCategories.NewReaction}`
             && m('.comment-body-excerpt', notificationBody),
-          m('.comment-body-created', createdAt.fromNow()),
+          m('.comment-body-created', createdAt.twitterShort()),
         ]),
       ]);
     }

@@ -31,35 +31,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   protected _serverLoaded: boolean;
   public get serverLoaded() { return this._serverLoaded; }
 
-  private async _postModuleLoad(listenEvents = false): Promise<void> {
-    // attach listener for entity update events
-    if (listenEvents) {
-      this.app.socket.addListener(
-        WebsocketMessageType.ChainEntity,
-        (payload: IWebsocketsPayload<any>) => {
-          if (!this.chainEntities) {
-            return;
-          }
-          if (!payload || !payload.data || payload.data.chainEntity.chain !== this.meta.chain.id) {
-            return;
-          }
-
-          const { chainEntity, chainEvent, chainEventType } = payload.data;
-
-          // add fake "include" for construction purposes
-          chainEvent.ChainEventType = chainEventType;
-          const eventModel = ChainEvent.fromJSON(chainEvent);
-
-          let existingEntity = this.chainEntities.store.get(chainEntity);
-          if (!existingEntity) {
-            existingEntity = ChainEntity.fromJSON(chainEntity);
-          }
-          this.chainEntities.update(existingEntity, eventModel);
-        }
-      );
-    }
-  }
-
   public async initServer(): Promise<void> {
     clearLocalStorage();
 
@@ -92,12 +63,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       });
     }
 
-    const { threads, comments, reactions, topics, admins } = response.result;
+    const { threads, comments, reactions, topics, admins, activeUsers } = response.result;
     this.app.threads.initialize(threads, true);
     this.app.comments.initialize(comments, false);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
     this.meta.chain.setAdmins(admins);
+    this.app.recentActivity.setMostActiveUsers(activeUsers);
 
     this._serverLoaded = true;
   }
@@ -117,8 +89,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     console.log(`Started API for ${this.meta.chain.id} on node: ${this.meta.url}.`);
   }
 
-  public async initData(listenEvents = false): Promise<void> {
-    await this._postModuleLoad(listenEvents);
+  public async initData(): Promise<void> {
     this._loaded = true;
     this.app.chainModuleReady.next(true);
     console.log(`Loaded data for ${this.meta.chain.id} on node: ${this.meta.url}.`);

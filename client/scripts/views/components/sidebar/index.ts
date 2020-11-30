@@ -5,13 +5,16 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner
+  Button, ButtonGroup, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner, Select
 } from 'construct-ui';
 
-import app from 'state';
+import { DropdownFormField } from 'views/components/forms';
+import { selectNode, initChain } from 'app';
+
+import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
 import { link } from 'helpers';
-import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo } from 'models';
+import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo, NodeInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
@@ -31,7 +34,7 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
       key: `${item instanceof ChainInfo ? 'chain' : 'community'}-${item.id}`
     }, [
       m(Tooltip, {
-        hoverOpenDelay: 350,
+        hoverOpenDelay: 500,
         hoverCloseDelay: 0,
         transitionDuration: 0,
         position: 'right',
@@ -347,12 +350,12 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
   }
 };
 
-const ChainStatusModule: m.Component<{}> = {
+const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
   view: (vnode) => {
     const url = app.chain?.meta?.url;
     if (!url) return;
 
-    const formattedUrl = url
+    const formatUrl = (u) => u
       .replace('ws://', '')
       .replace('wss://', '')
       .replace('http://', '')
@@ -360,9 +363,58 @@ const ChainStatusModule: m.Component<{}> = {
       .split('/')[0]
       .split(':')[0];
 
+    const nodes = (app.chain && app.chain.meta ? [] : [{
+      name: 'node',
+      label: 'Select a node',
+      value: undefined,
+      selected: true,
+      chainId: undefined,
+    }]).concat(app.config.nodes.getAll().map((n) => ({
+      name: 'node',
+      label: formatUrl(n.url),
+      value: n.id,
+      selected: app.chain && app.chain.meta && n.url === app.chain.meta.url && n.chain === app.chain.meta.chain,
+      chainId: n.chain.id,
+    })));
+
     return m('.ChainStatusModule', [
-      m('.chain-url', formattedUrl),
-      app.chain.deferred ? m('.chain-deferred', 'Ready to connect') : m(ChainStatusIndicator),
+      m(PopoverMenu, {
+        transitionDuration: 0,
+        closeOnContentClick: true,
+        closeOnOutsideClick: true,
+        content: app.chain.deferred ? m(MenuItem, {
+          label: 'Connect to chain',
+          size: 'sm',
+          onclick: async () => {
+            vnode.state.initializing = true;
+            await initChain();
+            vnode.state.initializing = false;
+            m.redraw();
+          }
+        }) : nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
+          return m(MenuItem, {
+            label: node.label,
+            size: 'sm',
+            onclick: async (e) => {
+              vnode.state.initializing = true;
+              const n: NodeInfo = app.config.nodes.getById(node.value);
+              if (!n) return;
+              await selectNode(n);
+              await initChain();
+              vnode.state.initializing = false;
+              m.redraw();
+            }
+          });
+        }),
+        trigger: m(Button, {
+          size: 'sm',
+          class: 'chain-status-main',
+          fluid: true,
+          disabled: vnode.state.initializing,
+          label: vnode.state.initializing ? 'Connecting...' : app.chain.deferred
+            ? 'Ready to connect' : m(ChainStatusIndicator),
+        }),
+      }),
     ]);
   }
 };
@@ -410,8 +462,10 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
         },
       }, [
         m('.SidebarHeader', m(CommunitySelector)),
-        (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
-        (app.chain || app.community) && m(OnchainNavigationModule),
+        m('.sidebar-content', [ // container for overflow scrolling
+          (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
+          (app.chain || app.community) && m(OnchainNavigationModule),
+        ]),
         app.chain && m(ChainStatusModule),
       ])
     ];

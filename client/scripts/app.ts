@@ -1,5 +1,4 @@
 import 'lib/normalize.css';
-import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
@@ -64,9 +63,10 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.invites = data.invites;
 
       // add recentActivity
-      const { recentThreads, recentComments } = data;
-      app.recentActivity.addThreads(recentThreads, true);
-      app.recentActivity.addAddressesFromActivity(recentThreads.concat(recentComments), true);
+      const { recentThreads } = data;
+      Object.entries(recentThreads).forEach(([comm, count]) => {
+        app.recentActivity.setCommunityThreadCounts(comm, count as number);
+      });
 
       // update the login status
       updateActiveUser(data.user);

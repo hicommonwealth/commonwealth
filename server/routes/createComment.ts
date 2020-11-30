@@ -260,7 +260,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       `comment-${parent_id}`,
       {
         created_at: new Date(),
-        root_id,
+        root_id: Number(id),
         root_title,
         root_type: prefix,
         comment_id: Number(finalComment.id),
@@ -308,7 +308,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id,
+          root_id: Number(id),
           root_title,
           root_type: prefix,
           comment_id: Number(finalComment.id),
@@ -332,6 +332,10 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       );
     }));
   }
+
+  // update author.last_active (no await)
+  author.last_active = new Date();
+  author.save();
 
   return res.json({ status: 'Success', result: finalComment.toJSON() });
 };

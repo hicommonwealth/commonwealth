@@ -380,7 +380,6 @@ const resetServer = (models): Promise<number> => {
           creator_id: 1,
           description: 'All things staking',
           default_chain: 'ethereum',
-          visible: true,
         }),
         models.OffchainCommunity.create({
           id: 'governance',
@@ -388,7 +387,6 @@ const resetServer = (models): Promise<number> => {
           creator_id: 1,
           description: 'All things governance',
           default_chain: 'ethereum',
-          visible: false,
         }),
         models.OffchainCommunity.create({
           id: 'meta',
@@ -396,7 +394,6 @@ const resetServer = (models): Promise<number> => {
           creator_id: 1,
           description: 'All things Commonwealth',
           default_chain: 'edgeware',
-          visible: true,
         })
       ]);
 

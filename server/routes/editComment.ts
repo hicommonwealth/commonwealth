@@ -108,13 +108,16 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       req.wss,
       [ finalComment.Address.address ],
     );
+    // TODO: dispatch notifications for new mention(s)
+
+    // update author.last_active (no await)
+    author.last_active = new Date();
+    author.save();
 
     return res.json({ status: 'Success', result: finalComment.toJSON() });
   } catch (e) {
     return next(e);
   }
-
-  // Todo: dispatch notifications conditional on a new mention
 };
 
 export default editComment;

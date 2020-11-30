@@ -5,6 +5,7 @@ import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover } from 'construct-ui';
 
 import app from 'state';
+import { pluralize } from 'helpers';
 import { sortNotifications } from 'helpers/notifications';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
@@ -43,7 +44,7 @@ const NotificationsPage: m.Component<{}> = {
           }),
           m(Popover, {
             content: [
-              m('div', { style: 'margin-bottom: 10px' }, 'Are you sure?'),
+              m('div', { style: 'margin-bottom: 10px' }, 'Clear chain events?'),
               m(Button, {
                 label: 'Confirm',
                 fluid: true,

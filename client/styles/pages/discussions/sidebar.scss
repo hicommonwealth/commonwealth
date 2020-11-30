@@ -12,36 +12,27 @@
         font-size: 15px;
         padding: 3px 0 6px;
     }
-    .user-activity {
+    .user-activity, .admins-mods {
         margin-bottom: 20px;
         .MostActiveUser {
             display: flex;
             justify-content: space-between;
+        }
+        .User {
             padding: 5px 0;
-            .User .user-avatar {
-                position: relative;
-                top: -2px;
-                margin-right: 10px;
-            }
-            .User .user-display-name {
-                font-weight: 500;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
-                display: inline-block;
-                max-width: 140px;
-            }
-            .username, .activity-count {
-                font-weight: 500;
-            }
-            .activity-count {
-                color: $text-color-lighter;
-                position: relative;
-                top: 1px;
-            }
-            a:hover {
-                text-decoration: none;
-            }
+        }
+        .User .user-avatar {
+            position: relative;
+            top: 2px;
+        }
+        .username, .activity-count {
+            font-weight: 500;
+        }
+        .activity-count {
+            color: $text-color-lighter;
+            position: relative;
+            top: 2px;
+            padding: 5px 0;
         }
     }
     .forum-activity {
@@ -59,19 +50,6 @@
             .User .user-display-name {
                 color: $text-color-light;
             }
-        }
-    }
-    .admins-mods {
-        margin-bottom: 20px;
-        .User {
-            padding: 5px 0;
-        }
-        .User .user-avatar {
-            position: relative;
-            top: 2px;
-        }
-        .username, .activity-count {
-            font-weight: 500;
         }
     }
 }

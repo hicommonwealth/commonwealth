@@ -3,7 +3,7 @@
 .NotificationRow {
     display: flex;
     flex-direction: column;
-    padding: 18px 22px 19px;
+    padding: 17px 22px 19px;
     line-height: 1.2;
     margin: 0;
     cursor: pointer;
@@ -55,6 +55,7 @@
     }
     .comment-body-created {
         color: #888;
-        margin-top: 10px;
+        font-size: 15px;
+        margin-top: 8px; // needed because .comment-body-excerpt may not be present
     }
 }

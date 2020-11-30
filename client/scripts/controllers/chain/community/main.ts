@@ -22,12 +22,13 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
       community: this.id,
       jwt: this.app.user.jwt,
     });
-    const { threads, comments, reactions, topics, admins } = response.result;
+    const { threads, comments, reactions, topics, admins, activeUsers } = response.result;
     this.app.threads.initialize(threads, true);
     this.app.comments.initialize(comments, true);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
     this.meta.setAdmins(admins);
+    this.app.recentActivity.setMostActiveUsers(activeUsers);
     this._serverLoaded = true;
     this._loaded = true;
   }

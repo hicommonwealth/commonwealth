@@ -8,7 +8,7 @@ import app from 'state';
 import { ChainBase } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
-const CHAINS_WITH_CLI = ['edgeware', 'kulupu', 'kusama', 'cosmos'];
+const CHAINS_WITH_CLI = ['edgeware', 'kulupu', 'kusama', 'cosmos', 'edgeware-local', 'edgeware-testnet'];
 
 const LoginWithWalletDropdown: m.Component<{
   label,
