@@ -2,6 +2,7 @@ import 'components/quill_editor.scss';
 
 import m, { VnodeDOM } from 'mithril';
 import $ from 'jquery';
+import moment from 'moment-twitter';
 import Quill from 'quill-2.0-dev/quill';
 import { Tag, Tooltip } from 'construct-ui';
 import ImageUploader from 'quill-image-uploader';
@@ -282,7 +283,7 @@ const instantiateEditor = (
         } else {
           avatar = document.createElement('div');
           avatar.className = 'ql-mention-avatar';
-          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 16);
+          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 20);
         }
 
         const nameSpan = document.createElement('span');
@@ -294,7 +295,7 @@ const instantiateEditor = (
         addrSpan.className = 'ql-mention-addr';
 
         const lastActiveSpan = document.createElement('span');
-        lastActiveSpan.innerText = profile.lastActive?.toString() || null;
+        lastActiveSpan.innerText = profile.lastActive ? `Last active ${moment(profile.lastActive).fromNow()}` : null;
         lastActiveSpan.className = 'ql-mention-la';
 
         const textWrap = document.createElement('div');
