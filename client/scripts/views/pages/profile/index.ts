@@ -123,12 +123,12 @@ const getProfileStatus = (account) => {
           return role.address_id === addr.id;
         }).length === 0;
       })
-      : null;
+      : [];
     const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
       return addr.id === account.id;
     });
     isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
-    if (unjoinedJoinableAddresses) {
+    if (isUnjoinedJoinableAddress) {
       currentAddressInfo = currentAddressInfoArray[0];
     }
   }
