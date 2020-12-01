@@ -16,11 +16,7 @@ const getDelegate = async (vnode) => {
   vnode.state.currentDelegate = await (app.chain as Marlin).marlinAccounts.senderGetDelegate();
 };
 
-const DelegateStats: m.Component<{}, {currentDelegate: string, }> = {
-  oninit: (vnode) => {
-    vnode.state.currentDelegate = null;
-    getDelegate(vnode).then(() => m.redraw());
-  },
+const DelegateStats: m.Component<{ currentDelegate: string, }, > = {
   view: (vnode) => {
     if (!app.chain) return;
 
@@ -33,8 +29,8 @@ const DelegateStats: m.Component<{}, {currentDelegate: string, }> = {
       m(Col, { span: { xs: 6, md: 3 } }, [
         m('.stats-tile', [
           m('.stats-heading', 'Current Delegate'),
-          vnode.state.currentDelegate
-            ? m('.stats-tile-figure-minor', vnode.state.currentDelegate)
+          vnode.attrs.currentDelegate
+            ? m('.stats-tile-figure-minor', vnode.attrs.currentDelegate)
             : '--',
         ]),
       ]),
@@ -46,56 +42,66 @@ interface IDelegateForm {
   address: string,
 }
 
-const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, }> = {
+const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, currentDelegate: string, }> = {
   oninit: (vnode) => {
     vnode.state.form = {
       address: '',
     };
     vnode.state.loading = false;
+    getDelegate(vnode);
   },
   view: (vnode) => {
     const { form, loading } = vnode.state;
-    return m(Form, { class: 'DelegateForm' }, [
-      m(Grid, [
-        m(Col, [
-          m(FormGroup, [
-            m(FormLabel, `Address to Delegate to (your address is: ${app.user.activeAccount.address}):`),
-            m(Input, {
-              options: {
-                name: 'address',
-                placeholder: 'Paste address you want to delegate to',
-                defaultValue: 'hello',
-              },
-              oninput: (e) => {
-                const result = (e.target as any).value;
-                vnode.state.form.address = result;
-                m.redraw();
-              }
-            })
-          ]),
-          m(FormLabel, [
-            m(Button, {
-              disabled: form.address === '' || loading,
-              intent: 'primary',
-              label: 'Delegate!',
-              onclick: async (e) => {
-                e.preventDefault();
-                vnode.state.loading = true;
-                console.log('HELLO????');
-                if ((app.chain as Marlin).apiInitialized) {
-                  await (app.chain as Marlin).marlinAccounts.senderSetDelegate(vnode.state.form.address)
-                    .then(() => { notifySuccess(`Successfully delegated to ${vnode.state.form.address}`); })
-                    .catch((err) => { notifyError(`${err.message}`); });
+    return [
+      m(DelegateStats, {
+        currentDelegate: vnode.state.currentDelegate,
+      }),
+      m(Form, { class: 'DelegateForm' }, [
+        m(Grid, [
+          m(Col, [
+            m(FormGroup, [
+              m(FormLabel, `Address to Delegate to (your address is: ${app.user.activeAccount.address}):`),
+              m(Input, {
+                options: {
+                  name: 'address',
+                  placeholder: 'Paste address you want to delegate to',
+                  defaultValue: 'hello',
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.form.address = result;
+                  m.redraw();
                 }
-                vnode.state.loading = false;
-                m.redraw();
-              },
-              type: 'submit',
-            }),
+              })
+            ]),
+            m(FormLabel, [
+              m(Button, {
+                disabled: form.address === '' || loading,
+                intent: 'primary',
+                label: 'Delegate!',
+                onclick: async (e) => {
+                  e.preventDefault();
+                  vnode.state.loading = true;
+                  console.log('HELLO????');
+                  if ((app.chain as Marlin).apiInitialized) {
+                    await (app.chain as Marlin).marlinAccounts.senderSetDelegate(vnode.state.form.address)
+                      .then(async () => {
+                        notifySuccess(`Successfully delegated to ${vnode.state.form.address}`);
+                        await getDelegate(vnode);
+                        m.redraw();
+                      })
+                      .catch((err) => { notifyError(`${err.message}`); });
+                  }
+                  vnode.state.loading = false;
+                  m.redraw();
+                },
+                type: 'submit',
+              }),
+            ]),
           ]),
         ]),
       ]),
-    ]);
+    ];
   }
 };
 
@@ -119,7 +125,6 @@ const DelegatePage: m.Component<{}> = {
       title: 'Delegate',
     }, [
       m('.forum-container', [
-        m(DelegateStats),
         m(DelegateForm, {}),
       ]),
     ]);
