@@ -86,7 +86,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   view: (vnode) => {
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
-    if (!activeEntity) return;
+    if (!activeEntity) return m(PageLoading, {
+      title: topic || 'Discussions',
+      showNewProposalButton: true,
+    });
     const subpage = topic || ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
