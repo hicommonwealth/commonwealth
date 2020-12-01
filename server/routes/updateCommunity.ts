@@ -38,7 +38,7 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
     }
   }
 
-  const { chat, description, invites, name, privacy, website, telegram, github } = req.body;
+  const { chat, description, iconUrl, invites, name, privacy, website, telegram, github } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -53,6 +53,7 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   if (req.body.name) community.name = req.body.name;
   if (req.body['featured_topics[]']) community.featured_topics = req.body['featured_topics[]'];
   community.description = description;
+  community.iconUrl = iconUrl;
   community.website = website;
   community.chat = chat;
   community.telegram = telegram;

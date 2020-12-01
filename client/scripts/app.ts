@@ -44,6 +44,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           id: community.id,
           name: community.name,
           description: community.description,
+          iconUrl: community.iconUrl,
           website: community.website,
           chat: community.chat,
           telegram: community.telegram,
