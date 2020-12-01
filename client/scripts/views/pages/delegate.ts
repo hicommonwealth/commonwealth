@@ -16,7 +16,7 @@ const getDelegate = async (vnode) => {
   vnode.state.currentDelegate = await (app.chain as Marlin).marlinAccounts.senderGetDelegate();
 };
 
-const DelegateStats: m.Component<{ currentDelegate: string, }, > = {
+const DelegateStats: m.Component<{ currentDelegate: string, }> = {
   view: (vnode) => {
     if (!app.chain) return;
 
