@@ -87,6 +87,7 @@ export enum EventKind {
   Reward = 'reward',
   Bonded = 'bonded',
   Unbonded = 'unbonded',
+  StakingElection = 'staking-election',
 
   VoteDelegated = 'vote-delegated',
   DemocracyProposed = 'democracy-proposed',
@@ -222,6 +223,12 @@ export interface IUnbonded extends IEvent {
   controller: AccountId;
 }
 
+export interface IStakingElection extends IEvent {
+  kind: EventKind.StakingElection;
+  era: number;
+  validators: AccountId[];
+}
+
 /**
  * Democracy Events
  */
@@ -348,15 +355,20 @@ export interface ITreasuryRejected extends IEvent {
  */
 export interface IElectionNewTerm extends IEvent {
   kind: EventKind.ElectionNewTerm;
+  round: number;
   newMembers: AccountId[];
+  allMembers: AccountId[];
 }
 
 export interface IElectionEmptyTerm extends IEvent {
   kind: EventKind.ElectionEmptyTerm;
+  round: number;
+  members: AccountId[];
 }
 
 export interface ICandidacySubmitted extends IEvent {
   kind: EventKind.ElectionCandidacySubmitted;
+  round: number;
   candidate: AccountId;
 }
 
@@ -504,6 +516,7 @@ export type IEventData =
   | IReward
   | IBonded
   | IUnbonded
+  | IStakingElection
   | IVoteDelegated
   | IDemocracyProposed
   | IDemocracyTabled

@@ -70,6 +70,7 @@ describe('Edgeware Event Processor Tests', () => {
       publicProps: async () => {
         return [ [ ], [ 4, 'hash', 'Alice' ] ];
       },
+      electionRounds: async () => '5',
       referendumInfoOf: async (idx) => {
         if (+idx === 5) {
           return {
@@ -134,6 +135,7 @@ describe('Edgeware Event Processor Tests', () => {
           data: {
             kind: EventKind.ElectionCandidacySubmitted,
             candidate: 'Alice',
+            round: 5,
           },
           blockNumber: 2,
           excludeAddresses: ['Alice'],

@@ -77,6 +77,12 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
         description: 'Your controller account unbonds from a stash account.',
       };
     }
+    case EventKind.StakingElection: {
+      return {
+        title: 'Staking Election',
+        description: 'A new validator set is elected.',
+      }
+    }
 
     /**
      * Democracy Events
