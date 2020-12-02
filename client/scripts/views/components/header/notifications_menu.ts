@@ -12,8 +12,9 @@ import { sortNotifications } from 'helpers/notifications';
 
 const MAX_NOTIFS = 40; // limit number of notifications shown
 
-const NotificationButtons: m.Component<{}> = {
+const NotificationButtons: m.Component<{ showingChainNotifications: boolean }> = {
   view: (vnode) => {
+    const { showingChainNotifications } = vnode.attrs;
     const notifications = app.user.notifications.notifications;
     const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);
 
@@ -23,22 +24,14 @@ const NotificationButtons: m.Component<{}> = {
       basic: true,
     }, [
       m(Button, {
-        label: 'Mark all read',
-        onclick: (e) => {
-          e.preventDefault();
-          if (notifications.length < 1) return;
-          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
-        },
-      }),
-      m(Button, {
         label: 'See all',
         onclick: () => (app.activeChainId() || app.activeCommunityId())
           ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationsList`)
           : m.route.set('/notificationsList'),
       }),
-      m(Popover, {
+      showingChainNotifications ? m(Popover, {
         content: [
-          m('div', { style: 'margin-bottom: 10px' }, 'Clear chain events?'),
+          m('div', { style: 'margin-bottom: 10px' }, 'Clear all chain notifications?'),
           m(Button, {
             label: 'Confirm',
             fluid: true,
@@ -58,6 +51,13 @@ const NotificationButtons: m.Component<{}> = {
         closeOnContentClick: true,
         closeOnEscapeKey: true,
         onClosed: () => { m.redraw(); },
+      }) : m(Button, {
+        label: 'Mark all read',
+        onclick: (e) => {
+          e.preventDefault();
+          if (notifications.length < 1) return;
+          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
+        },
       }),
     ]);
   }
@@ -146,7 +146,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }, { selectedChainEvents:
               vnode.state.selectedChainEvents ? 'No chain notifications' : 'No discussion notifications'
             ]),
         ]),
-        m(NotificationButtons),
+        m(NotificationButtons, { showingChainNotifications: vnode.state.selectedChainEvents }),
       ]
     });
   },
