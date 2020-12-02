@@ -25,6 +25,9 @@ const offenceDetails = [
 ];
 const blockNumber = 10;
 const api = constructFakeApi({
+  electionRounds: async () => '10',
+  electionMembers: async () => [ [ 'dave' ], [ 'charlie' ], [ 'eve' ] ],
+  activeEra: async () => '5',
   validators: async () => {
     return {
       'validators': [
@@ -769,6 +772,27 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       }
     });
   });
+  it('should enrich staking-election event', async () => {
+    const kind = EventKind.StakingElection;
+    const event = constructEvent([ ]);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        era: 5,
+        validators: [
+          'EXkCSUQ6Z1hKvGWMNkUDKrTMVHRduQHWc8G6vgo4NccUmhU',
+          'FnWdLnFhRuphztWJJLoNV4zc18dBsjpaAMboPLhLdL7zZp3',
+          'EZ7uBY7ZLohavWAugjTSUVVSABLfad77S6RQf4pDe3cV9q4',
+          'GweeXog8vdnDhjiBCLVvbE4NA4CPTFS3pdFFAFwgZzpUzKu',
+          'DbuPiksDXhFFEWgjsEghUypTJjQKyULiNESYji3Gaose2NV',
+          'Gt6HqWBhdu4Sy1u8ASTbS1qf2Ac5gwdegwr8tWN8saMxPt5',
+          'JKmFAAo9QbR9w3cfSYxk7zdpNEXaN1XbX4NcMU1okAdpwYx'
+        ],
+      }
+    });
+  });
 
   /** democracy events */
   it('should enrich vote-delegated event', async () => {
@@ -1026,7 +1050,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       blockNumber,
       data: {
         kind,
+        round: 10,
         newMembers: [ 'alice', 'bob' ],
+        allMembers: [ 'dave', 'charlie', 'eve' ],
       }
     });
   });
@@ -1038,6 +1064,8 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       blockNumber,
       data: {
         kind,
+        round: 10,
+        members: [ 'dave', 'charlie', 'eve' ],
       }
     });
   });
@@ -1050,6 +1078,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       excludeAddresses: [ 'alice' ],
       data: {
         kind,
+        round: 10,
         candidate: 'alice',
       }
     });

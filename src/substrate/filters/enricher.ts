@@ -213,6 +213,17 @@ export async function Enrich(
           }
         };
       }
+      case EventKind.StakingElection: {
+        const era = await api.query.staking.activeEra();
+        const validators = await api.derive.staking.validators();
+        return {
+          data: {
+            kind,
+            era: +era,
+            validators: validators.validators?.map((v) => v.toString()),
+          }
+        };
+      }
 
       /**
        * Democracy Events
@@ -449,15 +460,29 @@ export async function Enrich(
        */
       case EventKind.ElectionNewTerm: {
         const [ newMembers ] = event.data as unknown as [ Vec<[ AccountId, Balance ] & Codec> ] & Codec;
+        const section = api.query.electionsPhragmen ? 'electionsPhragmen' : 'elections';
+        const allMembers = await api.query[section].members<Vec<[ AccountId, Balance ] & Codec>>();
+        const round = await api.query[section].electionRounds<u32>();
         return {
           data: {
             kind,
+            round: +round,
             newMembers: newMembers.map(([ who ]) => who.toString()),
+            allMembers: allMembers.map(([ who ]) => who.toString()),
           }
         };
       }
       case EventKind.ElectionEmptyTerm: {
-        return { data: { kind } };
+        const section = api.query.electionsPhragmen ? 'electionsPhragmen' : 'elections';
+        const allMembers = await api.query[section].members<Vec<[ AccountId, Balance ] & Codec>>();
+        const round = await api.query[section].electionRounds<u32>();
+        return {
+          data: {
+            kind,
+            round: +round,
+            members: allMembers.map(([ who ]) => who.toString()),
+          }
+        };
       }
       case EventKind.ElectionMemberKicked:
       case EventKind.ElectionMemberRenounced: {
@@ -716,10 +741,13 @@ export async function Enrich(
     switch (kind) {
       case EventKind.ElectionCandidacySubmitted: {
         const candidate = extrinsic.signer.toString();
+        const section = api.query.electionsPhragmen ? 'electionsPhragmen' : 'elections';
+        const round = await api.query[section].electionRounds<u32>();
         return {
           excludeAddresses: [ candidate ],
           data: {
             kind,
+            round: +round,
             candidate,
           }
         };

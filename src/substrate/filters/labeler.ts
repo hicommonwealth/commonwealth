@@ -173,6 +173,13 @@ export const Label: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/account/${stash}` : null,
       };
     }
+    case EventKind.StakingElection: {
+      const { era } = data;
+      return {
+        heading: 'Staking Election',
+        label: `A new validator set was elected for era ${era}.`
+      };
+    }
 
     /**
      * Democracy Events

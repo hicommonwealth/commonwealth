@@ -34,6 +34,7 @@ export function ParseType (
         // NOTE: these are not supported yet on Edgeware, only kusama and edgeware-develop
         case 'Bonded': return EventKind.Bonded;
         case 'Unbonded': return EventKind.Unbonded;
+        case 'StakingElection': return EventKind.StakingElection;
         default: return null;
       }
     case 'democracy':
