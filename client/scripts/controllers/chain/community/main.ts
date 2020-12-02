@@ -1,5 +1,5 @@
 import { ICommunityAdapter } from 'models';
-
+import m from 'mithril';
 import { Coin } from 'adapters/currency';
 import { CommentRefreshOption } from 'controllers/server/comments';
 import $ from 'jquery';
@@ -22,6 +22,11 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
       community: this.id,
       jwt: this.app.user.jwt,
     });
+    if (this.meta.id !== m.route.get().split('/')[1]) {
+      console.log('does not equals');
+      return false;
+    }
+    console.log(`fetching ${this.meta.id}`);
     const { threads, comments, reactions, topics, admins, activeUsers } = response.result;
     this.app.threads.initialize(threads, true);
     this.app.comments.initialize(comments, true);
@@ -31,6 +36,7 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this._serverLoaded = true;
     this._loaded = true;
+    return true;
   }
 
   public deinit = async (): Promise<void> => {
@@ -39,7 +45,7 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     this.app.threads.deinit();
     this.app.comments.deinit();
     this.app.reactions.deinit();
-    console.log('Community stopped.');
+    console.log(`${this.meta.name} stopped.`);
   }
 }
 
