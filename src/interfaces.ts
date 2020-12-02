@@ -49,7 +49,7 @@ export abstract class IEventProcessor<Api, RawEvent> {
   ) { }
 
   // throws on error
-  public abstract async process(block: RawEvent): Promise<CWEvent[]>;
+  public abstract process(block: RawEvent): Promise<CWEvent[]>;
 }
 
 // fetches blocks from chain in real-time via subscription for processing
@@ -102,7 +102,7 @@ export abstract class IEventPoller<Api, RawEvent> {
   ) { }
 
   // throws on error
-  public abstract async poll(range: IDisconnectedRange, maxRange?: number): Promise<RawEvent[]>;
+  public abstract poll(range: IDisconnectedRange, maxRange?: number): Promise<RawEvent[]>;
 }
 
 // a set of labels used to display notifications

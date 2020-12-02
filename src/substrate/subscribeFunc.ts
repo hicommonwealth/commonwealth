@@ -22,7 +22,7 @@ export async function createApi(
   // construct provider
   const provider = new WsProvider(url);
   let unsubscribe: () => void;
-  await new Promise((resolve) => {
+  await new Promise<void>((resolve) => {
     unsubscribe = provider.on('connected', () => resolve());
   });
   if (unsubscribe) unsubscribe();
