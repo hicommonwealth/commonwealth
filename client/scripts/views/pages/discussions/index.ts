@@ -228,6 +228,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           m.redraw();
         });
         vnode.state.topicInitialized[subpage] = true;
+      } else if (allThreads.length < 20 && subpage === ALL_PROPOSALS_KEY) {
+        vnode.state.postsDepleted[subpage] = true;
       }
 
       // Initialize infiniteScroll
