@@ -327,7 +327,7 @@ export async function initChain(): Promise<void> {
   m.redraw();
 }
 
-export function initCommunity(communityId: string): Promise<void> {
+export function initCommunity(communityId: string): Promise<boolean> {
   const community = app.config.communities.getByCommunity(communityId);
   if (community && community.length > 0) {
     return selectCommunity(community[0]);
