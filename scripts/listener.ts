@@ -53,7 +53,12 @@ const argv = yargs.options({
     alias: 'c',
     type: 'string',
     description: 'eth contract address',
-  }
+  },
+  archival: {
+    alias: 'a',
+    type: 'boolean',
+    description: 'run listener in archival mode or not',
+  },
 }).check((data) => {
   if (!chainSupportedBy(data.network, SubstrateEvents.Types.EventChains) && data.spec) {
     throw new Error('cannot pass spec on non-substrate network');
@@ -63,9 +68,10 @@ const argv = yargs.options({
   }
   return true;
 }).argv;
-
+const archival: boolean = argv.archival;
 const network = argv.network;
-const spec = specs[argv.spec] || specs[network] || {};
+// if running archival mode, the archival node requires mainnet specs
+const spec = specs[argv.spec] || archival == true? specs['mainnet']:specs[network] || {};
 const url: string = argv.url || networks[network];
 const contract: string | undefined = argv.contractAddress || contracts[network];
 
@@ -91,6 +97,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       api,
       handlers: [ new StandaloneEventHandler() ],
       skipCatchup,
+      archival,
       verbose: true,
     });
   });

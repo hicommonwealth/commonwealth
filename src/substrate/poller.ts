@@ -47,8 +47,13 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
     const blockNumbers = [ ...Array(range.endBlock - range.startBlock).keys()]
       .map((i) => range.startBlock + i);
     log.debug(`Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`);
-    const hashes: Hash[] = await this._api.query.system.blockHash.multi(blockNumbers);
 
+    // the hashes are pruned when using api.query.system.blockHash.multi
+    // therefore fetching hashes from chain. the downside is that for every
+    // single hash a separate request is made
+    const hashes = await Promise.all(
+        blockNumbers.map( (number)=> (this._api.rpc.chain.getBlockHash(number))))
+    
     // remove all-0 block hashes -- those blocks have been pruned & we cannot fetch their data
     const nonZeroHashes = hashes.filter((hash) => !hash.isEmpty);
     log.info(`${nonZeroHashes.length} active and ${hashes.length - nonZeroHashes.length} pruned hashes fetched!`);
@@ -63,6 +68,35 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
     }));
     log.info('Finished polling past blocks!');
 
+    return blocks;
+  }
+
+  /**
+   * Connects to chain, fetches blocks specified in given range in provided batch size,
+   * prcoesses the blocks if a handler is provided else returns the blocks for 
+   * further processing
+   * @param range IDisconnectedRange having startBlock and optional endBlock
+   * @param batchSize size of the batch in which blocks are to be fetched from chain
+   * @param processBlockFn an optional function to process the blocks
+   */
+  public async archive(range: IDisconnectedRange, batchSize: number = 500, processBlockFn: (block: Block) => any = null): Promise<Block[]> {
+    if(!range.endBlock){
+      const header = await this._api.rpc.chain.getHeader();
+      range.endBlock =  +header.number;
+    }
+    const blocks = [];
+    for (let block = range.startBlock; block < range.endBlock; block = Math.min(block + batchSize, range.endBlock)) {
+      try {
+        let currentBlocks = await this.poll({startBlock: block, endBlock: Math.min(block + batchSize, range.endBlock)}, batchSize); 
+        if(processBlockFn){
+          await Promise.all(currentBlocks.map(processBlockFn));
+        }
+        blocks.push(...currentBlocks);
+      } catch (e) {
+        log.error(`Block polling failed after disconnect at block ${range.startBlock}`);
+        return;
+      }
+    }
     return blocks;
   }
 }

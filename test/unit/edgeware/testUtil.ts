@@ -82,6 +82,7 @@ export function constructFakeApi(
         subscribeNewHeads: callOverrides['subscribeNewHeads'],
         getHeader: callOverrides['getHeader'],
         getBlock: callOverrides['getBlock'],
+        getBlockHash: callOverrides['getBlockHash'],
       },
       state: {
         getRuntimeVersion: callOverrides['getRuntimeVersion'],
