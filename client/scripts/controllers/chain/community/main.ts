@@ -23,10 +23,8 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
       jwt: this.app.user.jwt,
     });
     if (this.meta.id !== m.route.get().split('/')[1]) {
-      console.log('does not equals');
       return false;
     }
-    console.log(`fetching ${this.meta.id}`);
     const { threads, comments, reactions, topics, admins, activeUsers } = response.result;
     this.app.threads.initialize(threads, true);
     this.app.comments.initialize(comments, true);

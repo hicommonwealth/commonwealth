@@ -136,7 +136,7 @@ export function handleUpdateEmailConfirmation() {
   }
 }
 
-export async function selectCommunity(c?: CommunityInfo): Promise<void> {
+export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   // Check for valid community selection, and that we need to switch
   if (app.community && c === app.community.meta) return;
 
@@ -149,8 +149,11 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
 
   // If the user is still in the initializing community, finalize the
   // initialization; otherwise, abort
-  if (!finalizeInitialization) return;
-  else app.community = newCommunity;
+  if (!finalizeInitialization) {
+    return false;
+  } else {
+    app.community = newCommunity;
+  }
   console.log(`${c.name.toUpperCase()} started.`);
 
   // Initialize available addresses
@@ -158,6 +161,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
 
   // Redraw with community fully loaded
   m.redraw();
+  return true;
 }
 
 // called by the user, when clicking on the chain/node switcher menu
@@ -279,8 +283,8 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (initApi) {
     app.chain.initApi(); // required for loading NearAccounts
   }
-  app.chain.deferred = deferred;
   app.chainPreloading = false;
+  app.chain.deferred = deferred;
 
   // Instantiate active addresses before chain fully loads
   await updateActiveAddresses(n.chain);
