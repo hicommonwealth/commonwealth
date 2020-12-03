@@ -21,6 +21,8 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Marlin;
   public chain: MarlinChain;
+  // public ethAccounts: EthereumAccounts;
+  // public accounts: MarlinHolders;
   public accounts: EthereumAccounts;
   public marlinAccounts:  MarlinHolders;
   public governance: MarlinGovernance;
