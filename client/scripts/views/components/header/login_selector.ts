@@ -4,7 +4,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 
-import { Button, ButtonGroup, Icon, Icons, List, Menu, MenuItem, MenuDivider,
+import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider,
   Popover } from 'construct-ui';
 
 import app from 'state';
@@ -93,7 +93,9 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const LoginSelector: m.Component<{ small?: boolean }, {
+const LoginSelector: m.Component<{
+  small?: boolean
+}, {
   profileLoadComplete: boolean
 }> = {
   view: (vnode) => {

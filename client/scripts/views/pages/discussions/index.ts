@@ -18,7 +18,7 @@ import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import Listing from 'views/pages/listing';
 
-import { notifyError } from 'controllers/app/notifications';
+import { DEFAULT_PAGE_SIZE } from 'controllers/server/threads';
 import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
@@ -231,6 +231,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           m.redraw();
         });
         vnode.state.topicInitialized[subpage] = true;
+      } else if (allThreads.length < DEFAULT_PAGE_SIZE && subpage === ALL_PROPOSALS_KEY) {
+        vnode.state.postsDepleted[subpage] = true;
       }
 
       // Initialize infiniteScroll
