@@ -12,7 +12,6 @@ import EthereumChain from 'controllers/chain/ethereum/chain';
 import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import MarlinHolders from './holders';
 import MarlinChain from './chain';
-import { bnToBn } from '@polkadot/util';
 
 export default class MarlinHolder extends EthereumAccount {
   private _isHolder: boolean;
@@ -31,7 +30,6 @@ export default class MarlinHolder extends EthereumAccount {
     );
   }
 
-
   public get isHolder() { return this._isHolder; }
   public get isDelegate() { return this._isDelegate; }
   public get getbalance() { return this._balance.value; }
@@ -46,6 +44,7 @@ export default class MarlinHolder extends EthereumAccount {
   ) {
     super(app, ChainInfo, Accounts, address);
     this._Holders = Holders;
+    this.compBalance();
     if (data) {
       if (address.toLowerCase() !== data.id.toLowerCase()) {
         throw new Error('Holder does not correspond with account');
