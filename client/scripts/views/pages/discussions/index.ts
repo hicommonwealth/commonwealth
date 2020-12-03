@@ -22,6 +22,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
+import { DEFAULT_PAGE_SIZE } from 'client/scripts/controllers/server/threads';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -231,7 +232,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           m.redraw();
         });
         vnode.state.topicInitialized[subpage] = true;
-      } else if (allThreads.length < 20 && subpage === ALL_PROPOSALS_KEY) {
+      } else if (allThreads.length < DEFAULT_PAGE_SIZE && subpage === ALL_PROPOSALS_KEY) {
         vnode.state.postsDepleted[subpage] = true;
       }
 
