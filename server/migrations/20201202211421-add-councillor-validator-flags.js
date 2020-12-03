@@ -5,10 +5,10 @@ module.exports = {
     return queryInterface.sequelize.transaction((t) => {
       return Promise.all([
         queryInterface.addColumn('Addresses', 'is_councillor', {
-          type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false,
+          type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false,
         }, { transaction: t }),
         queryInterface.addColumn('Addresses', 'is_validator', {
-          type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false,
+          type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false,
         }, { transaction: t }),
       ]);
     });
