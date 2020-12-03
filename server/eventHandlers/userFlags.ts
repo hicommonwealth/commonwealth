@@ -46,6 +46,15 @@ export default class extends IEventHandler {
     log.info(`Cleared ${flag} on ${oldInstances.length} addresses and set on ${newInstances.length} addresses.`);
   }
 
+  public async forceSync(councillors?: string[], validators?: string[]) {
+    if (councillors instanceof Array) {
+      await this.syncAddressFlags('is_councillor', councillors);
+    }
+    if (validators instanceof Array) {
+      await this.syncAddressFlags('is_validator', validators);
+    }
+  }
+
   public async handle(event: CWEvent, dbEvent) {
     // handle new councillors
     if (event.data.kind === SubstrateTypes.EventKind.ElectionNewTerm

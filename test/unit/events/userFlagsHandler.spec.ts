@@ -31,12 +31,26 @@ describe('Edgeware Archival Event Handler Tests', () => {
   });
 
   beforeEach('reset address flags', async () => {
-    const addressModel = await models['Address'].findOne({ where: {
+    const address1Model = await models['Address'].findOne({ where: {
       address: addresses[0],
-    }});
-    addressModel.is_councillor = true;
-    addressModel.is_validator = true;
-    await addressModel.save();
+    } });
+    address1Model.is_councillor = true;
+    address1Model.is_validator = true;
+    await address1Model.save();
+
+    const address2Model = await models['Address'].findOne({ where: {
+      address: addresses[1],
+    } });
+    address2Model.is_councillor = false;
+    address2Model.is_validator = false;
+    await address2Model.save();
+
+    const address3Model = await models['Address'].findOne({ where: {
+      address: addresses[2],
+    } });
+    address3Model.is_councillor = false;
+    address3Model.is_validator = false;
+    await address3Model.save();
   });
 
   it('should sync councillors from NewTerm event', async () => {
@@ -62,14 +76,14 @@ describe('Edgeware Archival Event Handler Tests', () => {
     // verify outputs
     const address1Model = await models['Address'].findOne({ where: {
       address: addresses[0],
-    }});
+    } });
     assert.equal(address1Model.is_councillor, false);
     const address2Model = await models['Address'].findOne({ where: {
       address: addresses[1],
-    }});
+    } });
     const address3Model = await models['Address'].findOne({ where: {
       address: addresses[2],
-    }});
+    } });
     assert.equal(address2Model.is_councillor, true);
     assert.equal(address3Model.is_councillor, true);
   });
@@ -96,14 +110,14 @@ describe('Edgeware Archival Event Handler Tests', () => {
     // verify outputs
     const address1Model = await models['Address'].findOne({ where: {
       address: addresses[0],
-    }});
+    } });
     assert.equal(address1Model.is_councillor, false);
     const address2Model = await models['Address'].findOne({ where: {
       address: addresses[1],
-    }});
+    } });
     const address3Model = await models['Address'].findOne({ where: {
       address: addresses[2],
-    }});
+    } });
     assert.equal(address2Model.is_councillor, true);
     assert.equal(address3Model.is_councillor, true);
   });
@@ -130,14 +144,14 @@ describe('Edgeware Archival Event Handler Tests', () => {
     // verify outputs
     const address1Model = await models['Address'].findOne({ where: {
       address: addresses[0],
-    }});
+    } });
     assert.equal(address1Model.is_validator, false);
     const address2Model = await models['Address'].findOne({ where: {
       address: addresses[1],
-    }});
+    } });
     const address3Model = await models['Address'].findOne({ where: {
       address: addresses[2],
-    }});
+    } });
     assert.equal(address2Model.is_validator, true);
     assert.equal(address3Model.is_validator, true);
   });
@@ -160,15 +174,62 @@ describe('Edgeware Archival Event Handler Tests', () => {
     // verify outputs (unchanged)
     const address1Model = await models['Address'].findOne({ where: {
       address: addresses[0],
-    }});
+    } });
     assert.equal(address1Model.is_validator, true);
     const address2Model = await models['Address'].findOne({ where: {
       address: addresses[1],
-    }});
+    } });
     const address3Model = await models['Address'].findOne({ where: {
       address: addresses[2],
-    }});
+    } });
     assert.equal(address2Model.is_validator, false);
     assert.equal(address3Model.is_validator, false);
+  });
+
+  it('should force sync with valid data', async () => {
+    const eventHandler = new UserFlagsHandler(models, 'edgeware');
+    await eventHandler.forceSync(
+      [ addresses[1], addresses[2] ],
+      [ addresses[1], addresses[2] ]
+    );
+
+    // verify outputs
+    const address1Model = await models['Address'].findOne({ where: {
+      address: addresses[0],
+    } });
+    assert.equal(address1Model.is_validator, false);
+    assert.equal(address1Model.is_councillor, false);
+    const address2Model = await models['Address'].findOne({ where: {
+      address: addresses[1],
+    } });
+    const address3Model = await models['Address'].findOne({ where: {
+      address: addresses[2],
+    } });
+    assert.equal(address2Model.is_validator, true);
+    assert.equal(address3Model.is_validator, true);
+    assert.equal(address2Model.is_councillor, true);
+    assert.equal(address3Model.is_councillor, true);
+  });
+
+  it('should ignore force sync without data', async () => {
+    const eventHandler = new UserFlagsHandler(models, 'edgeware');
+    await eventHandler.forceSync();
+
+    // verify outputs (unchanged)
+    const address1Model = await models['Address'].findOne({ where: {
+      address: addresses[0],
+    } });
+    assert.equal(address1Model.is_validator, true);
+    assert.equal(address1Model.is_councillor, true);
+    const address2Model = await models['Address'].findOne({ where: {
+      address: addresses[1],
+    } });
+    const address3Model = await models['Address'].findOne({ where: {
+      address: addresses[2],
+    } });
+    assert.equal(address2Model.is_validator, false);
+    assert.equal(address3Model.is_validator, false);
+    assert.equal(address2Model.is_councillor, false);
+    assert.equal(address3Model.is_councillor, false);
   });
 });
