@@ -24,12 +24,18 @@ export const CommunityIcon: m.Component<{ community: CommunityInfo, onclick?: Fu
     const size = vnode.attrs.size || 32;
 
     return m('.CommunityIcon', { class: onclick ? 'onclick' : '' }, [
-      m('.community-icon', {
-        style: `width: ${size}px; height: ${size}px;`,
-        onclick
-      }, [
-        m('span', community.name.slice(0, 1))
-      ]),
+      community.iconUrl
+        ? m('img.community-icon', {
+          style: `width: ${size}px; height: ${size}px;`,
+          src: community.iconUrl,
+          onclick
+        })
+        : m('.community-icon.no-image', {
+          style: `width: ${size}px; height: ${size}px;`,
+          onclick
+        }, [
+          m('span', community.name.slice(0, 1))
+        ]),
     ]);
   }
 };
