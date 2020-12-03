@@ -35,7 +35,7 @@ export default async function (models, chain?: string): Promise<void> {
 
   // 2. for each node, fetch and migrate chain entities
   for (const node of nodes) {
-    console.log('Fetching and migrating councillor/validator flags for', node.chain);
+    log.info(`Fetching and migrating councillor/validator flags for ${node.chain}.`);
     const flagsHandler = new UserFlagsHandler(models, node.chain);
 
     const nodeUrl = constructSubstrateUrl(node.url);
@@ -45,12 +45,16 @@ export default async function (models, chain?: string): Promise<void> {
     );
 
     log.info('Fetching councillor and validator lists...');
-    const validators = await api.derive.staking.validators();
-    const section = api.query.electionsPhragmen ? 'electionsPhragmen' : 'elections';
-    const councillors = await api.query[section].members<Vec<[ AccountId, Balance ] & Codec>>();
-    await flagsHandler.forceSync(
-      councillors.map(([ who ]) => who.toString()),
-      validators.validators.map((v) => v.toString()),
-    );
+    try {
+      const validators = await api.derive.staking.validators();
+      const section = api.query.electionsPhragmen ? 'electionsPhragmen' : 'elections';
+      const councillors = await api.query[section].members<Vec<[ AccountId, Balance ] & Codec>>();
+      await flagsHandler.forceSync(
+        councillors.map(([ who ]) => who.toString()),
+        validators.validators.map((v) => v.toString()),
+      );
+    } catch (e) {
+      log.error(`Failed to sync flags: ${e.message}.`);
+    }
   }
 }
