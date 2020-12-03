@@ -59,24 +59,6 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
         ]),
       ]),
     ]);
-    // onMoloch && m('.stats-tile', [
-    //   m('.stats-tile-label', 'DAO Basics'),
-    //   m('.stats-tile-figure-minor', [
-    //     `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
-    //   ]),
-    //   m('.stats-tile-figure-minor', [
-    //     `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
-    //   ]),
-    //   m('.stats-tile-figure-minor', [
-    //     `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
-    //   ]),
-    //   m('.stats-tile-figure-minor', [
-    //     `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
-    //   ]),
-    //   m('.stats-tile-figure-minor', [
-    //     `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
-    //   ]),
-    // ]),
   }
 };
 
@@ -97,10 +79,10 @@ const MarlinProposalStats: m.Component<{}, {}> = {
             `Quorum Votes: ${(app.chain as Marlin).governance?.quorumVotes.toString(10)}`
           ]),
           m('.stats-tile-figure-minor', [
-            `Proposal Threshold: ${(app.chain as Marlin).governance?.proposalThreshold.toString(10)}`
+            `Proposal Threshold: ${(app.chain as Marlin).governance?.proposalThreshold.toString(10, 10)}`
           ]),
           m('.stats-tile-figure-minor', [
-            `Voting Period Length: ${(app.chain as Marlin).governance.votingPeriod.toString(10)}`,
+            `Voting Period Length: ${(app.chain as Marlin).governance.votingPeriod.toString(10, 10)}`,
           ]),
         ]),
       ]),
