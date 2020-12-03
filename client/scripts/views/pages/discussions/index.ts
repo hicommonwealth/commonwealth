@@ -18,11 +18,10 @@ import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import Listing from 'views/pages/listing';
 
-import { notifyError } from 'controllers/app/notifications';
+import { DEFAULT_PAGE_SIZE } from 'controllers/server/threads';
 import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
-import { DEFAULT_PAGE_SIZE } from 'client/scripts/controllers/server/threads';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
