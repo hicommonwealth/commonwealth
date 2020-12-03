@@ -8,12 +8,10 @@ import NewProposalButton from 'views/components/new_proposal_button';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
-import { CollectiveVotingButton, CandidacyButton, getCouncilCandidates } from './pages/council/index';
-import { SubstrateAccount } from '../controllers/chain/substrate/account';
-import Substrate from '../controllers/chain/substrate/main';
-
 import Sidebar from 'views/components/sidebar';
 import RightSidebar from 'views/components/right_sidebar';
+import { getCouncilCandidates } from './pages/council/index';
+import { SubstrateAccount } from '../controllers/chain/substrate/account';
 
 const Sublayout: m.Component<{
   // overrides
