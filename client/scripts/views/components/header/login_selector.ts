@@ -8,7 +8,7 @@ import { Button, ButtonGroup, Icon, Icons, List, Menu, MenuItem, MenuDivider,
   Popover } from 'construct-ui';
 
 import app from 'state';
-import { ChainInfo, CommunityInfo } from 'models';
+import { ChainInfo, CommunityInfo, Profile } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
@@ -93,7 +93,9 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const LoginSelector: m.Component<{ small?: boolean }, {
+const LoginSelector: m.Component<{
+  small?: boolean
+}, {
   profileLoadComplete: boolean
 }> = {
   view: (vnode) => {
