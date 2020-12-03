@@ -4,11 +4,11 @@ import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 
-import { Button, ButtonGroup, Icon, Icons, List, Menu, MenuItem, MenuDivider,
+import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider,
   Popover } from 'construct-ui';
 
 import app from 'state';
-import { ChainInfo, CommunityInfo, Profile } from 'models';
+import { ChainInfo, CommunityInfo } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
