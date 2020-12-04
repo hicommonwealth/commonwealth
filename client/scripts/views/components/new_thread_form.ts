@@ -6,17 +6,19 @@ import _ from 'lodash';
 import $ from 'jquery';
 import Quill from 'quill-2.0-dev/quill';
 import {
-  Tabs, TabItem, Form, FormGroup, Input, Button,
+  Callout, Tabs, TabItem, Form, FormGroup, Input, Button,
   Icon, Icons, List, ListItem, Tag,
 } from 'construct-ui';
 
 import app from 'state';
+import { link } from 'helpers';
 import { OffchainTopic } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
 import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pages/threads';
+import EditProfileModal from 'views/modals/edit_profile_modal';
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
@@ -328,6 +330,25 @@ export const NewThreadForm: m.Component<{
             }),
           ]),
         ]),
+        app.user.activeAccount?.profile && !app.user.activeAccount.profile.name && m(Callout, {
+          class: 'no-profile-callout',
+          content: [
+            'You haven\'t set a display name for this address yet. ',
+            m('a', {
+              href: `/${app.activeId()}/account/${app.user.activeAccount.address}?base=${app.user.activeAccount.chain}`,
+              onclick: (e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: EditProfileModal,
+                  data: {
+                    account: app.user.activeAccount,
+                    refreshCallback: () => m.redraw(),
+                  },
+                });
+              }
+            }, 'Set one now'),
+          ],
+        }),
         postType === PostType.Link && m(Form, [
           hasTopics
             ? m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
