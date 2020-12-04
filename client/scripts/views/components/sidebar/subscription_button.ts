@@ -14,7 +14,7 @@ const SubscriptionButton: m.Component<{}> = {
     const communityOrChain = app.activeChainId() ? app.activeChainId() : app.activeCommunityId();
 
     return m('.SubscriptionButton', [
-      m('.subscription-button-header', 'Notifications'),
+      m('.subscription-button-header', 'New thread notifications'),
       m(Button, {
         onclick: (e) => {
           e.preventDefault();
@@ -30,7 +30,7 @@ const SubscriptionButton: m.Component<{}> = {
         },
         size: 'sm',
         fluid: true,
-        label: communitySubscription ? 'Thread notifications on' : 'Thread notifications off',
+        label: communitySubscription ? 'Notifications on' : 'Notifications off',
         intent: communitySubscription ? 'primary' : 'none',
       }),
       m('.subscription-button-sub', [
