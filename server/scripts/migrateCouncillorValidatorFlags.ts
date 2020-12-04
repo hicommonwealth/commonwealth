@@ -46,12 +46,12 @@ export default async function (models, chain?: string): Promise<void> {
 
     log.info('Fetching councillor and validator lists...');
     try {
-      const validators = await api.derive.staking.validators();
+      const validators = await api.derive.staking?.validators();
       const section = api.query.electionsPhragmen ? 'electionsPhragmen' : 'elections';
       const councillors = await api.query[section].members<Vec<[ AccountId, Balance ] & Codec>>();
       await flagsHandler.forceSync(
         councillors.map(([ who ]) => who.toString()),
-        validators.validators.map((v) => v.toString()),
+        validators ? validators.validators.map((v) => v.toString()) : [],
       );
     } catch (e) {
       log.error(`Failed to sync flags: ${e.message}.`);
