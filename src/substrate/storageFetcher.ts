@@ -10,7 +10,7 @@ import { ApiPromise } from '@polkadot/api';
 import { Option, Vec } from '@polkadot/types';
 import { BalanceOf, AccountId, Hash, BlockNumber, Registration } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
-import { DeriveProposalImage, DeriveCollectiveProposal } from '@polkadot/api-derive/types';
+import { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { isFunction } from '@polkadot/util';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 
@@ -38,10 +38,8 @@ import { factory, formatFilename } from '../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export class StorageFetcher extends IStorageFetcher<ApiPromise> {
-  private _blockNumber: number;
-
   public async fetchIdentities(addresses: string[]): Promise<CWEvent<IIdentitySet>[]> {
-    this._blockNumber = +(await this._api.rpc.chain.getHeader()).number;
+    const blockNumber = +(await this._api.rpc.chain.getHeader()).number;
 
     // fetch all identities and registrars from chain
     const identities: Option<Registration>[] = await this._api.query.identity.identityOf.multi(addresses);
@@ -66,7 +64,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
           .filter((j) => !!j);
         return {
           // use current block as "fake" set date
-          blockNumber: this._blockNumber,
+          blockNumber,
           data: {
             kind: EventKind.IdentitySet,
             who: address,
@@ -82,30 +80,34 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
 
   public async fetch(): Promise<CWEvent<IEventData>[]> {
     // get current blockNumber for synthesizing events
-    this._blockNumber = +(await this._api.rpc.chain.getHeader()).number;
+    const blockNumber = +(await this._api.rpc.chain.getHeader()).number;
 
     /** democracy proposals */
-    const democracyProposalEvents = await this._fetchDemocracyProposals();
+    const democracyProposalEvents = await this.fetchDemocracyProposals(blockNumber);
 
     /** democracy referenda */
-    const democracyReferendaEvents = await this._fetchDemocracyReferenda();
+    const democracyReferendaEvents = await this.fetchDemocracyReferenda(blockNumber);
 
     /** democracy preimages */
     const proposalHashes = democracyProposalEvents
-      .map((d) => (d.data as IDemocracyStarted).proposalHash);
+      .map((d) => (d.data as IDemocracyProposed).proposalHash);
     const referendaHashes = democracyReferendaEvents
       .filter((d) => d.data.kind === EventKind.DemocracyStarted)
       .map((d) => (d.data as IDemocracyStarted).proposalHash);
-    const democracyPreimageEvents = await this._fetchDemocracyPreimages([ ...proposalHashes, ...referendaHashes ]);
+    const democracyPreimageEvents = await this.fetchDemocracyPreimages([ ...proposalHashes, ...referendaHashes ]);
 
     /** treasury proposals */
-    const treasuryProposalEvents = await this._fetchTreasuryProposals();
+    const treasuryProposalEvents = await this.fetchTreasuryProposals(blockNumber);
 
     /** collective proposals */
-    const collectiveProposalEvents = await this._fetchCollectiveProposals();
+    let technicalCommitteeProposalEvents = [];
+    if (this._api.query.technicalCommittee) {
+      technicalCommitteeProposalEvents = await this.fetchCollectiveProposals('technicalCommittee', blockNumber);
+    }
+    const councilProposalEvents = await this.fetchCollectiveProposals('council', blockNumber);
 
     /** signaling proposals */
-    const signalingProposalEvents = await this._fetchSignalingProposals();
+    const signalingProposalEvents = await this.fetchSignalingProposals(blockNumber);
 
     log.info('Fetch complete.');
     return [
@@ -113,12 +115,13 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       ...democracyReferendaEvents,
       ...democracyPreimageEvents,
       ...treasuryProposalEvents,
-      ...collectiveProposalEvents,
+      ...technicalCommitteeProposalEvents,
+      ...councilProposalEvents,
       ...signalingProposalEvents,
     ];
   }
 
-  private async _fetchDemocracyProposals(): Promise<CWEvent<IEventData>[]> {
+  public async fetchDemocracyProposals(blockNumber: number): Promise<CWEvent<IDemocracyProposed>[]> {
     log.info('Fetching democracy proposals...');
     const publicProps = await this._api.query.democracy.publicProps();
     const deposits: Array<Option<[BalanceOf, Vec<AccountId>] & Codec>> = await this._api.queryMulti(
@@ -146,10 +149,10 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       })
       .filter((e) => !!e);
     log.info(`Found ${proposedEvents.length} democracy proposals!`);
-    return proposedEvents.map((data) => ({ blockNumber: this._blockNumber, data }));
+    return proposedEvents.map((data) => ({ blockNumber, data }));
   }
 
-  private async _fetchDemocracyReferenda(): Promise<CWEvent<IEventData>[]> {
+  public async fetchDemocracyReferenda(blockNumber: number): Promise<CWEvent<IDemocracyStarted | IDemocracyPassed>[]> {
     log.info('Migrating democracy referenda...');
     const activeReferenda = await this._api.derive.democracy.referendumsActive();
     const startEvents = activeReferenda.map((r) => {
@@ -183,11 +186,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       })
     );
     log.info(`Found ${startEvents.length} democracy referenda!`);
-    return [ ...startEvents, ...passedEvents ].map((data) => ({ blockNumber: this._blockNumber, data }));
+    return [ ...startEvents, ...passedEvents ].map((data) => ({ blockNumber, data }));
   }
 
   // must pass proposal hashes found in prior events
-  private async _fetchDemocracyPreimages(hashes: string[]): Promise<CWEvent<IEventData>[]> {
+  public async fetchDemocracyPreimages(hashes: string[]): Promise<CWEvent<IPreimageNoted>[]> {
     log.info('Migrating preimages...');
     const hashCodecs = hashes.map((hash) => this._api.createType('Hash', hash));
     const preimages = await this._api.derive.democracy.preimages(hashCodecs);
@@ -212,7 +215,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     return cwEvents;
   }
 
-  private async _fetchTreasuryProposals(): Promise<CWEvent<IEventData>[]> {
+  public async fetchTreasuryProposals(blockNumber: number): Promise<CWEvent<ITreasuryProposed>[]> {
     log.info('Migrating treasury proposals...');
     const proposals = await this._api.derive.treasury.proposals();
     const proposedEvents = proposals.proposals.map((p) => {
@@ -226,25 +229,19 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       } as ITreasuryProposed;
     });
     log.info(`Found ${proposedEvents.length} treasury proposals!`);
-    return proposedEvents.map((data) => ({ blockNumber: this._blockNumber, data }));
+    return proposedEvents.map((data) => ({ blockNumber, data }));
   }
 
-  private async _fetchCollectiveProposals(): Promise<CWEvent<IEventData>[]> {
-    log.info('Migrating collective proposals...');
-    const councilProposals = await this._api.derive.council.proposals();
-    let technicalCommitteeProposals = [];
-    if (this._api.query.technicalCommittee) {
-      technicalCommitteeProposals = await this._api.derive.technicalCommittee.proposals();
-    }
-    const constructProposedEvents = (
-      ps: DeriveCollectiveProposal[],
-      name: 'council' | 'technicalCommittee',
-    ) => ps
-      .filter((p) => p.proposal && p.votes)
+  public async fetchCollectiveProposals(
+    moduleName: 'council' | 'technicalCommittee', blockNumber: number
+  ): Promise<CWEvent<ICollectiveProposed | ICollectiveVoted>[]> {
+    log.info(`Migrating ${moduleName} proposals...`);
+    const proposals = await this._api.derive[moduleName].proposals();
+    const proposedEvents = proposals.filter((p) => p.proposal && p.votes)
       .map((p) => {
         return {
           kind: EventKind.CollectiveProposed,
-          collectiveName: name,
+          collectiveName: moduleName,
           proposalIndex: +p.votes.index,
           proposalHash: p.hash.toString(),
           threshold: +p.votes.threshold,
@@ -258,39 +255,32 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
           proposer: '',
         } as ICollectiveProposed;
       });
-    const constructVotedEvents = (ps: DeriveCollectiveProposal[], name: 'council' | 'technicalCommittee') => ps
-      .filter((p) => p.proposal && p.votes)
+    const votedEvents = _.flatten(proposals.filter((p) => p.proposal && p.votes)
       .map((p) => {
         return [
           ...p.votes.ayes.map((who) => ({
             kind: EventKind.CollectiveVoted,
-            collectiveName: name,
+            collectiveName: moduleName,
             proposalHash: p.hash.toString(),
             voter: who.toString(),
             vote: true,
           } as ICollectiveVoted)),
           ...p.votes.nays.map((who) => ({
             kind: EventKind.CollectiveVoted,
-            collectiveName: name,
+            collectiveName: moduleName,
             proposalHash: p.hash.toString(),
             voter: who.toString(),
             vote: false,
           } as ICollectiveVoted)),
         ];
-      });
-    const proposedEvents = [
-      ...constructProposedEvents(councilProposals, 'council'),
-      ...constructProposedEvents(technicalCommitteeProposals, 'technicalCommittee')
-    ];
-    const votedEvents: ICollectiveVoted[] = _.flatten([
-      constructVotedEvents(councilProposals, 'council'),
-      constructVotedEvents(technicalCommitteeProposals, 'technicalCommittee'),
-    ]);
-    log.info(`Found ${proposedEvents.length} collective proposals and ${votedEvents.length} votes!`);
-    return [...proposedEvents, ...votedEvents].map((data) => ({ blockNumber: this._blockNumber, data }));
+      }));
+    log.info(`Found ${proposedEvents.length} ${moduleName} proposals and ${votedEvents.length} votes!`);
+    return [...proposedEvents, ...votedEvents].map((data) => ({ blockNumber, data }));
   }
 
-  private async _fetchSignalingProposals(): Promise<CWEvent<IEventData>[]> {
+  public async fetchSignalingProposals(
+    blockNumber: number
+  ): Promise<CWEvent<ISignalingNewProposal | ISignalingCommitStarted | ISignalingVotingStarted | ISignalingVotingCompleted>[]> {
     log.info('Migrating signaling proposals...');
     if (!this._api.query.voting || !this._api.query.signaling) {
       log.info('Found no signaling proposals (wrong chain)!');
@@ -372,6 +362,6 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     const events = [...newProposalEvents, ...commitStartedEvents, ...votingStartedEvents, ...completedEvents];
     // we could plausibly populate the completed events with block numbers, but not necessary
     log.info(`Found ${newProposalEvents.length} signaling proposals!`);
-    return events.map((data) => ({ blockNumber: this._blockNumber, data }));
+    return events.map((data) => ({ blockNumber, data }));
   }
 }

@@ -23,7 +23,34 @@ Be sure to call `yarn unlink` once development has been completed and the new ch
 
 Please submit any enhancements or bug fixes as a Pull Request on the [project's github page](https://github.com/hicommonwealth/chain-events).
 
-## Usage
+## Standalone Usage
+
+This package includes a "event listener" script located at [listener.ts](./scripts/listener.ts), which permits real-time listening for on-chain events, and can be used for testing a chain connection.
+
+The following is an example usage, connecting to a local node running on edgeware mainnet:
+
+```bash
+~/chain-events$ yarn build
+~/chain-events$ yarn listen -n edgeware -u ws://localhost:9944
+```
+
+The full set of options is listed as, with only `-n` required:
+
+```
+Options:
+      --help             Show help                                     [boolean]
+      --version          Show version number                           [boolean]
+  -n, --network          chain to listen on
+          [required] [choices: "edgeware", "edgeware-local", "edgeware-testnet",
+     "kusama", "kusama-local", "polkadot", "polkadot-local", "kulupu", "moloch",
+                                                                 "moloch-local"]
+  -s, --spec             edgeware spec to use
+                                [choices: "dev", "beresheet", "mainnet", "none"]
+  -u, --url              node url                                       [string]
+  -c, --contractAddress  eth contract address                           [string]
+```
+
+## Library Usage
 
 The easiest usage of the package involves calling `subscribeEvents` directly, which initializes the various components automatically. Do this for Substrate as follows.
 
@@ -40,10 +67,8 @@ class ExampleEventHandler extends IEventHandler {
 }
 
 async function subscribe(url) {
-  // Populate with chain-specific types
-  const types = Mainnet.types;
-  const typesAlias = Mainnet.typesAlias;
-  const api = await SubstrateEvents.createApi(url, types, typesAlias);
+  // Populate with chain spec type overrides
+  const api = await SubstrateEvents.createApi(url, Mainnet);
 
   const handlers = [ new ExampleEventHandler() ];
   const subscriber = await SubstrateEvents.subscribeEvents({
@@ -68,7 +93,7 @@ async function subscribe(url) {
 Alternatively, the individual `Subscriber`, `Poller`, `StorageFetcher`, and `Processor` objects can be accessed directly on the `SubstrateEvents` object, and
 can be set up directly. For an example of this, see the initialization procedure in [subscribeFunc.ts](./src/substrate/subscribeFunc.ts).
 
-## Class Details
+### Class Details
 
 The top level `@commonwealth/chain-events` import exposes various abstract types from the [interfaces.ts](./src/interfaces.ts) file, as well as "per-chain" modules, e.g. for Substrate, `SubstrateTypes` and `SubstrateEvents`, with the former containing interfaces and the latter containing classes and functions.
 

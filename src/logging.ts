@@ -23,7 +23,7 @@ export const factory = LFService.createNamedLoggerFactory('ChainEvents', options
 const control = getLogControl();
 
 // Factories are numbered, use listFactories() to find out
-const factoryControl = control.getLoggerFactoryControl(0);
+export const factoryControl = control.getLoggerFactoryControl(0);
 
 // Change the loglevel for all LogGroups for this factory to Debug
 // (so all existing/new loggers from this factory will log to Debug)

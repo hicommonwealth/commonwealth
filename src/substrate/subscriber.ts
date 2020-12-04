@@ -21,7 +21,7 @@ export class Subscriber extends IEventSubscriber<ApiPromise, Block> {
    */
   public async subscribe(cb: (block: Block) => any): Promise<void> {
     // wait for version available before we start producing blocks
-    await new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       this._api.rpc.state.subscribeRuntimeVersion((version: RuntimeVersion) => {
         this._versionNumber = +version.specVersion;
         this._versionName = version.specName.toString();

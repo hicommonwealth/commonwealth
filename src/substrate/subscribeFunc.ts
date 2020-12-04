@@ -1,6 +1,6 @@
 import { WsProvider, ApiPromise } from '@polkadot/api';
 import { TypeRegistry } from '@polkadot/types';
-import { RegistryTypes, OverrideModuleType } from '@polkadot/types/types';
+import { RegisteredTypes } from '@polkadot/types/types';
 
 import { IDisconnectedRange, CWEvent, SubscribeFunc, ISubscribeOptions } from '../interfaces';
 import { Subscriber } from './subscriber';
@@ -17,14 +17,12 @@ const log = factory.getLogger(formatFilename(__filename));
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
 export async function createApi(
-  url: string,
-  types?: RegistryTypes,
-  typesAlias?: Record<string, OverrideModuleType>,
+  url: string, typeOverrides: RegisteredTypes = {},
 ): Promise<ApiPromise> {
   // construct provider
   const provider = new WsProvider(url);
   let unsubscribe: () => void;
-  await new Promise((resolve) => {
+  await new Promise<void>((resolve) => {
     unsubscribe = provider.on('connected', () => resolve());
   });
   if (unsubscribe) unsubscribe();
@@ -33,9 +31,8 @@ export async function createApi(
   const registry = new TypeRegistry();
   const api = new ApiPromise({
     provider,
-    types,
-    typesAlias,
-    registry
+    registry,
+    ...typeOverrides
   });
   return api.isReady;
 }
@@ -52,7 +49,7 @@ export async function createApi(
  * @returns An active block subscriber.
  */
 export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions<ApiPromise>> = async (options) => {
-  const { chain, api, handlers, skipCatchup, discoverReconnectRange, verbose } = options;
+  const { chain, api, handlers, skipCatchup, archival, discoverReconnectRange, verbose } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>) => {
     let prevResult = null;
@@ -90,7 +87,6 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
     // grab the cached block immediately to avoid a new block appearing before the
     // server can do its thing...
     const lastBlockNumber = processor.lastBlockNumber;
-
     // determine how large of a reconnect we dealt with
     let offlineRange: IDisconnectedRange;
 
@@ -108,23 +104,37 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
       offlineRange = { startBlock: lastBlockNumber };
     }
 
-    // if we can't figure out when the last block we saw was, do nothing
+    // if we can't figure out when the last block we saw was,
+    // and we are not running in archival mode, do nothing
     // (i.e. don't try and fetch all events from block 0 onward)
-    if (!offlineRange || !offlineRange.startBlock) {
-      log.warn('Unable to determine offline time range.');
-      return;
+    if(!offlineRange || !offlineRange.startBlock){
+      if(archival){
+        offlineRange = {startBlock: 0}
+      }
+      else{
+        log.warn('Unable to determine offline time range.');
+        return;
+      }
     }
-
-    // poll the missed blocks for events
-    try {
-      const blocks = await poller.poll(offlineRange);
-      await Promise.all(blocks.map(processBlockFn));
-    } catch (e) {
-      log.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
+    
+    // if running in archival mode then run poller.archive with 
+    // batch_size 500 
+    if(archival){
+      log.info(`Executing in archival mode, polling blocks starting from: ${offlineRange.startBlock}`);
+      await poller.archive(offlineRange,500,processBlockFn);
+    }
+    // else just run poller normally
+    else {
+      try {
+        const blocks = await poller.poll(offlineRange);
+        await Promise.all(blocks.map(processBlockFn));
+      } catch (e) {
+        log.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
+      }
     }
   };
 
-  if (!skipCatchup) {
+  if (!skipCatchup || archival) {
     await pollMissedBlocksFn();
   } else {
     log.info('Skipping event catchup on startup!');

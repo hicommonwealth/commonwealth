@@ -44,18 +44,15 @@ const getMockApi = () => {
     'events.at': (hash: Hash) => {
       return events[hash as unknown as number] || [];
     },
-    'blockHash.multi': (blockNumbers: number[]) => {
-      return blockNumbers.map((n) => {
-        // fake a few values to test the size reduction actually works
-        if (n === 2600 || n === 2400) {
-          return hashes[5];
-        }
-        if (n >= 100 && n <= 110) {
-          return hashes[n - 100];
-        } else {
-          return new IMockHash(0);
-        }
-      });
+    getBlockHash: (blockNumber: number) => {
+      if (blockNumber === 2600 || blockNumber === 2400) {
+        return hashes[5];
+      }
+      if (blockNumber >= 100 && blockNumber <= 110) {
+        return hashes[blockNumber - 100];
+      } else {
+        return new IMockHash(0);
+      }
     },
     getBlock: (hash) => {
       return {
@@ -78,7 +75,6 @@ describe('Edgeware Event Poller Tests', () => {
   it('should return block data', async () => {
     // setup mock data
     const api = getMockApi();
-
     // setup test class
     const poller = new Poller(api);
 
@@ -167,4 +163,22 @@ describe('Edgeware Event Poller Tests', () => {
     assert.equal(blocks[0].versionNumber, 10);
     assert.equal(blocks[0].versionName, 'edgeware');
   });
+
+  it('should return all blocks with non-zeroed hashes', async () => {
+    // setup mock data
+    const api = getMockApi();
+
+    // setup test class
+    const poller = new Poller(api);
+
+    // run test
+    const blocks = await poller.archive({ startBlock: 0});
+    assert.lengthOf(blocks, 4);
+    assert.equal(+blocks[0].header.number, 105);
+    assert.deepEqual(blocks[0].events, []);
+    assert.equal(blocks[0].versionNumber, 10);
+    assert.equal(blocks[0].versionName, 'edgeware');
+
+  });
+
 });
