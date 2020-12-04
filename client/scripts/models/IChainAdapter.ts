@@ -21,6 +21,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   protected _loaded: boolean = false;
   public get loaded() { return this._loaded; }
 
+  protected _failed: boolean = false;
+  public get failed() { return this._failed; }
+
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
   public readonly chainEntities?: ChainEntityController;
