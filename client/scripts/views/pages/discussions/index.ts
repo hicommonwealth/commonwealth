@@ -202,10 +202,17 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       if (topic) {
         topicId = app.topics.getByName(topic, app.activeId())?.id;
         if (!topicId) {
-          return m(EmptyTopicPlaceholder, {
-            communityName: app.activeId(),
-            topicName: topic
-          });
+          return m(Sublayout, {
+            class: 'DiscussionsPage',
+            title: topic || 'Discussions',
+            showNewProposalButton: true,
+            rightSidebar: m(ListingSidebar, { entity: app.activeId() })
+          }, [
+            m(EmptyTopicPlaceholder, {
+              communityName: app.activeId(),
+              topicName: topic,
+            }),
+          ]);
         }
       }
 
