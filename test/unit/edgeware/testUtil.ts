@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { ApiPromise } from '@polkadot/api';
 import { Option } from '@polkadot/types';
-import { IdentityJudgement } from '@polkadot/types/interfaces';
+import { IdentityJudgement, AccountVote } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { IdentityJudgement as JudgementEnum } from '../../../src/substrate/types';
 
@@ -59,6 +59,32 @@ export function constructIdentityJudgement(j: JudgementEnum): IdentityJudgement 
       break;
   }
   return obj as unknown as IdentityJudgement;
+}
+
+export function constructAccountVote(
+  isAye: boolean,
+  conviction: number,
+  balance: string,
+  isSplit = false,
+): AccountVote {
+  if (isSplit) {
+    return { isSplit: true, asSplit: {}, isStandard: false } as AccountVote;
+  } else {
+    return {
+      isSplit: false,
+      isStandard: true,
+      asStandard: {
+        balance,
+        vote: {
+          isAye,
+          isNay: !isAye,
+          conviction: {
+            index: conviction,
+          }
+        }
+      }
+    } as unknown as AccountVote;
+  }
 }
 
 export function constructFakeApi(

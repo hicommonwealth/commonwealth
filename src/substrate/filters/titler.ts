@@ -111,6 +111,12 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
         description: 'A new democracy referendum started voting.',
       };
     }
+    case EventKind.DemocracyVoted: {
+      return {
+        title: 'Democracy Vote Received',
+        description: 'A democracy vote was received.',
+      };
+    }
     case EventKind.DemocracyPassed: {
       return {
         title: 'Referendum Passed',

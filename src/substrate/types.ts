@@ -93,6 +93,7 @@ export enum EventKind {
   DemocracyProposed = 'democracy-proposed',
   DemocracyTabled = 'democracy-tabled',
   DemocracyStarted = 'democracy-started',
+  DemocracyVoted = 'democracy-voted',
   DemocracyPassed = 'democracy-passed',
   DemocracyNotPassed = 'democracy-not-passed',
   DemocracyCancelled = 'democracy-cancelled',
@@ -258,6 +259,15 @@ export interface IDemocracyStarted extends IEvent {
   proposalHash: string;
   voteThreshold: string;
   endBlock: BlockNumber;
+}
+
+export interface IDemocracyVoted extends IEvent {
+  kind: EventKind.DemocracyVoted;
+  referendumIndex: number;
+  who: AccountId;
+  isAye: boolean;
+  conviction: number; // index of the conviction enum
+  balance: BalanceString;
 }
 
 export interface IDemocracyPassed extends IEvent {
@@ -521,6 +531,7 @@ export type IEventData =
   | IDemocracyProposed
   | IDemocracyTabled
   | IDemocracyStarted
+  | IDemocracyVoted
   | IDemocracyPassed
   | IDemocracyNotPassed
   | IDemocracyCancelled
@@ -571,8 +582,8 @@ export const EventKinds: EventKind[] = Object.values(EventKind);
 export type IDemocracyProposalEvents =
   IDemocracyProposed | IDemocracyTabled;
 export type IDemocracyReferendumEvents =
-  IDemocracyStarted | IDemocracyPassed | IDemocracyNotPassed
-  | IDemocracyCancelled | IDemocracyExecuted;
+  IDemocracyStarted | IDemocracyVoted | IDemocracyPassed
+  | IDemocracyNotPassed | IDemocracyCancelled | IDemocracyExecuted;
 export type IDemocracyPreimageEvents =
   IPreimageNoted | IPreimageUsed | IPreimageInvalid
   | IPreimageMissing | IPreimageReaped;

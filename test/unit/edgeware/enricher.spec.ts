@@ -13,7 +13,7 @@ import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { ValidatorId } from '@polkadot/types/interfaces';
 import { OffenceDetails, ReportIdOf } from '@polkadot/types/interfaces/offences';
 import { Enrich } from '../../../src/substrate/filters/enricher';
-import { constructFakeApi, constructOption, constructIdentityJudgement } from './testUtil';
+import { constructFakeApi, constructOption, constructIdentityJudgement, constructAccountVote } from './testUtil';
 import { EventKind, IdentityJudgement, Validator } from '../../../src/substrate/types';
 
 const { assert } = chai;
@@ -869,7 +869,34 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       }
     });
   });
-
+  it('should enrich new democracy-voted event', async () => {
+    const kind = EventKind.DemocracyVoted;
+    const extrinsic = constructExtrinsic('alice', [
+      '1', constructAccountVote(true, 3, '100000'),
+    ]);
+    const result = await Enrich(api, blockNumber, kind, extrinsic);
+    assert.deepEqual(result, {
+      blockNumber,
+      excludeAddresses: [ 'alice' ],
+      data: {
+        kind,
+        referendumIndex: 1,
+        who: 'alice',
+        balance: '100000',
+        isAye: true,
+        conviction: 3,
+      }
+    });
+  });
+  it('should not enrich democracy-voted event with split vote', (done) => {
+    const kind = EventKind.DemocracyVoted;
+    const extrinsic = constructExtrinsic('alice', [
+      '1', constructAccountVote(true, 3, '100000', true),
+    ]);
+    Enrich(api, blockNumber, kind, extrinsic)
+      .then((v) => done(new Error('should not permit split vote')))
+      .catch(() => done());
+  });
   it('should enrich democracy-passed event', async () => {
     const kind = EventKind.DemocracyPassed;
     const event = constructEvent([ '1' ]);

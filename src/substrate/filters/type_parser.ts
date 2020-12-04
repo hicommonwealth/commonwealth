@@ -52,6 +52,7 @@ export function ParseType (
         case 'PreimageInvalid': return EventKind.PreimageInvalid;
         case 'PreimageMissing': return EventKind.PreimageMissing;
         case 'PreimageReaped': return EventKind.PreimageReaped;
+        case 'vote': return EventKind.DemocracyVoted;
         default: return null;
       }
     case 'treasury':

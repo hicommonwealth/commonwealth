@@ -3,12 +3,12 @@ import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
   ReferendumInfo, SessionIndex, ValidatorId, Exposure, EraIndex, AuthorityId, IdentificationTuple,
-  EraRewardPoints
+  EraRewardPoints, AccountVote
 } from '@polkadot/types/interfaces';
 import { DeriveStakingElected } from '@polkadot/api-derive/types';
 import BN from 'bn.js';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
-import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
+import { Option, bool, Vec, u32, u64, Compact } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { filter } from 'lodash';
 import { Kind, OpaqueTimeSlot, OffenceDetails } from '@polkadot/types/interfaces/offences';
@@ -739,6 +739,25 @@ export async function Enrich(
     excludeAddresses?: string[],
   }> => {
     switch (kind) {
+      case EventKind.DemocracyVoted: {
+        const voter = extrinsic.signer.toString();
+        const [ idx, vote ] = extrinsic.args as [ Compact<ReferendumIndex>, AccountVote ];
+        if (vote.isSplit) {
+          throw new Error('split votes not supported');
+        }
+        return {
+          excludeAddresses: [ voter ],
+          data: {
+            kind,
+            referendumIndex: +idx,
+            who: voter,
+            isAye: vote.asStandard.vote.isAye,
+            conviction: vote.asStandard.vote.conviction.index,
+            balance: vote.asStandard.balance.toString(),
+          }
+        }
+      }
+
       case EventKind.ElectionCandidacySubmitted: {
         const candidate = extrinsic.signer.toString();
         const section = api.query.electionsPhragmen ? 'electionsPhragmen' : 'elections';

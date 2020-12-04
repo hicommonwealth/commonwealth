@@ -218,6 +218,14 @@ export const Label: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
+    case EventKind.DemocracyVoted: {
+      const { referendumIndex, who, isAye } = data;
+      return {
+        heading: 'Vote Received on Democracy Referendum',
+        label: `Voter ${fmtAddr(who)} voted ${isAye ? 'Yes' : 'No'} on referendum ${referendumIndex}.`,
+        linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
+      };
+    }
     case EventKind.DemocracyPassed: {
       const { dispatchBlock, referendumIndex } = data;
       return {
