@@ -9,6 +9,7 @@ import PageLoading from 'views/pages/loading';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { ChainBase, ChainNetwork, ProposalModule } from 'models';
 import NewProposalForm from 'views/pages/new_proposal/new_proposal_form';
+import PageNotFound from '../404';
 
 async function loadCmd(type: string) {
   if (!app || !app.chain || !app.chain.loaded) {
@@ -30,6 +31,11 @@ const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
 
     // wait for chain if not offchain
     if (vnode.state.typeEnum !== ProposalType.OffchainThread) {
+      if (app.chain?.failed)
+        return m(PageNotFound, {
+          title: 'Wrong Ethereum Provider Network!',
+          message: 'Change Metamask to point to Ropsten Testnet',
+        });
       if (!app.chain || !app.chain.loaded)
         return m(PageLoading, { narrow: true, showNewProposalButton: true });
 

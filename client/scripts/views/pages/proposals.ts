@@ -27,6 +27,7 @@ import { Grid, Col, List } from 'construct-ui';
 import moment from 'moment';
 import Listing from './listing';
 import ErrorPage from './error';
+import PageNotFound from './404';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -129,6 +130,10 @@ const ProposalsPage: m.Component<{}> = {
           title: 'Proposals',
         });
       }
+      if (app.chain?.failed) return m(PageNotFound, {
+        title: 'Wrong Ethereum Provider Network!',
+        message: 'Change Metamask to point to Ropsten Testnet',
+      });
       return m(PageLoading, {
         message: 'Connecting to chain (may take up to 10s)...',
         title: 'Proposals',

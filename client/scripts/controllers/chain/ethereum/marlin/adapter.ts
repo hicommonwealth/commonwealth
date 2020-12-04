@@ -58,13 +58,16 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     // await this.ethAccounts.init(this.chain);
-    await this.webWallet.enable().catch((e) => {console.log('thowing!11'); console.error(e);});
+    await this.webWallet.enable();
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     const compContractAddress = this.meta.address;
     const governorAlphaContractAddress = '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff';
     const api = new MarlinAPI(this.meta.address, governorAlphaContractAddress, this.chain.api.currentProvider as any, activeAddress);
-    await api.init().catch((e) => notifyError('Please change your Metamask network to Ropsten'));
+    await api.init().catch((e) => {
+      this._failed = true;
+      notifyError('Please change your Metamask network to Ropsten');
+    });
     this.chain.marlinApi = api;
 
     if (this.webWallet) {

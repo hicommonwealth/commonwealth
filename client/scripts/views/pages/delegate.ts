@@ -107,6 +107,12 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
 const DelegatePage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
+      if (app.chain?.failed) {
+        return m(PageNotFound, {
+          title: 'Wrong Ethereum Provider Network!',
+          message: 'Change Metamask to point to Ropsten Testnet',
+        });
+      }
       if (app.chain && app.chain?.network !== ChainNetwork.Marlin) {
         return m(PageNotFound, {
           title: 'Delegate Page',
