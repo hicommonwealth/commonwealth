@@ -36,10 +36,10 @@ const SubscriptionButton: m.Component<{}> = {
       m('.subscription-button-sub', [
         !communitySubscription
           ? 'You will not be notified of new threads'
-          : (app.user.emailInterval === 'daily' && !app.user.email)
+          : (app.user.emailInterval === 'daily' && (!app.user.email || !app.user.emailVerified))
             ? [
               'You will be notified in the app. ',
-              link('a', `${app.activeId()}/settings`, 'Add an email'),
+              link('a', `${app.activeId()}/settings`, app.user.email ? 'Verify your email' : 'Add an email'),
             ]
             : (app.user.emailInterval === 'daily' && communitySubscription.immediateEmail)
               ? [
