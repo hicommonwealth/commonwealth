@@ -3,6 +3,7 @@ const SequelizeLib = require('sequelize');
 const Op = SequelizeLib.Op;
 
 const EventKinds = {
+  DemocracySeconded: 'democracy-seconded',
   IdentitySet: 'identity-set',
   JudgementGiven: 'identity-judgement-given',
   IdentityCleared: 'identity-cleared',
