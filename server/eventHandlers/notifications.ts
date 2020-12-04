@@ -22,7 +22,7 @@ export default class extends IEventHandler {
   public async handle(event: CWEvent, dbEvent) {
     // log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     if (!dbEvent) {
-      log.error('No db event received! Ignoring.');
+      log.trace('No db event received! Ignoring.');
       return;
     }
     const dbEventType = await dbEvent.getChainEventType();

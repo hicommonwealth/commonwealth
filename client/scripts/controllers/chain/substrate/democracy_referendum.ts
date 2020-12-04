@@ -376,7 +376,7 @@ export class SubstrateDemocracyReferendum
           aye: vote.choice,
           conviction,
         },
-        balance: balance.asBN,
+        balance: balance.toString(),
       }
     };
 
