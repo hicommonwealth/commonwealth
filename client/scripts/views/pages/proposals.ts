@@ -76,13 +76,13 @@ const MarlinProposalStats: m.Component<{}, {}> = {
         m('.stats-tile', [
           m('.stats-heading', 'Marlin Basics'),
           m('.stats-tile-figure-major', [
-            `Quorum Votes: ${(app.chain as Marlin).governance?.quorumVotes.toString(10)}`
+            `Quorum Votes: ${(app.chain as Marlin).governance?.quorumVotes.toLocaleString()}`
           ]),
           m('.stats-tile-figure-minor', [
-            `Proposal Threshold: ${(app.chain as Marlin).governance?.proposalThreshold.toString(10, 10)}`
+            `Proposal Threshold: ${(app.chain as Marlin).governance?.proposalThreshold.toLocaleString()}`
           ]),
           m('.stats-tile-figure-minor', [
-            `Voting Period Length: ${(app.chain as Marlin).governance.votingPeriod.toString(10, 10)}`,
+            `Voting Period Length: ${(app.chain as Marlin).governance.votingPeriod.toString(10)}`,
           ]),
         ]),
       ]),
