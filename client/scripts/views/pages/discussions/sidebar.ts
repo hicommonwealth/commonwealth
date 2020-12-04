@@ -18,7 +18,7 @@ export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: num
         avatarSize: 24,
         linkify: true,
         popover: true,
-        showRole: true
+        showRole: true,
       }),
       m('.activity-count', activityCount)
     ]);

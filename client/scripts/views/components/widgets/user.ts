@@ -19,13 +19,14 @@ const User: m.Component<{
   onclick?: any;
   popover?: boolean;
   showRole?: boolean;
+  hideOnchainRole?: boolean;
 }, {
   identityWidgetLoading: boolean;
   IdentityWidget: any;
 }> = {
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
-    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, popover, showRole } = vnode.attrs;
+    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, popover, showRole, hideOnchainRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
@@ -111,6 +112,9 @@ const User: m.Component<{
               : m('a.user-display-name.username', profile ? profile.name : addrShort)
           ],
         showRole && roleTag,
+        !hideOnchainRole
+          && (profile.isCouncillor || profile.isValidator)
+          && m('span.user-flag', `${profile.isCouncillor ? 'C' : 'V'}`),
       ]);
 
     const userPopover = m('.UserPopover', {
@@ -157,11 +161,12 @@ export const UserBlock: m.Component<{
   hideIdentityIcon?: boolean,
   popover?: boolean,
   showRole?: boolean,
+  hideOnchainRole?: boolean,
   selected?: boolean,
   compact?: boolean,
 }> = {
   view: (vnode) => {
-    const { user, hideIdentityIcon, popover, showRole, selected, compact } = vnode.attrs;
+    const { user, hideIdentityIcon, popover, showRole, hideOnchainRole, selected, compact } = vnode.attrs;
 
     let profile;
     if (user instanceof AddressInfo) {
@@ -192,6 +197,7 @@ export const UserBlock: m.Component<{
             hideIdentityIcon,
             popover,
             showRole,
+            hideOnchainRole,
           }),
         ]),
         m('.user-block-address', {
