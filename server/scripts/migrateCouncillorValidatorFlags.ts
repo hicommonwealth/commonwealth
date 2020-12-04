@@ -1,7 +1,5 @@
 /**
- * This script "migrates" chain entities (proposals) from the chain into the database, by first
- * querying events, and then attempting to fetch corresponding entities
- * from the chain, writing the results back into the database.
+ * This script "migrates" councillors and validators into the database.
  */
 
 import _ from 'underscore';
@@ -33,7 +31,7 @@ export default async function (models, chain?: string): Promise<void> {
     throw new Error('no nodes found for chain entity migration');
   }
 
-  // 2. for each node, fetch and migrate chain entities
+  // 2. for each node, fetch councillors and validators
   for (const node of nodes) {
     log.info(`Fetching and migrating councillor/validator flags for ${node.chain}.`);
     const flagsHandler = new UserFlagsHandler(models, node.chain);
