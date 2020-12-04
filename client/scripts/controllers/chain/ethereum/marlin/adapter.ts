@@ -11,6 +11,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
+import { notifyError } from 'controllers/app/notifications';
 import MarlinAPI from './api';
 import MarlinChain from './chain';
 import MarlinGovernance from './governance';
@@ -63,7 +64,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     const compContractAddress = this.meta.address;
     const governorAlphaContractAddress = '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff';
     const api = new MarlinAPI(this.meta.address, governorAlphaContractAddress, this.chain.api.currentProvider as any, activeAddress);
-    await api.init().catch((e) => console.log('throwwwwww', e));
+    await api.init().catch((e) => notifyError('Please change your Metamask network to Ropsten'));
     this.chain.marlinApi = api;
 
     if (this.webWallet) {
