@@ -62,6 +62,7 @@ async function main() {
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
+  const ARCHIVAL = process.env.ARCHIVAL === 'true';
   const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
@@ -77,7 +78,7 @@ async function main() {
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
-      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP, ARCHIVAL);
 
       // construct storageFetchers needed for the identity cache
       const fetchers = {};

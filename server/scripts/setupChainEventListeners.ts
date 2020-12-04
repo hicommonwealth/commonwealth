@@ -46,7 +46,7 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
 };
 
 const setupChainEventListeners = async (
-  models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean
+  models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean, archival?: boolean
 ): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
   log.info('Fetching node urls...');
   await sequelize.authenticate();
@@ -116,6 +116,7 @@ const setupChainEventListeners = async (
         chain: node.chain,
         handlers,
         skipCatchup,
+        archival,
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
       });
