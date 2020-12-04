@@ -19,14 +19,13 @@ const User: m.Component<{
   onclick?: any;
   popover?: boolean;
   showRole?: boolean;
-  hideOnchainRole?: boolean;
 }, {
   identityWidgetLoading: boolean;
   IdentityWidget: any;
 }> = {
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
-    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, popover, showRole, hideOnchainRole } = vnode.attrs;
+    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, popover, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
@@ -74,12 +73,28 @@ const User: m.Component<{
       profile = account.profile;
       role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === chainId);
     }
-    const roleTag = role ? m(Tag, {
-      class: 'role-tag',
-      label: role.permission,
-      rounded: true,
-      size: 'xs',
-    }) : null;
+    const roleTags = [
+      // onchain roles
+      profile.isCouncillor && m(Tag, {
+        class: 'role-tag',
+        label: 'councillor',
+        rounded: true,
+        size: 'xs',
+      }),
+      profile.isValidator && m(Tag, {
+        class: 'role-tag',
+        label: 'validator',
+        rounded: true,
+        size: 'xs',
+      }),
+      // offchain role
+      role && m(Tag, {
+        class: 'role-tag',
+        label: `forum ${role.permission}`,
+        rounded: true,
+        size: 'xs',
+      }),
+    ];
 
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
@@ -111,10 +126,7 @@ const User: m.Component<{
                 profile ? profile.name : addrShort)
               : m('a.user-display-name.username', profile ? profile.name : addrShort)
           ],
-        showRole && roleTag,
-        !hideOnchainRole
-          && (profile.isCouncillor || profile.isValidator)
-          && m('span.user-flag', `${profile.isCouncillor ? 'C' : 'V'}`),
+        showRole && roleTags,
       ]);
 
     const userPopover = m('.UserPopover', {
@@ -139,7 +151,7 @@ const User: m.Component<{
           profile ? profile.name : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
-      showRole && roleTag,
+      roleTags, // always show roleTags in .UserPopover
     ]);
 
     return popover
@@ -197,7 +209,6 @@ export const UserBlock: m.Component<{
             hideIdentityIcon,
             popover,
             showRole,
-            hideOnchainRole,
           }),
         ]),
         m('.user-block-address', {

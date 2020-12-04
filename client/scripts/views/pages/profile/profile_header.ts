@@ -114,7 +114,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', account.profile ? m(User, { user: account, hideAvatar: true }) : account.address),
+            m('.User', account.profile ? m(User, { user: account, hideAvatar: true, showRole: true }) : account.address),
           ]),
           m('.info-row', [
             account.profile?.headline && m('span.profile-headline', account.profile.headline),

@@ -18,7 +18,6 @@ export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: num
         avatarSize: 24,
         linkify: true,
         popover: true,
-        showRole: true,
       }),
       m('.activity-count', activityCount)
     ]);
@@ -78,7 +77,6 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
               avatarSize: 24,
               linkify: true,
               popover: true,
-              showRole: true,
             });
           }),
         ]),
