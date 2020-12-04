@@ -2,6 +2,7 @@ import _ from 'lodash';
 import m from 'mithril';
 
 import app from 'state';
+import { link } from 'helpers';
 import { NotificationCategories } from 'types';
 import { Button, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
 
@@ -12,11 +13,9 @@ const SubscriptionButton: m.Component<{}> = {
       .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeId());
     const communityOrChain = app.activeChainId() ? app.activeChainId() : app.activeCommunityId();
 
-    return m(PopoverMenu, {
-      transitionDuration: 0,
-      closeOnContentClick: true,
-      menuAttrs: { size: 'sm', },
-      content: m(MenuItem, {
+    return m('.SubscriptionButton', [
+      m('.subscription-button-header', 'Notifications'),
+      m(Button, {
         onclick: (e) => {
           e.preventDefault();
           if (communitySubscription) {
@@ -29,11 +28,35 @@ const SubscriptionButton: m.Component<{}> = {
             });
           }
         },
-        label: communitySubscription ? 'Turn off new thread notifications' : 'Turn on new thread notifications',
+        size: 'sm',
+        fluid: true,
+        label: communitySubscription ? 'Thread notifications on' : 'Thread notifications off',
+        intent: communitySubscription ? 'primary' : 'none',
       }),
-      inline: true,
-      trigger: m(Icon, { name: Icons.CHEVRON_DOWN, class: 'SubscriptionButton' }),
-    });
+      m('.subscription-button-sub', [
+        !communitySubscription
+          ? 'You will not be notified of new threads'
+          : (app.user.emailInterval === 'daily' && !app.user.email)
+            ? [
+              'You will be notified in the app. ',
+              link('a', `${app.activeId()}/settings`, 'Add an email'),
+            ]
+            : (app.user.emailInterval === 'daily' && communitySubscription.immediateEmail)
+              ? [
+                'You will be notified in the app & immediately by email. ',
+                link('a', `${app.activeId()}/notifications`, 'Manage'),
+              ]
+              : app.user.emailInterval === 'daily'
+                ? [
+                  'You will be notified in the app & daily emails. ',
+                  link('a', `${app.activeId()}/notifications`, 'Manage'),
+                ]
+                : app.user.emailInterval === 'never' ? [
+                  'You will be notified in the app. ',
+                  link('a', `${app.activeId()}/notifications`, 'Manage'),
+                ] : '',
+      ]),
+    ]);
   },
 };
 
