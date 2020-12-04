@@ -59,9 +59,8 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
         });
       }
     },
-    label: vnode.state.chainLoading
-      ? 'Loading chain (may take some time)...'
-      : currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
+    loading: !!vnode.state.chainLoading,
+    label: currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
   });
 };
 
