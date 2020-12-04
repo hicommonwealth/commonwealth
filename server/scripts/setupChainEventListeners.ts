@@ -11,6 +11,7 @@ import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
+import UserFlagsHandler from '../eventHandlers/userFlags';
 import { sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
@@ -78,11 +79,12 @@ const setupChainEventListeners = async (
     const notificationHandler = new EventNotificationHandler(models, wss);
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
     const identityHandler = new IdentityHandler(models, node.chain);
+    const userFlagsHandler = new UserFlagsHandler(models, node.chain);
     const handlers: IEventHandler[] = [ storageHandler, notificationHandler, entityArchivalHandler ];
     let subscriber: IEventSubscriber<any, any>;
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
-      // only handle identities on substrate chains
-      handlers.push(identityHandler);
+      // only handle identities and user flags on substrate chains
+      handlers.push(identityHandler, userFlagsHandler);
 
       const nodeUrl = constructSubstrateUrl(node.url);
       const api = await SubstrateEvents.createApi(

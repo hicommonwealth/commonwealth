@@ -17,6 +17,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from 'views/components/widgets/user';
 import CreateInviteModal from 'views/modals/create_invite_modal';
+import EditProfileModal from 'views/modals/edit_profile_modal';
 import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
@@ -191,6 +192,19 @@ const LoginSelector: m.Component<{
                   const a = app.user.activeAccount;
                   m.route.set(`/${app.activeId()}/account/${a.address}?base=${a.chain}`);
                 }
+              },
+              label: 'View profile',
+            }),
+            activeAddressesWithRole.length > 0 && app.user.activeAccount && app.activeId() && m(MenuItem, {
+              onclick: (e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: EditProfileModal,
+                  data: {
+                    account: app.user.activeAccount,
+                    refreshCallback: () => m.redraw(),
+                  },
+                });
               },
               label: 'Edit profile',
             }),

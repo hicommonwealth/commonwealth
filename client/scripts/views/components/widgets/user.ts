@@ -73,12 +73,28 @@ const User: m.Component<{
       profile = account.profile;
       role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === chainId);
     }
-    const roleTag = role ? m(Tag, {
-      class: 'role-tag',
-      label: role.permission,
-      rounded: true,
-      size: 'xs',
-    }) : null;
+    const roleTags = [
+      // onchain roles
+      profile.isCouncillor && m(Tag, {
+        class: 'role-tag',
+        label: 'councillor',
+        rounded: true,
+        size: 'xs',
+      }),
+      profile.isValidator && m(Tag, {
+        class: 'role-tag',
+        label: 'validator',
+        rounded: true,
+        size: 'xs',
+      }),
+      // offchain role
+      role && m(Tag, {
+        class: 'role-tag',
+        label: `forum ${role.permission}`,
+        rounded: true,
+        size: 'xs',
+      }),
+    ];
 
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
@@ -110,7 +126,7 @@ const User: m.Component<{
                 profile ? profile.name : addrShort)
               : m('a.user-display-name.username', profile ? profile.name : addrShort)
           ],
-        showRole && roleTag,
+        showRole && roleTags,
       ]);
 
     const userPopover = m('.UserPopover', {
@@ -135,7 +151,7 @@ const User: m.Component<{
           profile ? profile.name : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
-      showRole && roleTag,
+      roleTags, // always show roleTags in .UserPopover
     ]);
 
     return popover
@@ -157,11 +173,12 @@ export const UserBlock: m.Component<{
   hideIdentityIcon?: boolean,
   popover?: boolean,
   showRole?: boolean,
+  hideOnchainRole?: boolean,
   selected?: boolean,
   compact?: boolean,
 }> = {
   view: (vnode) => {
-    const { user, hideIdentityIcon, popover, showRole, selected, compact } = vnode.attrs;
+    const { user, hideIdentityIcon, popover, showRole, hideOnchainRole, selected, compact } = vnode.attrs;
 
     let profile;
     if (user instanceof AddressInfo) {

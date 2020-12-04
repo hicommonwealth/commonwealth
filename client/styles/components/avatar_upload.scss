@@ -1,6 +1,8 @@
 @import 'client/styles/shared';
 
 .AvatarUpload {
+    border-radius: 9999px;
+    overflow: hidden;
     margin-bottom: 10px;
     display: flex;
     justify-content: center;
@@ -8,6 +10,10 @@
     background-color: white;
     border: 1px solid $background-color-light;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
+    > .User {
+        position: absolute;
+        z-index: 0;
+    }
     .dropzone-attach {
         display: flex;
         justify-content: center;
@@ -15,6 +21,7 @@
         height: 100%;
         width: 100%;
         color: #999;
+        z-index: 1;
         &.hidden {
             display: none;
         }
@@ -47,6 +54,7 @@
         text-align: right;
         height: 100%;
         width: 100%;
+        z-index: 2;
         &.hidden {
             display: none;
         }

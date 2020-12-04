@@ -76,6 +76,14 @@
                 }
             }
         }
+        .no-profile-callout {
+            margin-top: 20px;
+            margin-bottom: 16px;
+            width: calc(100% - 28px);
+            @include xs-max {
+                width: 100%;
+            }
+        }
         .cui-form {
             margin: 0;
             margin-right: 28px;
@@ -105,12 +113,20 @@
         .cui-tabs {
             padding-left: 28px;
         }
+        .no-profile-callout {
+            margin-left: 28px;
+            width: calc(100% - 56px);
+        }
         .cui-form {
             margin-left: 28px;
         }
         @include xs-max {
             .cui-tabs {
                 padding: 0;
+            }
+            .no-profile-callout {
+                margin-left: 20px;
+                width: calc(100% - 40px);
             }
             .cui-form {
                 margin: 0 20px;

@@ -10,7 +10,7 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { Button, Callout, Input, TextArea, Icon, Icons, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
-import { formatAddressShort, isSameAccount } from 'helpers';
+import { formatAddressShort, isSameAccount, link } from 'helpers';
 import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
@@ -371,12 +371,23 @@ const LinkNewAddressModal: m.Component<{
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },
-              label: vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected
-                ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ]
-                : app.chain.networkStatus === ApiStatus.Disconnected ?  'Could not connect to chain'
-                : (app.chain as Substrate || app.chain as Ethereum).webWallet.available
-                  ? 'Connect to wallet' : 'No wallet detected',
+              label:
+                !(app.chain as Substrate || app.chain as Ethereum).webWallet.available
+                  ? 'No wallet detected'
+                  : (vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected)
+                    ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ]
+                    : app.chain.networkStatus === ApiStatus.Disconnected
+                      ? 'Could not connect to chain'
+                      : 'Connect to wallet'
             }),
+          !(app.chain as Substrate || app.chain as Ethereum).webWallet.available && m('.get-wallet-text', [
+            'Install a ',
+            app.chain.base === ChainBase.Substrate
+              && link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', { target: '_blank' }),
+            app.chain.base === ChainBase.Ethereum
+              && link('a', 'https://metamask.io/', 'Metamask', { target: '_blank' }),
+            ' compatible wallet to continue'
+          ]),
           (app.chain as Substrate || app.chain as Ethereum).webWallet
             && (app.chain as Substrate || app.chain as Ethereum).webWallet.enabled && m('.accounts-caption', [
             (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length ? [

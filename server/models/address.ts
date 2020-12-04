@@ -40,6 +40,8 @@ export interface AddressAttributes {
   created_at?: Date;
   updated_at?: Date;
   user_id?: number;
+  is_councillor?: boolean;
+  is_validator?: boolean;
 
   // associations
   Chain?: ChainAttributes;
@@ -94,6 +96,8 @@ export default (
     created_at:                 { type: dataTypes.DATE, allowNull: false },
     updated_at:                 { type: dataTypes.DATE, allowNull: false },
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
+    is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
     underscored: true,
     indexes: [
