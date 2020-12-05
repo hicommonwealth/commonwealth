@@ -84,6 +84,15 @@
         background: $background-color-light;
         border-color: $background-color-border;
     }
+    .user-flag {
+        margin-left: 2px;
+        margin-right: 2px;
+        margin-top: -5px;
+        margin-bottom: -5px;
+        padding: 0 2px;
+        background: $background-color-light;
+        border-color: $background-color-border;
+    }
 }
 
 .UserPopover {
@@ -116,6 +125,9 @@
     }
     .user-address {
         color: #999;
+    }
+    .role-tag {
+        margin-top: 10px;
     }
 }
 

@@ -204,6 +204,18 @@ export class SubstrateDemocracyReferendum
       case SubstrateTypes.EventKind.DemocracyStarted: {
         break;
       }
+      case SubstrateTypes.EventKind.DemocracyVoted: {
+        const { who, isAye, conviction, balance } = e.data;
+        const vote = new SubstrateDemocracyVote(
+          this,
+          this._Accounts.fromAddress(who),
+          isAye,
+          this._Chain.coins(new BN(balance)),
+          convictionToWeight(conviction),
+        );
+        this.addOrUpdateVote(vote);
+        break;
+      }
       case SubstrateTypes.EventKind.DemocracyCancelled:
       case SubstrateTypes.EventKind.DemocracyNotPassed: {
         this._passed.next(false);
@@ -351,7 +363,6 @@ export class SubstrateDemocracyReferendum
   // TRANSACTIONS
   // TODO: allow the user to enter how much balance they want to vote with
   public async submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
-    let srmlVote;
     const conviction = convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index;
 
     // fake the arg to compute balance
@@ -359,13 +370,13 @@ export class SubstrateDemocracyReferendum
 
     // "AccountVote" type, for kusama
     // we don't support "Split" votes right now
-    srmlVote = {
+    const srmlVote = {
       Standard: {
         vote: {
           aye: vote.choice,
           conviction,
         },
-        balance: balance.asBN,
+        balance: balance.toString(),
       }
     };
 

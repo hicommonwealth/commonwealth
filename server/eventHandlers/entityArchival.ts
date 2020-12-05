@@ -53,7 +53,7 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
     if (!dbEvent) {
-      log.error('no db event found!');
+      log.trace('no db event found!');
       return;
     }
 

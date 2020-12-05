@@ -15,6 +15,7 @@ import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
 import { decodeAddress } from '@polkadot/keyring';
+import { setActiveAccount } from 'controllers/app/login';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
@@ -198,10 +199,20 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
                 profileData.bio,
                 profileData.avatarUrl,
                 a.OffchainProfile.judgements,
-                a.last_active
+                a.last_active,
+                a.is_councillor,
+                a.is_validator,
               );
             } else {
-              profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl, a.last_active);
+              profile.initialize(
+                profileData.name,
+                profileData.headline,
+                profileData.bio,
+                profileData.avatarUrl,
+                a.last_active,
+                a.is_councillor,
+                a.is_validator
+              );
             }
           } else {
             profile.initializeEmpty();
@@ -261,10 +272,19 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     if (!account) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     }
+
+    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
+
     if (refreshProfile) {
       loadProfile();
       vnode.state.refreshProfile = false;
-      m.redraw();
+      if (onOwnProfile) {
+        setActiveAccount(account).then(() => {
+          m.redraw();
+        });
+      } else {
+        m.redraw();
+      }
     }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
@@ -284,8 +304,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
-
-    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
 
     return m(Sublayout, {
       class: 'ProfilePage',

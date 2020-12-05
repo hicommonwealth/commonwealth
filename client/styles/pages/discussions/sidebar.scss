@@ -6,7 +6,8 @@
 
     .user-activity-header,
     .forum-activity-header,
-    .admins-mods-header {
+    .admins-mods-header,
+    .subscription-button-header {
         color: $text-color-lighter;
         font-weight: 500;
         font-size: 15px;
@@ -51,5 +52,14 @@
                 color: $text-color-light;
             }
         }
+    }
+    .subscription-button-header {
+        margin-bottom: 3px;
+    }
+    .subscription-button-sub {
+        margin-top: 10px;
+        line-height: 1.15;
+        font-size: 15px;
+        color: $text-color-medium;
     }
 }

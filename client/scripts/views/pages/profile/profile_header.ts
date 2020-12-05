@@ -59,9 +59,8 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
         });
       }
     },
-    label: vnode.state.chainLoading
-      ? 'Loading chain (may take some time)...'
-      : currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
+    loading: !!vnode.state.chainLoading,
+    label: currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
   });
 };
 
@@ -114,7 +113,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', account.profile ? m(User, { user: account, hideAvatar: true }) : account.address),
+            m('.User', account.profile ? m(User, { user: account, hideAvatar: true, showRole: true }) : account.address),
           ]),
           m('.info-row', [
             account.profile?.headline && m('span.profile-headline', account.profile.headline),

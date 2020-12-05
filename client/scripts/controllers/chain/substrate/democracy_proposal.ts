@@ -142,6 +142,12 @@ class SubstrateDemocracyProposal extends Proposal<
       case SubstrateTypes.EventKind.DemocracyProposed: {
         break;
       }
+      case SubstrateTypes.EventKind.DemocracySeconded: {
+        const acct = this._Accounts.fromAddress(e.data.who);
+        const vote = new DepositVote(acct, this._Chain.coins(this.data.deposit));
+        this.addOrUpdateVote(vote);
+        break;
+      }
       case SubstrateTypes.EventKind.DemocracyTabled: {
         this.complete();
         break;
