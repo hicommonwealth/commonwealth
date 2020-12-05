@@ -149,7 +149,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   const finalizeInitialization = await newCommunity.init();
 
   // If the user is still in the initializing community, finalize the
-  // initialization; otherwise, abort
+  // initialization; otherwise, abort and return false
   if (!finalizeInitialization) {
     return false;
   } else {
@@ -166,6 +166,8 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
 }
 
 // called by the user, when clicking on the chain/node switcher menu
+// returns a boolean reflecting whether initialization of chain via the
+// initChain fn ought to proceed or abort
 export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolean> {
   // Select the default node, if one wasn't provided
   if (!n) {
@@ -194,7 +196,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
-  let initApi;
+  let initApi; // required for NEAR
   if (n.chain.network === ChainNetwork.Edgeware) {
     const Edgeware = (await import(
       /* webpackMode: "lazy" */
