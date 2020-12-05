@@ -64,8 +64,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       });
     }
 
-    if (this.meta.chain.id !== m.route.get().split('/')[1]) {
-      // If user is no longer on the initializing chain, abort initialization
+    // If user is no longer on the initializing chain, abort initialization
+    if (this.meta.chain.id !== m.route.params('scope')) {
       return false;
     }
 
