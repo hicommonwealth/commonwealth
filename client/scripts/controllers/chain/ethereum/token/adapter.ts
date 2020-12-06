@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
@@ -53,5 +55,16 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
     this.chain.deinitApi();
+  }
+
+  public async getEthersProvider() {
+    const provider = new ethers.providers.Web3Provider(this.chain.api.currentProvider as any);
+    return provider;
+  }
+
+  public async activeAddressHasToken(): Promise<boolean> {
+    if (!this.app.user.activeAccount) return false;
+    const address = this.accounts.get(this.app.user.activeAccount.address);
+    return (await address.tokenBalance(this.contractAddress)).isZero();
   }
 }
