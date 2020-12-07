@@ -18,7 +18,11 @@ export const formatFilename = (name) => {
   return t[t.length - 1];
 };
 
-export const factory = LFService.createNamedLoggerFactory('ChainEvents', options);
+let factory; 
+try{factory = LFService.createNamedLoggerFactory('ChainEvents', options);} 
+catch(e){factory = LFService.createNamedLoggerFactory('ChainEvents2', options);}
+export {factory};
+//export const factory = LFService.createNamedLoggerFactory('ChainEvents2', options);
 
 const control = getLogControl();
 

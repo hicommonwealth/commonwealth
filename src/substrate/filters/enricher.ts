@@ -14,6 +14,7 @@ import { filter } from 'lodash';
 import { Kind, OpaqueTimeSlot, OffenceDetails } from '@polkadot/types/interfaces/offences';
 import { CWEvent } from '../../interfaces';
 import { EventKind, IEventData, isEvent, parseJudgement, IdentityJudgement } from '../types';
+import { currentPoints } from './currentPoint';
 
 /**
  * This is an "enricher" function, whose goal is to augment the initial event data
@@ -76,7 +77,12 @@ export async function Enrich(
        */
       case EventKind.Offence: {
         const [ offenceKind, opaqueTimeSlot, applied ] = event.data as unknown as [ Kind, OpaqueTimeSlot, bool ];
-        const offenceApplied = applied.isTrue;
+        
+        // for past events we dont get the applied field so offenceApplied can be undefined
+        let offenceApplied:boolean = null;
+        if (applied){
+          offenceApplied = applied.isTrue;
+        }
         const reportIds = await api.query.offences.concurrentReportsIndex(offenceKind, opaqueTimeSlot);
         const offenceDetails: Option<OffenceDetails>[] = await api.query.offences.reports
           .multi(reportIds);
@@ -105,8 +111,14 @@ export async function Enrich(
         const [sessionIndex] = event.data as unknown as [SessionIndex] & Codec
         const validators = await api.derive.staking.validators();
         const electedInfo: DeriveStakingElected = await api.derive.staking.electedInfo() as any; // validator preferences for getting commision
-        const validatorEraPoints: EraRewardPoints = await api.query.staking.currentPoints() as EraRewardPoints;
-        const currentEra = (Number)(await (await api.query.staking.currentEra<Option<EraIndex>>()).unwrap());
+
+        const validatorEraPoints: EraRewardPoints = await currentPoints(api) as EraRewardPoints;
+        
+        // const currentEra = (Number)(await (await api.query.staking.currentEra<Option<EraIndex>>()).unwrap());
+
+        const rawCurrentEra = await api.query.staking.currentEra();
+        const currentEra = parseInt(rawCurrentEra.toString(), 10) as Number;
+
         const eraPointsIndividual = validatorEraPoints.individual;
         let active: Array<ValidatorId>
         let waiting: Array<ValidatorId>
@@ -114,11 +126,20 @@ export async function Enrich(
         electedInfo.info.forEach(async ({ accountId, controllerId, validatorPrefs, rewardDestination }) => {
           const commissionPer = (Number)(validatorPrefs.commission || new BN(0)) / 10_000_000;
           const key = accountId.toString();
+          let nextSessionIds;
+          
+          try {
+            nextSessionIds = await (await api.query.session.nextKeys(key)).toString()
+          }
+          catch(e) {
+            nextSessionIds = [];
+          }
+
           validatorInfo[key] = {
             commissionPer,
             controllerId,
             rewardDestination,
-            nextSessionIds: await (await api.query.session.nextKeys(key)).toString(),
+            nextSessionIds: nextSessionIds,
             eraPoints: Number(eraPointsIndividual[key])
           };
         });
@@ -411,6 +432,7 @@ export async function Enrich(
       case EventKind.TreasuryProposed: {
         const [ proposalIndex ] = event.data as unknown as [ ProposalIndex ] & Codec;
         const proposalOpt = await api.query.treasury.proposals<Option<TreasuryProposal>>(proposalIndex);
+        
         if (!proposalOpt.isSome) {
           throw new Error(`could not fetch treasury proposal index ${+proposalIndex}`);
         }
