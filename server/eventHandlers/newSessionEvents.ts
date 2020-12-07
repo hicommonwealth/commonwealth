@@ -61,15 +61,15 @@ export default class extends IEventHandler {
     // update existing validators with new state and other details of all validators.
     allValidators.forEach((validator: any) => {
       const stashId = newValidators[validator.stash];
-      const validatorsInfo = (newSessionEventData as any).validatorInfo[stashId];
-      validator.updated_at = new Date().toISOString();
 
-      if (stashId) {
+      if (stashId && stashId.length > 0) {
+        const validatorsInfo = (newSessionEventData as any).validatorInfo[validator.stash];        
         validator.state = stashId.state;
         validator.controller = validatorsInfo.controllerId;
         validator.sessionKeys = validatorsInfo.nextSessionIds;
         validator.lastUpdate = event.blockNumber.toString();
         newValidators[validator.stash].visited = true;
+        validator.updated_at = new Date().toISOString();
       }
     });
 
@@ -123,7 +123,7 @@ export default class extends IEventHandler {
     }
 
     // 4) Add validators records HistoricalValidatorStatistic in table.
-    await Promise.all(allValidators.map((row: any) => {
+    await Promise.all(newValidatorForHistoricalStats.map((row: any) => {
       return this._models.HistoricalValidatorStatistic.create(row, { ignoreDuplicates: true });
     }));
 
