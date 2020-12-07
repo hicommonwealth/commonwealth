@@ -256,6 +256,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     app.chain = new Moloch(n, app);
+  } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
+    const Token = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "token-main" */
+      './controllers/chain/ethereum/token/adapter'
+    )).default;
+    app.chain = new Token(n, app);
   } else {
     throw new Error('Invalid chain');
   }

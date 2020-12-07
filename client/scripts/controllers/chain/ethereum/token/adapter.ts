@@ -30,9 +30,11 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     this.accounts = new EthereumAccounts(this.app);
     this.class = meta.chain.network;
     this.contractAddress = meta.address;
+    this.initApi();
   }
 
   public async initApi() {
+    console.log('beginning of initAPI');
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
@@ -44,6 +46,8 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
         await setActiveAccount(updatedAddress);
       });
     }
+
+    this.activeAddressHasToken();
 
     await this.chain.initEventLoop();
     await super.initApi();
@@ -65,6 +69,8 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public async activeAddressHasToken(): Promise<boolean> {
     if (!this.app.user.activeAccount) return false;
     const address = this.accounts.get(this.app.user.activeAccount.address);
-    return (await address.tokenBalance(this.contractAddress)).isZero();
+    const balance = await address.tokenBalance(this.contractAddress);
+    console.log('balance of token', balance);
+    return !balance.isZero();
   }
 }
