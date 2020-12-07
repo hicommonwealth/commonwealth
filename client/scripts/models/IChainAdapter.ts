@@ -65,6 +65,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
 
     // If user is no longer on the initializing chain, abort initialization
+    // and return false, so that the invoking selectNode fn can similarly
+    // break, rather than complete.
     if (this.meta.chain.id !== m.route.params('scope')) {
       return false;
     }

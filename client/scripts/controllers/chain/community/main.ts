@@ -24,6 +24,8 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     });
     
     // If user is no longer on the initializing community, abort initialization
+    // and return false, so that the invoking selectCommunity fn can similarly
+    // break, rather than complete.
     if (this.meta.id !== m.route.params('scope')) {
       return false;
     }
