@@ -160,7 +160,8 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   // Initialize available addresses
   await updateActiveAddresses();
 
-  // Redraw with community fully loaded
+  // Redraw with community fully loaded and return true to indicate
+  // initialization has finalized.
   m.redraw();
   return true;
 }
@@ -276,7 +277,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   const finalizeInitialization = await newChain.initServer();
 
   // If the user is still on the initializing node, finalize the
-  // initialization; otherwise, abort
+  // initialization; otherwise, abort and return false
   if (!finalizeInitialization) {
     app.chainPreloading = false;
     return false;
@@ -303,7 +304,8 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
   handleInviteLinkRedirect();
 
-  // Redraw with not-yet-loaded chain
+  // Redraw with not-yet-loaded chain and return true to indicate
+  // initialization has finalized.
   m.redraw();
   return true;
 }
