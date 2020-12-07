@@ -21,6 +21,7 @@ import WebsocketController from 'controllers/server/socket/index';
 import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -257,11 +258,11 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
     )).default;
     app.chain = new Moloch(n, app);
   } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
-    const Token = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "token-main" */
-      './controllers/chain/ethereum/token/adapter'
-    )).default;
+    // const Token = (await import(
+    //   /* webpackMode: "lazy" */
+    //   /* webpackChunkName: "token-main" */
+    //   './controllers/chain/ethereum/token/adapter'
+    // )).default;
     app.chain = new Token(n, app);
   } else {
     throw new Error('Invalid chain');
@@ -420,6 +421,7 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
+      if (app.chain instanceof Token) deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });

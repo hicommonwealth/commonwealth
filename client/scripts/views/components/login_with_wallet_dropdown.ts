@@ -47,7 +47,7 @@ const LoginWithWalletDropdown: m.Component<{
       label: m('.chain-login-label', [
         m(ChainIcon, { chain, size: 20 }),
         m('.chain-login-label-name', [
-          cli ? `${chain.name} (command line)` : chain.name
+          cli ? `${chain.name} (command line)` : chain
         ]),
       ]),
       onclick: (e) => {
@@ -75,7 +75,7 @@ const LoginWithWalletDropdown: m.Component<{
         getMenuItemForChain(app.chain.meta.chain),
         getMenuItemForChain(app.chain.meta.chain, true)
       ] : app.chain ? [
-        getMenuItemForChain(app.chain.meta.chain)
+        getMenuItemForChain(app.chain.meta.chain.id)
       ] : sortedChains.map((chain) => getMenuItemForChain(chain))
         .concat(sortedChainsWithCLI.length > 0 ? m(MenuDivider) : null)
         .concat(sortedChainsWithCLI.map((chain) => getMenuItemForChain(chain, true)));

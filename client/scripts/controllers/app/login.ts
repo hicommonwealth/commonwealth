@@ -15,6 +15,7 @@ import {
   AddressInfo,
 } from 'models';
 import moment from 'moment';
+import Token from '../chain/ethereum/token/adapter';
 
 function createAccount(account: Account<any>) {
   // TODO: Change to POST /address

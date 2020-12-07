@@ -224,6 +224,7 @@ export default (
     } else if (chain.network === 'ethereum'
       || chain.network === 'moloch'
       || chain.network === 'metacart'
+      || chain.network === 'alex'
     ) {
       const msgBuffer = Buffer.from(addressModel.verification_token.trim());
       // toBuffer() doesn't work if there is a newline

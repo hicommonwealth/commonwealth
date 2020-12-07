@@ -8,8 +8,9 @@ import app from 'state';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
-import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
-import Substrate from 'client/scripts/controllers/chain/substrate/main';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import Substrate from 'controllers/chain/substrate/main';
+import Token from 'controllers/chain/ethereum/token/adapter';
 import { CandidacyButton, CollectiveVotingButton, getCouncilCandidates } from '../pages/council';
 
 const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
@@ -75,7 +76,8 @@ export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Arra
         hoverCloseDelay: 0,
         hasArrow: false,
         trigger: m(Button, {
-          disabled: !app.user.activeAccount,
+          disabled: !app.user.activeAccount
+            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
           label: m(Icon, { name: Icons.PLUS }),
         }),
         inline: true,
@@ -109,7 +111,8 @@ const NewProposalButton: m.Component<{
         label: 'New thread',
         intent: 'primary',
         fluid,
-        disabled: !app.user.activeAccount,
+        disabled: !app.user.activeAccount
+          || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }
@@ -123,7 +126,8 @@ const NewProposalButton: m.Component<{
         hoverCloseDelay: 0,
         hasArrow: false,
         trigger: m(Button, {
-          disabled: !app.user.activeAccount,
+          disabled: !app.user.activeAccount
+            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
           label: 'New thread',
           intent: 'primary',
         }),
@@ -135,7 +139,8 @@ const NewProposalButton: m.Component<{
         content: getNewProposalMenu(councilCandidates),
       }),
       m(Button, {
-        disabled: !app.user.activeAccount,
+        disabled: !app.user.activeAccount
+          || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
         intent: 'primary',
         iconLeft: Icons.EDIT,
         fluid,

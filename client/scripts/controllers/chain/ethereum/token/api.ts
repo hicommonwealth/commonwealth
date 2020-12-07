@@ -33,8 +33,7 @@ export default class TokenAPI {
   }
 
   public async init() {
-    // perform fetch of approved ERC20 token and set up contract for approval
-    const tokenAddress = await this._Contract.approvedToken();
-    this._Contract = Erc20Factory.connect(tokenAddress, this._Signer);
+    // Set up contract
+    this._Contract = Erc20Factory.connect(this._contractAddress, this._Signer);
   }
 }

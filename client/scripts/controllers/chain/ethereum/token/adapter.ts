@@ -11,30 +11,31 @@ import { setActiveAccount } from 'controllers/app/login';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
-import EthereumChain from '../chain';
+import EthereumTokenChain from './chain';
+import TokenAPI from './api';
 
 export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
   public readonly class;
   public readonly contractAddress;
+  public readonly isToken = true;
 
-  public chain: EthereumChain;
+  public chain: EthereumTokenChain;
   public accounts: EthereumAccounts;
+  public hasToken: boolean = false;
 
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.chain = new EthereumChain(this.app);
+    this.chain = new EthereumTokenChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
     this.class = meta.chain.network;
     this.contractAddress = meta.address;
-    this.initApi();
   }
 
   public async initApi() {
-    console.log('beginning of initAPI');
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
@@ -47,7 +48,11 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
       });
     }
 
-    this.activeAddressHasToken();
+    const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
+    const api = new TokenAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
+    await api.init();
+    this.chain.tokenAPI = api;
+    this.activeAddressHasToken(activeAddress);
 
     await this.chain.initEventLoop();
     await super.initApi();
@@ -66,11 +71,10 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     return provider;
   }
 
-  public async activeAddressHasToken(): Promise<boolean> {
-    if (!this.app.user.activeAccount) return false;
-    const address = this.accounts.get(this.app.user.activeAccount.address);
+  public async activeAddressHasToken(activeAddress?: string) {
+    if (!activeAddress) return false;
+    const address = this.accounts.get('0x6060B77a5D8309eb36374198e197072205eA2bB3');
     const balance = await address.tokenBalance(this.contractAddress);
-    console.log('balance of token', balance);
-    return !balance.isZero();
+    this.hasToken = balance && !balance.isZero();
   }
 }

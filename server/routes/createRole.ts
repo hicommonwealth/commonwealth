@@ -29,24 +29,13 @@ const createRole = async (models, req, res: Response, next: NextFunction) => {
   });
   if (!validAddress) return next(new Error(Errors.InvalidAddress));
 
-  const existingRole = await models.Role.findOne({ where: chain ? {
+  const role = await models.Role.findOrCreate({ where: chain ? {
     address_id: req.body.address_id,
     chain_id: chain.id,
   } : {
     address_id: req.body.address_id,
     offchain_community_id: community.id,
   } });
-  if (existingRole) return next(new Error(Errors.RoleAlreadyExists));
-
-  const newRole = await models.Role.create(chain ? {
-    address_id: req.body.address_id,
-    chain_id: chain.id,
-    permission: 'member',
-  } : {
-    address_id: req.body.address_id,
-    offchain_community_id: community.id,
-    permission: 'member',
-  });
 
   const subscription = await models.Subscription.findOrCreate({
     where: chain ? {
@@ -64,7 +53,7 @@ const createRole = async (models, req, res: Response, next: NextFunction) => {
     }
   });
 
-  return res.json({ status: 'Success', result: { newRole, subscription } });
+  return res.json({ status: 'Success', result: { role, subscription } });
 };
 
 export default createRole;
