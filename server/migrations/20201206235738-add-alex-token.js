@@ -26,6 +26,9 @@ module.exports = {
       await queryInterface.bulkDelete('Addresses', {
         chain: 'alex'
       }, { transaction: t });
+      await queryInterface.bulkDelete('Roles', {
+        chain_id: 'alex'
+      }, { transaction: t });
       await queryInterface.bulkDelete('ChainNodes', {
         chain: 'alex',
       }, { transaction: t });
