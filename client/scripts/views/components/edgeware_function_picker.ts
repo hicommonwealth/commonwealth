@@ -41,9 +41,10 @@ const EdgewareFunctionPicker = {
           title: 'Module',
           name: 'module',
           choices: (app.chain as Substrate).chain.listApiModules().map((mod) => {
-            return { name: mod, label: mod, value: mod };
+            return { label: mod, value: mod };
           }),
           callback: (result) => {
+            console.log(result);
             vnode.state.form.module = result;
             vnode.state.form.function = (app.chain as Substrate).chain.listModuleFunctions(result)[0];
             vnode.state.form.args = [];
@@ -54,7 +55,7 @@ const EdgewareFunctionPicker = {
           title: 'Function',
           name: 'function',
           choices: (app.chain as Substrate).chain.listModuleFunctions(vnode.state.form.module).map((func) => {
-            return { name: func, label: func, value: func };
+            return { label: func, value: func };
           }),
           callback: (result) => {
             vnode.state.form.function = result;

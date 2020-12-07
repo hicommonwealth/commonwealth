@@ -2,7 +2,7 @@ import 'components/forms.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button } from 'construct-ui';
+import { Button, Select } from 'construct-ui';
 
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 
@@ -16,7 +16,7 @@ interface IDropdownFormFieldAttrs {
 }
 
 interface IDropdownFormFieldChoice {
-  name: string;
+  name?: string;
   label: string;
   value: string | number;
   selected?: boolean;
@@ -24,11 +24,15 @@ interface IDropdownFormFieldChoice {
 
 export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
   view: (vnode: m.VnodeDOM<IDropdownFormFieldAttrs>) => {
-    const options = vnode.attrs.options || {};
     const { choices, name, subtitle, title } = vnode.attrs;
-    const oninput = options.oninput || (() => (undefined));
+    const selectAttrs = {
+      class: 'form-field',
+      options: choices.map(({ label, value }) => ({ label, value })),
+      ...vnode.attrs.options
+    };
+    const oninput = selectAttrs.oninput || (() => (undefined));
 
-    options.oninput = (e) => {
+    selectAttrs.onchange = (e) => {
       e.redraw = false;
       if (vnode.attrs.callback) {
         vnode.attrs.callback($(e.target).val());
@@ -38,14 +42,13 @@ export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
 
     return m('.DropdownFormField.FormField', {
       oncreate: (vvnode) => {
-        $(vvnode.dom).find('select').trigger('input');
+        $(vvnode.dom).find('.cui-select').trigger('input');
       }
     }, [
       m('.form-group', [
         title && m('.form-title', title),
         subtitle && m('.form-subtitle', subtitle),
-        m('select.form-field', options,
-          choices.map((item) => m('option', item))),
+        m(Select, selectAttrs)
       ]),
     ]);
   }
