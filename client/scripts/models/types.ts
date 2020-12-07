@@ -28,6 +28,7 @@ export enum ChainNetwork {
   NEAR = 'near',
   Moloch = 'moloch',
   Metacartel = 'metacartel',
+  ALEX = 'alex',
 }
 
 // TODO: this should be deprecated, and replaced with ChainNetwork in most instances
@@ -43,6 +44,7 @@ export enum ChainClass {
   Ethereum = 'ethereum',
   Near = 'near',
   Moloch = 'moloch',
+  ALEX = 'alex'
 }
 
 // TODO: this is inconsistently used
