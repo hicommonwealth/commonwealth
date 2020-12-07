@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkInsert('Chains', [{
         id: 'alex',
-        network: 'ethereum',
+        network: 'alex',
         symbol: 'ALEX',
         name: '$ALEX',
         icon_url: '/static/img/protocols/eth.png',
@@ -22,6 +22,10 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
+      // Remove addresses made in testing
+      await queryInterface.bulkDelete('Addresses', {
+        chain: 'alex'
+      }, { transaction: t });
       await queryInterface.bulkDelete('ChainNodes', {
         chain: 'alex',
       }, { transaction: t });
