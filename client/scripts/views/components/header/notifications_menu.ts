@@ -5,6 +5,7 @@ import Infinite from 'mithril-infinite';
 import app from 'state';
 
 import { Popover, PopoverMenu, Button, Icon, Icons, ButtonGroup } from 'construct-ui';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import NotificationRow from 'views/components/notification_row';
 import { Notification } from 'models';
 import { pluralize } from 'helpers';
@@ -29,28 +30,13 @@ const NotificationButtons: m.Component<{ showingChainNotifications: boolean }> =
           ? m.route.set(`/${app.activeChainId() || app.activeCommunityId()}/notificationsList`)
           : m.route.set('/notificationsList'),
       }),
-      showingChainNotifications ? m(Popover, {
-        content: [
-          m('div', { style: 'margin-bottom: 10px' }, 'Clear all chain notifications?'),
-          m(Button, {
-            label: 'Confirm',
-            fluid: true,
-            disabled: chainEventNotifications.length === 0,
-            onclick: async (e) => {
-              e.preventDefault();
-              if (chainEventNotifications.length === 0) return;
-              app.user.notifications.clear(chainEventNotifications).then(() => m.redraw());
-            }
-          })
-        ],
-        trigger: m(Button, {
-          disabled: chainEventNotifications.length === 0,
-          label: 'Clear events',
-        }),
-        transitionDuration: 0,
-        closeOnContentClick: true,
-        closeOnEscapeKey: true,
-        onClosed: () => { m.redraw(); },
+      showingChainNotifications ? m(Button, {
+        label: 'Clear events',
+        onclick: async (e) => {
+          e.preventDefault();
+          const confirmed = await confirmationModalWithText('Clear all chain notifications?')();
+          app.user.notifications.clear(chainEventNotifications).then(() => m.redraw());
+        },
       }) : m(Button, {
         label: 'Mark all read',
         onclick: (e) => {
