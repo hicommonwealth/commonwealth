@@ -34,6 +34,7 @@ const NotificationButtons: m.Component<{ showingChainNotifications: boolean }> =
         label: 'Clear events',
         onclick: async (e) => {
           e.preventDefault();
+          e.stopPropagation();
           const confirmed = await confirmationModalWithText('Clear all chain notifications?')();
           app.user.notifications.clear(chainEventNotifications).then(() => m.redraw());
         },
