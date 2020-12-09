@@ -4,7 +4,6 @@ import { Coin } from 'adapters/currency';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
-import m from 'mithril';
 
 import { CommentRefreshOption } from 'controllers/server/comments';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
@@ -32,9 +31,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   protected _serverLoaded: boolean;
   public get serverLoaded() { return this._serverLoaded; }
 
-  public async initServer(): Promise<boolean> {
+  public async initServer(): Promise<void> {
     clearLocalStorage();
-    console.log(`Starting ${this.meta.chain.name}`);
+
     // parallel fetch for offchain data and chain entities
     let unused, response;
     if (this.chainEntities) {
@@ -64,13 +63,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       });
     }
 
-    // If user is no longer on the initializing chain, abort initialization
-    // and return false, so that the invoking selectNode fn can similarly
-    // break, rather than complete.
-    if (this.meta.chain.id !== m.route.param('scope')) {
-      return false;
-    }
-
     const { threads, comments, reactions, topics, admins, activeUsers } = response.result;
     this.app.threads.initialize(threads, true);
     this.app.comments.initialize(comments, false);
@@ -80,7 +72,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this.app.recentActivity.setMostActiveUsers(activeUsers);
 
     this._serverLoaded = true;
-    return true;
   }
 
   public deinitServer() {
@@ -91,7 +82,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     if (this.chainEntities) {
       this.chainEntities.deinit();
     }
-    console.log(`${this.meta.chain.name} stopped`);
   }
 
   public async initApi(): Promise<void> {

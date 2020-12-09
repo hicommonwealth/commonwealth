@@ -11,7 +11,7 @@ abstract class ICommunityAdapter<C extends Coin, A extends Account<C>> {
 
   public abstract accounts: IOffchainAccountsModule<C, A>;
 
-  public abstract init: (onServerLoaded? : () => void) => Promise<boolean>;
+  public abstract init: (onServerLoaded? : () => void) => Promise<void>;
   public abstract deinit: () => Promise<void>;
 
   public networkStatus: ApiStatus = ApiStatus.Connected;

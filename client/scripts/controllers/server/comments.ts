@@ -275,7 +275,7 @@ class CommentsController {
         // Comment is on an object that was deleted or unavailable
       }
     });
-  }
+  };
 
   public deinit() {
     this.store.clear();
