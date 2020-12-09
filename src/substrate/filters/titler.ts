@@ -99,6 +99,12 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
         description: 'A new community democracy proposal is introduced.',
       };
     }
+    case EventKind.DemocracySeconded: {
+      return {
+        title: 'Democracy Proposal Seconded',
+        description: 'A democracy proposal is seconded.',
+      }
+    }
     case EventKind.DemocracyTabled: {
       return {
         title: 'Democracy Proposal Tabled',

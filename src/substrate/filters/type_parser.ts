@@ -40,6 +40,7 @@ export function ParseType (
     case 'democracy':
       switch (method) {
         case 'Proposed': return EventKind.DemocracyProposed;
+        case 'second': return EventKind.DemocracySeconded;
         case 'Tabled': return EventKind.DemocracyTabled;
         case 'Started': return EventKind.DemocracyStarted;
         case 'Passed': return EventKind.DemocracyPassed;

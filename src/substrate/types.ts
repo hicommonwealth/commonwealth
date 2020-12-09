@@ -91,6 +91,7 @@ export enum EventKind {
 
   VoteDelegated = 'vote-delegated',
   DemocracyProposed = 'democracy-proposed',
+  DemocracySeconded = 'democracy-seconded',
   DemocracyTabled = 'democracy-tabled',
   DemocracyStarted = 'democracy-started',
   DemocracyVoted = 'democracy-voted',
@@ -127,7 +128,6 @@ export enum EventKind {
   SignalingCommitStarted = 'signaling-commit-started',
   SignalingVotingStarted = 'signaling-voting-started',
   SignalingVotingCompleted = 'signaling-voting-completed',
-  // TODO: do we want to track votes for signaling?
 
   TreasuryRewardMinting = 'treasury-reward-minting',
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
@@ -247,10 +247,15 @@ export interface IDemocracyProposed extends IEvent {
   proposer: AccountId;
 }
 
+export interface IDemocracySeconded extends IEvent {
+  kind: EventKind.DemocracySeconded;
+  proposalIndex: number;
+  who: AccountId;
+}
+
 export interface IDemocracyTabled extends IEvent {
   kind: EventKind.DemocracyTabled;
   proposalIndex: number;
-  // TODO: do we want to store depositors?
 }
 
 export interface IDemocracyStarted extends IEvent {
@@ -529,6 +534,7 @@ export type IEventData =
   | IStakingElection
   | IVoteDelegated
   | IDemocracyProposed
+  | IDemocracySeconded
   | IDemocracyTabled
   | IDemocracyStarted
   | IDemocracyVoted
@@ -580,7 +586,7 @@ export const EventKinds: EventKind[] = Object.values(EventKind);
  * not be relied upon for general implementations.
  */
 export type IDemocracyProposalEvents =
-  IDemocracyProposed | IDemocracyTabled;
+  IDemocracyProposed | IDemocracySeconded | IDemocracyTabled;
 export type IDemocracyReferendumEvents =
   IDemocracyStarted | IDemocracyVoted | IDemocracyPassed
   | IDemocracyNotPassed | IDemocracyCancelled | IDemocracyExecuted;

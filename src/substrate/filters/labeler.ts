@@ -200,6 +200,14 @@ export const Label: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/democracyproposal/${proposalIndex}` : null,
       };
     }
+    case EventKind.DemocracySeconded: {
+      const { proposalIndex, who } = data;
+      return {
+        heading: 'Democracy Proposal Created',
+        label: `Democracy proposal ${proposalIndex} was seconded by ${fmtAddr(who)}.`,
+        linkUrl: chainId ? `/${chainId}/proposal/democracyproposal/${proposalIndex}` : null,
+      };
+    }
     case EventKind.DemocracyTabled: {
       const { proposalIndex } = data;
       return {
