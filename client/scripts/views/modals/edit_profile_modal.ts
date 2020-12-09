@@ -43,7 +43,7 @@ const EditProfileModal = {
           m(FormLabel, 'Name'),
           m(Input, {
             name: 'name',
-            defaultValue: account.name,
+            defaultValue: account.name || account.profile.name,
             placeholder: 'Add your name',
             disabled: account.profile.isOnchain,
             fluid: true,
