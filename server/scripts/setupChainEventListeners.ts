@@ -12,6 +12,7 @@ import EventNotificationHandler from '../eventHandlers/notifications';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
+import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
@@ -75,12 +76,35 @@ const setupChainEventListeners = async (
       SubstrateTypes.EventKind.TreasuryRewardMinting,
       SubstrateTypes.EventKind.TreasuryRewardMintingV2,
     ];
+
+    // writes events into the db as ChainEvents rows
     const storageHandler = new EventStorageHandler(models, node.chain, excludedEvents);
+
+    // emits notifications by writing into the db's Notifications table, and also optionally
+    // sending a notification to the client via websocket
     const notificationHandler = new EventNotificationHandler(models, wss);
+
+    // creates and updates ChainEntity rows corresponding with entity-related events
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
+
+    // creates empty Address and OffchainProfile models for users who perform certain
+    // actions, like voting on proposals or registering an identity
+    const profileCreationHandler = new ProfileCreationHandler(models, node.chain);
+
+    // populates identity information in OffchainProfiles when received (Substrate only)
     const identityHandler = new IdentityHandler(models, node.chain);
+
+    // populates is_validator and is_councillor flags on Addresses when validator and
+    // councillor sets are updated (Substrate only)
     const userFlagsHandler = new UserFlagsHandler(models, node.chain);
-    const handlers: IEventHandler[] = [ storageHandler, notificationHandler, entityArchivalHandler ];
+
+    // the set of handlers, run sequentially on all incoming chain events
+    const handlers: IEventHandler[] = [
+      storageHandler,
+      notificationHandler,
+      entityArchivalHandler,
+      profileCreationHandler,
+    ];
     let subscriber: IEventSubscriber<any, any>;
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
       // only handle identities and user flags on substrate chains
