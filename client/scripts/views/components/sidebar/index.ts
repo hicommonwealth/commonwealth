@@ -432,8 +432,8 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
               vnode.state.initializing = true;
               const n: NodeInfo = app.config.nodes.getById(node.value);
               if (!n) return;
-              await selectNode(n);
-              await initChain();
+              const finalizeInitialization = await selectNode(n);
+              if (finalizeInitialization) await initChain();
               vnode.state.initializing = false;
               m.redraw();
             }
