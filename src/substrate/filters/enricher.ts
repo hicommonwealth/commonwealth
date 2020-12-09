@@ -739,6 +739,18 @@ export async function Enrich(
     excludeAddresses?: string[],
   }> => {
     switch (kind) {
+      case EventKind.DemocracySeconded: {
+        const voter = extrinsic.signer.toString();
+        const [ proposal ] = extrinsic.args as [ Compact<PropIndex> ];
+        return {
+          excludeAddresses: [ voter ],
+          data: {
+            kind,
+            proposalIndex: +proposal,
+            who: voter,
+          }
+        }
+      }
       case EventKind.DemocracyVoted: {
         const voter = extrinsic.signer.toString();
         const [ idx, vote ] = extrinsic.args as [ Compact<ReferendumIndex>, AccountVote ];

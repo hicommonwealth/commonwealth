@@ -825,6 +825,20 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       }
     });
   });
+  it('should enrich democracy-seconded event', async () => {
+    const kind = EventKind.DemocracySeconded;
+    const extrinsic = constructExtrinsic('alice', [ '1' ]);
+    const result = await Enrich(api, blockNumber, kind, extrinsic);
+    assert.deepEqual(result, {
+      blockNumber,
+      excludeAddresses: [ 'alice' ],
+      data: {
+        kind,
+        proposalIndex: 1,
+        who: 'alice',
+      }
+    });
+  });
   it('should enrich democracy-tabled event', async () => {
     const kind = EventKind.DemocracyTabled;
     const event = constructEvent([ '1', 1000 ]);
