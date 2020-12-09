@@ -17,7 +17,7 @@ export const Label: LabelerFilter = (
   data: IEventData,
 ): IEventLabel => {
   switch (data.kind) {
-    // Comp events
+    // MPond events
     case EventKind.Approval: {
       return {
         heading: 'Approval',

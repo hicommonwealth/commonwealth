@@ -8,11 +8,11 @@ import { EventKind } from '../types';
  */
 export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
   switch (kind) {
-    // Comp events
+    // MPond events
     case EventKind.Approval: {
       return {
-        title: 'Comp Approval',
-        description: 'An Approval event occurred on Comp Contract.',
+        title: 'MPond Approval',
+        description: 'An Approval event occurred on MPond Contract.',
       };
     }
     case EventKind.DelegateChanged: {

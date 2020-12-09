@@ -11,7 +11,7 @@ export function ParseType(
   name: string,
 ): EventKind | null {
   switch (name) {
-    // Comp Events
+    // MPond Events
     case 'Approval': return EventKind.Approval;
     case 'DelegateChanged': return EventKind.DelegateChanged;
     case 'DelegateVotesChanged': return EventKind.DelegateVotesChanged;

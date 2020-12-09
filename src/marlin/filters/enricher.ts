@@ -10,7 +10,7 @@ export async function Enrich(
   rawData: RawEvent,
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
-    // Comp events
+    // MPond events
     case EventKind.Approval: {
       const {
         owner,
