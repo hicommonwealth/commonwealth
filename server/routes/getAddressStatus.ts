@@ -7,6 +7,7 @@ export const Errors = {
 };
 
 const getAddress = async (models, req: Request, res: Response, next: NextFunction) => {
+  console.log(req.body);
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
   }

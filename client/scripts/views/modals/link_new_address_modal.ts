@@ -15,7 +15,7 @@ import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import Substrate from 'controllers/chain/substrate/main';
 import Ethereum from 'controllers/chain/ethereum/main';
 import Near from 'controllers/chain/near/main';
@@ -103,6 +103,23 @@ const SubstrateLinkAccountItem: m.Component<{
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
+
+        const res = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+          address: account.address,
+          chain: account.chain.id,
+          jwt: app.user.jwt,
+        });
+
+        if (res.belongsToUser) {
+          notifyInfo('This address is already linked to your current account.');
+        } else if (res.isClaimable) {
+          const modalMsg = 'This address is currently linked to another account. Continue?';
+          const confirmed = await confirmationModalWithText(modalMsg);
+          if (!confirmed) {
+            vnode.state.linking = false;
+            return;
+          }
+        }
 
         try {
           const signerAccount = await createUserWithAddress(address) as SubstrateAccount;
