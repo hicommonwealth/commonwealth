@@ -36,13 +36,14 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
     }
 
     addThread(thread.topic?.name);
+    console.log(this);
     return this;
   }
 
   public update(thread: OffchainThread) {
     // This function is a "true" update function: if the thread is not already in a
     // store, it will not add the thread
-    super.update(thread);
+    super.update(thread, (t) => t.id === thread.id);
     const parentEntity = thread.community ? thread.community : thread.chain;
     if (!this._threadsByCommunity[parentEntity]) return;
     const communityStore = this._threadsByCommunity[parentEntity];
@@ -59,7 +60,7 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
 
     updateThread(thread.topic?.name);
     updateThread(ALL_PROPOSALS_KEY);
-
+    console.log(this);
     return this;
   }
 
@@ -79,7 +80,7 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
 
     removeThread(thread.topic?.name);
     removeThread(ALL_PROPOSALS_KEY);
-
+    console.log(this);
     return this;
   }
 

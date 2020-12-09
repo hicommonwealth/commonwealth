@@ -467,6 +467,7 @@ const ViewProposalPage: m.Component<{
   type: string
 }, {
   editing: boolean,
+  recentlyEdited: boolean,
   replyParent: number | boolean,
   highlightedComment: boolean,
   prefetch: IPrefetch,
@@ -505,8 +506,10 @@ const ViewProposalPage: m.Component<{
       return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
+    const proposalRecentlyEdited = vnode.state.recentlyEdited;
+    const proposalDoesNotMatch = Number(vnode.state.proposal.identifier) !== Number(proposalId);
     // load proposal
-    if (!vnode.state.proposal || Number(vnode.state.proposal.identifier) !== Number(proposalId)) {
+    if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
       } catch (e) {
@@ -537,6 +540,7 @@ const ViewProposalPage: m.Component<{
       }
     }
     const { proposal } = vnode.state;
+    if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
       m.route.set(`/${app.activeId()}/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
         { replace: true });

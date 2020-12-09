@@ -69,6 +69,7 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
 
 export const idToProposal = (slug, id) => {
   const store = proposalSlugToStore(slug);
+  console.log({store});
   const proposal = store.getByIdentifier(id);
   if (!proposal) {
     throw new Error(`Proposal missing from store with id ${id}`);

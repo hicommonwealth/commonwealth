@@ -7,6 +7,7 @@ abstract class Store<T> {
   }
 
   public remove(item: T, eqFn?: (a: T) => boolean): Store<T> {
+    console.log(this._store);
     const index = eqFn ? this._store.findIndex(eqFn) : this._store.indexOf(item);
     if (index === -1) {
       console.error('Attempting to remove an object that was not found in the store');
@@ -17,6 +18,7 @@ abstract class Store<T> {
   }
 
   public update(item: T, eqFn?: (a: T) => boolean): Store<T> {
+    console.log(this._store);
     const index = eqFn ? this._store.findIndex(eqFn) : this._store.indexOf(item);
     if (index === -1) {
       console.error('Attempting to update an object that was not found in the store');

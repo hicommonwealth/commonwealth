@@ -126,6 +126,7 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+      console.log(this._store);
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
       this._listingStore.add(result, storeOptions);
@@ -167,6 +168,7 @@ class ThreadsController {
         const result = modelFromServer(response.result);
         // Post edits propagate to all thread stores
         this._store.update(result);
+        console.log(this._store);
         this._listingStore.update(result);
         return result;
       },
@@ -188,6 +190,7 @@ class ThreadsController {
       }).then((result) => {
         // Deleted posts are removed from all stores containing them
         this.store.remove(proposal);
+        console.log(this.store);
         this._listingStore.remove(proposal);
         m.redraw();
         resolve(result);
