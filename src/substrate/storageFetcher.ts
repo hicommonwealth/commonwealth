@@ -8,7 +8,10 @@
 import _ from 'underscore';
 import { ApiPromise } from '@polkadot/api';
 import { Option, Vec } from '@polkadot/types';
-import { BalanceOf, AccountId, Hash, BlockNumber, Registration } from '@polkadot/types/interfaces';
+import {
+  BalanceOf, AccountId, Hash, BlockNumber, Registration,
+  ProposalIndex, TreasuryProposal, Proposal, Votes
+} from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { isFunction } from '@polkadot/util';
@@ -217,17 +220,28 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
 
   public async fetchTreasuryProposals(blockNumber: number): Promise<CWEvent<ITreasuryProposed>[]> {
     log.info('Migrating treasury proposals...');
-    const proposals = await this._api.derive.treasury.proposals();
-    const proposedEvents = proposals.proposals.map((p) => {
+    const approvals = await this._api.query.treasury.approvals();
+    const nProposals = await this._api.query.treasury.proposalCount();
+    const proposalIds: number[] = [];
+
+    for (let i = 0; i < +nProposals; i++) {
+      if (!approvals.some((id) => +id === i)) {
+        proposalIds.push(i);
+      }
+    }
+    const proposals = await this._api.query.treasury.proposals.multi<Option<TreasuryProposal>>(proposalIds);
+    const proposedEvents = proposalIds.map((id, index) => {
+      if (!proposals[index] || !proposals[index].isSome) return null;
+      const { proposer, value, beneficiary, bond } = proposals[index].unwrap();
       return {
         kind: EventKind.TreasuryProposed,
-        proposalIndex: +p.id,
-        proposer: p.proposal.proposer.toString(),
-        value: p.proposal.value.toString(),
-        beneficiary: p.proposal.beneficiary.toString(),
-        bond: p.proposal.bond.toString(),
+        proposalIndex: +id,
+        proposer: proposer.toString(),
+        value: value.toString(),
+        beneficiary: beneficiary.toString(),
+        bond: bond.toString(),
       } as ITreasuryProposed;
-    });
+    }).filter((e) => !!e);
     log.info(`Found ${proposedEvents.length} treasury proposals!`);
     return proposedEvents.map((data) => ({ blockNumber, data }));
   }
@@ -236,46 +250,58 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     moduleName: 'council' | 'technicalCommittee', blockNumber: number
   ): Promise<CWEvent<ICollectiveProposed | ICollectiveVoted>[]> {
     log.info(`Migrating ${moduleName} proposals...`);
-    const proposals = await this._api.derive[moduleName].proposals();
-    const proposedEvents = proposals.filter((p) => p.proposal && p.votes)
-      .map((p) => {
-        return {
+    const proposalHashes = await this._api.query[moduleName].proposals();
+    const proposals: Array<Option<Proposal>> = await Promise.all(proposalHashes.map(async (h) => {
+      try {
+        // awaiting inside the map here to force the individual call to throw, rather than the Promise.all
+        return await this._api.query[moduleName].proposalOf(h);
+      } catch (e) {
+        log.error('Failed to fetch council motion hash ' + h.toString());
+        return Promise.resolve(null);
+      }
+    }));
+    const proposalVotes = await this._api.query[moduleName].voting.multi<Option<Votes>>(proposalHashes);
+    const proposedEvents = _.flatten(proposalHashes.map((hash, index) => {
+      const proposalOpt = proposals[index];
+      const votesOpt = proposalVotes[index];
+      if (!hash || !proposalOpt || !votesOpt || !proposalOpt.isSome || !votesOpt.isSome) return null;
+      const proposal = proposalOpt.unwrap();
+      const votes = votesOpt.unwrap();
+      return [
+        {
           kind: EventKind.CollectiveProposed,
           collectiveName: moduleName,
-          proposalIndex: +p.votes.index,
-          proposalHash: p.hash.toString(),
-          threshold: +p.votes.threshold,
+          proposalIndex: +votes.index,
+          proposalHash: hash.toString(),
+          threshold: +votes.threshold,
           call: {
-            method: p.proposal.methodName,
-            section: p.proposal.sectionName,
-            args: p.proposal.args.map((arg) => arg.toString()),
+            method: proposal.methodName,
+            section: proposal.sectionName,
+            args: proposal.args.map((arg) => arg.toString()),
           },
-
+  
           // unknown
           proposer: '',
-        } as ICollectiveProposed;
-      });
-    const votedEvents = _.flatten(proposals.filter((p) => p.proposal && p.votes)
-      .map((p) => {
-        return [
-          ...p.votes.ayes.map((who) => ({
-            kind: EventKind.CollectiveVoted,
-            collectiveName: moduleName,
-            proposalHash: p.hash.toString(),
-            voter: who.toString(),
-            vote: true,
-          } as ICollectiveVoted)),
-          ...p.votes.nays.map((who) => ({
-            kind: EventKind.CollectiveVoted,
-            collectiveName: moduleName,
-            proposalHash: p.hash.toString(),
-            voter: who.toString(),
-            vote: false,
-          } as ICollectiveVoted)),
-        ];
-      }));
-    log.info(`Found ${proposedEvents.length} ${moduleName} proposals and ${votedEvents.length} votes!`);
-    return [...proposedEvents, ...votedEvents].map((data) => ({ blockNumber, data }));
+        } as ICollectiveProposed,
+        ...votes.ayes.map((who) => ({
+          kind: EventKind.CollectiveVoted,
+          collectiveName: moduleName,
+          proposalHash: hash.toString(),
+          voter: who.toString(),
+          vote: true,
+        } as ICollectiveVoted)),
+        ...votes.nays.map((who) => ({
+          kind: EventKind.CollectiveVoted,
+          collectiveName: moduleName,
+          proposalHash: hash.toString(),
+          voter: who.toString(),
+          vote: false,
+        } as ICollectiveVoted)),
+      ];
+    }).filter((es) => !!es));
+    const nProposalEvents = proposedEvents.filter((e) => e.kind === EventKind.CollectiveProposed).length;
+    log.info(`Found ${nProposalEvents} ${moduleName} proposals and ${proposedEvents.length - nProposalEvents} votes!`);
+    return proposedEvents.map((data) => ({ blockNumber, data }));
   }
 
   public async fetchSignalingProposals(

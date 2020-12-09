@@ -1,6 +1,6 @@
 import chai from 'chai';
 import {
-  AccountId, BalanceOf, Registration, RegistrarInfo
+  AccountId, BalanceOf, Registration, RegistrarInfo, TreasuryProposal, Proposal, Votes
 } from '@polkadot/types/interfaces';
 import { Vec, Data, TypeRegistry } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
@@ -107,31 +107,39 @@ const api = constructFakeApi({
       : null),
 
   // treasury proposals
-  treasuryProposalsDerive: async () => ({ proposals: [{
-    id: '20',
-    proposal: {
+  treasuryApprovals: async () => [ '0', '1', '2' ],
+  treasuryProposalCount: async () => '4',
+  treasuryProposalsMulti: async (ids) => ids.length === 1 && +ids[0] === 3 ? [
+    constructOption({
       proposer: 'Alice',
       value: 50,
       beneficiary: 'Bob',
       bond: 5,
-    }
-  }] }),
+    } as unknown as TreasuryProposal)
+  ] : [], // should not see anything else
 
   // collective proposals
-  councilProposalsDerive: async () => [{
-    votes: {
+  collectiveProposals: async () => [ 'council-hash2', 'council-hash' ],
+  votingMulti: async () => [
+    constructOption(),
+    constructOption({
       index: '15',
       threshold: '4',
       ayes: ['Alice'],
       nays: ['Bob'],
-    },
-    hash: 'council-hash',
-    proposal: {
-      methodName: 'proposal-method',
-      sectionName: 'proposal-section',
-      args: [ 'proposal-arg-1', 'proposal-arg-2' ],
+    } as unknown as Votes)
+  ],
+  collectiveProposalOf: async (h) => {
+    if (h !== 'council-hash') {
+      throw new Error('invalid council proposal');
+    } else {
+      return constructOption({
+        methodName: 'proposal-method',
+        sectionName: 'proposal-section',
+        args: [ 'proposal-arg-1', 'proposal-arg-2' ],
+      } as unknown as Proposal);
     }
-  }],
+  },
 
   // signaling proposals
   inactiveProposals: async () => [
@@ -277,7 +285,7 @@ describe('Edgeware Event Migration Tests', () => {
       { blockNumber,
         data: {
           kind: EventKind.TreasuryProposed,
-          proposalIndex: 20,
+          proposalIndex: 3,
           proposer: 'Alice',
           value: '50',
           beneficiary: 'Bob',
