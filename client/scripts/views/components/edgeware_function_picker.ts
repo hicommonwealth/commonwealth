@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Button, Input, FormLabel, FormGroup } from 'construct-ui';
+import { Input, FormLabel, FormGroup } from 'construct-ui';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
@@ -43,12 +43,14 @@ const EdgewareFunctionPicker = {
           choices: (app.chain as Substrate).chain.listApiModules().map((mod) => {
             return { label: mod, value: mod };
           }),
+          value: vnode.state.form.module,
+          defaultValue: (app.chain as Substrate).chain.listApiModules()[0],
           callback: (result) => {
-            console.log(result);
             vnode.state.form.module = result;
             vnode.state.form.function = (app.chain as Substrate).chain.listModuleFunctions(result)[0];
             vnode.state.form.args = [];
             m.redraw();
+            setTimeout(() => { m.redraw(); }, 0);
           },
         }),
         m(DropdownFormField, {
@@ -57,6 +59,8 @@ const EdgewareFunctionPicker = {
           choices: (app.chain as Substrate).chain.listModuleFunctions(vnode.state.form.module).map((func) => {
             return { label: func, value: func };
           }),
+          defaultValue: (app.chain as Substrate).chain.listModuleFunctions(vnode.state.form.module)[0],
+          value: vnode.state.form.function,
           callback: (result) => {
             vnode.state.form.function = result;
             vnode.state.form.args = [];

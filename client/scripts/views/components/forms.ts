@@ -2,13 +2,13 @@ import 'components/forms.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, Select } from 'construct-ui';
-
-import ResizableTextarea from 'views/components/widgets/resizable_textarea';
+import { Button, CustomSelect } from 'construct-ui';
 
 interface IDropdownFormFieldAttrs {
   callback?: CallableFunction;
   choices: IDropdownFormFieldChoice[];
+  defaultValue?: string;
+  value?: string;
   options?: any;
   name?: string;
   subtitle?: string;
@@ -24,31 +24,26 @@ interface IDropdownFormFieldChoice {
 
 export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
   view: (vnode: m.VnodeDOM<IDropdownFormFieldAttrs>) => {
-    const { choices, name, subtitle, title } = vnode.attrs;
+    const { choices, name, defaultValue, subtitle, title } = vnode.attrs;
     const selectAttrs = {
       class: 'form-field',
+      name,
+      value: vnode.attrs.value,
+      defaultValue: defaultValue || choices[0].value,
       options: choices.map(({ label, value }) => ({ label, value })),
       ...vnode.attrs.options
     };
-    const oninput = selectAttrs.oninput || (() => (undefined));
-
-    selectAttrs.onchange = (e) => {
-      e.redraw = false;
+    selectAttrs.onSelect = (choice) => {
       if (vnode.attrs.callback) {
-        vnode.attrs.callback($(e.target).val());
+        vnode.attrs.callback(choice.value);
       }
-      oninput.call(this, e);
     };
 
-    return m('.DropdownFormField.FormField', {
-      oncreate: (vvnode) => {
-        $(vvnode.dom).find('.cui-select').trigger('input');
-      }
-    }, [
+    return m('.DropdownFormField.FormField', [
       m('.form-group', [
         title && m('.form-title', title),
         subtitle && m('.form-subtitle', subtitle),
-        m(Select, selectAttrs)
+        m(CustomSelect, selectAttrs)
       ]),
     ]);
   }
