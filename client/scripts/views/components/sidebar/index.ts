@@ -8,7 +8,6 @@ import {
   Button, ButtonGroup, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner, Select
 } from 'construct-ui';
 
-import { DropdownFormField } from 'views/components/forms';
 import { selectNode, initChain } from 'app';
 
 import app, { ApiStatus } from 'state';

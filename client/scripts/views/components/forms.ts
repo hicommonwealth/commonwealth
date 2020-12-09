@@ -25,6 +25,9 @@ interface IDropdownFormFieldChoice {
 export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
   view: (vnode: m.VnodeDOM<IDropdownFormFieldAttrs>) => {
     const { choices, name, defaultValue, subtitle, title } = vnode.attrs;
+    if (!choices  || choices.length === 0) {
+      return;
+    }
     const selectAttrs = {
       class: 'form-field',
       name,
