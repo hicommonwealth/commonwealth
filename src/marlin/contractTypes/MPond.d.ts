@@ -8,7 +8,7 @@ import {
   TransactionOverrides,
   TypedEventDescription,
   TypedFunctionDescription
-} from ".";
+} from "../../../eth/types";
 
 interface MPondInterface extends Interface {
   functions: {
