@@ -42,7 +42,7 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
   public update(thread: OffchainThread) {
     // This function is a "true" update function: if the thread is not already in a
     // store, it will not add the thread
-    super.update(thread);
+    super.update(thread, (t) => t.id === thread.id);
     const parentEntity = thread.community ? thread.community : thread.chain;
     if (!this._threadsByCommunity[parentEntity]) return;
     const communityStore = this._threadsByCommunity[parentEntity];
