@@ -104,7 +104,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       verbose: true,
     });
   });
-} else if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
+} else if (chainSupportedBy(network, MolochEvents.Types.EventChains)) {
   const contractVersion = 1;
   if (!contract) throw new Error(`no contract address for ${network}`);
   MolochEvents.createApi(url, contractVersion, contract).then((api) => {
