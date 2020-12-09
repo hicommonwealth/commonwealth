@@ -167,8 +167,7 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Post edits propagate to all thread stores
-        this._store.update(result);
-        console.log(this._store);
+        this._store.update(result, (t) => t.id === result.id);
         this._listingStore.update(result);
         return result;
       },
@@ -190,7 +189,6 @@ class ThreadsController {
       }).then((result) => {
         // Deleted posts are removed from all stores containing them
         this.store.remove(proposal);
-        console.log(this.store);
         this._listingStore.remove(proposal);
         m.redraw();
         resolve(result);

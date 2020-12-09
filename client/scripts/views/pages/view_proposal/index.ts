@@ -507,7 +507,7 @@ const ViewProposalPage: m.Component<{
     }
 
     const proposalRecentlyEdited = vnode.state.recentlyEdited;
-    const proposalDoesNotMatch = Number(vnode.state.proposal.identifier) !== Number(proposalId);
+    const proposalDoesNotMatch = vnode.state.proposal && Number(vnode.state.proposal.identifier) !== Number(proposalId);
     // load proposal
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
@@ -660,6 +660,9 @@ const ViewProposalPage: m.Component<{
       if (call === GlobalStatus.Get) return vnode.state.editing;
       if (call === GlobalStatus.Set && status !== undefined) {
         vnode.state.editing = status;
+        if (status === false) {
+          vnode.state.recentlyEdited = true;
+        }
         m.redraw();
       }
     };

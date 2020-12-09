@@ -36,7 +36,6 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
     }
 
     addThread(thread.topic?.name);
-    console.log(this);
     return this;
   }
 
@@ -60,7 +59,6 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
 
     updateThread(thread.topic?.name);
     updateThread(ALL_PROPOSALS_KEY);
-    console.log(this);
     return this;
   }
 
@@ -80,7 +78,6 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
 
     removeThread(thread.topic?.name);
     removeThread(ALL_PROPOSALS_KEY);
-    console.log(this);
     return this;
   }
 

@@ -10,16 +10,16 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
     return this;
   }
 
-  public update(proposal: ProposalT) {
+  public update(proposal: ProposalT, eqFn?: (a: ProposalT) => boolean) {
     if (this.getByIdentifier(proposal.identifier)) {
-      this.remove(proposal);
+      this.remove(proposal, eqFn);
       this.add(proposal);
     }
     return this;
   }
 
-  public remove(proposal: ProposalT) {
-    super.remove(proposal);
+  public remove(proposal: ProposalT, eqFn?: (a: ProposalT) => boolean) {
+    super.remove(proposal, eqFn);
     delete this._storeId[proposal.identifier];
     return this;
   }
