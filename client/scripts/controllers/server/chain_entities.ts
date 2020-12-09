@@ -3,13 +3,12 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { ChainEntityStore } from 'stores';
-import { ChainEntity, ChainEvent, ChainEventType, IChainAdapter, IChainModule, ProposalModule } from 'models';
+import { ChainEntity, ChainEvent, ChainEventType } from 'models';
 import app from 'state';
 import {
   CWEvent,
   eventToEntity,
   entityToFieldName,
-  IStorageFetcher,
   IEventProcessor,
   IEventSubscriber,
   SubstrateTypes,
@@ -106,7 +105,6 @@ class ChainEntityController {
       const eventEntity = eventToEntity(cwEvent.data.kind);
       if (!eventEntity) return;
       const [ entityKind ] = eventEntity;
-
       // create event type
       const eventType = new ChainEventType(
         `${chain}-${cwEvent.data.kind.toString()}`,
@@ -136,18 +134,16 @@ class ChainEntityController {
       const handlers = this._handlers[entity.type];
       if (!handlers) {
         console.log(`No handler for entity type ${entity.type}, ignoring.`);
-        return;
+      } else {
+        for (const handler of handlers) {
+          handler(entity, event);
+        }
       }
-      for (const handler of handlers) {
-        handler(entity, event);
-      }
-      return [ entity, event ];
     }
   }
 
   public async fetchEntities<T extends CWEvent>(
     chain: string,
-    proposalModule: ProposalModule<any, any, any>,
     fetch: () => Promise<T[]>,
     eventSortFn?: (a: CWEvent, b: CWEvent) => number,
   ): Promise<T[]> {
