@@ -55,7 +55,7 @@ export async function createApi(
       } as any,
     );
     const provider = new providers.Web3Provider(web3Provider);
-    const compContract = CompFactory.connect(contractAddresses.comp, provider);
+    const compContract = MPondFactory.connect(contractAddresses.comp, provider);
     const governorAlphaContract = GovernorAlphaFactory.connect(contractAddresses.governorAlpha, provider);
     const timelockContract = TimelockFactory.connect(contractAddresses.timelock, provider);
     await Promise.all([
