@@ -126,7 +126,7 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
-      console.log(this._store);
+
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
       this._listingStore.add(result, storeOptions);

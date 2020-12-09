@@ -59,6 +59,7 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
 
     updateThread(thread.topic?.name);
     updateThread(ALL_PROPOSALS_KEY);
+
     return this;
   }
 
@@ -78,6 +79,7 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
 
     removeThread(thread.topic?.name);
     removeThread(ALL_PROPOSALS_KEY);
+
     return this;
   }
 
