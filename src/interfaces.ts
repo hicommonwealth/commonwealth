@@ -9,7 +9,7 @@ import * as MarlinTypes from './marlin/types';
 // add other events here as union types
 export type IChainEntityKind = SubstrateTypes.EntityKind | MolochTypes.EntityKind | MarlinTypes.EntityKind;
 export type IChainEventData = SubstrateTypes.IEventData | MolochTypes.IEventData | MarlinTypes.IEventData;
-export type IChainEventKind = SubstrateTypes.EventKind | MolochTypes.EventKind | MarlinTypes.EntityKind;
+export type IChainEventKind = SubstrateTypes.EventKind | MolochTypes.EventKind | MarlinTypes.EventKind;
 export const ChainEventKinds = [...SubstrateTypes.EventKinds, ...MolochTypes.EventKinds, ...MarlinTypes.EventKinds];
 export const EventSupportingChains = [...SubstrateTypes.EventChains, ...MolochTypes.EventChains, ...MarlinTypes.EventChains] as const;
 export type EventSupportingChainT = typeof EventSupportingChains[number];
