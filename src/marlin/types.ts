@@ -13,6 +13,7 @@ export type Receipt = UnPromisify<ReturnType<GovernorAlpha['functions']['getRece
 
 // API is imported contracts classes
 interface IMarlinContracts {
+  // keep arg name same as Compound structure, functions similarly
   comp: MPond;
   governorAlpha: GovernorAlpha;
   timelock: Timelock;
@@ -29,7 +30,7 @@ export enum EntityKind {
 }
 
 export enum EventKind {
-  // Comp Events
+  // MPond Events
   Approval = 'approval',
   DelegateChanged = 'delegate-changed',
   DelegateVotesChanged = 'delegate-votes-changed',
@@ -56,7 +57,7 @@ interface IEvent {
 type Address = string;
 type Balance = string; // number???
 
-// Comp Event Interfaces
+// MPond Event Interfaces
 export interface IApproval extends IEvent {
   kind: EventKind.Approval;
   owner: Address;
@@ -171,7 +172,7 @@ export interface IQueueTransaction extends IEvent {
 }
 
 export type IEventData =
-  // Comp
+  // MPond
   IApproval
   | IDelegateChanged
   | IDelegateVotesChanged
