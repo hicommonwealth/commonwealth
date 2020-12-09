@@ -31,10 +31,6 @@ const VoteListing: m.Component<{
   balancesCache,
   balancesCacheInitialized,
 }> = {
-  oncreate: (vnode) => {
-    vnode.state.balancesCache = {};
-    vnode.state.balancesCacheInitialized = {};
-  },
   view: (vnode) => {
     const { proposal, votes, amount, weight } = vnode.attrs;
     const balanceWeighted = proposal.votingUnit === VotingUnit.CoinVote
@@ -43,6 +39,9 @@ const VoteListing: m.Component<{
       ? votes
       : votes.slice(0, 3);
 
+    if (!vnode.state.balancesCache) vnode.state.balancesCache = {};
+    if (!vnode.state.balancesCacheInitialized) vnode.state.balancesCacheInitialized = {};
+
     return m('.VoteListing', [
       (displayedVotes.length === 0)
         ? m('.no-votes', 'No votes')
@@ -50,10 +49,6 @@ const VoteListing: m.Component<{
           (vote) => {
             let balance;
             if (balanceWeighted && !(vote instanceof CosmosVote)) {
-              // not sure why these attributes might not be initialized, but it's happened in prod
-              if (!vnode.state.balancesCache || !vnode.state.balancesCacheInitialized) {
-                balance = '--';
-              }
               // fetch and display balances
               if (vnode.state.balancesCache[vote.account.address]) {
                 balance = vnode.state.balancesCache[vote.account.address];
