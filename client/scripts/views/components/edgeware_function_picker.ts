@@ -110,7 +110,7 @@ const EdgewareFunctionPicker = {
         ]);
       })),
 
-      m(FormGroup, [
+      m(FormGroup, { style: 'margin-top: 20px' }, [
         m(FormLabel, 'Proposal Hash'),
         m(Input, {
           disabled: true,
