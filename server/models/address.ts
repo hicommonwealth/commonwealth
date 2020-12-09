@@ -56,6 +56,11 @@ export interface AddressInstance extends Sequelize.Instance<AddressAttributes>, 
 
 export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAttributes> {
   // static methods
+  createEmpty?: (
+    chain: string,
+    address: string,
+  ) => Promise<AddressInstance>;
+
   createWithToken?: (
     user_id: number,
     chain: string,
@@ -106,6 +111,15 @@ export default (
       { fields: ['name'] }
     ]
   });
+
+  Address.createEmpty = (
+    chain: string,
+    address: string,
+  ): Promise<AddressInstance> => {
+    const verification_token = 'NO_USER';
+    const verification_token_expires = new Date(); // expired immediately
+    return Address.create({ chain, address, verification_token, verification_token_expires });
+  };
 
   Address.createWithToken = (
     user_id: number,
