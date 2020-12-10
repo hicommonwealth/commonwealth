@@ -128,7 +128,6 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       // work backwards through the queue, starting with the most recent
       const queuePosition = queueLength - i - 1;
       const proposal: Proposal = await this._api.governorAlpha.proposals(queuePosition);
-      console.log('hi', proposal);
       // fetch actual proposal
       // const proposal: Proposal = await this._api.governorAlpha.proposalQueue(proposalIndex);
       log.debug(`Fetched Marlin proposal ${proposal.id} from storage.`);
@@ -148,9 +147,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
         // eslint-disable-next-line no-continue
         continue;
       }
-      console.log('before creating event')
       if (proposalStartBlock >= range.startBlock && proposalStartBlock <= range.endBlock) {
-        console.log('creating event');
         const events = await this._eventsFromProposal(
           proposal.id.toNumber(),
           proposal,
