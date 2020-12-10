@@ -111,18 +111,21 @@ export async function Enrich(
         const [sessionIndex] = event.data as unknown as [SessionIndex] & Codec
         // get the hash of current block number
         const hash = await api.rpc.chain.getBlockHash(blockNumber);
-        
+
+        // get the validators for the current block's session
+        const validators = await api.query.session.validators.at(hash);
+
         // get the era of block
         const rawCurrentEra = await api.query.staking.currentEra.at(hash);
-        const currentEra = rawCurrentEra.unwrap();
-        
-        // get the validators for the current block
-        const validators = await api.query.session.validators.at(hash);
-        
-        // get the nextElected Validators
-        const nextKeys = await api.query.staking.erasStakers.keys(currentEra)
-        const nextElected = nextKeys.length ? nextKeys.map((key) => key.args[1] as AccountId): validators;
+        const currentEra = rawCurrentEra.toRawType() === 'u32' ? rawCurrentEra.toString() as unknown as EraIndex: rawCurrentEra.unwrap();
 
+
+        // get the nextElected Validators
+        const keys = api.query.staking.erasStakers ? 
+          await api.query.staking.erasStakers.keys(currentEra) :
+          await api.query.staking.stakers.keys() ; //this is wrong as it returns the data for latest header
+        const nextElected = keys.length ? keys.map((key) => key.args[1] as AccountId): validators;
+        
 
         // get validators current era reward points
         const validatorEraPoints: EraRewardPoints = await currentPoints(api, currentEra, hash, validators) as EraRewardPoints;
@@ -132,16 +135,29 @@ export async function Enrich(
         let waiting: Array<ValidatorId>
         const validatorInfo = {};
 
-        for(let i =0 ;i<validators.length;i++){
+        for(let i = 0 ;i<validators.length;i++){
           const key = validators[i].toString();
-
           // to do remove await use promise resolve
-          const prefs = await api.query.staking.erasValidatorPrefs(currentEra,key);
-          const commissionPer =  (Number)(prefs.commission || new BN(0)) / 10_000_000;
+          const preference = api.query.staking.erasValidatorPrefs ? 
+            await api.query.staking.erasValidatorPrefs(currentEra,key) :
+            await api.query.staking.validators.at(hash, key);
+
+          const commissionPer =  (Number)(preference.commission || new BN(0)) / 10_000_000;
+
           const rewardDestination = await api.query.staking.payee.at(hash,key);
           const controllerId = await api.query.staking.bonded.at(hash, key);
-          const nextSessionKeysOpt = await api.query.session.nextKeys.at(hash,key);
-          const nextSessionKeys = nextSessionKeysOpt.isSome? nextSessionKeysOpt.unwrap(): [] 
+          let nextSessionKeysOpt;
+
+          try{
+            // to get keys of old blocks
+            nextSessionKeysOpt = await api.query.session.nextKeys(hash,key);
+            // there is queuedKeys function as well not sure which one to use
+          }
+          catch(e){
+            // for new blocks
+            nextSessionKeysOpt = await api.query.session.nextKeys.at(hash,key);
+          }
+          const nextSessionKeys = nextSessionKeysOpt.isSome? nextSessionKeysOpt.unwrap(): []
 
           validatorInfo[key] = {
             commissionPer,
@@ -152,21 +168,18 @@ export async function Enrich(
           };
         };
 
-        // erasStakers(EraIndex, AccountId): Exposure -> api.query.staking.erasStakers // KUSAMA
-        // stakers(AccountId): Exposure -> api.query.staking.stakers // EDGEWARE
-        const stakersCall = (api.query.staking.stakers)
-          ? api.query.staking.stakers
-          : api.query.staking.erasStakers;
-        const stakersCallArgs = (account) => (api.query.staking.stakers)
-          ? [account]
-          : [currentEra, account];
-        
+        const stakersCall = (account) => {
+          return  api.query.staking.stakers ?
+          api.query.staking.stakers.at(hash, account) : 
+          api.query.staking.erasStakers(currentEra, account);
+        }
+
         let activeExposures: { [key: string]: any } = {}
         if (validators && currentEra) { // if currentEra isn't empty
           active = validators;
           waiting = nextElected;
           await Promise.all(active.map(async (validator) => {
-            const tmp_exposure = (await stakersCall(...stakersCallArgs(validator))) as Exposure;
+            const tmp_exposure = (await stakersCall(validator)) as Exposure;
             const exposure = {
               own: tmp_exposure.own,
               total: tmp_exposure.total,
@@ -175,6 +188,7 @@ export async function Enrich(
             activeExposures[validator.toString()] = exposure;
           }));
         }
+
         return {
           data: {
             kind,
