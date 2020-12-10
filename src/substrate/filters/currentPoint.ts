@@ -1,28 +1,27 @@
-import { AccountId, EraPoints, EraRewardPoints, RewardPoint } from '@polkadot/types/interfaces';
+import { AccountId, EraPoints, EraRewardPoints, RewardPoint, EraIndex, BlockHash } from '@polkadot/types/interfaces';
 import { ApiPromise } from '@polkadot/api';
 
 
-async function retrievePoints (api: ApiPromise    , currentElected: AccountId[]): Promise<EraRewardPoints> {
-    let currentEraPointsEarned = await api.query.staking.currentEraPointsEarned<EraPoints>();
-    let total = currentEraPointsEarned.total;
-    let individual = currentEraPointsEarned.individual;
+async function retrievePoints (api: ApiPromise    ,hash: BlockHash, validators: AccountId[]): Promise<EraRewardPoints> {
+    const currentEraPointsEarned = await api.query.staking.currentEraPointsEarned.at<EraPoints>(hash);
+    const total = currentEraPointsEarned.total;
+    const individual = currentEraPointsEarned.individual;
+
     return await api.registry.createType('EraRewardPoints', {
           individual: new Map<AccountId, RewardPoint>(
             individual
               .map((points) => api.registry.createType('RewardPoint', points))
-              .map((points, index): [AccountId, RewardPoint] => [currentElected[index], points])
+              .map((points, index): [AccountId, RewardPoint] => [validators[index] as AccountId, points])
             ),
             total
         });
 }
 
 
-export async function currentPoints (api: ApiPromise): Promise<EraRewardPoints> {
-    const apiOverview = await api.derive.staking.overview();
-    
+export async function currentPoints (api: ApiPromise, era:EraIndex, hash: BlockHash, validators: AccountId[]): Promise<EraRewardPoints> {    
     // when running against an archival node .staking.erasRewardPoints does not exist!
     if (api.query.staking.erasRewardPoints)
-        return await api.query.staking.erasRewardPoints<EraRewardPoints>(apiOverview.activeEra)
+        return await api.query.staking.erasRewardPoints<EraRewardPoints>(era)
     else
-        return await retrievePoints(api, apiOverview.nextElected);
+        return await retrievePoints(api, hash, validators);
 }
