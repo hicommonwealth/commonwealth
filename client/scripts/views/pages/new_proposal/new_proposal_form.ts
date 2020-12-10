@@ -349,7 +349,6 @@ const NewProposalForm = {
 
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
 
-    // TODO: Add Marlin Fields to NewProposalForm
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
         m(Col, [
