@@ -33,7 +33,7 @@ import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
 import {
-  ProposalHeaderExternalLink, ProposalHeaderTopics, ProposalHeaderTitle,
+  ProposalHeaderExternalLink, ProposalHeaderVotingLink, ProposalHeaderTopics, ProposalHeaderTitle,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyButtons,
   ProposalTitleEditor,
@@ -152,6 +152,8 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           proposal instanceof OffchainThread
             && proposal.kind === OffchainThreadKind.Link
             && m('.proposal-body-link', m(ProposalHeaderExternalLink, { proposal })),
+          proposal['blockExplorerLink']
+            && m('.proposal-body-link', m(ProposalHeaderVotingLink, { proposal })),
         ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-content', [

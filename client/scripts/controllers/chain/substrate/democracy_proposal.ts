@@ -87,6 +87,15 @@ class SubstrateDemocracyProposal extends Proposal<
 
   private _depositSubscription: Unsubscribable;
 
+  public get blockExplorerLink() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) {
+      const subdomain = blockExplorerIds['subscan'];
+      return `https://${subdomain}.subscan.io/democracy_proposal/${this.identifier}`;
+    }
+  }
+
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,
