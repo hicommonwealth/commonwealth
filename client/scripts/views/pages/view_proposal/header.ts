@@ -40,13 +40,26 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
   }
 };
 
-export const ProposalHeaderVotingLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
+export const ProposalHeaderBlockExplorerLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal || !proposal['blockExplorerLink']) return;
-    return m('.ProposalHeaderVotingLink', [
+    return m('.ProposalHeaderBlockExplorerLink', [
       externalLink('a.voting-link', proposal['blockExplorerLink'], [
-        extractDomain(proposal['blockExplorerLink']),
+        proposal['blockExplorerLinkLabel'] || extractDomain(proposal['blockExplorerLink']),
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
+    ]);
+  }
+};
+
+export const ProposalHeaderVotingInterfaceLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (!proposal || !proposal['votingInterfaceLink']) return;
+    return m('.ProposalHeaderVotingInterfaceLink', [
+      externalLink('a.voting-link', proposal['votingInterfaceLink'], [
+        proposal['votingInterfaceLinkLabel'] || extractDomain(proposal['votingInterfaceLink']),
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
     ]);
