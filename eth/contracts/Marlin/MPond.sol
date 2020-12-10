@@ -2,19 +2,19 @@ pragma solidity >=0.4.21 <0.7.0;
 pragma experimental ABIEncoderV2;
 
 
-contract Comp {
+contract MPond {
     /// @notice EIP-20 token name for this token
     string public constant name = "Marlin Governance Token";
 
     /// @notice EIP-20 token symbol for this token
-    string public constant symbol = "mPOND";
+    string public constant symbol = "MPOND";
 
     /// @notice EIP-20 token decimals for this token
     uint8 public constant decimals = 18;
 
     /// @notice Total number of tokens in circulation
-    uint256 public constant totalSupply = 1000000e18; // 1 million Comp
-
+    uint256 public constant totalSupply = 10000e18; // 10k MPond
+    uint256 public constant bridgeSupply = 7000e18; // 3k MPond
     /// @notice Allowance amounts on behalf of others
     mapping(address => mapping(address => uint96)) internal allowances;
 
@@ -22,7 +22,7 @@ contract Comp {
     mapping(address => uint96) internal balances;
 
     /// @notice A record of each accounts delegate
-    mapping(address => address) public delegates;
+    mapping(address => mapping(address => uint96)) public delegates;
 
     /// @notice A checkpoint for marking number of votes from a given block
     struct Checkpoint {
@@ -43,11 +43,20 @@ contract Comp {
 
     /// @notice The EIP-712 typehash for the delegation struct used by the contract
     bytes32 public constant DELEGATION_TYPEHASH = keccak256(
-        "Delegation(address delegatee,uint256 nonce,uint256 expiry)"
+        "Delegation(address delegatee,uint256 nonce,uint256 expiry,uint96 amount)"
     );
 
+    /// @notice The EIP-712 typehash for the delegation struct used by the contract
+    bytes32 public constant UNDELEGATION_TYPEHASH = keccak256(
+        "Unelegation(address delegatee,uint256 nonce,uint256 expiry,uint96 amount)"
+    );
     /// @notice A record of states for signing / validating signatures
     mapping(address => uint256) public nonces;
+
+    /// customized params
+    address public admin;
+    mapping(address => bool) public isWhiteListed;
+    bool public enableAllTranfers = true;
 
     /// @notice An event thats emitted when an account changes its delegate
     event DelegateChanged(
@@ -77,9 +86,47 @@ contract Comp {
      * @notice Construct a new Comp token
      * @param account The initial account to grant all the tokens
      */
-    constructor(address account) public {
-        balances[account] = uint96(totalSupply);
-        emit Transfer(address(0), account, totalSupply);
+    constructor(address account, address bridge) public {
+        require(
+            account != bridge,
+            "Bridge and accoutn should not be the same address"
+        );
+        balances[bridge] = uint96(bridgeSupply);
+        delegates[bridge][address(0)] = uint96(bridgeSupply);
+        isWhiteListed[bridge] = true;
+        emit Transfer(address(0), bridge, bridgeSupply);
+
+        uint96 remainingSupply = sub96(
+            uint96(totalSupply),
+            uint96(bridgeSupply),
+            "Comp: Subtraction overflow in the constructor"
+        );
+        balances[account] = remainingSupply;
+        delegates[account][address(0)] = remainingSupply;
+        isWhiteListed[account] = true;
+        emit Transfer(address(0), account, uint256(remainingSupply));
+    }
+
+    function addWhiteListAddress(address _address) external returns (bool) {
+        require(msg.sender == admin, "Only admin can whitelist");
+        isWhiteListed[_address] = true;
+        return true;
+    }
+
+    function enableAllTransfers() external returns (bool) {
+        require(msg.sender == admin, "Only enable can enable all transfers");
+        enableAllTranfers = true;
+        return true;
+    }
+
+    function isWhiteListedTransfer(address _address1, address _address2)
+        public
+        view
+        returns (bool)
+    {
+        return
+            (isWhiteListed[_address1] || isWhiteListed[_address2]) ||
+            enableAllTranfers;
     }
 
     /**
@@ -137,6 +184,10 @@ contract Comp {
      * @return Whether or not the transfer succeeded
      */
     function transfer(address dst, uint256 rawAmount) external returns (bool) {
+        require(
+            isWhiteListedTransfer(msg.sender, dst),
+            "Atleast of the address (msg.sender or dst) should be whitelisted"
+        );
         uint96 amount = safe96(
             rawAmount,
             "Comp::transfer: amount exceeds 96 bits"
@@ -157,6 +208,10 @@ contract Comp {
         address dst,
         uint256 rawAmount
     ) external returns (bool) {
+        require(
+            isWhiteListedTransfer(msg.sender, dst),
+            "Atleast of the address (src or dst) should be whitelisted"
+        );
         address spender = msg.sender;
         uint96 spenderAllowance = allowances[src][spender];
         uint96 amount = safe96(
@@ -183,8 +238,12 @@ contract Comp {
      * @notice Delegate votes from `msg.sender` to `delegatee`
      * @param delegatee The address to delegate votes to
      */
-    function delegate(address delegatee) public {
-        return _delegate(msg.sender, delegatee);
+    function delegate(address delegatee, uint96 amount) public {
+        return _delegate(msg.sender, delegatee, amount);
+    }
+
+    function undelegate(address delegatee, uint96 amount) public {
+        return _undelegate(msg.sender, delegatee, amount);
     }
 
     /**
@@ -202,7 +261,8 @@ contract Comp {
         uint256 expiry,
         uint8 v,
         bytes32 r,
-        bytes32 s
+        bytes32 s,
+        uint96 amount
     ) public {
         bytes32 domainSeparator = keccak256(
             abi.encode(
@@ -213,7 +273,7 @@ contract Comp {
             )
         );
         bytes32 structHash = keccak256(
-            abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry)
+            abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry, amount)
         );
         bytes32 digest = keccak256(
             abi.encodePacked("\x19\x01", domainSeparator, structHash)
@@ -228,7 +288,43 @@ contract Comp {
             "Comp::delegateBySig: invalid nonce"
         );
         require(now <= expiry, "Comp::delegateBySig: signature expired");
-        return _delegate(signatory, delegatee);
+        return _delegate(signatory, delegatee, amount);
+    }
+
+    function undelegateBySig(
+        address delegatee,
+        uint256 nonce,
+        uint256 expiry,
+        uint8 v,
+        bytes32 r,
+        bytes32 s,
+        uint96 amount
+    ) public {
+        bytes32 domainSeparator = keccak256(
+            abi.encode(
+                DOMAIN_TYPEHASH,
+                keccak256(bytes(name)),
+                getChainId(),
+                address(this)
+            )
+        );
+        bytes32 structHash = keccak256(
+            abi.encode(UNDELEGATION_TYPEHASH, delegatee, nonce, expiry, amount)
+        );
+        bytes32 digest = keccak256(
+            abi.encodePacked("\x19\x01", domainSeparator, structHash)
+        );
+        address signatory = ecrecover(digest, v, r, s);
+        require(
+            signatory != address(0),
+            "Comp::undelegateBySig: invalid signature"
+        );
+        require(
+            nonce == nonces[signatory]++,
+            "Comp::undelegateBySig: invalid nonce"
+        );
+        require(now <= expiry, "Comp::undelegateBySig: signature expired");
+        return _undelegate(signatory, delegatee, amount);
     }
 
     /**
@@ -290,14 +386,44 @@ contract Comp {
         return checkpoints[account][lower].votes;
     }
 
-    function _delegate(address delegator, address delegatee) internal {
-        address currentDelegate = delegates[delegator];
-        uint96 delegatorBalance = balances[delegator];
-        delegates[delegator] = delegatee;
+    function _delegate(
+        address delegator,
+        address delegatee,
+        uint96 amount
+    ) internal {
+        delegates[delegator][address(0)] = sub96(
+            delegates[delegator][address(0)],
+            amount,
+            "Comp: delegates underflow"
+        );
+        delegates[delegator][delegatee] = add96(
+            delegates[delegator][delegatee],
+            amount,
+            "Comp: delegates overflow"
+        );
 
-        emit DelegateChanged(delegator, currentDelegate, delegatee);
+        emit DelegateChanged(delegator, address(0), delegatee);
 
-        _moveDelegates(currentDelegate, delegatee, delegatorBalance);
+        _moveDelegates(address(0), delegatee, amount);
+    }
+
+    function _undelegate(
+        address delegator,
+        address delegatee,
+        uint96 amount
+    ) internal {
+        delegates[delegator][delegatee] = sub96(
+            delegates[delegator][delegatee],
+            amount,
+            "Comp: undelegates underflow"
+        );
+        delegates[delegator][address(0)] = add96(
+            delegates[delegator][address(0)],
+            amount,
+            "Comp: delegates underflow"
+        );
+        emit DelegateChanged(delegator, delegatee, address(0));
+        _moveDelegates(delegatee, address(0), amount);
     }
 
     function _transferTokens(
@@ -310,6 +436,10 @@ contract Comp {
             "Comp::_transferTokens: cannot transfer from the zero address"
         );
         require(
+            delegates[src][address(0)] >= amount,
+            "Comp: _transferTokens: undelegated amount should be greater than transfer amount"
+        );
+        require(
             dst != address(0),
             "Comp::_transferTokens: cannot transfer to the zero address"
         );
@@ -319,14 +449,25 @@ contract Comp {
             amount,
             "Comp::_transferTokens: transfer amount exceeds balance"
         );
+        delegates[src][address(0)] = sub96(
+            delegates[src][address(0)],
+            amount,
+            "Comp: _tranferTokens: undelegate subtraction error"
+        );
+
         balances[dst] = add96(
             balances[dst],
             amount,
             "Comp::_transferTokens: transfer amount overflows"
         );
+        delegates[dst][address(0)] = add96(
+            delegates[dst][address(0)],
+            amount,
+            "Comp: _transferTokens: undelegate addition error"
+        );
         emit Transfer(src, dst, amount);
 
-        _moveDelegates(delegates[src], delegates[dst], amount);
+        // _moveDelegates(delegates[src], delegates[dst], amount);
     }
 
     function _moveDelegates(
