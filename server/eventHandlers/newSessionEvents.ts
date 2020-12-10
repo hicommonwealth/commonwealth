@@ -69,12 +69,13 @@ export default class extends IEventHandler {
       const validatorsInfo = (newSessionEventData as any).validatorInfo[stashId];
       validator.updated_at = new Date().toISOString();
 
-      if (stateInfo) {
-        validator.state = stateInfo.state;
-        validator.controller = validatorsInfo.controllerId.toString();
+      if (stashId && stashId.length > 0) {
+        validator.state = stashId.state;
+        validator.controller = validatorsInfo.controllerId;
         validator.sessionKeys = validatorsInfo.nextSessionIds;
         validator.lastUpdate = event.blockNumber.toString();
         newValidators[validator.stash].visited = true;
+        validator.updated_at = new Date().toISOString();
       }
     });
 
