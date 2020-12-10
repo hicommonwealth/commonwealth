@@ -151,6 +151,16 @@ export class SubstrateDemocracyReferendum
   private _Accounts: SubstrateAccounts;
   private _Democracy: SubstrateDemocracy;
 
+  // BLOCK EXPLORER LINK
+  public get blockExplorerLink() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) {
+      const subdomain = blockExplorerIds['subscan'];
+      return `https://${subdomain}.subscan.io/referenda/${this.identifier}`;
+    }
+  }
+
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,
