@@ -51,6 +51,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           github: community.github,
           default_chain: app.config.chains.getById(community.default_chain),
           visible: community.visible,
+          collapsed_on_homepage: community.collapsed_on_homepage,
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
           featuredTopics: community.featured_topics,

@@ -183,7 +183,7 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
     const myChains: any = Object.entries(chains);
     const myCommunities: any = app.config.communities.getAll();
 
-    const sortedChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
+    const sortChainsAndCommunities = (list) => list.sort((a, b) => {
       const threadCountA = app.recentActivity.getCommunityThreadCount(Array.isArray(a) ? a[0] : a.id);
       const threadCountB = app.recentActivity.getCommunityThreadCount(Array.isArray(b) ? b[0] : b.id);
       return (threadCountB - threadCountA);
@@ -197,9 +197,21 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
       return null;
     });
 
+    const sortedChainsAndCommunities = sortChainsAndCommunities(
+      myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
+        .concat(myCommunities.filter((c) => !c.collapsedOnHomepage))
+    );
+    const betaChainsAndCommunities = sortChainsAndCommunities(
+      myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
+        .concat(myCommunities.filter((c) => c.collapsedOnHomepage))
+    );
+
     return m('.HomepageCommunityCards', [
       m('.communities-list', [
         sortedChainsAndCommunities,
+        m('.clear'),
+        betaChainsAndCommunities.length > 0 && m('h4', 'Testnets & New Communities'),
+        betaChainsAndCommunities,
         m('.clear'),
       ]),
       m('.other-list', [
