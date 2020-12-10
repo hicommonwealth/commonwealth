@@ -71,8 +71,8 @@ export const Layout: m.Component<{
       vnode.state.loadingScope = scope;
       if (scopeMatchesChain) {
         vnode.state.deferred = deferChain;
-        selectNode(scopeMatchesChain, deferChain).then(() => {
-          if (!deferChain) {
+        selectNode(scopeMatchesChain, deferChain).then((response) => {
+          if (!deferChain && response) {
             initChain();
           }
         });

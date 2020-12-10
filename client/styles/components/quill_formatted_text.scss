@@ -67,16 +67,57 @@
 
     // list styles
     ul, ol {
-        margin: 10px 0;
         li {
             margin: 2px 0;
         }
-    }
-    ul + ol,
-    ul + ul,
-    ol + ol,
-    ol + ul {
-        margin-top: -10px;
+        ol {
+            list-style-type: lower-latin;
+        }
+        ul, ol {
+            ol {
+                list-style-type: lower-roman;
+            }
+        }
+        ul, ol {
+            ul, ol {
+                ol {
+                    list-style-type: decimal;
+                }
+            }
+        }
+        ul, ol {
+            ul, ol {
+                ul, ol {
+                    ol {
+                        list-style-type: lower-latin;
+                    }
+                }
+            }
+        }
+        ul, ol {
+            ul, ol {
+                ul, ol {
+                    ul, ol {
+                        ol {
+                            list-style-type: lower-roman;
+                        }
+                    }
+                }
+            }
+        }
+        ul, ol {
+            ul, ol {
+                ul, ol {
+                    ul, ol {
+                        ul, ol {
+                            ol {
+                                list-style-type: decimal;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     ul.checklist {
         padding-left: 1em;

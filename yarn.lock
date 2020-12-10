@@ -784,10 +784,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@0.3.14":
-  version "0.3.14"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.3.14.tgz#a6623c920da87c1f531f47aaa17abaf13243bc11"
-  integrity sha512-gcRDKCgYXTfzjT2sCqFjd1FQSH8KWKmVzaOyR6tA2+MS7tOVmsZYIbe+ncSV8hfMhibFeFizOjngMcjkeeFsBA==
+"@commonwealth/chain-events@0.3.15":
+  version "0.3.15"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.3.15.tgz#822623f8a9b08684c2800b3fb18e07ea888fb994"
+  integrity sha512-Tfq4JVjYTHQuoJbQbe4Yji9/CLWG1eGnWm9UPziXl5MOs7psemBGWCaoPahEb47YVuAXT1N1wlS1fWgzkm+nmg==
   dependencies:
     "@edgeware/node-types" "3.0.10"
     "@polkadot/api" "2.5.1"
@@ -1189,9 +1189,10 @@
     camelcase "^5.3.1"
     ip-regex "^4.2.0"
 
-"@polkadot/wasm-crypto@^1.2.1", "@polkadot/wasm-crypto@^1.4.1", "@polkadot/wasm-crypto@hicommonwealth/wasm-crypto#c5ee2ea5ed0edd87da792e758832edfd1d9072bd":
-  version "0.14.0-beta.0"
-  resolved "https://codeload.github.com/hicommonwealth/wasm-crypto/tar.gz/c5ee2ea5ed0edd87da792e758832edfd1d9072bd"
+"@polkadot/wasm-crypto@^1.2.1", "@polkadot/wasm-crypto@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@polkadot/wasm-crypto/-/wasm-crypto-1.4.1.tgz#0a053d0c2587da30fb5313cef81f8d9a52029c68"
+  integrity sha512-GPBCh8YvQmA5bobI4rqRkUhrEHkEWU1+lcJVPbZYsa7jiHFaZpzCLrGQfiqW/vtbU1aBS2wmJ0x1nlt33B9QqQ==
 
 "@polkadot/x-fetch@^3.7.1":
   version "3.7.1"
