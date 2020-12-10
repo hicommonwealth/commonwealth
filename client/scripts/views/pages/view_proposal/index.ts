@@ -33,7 +33,7 @@ import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
 import {
-  ProposalHeaderExternalLink, ProposalHeaderTopics, ProposalHeaderTitle,
+  ProposalHeaderExternalLink, ProposalHeaderVotingLink, ProposalHeaderTopics, ProposalHeaderTitle,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyButtons,
   ProposalTitleEditor,
@@ -152,6 +152,8 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           proposal instanceof OffchainThread
             && proposal.kind === OffchainThreadKind.Link
             && m('.proposal-body-link', m(ProposalHeaderExternalLink, { proposal })),
+          proposal['blockExplorerLink']
+            && m('.proposal-body-link', m(ProposalHeaderVotingLink, { proposal })),
         ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-content', [
@@ -467,6 +469,7 @@ const ViewProposalPage: m.Component<{
   type: string
 }, {
   editing: boolean,
+  recentlyEdited: boolean,
   replyParent: number | boolean,
   highlightedComment: boolean,
   prefetch: IPrefetch,
@@ -505,8 +508,10 @@ const ViewProposalPage: m.Component<{
       return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
+    const proposalRecentlyEdited = vnode.state.recentlyEdited;
+    const proposalDoesNotMatch = vnode.state.proposal && Number(vnode.state.proposal.identifier) !== Number(proposalId);
     // load proposal
-    if (!vnode.state.proposal || Number(vnode.state.proposal.identifier) !== Number(proposalId)) {
+    if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
       } catch (e) {
@@ -537,6 +542,7 @@ const ViewProposalPage: m.Component<{
       }
     }
     const { proposal } = vnode.state;
+    if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
       m.route.set(`/${app.activeId()}/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
         { replace: true });
@@ -656,6 +662,9 @@ const ViewProposalPage: m.Component<{
       if (call === GlobalStatus.Get) return vnode.state.editing;
       if (call === GlobalStatus.Set && status !== undefined) {
         vnode.state.editing = status;
+        if (status === false) {
+          vnode.state.recentlyEdited = true;
+        }
         m.redraw();
       }
     };

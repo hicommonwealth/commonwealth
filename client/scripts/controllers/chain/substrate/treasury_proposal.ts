@@ -78,6 +78,15 @@ export class SubstrateTreasuryProposal
   private _Accounts: SubstrateAccounts;
   private _Treasury: SubstrateTreasury;
 
+  public get blockExplorerLink() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) {
+      const subdomain = blockExplorerIds['subscan'];
+      return `https://${subdomain}.subscan.io/treasury/${this.identifier}`;
+    }
+  }
+
   constructor(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,

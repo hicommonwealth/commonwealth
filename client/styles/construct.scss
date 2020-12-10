@@ -229,7 +229,11 @@ button, .cui-button {
     line-height: 1.2;
 }
 .cui-callout.cui-primary {
-    border-color: tint($cui-primary-border-color, 75%);
+    border-color: $text-color-primary-light;
+}
+.cui-callout a {
+    font-weight: 500;
+    color: $text-color-primary;
 }
 
 // adjust card padding
