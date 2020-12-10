@@ -16,18 +16,13 @@ export const Errors = {
 
 const verifyAddress = async (models, req: Request, res: Response, next: NextFunction) => {
   // Verify that a linked address is actually owned by its supposed user.
-  //
-  // We accept `signature` if the user is capable of directly signing
-  // bytes, or `txSignature` and `txParams` if the user can't sign
-  // bytes but can sign a no-op tx like Substrate's system.remark().
-
   if (!req.body.address) {
     return next(new Error(Errors.NoAddress));
   }
   if (!req.body.chain) {
     return next(new Error(Errors.NoChain));
   }
-  if (!req.body.signature && !(req.body.txSignature && req.body.txParams)) {
+  if (!req.body.signature) {
     return next(new Error(Errors.NoSignature));
   }
   const chain = await models.Chain.findOne({
@@ -49,13 +44,9 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
     const isAddressTransfer = !!existingAddress.verified && req.user && existingAddress.user_id !== req.user.id;
     const oldId = existingAddress.user_id;
     try {
-      const valid = req.body.signature
-        ? await models.Address.verifySignature(
-          models, chain, existingAddress, (req.user ? req.user.id : null), req.body.signature
-        )
-        : await models.Address.verifySignature(
-          models, chain, existingAddress, (req.user ? req.user.id : null), req.body.txSignature, req.body.txParams
-        );
+      const valid = await models.Address.verifySignature(
+        models, chain, existingAddress, (req.user ? req.user.id : null), req.body.signature
+      );
       if (!valid) {
         return next(new Error(Errors.InvalidSignature));
       }
