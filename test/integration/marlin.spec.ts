@@ -129,11 +129,11 @@ describe('Marlin Event Integration Tests', () => {
     });
     it('initial address should transfer tokens to an address', async () => {
       const initialBalance = await comp.balanceOf(addresses[0]);
-      const newUser = await comp.balanceOf(addresses[1]);
+      const newUser = await comp.balanceOf(addresses[2]);
       assert.isAtMost(+newUser, 0)
       assert.isAtLeast(+initialBalance, 100000);
-      await comp.transfer(addresses[1], 100);
-      const newUserNewBalance = await comp.balanceOf(addresses[1]);
+      await comp.transfer(addresses[2], 100);
+      const newUserNewBalance = await comp.balanceOf(addresses[2]);
       assert.isAtLeast(+newUserNewBalance, 100);
       await new Promise((resolve) => {
         handler.emitter.on(
@@ -148,7 +148,7 @@ describe('Marlin Event Integration Tests', () => {
             }, {
               kind: EventKind.Transfer,
               from: addresses[0],
-              to: addresses[1],
+              to: addresses[2],
               amount: newUserNewBalance.toString(),
             })
             resolve();
@@ -159,7 +159,7 @@ describe('Marlin Event Integration Tests', () => {
     it('initial address should delegate to address 2', async () => {
       const initialBalance = await comp.balanceOf(addresses[0]);
       // delegate
-      await comp.delegate(addresses[1]);
+      await comp.delegate(addresses[2], 1000);
       await Promise.all([
         handler.emitter.on(
           EventKind.DelegateChanged.toString(),
@@ -167,7 +167,7 @@ describe('Marlin Event Integration Tests', () => {
             assert.deepEqual(evt.data, {
               kind: EventKind.DelegateChanged,
               delegator: addresses[0],
-              toDelegate: addresses[1],
+              toDelegate: addresses[2],
               fromDelegate: '0x0000000000000000000000000000000000000000',
             });
             resolve();
@@ -184,7 +184,7 @@ describe('Marlin Event Integration Tests', () => {
               newBalance: newBalance.toString(),
             }, {
               kind: EventKind.DelegateVotesChanged,
-              delegate: addresses[1],
+              delegate: addresses[2],
               previousBalance: '0',
               newBalance: initialBalance.toString(),
             });
@@ -198,7 +198,7 @@ describe('Marlin Event Integration Tests', () => {
       const initialBalance = await comp.balanceOf(addresses[0]);
       const newUser = await comp.balanceOf(addresses[1]);
       // delegate
-      await comp.delegate(addresses[0]);
+      await comp.delegate(addresses[0], 1000);
       await Promise.all([
         handler.emitter.on(
           EventKind.DelegateChanged.toString(),
@@ -238,7 +238,8 @@ describe('Marlin Event Integration Tests', () => {
     let proposal;
     before('it should setupSubscriber and delegate', async () => {
       const initialBalance = await comp.balanceOf(addresses[0]);
-      await comp.delegate(addresses[0]);
+      const proposalMinimum = await governorAlpha.proposalThreshold();
+      await comp.delegate(addresses[0], proposalMinimum);
       await Promise.all([
         handler.emitter.on(
           EventKind.DelegateChanged.toString(),
@@ -277,11 +278,11 @@ describe('Marlin Event Integration Tests', () => {
       const targets = [
         '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',
       ];
-      const values = [0,]; // todo: check if they're strings
+      const values = [0,];
       const signatures = [
         '_setCollateralFactor(address,uint256)'
       ];
-      const calldatas = [ // todo: check if string[] is sufficient for bytes[]
+      const calldatas = [
         '0x000000000000000000000000C11B1268C1A384E55C48C2391D8D480264A3A7F40000000000000000000000000000000000000000000000000853A0D2313C0000',
       ];
       proposal = await governorAlpha.propose(targets, values, signatures, calldatas, 'test description');
