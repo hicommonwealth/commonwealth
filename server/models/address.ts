@@ -4,9 +4,7 @@ import * as Sequelize from 'sequelize';
 import crypto from 'crypto';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
-import { stringToU8a, hexToU8a, u8aToString } from '@polkadot/util';
-import ExtrinsicPayload from '@polkadot/types/extrinsic/v4/ExtrinsicPayload';
-import { TypeRegistry } from '@polkadot/types';
+import { stringToU8a, hexToU8a } from '@polkadot/util';
 
 import * as secp256k1 from 'secp256k1';
 import * as CryptoJS from 'crypto-js';
@@ -80,7 +78,6 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
     addressModel: AddressInstance,
     user_id: number,
     signatureString: string,
-    signatureParams: string,
   ) => Promise<boolean>;
 }
 
@@ -161,7 +158,6 @@ export default (
     addressModel: AddressInstance,
     user_id: number,
     signatureString: string,
-    signatureParams: string,
   ): Promise<boolean> => {
     if (!chain) {
       log.error('no chain provided to verifySignature');
@@ -196,28 +192,13 @@ export default (
         keyringOptions.ss58Format = 42; // default chain id
       }
       const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
-      if (signatureParams) {
-        let params;
-        try {
-          params = JSON.parse(signatureParams);
-          const verificationToken = u8aToString(hexToU8a(params.method));
-          const verificationTokenValid = verificationToken.indexOf(addressModel.verification_token) !== -1;
-          if (!verificationTokenValid) return false;
-        } catch (e) {
-          log.error('Invalid signatureParams');
-          return false;
-        }
-        const signedPayload = new ExtrinsicPayload(new TypeRegistry(), params).toU8a(true);
-        isValid = signerKeyring.verify(signedPayload, hexToU8a(signatureString));
-      } else {
-        const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
-        const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
-        const signatureU8a = signatureString.slice(0, 2) === '0x'
-          ? hexToU8a(signatureString)
-          : hexToU8a(`0x${signatureString}`);
-        isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
-          || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
-      }
+      const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
+      const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
+      const signatureU8a = signatureString.slice(0, 2) === '0x'
+        ? hexToU8a(signatureString)
+        : hexToU8a(`0x${signatureString}`);
+      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
+        || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
     } else if (chain.network === 'cosmos') {
       const signatureData = JSON.parse(signatureString);
       // this saved "address" is actually just the address
