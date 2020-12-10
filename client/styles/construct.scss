@@ -231,6 +231,10 @@ button, .cui-button {
 .cui-callout.cui-primary {
     border-color: tint($cui-primary-border-color, 75%);
 }
+.cui-callout a {
+    font-weight: 500;
+    color: shade($cui-primary-border-color, 15%);
+}
 
 // adjust card padding
 .cui-card {

@@ -46,7 +46,7 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@babel/register": "^7.4.0",
-    "@commonwealth/chain-events": "0.3.14",
+    "@commonwealth/chain-events": "0.3.15",
     "@edgeware/node-types": "3.0.10",
     "@lunie/cosmos-api": "git+https://git@github.com/hicommonwealth/cosmos-api.git#develop",
     "@lunie/cosmos-keys": "^0.0.11",
@@ -182,9 +182,6 @@
     "webpack-merge": "^4.1.4",
     "webpack-node-externals": "^1.7.2",
     "ws": "^7.2.1"
-  },
-  "resolutions": {
-    "**/@polkadot/wasm-crypto": "hicommonwealth/wasm-crypto#c5ee2ea5ed0edd87da792e758832edfd1d9072bd"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^0.1.3",

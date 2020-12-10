@@ -32,10 +32,6 @@ const VoteListing: m.Component<{
   balancesCache,
   balancesCacheInitialized,
 }> = {
-  oninit: (vnode) => {
-    vnode.state.balancesCache = {};
-    vnode.state.balancesCacheInitialized = {};
-  },
   view: (vnode) => {
     const { proposal, votes, amount, weight } = vnode.attrs;
     const balanceWeighted = proposal.votingUnit === VotingUnit.CoinVote
@@ -43,6 +39,9 @@ const VoteListing: m.Component<{
     const displayedVotes = vnode.state.expanded
       ? votes
       : votes.slice(0, 3);
+
+    if (!vnode.state.balancesCache) vnode.state.balancesCache = {};
+    if (!vnode.state.balancesCacheInitialized) vnode.state.balancesCacheInitialized = {};
 
     return m('.VoteListing', [
       (displayedVotes.length === 0)

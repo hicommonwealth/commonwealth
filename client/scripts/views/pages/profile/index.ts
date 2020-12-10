@@ -195,9 +195,9 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
             if (a.OffchainProfile.identity) {
               profile.initializeWithChain(
                 a.OffchainProfile.identity,
-                profileData.headline,
-                profileData.bio,
-                profileData.avatarUrl,
+                profileData?.headline,
+                profileData?.bio,
+                profileData?.avatarUrl,
                 a.OffchainProfile.judgements,
                 a.last_active,
                 a.is_councillor,
@@ -205,10 +205,10 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
               );
             } else {
               profile.initialize(
-                profileData.name,
-                profileData.headline,
-                profileData.bio,
-                profileData.avatarUrl,
+                profileData?.name,
+                profileData?.headline,
+                profileData?.bio,
+                profileData?.avatarUrl,
                 a.last_active,
                 a.is_councillor,
                 a.is_validator

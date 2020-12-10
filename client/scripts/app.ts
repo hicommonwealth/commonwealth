@@ -137,28 +137,39 @@ export function handleUpdateEmailConfirmation() {
   }
 }
 
-export async function selectCommunity(c?: CommunityInfo): Promise<void> {
+export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   // Check for valid community selection, and that we need to switch
   if (app.community && c === app.community.meta) return;
 
   // Shut down old chain if applicable
-  const oldCommunity = app.community && app.community.meta;
   await deinitChainOrCommunity();
 
-  // Initialize the community
-  app.community = new Community(c, app);
-  await app.community.init();
+  // Begin initializing the community
+  const newCommunity = new Community(c, app);
+  const finalizeInitialization = await newCommunity.init();
+
+  // If the user is still in the initializing community, finalize the
+  // initialization; otherwise, abort and return false
+  if (!finalizeInitialization) {
+    return false;
+  } else {
+    app.community = newCommunity;
+  }
   console.log(`${c.name.toUpperCase()} started.`);
 
   // Initialize available addresses
   await updateActiveAddresses();
 
-  // Redraw with community fully loaded
+  // Redraw with community fully loaded and return true to indicate
+  // initialization has finalized.
   m.redraw();
+  return true;
 }
 
 // called by the user, when clicking on the chain/node switcher menu
-export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> {
+// returns a boolean reflecting whether initialization of chain via the
+// initChain fn ought to proceed or abort
+export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolean> {
   // Select the default node, if one wasn't provided
   if (!n) {
     if (app.user.selectedNode) {
@@ -185,92 +196,106 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
+  let newChain;
+  let initApi; // required for NEAR
   if (n.chain.network === ChainNetwork.Edgeware) {
     const Edgeware = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "edgeware-main" */
       './controllers/chain/edgeware/main'
     )).default;
-    app.chain = new Edgeware(n, app);
+    newChain = new Edgeware(n, app);
   } else if (n.chain.network === ChainNetwork.Kusama) {
     const Kusama = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "kusama-main" */
       './controllers/chain/kusama/main'
     )).default;
-    app.chain = new Kusama(n, app);
+    newChain = new Kusama(n, app);
   } else if (n.chain.network === ChainNetwork.Polkadot) {
     const Polkadot = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "kusama-main" */
       './controllers/chain/polkadot/main'
     )).default;
-    app.chain = new Polkadot(n, app);
+    newChain = new Polkadot(n, app);
   } else if (n.chain.network === ChainNetwork.Kulupu) {
     const Kulupu = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "kulupu-main" */
       './controllers/chain/kulupu/main'
     )).default;
-    app.chain = new Kulupu(n, app);
+    newChain = new Kulupu(n, app);
   } else if (n.chain.network === ChainNetwork.Plasm) {
     const Plasm = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "plasm-main" */
       './controllers/chain/plasm/main'
     )).default;
-    app.chain = new Plasm(n, app);
+    newChain = new Plasm(n, app);
   } else if (n.chain.network === ChainNetwork.Stafi) {
     const Stafi = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "stafi-main" */
       './controllers/chain/stafi/main'
     )).default;
-    app.chain = new Stafi(n, app);
+    newChain = new Stafi(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "cosmos-main" */
       './controllers/chain/cosmos/main'
     )).default;
-    app.chain = new Cosmos(n, app);
+    newChain = new Cosmos(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "ethereum-main" */
       './controllers/chain/ethereum/main'
     )).default;
-    app.chain = new Ethereum(n, app);
+    newChain = new Ethereum(n, app);
   } else if (n.chain.network === ChainNetwork.NEAR) {
     const Near = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "near-main" */
       './controllers/chain/near/main'
     )).default;
-    app.chain = new Near(n, app);
-    app.chain.initApi(); // required for loading NearAccounts
+    newChain = new Near(n, app);
+    initApi = true;
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "moloch-main" */
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
-    app.chain = new Moloch(n, app);
+    newChain = new Moloch(n, app);
   } else if (n.chain.network === ChainNetwork.Marlin) {
     const Marlin = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "marlin-main" */
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
-    app.chain = new Marlin(n, app);
+    newChain = new Marlin(n, app);
   } else {
     throw new Error('Invalid chain');
   }
-  app.chainPreloading = false;
-  app.chain.deferred = deferred;
 
   // Load server data without initializing modules/chain connection.
-  await app.chain.initServer();
+  const finalizeInitialization = await newChain.initServer();
+
+  // If the user is still on the initializing node, finalize the
+  // initialization; otherwise, abort and return false
+  if (!finalizeInitialization) {
+    app.chainPreloading = false;
+    return false;
+  } else {
+    app.chain = newChain;
+  }
+  if (initApi) {
+    app.chain.initApi(); // required for loading NearAccounts
+  }
+  app.chainPreloading = false;
+  app.chain.deferred = deferred;
 
   // Instantiate active addresses before chain fully loads
   await updateActiveAddresses(n.chain);
@@ -286,8 +311,10 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
   handleInviteLinkRedirect();
 
-  // Redraw with not-yet-loaded chain
+  // Redraw with not-yet-loaded chain and return true to indicate
+  // initialization has finalized.
   m.redraw();
+  return true;
 }
 
 // Initializes a selected chain. Requires `app.chain` to be defined and valid
@@ -312,7 +339,7 @@ export async function initChain(): Promise<void> {
   m.redraw();
 }
 
-export function initCommunity(communityId: string): Promise<void> {
+export function initCommunity(communityId: string): Promise<boolean> {
   const community = app.config.communities.getByCommunity(communityId);
   if (community && community.length > 0) {
     return selectCommunity(community[0]);
@@ -377,7 +404,10 @@ moment.updateLocale('en', {
 
 $(() => {
   // set window error handler
+  // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
+  const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
+    if (typeof errorMsg === 'string' && resizeObserverLoopErrRe.test(errorMsg)) return false;
     notifyError(`${errorMsg}`);
     return false;
   };

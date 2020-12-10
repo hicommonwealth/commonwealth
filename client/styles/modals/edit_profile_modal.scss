@@ -17,8 +17,13 @@
         padding: 26px;
         .text-input-wrapper {
             margin: 6px 0 4px 0;
+            label.cui-form-label {
+                display: block;
+                margin-top: 8px;
+                color: $text-color-dark;
+            }
             input, textarea {
-                margin: 6px 0;
+                margin: 8px 0;
             }
             textarea {
                 height: 96px !important;

@@ -126,6 +126,7 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
       this._listingStore.add(result, storeOptions);
@@ -166,7 +167,7 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Post edits propagate to all thread stores
-        this._store.update(result);
+        this._store.update(result, (t) => t.id === result.id);
         this._listingStore.update(result);
         return result;
       },
