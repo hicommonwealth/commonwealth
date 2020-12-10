@@ -58,6 +58,16 @@ export class SubstrateCollectiveProposal
     return this._Collective.moduleName;
   }
 
+  // BLOCK EXPLORER LINK
+  public get blockExplorerLink() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) {
+      const subdomain = blockExplorerIds['subscan'];
+      return `https://${subdomain}.subscan.io/council/${this.identifier}`;
+    }
+  }
+
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,

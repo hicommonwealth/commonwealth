@@ -107,7 +107,9 @@ $discussion-title-font-size: 1.45rem;
                 }
             }
         }
-        .ProposalHeaderExternalLink {
+        .ProposalHeaderExternalLink,
+        .ProposalHeaderVotingLink {
+            display: inline-block;
             margin-top: 18px;
             font-weight: 500;
             a:link,
@@ -116,11 +118,11 @@ $discussion-title-font-size: 1.45rem;
                 padding: 10px 15px;
                 border-radius: 6px;
                 background: $background-color-light;
-                color: $theme-base-color;
+                color: $text-color-primary;
                 text-decoration: none !important;
             }
             svg {
-                stroke: $theme-base-color;
+                stroke: $text-color-primary;
                 position: relative;
                 top: -1px;
                 margin-left: 5px;
