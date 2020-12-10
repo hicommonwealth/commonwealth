@@ -397,7 +397,10 @@ moment.updateLocale('en', {
 
 $(() => {
   // set window error handler
+  // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
+  const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
+    if (typeof errorMsg === 'string' && resizeObserverLoopErrRe.test(errorMsg)) return false;
     notifyError(`${errorMsg}`);
     return false;
   };
