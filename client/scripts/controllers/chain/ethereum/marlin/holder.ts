@@ -3,7 +3,7 @@ import { IApp } from 'state';
 import { from, of, Observable, BehaviorSubject } from 'rxjs';
 import { switchMap, first } from 'rxjs/operators';
 
-import { Comp } from 'adapters/chain/ethereum/types';
+import { MPond } from 'adapters/chain/ethereum/types';
 
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumAccount from 'controllers/chain/ethereum/account';
