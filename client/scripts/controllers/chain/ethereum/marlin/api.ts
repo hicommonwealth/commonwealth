@@ -23,6 +23,7 @@ export default class MarlinAPI {
   private _tokenContract: Erc20;
   private _userMPond: BigNumber;
   private _Symbol: string;
+  private _Bridge: string;
 
   public get userAddress() { return this._userAddress; }
   public get mPondAddress() { return this._MPondAddress; }
@@ -35,6 +36,7 @@ export default class MarlinAPI {
   public get tokenContract() { return this._tokenContract; }
   public get userMPond(): number { return this._userMPond.toNumber(); }
   public get symbol(): string { return this._Symbol; }
+  public get bridge(): string { return this._Bridge; }
 
   constructor(
     mPondAddress: string,

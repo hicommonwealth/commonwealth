@@ -1,5 +1,5 @@
 // import { MarlinTypes } from '@commonwealth/chain-events';
-import { Comp, EthereumCoin } from 'adapters/chain/ethereum/types';
+import { MPond, EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -61,7 +61,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.webWallet.enable();
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
-    const compContractAddress = this.meta.address;
+    const mpondContractAddress = this.meta.address;
     const governorAlphaContractAddress = '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff';
     const api = new MarlinAPI(this.meta.address, governorAlphaContractAddress, this.chain.api.currentProvider as any, activeAddress);
     await api.init().catch((e) => {
@@ -71,7 +71,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.chain.marlinApi = api;
 
     if (this.webWallet) {
-      await this.webWallet.enable().catch((e) => {console.log('thowing!22'); console.error(e);});
+      await this.webWallet.enable().catch((e) => { console.log('thowing!22'); console.error(e); });
       await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
         const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
         setActiveAccount(updatedAddress);
@@ -100,8 +100,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     console.log('Marlin deinit()');
     await super.deinit();
     this.governance.deinit();
-    // this.ethAccounts.deinit();
-    this.marlinAccounts.deinit(); //
+    this.marlinAccounts.deinit();
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();

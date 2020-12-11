@@ -8,7 +8,6 @@ import { AccountsStore } from 'stores';
 import MarlinHolder from './Holder';
 import MarlinAPI from './api';
 import MarlinChain from './chain';
-import BN from 'bn.js';
 
 export default class MarlinHolders implements IAccountsModule<EthereumCoin, MarlinHolder> {
   protected _store: AccountsStore<MarlinHolder> = new AccountsStore();
@@ -66,9 +65,9 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
     }
   }
 
-  public async senderSetDelegate(address: string) {
+  public async senderSetDelegate(address: string, amount: number) {
     try {
-      await this.api.compContract.delegate(address);
+      await this.api.mPondContract.delegate(address, amount);
     } catch (e) {
       console.error(e);
       throw new Error(e);
@@ -77,8 +76,9 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
 
   public async senderGetDelegate(): Promise<string> {
     const sender = this._api.userAddress;
+    const bridge = this._api.bridge;
     try {
-      const delegate = await this._api.compContract.delegates(sender);
+      const delegate = await this._api.mPondContract.delegates(bridge, sender);
       const zeroAddress = '0x0000000000000000000000000000000000000000';
       return delegate === zeroAddress ? null : delegate;
     } catch (err) {
@@ -89,13 +89,14 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
 
   public async isSenderHolder(): Promise<boolean> {
     const sender = this._api.userAddress;
-    const m = await this._api.compContract.balances(sender);
+    const m = await this._api.mPondContract.balances(sender);
     return !m.isZero();
   }
 
   public async isSenderDelegate(): Promise<boolean> {
     const sender = this._api.userAddress;
-    const delegator = await this._api.compContract.delegates(sender);
+    const bridge = this._api.bridge;
+    const delegator = await this._api.mPondContract.delegates(bridge, sender);
     return delegator === sender;
   }
 }
