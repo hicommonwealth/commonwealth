@@ -17,16 +17,16 @@ export default class MarlinHolder extends EthereumAccount {
   private _isHolder: boolean;
   private _isDelegate: boolean;
 
-  private _balance: BehaviorSubject<Comp> = new BehaviorSubject(null);
-  private _delegates: BehaviorSubject<Comp> = new BehaviorSubject(null);
+  private _balance: BehaviorSubject<MPond> = new BehaviorSubject(null);
+  private _delegates: BehaviorSubject<MPond> = new BehaviorSubject(null);
 
   private _Holders: MarlinHolders;
 
-  public get balance(): Observable<Comp> {
+  public get balance(): Observable<MPond> {
     return from(this.initialized).pipe(
       switchMap(() => this.isHolder
         ? this._balance.asObservable()
-        : of(new Comp(this._Holders.api.compAddress, 0)))
+        : of(new MPond(this._Holders.api.mPondAddress, 0)))
     );
   }
 
@@ -49,8 +49,8 @@ export default class MarlinHolder extends EthereumAccount {
         throw new Error('Holder does not correspond with account');
       }
       this._isHolder = true;
-      this._balance.next(new Comp(this._Holders.api.compAddress, new BN(data.balance)));
-      this._delegates.next(new Comp(this._Holders.api.compAddress, new BN(data.delegates)));
+      this._balance.next(new MPond(this._Holders.api.mPondAddress, new BN(data.balance)));
+      this._delegates.next(new MPond(this._Holders.api.mPondAddress, new BN(data.delegates)));
       this._initialized = Promise.resolve(true);
     } else {
       this._initialized = new Promise((resolve, reject) => {
@@ -61,38 +61,38 @@ export default class MarlinHolder extends EthereumAccount {
   }
 
   public async refresh() {
-    const balance = await this._Holders.api.compContract?.balanceOf(this.address);
+    const balance = await this._Holders.api.mPondContract?.balanceOf(this.address);
     if (!balance.isZero()) {
       this._isHolder = true;
-      this._balance.next(new Comp(this._Holders.api.compAddress, new BN(balance.toString())));
+      this._balance.next(new MPond(this._Holders.api.mPondAddress, new BN(balance.toString())));
     } else {
       this._isHolder = false;
-      this._balance.next(new Comp(this._Holders.api.compAddress, new BN(0)));
+      this._balance.next(new MPond(this._Holders.api.mPondAddress, new BN(0)));
     }
-    const delegates = await this._Holders.api.compContract.getCurrentVotes(this.address);
+    const delegates = await this._Holders.api.mPondContract.getCurrentVotes(this.address);
     if (!delegates.isZero()) {
       this._isDelegate = true;
-      this._delegates.next(new Comp(this._Holders.api.compAddress, new BN(delegates.toString())));
+      this._delegates.next(new MPond(this._Holders.api.mPondAddress, new BN(delegates.toString())));
     } else {
       this._isDelegate = false;
-      this._delegates.next(new Comp(this._Holders.api.compAddress, new BN(0)));
+      this._delegates.next(new MPond(this._Holders.api.mPondAddress, new BN(0)));
     }
   }
 
   public async priorDelegates(blockNumber: number | string) {
-    const delegates = new BN((await this._Holders.api.compContract.getPriorVotes(this.address, blockNumber)).toString(), 10);
+    const delegates = new BN((await this._Holders.api.mPondContract.getPriorVotes(this.address, blockNumber)).toString(), 10);
     return delegates || 0;
   }
 
   public async balanceOf() {
-    const balance = await this._Holders.api.compContract.balanceOf(this.address);
+    const balance = await this._Holders.api.mPondContract.balanceOf(this.address);
     console.log('balanceOf Marlin Accounts', balance);
     if (!balance.isZero()) {
       this._isHolder = true;
-      this._balance.next(new Comp(this._Holders.api.compAddress, new BN(balance.toString())));
+      this._balance.next(new MPond(this._Holders.api.mPondAddress, new BN(balance.toString())));
     } else {
       this._isHolder = false;
-      this._balance.next(new Comp(this._Holders.api.compAddress, new BN(0)));
+      this._balance.next(new MPond(this._Holders.api.mPondAddress, new BN(0)));
     }
     return balance.toString();
   }
