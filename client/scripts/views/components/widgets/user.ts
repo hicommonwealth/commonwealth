@@ -123,8 +123,8 @@ const User: m.Component<{
                 profile
                   ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:',
-                profile ? profile.name : addrShort)
-              : m('a.user-display-name.username', profile ? profile.name : addrShort)
+                profile ? profile.displayName : addrShort)
+              : m('a.user-display-name.username', profile ? profile.displayName : addrShort)
           ],
         showRole && roleTags,
       ]);
@@ -143,12 +143,11 @@ const User: m.Component<{
       m('.user-name', [
         (app.chain && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
           ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort })
-          : link(`a.user-display-name${
-            (profile && profile.name !== 'Anonymous') ? '.username' : '.anonymous'}`,
-          profile
-            ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
-            : 'javascript:',
-          profile ? profile.name : addrShort)
+          : link('a.user-display-name',
+            profile
+              ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+              : 'javascript:',
+            profile ? profile.displayName : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
       roleTags, // always show roleTags in .UserPopover

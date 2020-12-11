@@ -18,10 +18,6 @@ import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PageLoading from 'views/pages/loading';
 
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
   if (!chainObj) return;
@@ -113,7 +109,9 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', account.profile ? m(User, { user: account, hideAvatar: true, showRole: true }) : account.address),
+            m('.User', [
+              account.profile ? m(User, { user: account, hideAvatar: true, showRole: true }) : account.address,
+            ]),
           ]),
           m('.info-row', [
             account.profile?.headline && m('span.profile-headline', account.profile.headline),

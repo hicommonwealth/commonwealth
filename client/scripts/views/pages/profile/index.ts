@@ -7,7 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 
 import app from 'state';
-import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
+import { OffchainThread, OffchainComment, OffchainAttachment, Profile, ChainBase } from 'models';
 
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';
@@ -232,8 +232,8 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         },
         error: (err) => {
           console.error(err);
-          // decode address properly
-          if (['kulupu', 'edgeware', 'polkadot', 'kusama'].includes(chain)) {
+          // decode address properly for polkadot chains
+          if (app.chain?.meta?.chain?.id === chain && app.chain.base === ChainBase.Substrate) {
             try {
               decodeAddress(address);
               vnode.state.account = {
@@ -251,8 +251,13 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
           vnode.state.loaded = true;
           vnode.state.loading = false;
           m.redraw();
-          if (!vnode.state.account) throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
-            : 'Failed to find profile');
+          if (!vnode.state.account) {
+            throw new Error(
+              (err.responseJSON && err.responseJSON.error)
+                ? err.responseJSON.error
+                : 'Failed to find profile'
+            );
+          }
         }
       });
     };
