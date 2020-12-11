@@ -2,7 +2,7 @@ import * as yargs from 'yargs';
 
 import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
 import {
-  chainSupportedBy, IEventHandler, CWEvent, SubstrateEvents, MolochEvents, EventSupportingChains
+  chainSupportedBy, IEventHandler, CWEvent, SubstrateEvents, MarlinEvents, MolochEvents, EventSupportingChains
 } from '../dist/index';
 
 const networks = {
@@ -15,6 +15,9 @@ const networks = {
 
   'moloch': 'wss://mainnet.infura.io/ws',
   'moloch-local': 'ws://127.0.0.1:9545',
+
+  'marlin': 'wss://mainnet.infura.io/ws',
+  'marlin-local': 'ws://127.0.0.1:9545',
 } as const;
 
 const specs = {
@@ -101,7 +104,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       verbose: true,
     });
   });
-} else if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
+} else if (chainSupportedBy(network, MolochEvents.Types.EventChains)) {
   const contractVersion = 1;
   if (!contract) throw new Error(`no contract address for ${network}`);
   MolochEvents.createApi(url, contractVersion, contract).then((api) => {
@@ -113,5 +116,20 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       skipCatchup,
       verbose: true,
     });
+  })
+} else if (chainSupportedBy(network, MarlinEvents.Types.EventChains)) {
+  const contracts = {
+    comp: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // TESTNET
+    governorAlpha: '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff', // TESTNET
+    timelock: '0x7d89D52c464051FcCbe35918cf966e2135a17c43'  // TESTNET
+  };
+  MarlinEvents.createApi(url, contracts).then((api) => {
+    MarlinEvents.subscribeEvents({
+      chain: network,
+      api,
+      handlers: [ new StandaloneEventHandler() ],
+      skipCatchup,
+      verbose: true,
+    })
   })
 }
