@@ -281,7 +281,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         // proposals (substrate, cosmos, moloch only)
         m(ListItem, {
           active: onProposalPage(m.route.get()),
-          label: 'Proposals & Motions',
+          label: showMarlinOptions ? 'View Proposals' : 'Proposals & Motions',
           contentLeft: m(Icon, { name: Icons.SEND }),
           onclick: (e) => {
             e.preventDefault();
@@ -339,6 +339,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         //     },
         //   }),
         showMolochMemberOptions && m(ListItem, {
+          active: m.route.get() === `/${app.activeChainId()}/new/proposal/:type`,
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
@@ -379,13 +380,17 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           contentLeft: m(Icon, { name: Icons.POWER }),
         }),
         showMarlinOptions && m(ListItem, {
-          onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MarlinProposal }),
-          label: 'Create Proposal',
+          active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.MarlinProposal}`,
+          onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, {
+            type: ProposalType.MarlinProposal
+          }),
+          label: 'Propose',
           contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
         }),
         showMarlinOptions && m(ListItem, {
+          active: m.route.get() === `/${app.activeChainId()}/delegate`,
           onclick: (e) => m.route.set(`/${app.activeChainId()}/delegate`),
-          label: 'Delegate COMP/LIN',
+          label: 'Delegate',
           contentLeft: m(Icon, { name: Icons.FLAG }),
         }),
       ]),
