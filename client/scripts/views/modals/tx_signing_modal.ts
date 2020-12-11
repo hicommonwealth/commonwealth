@@ -371,7 +371,6 @@ const TXSigningModalStates = {
         vnode.state.timer++;
         m.redraw();
       }, 1000);
-
       // for edgeware mainnet, timeout after 10 sec
       // TODO: remove this after the runtime upgrade to Substrate 2.0 rc3+
       if (app.chain?.meta?.chain?.id === 'edgeware') {
@@ -387,9 +386,6 @@ const TXSigningModalStates = {
       }
 
       vnode.attrs.stateData.obs.subscribe((data: ITransactionResult) => {
-        if (vnode.state.timerHandle) {
-          clearInterval(vnode.state.timerHandle);
-        }
         if (data.status === TransactionStatus.Success) {
           vnode.attrs.next('SentTransactionSuccess', {
             hash: data.hash,
