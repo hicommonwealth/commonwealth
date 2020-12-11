@@ -447,7 +447,7 @@ const LinkNewAddressModal: m.Component<{
           app.chain.base === ChainBase.Substrate && [
             m('p.link-address-cli-explainer', [
               'Enter the address you are using. If you need a new address, generate one by running ',
-              m('code', vnode.state.isEd25519 ? 'subkey -e generate' : 'subkey generate'),
+              m('code', vnode.state.isEd25519 ? 'subkey generate --scheme ed25519' : 'subkey generate'),
             ]),
           ],
           app.chain.base === ChainBase.CosmosSDK && [
@@ -464,6 +464,7 @@ const LinkNewAddressModal: m.Component<{
           m(Input, {
             name: 'Address',
             fluid: true,
+            autocomplete: 'off',
             placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
               : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here (e.g. cosmos123...)'
                 : 'Paste the address here',
@@ -534,7 +535,9 @@ const LinkNewAddressModal: m.Component<{
             app.chain.base === ChainBase.Substrate && [
               m('p', 'Use the secret phrase to sign this message:'),
               m(CodeBlock, { clickToSelect: true }, [
-                `subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : ''}--message "${vnode.state.newAddress.validationToken}"`,
+                `echo "${vnode.state.newAddress.validationToken}" | subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : ''}--suri "`,
+                m('span.no-select', 'secret phrase'),
+                '"',
               ]),
             ],
             app.chain.base === ChainBase.CosmosSDK && m('p', [
@@ -554,6 +557,7 @@ const LinkNewAddressModal: m.Component<{
             m(Input, {
               name: 'Signature',
               fluid: true,
+              autocomplete: 'off',
               placeholder: (app.chain.base === ChainBase.CosmosSDK)
                 ? 'Paste the entire output'
                 : 'Paste the signature here',
