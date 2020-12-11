@@ -6,7 +6,7 @@ const Op = SequelizeLib.Op;
 //   from the shared/events/edgeware/types file.
 
 const MarlinEventKinds = {
-  // Comp Events
+  // MPond Events
   Approval: 'approval',
   DelegateChanged: 'delegate-changed',
   DelegateVotesChanged: 'delegate-votes-changed',
