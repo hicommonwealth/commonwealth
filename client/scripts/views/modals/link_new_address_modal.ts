@@ -446,11 +446,8 @@ const LinkNewAddressModal: m.Component<{
         m('.link-address-step-narrow', [
           app.chain.base === ChainBase.Substrate && [
             m('p.link-address-cli-explainer', [
-              'Enter the address you are using. If you need a new address, you can generate one by running:',
-            ]),
-            vnode.state.error && !vnode.state.newAddress && m('.error-message', vnode.state.error),
-            m(CodeBlock, { clickToSelect: true }, [
-              vnode.state.isEd25519 ? 'subkey -e generate' : 'subkey generate',
+              'Enter the address you are using. If you need a new address, generate one by running ',
+              m('code', vnode.state.isEd25519 ? 'subkey -e generate' : 'subkey generate'),
             ]),
           ],
           app.chain.base === ChainBase.CosmosSDK && [
@@ -464,29 +461,6 @@ const LinkNewAddressModal: m.Component<{
               m('span.no-select', '<name>'),
             ]),
           ],
-          app.chain.base === ChainBase.Substrate && m(Checkbox, {
-            name: 'is-ed25519',
-            label: 'Key is ed25519 format',
-            onchange: async (e) => {
-              const result = (e.target as any).checked;
-              vnode.state.isEd25519 = !!result;
-
-              // resubmit creation if they check box after pasting address
-              if (!vnode.state.enteredAddress) return;
-              if (!vnode.state.error) {
-                try {
-                  vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
-                    address: vnode.state.enteredAddress,
-                    currentPrefix: (app.chain as Substrate).chain.ss58Format,
-                  }), vnode.state.isEd25519 ? 'ed25519' : undefined);
-                } catch (e) {
-                  vnode.state.error = e.responseJSON ? e.responseJSON.error : 'Failed to create user.';
-                }
-              }
-
-              m.redraw();
-            },
-          }),
           m(Input, {
             name: 'Address',
             fluid: true,
@@ -531,14 +505,36 @@ const LinkNewAddressModal: m.Component<{
               m.redraw();
             },
           }),
+          app.chain.base === ChainBase.Substrate && m(Checkbox, {
+            name: 'is-ed25519',
+            label: 'Key is ed25519 format',
+            onchange: async (e) => {
+              const result = (e.target as any).checked;
+              vnode.state.isEd25519 = !!result;
+
+              // resubmit creation if they check box after pasting address
+              if (!vnode.state.enteredAddress) return;
+              if (!vnode.state.error) {
+                try {
+                  vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
+                    address: vnode.state.enteredAddress,
+                    currentPrefix: (app.chain as Substrate).chain.ss58Format,
+                  }), vnode.state.isEd25519 ? 'ed25519' : undefined);
+                } catch (err) {
+                  vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
+                }
+              }
+
+              m.redraw();
+            },
+          }),
+          vnode.state.error && !vnode.state.newAddress && m('.error-message', vnode.state.error),
           // Allow signing iff address has been created and account has been verified
           vnode.state.newAddress && m('.link-address-cli-verification', [
             app.chain.base === ChainBase.Substrate && [
               m('p', 'Use the secret phrase to sign this message:'),
               m(CodeBlock, { clickToSelect: true }, [
-                `echo "${vnode.state.newAddress.validationToken}" | subkey ${vnode.state.isEd25519 ? '-e ' : ''}sign "`,
-                m('span.no-select', 'secret phrase'),
-                '"',
+                `subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : ''}--message "${vnode.state.newAddress.validationToken}"`,
               ]),
             ],
             app.chain.base === ChainBase.CosmosSDK && m('p', [
@@ -573,7 +569,7 @@ const LinkNewAddressModal: m.Component<{
                     vnode.state.error = 'Invalid signature';
                   }
                 } catch (err) {
-                  vnode.state.error = 'Invalid signature';
+                  vnode.state.error = 'Invalid signature (2)';
                 }
                 m.redraw();
               },
