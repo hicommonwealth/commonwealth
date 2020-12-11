@@ -4,7 +4,7 @@ import moment from 'moment';
 import { MPond, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
 
-// import { MarlinTypes } from '@commonwealth/chain-events';
+import { MarlinTypes } from '@commonwealth/chain-events';
 
 import {
   Proposal,
@@ -53,70 +53,70 @@ const backportEntityToAdapter = (
   Gov: MarlinGovernance,
   entity: ChainEntity
 ): IMarlinProposalResponse => {
-  // TODO: Uncomment when Chain-events is being imported
-  // const startEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalCreated);
-  // const canceledEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalCanceled);
-  // const executedEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalExecuted);
-  // const voteEvents = entity.chainEvents.filter((e) => e.data.kind === MarlinTypes.EventKind.VoteCast);
-  // if (!startEvent) {
-  //   throw new Error('Proposal start event not found!');
-  // }
+  const startEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalCreated);
+  const canceledEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalCanceled);
+  const executedEvent = entity.chainEvents.find((e) => e.data.kind === MarlinTypes.EventKind.ProposalExecuted);
+  const voteEvents = entity.chainEvents.filter((e) => e.data.kind === MarlinTypes.EventKind.VoteCast);
+  if (!startEvent) {
+    throw new Error('Proposal start event not found!');
+  }
 
-  // const identifier = `${(startEvent.data as MarlinTypes.IProposalCreated).id}`;
-  // const id = identifier;
-  // const proposer = `${(startEvent.data as MarlinTypes.IProposalCreated).proposer}`;
-  // const description = `${(startEvent.data as MarlinTypes.IProposalCreated).description}`;
-  // const targets = (startEvent.data as MarlinTypes.IProposalCreated).targets;
-  // const values = (startEvent.data as MarlinTypes.IProposalCreated).values;
-  // const signatures = (startEvent.data as MarlinTypes.IProposalCreated).signatures;
-  // const calldatas = (startEvent.data as MarlinTypes.IProposalCreated).calldatas;
-  // const startBlock = (startEvent.data as MarlinTypes.IProposalCreated).startBlock;
-  // const endBlock = (startEvent.data as MarlinTypes.IProposalCreated).endBlock;
-  // const eta = null;
+  const identifier = `${(startEvent.data as MarlinTypes.IProposalCreated).id}`;
+  const id = identifier;
+  const proposer = `${(startEvent.data as MarlinTypes.IProposalCreated).proposer}`;
+  const description = `${(startEvent.data as MarlinTypes.IProposalCreated).description}`;
+  const targets = (startEvent.data as MarlinTypes.IProposalCreated).targets;
+  const values = (startEvent.data as MarlinTypes.IProposalCreated).values;
+  const signatures = (startEvent.data as MarlinTypes.IProposalCreated).signatures;
+  const calldatas = (startEvent.data as MarlinTypes.IProposalCreated).calldatas;
+  const startBlock = (startEvent.data as MarlinTypes.IProposalCreated).startBlock;
+  const endBlock = (startEvent.data as MarlinTypes.IProposalCreated).endBlock;
+  const eta = null;
 
-  // const voteReducer = (acc, vote) => acc + vote.votes.toNumber();
-  // const forVotesArray = voteEvents.filter((e) => e.data.support);
-  // const forVotes = forVotesArray.reduce(voteReducer, 0);
-  // const againstVotesArray = voteEvents.filter((e) => !e.data.support);
-  // const againstVotes = againstVotesArray.reduce(voteReducer, 0);
-  // const canceled = !!canceledEvent;
-  // const executed = !!executedEvent;
-
-  // const proposal: IMarlinProposalResponse = {
-  //   identifier,
-  //   id,
-  //   proposer,
-  //   description,
-  //   targets,
-  //   values,
-  //   signatures,
-  //   calldatas,
-  //   startBlock,
-  //   endBlock,
-  //   eta,
-  //   forVotes,
-  //   againstVotes,
-  //   canceled,
-  //   executed,
-  // };
+  const voteReducer = (acc, vote) => acc + vote.votes.toNumber();
+  const forVotesArray = voteEvents.filter((e) => (e.data as MarlinTypes.IVoteCast).support);
+  const forVotes = forVotesArray.reduce(voteReducer, 0);
+  const againstVotesArray = voteEvents.filter((e) => !(e.data as MarlinTypes.IVoteCast).support);
+  const againstVotes = againstVotesArray.reduce(voteReducer, 0);
+  const canceled = !!canceledEvent;
+  const executed = !!executedEvent;
 
   const proposal: IMarlinProposalResponse = {
-    identifier: null,
-    id: null,
-    proposer: null,
-    description: null,
-    targets: null,
-    values: null,
-    signatures: null,
-    calldatas: null,
-    startBlock: null,
-    endBlock: null,
-    eta: null,
-    forVotes: null,
-    againstVotes: null,
-    canceled: null,
-    executed: null,
+    identifier,
+    id,
+    proposer,
+    description,
+    targets,
+    values,
+    signatures,
+    calldatas,
+    startBlock,
+    endBlock,
+    eta,
+    forVotes,
+    againstVotes,
+    canceled,
+    executed,
   };
+
+  // TODO: Remove after working
+  // const proposal: IMarlinProposalResponse = {
+  //   identifier: null,
+  //   id: null,
+  //   proposer: null,
+  //   description: null,
+  //   targets: null,
+  //   values: null,
+  //   signatures: null,
+  //   calldatas: null,
+  //   startBlock: null,
+  //   endBlock: null,
+  //   eta: null,
+  //   forVotes: null,
+  //   againstVotes: null,
+  //   canceled: null,
+  //   executed: null,
+  // };
 
   return proposal;
 };
@@ -196,7 +196,6 @@ export default class MarlinProposal extends Proposal<
     entity: ChainEntity,
   ) {
     // must set identifier before super() because of how response object is named
-    // TODO: Fix BackPortEntityToAdapter for this to work
     super('marlinproposal', backportEntityToAdapter(Gov, entity));
 
     this._Holders = Holders;
