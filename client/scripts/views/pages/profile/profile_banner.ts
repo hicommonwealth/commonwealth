@@ -5,8 +5,8 @@ import { Button } from 'construct-ui';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
-import { formatAddressShort } from 'helpers';
 import { Account, AddressInfo } from 'models';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressInfo }, { loading: boolean }> = {
   view: (vnode) => {

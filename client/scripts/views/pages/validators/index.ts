@@ -5,7 +5,6 @@ import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus } from 'state';
-import { formatAddressShort } from 'helpers';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -21,6 +20,7 @@ import Sublayout from 'views/sublayout';
 
 import * as CosmosValidationViews from './cosmos';
 import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 export interface IValidatorAttrs {
   stash: string;
