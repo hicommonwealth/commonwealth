@@ -641,7 +641,7 @@ const NewProposalForm = {
             m(FormGroup, [
               m(FormLabel, 'Proposal Targets'),
               m(Input, {
-                name: 'description',
+                name: 'targets',
                 placeholder: 'Proposal Targets',
                 oninput: (e) => {
                   const result = (e.target as any).value;
@@ -653,7 +653,7 @@ const NewProposalForm = {
             m(FormGroup, [
               m(FormLabel, 'Proposal Values'),
               m(Input, {
-                name: 'description',
+                name: 'values',
                 placeholder: 'Proposal Values',
                 oninput: (e) => {
                   const result = (e.target as any).value;
@@ -665,7 +665,7 @@ const NewProposalForm = {
             m(FormGroup, [
               m(FormLabel, 'Proposal Calldatas'),
               m(Input, {
-                name: 'description',
+                name: 'calldatas',
                 placeholder: 'Proposal Calldatas',
                 oninput: (e) => {
                   const result = (e.target as any).value;
@@ -677,7 +677,7 @@ const NewProposalForm = {
             m(FormGroup, [
               m(FormLabel, 'Proposal Signatures'),
               m(Input, {
-                name: 'description',
+                name: 'signatures',
                 placeholder: 'Proposal Signatures',
                 oninput: (e) => {
                   const result = (e.target as any).value;
