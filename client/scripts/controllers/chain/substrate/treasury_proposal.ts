@@ -2,7 +2,6 @@ import { BehaviorSubject } from 'rxjs';
 import { ApiRx } from '@polkadot/api';
 
 import { formatCoin } from 'adapters/currency';
-import { formatAddressShort } from 'helpers';
 import { ISubstrateTreasuryProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
@@ -12,6 +11,7 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasury from './treasury';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,

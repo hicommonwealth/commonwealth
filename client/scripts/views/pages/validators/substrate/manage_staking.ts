@@ -1,12 +1,12 @@
 import m from 'mithril';
 import app from 'state';
-import { formatAddressShort } from 'helpers';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
 import User from 'views/components/widgets/user';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
 import { StakingLedger } from '@polkadot/types/interfaces';
+import { formatAddressShort } from '../../../../../../shared/utils';
 import StashAccountForm from './stash_form';
 import ControllerAccountForm from './controller_form';
 import NewStashForm from './new_stash_form';

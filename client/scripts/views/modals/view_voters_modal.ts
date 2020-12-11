@@ -6,7 +6,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CompactModalExitButton } from 'views/modal';
 import app from 'state';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
-import { formatAddressShort } from 'helpers';
+import { formatAddressShort } from '../../../../shared/utils';
 import User from '../components/widgets/user';
 
 interface IVoterRowAttrs {

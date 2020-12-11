@@ -3,7 +3,8 @@ import 'components/widgets/user.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { formatAddressShort, link } from 'helpers';
+import { link } from 'helpers';
+import { formatAddressShort } from 'shared/utils';
 
 import app from 'state';
 import { Account, Profile } from 'models';
