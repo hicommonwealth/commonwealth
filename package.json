@@ -46,7 +46,7 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@babel/register": "^7.4.0",
-    "@commonwealth/chain-events": "git+https://git@github.com/hicommonwealth/chain-events.git#master",
+    "@commonwealth/chain-events": "0.3.16-beta.0",
     "@edgeware/node-types": "3.0.11",
     "@lunie/cosmos-api": "git+https://git@github.com/hicommonwealth/cosmos-api.git#develop",
     "@lunie/cosmos-keys": "^0.0.11",

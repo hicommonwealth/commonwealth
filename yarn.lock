@@ -784,9 +784,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@git+https://git@github.com/hicommonwealth/chain-events.git#master":
-  version "0.3.16"
-  resolved "git+https://git@github.com/hicommonwealth/chain-events.git#dafbe318c5299cf0065240776eb506922d6f0eb3"
+"@commonwealth/chain-events@0.3.16-beta.0":
+  version "0.3.16-beta.0"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.3.16-beta.0.tgz#57795adb44274ab00a191cb81695ba37ac039db7"
+  integrity sha512-foPDX8Daw6vj59RluR3TxMZt6iyax0QfTSOSOVXB4QlXhhoYTR+E+Wngt5J1tCXnd3suVOrcsoyzv6qqSW0wuw==
   dependencies:
     "@edgeware/node-types" "3.0.11"
     "@polkadot/api" "2.10.1"
