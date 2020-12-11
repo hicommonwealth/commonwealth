@@ -51,7 +51,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       const [account, role] = activeAccountsByRole[index];
       const addressInfo = app.user.addresses
         .find((a) => a.address === account.address && a.chain === account.chain.id);
-      const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
 
       // confirm
       const confirmed = await confirmationModalWithText('Remove this address from the community?')();
@@ -73,7 +72,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         if (isSameAccount(app.user.activeAccount, account)) {
           app.user.ephemerallySetActiveAccount(null);
         }
-        $(e.target).trigger('modalexit');
       }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();
