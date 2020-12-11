@@ -5,7 +5,7 @@ import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
-import MarlinHolder from './Holder';
+import MarlinHolder from './holder';
 import MarlinAPI from './api';
 import MarlinChain from './chain';
 
