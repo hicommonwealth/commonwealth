@@ -1,5 +1,5 @@
 import { IPostNotificationData, IChainEventNotificationData, NotificationCategories } from './types';
-import { getProposalUrl, renderQuillDeltaToText, smartTrim } from './utils';
+import { getProposalUrl, renderQuillDeltaToText, smartTrim, formatAddressShort } from './utils';
 
 import { SERVER_URL } from '../server/config';
 
@@ -31,10 +31,11 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
     }]
   });
   let authorName;
+  const author_addr_short = formatAddressShort(author_address, author_chain);
   try {
-    authorName = authorProfile.Address.name || JSON.parse(authorProfile.data).name || 'Someone';
+    authorName = authorProfile.Address.name || JSON.parse(authorProfile.data).name || author_addr_short;
   } catch (e) {
-    authorName = 'Someone';
+    authorName = author_addr_short;
   }
 
   // author profile link

@@ -7,11 +7,12 @@ import { Tag, Button, Icon, Icons } from 'construct-ui';
 import app from 'state';
 import { Account, RoleInfo, RolePermission } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
-import { isSameAccount, formatAsTitleCase, formatAddressShort } from 'helpers';
+import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
+import { formatAddressShort } from '../../../../shared/utils';
 
 const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean }> = {
   view: (vnode) => {

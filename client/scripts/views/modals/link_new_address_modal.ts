@@ -10,7 +10,7 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { Button, Callout, Input, TextArea, Icon, Icons, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
-import { formatAddressShort, isSameAccount, link } from 'helpers';
+import { isSameAccount, link } from 'helpers';
 import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
@@ -27,6 +27,7 @@ import { ChainIcon } from 'views/components/chain_icon';
 import CodeBlock from 'views/components/widgets/code_block';
 import User, { UserBlock } from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
+import { formatAddressShort } from '../../../../shared/utils';
 import AddressSwapper from '../components/addresses/address_swapper';
 
 enum LinkNewAddressSteps {
