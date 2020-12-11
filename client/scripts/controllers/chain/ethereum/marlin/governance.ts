@@ -2,10 +2,9 @@ import BN from 'bn.js';
 
 import { ProposalModule, ITXModalData, ChainEntity, IChainModule } from 'models';
 
-import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
 
-// import { MarlinEvents } from '@commonwealth/chain-events';
+import { MarlinEvents } from '@commonwealth/chain-events';
 
 import { IApp } from 'state';
 
@@ -130,7 +129,7 @@ MarlinProposal
 
     this._quorumVotes = new BN((await this._api.governorAlphaContract.quorumVotes()).toString(), 10);
     this._proposalThreshold = new BN((await this._api.governorAlphaContract.proposalThreshold()).toString(), 10);
-    this._proposalMaxOperations =new BN((await this._api.governorAlphaContract.proposalMaxOperations()).toString(), 10);
+    this._proposalMaxOperations = new BN((await this._api.governorAlphaContract.proposalMaxOperations()).toString(), 10);
     this._votingDelay = new BN((await this._api.governorAlphaContract.votingDelay()).toString(), 10);
     this._votingPeriod = new BN((await this._api.governorAlphaContract.votingPeriod()).toString(), 10);
     this._initialized = true;

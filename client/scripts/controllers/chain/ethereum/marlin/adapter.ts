@@ -12,6 +12,7 @@ import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 import { notifyError } from 'controllers/app/notifications';
+import { MarlinTypes } from '@commonwealth/chain-events';
 import MarlinAPI from './api';
 import MarlinChain from './chain';
 import MarlinGovernance from './governance';
@@ -39,19 +40,18 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.accounts.init(this.chain);
   }
 
-  // public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
-  //   switch (entity.type) {
-  //     case MarlinTypes.EntityKind.Proposal: {
-  //       const constructorFunc = (e: ChainEntity) => new MarlinProposal(this.accounts, this.governance, e);
-  //       this.governance.updateProposal(constructorFunc, entity, event);
-  //       break;
-  //     }
-  //     default: {
-  //       console.error('Received invalid marlin chain entity!');
-  //       break;
-  //     }
-  //   }
-  // }
+  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
+    switch (entity.type) {
+      case MarlinTypes.EntityKind.Proposal: {
+        this.governance.updateProposal(entity, event);
+        break;
+      }
+      default: {
+        console.error('Received invalid marlin chain entity!');
+        break;
+      }
+    }
+  }
 
   public async initApi() {
     console.log('Marlin initApi()');
