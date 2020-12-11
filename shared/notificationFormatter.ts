@@ -73,7 +73,6 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   };
   const proposalUrlArgs = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
   const proposalPath = (getProposalUrl as any)(...proposalUrlArgs);
-
   return [emailSubjectLine, authorName, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath];
 };
 
