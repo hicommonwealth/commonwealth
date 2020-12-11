@@ -28,6 +28,7 @@ import moment from 'moment';
 import Listing from './listing';
 import ErrorPage from './error';
 import PageNotFound from './404';
+import BN from 'bn.js';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -77,10 +78,10 @@ const MarlinProposalStats: m.Component<{}, {}> = {
         m('.stats-tile', [
           m('.stats-heading', 'Marlin Basics'),
           m('.stats-tile-figure-major', [
-            `Quorum Votes: ${(app.chain as Marlin).governance?.quorumVotes.toLocaleString()}`
+            `Quorum Votes: ${(app.chain as Marlin).governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} MPOND`
           ]),
           m('.stats-tile-figure-minor', [
-            `Proposal Threshold: ${(app.chain as Marlin).governance?.proposalThreshold.toLocaleString()}`
+            `Proposal Threshold: ${(app.chain as Marlin).governance?.proposalThreshold.div(new BN('1000000000000000000')).toString()} MPOND`
           ]),
           m('.stats-tile-figure-minor', [
             `Voting Period Length: ${(app.chain as Marlin).governance.votingPeriod.toString(10)}`,
