@@ -2,7 +2,7 @@ import 'sublayout.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { EmptyState, Button, Icons, Grid, Col } from 'construct-ui';
+import { EmptyState, Button, Icons, Grid, Col, Spinner } from 'construct-ui';
 
 import NewProposalButton from 'views/components/new_proposal_button';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
@@ -25,16 +25,18 @@ const Sublayout: m.Component<{
   sidebarTopic?: number,           // used to override the sidebar
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
+  hideSidebar?: boolean,
   rightSidebar?,
 }> = {
   view: (vnode) => {
     const {
       title,
       description,
-      rightSidebar,
+      sidebarTopic,
       showNewProposalButton,
       showCouncilMenu,
-      sidebarTopic,
+      hideSidebar,
+      rightSidebar,
     } = vnode.attrs;
 
     let councilCandidates: Array<[SubstrateAccount, number]>;
@@ -54,15 +56,17 @@ const Sublayout: m.Component<{
     ]);
 
     if (vnode.attrs.loadingLayout) return [
-      m(Sidebar, { sidebarTopic }),
+      !hideSidebar && m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
-        m('.LoadingLayout'),
+        m('.LoadingLayout', [
+          m(Spinner, { active: true, fill: true, size: 'lg' }),
+        ]),
       ]),
       m(RightSidebar, { rightSidebar }),
     ];
 
     if (vnode.attrs.errorLayout) return [
-      m(Sidebar, { sidebarTopic }),
+      !hideSidebar && m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m(EmptyState, {
           fill: true,
@@ -75,7 +79,7 @@ const Sublayout: m.Component<{
     ];
 
     return [
-      m(Sidebar, { sidebarTopic }),
+      !hideSidebar && m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
           m(Grid, { class: 'sublayout-grid' }, [
