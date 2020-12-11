@@ -75,16 +75,18 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
   }
 
   public async senderGetDelegate(): Promise<string> {
-    const sender = this._api.userAddress;
-    const bridge = this._api.bridge;
-    try {
-      const delegate = await this._api.mPondContract.delegates(bridge, sender);
-      const zeroAddress = '0x0000000000000000000000000000000000000000';
-      return delegate === zeroAddress ? null : delegate;
-    } catch (err) {
-      console.error(err);
-      return null;
-    }
+    // TODO: I don't think this is implementable anymore because of how the MPOND delegates mapping works now
+    return new Promise(() => 'Method Not Implemented');
+    // const sender = this._api.userAddress;
+    // const bridge = this._api.bridge;
+    // try {
+    //   const delegate = await this._api.mPondContract.delegates(bridge, sender);
+    //   const zeroAddress = '0x0000000000000000000000000000000000000000';
+    //   return delegate === zeroAddress ? null : delegate;
+    // } catch (err) {
+    //   console.error(err);
+    //   return null;
+    // }
   }
 
   public async isSenderHolder(): Promise<boolean> {
@@ -95,8 +97,7 @@ export default class MarlinHolders implements IAccountsModule<EthereumCoin, Marl
 
   public async isSenderDelegate(): Promise<boolean> {
     const sender = this._api.userAddress;
-    const bridge = this._api.bridge;
-    const delegator = await this._api.mPondContract.delegates(bridge, sender);
-    return delegator === sender;
+    const delegator = await this._api.mPondContract.getCurrentVotes(sender);
+    return !delegator.isZero();
   }
 }

@@ -40,12 +40,14 @@ const DelegateStats: m.Component<{ currentDelegate: string, }> = {
 
 interface IDelegateForm {
   address: string,
+  amount: number,
 }
 
 const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, currentDelegate: string, }> = {
   oninit: (vnode) => {
     vnode.state.form = {
       address: '',
+      amount: null,
     };
     vnode.state.loading = false;
     getDelegate(vnode);
@@ -72,7 +74,20 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
                   vnode.state.form.address = result;
                   m.redraw();
                 }
-              })
+              }),
+              m(FormLabel, 'Amount of MPOND to delegate:'),
+              m(Input, {
+                options: {
+                  name: 'address',
+                  placeholder: '...',
+                  defaultValue: '',
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.form.amount = result;
+                  m.redraw();
+                }
+              }),
             ]),
             m(FormLabel, [
               m(Button, {
@@ -83,7 +98,7 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
                   e.preventDefault();
                   vnode.state.loading = true;
                   if ((app.chain as Marlin).apiInitialized) {
-                    await (app.chain as Marlin).marlinAccounts.senderSetDelegate(vnode.state.form.address)
+                    await (app.chain as Marlin).marlinAccounts.senderSetDelegate(vnode.state.form.address, vnode.state.form.amount)
                       .then(async () => {
                         notifySuccess(`Sent transaction to delegate to ${vnode.state.form.address}`);
                         await getDelegate(vnode);
