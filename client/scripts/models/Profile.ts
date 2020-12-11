@@ -63,7 +63,7 @@ class Profile {
 
   get displayName() : string {
     if (!this._initialized) return 'Loading...';
-    return this.name || formatAddressShort(this.address, this.chain);
+    return this.name || 'Anonymous';
   }
 
   public getAvatar(size: number) {

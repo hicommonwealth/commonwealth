@@ -82,8 +82,11 @@
             min-width: 260px;
             border: none;
             .cui-menu-item.cui-button.switch-user {
-                height: 40px;
-                max-height: 40px;
+                height: initial;
+                max-height: none;
+                padding-top: 2px;
+                padding-bottom: 3px;
+                width: 100%;
             }
         }
     }
