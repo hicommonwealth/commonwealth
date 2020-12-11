@@ -113,6 +113,18 @@ heroku pg:copy <PRODUCTION_APP>::<PRODUCTION_DB_URL> <STAGING_DB_URL> -a <STAGIN
 heroku maintenance:off -a <STAGING_APP>
 ```
 
+## Running Migrations
+
+A number of migrations for loading the latest on-chain data are
+defined in server.ts and package.json. To run these migrations on
+Heroku, some special syntax is needed.
+
+For example, to run the councillor/validator flags migration:
+
+```
+FLAG_MIGRATION=true ts-node --log-error --project tsconfig.node.json server.ts
+```
+
 ## Production Logs
 
 To view production logs: `heroku addons:open timber-logging`

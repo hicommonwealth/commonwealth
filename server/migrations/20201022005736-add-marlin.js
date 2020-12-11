@@ -34,7 +34,7 @@ module.exports = {
         id: 'marlin',
         symbol: 'LIN',
         name: 'Marlin',
-        icon_url: '/static/img/protocols/eth.png',
+        icon_url: '/static/img/protocols/lin.png',
         type: 'dao',
         network: 'marlin',
         active: true,

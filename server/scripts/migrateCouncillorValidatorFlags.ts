@@ -39,7 +39,7 @@ export default async function (models, chain?: string): Promise<void> {
     const nodeUrl = constructSubstrateUrl(node.url);
     const api = await SubstrateEvents.createApi(
       nodeUrl,
-      node.chain.includes('edgeware') ? Mainnet : {},
+      node.chain.includes('edgeware') ? Mainnet as any : {}, // workaround for chain-events type mismatch
     );
 
     log.info('Fetching councillor and validator lists...');
