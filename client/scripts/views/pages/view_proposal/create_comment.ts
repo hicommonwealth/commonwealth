@@ -125,7 +125,7 @@ const CreateComment: m.Component<{
       class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
     }, [
       m('.create-comment-avatar', [
-        m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 36 }),
+        m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 40 }),
       ]),
       m('.create-comment-body', [
         m(User, { user: author, popover: true, hideAvatar: true }),
