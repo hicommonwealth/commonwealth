@@ -248,6 +248,20 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/darwinia/main'
     )).default;
     newChain = new Darwinia(n, app);
+  } else if (n.chain.network === ChainNetwork.Phala) {
+    const Phala = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "phala-main" */
+      './controllers/chain/phala/main'
+    )).default;
+    newChain = new Phala(n, app);
+  } else if (n.chain.network === ChainNetwork.Centrifuge) {
+    const Centrifuge = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "centrifuge-main" */
+      './controllers/chain/centrifuge/main'
+    )).default;
+    newChain = new Centrifuge(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */
