@@ -241,6 +241,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/stafi/main'
     )).default;
     newChain = new Stafi(n, app);
+  } else if (n.chain.network === ChainNetwork.Darwinia) {
+    const Darwinia = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "darwinia-main" */
+      './controllers/chain/darwinia/main'
+    )).default;
+    newChain = new Darwinia(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */

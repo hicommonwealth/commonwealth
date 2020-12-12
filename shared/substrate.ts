@@ -4,6 +4,7 @@ export function constructSubstrateUrl(url: string): string {
     'kusama-rpc.polkadot.io',
     'rpc.polkadot.io',
     'rpc.plasmnet.io',
+    'cc1.darwinia.network',
     'scan-rpc.stafi.io',
     'rpc.kulupu.corepaper.org',
   ];
