@@ -15,7 +15,7 @@ import MarlinProposal from './proposal';
 import MarlinHolders from './holders';
 import MarlinChain from './chain';
 
-export interface ProposalArgs {
+export interface MarlinProposalArgs {
   targets: string[],
   values: string[],
   signatures: string[],
@@ -70,7 +70,7 @@ MarlinProposal
 
   // PROPOSE
 
-  public async propose(args: ProposalArgs) {
+  public async propose(args: MarlinProposalArgs) {
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !signatures || !calldatas || !description) return;
     if (!(await this._Holders.isSenderDelegate())) throw new Error('sender must be valid delegate');

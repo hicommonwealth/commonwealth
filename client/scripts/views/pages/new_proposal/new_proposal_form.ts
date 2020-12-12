@@ -22,6 +22,7 @@ import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import MarlinHolder from 'controllers/chain/ethereum/marlin/holder';
 import Marlin from 'controllers/chain/ethereum/marlin/adapter';
+import { MarlinProposalArgs } from 'controllers/chain/ethereum/marlin/governance';
 
 import {
   DropdownFormField,
@@ -296,7 +297,7 @@ const NewProposalForm = {
           && valuesArray.length !== calldatasArray.length
           && calldatasArray.length !== signaturesArray.length)
           throw new Error('Array lengths do not match');
-        const details = {
+        const details: MarlinProposalArgs = {
           targets: targetsArray.toString(),
           values: valuesArray.toString(),
           signatures: signaturesArray.toString(),
