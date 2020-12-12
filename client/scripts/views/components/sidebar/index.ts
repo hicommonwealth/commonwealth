@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, ButtonGroup, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner, Select
+  Button, ButtonGroup, List, ListItem, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
 } from 'construct-ui';
 
 import { selectNode, initChain } from 'app';
@@ -32,11 +32,14 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
     return m('.SidebarQuickSwitcherItem', {
       key: `${item instanceof ChainInfo ? 'chain' : 'community'}-${item.id}`
     }, [
-      m(Tooltip, {
+      m(Popover, {
+        interactionType: 'hover',
         hoverOpenDelay: 500,
         hoverCloseDelay: 0,
         transitionDuration: 0,
         position: 'right',
+        restoreFocus: false,
+        inline: true,
         content: m('.quick-switcher-option-text', item.name),
         class: 'SidebarQuickSwitcherItemTooltip',
         trigger: m('.quick-switcher-option', {
