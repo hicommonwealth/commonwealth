@@ -15,9 +15,10 @@ const LoginWithWalletDropdown: m.Component<{
   loggingInWithAddress,
   joiningChain,
   joiningCommunity,
+  onSuccess?,
 }> = {
   view: (vnode) => {
-    const { label, loggingInWithAddress, joiningChain, joiningCommunity } = vnode.attrs;
+    const { label, loggingInWithAddress, joiningChain, joiningCommunity, onSuccess } = vnode.attrs;
 
     // prev and next must work whether the modal is on the web3login page, or not...which is why this is so confusing
     const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
@@ -65,7 +66,10 @@ const LoginWithWalletDropdown: m.Component<{
               m.route.set(next);
             }
             m.redraw();
-            setTimeout(() => m.redraw(), 1); // necessary because address linking may be deferred
+            setTimeout(() => {
+              m.redraw();
+              if (onSuccess) onSuccess();
+            }, 1); // necessary because address linking may be deferred
           }
         });
       }

@@ -506,29 +506,32 @@ const LinkNewAddressModal: m.Component<{
               m.redraw();
             },
           }),
-          app.chain.base === ChainBase.Substrate && m(Checkbox, {
-            name: 'is-ed25519',
-            label: 'Key is ed25519 format',
-            onchange: async (e) => {
-              const result = (e.target as any).checked;
-              vnode.state.isEd25519 = !!result;
+          // // ed25519 account linking disabled for now, since while address ownership verification works,
+          // // the resulting address is missing an addressId, and will not be added to the current community
+          // // or set as activeAddress correctly (unclear why)
+          // app.chain.base === ChainBase.Substrate && m(Checkbox, {
+          //   name: 'is-ed25519',
+          //   label: 'Key is ed25519 format',
+          //   onchange: async (e) => {
+          //     const result = (e.target as any).checked;
+          //     vnode.state.isEd25519 = !!result;
 
-              // resubmit creation if they check box after pasting address
-              if (!vnode.state.enteredAddress) return;
-              if (!vnode.state.error) {
-                try {
-                  vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
-                    address: vnode.state.enteredAddress,
-                    currentPrefix: (app.chain as Substrate).chain.ss58Format,
-                  }), vnode.state.isEd25519 ? 'ed25519' : undefined);
-                } catch (err) {
-                  vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
-                }
-              }
+          //     // resubmit creation if they check box after pasting address
+          //     if (!vnode.state.enteredAddress) return;
+          //     if (!vnode.state.error) {
+          //       try {
+          //         vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
+          //           address: vnode.state.enteredAddress,
+          //           currentPrefix: (app.chain as Substrate).chain.ss58Format,
+          //         }), vnode.state.isEd25519 ? 'ed25519' : undefined);
+          //       } catch (err) {
+          //         vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
+          //       }
+          //     }
 
-              m.redraw();
-            },
-          }),
+          //     m.redraw();
+          //   },
+          // }),
           vnode.state.error && !vnode.state.newAddress && m('.error-message', vnode.state.error),
           // Allow signing iff address has been created and account has been verified
           vnode.state.newAddress && m('.link-address-cli-verification', [

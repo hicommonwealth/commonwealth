@@ -128,10 +128,10 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           joiningCommunity: app.activeCommunityId(),
           joiningChain: app.activeChainId(),
           label: 'Connect a new address',
-          // compact: true,
-          // fluid: true,
-          // disabled: vnode.state.loading,
-          // intent: 'none',
+          onSuccess: () => {
+            $('.SelectAddressModal').trigger('modalexit');
+            notifySuccess('New address connected!');
+          }
         }),
       ]),
     ]);
