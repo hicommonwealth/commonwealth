@@ -83,6 +83,7 @@ MarlinProposal
 
     const tx = await this._api.governorAlphaContract.propose(
       targets, values, signatures, calldatas, description,
+      { gasLimit: this._api.gasLimit },
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {

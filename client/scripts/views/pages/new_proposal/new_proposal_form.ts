@@ -304,7 +304,10 @@ const NewProposalForm = {
           calldatas: calldatasArray.toString(),
           description: vnode.state.description,
         };
-        (app.chain as Marlin).governance.propose(details);
+        (app.chain as Marlin).governance.propose(details)
+          .then((result) => done(result))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
 
         // TODO: Create Proposal via WebTx
       } else {
