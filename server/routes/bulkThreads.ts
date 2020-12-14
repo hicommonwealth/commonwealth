@@ -7,13 +7,6 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
-
-// TODO: also support search here, using the form:
-//
-// SELECT *
-// FROM authors
-// WHERE _search @@ plainto_tsquery('english', 'John Doe');
-
 const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
   const { cutoff_date, topic_id } = req.query;

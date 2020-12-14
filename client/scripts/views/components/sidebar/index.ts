@@ -93,6 +93,7 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
 
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+    const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     const featuredTopics = {};
@@ -182,6 +183,16 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
             m.route.set(`/${app.activeId()}`);
           },
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+        }),
+        m(ListItem, {
+          active: onSearchPage(m.route.get())
+            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          label: 'Search',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeId()}/search`);
+          },
+          contentLeft: m(Icon, { name: Icons.SEARCH }),
         }),
         // m(ListItem, {
         //   active: onChatPage(m.route.get()),
