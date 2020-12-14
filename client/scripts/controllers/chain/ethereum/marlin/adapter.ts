@@ -58,7 +58,9 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     // await this.ethAccounts.init(this.chain);
-    await this.webWallet.enable();
+    // await this.webWallet.enable();
+
+    console.log(this.chain.api.currentProvider);
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     const mpondContractAddress = this.meta.address;
@@ -70,21 +72,22 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
     });
     this.chain.marlinApi = api;
 
-    if (this.webWallet) {
-      await this.webWallet.enable().catch((e) => { console.log('thowing!22'); console.error(e); });
-      await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        setActiveAccount(updatedAddress);
-      });
-    }
+    // if (this.webWallet) {
+    //   await this.webWallet.enable().catch((e) => { console.log('thowing!22'); console.error(e); });
+    //   await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
+    //     const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
+    //     setActiveAccount(updatedAddress);
+    //   });
 
-    await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
-      const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-      setActiveAccount(updatedAddress);
-      api.updateSigner(accounts[0]);
-    });
+      // await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
+      //   const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
+      //   setActiveAccount(updatedAddress);
+      //   api.updateSigner(accounts[0]);
+      // });
 
-    await this.marlinAccounts.init(api);
+      // await this.marlinAccounts.init(api);
+    // }
+
     this.block.height = await api.Provider.getBlockNumber(); // TODO: Fix the global eth block height setting
     await super.initApi();
   }
