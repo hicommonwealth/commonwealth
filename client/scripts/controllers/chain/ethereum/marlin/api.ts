@@ -56,9 +56,8 @@ export default class MarlinAPI {
       this._MPondContract = MPondFactory.connect(mPondAddress, this._Signer); 
       this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this._Signer);
     } else {
-      console.log(this.Provider._web3Provider as Provider);
-      this._MPondContract = MPondFactory.connect(mPondAddress, this.Provider);
-      this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this.Provider);
+      this._MPondContract = MPondFactory.connect(mPondAddress, this._Provider);
+      this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this._Provider);
     }
   }
 
@@ -71,7 +70,7 @@ export default class MarlinAPI {
   public async init() {
     // perform fetch of approved ERC20 token and set up contract for approval
     const tokenAddress = await this._MPondContract.address;
-    this._tokenContract = Erc20Factory.connect(tokenAddress, (this.Provider._web3Provider as Provider));
+    this._tokenContract = Erc20Factory.connect(tokenAddress, this._Provider);
     if (this._userAddress) this._userMPond = await this._MPondContract.balanceOf(this._userAddress);
     this._Symbol = await this._MPondContract.symbol();
   }
