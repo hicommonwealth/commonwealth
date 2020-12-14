@@ -12,6 +12,44 @@ export default class extends IEventHandler {
 
   /**
     Event handler to store new-session's validators details in DB.
+    Sample Payload:
+                  {
+                    "data": {
+                      "kind": "new-session",
+                      "activeExposures": {
+                        "nBEPWLmcAoSDPNoFKuKZXyAwEMtfhz7RU9nzRAZfjD5v9Eb": {
+                          "own": "0x000000000000005d59ea50d4ae28b3f0",
+                          "total": "0x00000000000045695e3f39b202770ee8",
+                          "others": [
+                            {
+                              "who": "jdxmHQWrvgFhzLtWzvpHHvc496J3bR98ZAvNKEkVHGV3gsT",
+                              "value": "0x00000000000004e68ea14311bf263b90"
+                            },
+                            ...
+                          ]
+                        },
+                        ...
+                      },
+                      "active": [
+                        "nBEPWLmcAoSDPNoFKuKZXyAwEMtfhz7RU9nzRAZfjD5v9Eb",
+                        ...
+                      ],
+                      "waiting": [],
+                      "sessionIndex": 6,
+                      "currentEra": 1,
+                      "validatorInfo": {
+                        "nBEPWLmcAoSDPNoFKuKZXyAwEMtfhz7RU9nzRAZfjD5v9Eb": {
+                          "commissionPer": 0,
+                          "controllerId": "mVkyikJBD8P6XPpsdVMTXzbSBsPD1U1oD9EYqTgpiWxUctx",
+                          "rewardDestination": "Staked",
+                          "nextSessionIds": [],
+                          "eraPoints": 0
+                        },
+                        ...
+                      }
+                    },
+                    "blockNumber": 600
+                  }
   */
   public async handle(event: CWEvent < IChainEventData >, dbEvent) {
     // 1) if other event type ignore and do nothing.

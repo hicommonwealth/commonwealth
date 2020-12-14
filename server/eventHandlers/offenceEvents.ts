@@ -13,6 +13,20 @@ export default class extends IEventHandler {
 
   /**
     Event handler to store offence information of validators details in DB.
+    Sample Payload:
+                  {
+                    data: {
+                      kind: 'offences-offence',
+                      offenceKind: '0x696d2d6f6e6c696e653a6f66666c696e',
+                      opaqueTimeSlot: '0x07000000',
+                      applied: null,
+                      offenders: [
+                        'nYST5VF8q99P8P2xVUBH829YxfHUSUXN9cuCLNmyPuTbo74',
+                        ...
+                      ]
+                    },
+                    blockNumber: 800
+                  }
   */
   public async handle(event: CWEvent < IChainEventData >, dbEvent) {
     // 1) if other event type ignore and do nothing.
@@ -34,25 +48,20 @@ export default class extends IEventHandler {
     const [validators, metadata] = await sequelize.query(rawQuery);
     const validatorsList = JSON.parse(JSON.stringify(validators));
 
-    // 3) Modify new offences related information for validators
-    validatorsList.forEach(async (validator: any) => {
+    // 3) Modify new offences related information for validators, create and update event details in db
+    await Promise.all(validatorsList.map(async(validator: any) => {
+      delete validator.id;
+      delete validator.row_number;
       // Added Last 30 days Offences count for a validator.
       const [offenceStatsSum, offenceStatsAvg, offenceStatsCount] = await computeEventStats(this._chain, newOffenceEventData.kind, validator.stash, 30);
       validator.offencesStats = { count: offenceStatsCount };
-
       validator.block = event.blockNumber.toString();
       validator.eventType = newOffenceEventData.kind;
       validator.created_at = new Date().toISOString();
       validator.updated_at = new Date().toISOString();
-      delete validator.id;
-      delete validator.row_number;
-    });
-
-    // 4) create and update event details in db
-    // await this._models.HistoricalValidatorStatistic.bulkCreate( validatorsList, {ignoreDuplicates: true} );
-    await Promise.all(validatorsList.map((row: any) => {
-      return this._models.HistoricalValidatorStatistic.create(row);
+      return this._models.HistoricalValidatorStatistic.create(validator);
     }));
+    // await this._models.HistoricalValidatorStatistic.bulkCreate( validatorsList, {ignoreDuplicates: true} );
     return dbEvent;
   }
 }
