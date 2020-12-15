@@ -97,19 +97,22 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
           m.route.set(`/${app.activeId()}/search?q=${encodeURIComponent(searchTerm.toString().trim())}`);
         }
       }),
-      vnode.state.searchLoading ? m('.SearchLoading', [
+      vnode.state.searchLoading ? m('.search-loading', [
         m(Spinner, {
           active: true,
           fill: true,
           size: 'xl',
         }),
-      ]) : vnode.state.errorText ? m('.SearchError', [
+      ]) : vnode.state.errorText ? m('.search-error', [
         m('.error-text', vnode.state.errorText),
-      ]) : vnode.state.results && m('.SearchResults', [
+      ]) : !vnode.state.results ? m('.search-loading', [
+        // TODO: prompt to start searching
+      ]) : m('.search-results', [
         m('.search-results-caption', [
           pluralize(vnode.state.results.length, 'result'),
-          ' for ',
+          ' for \'',
           vnode.state.searchTerm,
+          '\'',
           m('a.search-results-clear', {
             href: '#',
             onclick: (e) => {

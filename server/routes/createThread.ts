@@ -63,9 +63,9 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   // Render a copy of the thread to plaintext for the search indexer
   const plaintext = (() => {
     try {
-      return renderQuillDeltaToText(JSON.parse(body));
+      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
     } catch (e) {
-      return body;
+      return decodeURIComponent(body);
     }
   })();
 
