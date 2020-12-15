@@ -8,7 +8,7 @@ export function constructSubstrateUrl(url: string): string {
     'rpc.kulupu.corepaper.org',
     'cc1.darwinia.network',
     'fullnode.centrifuge.io',
-    'poc2.phala.network',
+    'poc3.phala.network',
   ];
   const hasProtocol = url.indexOf('wss://') !== -1 || url.indexOf('ws://') !== -1;
   url = hasProtocol ? url.split('://')[1] : url;

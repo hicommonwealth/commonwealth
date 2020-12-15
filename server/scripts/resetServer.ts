@@ -31,7 +31,7 @@ const nodes = [
   [ 'wss://rpc.plasmnet.io/ws', 'plasm'],
   [ 'wss://scan-rpc.stafi.io/ws', 'stafi'],
   [ 'wss://cc1.darwinia.network/ws', 'darwinia'],
-  [ 'wss://poc2.phala.com/ws', 'phala'],
+  [ 'wss://poc3.phala.com/ws', 'phala'],
   [ 'wss://fullnode.centrifuge.io', 'centrifuge'],
   // [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],

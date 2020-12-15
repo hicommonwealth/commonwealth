@@ -21,7 +21,7 @@ module.exports = {
 
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'phala',
-        url: 'wss://poc2.phala.network/',
+        url: 'wss://poc3.phala.network/',
       }], { transaction: t });
     });
   },
