@@ -10,7 +10,7 @@ module.exports = {
         icon_url: '/static/img/protocols/pha.png',
         type: 'chain',
         network: 'phala',
-        active: true,
+        active: false,
         description: 'A general-purpose confidential smart contract platform for DApps and DeFi.',
         telegram: 'https://t.me/phalanetwork',
         website: 'https://phala.network',
