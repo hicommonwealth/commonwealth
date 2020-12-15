@@ -6,11 +6,17 @@ $discussion-meta-padding: 18px;
     .row-left {
         .row-header {
             a.external-discussion-link {
-                .cui-icon {
+                .cui-tag {
                     position: relative;
                     top: -2px;
+                    padding-top: 1px;
+                    padding-bottom: 1px;
+                    margin-right: 9px;
+                    text-decoration: none;
+                }
+                .cui-icon {
                     color: #111;
-                    margin-left: 2px;
+                    margin-left: 3px;
                 }
             }
         }

@@ -2,6 +2,7 @@ import 'pages/discussions/discussion_row.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
+import $ from 'jquery';
 import moment from 'moment-twitter';
 import { Icon, Icons, Tag } from 'construct-ui';
 
@@ -31,7 +32,11 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
 
     const rowHeader = (propType === OffchainThreadKind.Link && proposal.url)
       ? externalLink('a.external-discussion-link', proposal.url, [
-        proposal.title, m.trust('&nbsp;'), m(Icon, { name: Icons.EXTERNAL_LINK })
+        m(Tag, {
+          size: 'xs',
+          label: [ extractDomain(proposal.url), m(Icon, { name: Icons.EXTERNAL_LINK }) ]
+        }),
+        proposal.title,
       ])
       : link('a', discussionLink, proposal.title);
 
@@ -48,9 +53,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       proposal.topic && link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
         m('span.proposal-topic-icon'),
         m('span.proposal-topic-name', `${proposal.topic.name}`),
-      ]),
-      (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
-        `Link: ${extractDomain(proposal.url)}`
       ]),
       m(User, {
         user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
@@ -116,6 +118,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       contentRight: rowMetadata,
       rightColSpacing: app.isLoggedIn() ?  [4, 4, 3, 1] : [4, 4, 4],
       onclick: (e) => {
+        if ($(e.target).hasClass('cui-tag')) return;
         e.preventDefault();
         localStorage[`${app.activeId()}-discussions-scrollY`] = window.scrollY;
         updateRoute(discussionLink);
