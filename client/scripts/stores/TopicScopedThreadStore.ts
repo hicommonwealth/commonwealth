@@ -94,6 +94,21 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
       ? this._threadsByCommunity[community][topic] || []
       : [];
   }
+
+  public removeTopic(community: string, topicName: string) {
+    const communityStore = this._threadsByCommunity[community];
+    if (communityStore) {
+      delete this._threadsByCommunity[community][topicName];
+      if (communityStore[ALL_PROPOSALS_KEY]) {
+        communityStore[ALL_PROPOSALS_KEY].forEach((thread) => {
+          if (thread.topic?.name === topicName) {
+            thread.topic = null;
+            this.update(thread);
+          }
+        });
+      }
+    }
+  }
 }
 
 export default TopicScopedThreadStore;
