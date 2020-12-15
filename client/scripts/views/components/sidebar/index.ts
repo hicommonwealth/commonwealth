@@ -510,7 +510,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           vnode.state.open = false;
         },
       }, [
-        m('.SidebarHeader', m(CommunitySelector)),
+        (app.chain || app.community) && m('.SidebarHeader', m(CommunitySelector)),
         m('.sidebar-content', [ // container for overflow scrolling
           (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
           (app.chain || app.community) && m(OnchainNavigationModule),
