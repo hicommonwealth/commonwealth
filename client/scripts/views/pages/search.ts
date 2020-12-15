@@ -151,7 +151,7 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
                 ]),
                 m('.search-results-thread-subtitle', [
                   m('span.created-at', moment(result.created_at).fromNow()),
-                  m(User, { user: new AddressInfo(result.address_id, result.address, result.chain, null) }),
+                  m(User, { user: new AddressInfo(result.address_id, result.address, result.address_chain, null) }),
                 ]),
                 m('.search-results-thread-body', [
                   (() => {
@@ -171,7 +171,7 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
                 ]),
                 m('.search-results-thread-subtitle', [
                   m('span.created-at', moment(result.created_at).fromNow()),
-                  m(User, { user: new AddressInfo(result.address_id, result.address, result.chain, null) }),
+                  m(User, { user: new AddressInfo(result.address_id, result.address, result.address_chain, null) }),
                 ]),
                 m('.search-results-comment', [
                   (() => {

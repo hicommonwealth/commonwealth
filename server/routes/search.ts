@@ -44,7 +44,7 @@ SELECT * FROM (
       'thread' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".chain,
+      "Addresses".chain as address_chain,
       "OffchainThreads".created_at
     FROM "OffchainThreads"
     JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id
@@ -58,10 +58,11 @@ SELECT * FROM (
       'comment' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".chain,
+      "Addresses".chain as address_chain,
       "OffchainComments".created_at
     FROM "OffchainComments"
-    JOIN "OffchainThreads" ON "OffchainThreads".id = CAST(REPLACE(root_id, 'discussion_', '') AS int)
+    JOIN "OffchainThreads" ON "OffchainThreads".id =
+        CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END
     JOIN "Addresses" ON "OffchainComments".address_id = "Addresses".id
     WHERE ${communityOptions2} AND "OffchainComments"._search @@ plainto_tsquery('english', :searchTerm)
     ORDER BY "OffchainComments".created_at DESC LIMIT :limit)
