@@ -18,14 +18,19 @@ const search = async (models, req: Request, res: Response, next: NextFunction) =
     ? { community: community.id }
     : { chain: chain.id };
   replacements['searchTerm'] = req.query.search;
+  replacements['limit'] = 20;
 
-  // make search query
+  // query for both threads and comments, and then execute a union and keep only the most recent :limit
   let threadsAndComments;
   try {
     threadsAndComments = await models.sequelize.query(`
-SELECT title, body FROM "OffchainThreads" WHERE ${communityOptions}
-AND _search @@ plainto_tsquery('english', :searchTerm)
-LIMIT 20;
+SELECT * FROM
+((SELECT title, body, CAST(id as VARCHAR) as proposalId, 'thread' as type, created_at FROM "OffchainThreads"
+WHERE ${communityOptions} AND _search @@ plainto_tsquery('english', :searchTerm) ORDER BY created_at DESC LIMIT :limit)
+UNION ALL
+(SELECT '' as title, text, root_id as proposalId, 'comment' as type, created_at FROM "OffchainComments"
+WHERE ${communityOptions} AND _search @@ plainto_tsquery('english', :searchTerm) ORDER BY created_at DESC LIMIT :limit)) s
+ORDER BY created_at DESC LIMIT :limit;
 `, {
       replacements,
       type: QueryTypes.SELECT

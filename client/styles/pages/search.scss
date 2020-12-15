@@ -1,4 +1,42 @@
 @import 'client/styles/shared';
 
 .SearchPage {
+    .cui-tag {
+        position: relative;
+        top: -2px;
+        margin-left: 6px;
+    }
+    .SearchLoading {
+    }
+    .SearchError {
+    }
+    .SearchResults {
+        .search-results-caption {
+            margin: 21px 0 8px;
+            color: $text-color-light;
+        }
+        .search-results-list {
+            a.search-results-item {
+                display: block;
+                padding: 9px 0;
+                color: $text-color-dark;
+                text-decoration: none;
+            }
+            .search-results-thread-title {
+                font-weight: 500;
+            }
+            .search-results-item:hover {
+                cursor: pointer;
+            }
+            .search-results-item:hover .search-results-thread-title {
+                text-decoration: underline;
+            }
+            .search-results-thread-body {
+                color: $text-color-light;
+            }
+            .search-results-comment {
+                color: $text-color-light;
+            }
+        }
+    }
 }

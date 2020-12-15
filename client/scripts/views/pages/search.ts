@@ -4,68 +4,149 @@ import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
 import moment from 'moment-twitter';
-import { Input } from 'construct-ui';
+import { Input, Spinner, Tag } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
 import app from 'state';
 
 import { modelFromServer as threadModelFromServer } from 'controllers/server/threads';
 import { modelFromServer as commentModelFromServer } from 'controllers/server/comments';
+import QuillFormattedText from 'views/components/quill_formatted_text';
+import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import Sublayout from 'views/sublayout';
 
 const SEARCH_PAGE_SIZE = 20;
 const SEARCH_DELAY = 750;
 
-const SearchPage : m.Component<{}, { results }> = {
-  view: (vnode) => {
-    const onSearchInput = _.debounce(async (e) => {
-      const searchTerm = e.target.value;
-      if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
-        return;
-      }
-
-      const chainId = app.activeChainId();
-      const communityId = app.activeCommunityId();
-      const params = {
-        chain: chainId,
-        community: communityId,
-        cutoff_date: null, // cutoffDate.toISOString(),
-        search: searchTerm,
-        page_size: SEARCH_PAGE_SIZE,
-      };
-      const response = await $.get(`${app.serverUrl()}/search`, params);
-      if (response.status !== 'Success') return;
-      vnode.state.results = response.response;
+const search = _.debounce((searchTerm, vnode) => {
+  vnode.state.searchTerm = searchTerm;
+  const chainId = app.activeChainId();
+  const communityId = app.activeCommunityId();
+  const params = {
+    chain: chainId,
+    community: communityId,
+    cutoff_date: null, // cutoffDate.toISOString(),
+    search: searchTerm,
+    page_size: SEARCH_PAGE_SIZE,
+  };
+  $.get(`${app.serverUrl()}/search`, params).then((response) => {
+    if (response.status !== 'Success') {
+      vnode.state.searchLoading = false;
       m.redraw();
-    }, SEARCH_DELAY);
+      return;
+    }
+    vnode.state.results = response.response;
+    vnode.state.searchLoading = false;
+    m.redraw();
+  }).catch((err: any) => {
+    vnode.state.searchLoading = false;
+    vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
+    m.redraw();
+  });
+}, SEARCH_DELAY);
 
+const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorText: string }> = {
+  view: (vnode) => {
     return m(Sublayout, {
-      class: 'ChatPage',
-      title: 'Search',
+      class: 'SearchPage',
+      title: [ 'Search ', m(Tag, { size: 'xs', label: 'Beta' }) ],
       showNewProposalButton: true,
     }, [
       m(Input, {
         placeholder: 'Type to search...',
         autofocus: true,
         fluid: true,
-        oninput: onSearchInput,
+        style: 'margin-top: 15px;',
+        class: 'search-page-input',
+        defaultValue: m.route.param('q'),
+        oncreate: (vnode) => {
+          const $input = $(vnode.dom).find('input');
+          if ($input.val() !== '') {
+            search($input.val(), vnode);
+          }
+        },
+        oninput: (e) => {
+          const searchTerm = e.target.value;
+          if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
+            vnode.state.errorText = 'Enter a valid search term';
+            vnode.state.searchLoading = false;
+            return;
+          }
+          vnode.state.errorText = null;
+          vnode.state.searchLoading = true;
+          search(e.target.value, vnode);
+          m.route.set(`/${app.activeId()}/search?q=${encodeURIComponent(searchTerm.toString().trim())}`);
+        }
       }),
-      vnode.state.results && m('.SearchResults', [
+      vnode.state.searchLoading ? m('.SearchLoading', [
+        m(Spinner, {
+          active: true,
+          fill: true,
+          size: 'xl',
+        }),
+      ]) : vnode.state.errorText ? m('.SearchError', [
+        m('.error-text', vnode.state.errorText),
+      ]) : vnode.state.results && m('.SearchResults', [
         m('.search-results-caption', [
-          pluralize(vnode.state.results.length, 'result')
+          pluralize(vnode.state.results.length, 'result'),
+          ' for ',
+          vnode.state.searchTerm,
+          m('a.search-results-clear', {
+            style: 'margin-left: 10px;',
+            href: '#',
+            onclick: (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              vnode.state.results = null;
+              $('.search-page-input input').val('')
+                .select()
+                .focus();
+            }
+          }, 'Clear'),
         ]),
         m('.search-results-list', [
           vnode.state.results.map((result) => {
-            return result.title
-              ? m('.search-results-item', [
-                m('strong', 'Thread: '),
-                m('.search-results-thread-title', result.title),
-                m('.search-results-thread-body', result.body),
+            const activeId = app.activeId();
+            const proposalType = result.proposalType;
+            const proposalId = result.proposalid;
+            return m('a.search-results-item', {
+              href: (result.type === 'thread')
+                ? `/${activeId}/proposal/discussion/${proposalId}`
+                : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`,
+              onclick: (e) => {
+                e.preventDefault();
+                m.route.set(
+                  result.type === 'thread'
+                    ? `/${activeId}/proposal/discussion/${proposalId}`
+                    : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`
+                );
+              }
+            }, [
+              result.type === 'thread' ? [
+                m('.search-results-thread-title', decodeURIComponent(result.title)),
+                m('.search-results-thread-body', [
+                  (() => {
+                    try {
+                      const doc = JSON.parse(decodeURIComponent(result.body));
+                      return m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
+                    } catch (e) {
+                      const doc = decodeURIComponent(result.body);
+                      return m(MarkdownFormattedText, { doc, hideFormatting: true, collapse: true });
+                    }
+                  })(),
+                ])
+              ] : m('.search-results-comment', [
+                (() => {
+                  try {
+                    const doc = JSON.parse(decodeURIComponent(result.body));
+                    return m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
+                  } catch (e) {
+                    const doc = decodeURIComponent(result.body);
+                    return m(MarkdownFormattedText, { doc, hideFormatting: true, collapse: true });
+                  }
+                })(),
               ])
-              : m('.search-results-item', [
-                m('strong', 'Comment: '),
-                m('.search-results-comment', result.text),
-              ]);
+            ]);
           })
         ]),
       ]),

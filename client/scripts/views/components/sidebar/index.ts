@@ -184,16 +184,6 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
           },
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
         }),
-        m(ListItem, {
-          active: onSearchPage(m.route.get())
-            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-          label: 'Search',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeId()}/search`);
-          },
-          contentLeft: m(Icon, { name: Icons.SEARCH }),
-        }),
         // m(ListItem, {
         //   active: onChatPage(m.route.get()),
         //   label: 'Chat',
@@ -226,6 +216,18 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
         }
       }, featuredTopicListItems),
       m(List, { class: 'more-topics-list' }, otherTopicListItems),
+      m(List, { class: 'search-list' }, [
+        m(ListItem, {
+          active: onSearchPage(m.route.get())
+            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          label: 'Search',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeId()}/search`);
+          },
+          contentLeft: m(Icon, { name: Icons.SEARCH }),
+        }),
+      ]),
     ]);
   }
 };
