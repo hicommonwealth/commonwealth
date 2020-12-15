@@ -59,9 +59,9 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     thread.body = body;
     thread.plaintext = (() => {
       try {
-        return renderQuillDeltaToText(JSON.parse(body));
+        return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
       } catch (e) {
-        return body;
+        return decodeURIComponent(body);
       }
     })();
     if (title) {
