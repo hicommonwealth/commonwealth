@@ -9,6 +9,7 @@ class Darwinia extends Substrate {
     super(n, app, ChainClass.Darwinia);
 
     this.signaling.disable();
+    this.phragmenElections.disable();
     this.democracyProposals.disable();
     this.democracy.disable();
   }
