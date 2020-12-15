@@ -32,6 +32,7 @@ export const modelFromServer = (thread) => {
     thread.chain,
     thread.read_only,
     decodeURIComponent(thread.body),
+    thread.plaintext,
     thread.url,
     thread.Address.chain,
     thread.pinned,

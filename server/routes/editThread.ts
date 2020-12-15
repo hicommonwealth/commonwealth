@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import { renderQuillDeltaToText } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 
@@ -56,6 +57,13 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     arr.unshift(version_history);
     thread.version_history = arr;
     thread.body = body;
+    thread.plaintext = (() => {
+      try {
+        return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
+      } catch (e) {
+        return decodeURIComponent(body);
+      }
+    })();
     if (title) {
       thread.title = title;
     }
