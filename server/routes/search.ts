@@ -17,8 +17,8 @@ const search = async (models, req: Request, res: Response, next: NextFunction) =
 
   // set up query parameters
   const communityOptions = community
-    ? `community = :community `
-    : `chain = :chain `;
+    ? `"OffchainThreads".community = :community `
+    : `"OffchainThreads".chain = :chain `;
   const communityOptions2 = community
     ? `"OffchainComments".community = :community `
     : `"OffchainComments".chain = :chain `;
@@ -36,14 +36,36 @@ const search = async (models, req: Request, res: Response, next: NextFunction) =
   let threadsAndComments;
   try {
     threadsAndComments = await models.sequelize.query(`
-SELECT * FROM
-((SELECT title, body, CAST(id as VARCHAR) as proposalId, 'thread' as type, created_at FROM "OffchainThreads"
-WHERE ${communityOptions} AND _search @@ plainto_tsquery('english', :searchTerm) ORDER BY created_at DESC LIMIT :limit)
-UNION ALL
-(SELECT "OffchainThreads".title, text, root_id as proposalId, 'comment' as type, "OffchainComments".created_at FROM "OffchainComments"
-JOIN "OffchainThreads" ON "OffchainThreads".id = CAST(REPLACE(root_id, 'discussion_', '') AS int)
-WHERE ${communityOptions2} AND "OffchainComments"._search @@ plainto_tsquery('english', :searchTerm)
-ORDER BY created_at DESC LIMIT :limit)) s
+SELECT * FROM (
+  (SELECT
+      "OffchainThreads".title,
+      "OffchainThreads".body,
+      CAST("OffchainThreads".id as VARCHAR) as proposalId,
+      'thread' as type,
+      "Addresses".id as address_id,
+      "Addresses".address,
+      "Addresses".chain,
+      "OffchainThreads".created_at
+    FROM "OffchainThreads"
+    JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id
+    WHERE ${communityOptions} AND "OffchainThreads"._search @@ plainto_tsquery('english', :searchTerm)
+    ORDER BY "OffchainThreads".created_at DESC LIMIT :limit)
+  UNION ALL
+  (SELECT
+      "OffchainThreads".title,
+      "OffchainComments".text,
+      "OffchainComments".root_id as proposalId,
+      'comment' as type,
+      "Addresses".id as address_id,
+      "Addresses".address,
+      "Addresses".chain,
+      "OffchainComments".created_at
+    FROM "OffchainComments"
+    JOIN "OffchainThreads" ON "OffchainThreads".id = CAST(REPLACE(root_id, 'discussion_', '') AS int)
+    JOIN "Addresses" ON "OffchainComments".address_id = "Addresses".id
+    WHERE ${communityOptions2} AND "OffchainComments"._search @@ plainto_tsquery('english', :searchTerm)
+    ORDER BY "OffchainComments".created_at DESC LIMIT :limit)
+) s
 ORDER BY created_at DESC LIMIT :limit;
 `, {
       replacements,
