@@ -68,7 +68,7 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
         class: 'search-page-input',
         defaultValue: m.route.param('q'),
         oncreate: (vvnode) => {
-          const $input = $(vvnode.dom).find('input');
+          const $input = $(vvnode.dom).find('input').focus();
           // wait for defaultValue to be applied, then try to load the search request for ?q=
           setTimeout(() => {
             if ($input.val() !== '' && $input.val().toString().length >= 3) {
