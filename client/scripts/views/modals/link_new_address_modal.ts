@@ -357,6 +357,7 @@ const LinkNewAddressModal: m.Component<{
                 || vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
               oninit: async (vvnode) => {
                 // initialize API if needed before starting webwallet
+                if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
                 await app.chain.initApi();
                 await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
@@ -365,6 +366,7 @@ const LinkNewAddressModal: m.Component<{
               },
               onclick: async (vvnode) => {
                 // initialize API if needed before starting webwallet
+                if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
                 await app.chain.initApi();
                 await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
