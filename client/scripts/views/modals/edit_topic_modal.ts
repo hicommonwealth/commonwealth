@@ -45,6 +45,7 @@ const EditTopicModal : m.Component<{
     const deleteTopic = async (form) => {
       const topicInfo = {
         id,
+        name: form.name,
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
       };
