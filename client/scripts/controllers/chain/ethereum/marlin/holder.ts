@@ -39,7 +39,7 @@ export default class MarlinHolder extends EthereumAccount {
     ChainInfo: MarlinChain,
     Accounts: EthereumAccounts,
     Holders: MarlinHolders,
-    address: string,
+    address?: string,
     data?: IMarlinHolder
   ) {
     super(app, ChainInfo, Accounts, address);
