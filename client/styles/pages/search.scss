@@ -28,8 +28,15 @@
             }
             .search-results-thread-title {
                 font-weight: 500;
+            }
+            .search-results-thread-subtitle {
+                margin: 2px 0 3px;
                 .created-at {
-                    margin-left: 10px;
+                    font-weight: 400;
+                    color: $text-color-light;
+                }
+                .User {
+                    margin-left: 14px;
                     font-weight: 400;
                     color: $text-color-light;
                 }

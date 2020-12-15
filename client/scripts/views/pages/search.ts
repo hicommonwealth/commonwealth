@@ -8,11 +8,13 @@ import { Input, Spinner, Tag } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
 import app from 'state';
+import { AddressInfo } from 'models';
 
 import { modelFromServer as threadModelFromServer } from 'controllers/server/threads';
 import { modelFromServer as commentModelFromServer } from 'controllers/server/comments';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 
 const SEARCH_PAGE_SIZE = 20;
@@ -146,7 +148,10 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
               result.type === 'thread' ? [
                 m('.search-results-thread-title', [
                   decodeURIComponent(result.title),
+                ]),
+                m('.search-results-thread-subtitle', [
                   m('span.created-at', moment(result.created_at).fromNow()),
+                  m(User, { user: new AddressInfo(result.address_id, result.address, result.chain, null) }),
                 ]),
                 m('.search-results-thread-body', [
                   (() => {
@@ -163,7 +168,10 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
                 m('.search-results-thread-title', [
                   'Comment on ',
                   decodeURIComponent(result.title),
+                ]),
+                m('.search-results-thread-subtitle', [
                   m('span.created-at', moment(result.created_at).fromNow()),
+                  m(User, { user: new AddressInfo(result.address_id, result.address, result.chain, null) }),
                 ]),
                 m('.search-results-comment', [
                   (() => {
