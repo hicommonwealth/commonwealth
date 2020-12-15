@@ -2,7 +2,7 @@ import 'pages/notificationsList.scss';
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
-import { Button, ButtonGroup, Popover } from 'construct-ui';
+import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
 import app from 'state';
 import { pluralize } from 'helpers';
@@ -21,7 +21,10 @@ const NotificationsPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'NotificationsListPage',
-      title: 'Notifications',
+      title: [
+        'Notifications ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
     }, [
       m('.forum-container', [
         m(ButtonGroup, {

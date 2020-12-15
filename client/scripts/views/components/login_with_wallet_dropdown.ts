@@ -8,7 +8,11 @@ import app from 'state';
 import { ChainBase } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
-const CHAINS_WITH_CLI = ['edgeware', 'kulupu', 'kusama', 'cosmos', 'edgeware-local', 'edgeware-testnet'];
+// TODO: store ChainBase in the database, and check for substrate/cosmos chains instead
+const CHAINS_WITH_CLI = [
+  'edgeware', 'kulupu', 'kusama', 'cosmos', 'edgeware-local', 'edgeware-testnet',
+  'darwinia', 'phala', 'plasm', 'polkadot', 'centrifuge'
+];
 
 const LoginWithWalletDropdown: m.Component<{
   label,

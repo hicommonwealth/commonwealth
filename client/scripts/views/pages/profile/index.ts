@@ -41,6 +41,7 @@ const commentModelFromServer = (comment) => {
         comment.community,
         comment.chain,
         null,
+        null,
         null
       );
     } else {
@@ -58,6 +59,7 @@ const commentModelFromServer = (comment) => {
     comment.chain,
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
+    comment.plaintext,
     comment.version_history,
     attachments,
     proposal,
@@ -88,6 +90,7 @@ const threadModelFromServer = (thread) => {
     thread.chain,
     thread.read_only,
     decodeURIComponent(thread.body),
+    thread.plaintext,
     thread.url,
     thread.Address.chain,
     thread.pinned,

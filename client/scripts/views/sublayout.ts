@@ -20,7 +20,7 @@ const Sublayout: m.Component<{
 
   // content
   class?: string,
-  title?: string,                  // displayed at the top of the layout
+  title?,                          // displayed at the top of the layout
   description?: string,            // displayed at the top of the layout
   sidebarTopic?: number,           // used to override the sidebar
   showNewProposalButton?: boolean,

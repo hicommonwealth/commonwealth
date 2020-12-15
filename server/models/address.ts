@@ -166,7 +166,8 @@ export default (
 
     let isValid;
     if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot'
-        || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi') {
+        || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi'
+        || chain.network === 'darwinia' || chain.network === 'phala' || chain.network === 'centrifuge') {
       const address = decodeAddress(addressModel.address);
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
       if (addressModel.keytype) {
@@ -188,6 +189,12 @@ export default (
         keyringOptions.ss58Format = 5;
       } else if (chain.network === 'stafi') {
         keyringOptions.ss58Format = 20;
+      } else if (chain.network === 'darwinia') {
+        keyringOptions.ss58Format = 18;
+      } else if (chain.network === 'phala') {
+        keyringOptions.ss58Format = 30;
+      } else if (chain.network === 'centrifuge') {
+        keyringOptions.ss58Format = 36;
       } else {
         keyringOptions.ss58Format = 42; // default chain id
       }

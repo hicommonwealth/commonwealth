@@ -111,6 +111,8 @@ class TopicsController {
         'jwt': app.user.jwt
       });
       this._store.remove(this._store.getById(topic.id));
+      const activeEntity = topic.communityId || topic.chainId;
+      app.threads.listingStore.removeTopic(activeEntity, topic.name);
     } catch (err) {
       console.log('Failed to delete topic');
       throw new Error((err.responseJSON && err.responseJSON.error)
