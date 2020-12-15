@@ -1,4 +1,4 @@
-import { Web3Provider, AsyncSendable, JsonRpcSigner } from 'ethers/providers';
+import { Web3Provider, AsyncSendable, JsonRpcSigner, Provider } from 'ethers/providers';
 import { ethers } from 'ethers';
 
 import { Erc20 } from 'Erc20';
@@ -42,15 +42,23 @@ export default class MarlinAPI {
     mPondAddress: string,
     governorAlphaAddress: string,
     web3Provider: AsyncSendable,
-    userAddress: string,
+    userAddress?: string,
   ) {
-    this._userAddress = userAddress.toLowerCase();
+    if (userAddress) {
+      this._userAddress = userAddress.toLowerCase();
+      this._Signer = this._Provider.getSigner(userAddress);
+    }
+
+    this._Provider = new ethers.providers.Web3Provider(web3Provider);
     this._MPondAddress = mPondAddress.toLowerCase();
     this._GovernorAlphaAddress = governorAlphaAddress.toLowerCase();
-    this._Provider = new ethers.providers.Web3Provider(web3Provider);
-    this._Signer = this._Provider.getSigner(userAddress);
-    this._MPondContract = MPondFactory.connect(mPondAddress, this._Signer);
-    this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this._Signer);
+    if (this._Signer) { 
+      this._MPondContract = MPondFactory.connect(mPondAddress, this._Signer); 
+      this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this._Signer);
+    } else {
+      this._MPondContract = MPondFactory.connect(mPondAddress, this._Provider);
+      this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this._Provider);
+    }
   }
 
   public updateSigner(userAddress: string) {
@@ -62,8 +70,8 @@ export default class MarlinAPI {
   public async init() {
     // perform fetch of approved ERC20 token and set up contract for approval
     const tokenAddress = await this._MPondContract.address;
-    this._tokenContract = Erc20Factory.connect(tokenAddress, this._Signer);
-    this._userMPond = await this._MPondContract.balanceOf(this._userAddress);
+    this._tokenContract = Erc20Factory.connect(tokenAddress, this._Provider);
+    if (this._userAddress) this._userMPond = await this._MPondContract.balanceOf(this._userAddress);
     this._Symbol = await this._MPondContract.symbol();
   }
 }
