@@ -9,7 +9,7 @@ module.exports = {
         { transaction: t }
       );
       await queryInterface.sequelize.query(
-        'UPDATE "OffchainThreads" SET _search = to_tsvector(\'english\', title || \' \' || body)',
+        'UPDATE "OffchainThreads" SET _search = to_tsvector(\'english\', title || \' \' || plaintext)',
         { transaction: t }
       );
       await queryInterface.sequelize.query(
@@ -18,7 +18,7 @@ module.exports = {
       );
       await queryInterface.sequelize.query(
         'CREATE TRIGGER "OffchainThreads_vector_update" BEFORE INSERT OR UPDATE ON "OffchainThreads" '
-          + 'FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(_search, \'pg_catalog.english\', title, body)',
+          + 'FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(_search, \'pg_catalog.english\', title, plaintext)',
         { transaction: t }
       );
 
@@ -28,7 +28,7 @@ module.exports = {
         { transaction: t }
       );
       await queryInterface.sequelize.query(
-        'UPDATE "OffchainComments" SET _search = to_tsvector(\'english\', text)',
+        'UPDATE "OffchainComments" SET _search = to_tsvector(\'english\', plaintext)',
         { transaction: t }
       );
       await queryInterface.sequelize.query(
@@ -37,7 +37,7 @@ module.exports = {
       );
       await queryInterface.sequelize.query(
         'CREATE TRIGGER "OffchainComments_vector_update" BEFORE INSERT OR UPDATE ON "OffchainComments" '
-          + 'FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(_search, \'pg_catalog.english\', text)',
+          + 'FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(_search, \'pg_catalog.english\', plaintext)',
         { transaction: t }
       );
     });
