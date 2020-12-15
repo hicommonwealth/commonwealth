@@ -315,7 +315,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           // ],
         }),
         // treasury (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate
+        !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
           && m(ListItem, {
             active: onTreasuryPage(m.route.get()),
             label: 'Treasury',
