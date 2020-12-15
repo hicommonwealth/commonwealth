@@ -113,7 +113,6 @@ class TopicsController {
       this._store.remove(this._store.getById(topic.id));
       const activeEntity = topic.communityId || topic.chainId;
       app.threads.listingStore.removeTopic(activeEntity, topic.name);
-      // app.threads.store.removeTopic(activeEntity, topic.name);
       console.log(this._store);
     } catch (err) {
       console.log('Failed to delete topic');

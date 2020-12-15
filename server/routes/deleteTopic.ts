@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-syntax */
 import { Response, NextFunction } from 'express';
-import { QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 export const Errors = {

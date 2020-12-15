@@ -28,6 +28,7 @@ const EditTopicModal : m.Component<{
     const { id, description, name } = vnode.attrs;
     if (!vnode.state.form) {
       vnode.state.form = { description, id, name };
+      console.log(vnode.state.form);
     }
 
     const updateTopic = async (form) => {
@@ -49,6 +50,7 @@ const EditTopicModal : m.Component<{
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
       };
+      console.log({ topicInfo });
       await app.topics.remove(topicInfo);
     };
 
@@ -113,7 +115,7 @@ const EditTopicModal : m.Component<{
                 e.preventDefault();
                 const confirmed = await confirmationModalWithText('Delete this topic?')();
                 if (!confirmed) return;
-                deleteTopic(id).then(() => {
+                deleteTopic(vnode.state.form).then(() => {
                   $(e.target).trigger('modalexit');
                   m.route.set(`/${app.activeId()}/`);
                 }).catch((err) => {
