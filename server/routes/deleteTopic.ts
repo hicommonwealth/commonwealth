@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { Response, NextFunction } from 'express';
+import { QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 export const Errors = {
@@ -35,7 +36,8 @@ const deleteTopic = async (models, req, res: Response, next: NextFunction) => {
   replacements['id'] = id;
   const query = `UPDATE "OffchainThreads" SET topic_id=null WHERE topic_id = :id AND ${chainOrCommunity};`;
   await models.sequelize.query(query, {
-    replacements
+    replacements,
+    type: QueryTypes.UPDATE,
   });
 
   topic.destroy().then(() => {
