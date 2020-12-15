@@ -26,8 +26,9 @@ const deleteTopic = async (models, req, res: Response, next: NextFunction) => {
   const topic = await models.OffchainTopic.findOne({ where: { id } });
   if (!topic) return next(new Error(Errors.TopicNotFound));
 
-  const chainOrCommunity = community ? `community=${community.id}` : `chain=${chain.id}`;
-  const query = `UPDATE "OffchainThreads" SET topic_id=null WHERE topic_id=63 AND ${chainOrCommunity};`
+  const chainOrCommunity = community ? `community='${community.id}'` : `chain='${chain.id}'`;
+  const query = `UPDATE "OffchainThreads" SET topic_id=null WHERE topic_id=${id} AND ${chainOrCommunity};`;
+  console.log(query);
   await models.sequelize.query(query);
 
   topic.destroy().then(() => {
