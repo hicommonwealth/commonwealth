@@ -6,7 +6,7 @@ module.exports = {
       await queryInterface.bulkInsert('Chains', [{
         id: 'centrifuge',
         symbol: 'RAD',
-        name: 'Centrifuge Network',
+        name: 'Centrifuge',
         icon_url: '/static/img/protocols/rad.png',
         type: 'chain',
         network: 'centrifuge',
