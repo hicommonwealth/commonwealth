@@ -68,6 +68,22 @@ export class SubstrateCollectiveProposal
     }
   }
 
+  public get blockExplorerLinkLabel() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    return undefined;
+  }
+
+  public get votingInterfaceLink() {
+    const rpcUrl = encodeURIComponent(this._Chain.app.user.selectedNode.url);
+    return `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/council/motions`;
+  }
+
+  public get votingInterfaceLinkLabel() {
+    return 'Vote on polkadot-js';
+  }
+
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,

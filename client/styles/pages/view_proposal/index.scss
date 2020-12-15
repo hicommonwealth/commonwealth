@@ -108,8 +108,10 @@ $discussion-title-font-size: 1.45rem;
             }
         }
         .ProposalHeaderExternalLink,
-        .ProposalHeaderVotingLink {
+        .ProposalHeaderBlockExplorerLink,
+        .ProposalHeaderVotingInterfaceLink {
             display: inline-block;
+            margin-right: 12px;
             margin-top: 18px;
             font-weight: 500;
             a:link,

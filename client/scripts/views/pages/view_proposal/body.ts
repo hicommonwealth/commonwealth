@@ -278,7 +278,7 @@ export const ProposalBodyDeleteMenuItem: m.Component<{
         if (!confirmed) return;
         (isThread ? app.threads : app.comments).delete(item).then(() => {
           if (isThread) m.route.set(`/${app.activeId()}/`);
-          refresh();
+          if (refresh) refresh();
           m.redraw();
           // TODO: set notification bar for 'thread deleted/comment deleted'
         });

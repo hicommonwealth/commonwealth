@@ -19,7 +19,7 @@ export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
       class: hideSidebar ? 'hidden-sidebar' : ''
     }, [
       hideSidebar && m('.home-gradient'),
-      m(Sublayout, { loadingLayout: true }),
+      m(Sublayout, { loadingLayout: true, hideSidebar }),
       m(AppModals),
       m(AppToasts),
     ]);
@@ -53,7 +53,7 @@ export const Layout: m.Component<{
       ]);
     } else if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
-      return m(LoadingLayout);
+      return m(LoadingLayout, { hideSidebar });
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
@@ -76,15 +76,15 @@ export const Layout: m.Component<{
             initChain();
           }
         });
-        return m(LoadingLayout);
+        return m(LoadingLayout, { hideSidebar });
       } else if (scopeMatchesCommunity) {
         initCommunity(scope);
-        return m(LoadingLayout);
+        return m(LoadingLayout, { hideSidebar });
       }
     } else if (scope && vnode.state.deferred && !deferChain) {
       vnode.state.deferred = false;
       initChain();
-      return m(LoadingLayout);
+      return m(LoadingLayout, { hideSidebar });
     } else if (!scope && ((app.chain && app.chain.class) || app.community)) {
       // Handle the case where we unload the chain or community, if we're
       // going to a page that doesn't have one
@@ -92,7 +92,7 @@ export const Layout: m.Component<{
         vnode.state.loadingScope = null;
         m.redraw();
       });
-      return m(LoadingLayout);
+      return m(LoadingLayout, { hideSidebar });
     }
 
     return m('.Layout.mithril-app', {

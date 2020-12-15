@@ -1,7 +1,7 @@
 import m from 'mithril';
 import jdenticon from 'jdenticon';
 
-import { formatAddressShort } from 'helpers';
+import { formatAddressShort } from '../../../shared/utils';
 
 class Profile {
   private _name: string;

@@ -2,7 +2,6 @@ import { BehaviorSubject } from 'rxjs';
 import { ApiRx } from '@polkadot/api';
 
 import { formatCoin } from 'adapters/currency';
-import { formatAddressShort } from 'helpers';
 import { ISubstrateTreasuryProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
@@ -12,6 +11,7 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasury from './treasury';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -85,6 +85,23 @@ export class SubstrateTreasuryProposal
       const subdomain = blockExplorerIds['subscan'];
       return `https://${subdomain}.subscan.io/treasury/${this.identifier}`;
     }
+    return undefined;
+  }
+
+  public get blockExplorerLinkLabel() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    return undefined;
+  }
+
+  public get votingInterfaceLink() {
+    const rpcUrl = encodeURIComponent(this._Chain.app.user.selectedNode.url);
+    return `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/treasury`;
+  }
+
+  public get votingInterfaceLinkLabel() {
+    return 'Vote on polkadot-js';
   }
 
   constructor(

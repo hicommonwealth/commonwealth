@@ -31,6 +31,12 @@
     p {
         margin: 4px 0;
     }
+    code {
+        font-size: 13px;
+        padding: 2px 3px;
+        margin: 0 3px;
+        white-space: nowrap;
+    }
     .CodeBlock {
         text-align: left;
         .no-select {
@@ -189,7 +195,7 @@
         margin-bottom: 20px;
     }
     .cui-control.cui-checkbox {
-        margin-bottom: 12px;
+        margin-top: 12px;
     }
     .link-address-cli-verification {
         margin-top: 20px;

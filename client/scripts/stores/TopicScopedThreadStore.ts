@@ -6,7 +6,6 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
   private _threadsByCommunity: { [community: string]: { [topic: string] : Array<OffchainThread> } } = {};
 
   public add(thread: OffchainThread, options?: { allProposals: boolean, exclusive: boolean }) {
-    super.add(thread);
     const parentEntity = thread.community ? thread.community : thread.chain;
     if (!this._threadsByCommunity[parentEntity]) {
       this._threadsByCommunity[parentEntity] = {};
@@ -14,6 +13,7 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
     const communityStore = this._threadsByCommunity[parentEntity];
 
     const addThread = (topic) => {
+      super.add(thread);
       if (!communityStore[topic]) {
         communityStore[topic] = [];
       }
@@ -42,7 +42,6 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
   public update(thread: OffchainThread) {
     // This function is a "true" update function: if the thread is not already in a
     // store, it will not add the thread
-    super.update(thread, (t) => t.id === thread.id);
     const parentEntity = thread.community ? thread.community : thread.chain;
     if (!this._threadsByCommunity[parentEntity]) return;
     const communityStore = this._threadsByCommunity[parentEntity];
@@ -52,8 +51,10 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
       const topicStore = communityStore[topic];
       const matchingThread = topicStore.filter((t) => t.id === thread.id)[0];
       if (!matchingThread) return;
+      super.remove(matchingThread);
       const proposalIndex = topicStore.indexOf(matchingThread);
       topicStore.splice(proposalIndex, 1);
+      super.add(thread);
       communityStore[topic].push(thread);
     };
 
@@ -64,11 +65,11 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
   }
 
   public remove(thread: OffchainThread) {
-    super.remove(thread);
     const parentEntity = thread.community ? thread.community : thread.chain;
     const communityStore = this._threadsByCommunity[parentEntity];
 
     const removeThread = (topic) => {
+      super.remove(thread);
       const topicStore = communityStore[topic];
       if (!topicStore) return;
       const matchingThread = topicStore.filter((t) => t.id === thread.id)[0];
