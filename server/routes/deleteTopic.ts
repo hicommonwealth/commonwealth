@@ -29,7 +29,7 @@ const deleteTopic = async (models, req, res: Response, next: NextFunction) => {
 
   const chainOrCommunity = community
     ? 'community = :community'
-    : 'chain = : chain';
+    : 'chain = :chain';
   const replacements = community
     ? { community: community.id }
     : { chain: chain.id };
