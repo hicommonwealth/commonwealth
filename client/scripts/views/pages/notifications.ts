@@ -692,7 +692,10 @@ const NotificationsPage: m.Component<{}, {
     if (subscriptions.length < 1) return m(PageLoading);
     return m(Sublayout, {
       class: 'NotificationsPage',
-      title: 'Notification Settings',
+      title: [
+        'Notification Settings ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
     }, [
       m('.forum-container', [
         m(EmailIntervalConfiguration),

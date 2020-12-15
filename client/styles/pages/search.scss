@@ -1,10 +1,10 @@
 @import 'client/styles/shared';
 
 .SearchPage {
-    .cui-tag {
-        position: relative;
-        top: -2px;
-        margin-left: 6px;
+    padding-bottom: 40px;
+
+    .search-page-input {
+        margin-top: 30px;
     }
     .SearchLoading {
     }
@@ -13,24 +13,29 @@
     }
     .SearchResults {
         .search-results-caption {
-            margin: 21px 0 8px;
+            margin: 20px 0;
             color: $text-color-light;
+            .search-results-clear {
+                margin-left: 10px;
+            }
         }
         .search-results-list {
             a.search-results-item {
                 display: block;
-                padding: 9px 0;
+                padding: 13px 0;
                 color: $text-color-dark;
                 text-decoration: none;
             }
             .search-results-thread-title {
                 font-weight: 500;
+                .created-at {
+                    margin-left: 10px;
+                    font-weight: 400;
+                    color: $text-color-light;
+                }
             }
             .search-results-item:hover {
                 cursor: pointer;
-            }
-            .search-results-item:hover .search-results-thread-title {
-                text-decoration: underline;
             }
             .search-results-thread-body {
                 color: $text-color-light;

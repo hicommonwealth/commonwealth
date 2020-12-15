@@ -49,19 +49,21 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
   view: (vnode) => {
     return m(Sublayout, {
       class: 'SearchPage',
-      title: [ 'Search ', m(Tag, { size: 'xs', label: 'Beta' }) ],
+      title: [
+        'Search ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       showNewProposalButton: true,
     }, [
       m(Input, {
         placeholder: 'Type to search...',
         autofocus: true,
         fluid: true,
-        style: 'margin-top: 15px;',
         class: 'search-page-input',
         defaultValue: m.route.param('q'),
-        oncreate: (vnode) => {
-          const $input = $(vnode.dom).find('input');
-          if ($input.val() !== '') {
+        oncreate: (vvnode) => {
+          const $input = $(vvnode.dom).find('input');
+          if ($input.val() !== '' && $input.val().toString().length >= 3) {
             search($input.val(), vnode);
           }
         },
@@ -73,6 +75,9 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
             return;
           }
           vnode.state.errorText = null;
+          if (searchTerm.length < 3) {
+            return;
+          }
           vnode.state.searchLoading = true;
           search(e.target.value, vnode);
           m.route.set(`/${app.activeId()}/search?q=${encodeURIComponent(searchTerm.toString().trim())}`);
@@ -92,7 +97,6 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
           ' for ',
           vnode.state.searchTerm,
           m('a.search-results-clear', {
-            style: 'margin-left: 10px;',
             href: '#',
             onclick: (e) => {
               e.preventDefault();
@@ -123,7 +127,10 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
               }
             }, [
               result.type === 'thread' ? [
-                m('.search-results-thread-title', decodeURIComponent(result.title)),
+                m('.search-results-thread-title', [
+                  decodeURIComponent(result.title),
+                  m('span.created-at', moment(result.created_at).fromNow()),
+                ]),
                 m('.search-results-thread-body', [
                   (() => {
                     try {
@@ -135,17 +142,24 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
                     }
                   })(),
                 ])
-              ] : m('.search-results-comment', [
-                (() => {
-                  try {
-                    const doc = JSON.parse(decodeURIComponent(result.body));
-                    return m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
-                  } catch (e) {
-                    const doc = decodeURIComponent(result.body);
-                    return m(MarkdownFormattedText, { doc, hideFormatting: true, collapse: true });
-                  }
-                })(),
-              ])
+              ] : [
+                m('.search-results-thread-title', [
+                  'Comment on ',
+                  decodeURIComponent(result.title),
+                  m('span.created-at', moment(result.created_at).fromNow()),
+                ]),
+                m('.search-results-comment', [
+                  (() => {
+                    try {
+                      const doc = JSON.parse(decodeURIComponent(result.body));
+                      return m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
+                    } catch (e) {
+                      const doc = decodeURIComponent(result.body);
+                      return m(MarkdownFormattedText, { doc, hideFormatting: true, collapse: true });
+                    }
+                  })(),
+                ]),
+              ]
             ]);
           })
         ]),
