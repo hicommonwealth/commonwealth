@@ -18,8 +18,11 @@ import Sublayout from 'views/sublayout';
 const SEARCH_PAGE_SIZE = 20;
 const SEARCH_DELAY = 750;
 
+const searchCache = {}; // only used to restore search results when returning to the page
+
 const search = _.debounce((searchTerm, vnode) => {
   vnode.state.searchTerm = searchTerm;
+
   const chainId = app.activeChainId();
   const communityId = app.activeCommunityId();
   const params = {
@@ -36,6 +39,7 @@ const search = _.debounce((searchTerm, vnode) => {
       return;
     }
     vnode.state.results = response.response;
+    searchCache[searchTerm] = response.response;
     vnode.state.searchLoading = false;
     m.redraw();
   }).catch((err: any) => {
@@ -63,9 +67,19 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
         defaultValue: m.route.param('q'),
         oncreate: (vvnode) => {
           const $input = $(vvnode.dom).find('input');
-          if ($input.val() !== '' && $input.val().toString().length >= 3) {
-            search($input.val(), vnode);
-          }
+          // wait for defaultValue to be applied, then try to load the search request for ?q=
+          setTimeout(() => {
+            if ($input.val() !== '' && $input.val().toString().length >= 3) {
+              const searchTerm = $input.val().toString();
+              if (searchCache[searchTerm]) {
+                vnode.state.results = searchCache[searchTerm];
+                vnode.state.searchLoading = false;
+                m.redraw();
+              } else {
+                search(searchTerm, vnode);
+              }
+            }
+          }, 0);
         },
         oninput: (e) => {
           const searchTerm = e.target.value;
