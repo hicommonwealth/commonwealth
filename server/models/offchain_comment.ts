@@ -13,6 +13,7 @@ export interface OffchainCommentAttributes {
   child_comments?: number[];
   address_id: number;
   text: string;
+  plaintext: string;
   community?: string;
   version_history?: string[];
   created_at?: Date;
@@ -47,6 +48,7 @@ export default (
     child_comments: { type: dataTypes.ARRAY(dataTypes.INTEGER), allowNull: false, defaultValue: [] },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     text: { type: dataTypes.TEXT, allowNull: false },
+    plaintext: { type: dataTypes.TEXT, allowNull: true },
     community: { type: dataTypes.STRING, allowNull: true },
     version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },

@@ -241,6 +241,27 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/stafi/main'
     )).default;
     newChain = new Stafi(n, app);
+  } else if (n.chain.network === ChainNetwork.Darwinia) {
+    const Darwinia = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "darwinia-main" */
+      './controllers/chain/darwinia/main'
+    )).default;
+    newChain = new Darwinia(n, app);
+  } else if (n.chain.network === ChainNetwork.Phala) {
+    const Phala = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "phala-main" */
+      './controllers/chain/phala/main'
+    )).default;
+    newChain = new Phala(n, app);
+  } else if (n.chain.network === ChainNetwork.Centrifuge) {
+    const Centrifuge = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "centrifuge-main" */
+      './controllers/chain/centrifuge/main'
+    )).default;
+    newChain = new Centrifuge(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */
@@ -479,6 +500,7 @@ $(() => {
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+    '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
     '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),

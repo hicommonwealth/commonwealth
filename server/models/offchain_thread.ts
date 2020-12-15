@@ -11,6 +11,7 @@ export interface OffchainThreadAttributes {
   address_id: number;
   title: string;
   body?: string;
+  plaintext?: string;
   kind: string;
   url?: string;
   topic_id?: number;
@@ -48,6 +49,7 @@ export default (
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     title: { type: dataTypes.TEXT, allowNull: false },
     body: { type: dataTypes.TEXT, allowNull: true },
+    plaintext: { type: dataTypes.TEXT, allowNull: true },
     kind: { type: dataTypes.TEXT, allowNull: false },
     url: { type: dataTypes.TEXT, allowNull: true },
     topic_id: { type: dataTypes.INTEGER, allowNull: true },

@@ -93,6 +93,7 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
 
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+    const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     const featuredTopics = {};
@@ -183,6 +184,16 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
           },
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
         }),
+        m(ListItem, {
+          active: onSearchPage(m.route.get())
+            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          label: 'Search',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeId()}/search`);
+          },
+          contentLeft: m(Icon, { name: Icons.SEARCH }),
+        }),
         // m(ListItem, {
         //   active: onChatPage(m.route.get()),
         //   label: 'Chat',
@@ -267,7 +278,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'section-header',
         }),
         // referenda (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate
+        !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia
           && m(ListItem, {
             active: onReferendaPage(m.route.get()),
             label: 'Referenda',
@@ -280,7 +291,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           }),
         // proposals (substrate, cosmos, moloch only)
         m(ListItem, {
-          active: onProposalPage(m.route.get()),
+          active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
           label: 'Proposals & Motions',
           contentLeft: m(Icon, { name: Icons.SEND }),
           onclick: (e) => {
@@ -304,7 +315,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           // ],
         }),
         // treasury (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate
+        !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
           && m(ListItem, {
             active: onTreasuryPage(m.route.get()),
             label: 'Treasury',
@@ -499,7 +510,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           vnode.state.open = false;
         },
       }, [
-        m('.SidebarHeader', m(CommunitySelector)),
+        (app.chain || app.community) && m('.SidebarHeader', m(CommunitySelector)),
         m('.sidebar-content', [ // container for overflow scrolling
           (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
           (app.chain || app.community) && m(OnchainNavigationModule),

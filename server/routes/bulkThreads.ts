@@ -35,7 +35,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_community, thread_chain, thread_created, threads.kind,
         threads.version_history, threads.read_only, threads.body,
-        threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name, 
+        threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
         topics.community_id AS topic_community
       FROM "Addresses" AS addr
