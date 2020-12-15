@@ -278,7 +278,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'section-header',
         }),
         // referenda (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate
+        !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia
           && m(ListItem, {
             active: onReferendaPage(m.route.get()),
             label: 'Referenda',
@@ -291,7 +291,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           }),
         // proposals (substrate, cosmos, moloch only)
         m(ListItem, {
-          active: onProposalPage(m.route.get()),
+          active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
           label: 'Proposals & Motions',
           contentLeft: m(Icon, { name: Icons.SEND }),
           onclick: (e) => {
