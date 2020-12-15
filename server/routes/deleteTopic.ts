@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { Response, NextFunction } from 'express';
+import { QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 export const Errors = {
@@ -26,10 +27,15 @@ const deleteTopic = async (models, req, res: Response, next: NextFunction) => {
   const topic = await models.OffchainTopic.findOne({ where: { id } });
   if (!topic) return next(new Error(Errors.TopicNotFound));
 
-  const chainOrCommunity = community ? `community='${community.id}'` : `chain='${chain.id}'`;
-  const query = `UPDATE "OffchainThreads" SET topic_id=null WHERE topic_id=${id} AND ${chainOrCommunity};`;
-  console.log(query);
-  await models.sequelize.query(query);
+  const chainOrCommunity = community
+    ? 'community = :community'
+    : 'chain = : chain';
+  const replacements = community
+    ? { community: community.id }
+    : { chain: chain.id };
+  replacements['id'] = id;
+  const query = `UPDATE "OffchainThreads" SET topic_id=null WHERE topic_id = :id AND ${chainOrCommunity};`;
+  await models.sequelize.query(query, { replacements });
 
   topic.destroy().then(() => {
     res.json({ status: 'Success' });
