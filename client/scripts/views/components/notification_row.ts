@@ -286,8 +286,13 @@ const NotificationRow: m.Component<{
             `${label.heading} on ${chainName}`,
             !vnode.attrs.onListPage && m(Icon, {
               name: Icons.X,
+              onmousedown: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              },
               onclick: (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 vnode.state.scrollOrStop = true;
                 app.user.notifications.clear([notification]);
                 m.redraw();
