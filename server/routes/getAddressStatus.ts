@@ -24,6 +24,7 @@ const getAddress = async (models, req: Request, res: Response, next: NextFunctio
   const existingAddress = await models.Address.findOne({
     where: { chain: req.body.chain, address: req.body.address }
   });
+  console.log(existingAddress);
   let result;
   if (existingAddress) {
     // address already exists on another user, only take ownership if
