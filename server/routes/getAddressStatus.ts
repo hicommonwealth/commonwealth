@@ -33,13 +33,13 @@ const getAddress = async (models, req: Request, res: Response, next: NextFunctio
     const isDisowned = existingAddress.user_id == null;
     const belongsToUser = req.user && (existingAddress.user_id === req.user.id);
     result = {
+      exists: true,
       isClaimable: isExpired || isDisowned,
       belongsToUser
     };
   } else {
     result = {
-      isClaimable: false,
-      belongsToUser: false,
+      exists: false,
     };
   }
 
