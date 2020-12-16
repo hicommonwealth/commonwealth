@@ -144,7 +144,7 @@ const ProposalsPage: m.Component<{}> = {
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
-    const onMarlin = app.chain && app.chain.network === ChainNetwork.Marlin;
+    const onMarlin = app.chain && (app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet);
 
     if (onSubstrate) {
       // Democracy, Council, and Signaling (Edgeware-only) must be loaded to proceed
