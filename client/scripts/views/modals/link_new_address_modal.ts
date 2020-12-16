@@ -104,25 +104,27 @@ const SubstrateLinkAccountItem: m.Component<{
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
-        console.log(account);
-        debugger
         const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
-          address: account.address,
-          chain: account?.chain?.id || 'edgeware',
+          address,
+          chain: app.activeChainId(),
           jwt: app.user.jwt,
         });
 
         if (result.exists) {
+          console.log(result);
           if (result.belongsToUser) {
             notifyInfo('This address is already linked to your current account.');
             return;
           } else if (result.isClaimable) {
             const modalMsg = 'This address is currently linked to another account. Continue?';
-            const confirmed = await confirmationModalWithText(modalMsg);
+            const confirmed = await confirmationModalWithText(modalMsg)();
             if (!confirmed) {
               vnode.state.linking = false;
               return;
             }
+          } else {
+            notifyInfo('This address already belongs to a user, and cannot be transferred.');
+            return;
           }
         }
 
