@@ -250,7 +250,8 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
       app.chain.base === ChainBase.CosmosSDK
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
         || app.chain.class === ChainClass.Moloch
-        || app.chain.network === ChainNetwork.Marlin);
+        || app.chain.network === ChainNetwork.Marlin
+        || app.chain.network === ChainNetwork.MarlinTestnet);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;

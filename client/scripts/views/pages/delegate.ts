@@ -128,7 +128,7 @@ const DelegatePage: m.Component<{}> = {
           message: 'Change Metamask to point to Ropsten Testnet',
         });
       }
-      if (app.chain && app.chain?.network !== ChainNetwork.Marlin) {
+      if (app.chain && [ChainNetwork.Marlin, ChainNetwork.MarlinTestnet].includes(app.chain?.network)) {
         return m(PageNotFound, {
           title: 'Delegate Page',
           message: 'Delegate page for Marlin users only!'
