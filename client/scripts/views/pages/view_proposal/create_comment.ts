@@ -39,13 +39,12 @@ const CreateComment: m.Component<{
       rootProposal
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
-    const author = app.user.activeAccount;
+    let author = app.user.activeAccount;
     const parentType = parentComment ? CommentParent.Comment : CommentParent.Proposal;
     if (!parentComment) parentComment = null;
     if (vnode.state.uploadsInProgress === undefined) {
       vnode.state.uploadsInProgress = 0;
     }
-
     const submitComment = async (e?) => {
       if (!vnode.state.quillEditorState || !vnode.state.quillEditorState.editor) {
         if (e) e.preventDefault();
@@ -59,6 +58,7 @@ const CreateComment: m.Component<{
       }
 
       const { quillEditorState } = vnode.state;
+      author = app.user.activeAccount;
 
       const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
