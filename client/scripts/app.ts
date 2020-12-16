@@ -298,6 +298,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
+  } else if (n.chain.network === ChainNetwork.MarlinTestnet) {
+    const Marlin = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "marlin-testnet" */
+      './controllers/chain/ethereum/marlin/adapter'
+    )).default;
+    newChain = new Marlin(n, app);
   } else {
     throw new Error('Invalid chain');
   }

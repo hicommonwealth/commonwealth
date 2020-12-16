@@ -31,6 +31,7 @@ export enum ChainNetwork {
   NEAR = 'near',
   Moloch = 'moloch',
   Marlin = 'marlin',
+  MarlinTestnet = 'marlin-testnet',
   Metacartel = 'metacartel',
 }
 
@@ -51,6 +52,7 @@ export enum ChainClass {
   Near = 'near',
   Moloch = 'moloch',
   Marlin = 'marlin',
+  MarlinTestnet = 'marlin-testnet',
 }
 
 // TODO: this is inconsistently used
