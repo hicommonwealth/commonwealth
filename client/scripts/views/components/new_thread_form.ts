@@ -332,8 +332,9 @@ export const NewThreadForm: m.Component<{
         ]),
         app.user.activeAccount?.profile && !app.user.activeAccount.profile.name && m(Callout, {
           class: 'no-profile-callout',
+          intent: 'primary',
           content: [
-            'You haven\'t set a display name for this address yet. ',
+            'You haven\'t set a display name yet, so other people can\'t see who you are. ',
             m('a', {
               href: `/${app.activeId()}/account/${app.user.activeAccount.address}?base=${app.user.activeAccount.chain}`,
               onclick: (e) => {
@@ -346,7 +347,7 @@ export const NewThreadForm: m.Component<{
                   },
                 });
               }
-            }, 'Set one now'),
+            }, 'Complete your profile'),
           ],
         }),
         postType === PostType.Link && m(Form, [

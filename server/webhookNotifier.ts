@@ -170,7 +170,6 @@ const send = async (models, content: WebhookContent) => {
           await request.post(url).send(webhookData);
         } else {
           console.log('Suppressed webhook notification to', url);
-          console.log(webhookData);
         }
       } catch (err) {
         console.error(err);

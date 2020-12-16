@@ -32,6 +32,7 @@ export const modelFromServer = (thread) => {
     thread.chain,
     thread.read_only,
     decodeURIComponent(thread.body),
+    thread.plaintext,
     thread.url,
     thread.Address.chain,
     thread.pinned,
@@ -126,6 +127,7 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
       this._listingStore.add(result, storeOptions);

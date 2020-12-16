@@ -39,3 +39,12 @@
         margin: 3px;
     }
 }
+.DropdownFormField {
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        .cui-custom-select {
+            width: 50%;
+        }
+    }
+}

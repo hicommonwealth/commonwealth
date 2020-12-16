@@ -7,6 +7,7 @@ class OffchainComment<T extends IUniqueId> {
   public readonly chain: string;
   public readonly author: string;
   public readonly text: string;
+  public readonly plaintext: string;
   public readonly attachments: OffchainAttachment[];
   public readonly proposal: T; // this may not be populated if the comment was loaded before the proposal!
   public readonly id: number;
@@ -22,6 +23,7 @@ class OffchainComment<T extends IUniqueId> {
     chain,
     author,
     text,
+    plaintext,
     versionHistory,
     attachments,
     proposal,
@@ -36,6 +38,7 @@ class OffchainComment<T extends IUniqueId> {
     this.chain = chain;
     this.author = author;
     this.text = text;
+    this.plaintext = plaintext;
     this.versionHistory = versionHistory;
     this.attachments = attachments;
     this.proposal = proposal;

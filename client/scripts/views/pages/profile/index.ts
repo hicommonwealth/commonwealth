@@ -41,6 +41,7 @@ const commentModelFromServer = (comment) => {
         comment.community,
         comment.chain,
         null,
+        null,
         null
       );
     } else {
@@ -58,6 +59,7 @@ const commentModelFromServer = (comment) => {
     comment.chain,
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
+    comment.plaintext,
     comment.version_history,
     attachments,
     proposal,
@@ -88,6 +90,7 @@ const threadModelFromServer = (thread) => {
     thread.chain,
     thread.read_only,
     decodeURIComponent(thread.body),
+    thread.plaintext,
     thread.url,
     thread.Address.chain,
     thread.pinned,
@@ -195,9 +198,9 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
             if (a.OffchainProfile.identity) {
               profile.initializeWithChain(
                 a.OffchainProfile.identity,
-                profileData.headline,
-                profileData.bio,
-                profileData.avatarUrl,
+                profileData?.headline,
+                profileData?.bio,
+                profileData?.avatarUrl,
                 a.OffchainProfile.judgements,
                 a.last_active,
                 a.is_councillor,
@@ -205,10 +208,10 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
               );
             } else {
               profile.initialize(
-                profileData.name,
-                profileData.headline,
-                profileData.bio,
-                profileData.avatarUrl,
+                profileData?.name,
+                profileData?.headline,
+                profileData?.bio,
+                profileData?.avatarUrl,
                 a.last_active,
                 a.is_councillor,
                 a.is_validator

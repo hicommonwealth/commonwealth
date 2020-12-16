@@ -2,13 +2,13 @@ import 'components/forms.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button } from 'construct-ui';
-
-import ResizableTextarea from 'views/components/widgets/resizable_textarea';
+import { Button, CustomSelect } from 'construct-ui';
 
 interface IDropdownFormFieldAttrs {
   callback?: CallableFunction;
   choices: IDropdownFormFieldChoice[];
+  defaultValue?: string;
+  value?: string;
   options?: any;
   name?: string;
   subtitle?: string;
@@ -16,7 +16,7 @@ interface IDropdownFormFieldAttrs {
 }
 
 interface IDropdownFormFieldChoice {
-  name: string;
+  name?: string;
   label: string;
   value: string | number;
   selected?: boolean;
@@ -24,28 +24,29 @@ interface IDropdownFormFieldChoice {
 
 export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
   view: (vnode: m.VnodeDOM<IDropdownFormFieldAttrs>) => {
-    const options = vnode.attrs.options || {};
-    const { choices, name, subtitle, title } = vnode.attrs;
-    const oninput = options.oninput || (() => (undefined));
-
-    options.oninput = (e) => {
-      e.redraw = false;
+    const { choices, name, defaultValue, subtitle, title } = vnode.attrs;
+    if (!choices  || choices.length === 0) {
+      return;
+    }
+    const selectAttrs = {
+      class: 'form-field',
+      name,
+      value: vnode.attrs.value,
+      defaultValue: defaultValue || choices[0].value,
+      options: choices.map(({ label, value }) => ({ label, value })),
+      ...vnode.attrs.options
+    };
+    selectAttrs.onSelect = (choice) => {
       if (vnode.attrs.callback) {
-        vnode.attrs.callback($(e.target).val());
+        vnode.attrs.callback(choice.value);
       }
-      oninput.call(this, e);
     };
 
-    return m('.DropdownFormField.FormField', {
-      oncreate: (vvnode) => {
-        $(vvnode.dom).find('select').trigger('input');
-      }
-    }, [
+    return m('.DropdownFormField.FormField', [
       m('.form-group', [
         title && m('.form-title', title),
         subtitle && m('.form-subtitle', subtitle),
-        m('select.form-field', options,
-          choices.map((item) => m('option', item))),
+        m(CustomSelect, selectAttrs)
       ]),
     ]);
   }

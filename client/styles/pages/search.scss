@@ -1,0 +1,55 @@
+@import 'client/styles/shared';
+
+.SearchPage {
+    padding-bottom: 40px;
+
+    .search-page-input {
+        margin-top: 30px;
+    }
+    .search-loading {
+    }
+    .search-error {
+        margin: 21px 0 8px;
+    }
+    .search-results {
+        .search-results-caption {
+            margin: 20px 0;
+            color: $text-color-light;
+            .search-results-clear {
+                margin-left: 10px;
+            }
+        }
+        .search-results-list {
+            a.search-results-item {
+                display: block;
+                padding: 13px 0;
+                color: $text-color-dark;
+                text-decoration: none;
+            }
+            .search-results-thread-title {
+                font-weight: 500;
+            }
+            .search-results-thread-subtitle {
+                margin: 2px 0 3px;
+                .created-at {
+                    font-weight: 400;
+                    color: $text-color-light;
+                }
+                .User {
+                    margin-left: 14px;
+                    font-weight: 400;
+                    color: $text-color-light;
+                }
+            }
+            .search-results-item:hover {
+                cursor: pointer;
+            }
+            .search-results-thread-body {
+                color: $text-color-light;
+            }
+            .search-results-comment {
+                color: $text-color-light;
+            }
+        }
+    }
+}

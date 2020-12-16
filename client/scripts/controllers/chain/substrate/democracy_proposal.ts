@@ -87,6 +87,31 @@ class SubstrateDemocracyProposal extends Proposal<
 
   private _depositSubscription: Unsubscribable;
 
+  public get blockExplorerLink() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) {
+      const subdomain = blockExplorerIds['subscan'];
+      return `https://${subdomain}.subscan.io/democracy_proposal/${this.identifier}`;
+    }
+  }
+
+  public get blockExplorerLinkLabel() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    return undefined;
+  }
+
+  public get votingInterfaceLink() {
+    const rpcUrl = encodeURIComponent(this._Chain.app.user.selectedNode.url);
+    return `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/democracy`;
+  }
+
+  public get votingInterfaceLinkLabel() {
+    return 'Vote on polkadot-js';
+  }
+
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,

@@ -63,6 +63,16 @@
     button.cui-button.login-selector-right:first-child {
         border-radius: 4px !important;
     }
+    .user-display-name {
+        max-width: 190px;
+        display: inline-block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        // maintain alignment with text
+        position: relative;
+        top: 4px;
+        margin-top: -4px;
+    }
 }
 
 .login-selector-popover {

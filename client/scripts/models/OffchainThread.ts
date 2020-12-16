@@ -9,6 +9,7 @@ class OffchainThread implements IUniqueId {
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
+  public readonly plaintext: string;
   public readonly pinned: boolean;
   public readonly kind: OffchainThreadKind;
   public readonly attachments: OffchainAttachment[];
@@ -43,6 +44,7 @@ class OffchainThread implements IUniqueId {
     chain: string,
     readOnly: boolean,
     body?: string,
+    plaintext?: string,
     url?: string,
     authorChain?: string,
     pinned?: boolean,
@@ -50,6 +52,7 @@ class OffchainThread implements IUniqueId {
     this.author = author;
     this.title = title;
     this.body = body;
+    this.plaintext = plaintext;
     this.attachments = attachments;
     this.id = id;
     this.identifier = `${id}`;
