@@ -711,7 +711,7 @@ const ViewProposalPage: m.Component<{
     const { replyParent } = vnode.state;
     return m(Sublayout, {
       class: 'ViewProposalPage',
-      sidebarTopic: proposal instanceof OffchainThread ? proposal.topic?.id : null,
+      sidebarTopic: proposal instanceof OffchainThread ? (proposal.topic?.id || null) : null,
       rightSidebar: proposal instanceof OffchainThread
         ? null
         : m(ProposalSidebar, { proposal }),

@@ -176,7 +176,7 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
         m(ListItem, {
           active: onDiscussionsPage(m.route.get())
             && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true)
-            && !sidebarTopic,
+            && (sidebarTopic === null || !m.route.get().startsWith(`/${app.activeId()}/proposal/discussion/`)),
           label: 'All Discussions',
           onclick: (e) => {
             e.preventDefault();

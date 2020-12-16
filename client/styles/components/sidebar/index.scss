@@ -210,6 +210,12 @@
                 &.section-header {
                     font-size: 15px;
                     color: $text-color-lighter;
+                    .cui-icon svg {
+                        stroke: $text-color-lightest;
+                    }
+                    .cui-icon:hover svg {
+                        stroke: $text-color-medium;
+                    }
                 }
                 &.section-callout {
                     margin-top: 8px;
