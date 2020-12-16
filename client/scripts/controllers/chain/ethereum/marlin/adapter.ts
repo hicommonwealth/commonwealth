@@ -68,6 +68,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
       notifyError('Please change your Metamask network');
     });
     this.chain.marlinApi = api;
+    console.log('hi');
 
     if ((window as any).ethereum || (window as any).web3) {
       await this.webWallet.enable();

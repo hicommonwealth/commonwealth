@@ -227,6 +227,7 @@ export default (
       || chain.network === 'moloch'
       || chain.network === 'metacart'
       || chain.network === 'marlin'
+      || chain.network === 'marlin-testnet'
     ) {
       const msgBuffer = Buffer.from(addressModel.verification_token.trim());
       // toBuffer() doesn't work if there is a newline
