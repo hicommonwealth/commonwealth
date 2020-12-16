@@ -55,6 +55,29 @@ const EthereumLinkAccountItem: m.Component<{
     return m('.EthereumLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
+        const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+          address,
+          chain: app.activeChainId(),
+          jwt: app.user.jwt,
+        });
+
+        if (result.exists) {
+          if (result.belongsToUser) {
+            notifyInfo('This address is already linked to your current account.');
+            return;
+          } else if (result.isClaimable) {
+            const modalMsg = 'This address is currently linked to another account. Continue?';
+            const confirmed = await confirmationModalWithText(modalMsg)();
+            if (!confirmed) {
+              vnode.state.linking = false;
+              return;
+            }
+          } else {
+            notifyInfo('This address already belongs to a user, and cannot be transferred.');
+            return;
+          }
+        }
+
         const api = (app.chain as Ethereum);
         const webWallet = api.webWallet;
 
