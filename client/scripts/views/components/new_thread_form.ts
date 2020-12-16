@@ -213,7 +213,7 @@ export const NewThreadForm: m.Component<{
   },
   view: (vnode) => {
     if (!app.community && !app.chain) return;
-    const author = app.user.activeAccount;
+    let author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     const { isModal, hasTopics } = vnode.attrs;
     if (vnode.state.quillEditorState?.container) {
@@ -415,6 +415,7 @@ export const NewThreadForm: m.Component<{
                   return;
                 }
                 vnode.state.saving = true;
+                author = app.user.activeAccount;
                 if (!vnode.state.form.linkTitle) {
                   vnode.state.form.linkTitle = (
                     $(e.target).closest('.NewThreadForm').find('input[name=\'new-link-title\'').val() as string
@@ -500,6 +501,7 @@ export const NewThreadForm: m.Component<{
               onclick: async (e) => {
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
+                author = app.user.activeAccount;
                 if (!vnode.state.form.threadTitle) {
                   vnode.state.form.threadTitle = (
                     $(e.target).closest('.NewThreadForm').find('input[name=\'new-thread-title\'').val() as string
@@ -537,6 +539,7 @@ export const NewThreadForm: m.Component<{
               onclick: async (e) => {
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
+                author = app.user.activeAccount;
                 const title = $(e.target).closest('.NewThreadForm').find('input[name=\'new-thread-title\']');
                 if (!vnode.state.form.threadTitle) {
                   vnode.state.form.threadTitle = (title.val() as string);

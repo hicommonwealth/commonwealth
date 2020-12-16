@@ -38,7 +38,7 @@ const NewProposalForm = {
   },
   view: (vnode) => {
     const callback = vnode.attrs.callback;
-    const author = app.user.activeAccount;
+    let author = app.user.activeAccount;
     const proposalTypeEnum = vnode.attrs.typeEnum;
     const activeEntity = app.community || app.chain;
 
@@ -122,6 +122,7 @@ const NewProposalForm = {
       let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (a) => {
         return (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any>).createTx(...a);
       };
+      author = app.user.activeAccount;
       let args = [];
       if (proposalTypeEnum === ProposalType.OffchainThread) {
         app.threads.create(
