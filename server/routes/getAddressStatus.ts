@@ -7,7 +7,6 @@ export const Errors = {
 };
 
 const getAddress = async (models, req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body);
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
   }
@@ -24,7 +23,7 @@ const getAddress = async (models, req: Request, res: Response, next: NextFunctio
   const existingAddress = await models.Address.findOne({
     where: { chain: req.body.chain, address: req.body.address }
   });
-  console.log(existingAddress);
+
   let result;
   if (existingAddress) {
     // address already exists on another user, only take ownership if

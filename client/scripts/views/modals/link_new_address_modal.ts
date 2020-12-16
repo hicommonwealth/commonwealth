@@ -100,7 +100,7 @@ const SubstrateLinkAccountItem: m.Component<{
       address: account.address,
       currentPrefix: (app.chain as Substrate).chain.ss58Format,
     });
-    console.log(address);
+
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
@@ -111,7 +111,6 @@ const SubstrateLinkAccountItem: m.Component<{
         });
 
         if (result.exists) {
-          console.log(result);
           if (result.belongsToUser) {
             notifyInfo('This address is already linked to your current account.');
             return;
