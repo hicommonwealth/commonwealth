@@ -173,7 +173,7 @@ export async function Enrich(
         const stakersCall = (account) => {
           return  api.query.staking.stakers ?
           api.query.staking.stakers.at(hash, account) : 
-          api.query.staking.erasStakers(currentEra, account);
+          api.query.staking.erasStakers.at(hash,currentEra, account);
         }
 
         let activeExposures: { [key: string]: any } = {}
