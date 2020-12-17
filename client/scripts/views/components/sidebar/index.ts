@@ -253,7 +253,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     return m('.OnchainNavigationModule.SidebarModule', [
       m(List, [
         m(ListItem, {
-          label: 'On-chain Governance 2',
+          label: 'On-chain Governance',
           class: 'section-header',
         }),
         // referenda (substrate only)
