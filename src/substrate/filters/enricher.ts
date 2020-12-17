@@ -153,7 +153,6 @@ export async function Enrich(
             nextSessionKeysOpt = await api.query.session.nextKeys(hash,key);
             // there is queuedKeys function as well not sure which one to use
             // nextSessionKeysOpt = await api.query.session.queuedKeys(hash,key);
-
           }
           catch(e){
             // for new blocks
@@ -164,7 +163,7 @@ export async function Enrich(
           validatorInfo[key] = {
             commissionPer,
             controllerId: controllerId.toString() == ''? key: controllerId.toString(),
-            rewardDestination,
+            rewardDestination: rewardDestination.toString(),
             nextSessionIds: nextSessionKeys,
             eraPoints: eraPointsIndividual[key]? Number(eraPointsIndividual[key]): 0
           };
