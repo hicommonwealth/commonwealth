@@ -56,7 +56,7 @@ const EthereumLinkAccountItem: m.Component<{
       onclick: async (e) => {
         e.preventDefault();
         const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
-          address,
+          address: address.toLowerCase(),
           chain: app.activeChainId(),
           jwt: app.user.jwt,
         });
