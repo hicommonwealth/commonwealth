@@ -7,11 +7,12 @@ import { Tag, Button, Icon, Icons } from 'construct-ui';
 import app from 'state';
 import { Account, RoleInfo, RolePermission } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
-import { isSameAccount, formatAsTitleCase, formatAddressShort } from 'helpers';
+import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
+import { formatAddressShort } from '../../../../shared/utils';
 
 const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean }> = {
   view: (vnode) => {
@@ -50,7 +51,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       const [account, role] = activeAccountsByRole[index];
       const addressInfo = app.user.addresses
         .find((a) => a.address === account.address && a.chain === account.chain.id);
-      const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
 
       // confirm
       const confirmed = await confirmationModalWithText('Remove this address from the community?')();
@@ -72,7 +72,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         if (isSameAccount(app.user.activeAccount, account)) {
           app.user.ephemerallySetActiveAccount(null);
         }
-        $(e.target).trigger('modalexit');
       }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();
@@ -129,10 +128,10 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           joiningCommunity: app.activeCommunityId(),
           joiningChain: app.activeChainId(),
           label: 'Connect a new address',
-          // compact: true,
-          // fluid: true,
-          // disabled: vnode.state.loading,
-          // intent: 'none',
+          onSuccess: () => {
+            $('.SelectAddressModal').trigger('modalexit');
+            notifySuccess('New address connected!');
+          }
         }),
       ]),
     ]);

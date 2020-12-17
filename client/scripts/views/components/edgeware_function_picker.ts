@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Button, Input, FormLabel, FormGroup } from 'construct-ui';
+import { Input, FormLabel, FormGroup } from 'construct-ui';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
@@ -41,21 +41,26 @@ const EdgewareFunctionPicker = {
           title: 'Module',
           name: 'module',
           choices: (app.chain as Substrate).chain.listApiModules().map((mod) => {
-            return { name: mod, label: mod, value: mod };
+            return { label: mod, value: mod };
           }),
+          value: vnode.state.form.module,
+          defaultValue: (app.chain as Substrate).chain.listApiModules()[0],
           callback: (result) => {
             vnode.state.form.module = result;
             vnode.state.form.function = (app.chain as Substrate).chain.listModuleFunctions(result)[0];
             vnode.state.form.args = [];
             m.redraw();
+            setTimeout(() => { m.redraw(); }, 0);
           },
         }),
         m(DropdownFormField, {
           title: 'Function',
           name: 'function',
           choices: (app.chain as Substrate).chain.listModuleFunctions(vnode.state.form.module).map((func) => {
-            return { name: func, label: func, value: func };
+            return { label: func, value: func };
           }),
+          defaultValue: (app.chain as Substrate).chain.listModuleFunctions(vnode.state.form.module)[0],
+          value: vnode.state.form.function,
           callback: (result) => {
             vnode.state.form.function = result;
             vnode.state.form.args = [];
@@ -105,7 +110,7 @@ const EdgewareFunctionPicker = {
         ]);
       })),
 
-      m(FormGroup, [
+      m(FormGroup, { style: 'margin-top: 20px' }, [
         m(FormLabel, 'Proposal Hash'),
         m(Input, {
           disabled: true,

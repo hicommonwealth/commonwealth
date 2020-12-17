@@ -57,18 +57,17 @@ class EdgewareSignaling extends ProposalModule<
         this._votingPeriod = +votinglength;
         this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
 
-        // fetch proposals from chain
-        await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          this,
-          () => this._Chain.fetcher.fetchSignalingProposals(this.app.chain.block.height)
-        );
-
         // register new chain-event handlers
         this.app.chain.chainEntities.registerEntityHandler(
           SubstrateTypes.EntityKind.SignalingProposal, (entity, event) => {
-            if (this.initialized) this.updateProposal(entity, event);
+            this.updateProposal(entity, event);
           }
+        );
+
+        // fetch proposals from chain
+        await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          () => this._Chain.fetcher.fetchSignalingProposals(this.app.chain.block.height)
         );
 
         this._initialized = true;

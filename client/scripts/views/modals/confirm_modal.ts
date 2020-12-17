@@ -11,7 +11,16 @@ const ConfirmModal = {
     const confirmText = vnode.attrs.prompt || 'Are you sure?';
     const primaryButton = vnode.attrs.primaryButton || 'Yes';
     const secondaryButton = vnode.attrs.secondaryButton || 'Cancel';
-    return m('.ConfirmModal', [
+    return m('.ConfirmModal', {
+      onclick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      },
+      onmousedown: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, [
       m('.compact-modal-body', [
         m('h3', confirmText),
       ]),

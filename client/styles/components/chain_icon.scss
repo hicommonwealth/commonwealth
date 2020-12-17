@@ -12,7 +12,11 @@ $icon-text: #fff;
 }
 
 .CommunityIcon {
-    .community-icon {
+    img.community-icon {
+        border-radius: 9999px;
+        background: $icon-background;
+    }
+    .community-icon.no-image {
         border-radius: 9999px;
         background: $icon-background;
         display: flex;
@@ -25,7 +29,7 @@ $icon-text: #fff;
             font-size: 16px;
         }
     }
-    &.onclick img.community-icon {
+    &.onclick .community-icon {
         cursor: pointer;
     }
 }

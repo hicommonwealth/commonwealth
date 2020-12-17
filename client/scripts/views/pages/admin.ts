@@ -360,7 +360,6 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
             choices: adminChoices,
             callback: (result) => {
               vnode.state.selected_profile = result;
-              console.log(vnode.state.selected_profile);
             }
           })
         ]),

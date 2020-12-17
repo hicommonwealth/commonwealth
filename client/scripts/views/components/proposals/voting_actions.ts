@@ -170,7 +170,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
     const onModalClose = () => {
       vnode.state.votingModalOpen = false;
       m.redraw();
-    }
+    };
 
     const voteYes = async (e) => {
       e.preventDefault();
@@ -186,10 +186,17 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         'Last Vote Created': new Date().toISOString()
       });
       if (proposal instanceof SubstrateDemocracyProposal) {
-        createTXModal(proposal.submitVoteTx(new DepositVote(user, proposal.deposit), onModalClose)); // TODO: new code, test
+        createTXModal(proposal.submitVoteTx(new DepositVote(user, proposal.deposit), onModalClose));
+        // TODO: new code, test
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
-        if (vnode.state.conviction === undefined) throw new Error('Must select a conviction');
-        if (vnode.state.amount === 0) throw new Error('Must select a valid amount');
+        if (vnode.state.conviction === undefined) {
+          vnode.state.votingModalOpen = false;
+          return notifyError('Must select a conviction');
+        }
+        if (vnode.state.amount === 0) {
+          vnode.state.votingModalOpen = false;
+          return notifyError('Must select a valid amount');
+        }
         createTXModal(proposal.submitVoteTx(
           new BinaryVote(user, true, vnode.state.amount, convictionToWeight(vnode.state.conviction)), onModalClose
         ));
@@ -202,9 +209,11 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
-        throw new Error('Unimplemented proposal type - use election voting modal');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Unimplemented proposal type - use election voting modal');
       } else {
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
     const voteNo = (e) => {
@@ -225,7 +234,14 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           (app.chain.chain as SubstrateChain).createType('VoteOutcome', [0])
         ], app.chain.chain.coins(0)), onModalClose)); // fake balance, not needed for voting
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
-        if (vnode.state.conviction === undefined) throw new Error('Must select a conviction'); // TODO: new code, test
+        if (vnode.state.conviction === undefined) {
+          vnode.state.votingModalOpen = false;
+          return notifyError('Must select a conviction'); // TODO: new code, test
+        }
+        if (vnode.state.amount === 0) {
+          vnode.state.votingModalOpen = false;
+          return notifyError('Must select a valid amount');
+        }
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, false, vnode.state.amount,
           convictionToWeight(vnode.state.conviction)), onModalClose));
       } else if (proposal instanceof SubstrateCollectiveProposal) {
@@ -235,7 +251,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
       } else {
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
     const cancelProposal = (e) => {
@@ -256,7 +273,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => { onModalClose(); m.redraw(); })
           .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else {
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
     // V2 only
@@ -276,7 +294,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
     //   if (proposal instanceof MolochProposal) {
     //     proposal.sponsorTx(proposal, user);
     //   } else {
-    //     throw new Error('Invalid proposal type');
+    //     vnode.state.votingModalOpen = false;
+    //     return notifyError('Invalid proposal type');
     //   }
     // };
     const processProposal = (e) => {
@@ -297,8 +316,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => { onModalClose(); m.redraw(); })
           .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else {
-        onModalClose()
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
     const voteAbstain = (e) => {
@@ -317,7 +336,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       if (proposal instanceof CosmosProposal) {
         createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.ABSTAIN), null, onModalClose));
       } else {
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
     const voteVeto = (e) => {
@@ -336,7 +356,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       if (proposal instanceof CosmosProposal) {
         createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.VETO), null, onModalClose));
       } else {
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
 

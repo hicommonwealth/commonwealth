@@ -40,8 +40,7 @@ export default async function (models, chain?: string): Promise<void> {
     const nodeUrl = constructSubstrateUrl(node.url);
     const api = await SubstrateEvents.createApi(
       nodeUrl,
-      node.chain.includes('edgeware') ? Mainnet.types : {},
-      node.chain.includes('edgeware') ? Mainnet.typesAlias : {},
+      node.chain.includes('edgeware') ? Mainnet : {},
     );
 
     // fetch all events and run through handlers in sequence then exit

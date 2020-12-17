@@ -44,7 +44,7 @@ export class OffchainAccount extends Account<Coin> {
   public setValidationToken(token: string): void {
     throw new Error('Method not implemented.');
   }
-  public async validate(signature?: string, txParams?: string) {
+  public async validate(signature?: string) {
     throw new Error('Method not implemented.');
   }
 }

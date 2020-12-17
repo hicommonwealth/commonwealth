@@ -2,8 +2,10 @@ import 'components/quill_editor.scss';
 
 import m, { VnodeDOM } from 'mithril';
 import $ from 'jquery';
+import moment from 'moment-twitter';
 import Quill from 'quill-2.0-dev/quill';
 import { Tag, Tooltip } from 'construct-ui';
+import AutoLinks from 'quill-auto-links';
 import ImageUploader from 'quill-image-uploader';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
@@ -50,6 +52,9 @@ const instantiateEditor = (
   // Remove existing editor, if there is one
   $editor.empty();
   $editor.siblings('.ql-toolbar').remove();
+
+  // Register automatic conversion to links
+  Quill.register('modules/autoLinks', AutoLinks);
 
   // Register image uploader extension
   Quill.register('modules/imageUploader', ImageUploader);
@@ -282,7 +287,7 @@ const instantiateEditor = (
         } else {
           avatar = document.createElement('div');
           avatar.className = 'ql-mention-avatar';
-          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 16);
+          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 20);
         }
 
         const nameSpan = document.createElement('span');
@@ -293,12 +298,17 @@ const instantiateEditor = (
         addrSpan.innerText = addr.chain === 'near' ? addr.address : `${addr.address.slice(0, 6)}...`;
         addrSpan.className = 'ql-mention-addr';
 
+        const lastActiveSpan = document.createElement('span');
+        lastActiveSpan.innerText = profile.lastActive ? `Last active ${moment(profile.lastActive).fromNow()}` : null;
+        lastActiveSpan.className = 'ql-mention-la';
+
         const textWrap = document.createElement('div');
         textWrap.className = 'ql-mention-text-wrap';
 
         node.appendChild(avatar);
         textWrap.appendChild(nameSpan);
         textWrap.appendChild(addrSpan);
+        textWrap.appendChild(lastActiveSpan);
         node.appendChild(textWrap);
 
         return ({
@@ -577,6 +587,7 @@ const instantiateEditor = (
   quill = new Quill($editor[0], {
     debug: 'error',
     modules: {
+      autoLinks: true,
       toolbar: hasFormats ? ([[{ header: 1 }, { header: 2 }]] as any).concat([
         ['bold', 'italic', 'strike', 'code-block'],
         [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }, 'blockquote', 'link', 'preview'],
@@ -769,10 +780,12 @@ const instantiateEditor = (
 
   setInterval(() => {
     if (state.unsavedChanges.length() > 0) {
-      // Save the entire updated text to localStorage
-      const data = JSON.stringify(quill.getContents());
-      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, data);
-      state.unsavedChanges = new Delta();
+      if (quill.isEnabled()) {
+        // Save the entire updated text to localStorage
+        const data = JSON.stringify(quill.getContents());
+        localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, data);
+        state.unsavedChanges = new Delta();
+      }
     }
   }, 2500);
 

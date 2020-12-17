@@ -27,7 +27,7 @@ import { Vec, Compact } from '@polkadot/types/codec';
 import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 
 import { formatCoin } from 'adapters/currency';
-import { formatAddressShort, BlocktimeHelper } from 'helpers';
+import { BlocktimeHelper } from 'helpers';
 import {
   NodeInfo,
   ITXModalData,
@@ -46,6 +46,7 @@ import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
 import { constructSubstrateUrl } from 'substrate';
+import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateAccount } from './account';
 
 export interface ISubstrateTXData extends ITXData {

@@ -30,15 +30,17 @@ class CommentsStore extends IdStore<OffchainComment<any>> {
 
     const authorIndex = this._storeAuthor[comment.author].indexOf(comment);
     if (authorIndex === -1) {
-      throw new Error('Comment not in authors store');
+      console.error('Attempting to remove a comment that was not found in the authors store');
     }
     this._storeAuthor[comment.author].splice(authorIndex, 1);
 
-    const proposalIndex = this._storeProposal[comment.proposal.uniqueIdentifier].indexOf(comment);
-    if (comment.proposal && proposalIndex === -1) {
-      throw new Error('Comment not in proposals store');
+    if (comment.proposal) {
+      const proposalIndex = this._storeProposal[comment.proposal.uniqueIdentifier].indexOf(comment);
+      if (comment.proposal && proposalIndex === -1) {
+        console.error('Attempting to remove a comment that was not found in the proposals store');
+      }
+      this._storeProposal[comment.proposal.uniqueIdentifier].splice(proposalIndex, 1);
     }
-    this._storeProposal[comment.proposal.uniqueIdentifier].splice(proposalIndex, 1);
     return this;
   }
 

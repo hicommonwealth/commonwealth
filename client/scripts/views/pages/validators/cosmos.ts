@@ -2,7 +2,7 @@ import m from 'mithril';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
-import { formatAddressShort, pluralize } from 'helpers';
+import { pluralize } from 'helpers';
 import { FormGroup, FormLabel, Input, Button } from 'construct-ui';
 
 import { Account } from 'models';
@@ -12,6 +12,7 @@ import { ICosmosValidator, CosmosAccount, CosmosValidatorState } from 'controlle
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import User from 'views/components/widgets/user';
 import Tabs from 'views/components/widgets/tabs';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 import { IValidatorAttrs } from '.';
 

@@ -15,6 +15,8 @@ class ChainInfo {
   public chat: string;
   public telegram: string;
   public github: string;
+  public readonly blockExplorerIds: object;
+  public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
@@ -22,7 +24,7 @@ class ChainInfo {
 
   constructor(
     id, network, symbol, name, iconUrl, description, website, chat, telegram,
-    github, featuredTopics, topics, adminsAndMods?
+    github, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
     this.network = network;
@@ -34,12 +36,20 @@ class ChainInfo {
     this.chat = chat;
     this.telegram = telegram;
     this.github = github;
+    this.blockExplorerIds = blockExplorerIds;
+    this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
   }
 
   public static fromJSON(json) {
+    let blockExplorerIds;
+    try {
+      blockExplorerIds = JSON.parse(json.blockExplorerIds);
+    } catch (e) {
+      // ignore invalid JSON blobs
+    }
     return new ChainInfo(
       json.id,
       json.network,
@@ -51,6 +61,8 @@ class ChainInfo {
       json.chat,
       json.telegram,
       json.github,
+      blockExplorerIds,
+      json.collapsed_on_homepage,
       json.featured_topics,
       json.topics,
       json.adminsAndMods,
@@ -64,6 +76,7 @@ class ChainInfo {
         return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
       });
       this.setAdmins(roles);
+      return this.adminsAndMods;
     } catch {
       console.log('Failed to fetch admins/mods');
     }

@@ -133,6 +133,10 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
     [ finalReaction.Address.address ],
   );
 
+  // update author.last_active (no await)
+  author.last_active = new Date();
+  author.save();
+
   return res.json({ status: 'Success', result: finalReaction.toJSON() });
 };
 

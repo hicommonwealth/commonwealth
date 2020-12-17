@@ -189,20 +189,6 @@ describe('Roles Test', () => {
       expect(res.body.error).to.be.equal(upgradeErrors.MustBeAdmin);
     });
 
-    it('should fail to demote an admin if self is admin', async () => {
-      const res = await chai.request(app)
-        .post('/api/upgradeMember')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: jwtToken,
-          community,
-          address: loggedInAddr,
-          new_role: 'member',
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(upgradeErrors.NoAdminDemotion);
-    });
-
     it('should fail to upgrade a nonexistent member', async () => {
       const temp = await modelUtils.createAndVerifyAddress({ chain });
       const tempJwt = jwt.sign({ id: temp.user_id, email: temp.email }, JWT_SECRET);
@@ -217,6 +203,21 @@ describe('Roles Test', () => {
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(upgradeErrors.NoMember);
+    });
+
+    it('should pass when an admin demotes self', async () => {
+      const role = 'member';
+      const res = await chai.request(app)
+        .post('/api/upgradeMember')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          community,
+          address: loggedInAddr,
+          new_role: role,
+        });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.permission).to.be.equal(role);
     });
   });
 

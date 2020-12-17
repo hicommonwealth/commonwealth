@@ -206,18 +206,9 @@ export function formatDuration(duration: moment.Duration, includeSeconds = true)
   ].join('');
 }
 
-export function formatAddressShort(address: string, chain: string) {
-  if (!address) return;
-  if (chain === 'near') {
-    return `@${address}`;
-  } else {
-    return `${address.slice(0, 5)}…`;
-  }
-}
-
 export function formatProposalHashShort(hash: string) {
   if (!hash) return;
-  return hash.slice(0, 8);
+  return `${hash.slice(0, 8)}…`;
 }
 
 export function renderMultilineText(text: string) {

@@ -7,13 +7,15 @@ import app from 'state';
 import { AddressInfo, AbridgedThread } from 'models';
 import User from 'views/components/widgets/user';
 import CommunityInfoModule from 'views/components/sidebar/community_info_module';
+import SubscriptionButton from 'views/components/sidebar/subscription_button';
 
 export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: number }, {}> = {
   view: (vnode) => {
     const { user, activityCount } = vnode.attrs;
+    const profile = app.profiles.getProfile(user.chain, user.address);
     return m('.MostActiveUser', [
       m(User, {
-        user,
+        user: profile,
         avatarSize: 24,
         linkify: true,
         popover: true,
@@ -47,18 +49,17 @@ export const MostActiveThread: m.Component<{ thread: AbridgedThread }> = {
 
 export const ListingSidebar: m.Component<{ entity: string }> = {
   view: (vnode) => {
-    const { entity } = vnode.attrs;
-    const activeAddresses = app.recentActivity.getMostActiveUsers(entity);
+    const activeAddresses = app.recentActivity.getMostActiveUsers();
     // const activeThreads = app.recentActivity.getMostActiveThreads(entity);
-
     return m('.ListingSidebar.forum-container.proposal-sidebar', [
       m(CommunityInfoModule),
-      m('.user-activity', [
+      activeAddresses.length > 0
+      && m('.user-activity', [
         m('.user-activity-header', 'Active members'),
         m('.active-members', activeAddresses.map((user) => {
           return m(MostActiveUser, {
-            user: user.addressInfo,
-            activityCount: user.postCount
+            user: user.info,
+            activityCount: user.count
           });
         })),
       ]),
@@ -77,11 +78,11 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
               avatarSize: 24,
               linkify: true,
               popover: true,
-              showRole: true,
             });
           }),
         ]),
       ]),
+      m(SubscriptionButton),
     ]);
   }
 };

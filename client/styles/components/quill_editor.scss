@@ -266,24 +266,29 @@
             cursor: pointer;
         }
         .ql-mention-text-wrap {
-            display: flex;
-            justify-content: space-between;
             width: 100%;
-        }
-        .ql-mention-name {
-            display: block;
-            min-width: 50px;
-            margin-right: 12px;
-        }
-        .ql-mention-addr {
-            color: #999;
+            .ql-mention-name {
+                margin-right: 15px;
+            }
+            .ql-mention-addr {
+                float: right;
+                color: #999;
+                font-size: 90%;
+                line-height: 1.6;
+            }
+            .ql-mention-la {
+                display: block;
+                color: #999;
+                font-size: 90%;
+                white-space: nowrap;
+            }
         }
         .ql-mention-avatar {
             height: 20px;
             width: 20px;
             min-height: 20px;
             min-width: 20px;
-            margin-right: 8px;
+            margin-right: 12px;
             border-radius: 9999px;
             &.missing {
                 background-color: $background-color-light;

@@ -5,7 +5,6 @@ import { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
 import { DeriveBalancesAccount } from '@polkadot/api-derive/types';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { IApp } from 'state';
-import { formatAddressShort } from 'helpers';
 import {
   ISubstrateTreasuryProposal,
   SubstrateCoin
@@ -14,6 +13,7 @@ import { ProposalModule } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
+import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
 
 class SubstrateTreasury extends ProposalModule<
@@ -92,18 +92,17 @@ class SubstrateTreasury extends ProposalModule<
             });
         });
 
-        // fetch proposals from chain
-        await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          this,
-          () => this._Chain.fetcher.fetchTreasuryProposals(this.app.chain.block.height)
-        );
-
         // register new chain-event handlers
         this.app.chain.chainEntities.registerEntityHandler(
           SubstrateTypes.EntityKind.TreasuryProposal, (entity, event) => {
-            if (this.initialized) this.updateProposal(entity, event);
+            this.updateProposal(entity, event);
           }
+        );
+
+        // fetch proposals from chain
+        await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          () => this._Chain.fetcher.fetchTreasuryProposals(this.app.chain.block.height),
         );
 
         this._initialized = true;

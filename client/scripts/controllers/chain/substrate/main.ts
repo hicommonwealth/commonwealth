@@ -66,11 +66,9 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   }
 
   public async initData() {
-    if (!this.usingServerChainEntities) {
-      await this.chain.initChainEntities();
-    }
+    await this.chain.initChainEntities();
     await this.chain.initEventLoop();
-    await super.initData(this.usingServerChainEntities);
+    await super.initData();
   }
 
   public async deinit(): Promise<void> {

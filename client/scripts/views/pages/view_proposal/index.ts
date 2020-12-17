@@ -33,7 +33,8 @@ import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
 import {
-  ProposalHeaderExternalLink, ProposalHeaderTopics, ProposalHeaderTitle,
+  ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
+  ProposalHeaderTopics, ProposalHeaderTitle,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyButtons,
   ProposalTitleEditor,
@@ -152,6 +153,12 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           proposal instanceof OffchainThread
             && proposal.kind === OffchainThreadKind.Link
             && m('.proposal-body-link', m(ProposalHeaderExternalLink, { proposal })),
+          (proposal['blockExplorerLink'] || proposal['votingInterfaceLink']) && m('.proposal-body-link', [
+            proposal['blockExplorerLink']
+              && m(ProposalHeaderBlockExplorerLink, { proposal }),
+            proposal['votingInterfaceLink']
+              && m(ProposalHeaderVotingInterfaceLink, { proposal }),
+          ]),
         ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-content', [
@@ -436,7 +443,6 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
 
     return m('.ProposalSidebar.forum-container.proposal-sidebar', [
       m(ProposalVotingActions, { proposal }),
-      m(ProposalVotingResults, { proposal }),
     ]);
   }
 };
@@ -468,11 +474,14 @@ const ViewProposalPage: m.Component<{
   type: string
 }, {
   editing: boolean,
+  recentlyEdited: boolean,
   replyParent: number | boolean,
   highlightedComment: boolean,
   prefetch: IPrefetch,
   comments,
   viewCount: number,
+  proposal: AnyProposal | OffchainThread,
+  threadFetched,
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -504,26 +513,41 @@ const ViewProposalPage: m.Component<{
       return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
+    const proposalRecentlyEdited = vnode.state.recentlyEdited;
+    const proposalDoesNotMatch = vnode.state.proposal && Number(vnode.state.proposal.identifier) !== Number(proposalId);
     // load proposal
-    let proposal: AnyProposal;
-    try {
-      proposal = idToProposal(proposalType, proposalId);
-    } catch (e) {
-      // proposal might be loading, if it's not an offchain thread
-      if (proposalType !== ProposalType.OffchainThread) {
-        if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
-
-        // check if module is still initializing
-        const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
-        if (!c.disabled && !c.initialized) {
-          if (!c.initializing) loadCmd(proposalType);
+    if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
+      try {
+        vnode.state.proposal = idToProposal(proposalType, proposalId);
+      } catch (e) {
+        // proposal might be loading, if it's not an offchain thread
+        if (proposalType === ProposalType.OffchainThread) {
+          if (!vnode.state.threadFetched) {
+            app.threads.fetchThread(Number(proposalId)).then((res) => {
+              vnode.state.proposal = res;
+              m.redraw();
+            }).catch((err) => {
+              notifyError('Thread not found');
+              return m(PageNotFound);
+            });
+            vnode.state.threadFetched = true;
+          }
           return m(PageLoading, { narrow: true, showNewProposalButton: true });
+        } else {
+          if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
+          // check if module is still initializing
+          const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
+          if (!c.disabled && !c.initialized) {
+            if (!c.initializing) loadCmd(proposalType);
+            return m(PageLoading, { narrow: true, showNewProposalButton: true });
+          }
         }
+        // proposal does not exist, 404
+        return m(PageNotFound);
       }
-
-      // proposal does not exist, 404
-      return m(PageNotFound);
     }
+    const { proposal } = vnode.state;
+    if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
       m.route.set(`/${app.activeId()}/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},
         { replace: true });
@@ -643,6 +667,9 @@ const ViewProposalPage: m.Component<{
       if (call === GlobalStatus.Get) return vnode.state.editing;
       if (call === GlobalStatus.Set && status !== undefined) {
         vnode.state.editing = status;
+        if (status === false) {
+          vnode.state.recentlyEdited = true;
+        }
         m.redraw();
       }
     };
@@ -684,7 +711,7 @@ const ViewProposalPage: m.Component<{
     const { replyParent } = vnode.state;
     return m(Sublayout, {
       class: 'ViewProposalPage',
-      sidebarTopic: proposal instanceof OffchainThread ? proposal.topic?.id : null,
+      sidebarTopic: proposal instanceof OffchainThread ? (proposal.topic?.id || null) : null,
       rightSidebar: proposal instanceof OffchainThread
         ? null
         : m(ProposalSidebar, { proposal }),
@@ -699,8 +726,9 @@ const ViewProposalPage: m.Component<{
       }),
       !(proposal instanceof OffchainThread) && m('.proposal-mobile-sidebar', [
         m(ProposalVotingActions, { proposal }),
-        m(ProposalVotingResults, { proposal }),
       ]),
+      !(proposal instanceof OffchainThread)
+        && m(ProposalVotingResults, { proposal }),
       m(ProposalComments, {
         proposal,
         comments,

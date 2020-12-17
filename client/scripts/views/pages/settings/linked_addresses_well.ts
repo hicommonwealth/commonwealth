@@ -44,7 +44,7 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
           }),
         ]),
         // checking for balance to guarantee that delegate key has loaded
-        m('.address', `${account.address} (${account.chain})`),
+        m('.address', `${account.address} - ${app.config.chains.getById(account.chain)?.name}`),
         (account instanceof MolochMember && account.isMember && account.delegateKey) ? m('.moloch-delegatekey', [
           'Delegate: ',
           account.isMember
@@ -56,11 +56,14 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
         m(Button, {
           intent: 'negative',
           size: 'sm',
-          class: vnode.state.removing ? ' disabled' : '',
           onclick: async () => {
             const confirmed = await confirmationModalWithText('Are you sure you want to remove this account?')();
             if (confirmed) {
               vnode.state.removing = true;
+              if (app.user.activeAccount?.address === account.address
+                  && app.user.activeAccount?.chain.id === account.chain) {
+                app.user.ephemerallySetActiveAccount(null);
+              }
               unlinkLogin(account).then(() => {
                 vnode.state.removing = false;
                 m.redraw();
@@ -68,7 +71,8 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
             }
           },
           disabled: vnode.state.removing,
-          label: vnode.state.removing ? 'Removing...' : 'Remove'
+          loading: vnode.state.removing,
+          label: 'Remove',
         }),
       ]),
     ]);
@@ -81,7 +85,6 @@ const LinkedAddressesWell: m.Component<{}> = {
 
     return m('.LinkedAddressesWell', [
       addressGroups.map(([chain_id, addresses]) => m('.address-group', [
-        m('h4', app.config.chains.getById(chain_id)?.name),
         addresses.sort(orderAccountsByAddress).map((account) => m(AccountRow, { account })),
       ])),
       app.user.addresses.length === 0

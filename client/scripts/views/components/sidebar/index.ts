@@ -5,13 +5,15 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner
+  Button, ButtonGroup, List, ListItem, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
 } from 'construct-ui';
 
-import app from 'state';
+import { selectNode, initChain } from 'app';
+
+import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
 import { link } from 'helpers';
-import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo } from 'models';
+import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo, NodeInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
@@ -30,11 +32,14 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
     return m('.SidebarQuickSwitcherItem', {
       key: `${item instanceof ChainInfo ? 'chain' : 'community'}-${item.id}`
     }, [
-      m(Tooltip, {
-        hoverOpenDelay: 350,
+      m(Popover, {
+        interactionType: 'hover',
+        hoverOpenDelay: 500,
         hoverCloseDelay: 0,
         transitionDuration: 0,
         position: 'right',
+        restoreFocus: false,
+        inline: true,
         content: m('.quick-switcher-option-text', item.name),
         class: 'SidebarQuickSwitcherItemTooltip',
         trigger: m('.quick-switcher-option', {
@@ -88,6 +93,7 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
 
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+    const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     const featuredTopics = {};
@@ -170,15 +176,31 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
         m(ListItem, {
           active: onDiscussionsPage(m.route.get())
             && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true)
-            && !sidebarTopic,
+            && (sidebarTopic === null || !m.route.get().startsWith(`/${app.activeId()}/proposal/discussion/`)),
           label: 'All Discussions',
-          onclick: (e) => m.route.set(`/${app.activeId()}`),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeId()}`);
+          },
           contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+        }),
+        m(ListItem, {
+          active: onSearchPage(m.route.get())
+            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          label: 'Search',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeId()}/search`);
+          },
+          contentLeft: m(Icon, { name: Icons.SEARCH }),
         }),
         // m(ListItem, {
         //   active: onChatPage(m.route.get()),
         //   label: 'Chat',
-        //   onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+        //   onclick: (e) => {
+        //     e.preventDefault();
+        //     m.route.set(`/${app.activeId()}/chat`);
+        //   },
         //   contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
         // }),
       ]),
@@ -257,20 +279,26 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           class: 'section-header',
         }),
         // referenda (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate
+        !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia
           && m(ListItem, {
             active: onReferendaPage(m.route.get()),
             label: 'Referenda',
             contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/referenda`),
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeChainId()}/referenda`);
+            },
             contentRight: [], // TODO
           }),
         // proposals (substrate, cosmos, moloch only)
         m(ListItem, {
-          active: onProposalPage(m.route.get()),
+          active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
           label: 'Proposals & Motions',
           contentLeft: m(Icon, { name: Icons.SEND }),
-          onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/proposals`);
+          },
           // contentRight: [
           //   (app.chain?.base === ChainBase.Substrate)
           //     && m(Tag, {
@@ -288,12 +316,15 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           // ],
         }),
         // treasury (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate
+        !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
           && m(ListItem, {
             active: onTreasuryPage(m.route.get()),
             label: 'Treasury',
             contentLeft: m(Icon, { name: Icons.TRUCK }),
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/treasury`),
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeChainId()}/treasury`);
+            },
             contentRight: [], // TODO
           }),
         // bounties (substrate only)
@@ -311,7 +342,10 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
             active: onCouncilPage(m.route.get()),
             label: 'Council',
             contentLeft: m(Icon, { name: Icons.AWARD }),
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeChainId()}/council`);
+            },
             contentRight: [], // TODO
           }),
         // validators (substrate and cosmos only)
@@ -320,35 +354,48 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
         //     active: onValidatorsPage(m.route.get()),
         //     label: 'Validators',
-        //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
+        //     onclick: (e) => {
+        //       e.preventDefault();
+        //       m.route.set(`/${app.activeChainId()}/validators`),
+        //     },
         //   }),
         showMolochMemberOptions && m(ListItem, {
           onclick: (e) => {
+            e.preventDefault();
             m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
           },
           label: 'New proposal',
           contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
         }),
         showMolochMemberOptions && m(ListItem, {
-          onclick: (e) => app.modals.lazyCreate('update_delegate_modal', {
-            account: app.user.activeAccount,
-            delegateKey: (app.user.activeAccount as any).delegateKey,
-          }),
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.lazyCreate('update_delegate_modal', {
+              account: app.user.activeAccount,
+              delegateKey: (app.user.activeAccount as any).delegateKey,
+            });
+          },
           label: 'Update delegate key',
           contentLeft: m(Icon, { name: Icons.KEY }),
         }),
         showMolochMemberOptions && m(ListItem, {
-          onclick: (e) => app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount }),
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
+          },
           label: 'Rage quit',
           contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
         }),
         showMolochMenuOptions && m(ListItem, {
-          onclick: (e) => app.modals.lazyCreate('token_management_modal', {
-            account: app.user.activeAccount,
-            accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
-            contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
-            tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
-          }),
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.lazyCreate('token_management_modal', {
+              account: app.user.activeAccount,
+              accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
+              contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
+              tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
+            });
+          },
           label: 'Approve tokens',
           contentLeft: m(Icon, { name: Icons.POWER }),
         }),
@@ -357,12 +404,12 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
   }
 };
 
-const ChainStatusModule: m.Component<{}> = {
+const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
   view: (vnode) => {
     const url = app.chain?.meta?.url;
     if (!url) return;
 
-    const formattedUrl = url
+    const formatUrl = (u) => u
       .replace('ws://', '')
       .replace('wss://', '')
       .replace('http://', '')
@@ -370,9 +417,60 @@ const ChainStatusModule: m.Component<{}> = {
       .split('/')[0]
       .split(':')[0];
 
+    const nodes = (app.chain && app.chain.meta ? [] : [{
+      name: 'node',
+      label: 'Select a node',
+      value: undefined,
+      selected: true,
+      chainId: undefined,
+    }]).concat(app.config.nodes.getAll().map((n) => ({
+      name: 'node',
+      label: formatUrl(n.url),
+      value: n.id,
+      selected: app.chain && app.chain.meta && n.url === app.chain.meta.url && n.chain === app.chain.meta.chain,
+      chainId: n.chain.id,
+    })));
+
     return m('.ChainStatusModule', [
-      m('.chain-url', formattedUrl),
-      app.chain.deferred ? m('.chain-deferred', 'Ready to connect') : m(ChainStatusIndicator),
+      m(PopoverMenu, {
+        transitionDuration: 0,
+        closeOnContentClick: true,
+        closeOnOutsideClick: true,
+        content: app.chain.deferred ? m(MenuItem, {
+          label: 'Connect to chain',
+          size: 'sm',
+          onclick: async (e) => {
+            e.preventDefault();
+            vnode.state.initializing = true;
+            await initChain();
+            vnode.state.initializing = false;
+            m.redraw();
+          }
+        }) : nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
+          return m(MenuItem, {
+            label: node.label,
+            size: 'sm',
+            onclick: async (e) => {
+              e.preventDefault();
+              vnode.state.initializing = true;
+              const n: NodeInfo = app.config.nodes.getById(node.value);
+              if (!n) return;
+              const finalizeInitialization = await selectNode(n);
+              if (finalizeInitialization) await initChain();
+              vnode.state.initializing = false;
+              m.redraw();
+            }
+          });
+        }),
+        trigger: m(Button, {
+          size: 'sm',
+          class: 'chain-status-main',
+          fluid: true,
+          disabled: vnode.state.initializing,
+          label: vnode.state.initializing ? 'Connecting...' : app.chain.deferred
+            ? 'Ready to connect' : m(ChainStatusIndicator),
+        }),
+      }),
     ]);
   }
 };
@@ -384,6 +482,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
     return [
       m('.MobileSidebarHeader', {
         onclick: (e) => {
+          e.preventDefault();
           // clicking anywhere outside the trigger should close the sidebar
           const onTrigger = $(e.target).hasClass('mobile-sidebar-trigger')
             || $(e.target).closest('.mobile-sidebar-trigger').length > 0;
@@ -395,6 +494,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
             class: 'mobile-sidebar-trigger',
             compact: true,
             onclick: (e) => {
+              e.preventDefault();
               vnode.state.open = !vnode.state.open;
             },
             label: m(Icon, { name: Icons.MENU }),
@@ -415,13 +515,16 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
       m('.Sidebar', {
         class: vnode.state.open ? 'open' : '',
         onclick: (e) => {
+          e.preventDefault();
           // clicking inside the sidebar should close the sidebar
           vnode.state.open = false;
         },
       }, [
-        m('.SidebarHeader', m(CommunitySelector)),
-        (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
-        (app.chain || app.community) && m(OnchainNavigationModule),
+        (app.chain || app.community) && m('.SidebarHeader', m(CommunitySelector)),
+        m('.sidebar-content', [ // container for overflow scrolling
+          (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
+          (app.chain || app.community) && m(OnchainNavigationModule),
+        ]),
         app.chain && m(ChainStatusModule),
       ])
     ];

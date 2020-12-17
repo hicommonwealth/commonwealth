@@ -110,3 +110,6 @@
         url("./MetricWeb-ThinItalic.woff") format("woff"),
         url("./MetricWeb-ThinItalic.ttf") format("truetype");
 }
+html, body {
+    font-family: Metric;
+}

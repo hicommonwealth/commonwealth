@@ -8,7 +8,6 @@ import { Unsubscribable } from 'rxjs';
 import { initChain } from 'app';
 import app from 'state';
 
-import { formatAddressShort, isSameAccount } from 'helpers';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
@@ -17,6 +16,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PageLoading from 'views/pages/loading';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -59,9 +59,8 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
         });
       }
     },
-    label: vnode.state.chainLoading
-      ? 'Loading chain (may take some time)...'
-      : currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
+    loading: !!vnode.state.chainLoading,
+    label: currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
   });
 };
 
@@ -69,10 +68,11 @@ export interface IProfileHeaderAttrs {
   account;
   setIdentity: boolean;
   refreshCallback: Function;
+  onLinkedProfile: boolean;
+  onOwnProfile: boolean;
 }
 
 export interface IProfileHeaderState {
-  onLinkedProfile: boolean;
   subscription: Unsubscribable | null;
   identity: SubstrateIdentity | null;
   copied: boolean;
@@ -81,22 +81,8 @@ export interface IProfileHeaderState {
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
-    const { account, refreshCallback } = vnode.attrs;
-    const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
-      ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
-      : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
-
+    const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
-
-    const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
-      && app.user.activeAccounts.filter((account_) => {
-        return app.user.getRoleInCommunity({
-          account: account_,
-          chain: app.activeChainId(),
-        });
-      }).filter((account_) => {
-        return account_.address === account.address;
-      }).length > 0;
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
@@ -127,7 +113,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', account.profile ? m(User, { user: account, hideAvatar: true }) : account.address),
+            m('.User', account.profile ? m(User, { user: account, hideAvatar: true, showRole: true }) : account.address),
           ]),
           m('.info-row', [
             account.profile?.headline && m('span.profile-headline', account.profile.headline),

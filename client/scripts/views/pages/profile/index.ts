@@ -7,7 +7,6 @@ import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 
 import app from 'state';
-import { uniqueIdToProposal } from 'identifiers';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
@@ -16,9 +15,11 @@ import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
 import { decodeAddress } from '@polkadot/keyring';
+import { setActiveAccount } from 'controllers/app/login';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
+import ProfileBanner from './profile_banner';
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -40,6 +41,7 @@ const commentModelFromServer = (comment) => {
         comment.community,
         comment.chain,
         null,
+        null,
         null
       );
     } else {
@@ -57,6 +59,7 @@ const commentModelFromServer = (comment) => {
     comment.chain,
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
+    comment.plaintext,
     comment.version_history,
     attachments,
     proposal,
@@ -87,10 +90,59 @@ const threadModelFromServer = (thread) => {
     thread.chain,
     thread.read_only,
     decodeURIComponent(thread.body),
+    thread.plaintext,
     thread.url,
     thread.Address.chain,
     thread.pinned,
   );
+};
+
+const getProfileStatus = (account) => {
+  const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
+    ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
+    : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
+  const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
+    && app.user.activeAccounts.filter((account_) => {
+      return app.user.getRoleInCommunity({
+        account: account_,
+        chain: app.activeChainId(),
+      });
+    }).filter((account_) => {
+      return account_.address === account.address;
+    }).length > 0;
+
+  // if the profile that we are visiting is in app.activeAddresses() but not the current active address,
+  // then display the ProfileBanner
+  // TODO: display the banner if the current address is in app.activeAddresses() and *is* a member of the
+  // community (this will require alternate copy on the banner)
+  let isUnjoinedJoinableAddress;
+  let currentAddressInfo;
+  if (!onOwnProfile && !onLinkedProfile) {
+    const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
+    const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
+    const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
+    const unjoinedJoinableAddresses = (joinableAddresses.length > communityRoles.length)
+      ? joinableAddresses.filter((addr) => {
+        return communityRoles.filter((role) => {
+          return role.address_id === addr.id;
+        }).length === 0;
+      })
+      : [];
+    const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
+      return addr.id === account.id;
+    });
+    isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
+    if (isUnjoinedJoinableAddress) {
+      currentAddressInfo = currentAddressInfoArray[0];
+    }
+  }
+
+  return ({
+    onOwnProfile,
+    onLinkedProfile,
+    displayBanner: isUnjoinedJoinableAddress,
+    currentAddressInfo
+  });
 };
 
 export enum UserContent {
@@ -146,13 +198,24 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
             if (a.OffchainProfile.identity) {
               profile.initializeWithChain(
                 a.OffchainProfile.identity,
-                profileData.headline,
-                profileData.bio,
-                profileData.avatarUrl,
-                a.OffchainProfile.judgements
+                profileData?.headline,
+                profileData?.bio,
+                profileData?.avatarUrl,
+                a.OffchainProfile.judgements,
+                a.last_active,
+                a.is_councillor,
+                a.is_validator,
               );
             } else {
-              profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
+              profile.initialize(
+                profileData?.name,
+                profileData?.headline,
+                profileData?.bio,
+                profileData?.avatarUrl,
+                a.last_active,
+                a.is_councillor,
+                a.is_validator
+              );
             }
           } else {
             profile.initializeEmpty();
@@ -212,10 +275,19 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     if (!account) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     }
+
+    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
+
     if (refreshProfile) {
       loadProfile();
       vnode.state.refreshProfile = false;
-      m.redraw();
+      if (onOwnProfile) {
+        setActiveAccount(account).then(() => {
+          m.redraw();
+        });
+      } else {
+        m.redraw();
+      }
     }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
@@ -235,14 +307,22 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
+
     return m(Sublayout, {
       class: 'ProfilePage',
       showNewProposalButton: true,
     }, [
       m('.forum-container-alt', [
+        displayBanner
+        && m(ProfileBanner, {
+          account,
+          addressInfo: currentAddressInfo
+        }),
         m(ProfileHeader, {
           account,
           setIdentity,
+          onOwnProfile,
+          onLinkedProfile,
           refreshCallback: () => { vnode.state.refreshProfile = true; },
         }),
         m('.row.row-narrow.forum-row', [

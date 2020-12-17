@@ -6,11 +6,17 @@ $discussion-meta-padding: 18px;
     .row-left {
         .row-header {
             a.external-discussion-link {
-                .cui-icon {
+                .cui-tag {
                     position: relative;
                     top: -2px;
+                    padding-top: 1px;
+                    padding-bottom: 1px;
+                    margin-right: 9px;
+                    text-decoration: none;
+                }
+                .cui-icon {
                     color: #111;
-                    margin-left: 2px;
+                    margin-left: 3px;
                 }
             }
         }
@@ -31,6 +37,25 @@ $discussion-meta-padding: 18px;
                     width: 9px;
                     height: 9px;
                     margin-right: 6px;
+                }
+            }
+            .mobile-comment-count {
+                display: none;
+                color: $text-color-light;
+                margin-left: 12px;
+                @include xs-max {
+                    display: block;
+                }
+                .cui-icon svg {
+                    position: relative;
+                    top: -1px;
+                    stroke: $text-color-light;
+                    opacity: 0.84;
+                    margin-right: 4px;
+                    height: 14px;
+                    width: 14px;
+                    min-height: 14px;
+                    min-height: 14px;
                 }
             }
             .discussion-link {

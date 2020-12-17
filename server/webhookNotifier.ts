@@ -109,11 +109,12 @@ const send = async (models, content: WebhookContent) => {
         // slack webhook format (stringified JSON)
         webhookData = JSON.stringify(isChainEvent ? {
           type: 'section',
-          text: fulltext,
+          text: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '') + fulltext,
           format: 'mrkdwn',
         } : {
           type: 'section',
-          text: `${notificationTitlePrefix}<${actedOnLink}|${actedOn}>`
+          text: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
+            + `${notificationTitlePrefix}<${actedOnLink}|${actedOn}>`
             + `\n> ${notificationExcerpt.split('\n').join('\n> ')}`,
           format: 'mrkdwn',
         });
@@ -169,7 +170,6 @@ const send = async (models, content: WebhookContent) => {
           await request.post(url).send(webhookData);
         } else {
           console.log('Suppressed webhook notification to', url);
-          console.log(webhookData);
         }
       } catch (err) {
         console.error(err);
