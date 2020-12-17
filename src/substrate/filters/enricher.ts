@@ -49,6 +49,7 @@ export async function Enrich(
           }
         }
       }
+      
       case EventKind.SomeOffline: {
         const [ validators ] = event.data as unknown as [ Vec<IdentificationTuple> ];
         const sessionIndex = await api.query.session.currentIndex();
@@ -112,7 +113,6 @@ export async function Enrich(
         // get the hash of current block number
         const hash = await api.rpc.chain.getBlockHash(blockNumber);
 
-        // get the validators for the current block's session
         const validators = await api.query.session.validators.at(hash);
 
         // get the era of block
@@ -122,7 +122,7 @@ export async function Enrich(
 
         // get the nextElected Validators
         const keys = api.query.staking.erasStakers ? 
-          await api.query.staking.erasStakers.keys(currentEra) :
+          await api.query.staking.erasStakers.keysAt(hash,currentEra) :
           await api.query.staking.stakers.keys() ; //this is wrong as it returns the data for latest header
         const nextElected = keys.length ? keys.map((key) => key.args[1] as AccountId): validators;
         
@@ -139,7 +139,7 @@ export async function Enrich(
           const key = validators[i].toString();
           // to do remove await use promise resolve
           const preference = api.query.staking.erasValidatorPrefs ? 
-            await api.query.staking.erasValidatorPrefs(currentEra,key) :
+            await api.query.staking.erasValidatorPrefs.at(hash, currentEra,key) :
             await api.query.staking.validators.at(hash, key);
 
           const commissionPer =  (Number)(preference.commission || new BN(0)) / 10_000_000;
@@ -152,6 +152,8 @@ export async function Enrich(
             // to get keys of old blocks
             nextSessionKeysOpt = await api.query.session.nextKeys(hash,key);
             // there is queuedKeys function as well not sure which one to use
+            // nextSessionKeysOpt = await api.query.session.queuedKeys(hash,key);
+
           }
           catch(e){
             // for new blocks

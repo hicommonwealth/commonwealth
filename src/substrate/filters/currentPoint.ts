@@ -2,8 +2,8 @@ import { AccountId, EraPoints, EraRewardPoints, RewardPoint, EraIndex, BlockHash
 import { ApiPromise } from '@polkadot/api';
 
 
-async function retrievePoints (api: ApiPromise    ,hash: BlockHash, validators: AccountId[]): Promise<EraRewardPoints> {
-    const currentEraPointsEarned = await api.query.staking.currentEraPointsEarned.at<EraPoints>(hash);
+async function retrievePoints (api: ApiPromise, era:EraIndex, hash: BlockHash, validators: AccountId[]): Promise<EraRewardPoints> {
+    const currentEraPointsEarned = await api.query.staking.currentEraPointsEarned.at<EraPoints>(hash,era);
     const total = currentEraPointsEarned.total;
     const individual = currentEraPointsEarned.individual;
 
@@ -21,7 +21,7 @@ async function retrievePoints (api: ApiPromise    ,hash: BlockHash, validators: 
 export async function currentPoints (api: ApiPromise, era:EraIndex, hash: BlockHash, validators: AccountId[]): Promise<EraRewardPoints> {    
     // when running against an archival node .staking.erasRewardPoints does not exist!
     if (api.query.staking.erasRewardPoints)
-        return await api.query.staking.erasRewardPoints<EraRewardPoints>(era)
+        return await api.query.staking.erasRewardPoints.at<EraRewardPoints>(hash,era)
     else
-        return await retrievePoints(api, hash, validators);
+        return await retrievePoints(api, era, hash, validators);
 }
