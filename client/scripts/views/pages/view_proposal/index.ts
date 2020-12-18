@@ -43,7 +43,7 @@ import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
   ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
-  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem, ProposalBodyAddEditorsMenuItem
+  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem, EditPermissionsButton
 } from './body';
 import CreateComment from './create_comment';
 
@@ -65,6 +65,7 @@ interface IProposalHeaderState {
   currentText: any;
   updatedTitle: string;
   topicEditorIsOpen: boolean;
+  editPermissionsIsOpen: boolean;
 }
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
@@ -125,7 +126,11 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                   item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
                 canEdit && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                canEdit && m(ProposalBodyAddEditorsMenuItem, { item: proposal }),
+                canEdit && m(EditPermissionsButton, {
+                  openEditPermissions: () => {
+                    vnode.state.editPermissionsIsOpen = true;
+                  }
+                }),
                 isAdmin && proposal instanceof OffchainThread && m(TopicEditorButton, {
                   openTopicEditor: () => {
                     vnode.state.topicEditorIsOpen = true;
@@ -137,6 +142,12 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
               ],
               inline: true,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+            }),
+            vnode.state.editPermissionsIsOpen && proposal instanceof OffchainThread && m(ProposalEditPermissions, {
+              thread: vnode.attrs.proposal as OffchainThread,
+              popoverMenu: true,
+              onChangeHandler: () => {},
+              openStateHandler: () => {},
             }),
             vnode.state.topicEditorIsOpen && proposal instanceof OffchainThread && m(TopicEditor, {
               thread: vnode.attrs.proposal as OffchainThread,

@@ -287,17 +287,27 @@ export const ProposalBodyDeleteMenuItem: m.Component<{
   }
 };
 
-export const ProposalBodyAddEditorsMenuItem: m.Component<{
-  item: OffchainThread,
+export const EditPermissionsButton: m.Component<{
+  openEditPermissions: Function,
 }> = {
   view: (vnode) => {
+    const { openEditPermissions } = vnode.attrs;
     return m(MenuItem, {
       label: 'Add editors',
       onclick: async (e) => {
         e.preventDefault();
-        m.redraw();
+        openEditPermissions();
       }
     });
+  }
+};
+
+export const ProposalEditPermissions: m.Component<{
+  thread, popoverMenu, onChangeHandler, openStateHandler
+}> = {
+  view: (vnode) => {
+    const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
+    return ();
   }
 };
 
