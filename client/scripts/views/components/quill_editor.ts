@@ -18,7 +18,7 @@ import PreviewModal from 'views/modals/preview_modal';
 import { detectURL } from 'views/pages/threads/index';
 import SettingsController from 'controllers/app/settings';
 import { Profile, RolePermission } from 'models';
-import { loadScript } from '../../helpers';
+import { loadScript, searchCommunityAddresses } from '../../helpers';
 import User from './widgets/user';
 
 // Rich text and Markdown editor.
@@ -234,20 +234,6 @@ const instantiateEditor = (
   Quill.register('formats/twitter', TwitterBlot, true);
   Quill.register('formats/video', VideoBlot, true);
 
-  const searchMentionableAddresses = async (searchTerm: string) => {
-    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-      limit: 6,
-      searchTerm,
-      order: ['name', 'ASC']
-    });
-    if (response.status !== 'Success') {
-      throw new Error(`got unsuccessful status: ${response.status}`);
-    }
-    return response.result;
-  };
-
   let typingListener;
   const queryMentions = async (searchTerm, renderList, mentionChar) => {
     if (mentionChar !== '@') return;
@@ -273,7 +259,7 @@ const instantiateEditor = (
       }, 300);
     } else if (searchTerm.length > 0) {
       if (typingListener) clearTimeout(typingListener);
-      members = await searchMentionableAddresses(searchTerm);
+      members = await searchCommunityAddresses(searchTerm);
       formattedMatches = members.map((addr) => {
         const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
         const node = document.createElement('div');

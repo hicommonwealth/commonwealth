@@ -298,3 +298,18 @@ export const loadScript = (scriptURI) => {
     document.head.appendChild(script);
   });
 };
+
+// search community members, e.g. for mentions
+export const searchCommunityAddresses = async (searchTerm: string) => {
+  const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+    chain: app.activeChainId(),
+    community: app.activeCommunityId(),
+    limit: 6,
+    searchTerm,
+    order: ['name', 'ASC']
+  });
+  if (response.status !== 'Success') {
+    throw new Error(`got unsuccessful status: ${response.status}`);
+  }
+  return response.result;
+};
