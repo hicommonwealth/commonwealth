@@ -76,7 +76,7 @@ export class SubstrateCollectiveProposal
   }
 
   public get votingInterfaceLink() {
-    const rpcUrl = encodeURIComponent(this._Chain.app.user.selectedNode.url);
+    const rpcUrl = encodeURIComponent(this._Chain.app.chain?.meta?.url);
     return `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/council/motions`;
   }
 
