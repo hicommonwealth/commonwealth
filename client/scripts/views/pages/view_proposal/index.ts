@@ -43,7 +43,7 @@ import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
   ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
-  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
+  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem, ProposalBodyAddEditorsMenuItem
 } from './body';
 import CreateComment from './create_comment';
 
@@ -125,6 +125,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                   item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
                 canEdit && m(ProposalBodyDeleteMenuItem, { item: proposal }),
+                canEdit && m(ProposalBodyAddEditorsMenuItem, { item: proposal }),
                 isAdmin && proposal instanceof OffchainThread && m(TopicEditorButton, {
                   openTopicEditor: () => {
                     vnode.state.topicEditorIsOpen = true;

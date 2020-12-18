@@ -287,6 +287,20 @@ export const ProposalBodyDeleteMenuItem: m.Component<{
   }
 };
 
+export const ProposalBodyAddEditorsMenuItem: m.Component<{
+  item: OffchainThread,
+}> = {
+  view: (vnode) => {
+    return m(MenuItem, {
+      label: 'Add editors',
+      onclick: async (e) => {
+        e.preventDefault();
+        m.redraw();
+      }
+    });
+  }
+};
+
 export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStatus, parentState }> = {
   view: (vnode) => {
     const { item, getSetGlobalEditingStatus, parentState } = vnode.attrs;
