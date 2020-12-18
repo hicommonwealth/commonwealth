@@ -310,11 +310,16 @@ export const ProposalEditPermissions: m.Component<{
   onChangeHandler: any,
   openStateHandler: any
 }, {
-  searchItems: any[],
+  items: any[],
   isOpen: boolean,
 }> = {
+  oninit: async (vnode) => {
+    vnode.state.items = await searchCommunityAddresses(null, null);
+  },
   view: (vnode) => {
     const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
+    if (vnode.state.items) return;
+    const { items } = vnode.state;
     return m('.ProposalEditPermissions', [
       m(Dialog, {
         basic: false,
@@ -322,14 +327,17 @@ export const ProposalEditPermissions: m.Component<{
         closeOnOutsideClick: true,
         content: m(QueryList, {
           initialContent: 'Enter an address',
-          items: vnode.state.searchItems,
+          checkmark: true,
+          items,
           itemRender: (addr: AddressInfo, index: number) => {
             const user: Profile = app.profiles.getProfile(addr.chain, addr.address);
             return m(User, { user });
           },
-          onQueryChange: async (query) => {
-            vnode.state.searchItems = await searchCommunityAddresses(query);
-          }
+          // onQueryChange: async (query) => {
+          //   vnode.state.items = await searchCommunityAddresses(query, null);
+          //   console.log(vnode.state.items);
+          //   m.redraw();
+          // }
         }),
         hasBackdrop: true,
         isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,

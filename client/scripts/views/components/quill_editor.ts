@@ -234,6 +234,7 @@ const instantiateEditor = (
   Quill.register('formats/twitter', TwitterBlot, true);
   Quill.register('formats/video', VideoBlot, true);
 
+  const QUERY_MENTION_LIMIT = 6;
   let typingListener;
   const queryMentions = async (searchTerm, renderList, mentionChar) => {
     if (mentionChar !== '@') return;
@@ -259,7 +260,7 @@ const instantiateEditor = (
       }, 300);
     } else if (searchTerm.length > 0) {
       if (typingListener) clearTimeout(typingListener);
-      members = await searchCommunityAddresses(searchTerm);
+      members = await searchCommunityAddresses(searchTerm, QUERY_MENTION_LIMIT);
       formattedMatches = members.map((addr) => {
         const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
         const node = document.createElement('div');
