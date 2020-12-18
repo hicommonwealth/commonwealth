@@ -48,7 +48,7 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
 
     return m('.ProfileBanner', [
       m('.banner-text', [
-        `You are already logged in with this address (${addrShort})`,
+        'You are already logged in with this address' // but have not joined the [Edgeware] community
       ]),
       m(Button, {
         label: 'Join community',
