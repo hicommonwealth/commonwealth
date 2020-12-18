@@ -13,6 +13,7 @@ import {
   Account,
   Profile,
   ChainBase,
+  AddressInfo,
 } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 
@@ -24,8 +25,9 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import { MenuItem, Button } from 'construct-ui';
+import { MenuItem, Button, Dialog, QueryList, Classes } from 'construct-ui';
 import { notifySuccess } from 'controllers/app/notifications';
+import { searchCommunityAddresses } from 'helpers';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -303,11 +305,77 @@ export const EditPermissionsButton: m.Component<{
 };
 
 export const ProposalEditPermissions: m.Component<{
-  thread, popoverMenu, onChangeHandler, openStateHandler
+  thread: OffchainThread,
+  popoverMenu: boolean,
+  onChangeHandler: any,
+  openStateHandler: any
+}, {
+  searchItems: any[],
+  isOpen: boolean,
 }> = {
   view: (vnode) => {
     const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
-    return ();
+    return m('.ProposalEditPermissions', [
+      m(Dialog, {
+        basic: false,
+        closeOnEscapeKey: true,
+        closeOnOutsideClick: true,
+        content: m(QueryList, {
+          initialContent: 'Enter an address',
+          items: vnode.state.searchItems,
+          itemRender: (addr: AddressInfo, index: number) => {
+            const user: Profile = app.profiles.getProfile(addr.chain, addr.address);
+            return m(User, { user });
+          },
+          onQueryChange: async (query) => {
+            vnode.state.searchItems = await searchCommunityAddresses(query);
+          }
+        }),
+        hasBackdrop: true,
+        isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
+        inline: false,
+        onClose: () => {
+          if (vnode.attrs.popoverMenu) {
+            vnode.attrs.openStateHandler(false);
+          } else {
+            vnode.state.isOpen = false;
+          }
+        },
+        title: 'Add editor permissions',
+        transitionDuration: 200,
+        footer: m(`.${Classes.ALIGN_RIGHT}`, [
+          m(Button, {
+            label: 'Close',
+            onclick: () => {
+              if (vnode.attrs.popoverMenu) {
+                vnode.attrs.openStateHandler(false);
+              } else {
+                vnode.state.isOpen = false;
+              }
+            },
+          }),
+          m(Button, {
+            label: 'Save changes',
+            intent: 'primary',
+            onclick: async () => {
+              try {
+                // logic
+              } catch (err) {
+                console.log('Failed to add editors');
+                throw new Error((err.responseJSON && err.responseJSON.error)
+                  ? err.responseJSON.error
+                  : 'Failed to update topic');
+              }
+              if (vnode.attrs.popoverMenu) {
+                vnode.attrs.openStateHandler(false);
+              } else {
+                vnode.state.isOpen = false;
+              }
+            },
+          }),
+        ])
+      })
+    ]);
   }
 };
 
