@@ -1,6 +1,7 @@
 import m from 'mithril';
 import moment from 'moment';
 import lity from 'lity';
+import $ from 'jquery';
 
 import { updateRoute } from 'app';
 import app from 'state';
@@ -315,20 +316,18 @@ export const ProposalEditPermissions: m.Component<{
   oninit: async (vnode) => {
     const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
     try {
-      const req = await $.get(`${app.activeId()}/bulkMembers`, chainOrCommObj);
+      const req = await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj);
       if (req.status !== 'Success') throw new Error('Could not fetch members');
       vnode.state.items = req.result;
       m.redraw();
     } catch (err) {
-      vnode.state.items = [];
       m.redraw();
       console.error(err);
     }
   },
   view: (vnode) => {
     const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
-    console.log('viewing');
-    if (vnode.state.items) return;
+    if (!vnode.state.items?.length) return;
     const { items } = vnode.state;
     return m('.ProposalEditPermissions', [
       m(Dialog, {
