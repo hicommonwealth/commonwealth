@@ -314,10 +314,15 @@ export const ProposalEditPermissions: m.Component<{
   isOpen: boolean,
 }> = {
   oninit: async (vnode) => {
-    vnode.state.items = await searchCommunityAddresses(null, null);
+    vnode.state.items = $.get(`${app.activeId()}/bulkAddresses`, {
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+      
+    })
   },
   view: (vnode) => {
     const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
+    console.log('viewing');
     if (vnode.state.items) return;
     const { items } = vnode.state;
     return m('.ProposalEditPermissions', [
