@@ -313,11 +313,17 @@ export const ProposalEditPermissions: m.Component<{
   isOpen: boolean,
 }> = {
   oninit: async (vnode) => {
-    const req = await $.get(`${app.activeId()}/bulkAddresses`, {
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-    });
-    vnode.state.items = req.result;
+    const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
+    try {
+      const req = await $.get(`${app.activeId()}/bulkMembers`, chainOrCommObj);
+      if (req.status !== 'Success') throw new Error('Could not fetch members');
+      vnode.state.items = req.result;
+      m.redraw();
+    } catch (err) {
+      vnode.state.items = [];
+      m.redraw();
+      console.error(err);
+    }
   },
   view: (vnode) => {
     const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
