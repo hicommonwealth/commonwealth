@@ -15,6 +15,7 @@ import {
   Profile,
   ChainBase,
   AddressInfo,
+  RoleInfo,
 } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 
@@ -338,15 +339,13 @@ export const ProposalEditPermissions: m.Component<{
           initialContent: 'Enter an address',
           checkmark: true,
           items,
-          itemRender: (addr: AddressInfo, index: number) => {
-            const user: Profile = app.profiles.getProfile(addr.chain, addr.address);
+          itemRender: (role: any, index: number) => {
+            const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
             return m(User, { user });
           },
-          // onQueryChange: async (query) => {
-          //   vnode.state.items = await searchCommunityAddresses(query, null);
-          //   console.log(vnode.state.items);
-          //   m.redraw();
-          // }
+          itemPredicate: (query, item, index) => {
+            return (item as any).Address.name.toLowerCase().includes(query.toLowerCase());
+          },
         }),
         hasBackdrop: true,
         isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,

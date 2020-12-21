@@ -186,6 +186,7 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
       return (role.permission === RolePermission.member) || (role.permission === RolePermission.moderator);
     });
     const names: string[] = noAdmins.map((role) => {
+      console.log(role);
       const displayName = app.profiles.getProfile(role.Address.chain, role.Address.address).displayName;
       const roletext = (role.permission === 'moderator') ? '(moderator)' : '';
       return `${displayName}: ${role.Address.address.slice(0, 6)}...${roletext}`;
