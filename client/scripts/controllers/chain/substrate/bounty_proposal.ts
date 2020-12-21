@@ -15,12 +15,12 @@ import { formatAddressShort } from '../../../../../shared/utils';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
-  event: SubstrateTypes.ITreasuryProposed
+  event: SubstrateTypes.ITreasuryBountyProposed
 ): ISubstrateBountyProposal => {
   return {
     identifier: event.proposalIndex.toString(),
     index: event.proposalIndex,
-    value: ChainInfo.createType('u128', event.value),
+    value: ,
     beneficiary: event.beneficiary,
     bond: ChainInfo.createType('u128', event.bond),
     proposer: event.proposer,
