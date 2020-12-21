@@ -27,7 +27,6 @@ import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes } from 'construct-ui';
 import { notifySuccess } from 'controllers/app/notifications';
-import { searchCommunityAddresses } from 'helpers';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -314,11 +313,11 @@ export const ProposalEditPermissions: m.Component<{
   isOpen: boolean,
 }> = {
   oninit: async (vnode) => {
-    vnode.state.items = $.get(`${app.activeId()}/bulkAddresses`, {
+    const req = await $.get(`${app.activeId()}/bulkAddresses`, {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
-      
-    })
+    });
+    vnode.state.items = req.result;
   },
   view: (vnode) => {
     const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
