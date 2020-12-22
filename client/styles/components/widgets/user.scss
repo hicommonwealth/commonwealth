@@ -86,6 +86,12 @@
     &.linkified a.user-display-name:hover {
         text-decoration: underline;
     }
+    .role-icon {
+        @include roleIcon();
+    }
+    .user-display-name .identity-icon {
+        margin-left: 7px !important;
+    }
     .role-tag {
         font-size: 14px;
         line-height: 0.7;
@@ -93,12 +99,6 @@
         position: relative;
         top: -2px;
         margin-left: 6px;
-    }
-    .role-icon {
-        @include roleIcon();
-    }
-    .user-display-name .identity-icon {
-        margin-left: 8px !important;
     }
 }
 
