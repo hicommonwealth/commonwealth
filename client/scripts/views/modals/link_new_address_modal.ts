@@ -216,7 +216,7 @@ const LinkNewAddressModal: m.Component<{
             class: 'account-adder-placeholder',
             key: 'placeholder',
             intent: 'primary',
-            label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ],
+            label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain' ],
             disabled: true,
           }),
         ])

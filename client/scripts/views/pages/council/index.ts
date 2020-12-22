@@ -220,12 +220,12 @@ const CouncilPage: m.Component<{}> = {
     if (!app.chain || !app.chain.loaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
-          message: 'Chain connection timed out.',
+          message: 'Could not connect to chain',
           title: 'Proposals',
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 10s)...',
+        message: 'Connecting to chain',
         title: 'Council',
         showNewProposalButton: true
       });
@@ -234,7 +234,7 @@ const CouncilPage: m.Component<{}> = {
     if (!initialized) {
       if (!(app.chain as Substrate).phragmenElections.initializing) loadCmd();
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 10s)...',
+        message: 'Connecting to chain',
         title: 'Council',
         showNewProposalButton: true
       });

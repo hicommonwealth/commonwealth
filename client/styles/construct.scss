@@ -204,6 +204,12 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
     padding: 13px 13px 6.5px !important;
 }
 
+// cui toast
+.cui-toast .cui-toast-message {
+    position: relative;
+    top: 3px;
+}
+
 // cui tabs
 .cui-tabs .cui-tabs-item {
     padding-top: 13px !important;
