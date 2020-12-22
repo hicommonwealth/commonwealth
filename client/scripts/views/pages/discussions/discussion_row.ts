@@ -26,21 +26,15 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
     const lastUpdated = app.comments.lastCommented(proposal) || proposal.createdAt;
-
+    const pinned = proposal.pinned;
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
-    const rowHeader = (propType === OffchainThreadKind.Link && proposal.url)
-      ? externalLink('a.external-discussion-link', proposal.url, [
-        m(Tag, {
-          size: 'xs',
-          label: [ extractDomain(proposal.url), m(Icon, { name: Icons.EXTERNAL_LINK }) ]
-        }),
-        proposal.title,
-      ])
-      : link('a', discussionLink, proposal.title);
-
-    const pinned = proposal.pinned;
+    const rowHeader = [
+      link('a', discussionLink, proposal.title),
+      (propType === OffchainThreadKind.Link && proposal.url)
+        && externalLink('a.external-discussion-link', proposal.url, [ extractDomain(proposal.url) ]),
+    ];
     const rowSubheader = [
       proposal.readOnly && m('.discussion-locked', [
         m(Tag, {

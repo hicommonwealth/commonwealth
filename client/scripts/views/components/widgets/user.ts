@@ -22,7 +22,6 @@ const User: m.Component<{
   showRole?: boolean;
 }, {
   identityWidgetLoading: boolean;
-  IdentityWidget: any;
 }> = {
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
@@ -40,14 +39,14 @@ const User: m.Component<{
       ? app.chain.meta.chain.adminsAndMods
       : app.community ? app.community.meta.adminsAndMods : [];
 
-    if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !vnode.state.IdentityWidget) {
+    if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !app.cachedIdentityWidget) {
       vnode.state.identityWidgetLoading = true;
       import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "substrate-identity-widget" */
         './substrate_identity'
       ).then((mod) => {
-        vnode.state.IdentityWidget = mod.default;
+        app.cachedIdentityWidget = mod.default;
         vnode.state.identityWidgetLoading = false;
         m.redraw();
       });
@@ -75,23 +74,12 @@ const User: m.Component<{
       role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === chainId);
     }
     const roleTags = [
-      // onchain roles
-      profile.isCouncillor && m(Tag, {
-        class: 'role-tag',
-        label: 'councillor',
-        rounded: true,
-        size: 'xs',
-      }),
-      profile.isValidator && m(Tag, {
-        class: 'role-tag',
-        label: 'validator',
-        rounded: true,
-        size: 'xs',
-      }),
+      profile.isCouncillor && m('.role-icon.role-icon-councillor', 'C'),
+      profile.isValidator && m('.role-icon.role-icon-validator', 'V'),
       // offchain role
-      role && m(Tag, {
+      showRole && role && m(Tag, {
         class: 'role-tag',
-        label: `forum ${role.permission}`,
+        label: role.permission,
         rounded: true,
         size: 'xs',
       }),
@@ -115,9 +103,9 @@ const User: m.Component<{
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (app.chain && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
+        (app.chain && app.chain.base === ChainBase.Substrate && app.cachedIdentityWidget)
           // substrate name
-          ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon, addrShort }) : [
+          ? m(app.cachedIdentityWidget, { account, linkify, profile, hideIdentityIcon, addrShort }) : [
             // non-substrate name
             linkify
               ? link('a.user-display-name.username',
@@ -127,7 +115,7 @@ const User: m.Component<{
                 profile ? profile.name : addrShort)
               : m('a.user-display-name.username', profile ? profile.name : addrShort)
           ],
-        showRole && roleTags,
+        roleTags,
       ]);
 
     const userPopover = m('.UserPopover', {
@@ -142,8 +130,8 @@ const User: m.Component<{
             : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (app.chain && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
-          ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort })
+        (app.chain && app.chain.base === ChainBase.Substrate && app.cachedIdentityWidget)
+          ? m(app.cachedIdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort })
           : link(`a.user-display-name${
             (profile && profile.name !== 'Anonymous') ? '.username' : '.anonymous'}`,
           profile

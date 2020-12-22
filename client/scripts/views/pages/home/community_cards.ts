@@ -10,14 +10,14 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import UserGallery from 'views/components/widgets/user_gallery';
 
 const getNewTag = (labelCount = null) => {
-  const label = labelCount === null ? 'New' : labelCount;
-  return m('.chain-new', [
+  const label = labelCount === null ? 'New' : `${labelCount} new`;
+  return m('span.chain-new', [
     m(Tag, {
       label,
-      size: 'sm',
-      compact: true,
+      size: 'xs',
       rounded: true,
       intent: 'primary',
+      style: 'margin-top: -3px; margin-left: 10px;',
     })
   ]);
 };
@@ -46,6 +46,14 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
       m('.card-right', [
         m('.card-right-top', [
           m('h3', chainInfo.name),
+        ]),
+        m('p.card-description', chainInfo.description),
+        // if no recently active threads, hide this module altogether
+        m('.recent-activity', !!monthlyThreadCount && [
+          m('span.recent-threads', [
+            pluralize(monthlyThreadCount, 'thread'),
+            ' this month',
+          ]),
           app.user.isMember({
             account: app.user.activeAccount,
             chain,
@@ -53,14 +61,6 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
             app.isLoggedIn() && !visitedChain && getNewTag(),
             updatedThreads > 0 && getNewTag(updatedThreads),
           ],
-        ]),
-        m('p.card-description', chainInfo.description),
-        // if no recently active threads, hide this module altogether
-        m('.recent-activity', !!monthlyThreadCount && [
-          m('.recent-threads', [
-            pluralize(monthlyThreadCount, 'thread'),
-            ' this month',
-          ]),
         ])
       ]),
     ]);
@@ -93,19 +93,19 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
             community.name,
             community.privacyEnabled && m('span.icon-lock'),
           ]),
+        ]),
+        m('p.card-description', community.description),
+        // if no recently active threads, hide this module altogether
+        m('.recent-activity', !!monthlyThreadCount && [
+          m('span.recent-threads', [
+            pluralize(monthlyThreadCount, 'thread'),
+            ' this month',
+          ]),
           app.user.isMember({ account: app.user.activeAccount, community: community.id })
             && [
               app.isLoggedIn() && !visitedCommunity && getNewTag(),
               updatedThreads > 0 && getNewTag(updatedThreads),
             ],
-        ]),
-        m('p.card-description', community.description),
-        // if no recently active threads, hide this module altogether
-        m('.recent-activity', !!monthlyThreadCount && [
-          m('.recent-threads', [
-            pluralize(monthlyThreadCount, 'thread'),
-            ' this month',
-          ]),
         ])
       ]),
     ]);

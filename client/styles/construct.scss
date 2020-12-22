@@ -141,10 +141,13 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
 .cui-button {
     font-size: inherit;
 }
+.cui-button .cui-button-sublabel,
 .cui-button .cui-button-label {
     position: relative;
     top: 3px;
+    overflow: visible;
 }
+.cui-button.cui-xl .cui-button-sublabel,
 .cui-button.cui-xl .cui-button-label {
     top: 4px;
 }
@@ -154,6 +157,8 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
     font-weight: $cui-font-weight-bold !important; // fix weight
 }
 .cui-form .cui-form-label {
+    font-size: $cui-font-size * 0.9;
+    margin-bottom: 8px;
     font-weight: $cui-font-weight-bold; // fix weight
 }
 .cui-empty-state .cui-empty-state-header {
@@ -387,6 +392,12 @@ button, .cui-button {
     .cui-tabs-item {
         padding: ($cui-base-padding * 0.84) 0;
         margin: 0 ($cui-base-padding * 0.84);
+        &:first-child {
+            margin-left: 0;
+        }
+        &:last-child {
+            margin-right: 0;
+        }
     }
     @each $size in $cui-sizes {
         &.cui-#{$size} {
@@ -464,9 +475,4 @@ button, .cui-button {
         margin: 4px 0 0;
         font-weight: 600;
     }
-}
-
-// form labels
-.cui-form .cui-form-label {
-    font-size: $cui-font-size;
 }
