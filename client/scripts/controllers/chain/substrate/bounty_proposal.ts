@@ -5,13 +5,13 @@ import { formatCoin } from 'adapters/currency';
 import { ISubstrateBounty, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
-  VotingType, VotingUnit, ChainEntity, ChainEvent
+  VotingType, VotingUnit, ChainEntity, ChainEvent,
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
-import SubstrateTreasury from './treasury';
 import { formatAddressShort } from '../../../../../shared/utils';
+import SubstrateBountyTreasury from './bountyTreasury';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -76,7 +76,7 @@ export class SubstrateBounty
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
-  private _Treasury: SubstrateTreasury;
+  private _Treasury: SubstrateBountyTreasury;
 
   public get blockExplorerLink() {
     const chainInfo = this._Chain.app.chain?.meta?.chain;
@@ -107,10 +107,10 @@ export class SubstrateBounty
   constructor(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
-    Treasury: SubstrateTreasury,
+    Treasury: SubstrateBountyTreasury,
     entity: ChainEntity,
   ) {
-    super('bountyproposal', backportEventToAdapter(
+    super('bountyproposal', backportEventToAdapter( // TODO: check if this is the right backport string
       ChainInfo,
       entity.chainEvents
         // TODO: Set SubstrateTypes.EventKind.
