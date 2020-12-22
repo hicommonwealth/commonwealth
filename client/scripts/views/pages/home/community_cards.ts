@@ -52,7 +52,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
         m('.recent-activity', !!monthlyThreadCount && [
           m('span.recent-threads', [
             pluralize(monthlyThreadCount, 'thread'),
-            ' this month',
+            ' / month',
           ]),
           app.user.isMember({
             account: app.user.activeAccount,
@@ -99,7 +99,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
         m('.recent-activity', !!monthlyThreadCount && [
           m('span.recent-threads', [
             pluralize(monthlyThreadCount, 'thread'),
-            ' this month',
+            ' / month',
           ]),
           app.user.isMember({ account: app.user.activeAccount, community: community.id })
             && [
