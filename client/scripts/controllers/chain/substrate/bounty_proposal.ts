@@ -2,7 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ApiRx } from '@polkadot/api';
 
 import { formatCoin } from 'adapters/currency';
-import { ISubstrateBountyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
+import { ISubstrateBounty, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
   VotingType, VotingUnit, ChainEntity, ChainEvent
@@ -16,19 +16,19 @@ import { formatAddressShort } from '../../../../../shared/utils';
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
   event: SubstrateTypes.ITreasuryBountyProposed
-): ISubstrateBountyProposal => {
+): ISubstrateBounty => {
   return {
     identifier: event.proposalIndex.toString(),
     index: event.proposalIndex,
-    value: ,
+    value: '',
     beneficiary: event.beneficiary,
     bond: ChainInfo.createType('u128', event.bond),
     proposer: event.proposer,
   };
 };
 
-export class SubstrateBountyProposal
-  extends Proposal<ApiRx, SubstrateCoin, ISubstrateBountyProposal, null> {
+export class SubstrateBounty
+  extends Proposal<ApiRx, SubstrateCoin, ISubstrateBounty, null> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
