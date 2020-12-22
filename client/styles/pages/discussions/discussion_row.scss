@@ -5,10 +5,13 @@ $discussion-meta-padding: 18px;
 .DiscussionRow {
     .row-left {
         .row-header {
+            .spacer {
+                display: inline-block;
+                width: 4px;
+            }
             a.external-discussion-link {
                 font-size: 17px;
                 color: $theme-base-color;
-                margin-left: 6px;
                 &:hover {
                     text-decoration: underline;
                 }

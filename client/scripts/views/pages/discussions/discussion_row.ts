@@ -31,9 +31,13 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       + `${slugify(proposal.title)}`;
 
     const rowHeader = [
-      link('a', discussionLink, proposal.title),
       (propType === OffchainThreadKind.Link && proposal.url)
-        && externalLink('a.external-discussion-link', proposal.url, [ extractDomain(proposal.url) ]),
+        && externalLink('a.external-discussion-link', proposal.url, [
+          extractDomain(proposal.url),
+        ]),
+      (propType === OffchainThreadKind.Link && proposal.url)
+        && m('span.spacer', ' '),
+      link('a', discussionLink, proposal.title),
     ];
     const rowSubheader = [
       proposal.readOnly && m('.discussion-locked', [
@@ -113,6 +117,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       rightColSpacing: app.isLoggedIn() ?  [4, 4, 3, 1] : [4, 4, 4],
       onclick: (e) => {
         if ($(e.target).hasClass('cui-tag')) return;
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
         e.preventDefault();
         localStorage[`${app.activeId()}-discussions-scrollY`] = window.scrollY;
         updateRoute(discussionLink);
