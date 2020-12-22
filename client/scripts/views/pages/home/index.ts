@@ -4,7 +4,6 @@ import m from 'mithril';
 
 import Sublayout from 'views/sublayout';
 import CommunityCards from './community_cards';
-import ComponentKit from 'views/components/component_kit';
 
 const Homepage: m.Component<{}, {}> = {
   view: (vnode: m.VnodeDOM) => {
@@ -15,7 +14,6 @@ const Homepage: m.Component<{}, {}> = {
         m('h1', 'Commonwealth'),
         m('p.lead-copy', 'On-chain communities'),
         m(CommunityCards),
-        m(ComponentKit),
       ]),
     ]);
   }
