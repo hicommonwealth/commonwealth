@@ -74,7 +74,7 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
     const events: CWEvent<IEventData>[] = await processor.process(block);
 
     // send all events through event-handlers in sequence
-    await Promise.all(events.map((event) => handleEventFn(event)));
+    for(let event of events) await handleEventFn(event); 
   };
 
   const subscriber = new Subscriber(api, verbose);

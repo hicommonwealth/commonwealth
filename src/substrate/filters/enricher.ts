@@ -57,7 +57,6 @@ export async function Enrich(
       
       case EventKind.SomeOffline: {
         const [ validators ] = event.data as unknown as [ Vec<IdentificationTuple> ];
-        
         return {
           data: {
             kind,
@@ -135,9 +134,8 @@ export async function Enrich(
         let waiting: Array<ValidatorId>
         const validatorInfo = {};
 
-        for(let i = 0 ;i<validators.length;i++){
-          const key = validators[i].toString();
-
+        for(let validator of validators){
+          const key = validator.toString();
 
           // eraValidatorPrefs does not return comission prior to 3139800
           const preference = api.query.staking.erasValidatorPrefs ? 
