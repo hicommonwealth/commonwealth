@@ -12,12 +12,14 @@
     .stats-container {
         display: flex;
         align-items: flex-start;
-        margin-top: 25px;
-        padding: 12px 20px 13px;
+        margin-top: 20px;
+        padding: 18px 20px 12px;
         background-color: $background-color-light;
         border-radius: 5px;
         .stats-heading {
             font-weight: 500;
+            line-height: 1.1;
+            margin-bottom: 2px;
         }
     }
     .Listing {
