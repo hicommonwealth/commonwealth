@@ -59,7 +59,7 @@ $discussion-meta-padding: 18px;
                 color: $text-color-light;
                 margin-right: 12px;
             }
-            .User a {
+            > .User > a {
                 display: inline-block;
                 text-decoration: none;
                 color: $text-color-light;
@@ -67,7 +67,7 @@ $discussion-meta-padding: 18px;
                     color: darken($text-color-light, 8%);
                     text-decoration: underline;
                 }
-                a.user-display-name {
+                > a.user-display-name {
                     color: $theme-base-color;
                 }
             }

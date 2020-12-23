@@ -22,26 +22,23 @@ const UserGallery: m.Component<{
     const { users, avatarSize, popover } = vnode.attrs;
     const userCount = users.length;
     const maxUsers = vnode.attrs.maxUsers || 10;
-    const displayedUsers = (users as any)
-      .slice(0, Math.min(userCount, maxUsers))
-      .map((user) => {
-        return m(User, {
+    const overflowUsers = (userCount < maxUsers) ? 0 : (userCount - maxUsers);
+
+    return m('.UserGallery', { class: vnode.attrs.class }, [
+      (users as any)
+        .slice(0, Math.min(userCount, maxUsers))
+        .map((user) => m(User, {
           user,
           avatarOnly: true,
           popover,
           avatarSize,
-        });
-      });
-    const overflowUsers = userCount < 10 ? 0 : userCount - 10;
-    if (overflowUsers) displayedUsers.push(
-      m('.overflow-users-wrap', {
-        style: `width: ${avatarSize}px; height: ${avatarSize}px; line-height: ${avatarSize}px;`
-      }, [
-        m('.overflow-users', `+${overflowUsers}`)
-      ])
-    );
-    return m('.UserGallery', { class: vnode.attrs.class }, [
-      displayedUsers,
+        })),
+      overflowUsers > 0
+        && m('.overflow-users-wrap', {
+          style: `width: ${avatarSize}px; height: ${avatarSize}px; line-height: ${avatarSize}px;`
+        }, [
+          m('.overflow-users', `+${overflowUsers}`)
+        ])
     ]);
   }
 };
