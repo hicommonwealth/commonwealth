@@ -58,6 +58,14 @@
     &.gray {
         background: $background-color-medium;
     }
+    &.long {
+        width: initial;
+        font-weight: 400;
+        padding: 4px 7px 0px;
+        height: initial;
+        font-size: 15px;
+        margin-top: 4px;
+    }
 }
 
 .User {
@@ -115,7 +123,7 @@
         @include circledAvatar();
         width: 36px;
         height: 36px;
-        margin: 0 auto 8px;
+        margin: 0 auto 12px;
     }
     .user-name {
         clear: both;

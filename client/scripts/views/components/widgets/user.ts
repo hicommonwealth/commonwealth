@@ -73,10 +73,15 @@ const User: m.Component<{
       profile = account.profile;
       role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === chainId);
     }
-    const roleTags = [
-      profile.isCouncillor && m('.role-icon.role-icon-councillor', 'C'),
-      profile.isValidator && m('.role-icon.role-icon-validator', 'V'),
-      // offchain role
+    const getRoleTags = (long?) => [
+      // 'long' makes role tags show as full length text
+      profile.isCouncillor && m('.role-icon.role-icon-councillor', {
+        class: long ? 'long' : ''
+      }, long ? 'Councillor' : 'C'),
+      profile.isValidator && m('.role-icon.role-icon-validator', {
+        class: long ? 'long' : ''
+      }, long ? 'Validator' : 'V'),
+      // offchain role in commonwealth forum
       showRole && role && m(Tag, {
         class: 'role-tag',
         label: role.permission,
@@ -115,7 +120,7 @@ const User: m.Component<{
                 profile ? profile.name : addrShort)
               : m('a.user-display-name.username', profile ? profile.name : addrShort)
           ],
-        roleTags,
+        getRoleTags(false),
       ]);
 
     const userPopover = m('.UserPopover', {
@@ -140,7 +145,7 @@ const User: m.Component<{
           profile ? profile.name : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
-      roleTags, // always show roleTags in .UserPopover
+      getRoleTags(true), // always show roleTags in .UserPopover
     ]);
 
     return popover
