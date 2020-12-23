@@ -130,7 +130,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    padding: 18px 14px;
+    padding: 12px 14px;
     width: $quick-switcher-width;
     background: $background-color-border;
     z-index: 3;
@@ -141,6 +141,7 @@
         cursor: pointer;
         opacity: 0.3;
         height: 50px;
+        padding-top: 6px;
         &:hover {
             opacity: 0.33;
         }

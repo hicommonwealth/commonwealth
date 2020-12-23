@@ -145,6 +145,9 @@ const User: m.Component<{
           profile ? profile.name : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
+      m('.user-chain', [
+        app.config.chains.getById(typeof user.chain === 'string' ? user.chain : user.chain?.id)?.name
+      ]),
       getRoleTags(true), // always show roleTags in .UserPopover
     ]);
 

@@ -140,7 +140,7 @@
             @include roleIcon();
         }
     }
-    .user-address {
+    .user-address, .user-chain {
         color: $text-color-light !important;
     }
     .role-tag {
