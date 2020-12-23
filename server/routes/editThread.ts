@@ -20,12 +20,12 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
   }
-
   if (kind === 'forum') {
     if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
       return next(new Error(Errors.NoBodyOrAttachment));
     }
   }
+
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
       await models.OffchainAttachment.create({

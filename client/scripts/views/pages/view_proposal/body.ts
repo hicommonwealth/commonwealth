@@ -339,11 +339,11 @@ export const ProposalEditPermissions: m.Component<{
           initialContent: 'Enter an address',
           checkmark: true,
           items,
-          itemRender: (role: any, index: number) => {
+          itemRender: (role: any, idx: number) => {
             const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
             return m(User, { user });
           },
-          itemPredicate: (query, item, index) => {
+          itemPredicate: (query, item, idx) => {
             return (item as any).Address.name.toLowerCase().includes(query.toLowerCase());
           },
         }),
@@ -352,6 +352,7 @@ export const ProposalEditPermissions: m.Component<{
         inline: false,
         onClose: () => {
           if (vnode.attrs.popoverMenu) {
+            debugger
             vnode.attrs.openStateHandler(false);
           } else {
             vnode.state.isOpen = false;
