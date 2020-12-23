@@ -65,16 +65,13 @@ const EthereumLinkAccountItem: m.Component<{
           if (result.belongsToUser) {
             notifyInfo('This address is already linked to your current account.');
             return;
-          } else if (result.isClaimable) {
+          } else {
             const modalMsg = 'This address is currently linked to another account. Continue?';
             const confirmed = await confirmationModalWithText(modalMsg)();
             if (!confirmed) {
               vnode.state.linking = false;
               return;
             }
-          } else {
-            notifyInfo('This address already belongs to a user, and cannot be transferred.');
-            return;
           }
         }
 
@@ -137,16 +134,13 @@ const SubstrateLinkAccountItem: m.Component<{
           if (result.belongsToUser) {
             notifyInfo('This address is already linked to your current account.');
             return;
-          } else if (result.isClaimable) {
+          } else {
             const modalMsg = 'This address is currently linked to another account. Continue?';
             const confirmed = await confirmationModalWithText(modalMsg)();
             if (!confirmed) {
               vnode.state.linking = false;
               return;
             }
-          } else {
-            notifyInfo('This address already belongs to a user, and cannot be transferred.');
-            return;
           }
         }
 

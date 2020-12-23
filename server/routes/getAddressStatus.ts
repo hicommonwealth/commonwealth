@@ -26,20 +26,15 @@ const getAddress = async (models, req: Request, res: Response, next: NextFunctio
 
   let result;
   if (existingAddress) {
-    // address already exists on another user, only take ownership if
-    // unverified and expired
-    const expiration = existingAddress.verification_token_expires;
-    const isExpired = expiration && +expiration <= +(new Date());
-    const isDisowned = existingAddress.user_id == null;
     const belongsToUser = req.user && (existingAddress.user_id === req.user.id);
     result = {
       exists: true,
-      isClaimable: isExpired || isDisowned,
       belongsToUser
     };
   } else {
     result = {
       exists: false,
+      belongsToUser: false,
     };
   }
 
