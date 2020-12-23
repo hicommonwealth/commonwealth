@@ -27,7 +27,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import { MenuItem, Button, Dialog, QueryList, Classes, ListItem } from 'construct-ui';
+import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, List } from 'construct-ui';
 import { notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'shared/utils';
 
@@ -354,12 +354,31 @@ export const ProposalEditorPermissions: m.Component<{
             key: role.Address.address
           });
         },
-        itemPredicate: (query, item, idx) => {
-          const address = (item as any).Address;
-          return address.name
-            ? address.name.toLowerCase().includes(query.toLowerCase())
-            : address.address.toLowerCase().includes(query.toLowerCase());
+        itemListPredicate: (q, i) => {
+          const itemPredicate = (query, item) => {
+            const address = (item as any).Address;
+            return address.name
+              ? address.name.toLowerCase().includes(q.toLowerCase())
+              : address.address.toLowerCase().includes(q.toLowerCase());
+          };
+
+          const allRoles = i.map((item) => itemPredicate(q, item));
+          const namedRoles = [];
+          const unnamedRoles = allRoles.map((role) => {
+            if ((role as any).Address.name) {
+              namedRoles.push(role);
+            } else {
+              return role;
+            }
+          });
+          return namedRoles.concat(unnamedRoles);
         },
+        // itemPredicate: (query, item, idx) => {
+        //   const address = (item as any).Address;
+        //   return address.name
+        //     ? address.name.toLowerCase().includes(query.toLowerCase())
+        //     : address.address.toLowerCase().includes(query.toLowerCase());
+        // },
         onSelect: (item) => {
           const addrItem = (item as any).Address;
           vnode.state.addedEditors[addrItem.address] = addrItem;
