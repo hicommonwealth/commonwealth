@@ -151,6 +151,32 @@ export class SubstrateDemocracyReferendum
   private _Accounts: SubstrateAccounts;
   private _Democracy: SubstrateDemocracy;
 
+  // BLOCK EXPLORER LINK
+  public get blockExplorerLink() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) {
+      const subdomain = blockExplorerIds['subscan'];
+      return `https://${subdomain}.subscan.io/referenda/${this.identifier}`;
+    }
+  }
+
+  public get blockExplorerLinkLabel() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    return undefined;
+  }
+
+  public get votingInterfaceLink() {
+    const rpcUrl = encodeURIComponent(this._Chain.app.chain?.meta?.url);
+    return `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/democracy`;
+  }
+
+  public get votingInterfaceLinkLabel() {
+    return 'Vote on polkadot-js';
+  }
+
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,
@@ -202,6 +228,18 @@ export class SubstrateDemocracyReferendum
     }
     switch (e.data.kind) {
       case SubstrateTypes.EventKind.DemocracyStarted: {
+        break;
+      }
+      case SubstrateTypes.EventKind.DemocracyVoted: {
+        const { who, isAye, conviction, balance } = e.data;
+        const vote = new SubstrateDemocracyVote(
+          this,
+          this._Accounts.fromAddress(who),
+          isAye,
+          this._Chain.coins(new BN(balance)),
+          convictionToWeight(conviction),
+        );
+        this.addOrUpdateVote(vote);
         break;
       }
       case SubstrateTypes.EventKind.DemocracyCancelled:
@@ -351,7 +389,6 @@ export class SubstrateDemocracyReferendum
   // TRANSACTIONS
   // TODO: allow the user to enter how much balance they want to vote with
   public async submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
-    let srmlVote;
     const conviction = convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index;
 
     // fake the arg to compute balance
@@ -359,13 +396,13 @@ export class SubstrateDemocracyReferendum
 
     // "AccountVote" type, for kusama
     // we don't support "Split" votes right now
-    srmlVote = {
+    const srmlVote = {
       Standard: {
         vote: {
           aye: vote.choice,
           conviction,
         },
-        balance: balance.asBN,
+        balance: balance.toString(),
       }
     };
 

@@ -4,9 +4,7 @@ import * as Sequelize from 'sequelize';
 import crypto from 'crypto';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
-import { stringToU8a, hexToU8a, u8aToString } from '@polkadot/util';
-import ExtrinsicPayload from '@polkadot/types/extrinsic/v4/ExtrinsicPayload';
-import { TypeRegistry } from '@polkadot/types';
+import { stringToU8a, hexToU8a } from '@polkadot/util';
 
 import * as secp256k1 from 'secp256k1';
 import * as CryptoJS from 'crypto-js';
@@ -40,6 +38,8 @@ export interface AddressAttributes {
   created_at?: Date;
   updated_at?: Date;
   user_id?: number;
+  is_councillor?: boolean;
+  is_validator?: boolean;
 
   // associations
   Chain?: ChainAttributes;
@@ -54,6 +54,11 @@ export interface AddressInstance extends Sequelize.Instance<AddressAttributes>, 
 
 export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAttributes> {
   // static methods
+  createEmpty?: (
+    chain: string,
+    address: string,
+  ) => Promise<AddressInstance>;
+
   createWithToken?: (
     user_id: number,
     chain: string,
@@ -73,7 +78,6 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
     addressModel: AddressInstance,
     user_id: number,
     signatureString: string,
-    signatureParams: string,
   ) => Promise<boolean>;
 }
 
@@ -94,6 +98,8 @@ export default (
     created_at:                 { type: dataTypes.DATE, allowNull: false },
     updated_at:                 { type: dataTypes.DATE, allowNull: false },
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
+    is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
     underscored: true,
     indexes: [
@@ -102,6 +108,15 @@ export default (
       { fields: ['name'] }
     ]
   });
+
+  Address.createEmpty = (
+    chain: string,
+    address: string,
+  ): Promise<AddressInstance> => {
+    const verification_token = 'NO_USER';
+    const verification_token_expires = new Date(); // expired immediately
+    return Address.create({ chain, address, verification_token, verification_token_expires });
+  };
 
   Address.createWithToken = (
     user_id: number,
@@ -143,7 +158,6 @@ export default (
     addressModel: AddressInstance,
     user_id: number,
     signatureString: string,
-    signatureParams: string,
   ): Promise<boolean> => {
     if (!chain) {
       log.error('no chain provided to verifySignature');
@@ -152,7 +166,8 @@ export default (
 
     let isValid;
     if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot'
-        || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi') {
+        || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi'
+        || chain.network === 'darwinia' || chain.network === 'phala' || chain.network === 'centrifuge') {
       const address = decodeAddress(addressModel.address);
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
       if (addressModel.keytype) {
@@ -174,32 +189,23 @@ export default (
         keyringOptions.ss58Format = 5;
       } else if (chain.network === 'stafi') {
         keyringOptions.ss58Format = 20;
+      } else if (chain.network === 'darwinia') {
+        keyringOptions.ss58Format = 18;
+      } else if (chain.network === 'phala') {
+        keyringOptions.ss58Format = 30;
+      } else if (chain.network === 'centrifuge') {
+        keyringOptions.ss58Format = 36;
       } else {
         keyringOptions.ss58Format = 42; // default chain id
       }
       const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
-      if (signatureParams) {
-        let params;
-        try {
-          params = JSON.parse(signatureParams);
-          const verificationToken = u8aToString(hexToU8a(params.method));
-          const verificationTokenValid = verificationToken.indexOf(addressModel.verification_token) !== -1;
-          if (!verificationTokenValid) return false;
-        } catch (e) {
-          log.error('Invalid signatureParams');
-          return false;
-        }
-        const signedPayload = new ExtrinsicPayload(new TypeRegistry(), params).toU8a(true);
-        isValid = signerKeyring.verify(signedPayload, hexToU8a(signatureString));
-      } else {
-        const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
-        const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
-        const signatureU8a = signatureString.slice(0, 2) === '0x'
-          ? hexToU8a(signatureString)
-          : hexToU8a(`0x${signatureString}`);
-        isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
-          || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
-      }
+      const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
+      const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
+      const signatureU8a = signatureString.slice(0, 2) === '0x'
+        ? hexToU8a(signatureString)
+        : hexToU8a(`0x${signatureString}`);
+      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
+        || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
     } else if (chain.network === 'cosmos') {
       const signatureData = JSON.parse(signatureString);
       // this saved "address" is actually just the address

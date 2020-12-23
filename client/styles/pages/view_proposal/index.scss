@@ -107,20 +107,24 @@ $discussion-title-font-size: 1.45rem;
                 }
             }
         }
-        .ProposalHeaderExternalLink {
+        .ProposalHeaderExternalLink,
+        .ProposalHeaderBlockExplorerLink,
+        .ProposalHeaderVotingInterfaceLink {
+            display: inline-block;
+            margin-right: 12px;
             margin-top: 18px;
             font-weight: 500;
             a:link,
             a:visited {
                 display: block;
-                padding: 10px 15px;
+                padding: 12px 15px 6px;
                 border-radius: 6px;
                 background: $background-color-light;
-                color: $theme-base-color;
+                color: $text-color-primary;
                 text-decoration: none !important;
             }
             svg {
-                stroke: $theme-base-color;
+                stroke: $text-color-primary;
                 position: relative;
                 top: -1px;
                 margin-left: 5px;

@@ -15,6 +15,7 @@ import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
 import { decodeAddress } from '@polkadot/keyring';
+import { setActiveAccount } from 'controllers/app/login';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
@@ -40,6 +41,7 @@ const commentModelFromServer = (comment) => {
         comment.community,
         comment.chain,
         null,
+        null,
         null
       );
     } else {
@@ -57,6 +59,7 @@ const commentModelFromServer = (comment) => {
     comment.chain,
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
+    comment.plaintext,
     comment.version_history,
     attachments,
     proposal,
@@ -87,6 +90,7 @@ const threadModelFromServer = (thread) => {
     thread.chain,
     thread.read_only,
     decodeURIComponent(thread.body),
+    thread.plaintext,
     thread.url,
     thread.Address.chain,
     thread.pinned,
@@ -123,12 +127,12 @@ const getProfileStatus = (account) => {
           return role.address_id === addr.id;
         }).length === 0;
       })
-      : null;
+      : [];
     const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
       return addr.id === account.id;
     });
     isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
-    if (unjoinedJoinableAddresses) {
+    if (isUnjoinedJoinableAddress) {
       currentAddressInfo = currentAddressInfoArray[0];
     }
   }
@@ -194,14 +198,24 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
             if (a.OffchainProfile.identity) {
               profile.initializeWithChain(
                 a.OffchainProfile.identity,
-                profileData.headline,
-                profileData.bio,
-                profileData.avatarUrl,
+                profileData?.headline,
+                profileData?.bio,
+                profileData?.avatarUrl,
                 a.OffchainProfile.judgements,
-                a.last_active
+                a.last_active,
+                a.is_councillor,
+                a.is_validator,
               );
             } else {
-              profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl, a.last_active);
+              profile.initialize(
+                profileData?.name,
+                profileData?.headline,
+                profileData?.bio,
+                profileData?.avatarUrl,
+                a.last_active,
+                a.is_councillor,
+                a.is_validator
+              );
             }
           } else {
             profile.initializeEmpty();
@@ -261,10 +275,19 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     if (!account) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     }
+
+    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
+
     if (refreshProfile) {
       loadProfile();
       vnode.state.refreshProfile = false;
-      m.redraw();
+      if (onOwnProfile) {
+        setActiveAccount(account).then(() => {
+          m.redraw();
+        });
+      } else {
+        m.redraw();
+      }
     }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
@@ -284,8 +307,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
-
-    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
 
     return m(Sublayout, {
       class: 'ProfilePage',

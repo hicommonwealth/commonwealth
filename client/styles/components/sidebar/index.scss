@@ -11,6 +11,9 @@
         &.logged-in {
             max-width: calc(100% - 242px);
         }
+        &.logged-in.no-community {
+            max-width: calc(100% - 142px);
+        }
     }
     .mobile-sidebar-left {
         padding-left: 6px !important;
@@ -52,11 +55,21 @@
         > .cui-button .cui-button-label {
             display: inline-block;
             position: relative;
-            top: 2px;
+            top: 1px;
+        }
+        @include xs-max {
+            .MobileNewProposalButton .cui-button {
+                .cui-button-label {
+                    top: 0 !important;
+                }
+            }
         }
         @include sm-max {
             .MobileNewProposalButton .cui-button {
                 padding: 0 12px;
+                .cui-button-label {
+                    top: 2px;
+                }
             }
             .cui-button.mobile-sidebar-trigger {
                 padding-left: 12px;
@@ -81,11 +94,11 @@
                 .user-display-name {
                     display: none;
                 }
+                .role-icon {
+                    display: none;
+                }
                 .LoginSelectorMenu .user-display-name {
                     display: inline;
-                }
-                .cui-tag.role-tag {
-                    display: none;
                 }
                 .cui-button-label .cui-icon-user {
                     margin-right: 0;
@@ -139,9 +152,10 @@
     }
 }
 
-.SidebarQuickSwitcherItemTooltip.cui-popover.cui-tooltip {
+.SidebarQuickSwitcherItemTooltip.cui-popover {
     .cui-popover-content {
-        padding: 8px 10px;
+        padding: 8px 16px;
+        white-space: nowrap;
     }
 }
 
@@ -149,7 +163,7 @@
     .sidebar-content {
         max-height: calc(100vh - 60px);
         padding-top: 16px;
-        padding-bottom: 40px;
+        padding-bottom: 60px;
         overflow-y: auto;
     }
     z-index: 2;
@@ -198,7 +212,7 @@
             .cui-list-item {
                 font-size: 17px;
                 font-weight: 500;
-                padding: 3px 12px;
+                padding: 6px 12px 0 !important;
                 border-radius: 4px;
                 border: none;
                 white-space: nowrap;
@@ -209,6 +223,13 @@
                 &.section-header {
                     font-size: 15px;
                     color: $text-color-lighter;
+                    margin-bottom: 4px;
+                    .cui-icon svg {
+                        stroke: $text-color-lightest;
+                    }
+                    .cui-icon:hover svg {
+                        stroke: $text-color-medium;
+                    }
                 }
                 &.section-callout {
                     margin-top: 8px;
@@ -217,8 +238,14 @@
                 .cui-list-item-content-left {
                     padding-right: 10px;
                 }
+                .cui-list-item-content-right {
+                    position: relative;
+                    right: -6px;
+                }
                 .cui-list-item-content-left .cui-icon svg {
                     stroke: $text-color-lighter;
+                    position: relative;
+                    top: -1px;
                 }
                 &:hover {
                     background: $background-color-light-hover;
@@ -286,6 +313,8 @@
         .proposal-topic-icon {
             margin-right: 0;
             border-color: $background-color-placeholder;
+            position: relative;
+            top: 2px;
         }
     }
 }

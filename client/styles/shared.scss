@@ -2,8 +2,8 @@
 @import 'mixins/responsive';
 @import 'mixins/dragula';
 
-$fonts: Metric, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-$monospace-fonts: "Courier New", Courier, monospace;
+$fonts: Calibre, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+$monospace-fonts: Menlo, Monaco, "Courier New", Courier, monospace;
 
 $base-bg-color:     #ffffff;
 $primary-bg-color:  #4f62bd;
@@ -20,8 +20,10 @@ $header-text-color: #ffffff;      // ??
 
 $background-color-white: #ffffff;       // white background
 $background-color-white-hover: #f9fafd; // white background with hover
-$background-color-light: #eef1fa;       // light background - used in sidebar, most styles
+$background-color-light: #eef1fa;       // light background
 $background-color-light-hover: #e5e8f7; // light background with hover
+$background-color-medium: #adb7d5;      // medium background for icons
+$background-color-dark: #4f62bd;        // dark background
 $background-color-border: #e0e4f1;      // border color
 $background-color-placeholder: #adb7d5; // placeholder color
 
@@ -30,6 +32,9 @@ $text-color-lighter: #a3a4a7;           // light text on white background - used
 $text-color-light: #9a9da4;             // light text on light background
 $text-color-medium: #777;               // medium text on any background
 $text-color-dark: #222;                 // black text on any background
+
+$text-color-primary-light: tint($primary-bg-color, 75%);
+$text-color-primary: $primary-bg-color;
 
 $form-border-color: #c5cdd1;
 $form-border-color-light: lighten(#c5cdd1, 12%);

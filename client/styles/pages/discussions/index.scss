@@ -46,11 +46,15 @@
         margin: 20px 0;
         text-align: center;
     }
+    .topic-loading-spinner-wrap,
     .infinite-scroll-spinner-wrap {
         height: 70px;
         width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    .topic-loading-spinner-wrap {
+        height: 120px;
     }
 }

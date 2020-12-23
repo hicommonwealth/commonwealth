@@ -10,7 +10,7 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { Button, Callout, Input, TextArea, Icon, Icons, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
-import { formatAddressShort, isSameAccount } from 'helpers';
+import { isSameAccount, link } from 'helpers';
 import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
@@ -27,6 +27,7 @@ import { ChainIcon } from 'views/components/chain_icon';
 import CodeBlock from 'views/components/widgets/code_block';
 import User, { UserBlock } from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
+import { formatAddressShort } from '../../../../shared/utils';
 import AddressSwapper from '../components/addresses/address_swapper';
 
 enum LinkNewAddressSteps {
@@ -215,7 +216,7 @@ const LinkNewAddressModal: m.Component<{
             class: 'account-adder-placeholder',
             key: 'placeholder',
             intent: 'primary',
-            label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ],
+            label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain' ],
             disabled: true,
           }),
         ])
@@ -357,6 +358,7 @@ const LinkNewAddressModal: m.Component<{
                 || vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
               oninit: async (vvnode) => {
                 // initialize API if needed before starting webwallet
+                if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
                 await app.chain.initApi();
                 await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
@@ -365,18 +367,30 @@ const LinkNewAddressModal: m.Component<{
               },
               onclick: async (vvnode) => {
                 // initialize API if needed before starting webwallet
+                if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
                 await app.chain.initApi();
                 await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },
-              label: vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected
-                ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ]
-                : app.chain.networkStatus === ApiStatus.Disconnected ?  'Could not connect to chain'
-                : (app.chain as Substrate || app.chain as Ethereum).webWallet.available
-                  ? 'Connect to wallet' : 'No wallet detected',
+              label:
+                !(app.chain as Substrate || app.chain as Ethereum).webWallet.available
+                  ? 'No wallet detected'
+                  : (vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected)
+                    ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ]
+                    : app.chain.networkStatus === ApiStatus.Disconnected
+                      ? 'Could not connect to chain'
+                      : 'Connect to wallet'
             }),
+          !(app.chain as Substrate || app.chain as Ethereum).webWallet.available && m('.get-wallet-text', [
+            'Install a ',
+            app.chain.base === ChainBase.Substrate
+              && link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', { target: '_blank' }),
+            app.chain.base === ChainBase.Ethereum
+              && link('a', 'https://metamask.io/', 'Metamask', { target: '_blank' }),
+            ' compatible wallet to continue'
+          ]),
           (app.chain as Substrate || app.chain as Ethereum).webWallet
             && (app.chain as Substrate || app.chain as Ethereum).webWallet.enabled && m('.accounts-caption', [
             (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length ? [
@@ -434,11 +448,8 @@ const LinkNewAddressModal: m.Component<{
         m('.link-address-step-narrow', [
           app.chain.base === ChainBase.Substrate && [
             m('p.link-address-cli-explainer', [
-              'Enter the address you are using. If you need a new address, you can generate one by running:',
-            ]),
-            vnode.state.error && !vnode.state.newAddress && m('.error-message', vnode.state.error),
-            m(CodeBlock, { clickToSelect: true }, [
-              vnode.state.isEd25519 ? 'subkey -e generate' : 'subkey generate',
+              'Enter the address you are using. If you need a new address, generate one by running ',
+              m('code', vnode.state.isEd25519 ? 'subkey generate --scheme ed25519' : 'subkey generate'),
             ]),
           ],
           app.chain.base === ChainBase.CosmosSDK && [
@@ -452,32 +463,10 @@ const LinkNewAddressModal: m.Component<{
               m('span.no-select', '<name>'),
             ]),
           ],
-          app.chain.base === ChainBase.Substrate && m(Checkbox, {
-            name: 'is-ed25519',
-            label: 'Key is ed25519 format',
-            onchange: async (e) => {
-              const result = (e.target as any).checked;
-              vnode.state.isEd25519 = !!result;
-
-              // resubmit creation if they check box after pasting address
-              if (!vnode.state.enteredAddress) return;
-              if (!vnode.state.error) {
-                try {
-                  vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
-                    address: vnode.state.enteredAddress,
-                    currentPrefix: (app.chain as Substrate).chain.ss58Format,
-                  }), vnode.state.isEd25519 ? 'ed25519' : undefined);
-                } catch (e) {
-                  vnode.state.error = e.responseJSON ? e.responseJSON.error : 'Failed to create user.';
-                }
-              }
-
-              m.redraw();
-            },
-          }),
           m(Input, {
             name: 'Address',
             fluid: true,
+            autocomplete: 'off',
             placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
               : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here (e.g. cosmos123...)'
                 : 'Paste the address here',
@@ -519,12 +508,39 @@ const LinkNewAddressModal: m.Component<{
               m.redraw();
             },
           }),
+          // // ed25519 account linking disabled for now, since while address ownership verification works,
+          // // the resulting address is missing an addressId, and will not be added to the current community
+          // // or set as activeAddress correctly (unclear why)
+          // app.chain.base === ChainBase.Substrate && m(Checkbox, {
+          //   name: 'is-ed25519',
+          //   label: 'Key is ed25519 format',
+          //   onchange: async (e) => {
+          //     const result = (e.target as any).checked;
+          //     vnode.state.isEd25519 = !!result;
+
+          //     // resubmit creation if they check box after pasting address
+          //     if (!vnode.state.enteredAddress) return;
+          //     if (!vnode.state.error) {
+          //       try {
+          //         vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
+          //           address: vnode.state.enteredAddress,
+          //           currentPrefix: (app.chain as Substrate).chain.ss58Format,
+          //         }), vnode.state.isEd25519 ? 'ed25519' : undefined);
+          //       } catch (err) {
+          //         vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
+          //       }
+          //     }
+
+          //     m.redraw();
+          //   },
+          // }),
+          vnode.state.error && !vnode.state.newAddress && m('.error-message', vnode.state.error),
           // Allow signing iff address has been created and account has been verified
           vnode.state.newAddress && m('.link-address-cli-verification', [
             app.chain.base === ChainBase.Substrate && [
               m('p', 'Use the secret phrase to sign this message:'),
               m(CodeBlock, { clickToSelect: true }, [
-                `echo "${vnode.state.newAddress.validationToken}" | subkey ${vnode.state.isEd25519 ? '-e ' : ''}sign "`,
+                `echo "${vnode.state.newAddress.validationToken}" | subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : ''}--suri "`,
                 m('span.no-select', 'secret phrase'),
                 '"',
               ]),
@@ -546,6 +562,7 @@ const LinkNewAddressModal: m.Component<{
             m(Input, {
               name: 'Signature',
               fluid: true,
+              autocomplete: 'off',
               placeholder: (app.chain.base === ChainBase.CosmosSDK)
                 ? 'Paste the entire output'
                 : 'Paste the signature here',
@@ -561,7 +578,7 @@ const LinkNewAddressModal: m.Component<{
                     vnode.state.error = 'Invalid signature';
                   }
                 } catch (err) {
-                  vnode.state.error = 'Invalid signature';
+                  vnode.state.error = 'Invalid signature (2)';
                 }
                 m.redraw();
               },

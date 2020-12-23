@@ -48,9 +48,19 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
 
     return m(Grid, { class: 'EmailIntervalConfiguration' }, [
       m(Col, { class: 'email-interval-configuration-left', span: { xs: 12, md: 6 } }, [
-        m('h4', 'Notification digest'),
-        m('p', 'Receive a digest of your unread notifications'),
+        m('h4', 'Get notifications immediately'),
+        m('p', {
+          style: 'margin-top: 8px',
+        }, [
+          'Select ',
+          m('strong', 'On (immediate)'),
+          ' to receive an email immediately when the selected event occurs'
+        ]),
+      ]),
+      m(Col, { class: 'email-interval-configuration-right', span: { xs: 12, md: 6 } }, [
+        m('h4', 'Get notifications in a daily digest'),
         m(RadioGroup, {
+          style: 'margin-top: 10px',
           options: ['daily', 'never'],
           name: 'interval',
           onchange: (e) => {
@@ -84,14 +94,6 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
             ' to continue receiving notification emails.'
           ]) : '',
         vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
-      ]),
-      m(Col, { class: 'email-interval-configuration-right', span: { xs: 12, md: 6 } }, [
-        m('h4', 'Immediate email notifications'),
-        m('p', [
-          'Select ',
-          m('strong', 'On (immediate)'),
-          ' to receive an email immediately when the selected event occurs'
-        ]),
       ]),
     ]);
   }
@@ -692,7 +694,10 @@ const NotificationsPage: m.Component<{}, {
     if (subscriptions.length < 1) return m(PageLoading);
     return m(Sublayout, {
       class: 'NotificationsPage',
-      title: 'Notification Settings',
+      title: [
+        'Notification Settings ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
     }, [
       m('.forum-container', [
         m(EmailIntervalConfiguration),

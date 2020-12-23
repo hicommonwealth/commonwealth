@@ -5,12 +5,15 @@ $discussion-meta-padding: 18px;
 .DiscussionRow {
     .row-left {
         .row-header {
+            .spacer {
+                display: inline-block;
+                width: 4px;
+            }
             a.external-discussion-link {
-                .cui-icon {
-                    position: relative;
-                    top: -2px;
-                    color: #111;
-                    margin-left: 2px;
+                font-size: 17px;
+                color: $theme-base-color;
+                &:hover {
+                    text-decoration: underline;
                 }
             }
         }

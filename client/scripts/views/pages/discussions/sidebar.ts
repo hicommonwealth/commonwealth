@@ -7,6 +7,7 @@ import app from 'state';
 import { AddressInfo, AbridgedThread } from 'models';
 import User from 'views/components/widgets/user';
 import CommunityInfoModule from 'views/components/sidebar/community_info_module';
+import SubscriptionButton from 'views/components/sidebar/subscription_button';
 
 export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: number }, {}> = {
   view: (vnode) => {
@@ -18,7 +19,6 @@ export const MostActiveUser: m.Component<{ user: AddressInfo, activityCount: num
         avatarSize: 24,
         linkify: true,
         popover: true,
-        showRole: true
       }),
       m('.activity-count', activityCount)
     ]);
@@ -78,11 +78,11 @@ export const ListingSidebar: m.Component<{ entity: string }> = {
               avatarSize: 24,
               linkify: true,
               popover: true,
-              showRole: true,
             });
           }),
         ]),
       ]),
+      m(SubscriptionButton),
     ]);
   }
 };

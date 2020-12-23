@@ -38,6 +38,7 @@ import setupChainEventListeners from './server/scripts/setupChainEventListeners'
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 import migrateChainEntities from './server/scripts/migrateChainEntities';
 import migrateIdentities from './server/scripts/migrateIdentities';
+import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -64,6 +65,7 @@ async function main() {
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
   const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
+  const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
@@ -149,6 +151,16 @@ async function main() {
       rc = 0;
     } catch (e) {
       log.error('Failed migrating chain identities into the DB: ', e.message);
+      rc = 1;
+    }
+  } else if (FLAG_MIGRATION) {
+    log.info('Started migrating councillor and validator flags into the DB');
+    try {
+      await migrateCouncillorValidatorFlags(models);
+      log.info('Finished migrating councillor and validator flags into the DB');
+      rc = 0;
+    } catch (e) {
+      log.error('Failed migrating councillor and validator flags into the DB: ', e.message);
       rc = 1;
     }
   }

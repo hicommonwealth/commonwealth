@@ -1,11 +1,11 @@
 import m from 'mithril';
 import app from 'state';
-import { formatAddressShort } from 'helpers';
-import { makeDynamicComponent } from 'models/mithril';
 import User from 'views/components/widgets/user';
+import { makeDynamicComponent } from 'models/mithril';
 import { StakingLedger } from '@polkadot/types/interfaces';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
+import { formatAddressShort } from '../../../../../../shared/utils';
 import ActionForm from './action_form';
 
 

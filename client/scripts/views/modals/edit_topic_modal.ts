@@ -45,6 +45,7 @@ const EditTopicModal : m.Component<{
     const deleteTopic = async (form) => {
       const topicInfo = {
         id,
+        name: form.name,
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
       };
@@ -112,7 +113,7 @@ const EditTopicModal : m.Component<{
                 e.preventDefault();
                 const confirmed = await confirmationModalWithText('Delete this topic?')();
                 if (!confirmed) return;
-                deleteTopic(id).then(() => {
+                deleteTopic(vnode.state.form).then(() => {
                   $(e.target).trigger('modalexit');
                   m.route.set(`/${app.activeId()}/`);
                 }).catch((err) => {

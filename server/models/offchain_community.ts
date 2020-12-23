@@ -11,6 +11,7 @@ export interface OffchainCommunityAttributes {
   name: string;
   creator_id: number;
   default_chain: string;
+  iconUrl: string;
   description?: string;
   website?: string;
   chat?: string;
@@ -51,6 +52,7 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       creator_id: { type: dataTypes.INTEGER, allowNull: false },
       default_chain: { type: dataTypes.STRING, allowNull: false },
+      iconUrl: { type: dataTypes.STRING, allowNull: true },
       description: { type: dataTypes.TEXT, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       chat: { type: dataTypes.STRING, allowNull: true },

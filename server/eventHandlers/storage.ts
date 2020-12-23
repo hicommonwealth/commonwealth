@@ -34,7 +34,7 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent) {
     event = this.truncateEvent(event);
-    log.trace(`Received event: ${JSON.stringify(event, null, 2)}`);
+    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     if (this._excludedEvents.includes(event.data.kind)) {
       log.trace('Skipping event!');
       return;

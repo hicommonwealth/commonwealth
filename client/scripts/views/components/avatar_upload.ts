@@ -3,6 +3,8 @@ import 'components/avatar_upload.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import Dropzone from 'dropzone';
+
+import User from 'views/components/widgets/user';
 import { featherIcon } from 'helpers';
 import app from 'state';
 
@@ -82,6 +84,11 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
           m('span.icon-plus')
         ])
       ]),
+      !vnode.state.uploaded && m(User, {
+        user: app.user.activeAccount,
+        avatarOnly: true,
+        avatarSize: 100,
+      }),
       m('.dropzone-previews', {
         class: (vnode.state.uploaded) ? '' : 'hidden'
       }),

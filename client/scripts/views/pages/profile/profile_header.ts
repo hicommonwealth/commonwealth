@@ -8,7 +8,6 @@ import { Unsubscribable } from 'rxjs';
 import { initChain } from 'app';
 import app from 'state';
 
-import { formatAddressShort, isSameAccount } from 'helpers';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
@@ -17,6 +16,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PageLoading from 'views/pages/loading';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -59,9 +59,8 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
         });
       }
     },
-    label: vnode.state.chainLoading
-      ? 'Loading chain (may take some time)...'
-      : currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
+    loading: !!vnode.state.chainLoading,
+    label: currentIdentity?.exists ? 'Edit identity' : 'Set identity'
   });
 };
 
@@ -114,7 +113,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', account.profile ? m(User, { user: account, hideAvatar: true }) : account.address),
+            m('.User', account.profile ? m(User, { user: account, hideAvatar: true, showRole: true }) : account.address),
           ]),
           m('.info-row', [
             account.profile?.headline && m('span.profile-headline', account.profile.headline),
@@ -137,6 +136,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             vnode.state.copied && m('span.copy-done', 'Copied'),
           ]),
         ]),
+        m('.bio-actions-breakpoint'),
         m('.bio-actions', [
           onOwnProfile ? [
             editIdentityAction(account, vnode.state.identity, vnode),
@@ -148,7 +148,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   data: { account, refreshCallback },
                 });
               },
-              label: 'Edit profile'
+              label: 'Edit'
             }),
           ] : (showJoinCommunityButton && app.activeChainId())
             ? m(Button, {

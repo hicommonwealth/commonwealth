@@ -87,6 +87,31 @@ class SubstrateDemocracyProposal extends Proposal<
 
   private _depositSubscription: Unsubscribable;
 
+  public get blockExplorerLink() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) {
+      const subdomain = blockExplorerIds['subscan'];
+      return `https://${subdomain}.subscan.io/democracy_proposal/${this.identifier}`;
+    }
+  }
+
+  public get blockExplorerLinkLabel() {
+    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const blockExplorerIds = chainInfo?.blockExplorerIds;
+    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    return undefined;
+  }
+
+  public get votingInterfaceLink() {
+    const rpcUrl = encodeURIComponent(this._Chain.app.chain?.meta?.url);
+    return `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/democracy`;
+  }
+
+  public get votingInterfaceLinkLabel() {
+    return 'Vote on polkadot-js';
+  }
+
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,
@@ -140,6 +165,12 @@ class SubstrateDemocracyProposal extends Proposal<
   public update(e: ChainEvent) {
     switch (e.data.kind) {
       case SubstrateTypes.EventKind.DemocracyProposed: {
+        break;
+      }
+      case SubstrateTypes.EventKind.DemocracySeconded: {
+        const acct = this._Accounts.fromAddress(e.data.who);
+        const vote = new DepositVote(acct, this._Chain.coins(this.data.deposit));
+        this.addOrUpdateVote(vote);
         break;
       }
       case SubstrateTypes.EventKind.DemocracyTabled: {
