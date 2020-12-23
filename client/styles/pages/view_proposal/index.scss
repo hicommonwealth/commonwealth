@@ -239,12 +239,6 @@ $discussion-title-font-size: 1.45rem;
         }
     }
 
-    .ProposalEditPermissions {
-        .User {
-            cursor: pointer;
-        }
-    }
-
     .comments-error {
         @include error-text();
         margin: 30px 0;

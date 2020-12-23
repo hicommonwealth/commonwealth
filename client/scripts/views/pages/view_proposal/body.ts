@@ -305,13 +305,14 @@ export const EditPermissionsButton: m.Component<{
   }
 };
 
-export const ProposalEditPermissions: m.Component<{
+export const ProposalEditorPermissions: m.Component<{
   thread: OffchainThread,
   popoverMenu: boolean,
   onChangeHandler: any,
   openStateHandler: any
 }, {
   items: any[],
+  addedEditors: any,
   isOpen: boolean,
 }> = {
   oninit: async (vnode) => {
@@ -329,70 +330,83 @@ export const ProposalEditPermissions: m.Component<{
   view: (vnode) => {
     const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
     if (!vnode.state.items?.length) return;
+    if (!vnode.state.addedEditors) {
+      vnode.state.addedEditors = [];
+    }
     const { items } = vnode.state;
-    return m('.ProposalEditPermissions', [
-      m(Dialog, {
-        basic: false,
-        closeOnEscapeKey: true,
-        closeOnOutsideClick: true,
-        content: m(QueryList, {
-          initialContent: 'Enter an address',
-          checkmark: true,
-          items,
-          itemRender: (role: any, idx: number) => {
-            const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
-            return m(User, { user });
-          },
-          itemPredicate: (query, item, idx) => {
-            return (item as any).Address.name.toLowerCase().includes(query.toLowerCase());
+    return m(Dialog, {
+      basic: false,
+      class: 'ProposalEditorPermissions',
+      closeOnEscapeKey: true,
+      closeOnOutsideClick: true,
+      content: m(QueryList, {
+        initialContent: 'Enter an address',
+        checkmark: true,
+        items,
+        itemRender: (role: any, idx: number) => {
+          const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
+          return m(User, { user });
+        },
+        itemPredicate: (query, item, idx) => {
+          return (item as any).Address.name.toLowerCase().includes(query.toLowerCase());
+        },
+        onSelect: (item) => {
+          const addrItem = (item as any).Address;
+          vnode.state.addedEditors[addrItem.address] = addrItem;
+          console.log(vnode.state.addedEditors);
+        }
+      }),
+      hasBackdrop: true,
+      isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
+      inline: false,
+      onClose: () => {
+        if (vnode.attrs.popoverMenu) {
+          debugger
+          vnode.attrs.openStateHandler(false);
+        } else {
+          vnode.state.isOpen = false;
+        }
+      },
+      title: 'Add editor permissions',
+      transitionDuration: 200,
+      footer: m(`.${Classes.ALIGN_RIGHT}`, [
+        m(Button, {
+          label: 'Close',
+          onclick: () => {
+            if (vnode.attrs.popoverMenu) {
+              vnode.attrs.openStateHandler(false);
+            } else {
+              vnode.state.isOpen = false;
+            }
           },
         }),
-        hasBackdrop: true,
-        isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
-        inline: false,
-        onClose: () => {
-          if (vnode.attrs.popoverMenu) {
-            debugger
-            vnode.attrs.openStateHandler(false);
-          } else {
-            vnode.state.isOpen = false;
-          }
-        },
-        title: 'Add editor permissions',
-        transitionDuration: 200,
-        footer: m(`.${Classes.ALIGN_RIGHT}`, [
-          m(Button, {
-            label: 'Close',
-            onclick: () => {
-              if (vnode.attrs.popoverMenu) {
-                vnode.attrs.openStateHandler(false);
-              } else {
-                vnode.state.isOpen = false;
+        m(Button, {
+          label: 'Save changes',
+          intent: 'primary',
+          onclick: async () => {
+            try {
+              const req = await $.get(`${app.serverUrl()}/addEditors`, {
+                thread_id: thread.id,
+                editors: JSON.stringify(vnode.state.addedEditors)
+              });
+              if (req.status !== '200') {
+                // TODO
               }
-            },
-          }),
-          m(Button, {
-            label: 'Save changes',
-            intent: 'primary',
-            onclick: async () => {
-              try {
-                // logic
-              } catch (err) {
-                console.log('Failed to add editors');
-                throw new Error((err.responseJSON && err.responseJSON.error)
-                  ? err.responseJSON.error
-                  : 'Failed to update topic');
-              }
-              if (vnode.attrs.popoverMenu) {
-                vnode.attrs.openStateHandler(false);
-              } else {
-                vnode.state.isOpen = false;
-              }
-            },
-          }),
-        ])
-      })
-    ]);
+            } catch (err) {
+              console.log('Failed to add editors');
+              throw new Error((err.responseJSON && err.responseJSON.error)
+                ? err.responseJSON.error
+                : 'Failed to update topic');
+            }
+            if (vnode.attrs.popoverMenu) {
+              vnode.attrs.openStateHandler(false);
+            } else {
+              vnode.state.isOpen = false;
+            }
+          },
+        }),
+      ])
+    });
   }
 };
 

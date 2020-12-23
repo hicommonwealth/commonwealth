@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { renderQuillDeltaToText } from '../../shared/utils';
+import { getProposalUrl } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
 export const Errors = {
@@ -11,9 +11,10 @@ export const Errors = {
   IncorrectOwner: 'Not owned by this user',
 };
 
-const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, title, kind, thread_id, version_history, } = req.body;
-
+const addEditors = async (models, req: Request, res: Response, next: NextFunction) => {
+  const { thread_id } = req.body;
+  const editors = JSON.parse(req.body.editors);
+  console.log(editors);
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
@@ -47,8 +48,8 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
             .find((role) => role.chain_id === chain.id);
           if (!isMember) return next(new Error(Errors.InvalidEditor));
         }
-        thread.addCollaborator(collaborator);
-        collaborator.addCollaboration(thread);
+        thread.addAddress(collaborator);
+        collaborator.addOffchainThread(thread);
       }));
     }
 
@@ -117,4 +118,4 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   }
 };
 
-export default editThread;
+export default addEditors;

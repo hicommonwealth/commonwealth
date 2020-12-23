@@ -43,7 +43,7 @@ import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
   ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
-  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem, EditPermissionsButton, ProposalEditPermissions
+  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem, EditPermissionsButton, ProposalEditorPermissions
 } from './body';
 import CreateComment from './create_comment';
 
@@ -143,7 +143,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
               inline: true,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
             }),
-            vnode.state.editPermissionsIsOpen && proposal instanceof OffchainThread && m(ProposalEditPermissions, {
+            vnode.state.editPermissionsIsOpen && proposal instanceof OffchainThread && m(ProposalEditorPermissions, {
               thread: vnode.attrs.proposal as OffchainThread,
               popoverMenu: true,
               onChangeHandler: () => {},
