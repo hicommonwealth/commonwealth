@@ -367,6 +367,7 @@ export const NewThreadForm: m.Component<{
             m(Input, {
               placeholder: 'https://',
               oninput: (e) => {
+                e.redraw = false; // do not redraw on input
                 const { value } = e.target as any;
                 vnode.state.form.url = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
@@ -383,6 +384,7 @@ export const NewThreadForm: m.Component<{
               name: 'new-link-title',
               autocomplete: 'off',
               oninput: (e) => {
+                e.redraw = false; // do not redraw on input
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
                 vnode.state.form.linkTitle = value;
@@ -472,6 +474,7 @@ export const NewThreadForm: m.Component<{
               placeholder: 'Title',
               autocomplete: 'off',
               oninput: (e) => {
+                e.redraw = false; // do not redraw on input
                 const { value } = (e as any).target;
                 if (vnode.state.quillEditorState && !vnode.state.quillEditorState.alteredText) {
                   vnode.state.quillEditorState.alteredText = true;
