@@ -61,18 +61,20 @@ export default class extends IEventHandler {
     // 2) Get relevant data from DB for processing and updating back to database.
     // merging up the active and waiting validators into the one list.
     const newValidators = [];
-    newSessionEventData.active.forEach((validator: any) => {
-      newValidators[validator] = {
-        state: 'Active',
-        visited: false
-      };
-    });
     newSessionEventData.waiting.forEach((validator: any) => {
       newValidators[validator] = {
         state: 'Waiting',
         visited: false
       };
     });
+    
+    newSessionEventData.active.forEach((validator: any) => {
+      newValidators[validator] = {
+        state: 'Active',
+        visited: false
+      };
+    });
+
 
     // Directly mark all validators as "Inactive" in the database those are not in new-session's active and waiting list.
     const updateOlderValidators = await this._models.Validator.update(
@@ -101,7 +103,7 @@ export default class extends IEventHandler {
       const stashId = newValidators[validator.stash];
 
       if (stashId && stashId.length > 0) {
-        const validatorsInfo = (newSessionEventData as any).validatorInfo[validator.stash]; 
+        const validatorsInfo = (newSessionEventData as any).validatorInfo[validator.stash];
         validator.state = stashId.state;
         validator.controller = validatorsInfo.controllerId;
         validator.sessionKeys = validatorsInfo.nextSessionIds;
