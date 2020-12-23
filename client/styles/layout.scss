@@ -18,6 +18,9 @@ html {
     background: #fff;
     overflow-y: scroll;
 }
+body {
+    overscroll-behavior-y: none;
+}
 .mithril-app {
     height: 100%;
     width: 100%;
