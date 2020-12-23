@@ -25,9 +25,22 @@ class SubstrateBountyTreasury extends ProposalModule<
   private _pot = new BehaviorSubject<SubstrateCoin>(null);
   get pot() { return this._pot.value; }
 
-  // The minimum bond for a proposal
-  private _bondMinimum: SubstrateCoin = null;
-  get bondMinimum() { return this._bondMinimum; }
+  // The minimum curator deposit for a bounty
+  private _bountyCuratorDeposit: SubstrateCoin = null;
+  get bountyCuratorDeposit() { return this._bountyCuratorDeposit; }
+
+  // The minimum deposit base for a bounty
+  private _bountyDepositBase: SubstrateCoin = null;
+  get bountyDepositBase() { return this._bountyDepositBase; }
+
+  // The payout delay for a bounty
+  private _bountyDepositPayoutDelay: SubstrateCoin = null;
+  get bountyDepositPayoutDelay() { return this._bountyDepositPayoutDelay; }
+
+  // The minimum value for a bounty
+  private _bountyValueMinimum: SubstrateCoin = null;
+  get bountyValueMinimum() { return this._bountyValueMinimum; }
+
 
   // The percentage of a proposal value that will be bonded
   private _bondPct: number = null;
@@ -45,10 +58,10 @@ class SubstrateBountyTreasury extends ProposalModule<
     return (Math.floor(this.app.chain.block.height / this.spendPeriod) + 1) * this.spendPeriod;
   }
 
-  public computeBond(amount: SubstrateCoin): SubstrateCoin {
-    const computed = amount.muln(this.bondPct);
-    return this.bondMinimum.gt(computed) ? this.bondMinimum : this._Chain.coins(computed);
-  }
+  // public computeBond(amount: SubstrateCoin): SubstrateCoin {
+  //   const computed = amount.muln(this.bondPct);
+  //   return this.bondMinimum.gt(computed) ? this.bondMinimum : this._Chain.coins(computed);
+  // }
 
   private _potSubscription: Unsubscribable;
   public deinit() {
@@ -79,7 +92,11 @@ class SubstrateBountyTreasury extends ProposalModule<
       this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
         // save parameters
         // this._bondPct = +(api.query.treasury.bounties as Permill) / 1_000_000;
-        this._bondMinimum = this._Chain.coins(api.consts.treasury.proposalBondMinimum as BalanceOf);
+        this._bountyCuratorDeposit = this._Chain.coins(api.consts.treasury.bountyCuratorDeposit);
+        this._bountyDepositBase = this._Chain.coins(api.consts.treasury.bountyDepositBase);
+        this._bountyDepositPayoutDelay = this._Chain.coins(api.consts.treasury.bountyDepositPayoutDelay);
+        this._bountyValueMinimum = this._Chain.coins(api.consts.treasury.bountyValueMinimum);
+
         this._spendPeriod = +(api.consts.treasury.spendPeriod as BlockNumber);
         this._burnPct = +(api.consts.treasury.burn as Permill) / 1_000_000;
         // kick off subscriptions
