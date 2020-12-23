@@ -5,12 +5,15 @@ $discussion-meta-padding: 18px;
 .DiscussionRow {
     .row-left {
         .row-header {
+            .spacer {
+                display: inline-block;
+                width: 4px;
+            }
             a.external-discussion-link {
-                .cui-icon {
-                    position: relative;
-                    top: -2px;
-                    color: #111;
-                    margin-left: 2px;
+                font-size: 17px;
+                color: $theme-base-color;
+                &:hover {
+                    text-decoration: underline;
                 }
             }
         }
@@ -56,7 +59,7 @@ $discussion-meta-padding: 18px;
                 color: $text-color-light;
                 margin-right: 12px;
             }
-            .User a {
+            > .User > a {
                 display: inline-block;
                 text-decoration: none;
                 color: $text-color-light;
@@ -64,7 +67,7 @@ $discussion-meta-padding: 18px;
                     color: darken($text-color-light, 8%);
                     text-decoration: underline;
                 }
-                a.user-display-name {
+                > a.user-display-name {
                     color: $theme-base-color;
                 }
             }

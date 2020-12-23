@@ -8,6 +8,7 @@ import app from 'state';
 
 import { OffchainThread, OffchainComment, AnyProposal } from 'models';
 import { CommentParent } from 'controllers/server/comments';
+import EditProfileModal from 'views/modals/edit_profile_modal';
 import { parseMentionsForServer } from 'views/pages/threads';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
@@ -125,7 +126,7 @@ const CreateComment: m.Component<{
       class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
     }, [
       m('.create-comment-avatar', [
-        m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 36 }),
+        m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 40 }),
       ]),
       m('.create-comment-body', [
         m(User, { user: author, popover: true, hideAvatar: true }),
@@ -135,6 +136,27 @@ const CreateComment: m.Component<{
             content: 'Commenting is disabled because this post has been locked.',
           })
           : [
+            app.user.activeAccount?.profile && !app.user.activeAccount.profile.name && m(Callout, {
+              class: 'no-profile-callout',
+              intent: 'primary',
+              content: [
+                'You haven\'t set a display name yet, so other people can\'t see who you are. ',
+                m('a', {
+                  href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
+                    + `?base=${app.user.activeAccount.chain}`,
+                  onclick: (e) => {
+                    e.preventDefault();
+                    app.modals.create({
+                      modal: EditProfileModal,
+                      data: {
+                        account: app.user.activeAccount,
+                        refreshCallback: () => m.redraw(),
+                      },
+                    });
+                  }
+                }, 'Complete your profile'),
+              ],
+            }),
             m(QuillEditor, {
               contentsDoc: '',
               oncreateBind: (state) => {

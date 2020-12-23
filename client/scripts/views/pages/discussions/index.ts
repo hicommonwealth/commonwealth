@@ -9,7 +9,7 @@ import app from 'state';
 
 import { Spinner } from 'construct-ui';
 import { pluralize } from 'helpers';
-import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
+import { NodeInfo, CommunityInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
 import Sublayout from 'views/sublayout';
@@ -280,6 +280,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, vnode.state.lookback[subpage]);
     const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
     const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true);
+
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',

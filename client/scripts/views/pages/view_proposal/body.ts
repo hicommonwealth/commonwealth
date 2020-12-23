@@ -25,6 +25,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button } from 'construct-ui';
+import { notifySuccess } from 'controllers/app/notifications';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -277,7 +278,7 @@ export const ProposalBodyDeleteMenuItem: m.Component<{
         if (!confirmed) return;
         (isThread ? app.threads : app.comments).delete(item).then(() => {
           if (isThread) m.route.set(`/${app.activeId()}/`);
-          refresh();
+          if (refresh) refresh();
           m.redraw();
           // TODO: set notification bar for 'thread deleted/comment deleted'
         });
@@ -349,7 +350,7 @@ export const ProposalBodySaveEdit: m.Component<{
               clearEditingLocalStorage(item, true);
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               m.redraw();
-              // TODO: set notification bar for 'thread edited' (?)
+              notifySuccess('Thread successfully edited');
             });
           } else if (item instanceof OffchainComment) {
             app.comments.edit(item, itemText).then((c) => {

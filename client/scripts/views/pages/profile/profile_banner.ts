@@ -5,8 +5,8 @@ import { Button } from 'construct-ui';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
-import { formatAddressShort } from 'helpers';
 import { Account, AddressInfo } from 'models';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressInfo }, { loading: boolean }> = {
   view: (vnode) => {
@@ -19,7 +19,7 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
       const community = app.chain?.meta.chain ? app.chain.meta.chain.name
         : app.community?.meta ? app.community.meta.name : 'current';
       const confirmed = await confirmationModalWithText(
-        `Join the ${community} community with this address (${addrShort})?`
+        `Join the ${community} community with this address?`
       )();
       if (!confirmed) {
         vnode.state.loading = false;
@@ -34,7 +34,7 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
       }).then(() => {
         vnode.state.loading = false;
         m.redraw();
-        notifySuccess(`Joined with ${addrShort}`);
+        notifySuccess(`Joined with ${addrShort}`); // ${addrShort} is now a member of the [Edgeware] community!
         setActiveAccount(account).then(() => {
           m.redraw();
           $(e.target).trigger('modalexit');
@@ -48,7 +48,7 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
 
     return m('.ProfileBanner', [
       m('.banner-text', [
-        `You are already logged in with this address (${addrShort})`,
+        'You are already logged in with this address' // but have not joined the [Edgeware] community
       ]),
       m(Button, {
         label: 'Join community',

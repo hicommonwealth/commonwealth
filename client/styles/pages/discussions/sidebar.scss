@@ -15,16 +15,20 @@
     }
     .user-activity, .admins-mods {
         margin-bottom: 20px;
+        .cui-overlay-inline {
+            display: block;
+        }
         .MostActiveUser {
             display: flex;
             justify-content: space-between;
         }
         .User {
+            display: block;
             padding: 5px 0;
         }
         .User .user-avatar {
             position: relative;
-            top: 2px;
+            top: 4px;
         }
         .username, .activity-count {
             font-weight: 500;
@@ -32,25 +36,8 @@
         .activity-count {
             color: $text-color-lighter;
             position: relative;
-            top: 2px;
+            top: 4px;
             padding: 5px 0;
-        }
-    }
-    .forum-activity {
-        margin-bottom: 20px;
-        .MostActiveThread {
-            margin: 4px 0 13px;
-            .active-thread a {
-                color: #111;
-                font-weight: 500;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                display: block;
-                white-space: nowrap;
-            }
-            .User .user-display-name {
-                color: $text-color-light;
-            }
         }
     }
     .subscription-button-header {

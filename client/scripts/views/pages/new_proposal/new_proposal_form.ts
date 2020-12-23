@@ -142,7 +142,10 @@ const NewProposalForm = {
           ? app.chain.chain.coins(vnode.state.deposit, true)
           : (app.chain as Substrate).democracyProposals.minimumDeposit;
 
-        if (vnode.state.toggleValue === 'proposal') {
+        if (!EdgewareFunctionPicker.getMethod()) {
+          notifyError('Missing arguments');
+          return;
+        } else if (vnode.state.toggleValue === 'proposal') {
           const proposalHash = blake2AsHex(EdgewareFunctionPicker.getMethod().method.toHex());
           args = [author, EdgewareFunctionPicker.getMethod(), proposalHash, deposit];
           createFunc = ([au, mt, pr, dep]) => (app.chain as Substrate).democracyProposals.createTx(au, mt, pr, dep);
@@ -300,7 +303,7 @@ const NewProposalForm = {
     if (!dataLoaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
-          message: 'Chain connection timed out.',
+          message: 'Could not connect to chain',
           title: 'Proposals',
         });
       }
@@ -313,7 +316,6 @@ const NewProposalForm = {
     }
 
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
-
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
         m(Col, [

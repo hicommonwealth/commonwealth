@@ -35,7 +35,7 @@
             width: 100%;
         }
         input[type="text"][readonly] {
-            background: #f8f8f8;
+            background: $background-color-white-hover;
         }
         .buttons {
             margin: 14px 0 16px;
@@ -46,17 +46,17 @@
         }
         .explanation {
             display: block;
-            color: #aaa;
+            color: $text-color-light;
             padding-top: 30px;
         }
         .explanation p {
             margin: 10px 0;
         }
         .explanation a {
-            color: #aaa;
+            color: $text-color-light;
         }
         .explanation a:hover {
-            color: #555;
+            color: $text-color-medium;
         }
         .network-selector {
             margin-top: 12px;
@@ -83,7 +83,7 @@
 
     // stats page styles
     .disclaimer {
-        color: #aaa;
+        color: $text-color-light;
         margin-bottom: 24px;
     }
     .top-line-summary {
@@ -111,7 +111,7 @@
         min-height: 230px;
     }
     .charts .chart-loading {
-        color: #c0c0c0;
+        color: $text-color-medium;
         text-align: center;
         width: 100%;
         margin-top: 76px;
@@ -125,7 +125,7 @@
     .charts .gl-disclaimer {
         margin: 15px 0;
         text-align: center;
-        color: #999;
+        color: $text-color-light;
     }
     .lock-lookup-results {
         margin-top: 40px;

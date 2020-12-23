@@ -5,7 +5,7 @@
 
     .UserGallery {
         .User {
-            margin-top: 2px;
+            margin-top: 3px;
             margin-right: -16px;
         }
     }
@@ -22,7 +22,7 @@
             .icon-pin-outline {
                 display: block;
                 font-size: 15px;
-                color: #aaa;
+                color: $text-color-light;
             }
         }
         .title-container {
@@ -31,7 +31,7 @@
             align-self: center;
             .row-header,
             .row-header a {
-                color: $text-color-dark;
+                color: $text-color-black;
                 font-size: $text-size-item-header;
                 text-decoration: none;
                 font-weight: 500;
@@ -43,7 +43,7 @@
             .row-subheader + .row-subheader {
                 margin-top: 1px;
             }
-            .row-subheader a, > span {
+            .row-subheader > a, > span {
                 color: $text-color-light;
                 font-size: $text-size-item-meta;
             }
@@ -75,7 +75,7 @@
                     text-align: right;
                     font-size: $text-size-item-meta;
                     color: $text-color-light;
-                    padding-top: 2px;
+                    padding-top: 6px;
                     &.older {
                         min-width: 116px;
                     }

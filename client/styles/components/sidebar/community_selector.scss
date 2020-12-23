@@ -14,6 +14,13 @@
         border: none !important;
         border-radius: 0 !important;
     }
+    .title-selector .cui-button .cui-button-label {
+        top: 2px;
+        .community-name {
+            position: relative;
+            top: 1px;
+        }
+    }
     .title-selector .ChainIcon {
         position: relative;
         top: 2px;
@@ -49,7 +56,7 @@
         }
         h4 {
             margin: 20px 24px 10px;
-            color: #999;
+            color: $text-color-light;
             font-weight: 400;
             font-size: 16px;
         }
@@ -59,7 +66,7 @@
         .community-placeholder {
             margin: 0 24px;
             font-size: 16px;
-            color: #999;
+            color: $text-color-light;
         }
     }
     .cui-list-item {
@@ -69,7 +76,7 @@
         border: none;
         user-select: none;
         &.cui-selected {
-            color: #111;
+            color: $text-color-black;
         }
         &:hover {
             background: $background-color-light-hover;

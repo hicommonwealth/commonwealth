@@ -2,7 +2,7 @@
 
 @mixin profile-module {
     width: 100%;
-    background: #fff;
+    background: $text-color-white;
     border-radius: 2px;
     border: 1px solid $background-color-light;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
@@ -13,7 +13,7 @@
         margin: 32px 0 30px;
     }
     .no-items {
-        color: #aaa;
+        color: $text-color-light;
         margin-bottom: 20px;
     }
     .QuillFormattedText,
@@ -42,9 +42,6 @@
 
 @mixin comment-level {
     margin: 26px 0 32px;
-    .username {
-        color: $theme-base-color !important;
-    }
     .proposal-title {
         color: black !important;
         font-size: 17px;
@@ -55,7 +52,8 @@
         color: $text-color-light;
         margin-bottom: 6px;
     }
-    .activity {
+    .summary > .User > .username {
+        color: $theme-base-color !important;
     }
     .proposal {
         .proposal-body {
@@ -81,6 +79,7 @@
 }
 
 .ProfilePage {
+    padding-bottom: 50px;
     .error-message {
         @include error-text();
         margin-top: 20px;
@@ -99,10 +98,10 @@
             padding: 8px 0 0 0;
             margin-right: 18px;
             margin-bottom: 10px;
-            color: #a0a0a0;
+            color: $text-color-medium;
         }
         a.tab-entry.active {
-            color: #111;
+            color: $text-color-darker;
         }
     }
     @include sm-max {
@@ -132,10 +131,10 @@
     .header {
         font-size: inherit;
         font-weight: 500;
-        color: #111;
+        color: $text-color-darker;
     }
     .no-items {
-        color: #aaa;
+        color: $text-color-light;
         margin: 8px 0 20px;
     }
 }
@@ -187,6 +186,7 @@
 
     .bio-main {
         display: flex;
+        flex-wrap: wrap;
     }
     .bio-left {
         width: 94px;
@@ -196,8 +196,8 @@
             position: relative;
             margin-top: -28px;
             margin-bottom: 18px;
-            background-color: #f8f8f8;
-            border: 2px solid #fff;
+            background-color: $background-color-white-hover;
+            border: 2px solid $text-color-white;
             border-radius: 9999px;
             overflow: hidden;
             box-shadow: 0.5px 0.5px 4px rgba(0,0,0,0.15);
@@ -216,8 +216,20 @@
             font-size: 21px;
             font-weight: 500;
             .username {
-                color: #111;
+                color: $text-color-darker;
             }
+        }
+        .role-tag {
+            position: relative;
+            top: 0px;
+        }
+    }
+    .bio-actions-breakpoint {
+        display: none;
+        @include lg-max {
+            display: block;
+            flex-basis: 100%;
+            height: 0;
         }
     }
     .bio-actions {
@@ -228,8 +240,20 @@
             margin-top: 3px;
             margin-bottom: 3px;
         }
-        @include xs-max {
+        @include lg-max {
             text-align: left;
+            padding: 0;
+            margin: 8px 0 22px 0;
+            width: 100%;
+            a.btn, button {
+                margin: 0 10px 0 0;
+                width: calc(50% - 5px);
+                &:last-child {
+                    margin-right: 0;
+                }
+            }
+        }
+        @include xs-max {
             button {
                 margin: 4px 0;
                 width: 100%;
@@ -260,13 +284,13 @@
         }
         .no-verification {
             display: inline-block;
-            color: #888;
+            color: $text-color-medium;
         }
         .verification-icon {
             position: relative;
             top: 2px;
             display: inline-block;
-            background: #08c;
+            background: $theme-base-color;
             width: 16px;
             height: 16px;
             border-radius: 8px;
@@ -281,18 +305,18 @@
         .verification-icon.unverified {
             position: relative;
             top: 0;
-            color: #fff;
-            background: #a0a0a0;
+            color: $text-color-white;
+            background: $text-color-medium;
             position: relative;
             line-height: 1.1;
             padding-left: 4px;
             font-size: 95%;
         }
         .verification-icon.none {
-            background: #a0a0a0;
+            background: $text-color-medium;
         }
         .verification-icon.unverified {
-            background: #fdc360;
+            background: $intermediate-icon-color;
         }
     }
     .info-row {
@@ -350,6 +374,6 @@
         margin-top: 16px;
     }
     .placeholder {
-        color: #999;
+        color: $text-color-light;
     }
 }

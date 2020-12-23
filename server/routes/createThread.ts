@@ -3,7 +3,7 @@ import { NotificationCategories, ProposalType } from '../../shared/types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl } from '../../shared/utils';
+import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -60,6 +60,15 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     return next(new Error(Errors.UnsupportedKind));
   }
 
+  // Render a copy of the thread to plaintext for the search indexer
+  const plaintext = (() => {
+    try {
+      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
+    } catch (e) {
+      return decodeURIComponent(body);
+    }
+  })();
+
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
   const versionHistory = [];
@@ -70,6 +79,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     address_id: author.id,
     title,
     body,
+    plaintext,
     version_history: versionHistory,
     kind,
     url,
@@ -79,6 +89,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     address_id: author.id,
     title,
     body,
+    plaintext,
     version_history: versionHistory,
     kind,
     url,

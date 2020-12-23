@@ -19,7 +19,7 @@ const ErrorPage: m.Component<{ title?: string, message?: string }> = {
       m(EmptyState, {
         class: 'ErrorPage',
         icon: Icons.ALERT_TRIANGLE,
-        fill: false,
+        fill: true,
         header: 'Error',
         content: message || 'An error occurred while loading this page.'
       })

@@ -111,3 +111,12 @@ export const renderQuillDeltaToText = (delta, paragraphSeparator = '\n\n') => {
     }).filter((child) => !!child).join(' ').replace(/  +/g, ' '); // remove multiple spaces
   }).filter((parent) => !!parent).join(paragraphSeparator);
 };
+
+export function formatAddressShort(address: string, chain: string) {
+  if (!address) return;
+  if (chain === 'near') {
+    return `@${address}`;
+  } else {
+    return `${address.slice(0, 5)}…`;
+  }
+}
