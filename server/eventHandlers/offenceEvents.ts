@@ -11,23 +11,6 @@ export default class extends IEventHandler {
     super();
   }
 
-  /**
-    Event handler to store offence information of validators details in DB.
-    Sample Payload:
-                  {
-                    data: {
-                      kind: 'offences-offence',
-                      offenceKind: '0x696d2d6f6e6c696e653a6f66666c696e',
-                      opaqueTimeSlot: '0x07000000',
-                      applied: null,
-                      offenders: [
-                        'nYST5VF8q99P8P2xVUBH829YxfHUSUXN9cuCLNmyPuTbo74',
-                        ...
-                      ]
-                    },
-                    blockNumber: 800
-                  }
-  */
   public async handle(event: CWEvent < IChainEventData >, dbEvent) {
     // 1) if other event type ignore and do nothing.
     if (event.data.kind !== SubstrateTypes.EventKind.Offence) {

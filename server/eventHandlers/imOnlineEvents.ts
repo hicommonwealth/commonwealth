@@ -20,22 +20,7 @@ export default class extends IEventHandler {
   ) {
     super();
   }
-
-  /**
-    Event handler to store ImOnline information of validators details in DB.
-    Sample Payload:
-                    {
-                      data: {
-                        kind: 'all-good'/'some-offline',
-                        sessionIndex: Number,
-                        validators: [
-                          'nYST5VF8q99P8P2xVUBH829YxfHUSUXN9cuCLNmyPuTbo74',
-                          ...
-                        ]
-                      },
-                      blockNumber: 800
-                    }
-  */
+  
   public async handle(event: CWEvent < IChainEventData >, dbEvent) {
     // 1) if other event type ignore and do nothing.
     if (event.data.kind !== SubstrateTypes.EventKind.AllGood

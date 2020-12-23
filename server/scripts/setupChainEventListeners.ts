@@ -2,8 +2,12 @@ import WebSocket from 'ws';
 import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
-  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
+
+import { createApi, subscribeEvents } from '/home/myym/Desktop/Github/chain-events/src/substrate/subscribeFunc';
+
+
 import { Mainnet } from '@edgeware/node-types';
 
 import EventStorageHandler from '../eventHandlers/storage';
@@ -22,6 +26,7 @@ import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
 const log = factory.getLogger(formatFilename(__filename));
+
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
@@ -46,7 +51,7 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
 };
 
 const setupChainEventListeners = async (
-  models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean, archival?: boolean
+  models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean, archival?: boolean, startBlock?: number
 ): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
   log.info('Fetching node urls...');
   await sequelize.authenticate();
@@ -91,17 +96,19 @@ const setupChainEventListeners = async (
     const offenceHandler = new OffenceHandler(models, node.chain);
     const heartbeatHandler = new HeartbeatHandler(models, node.chain);
     const identityHandler = new IdentityHandler(models, node.chain);
-    const handlers: IEventHandler[] = [ storageHandler,
+    const handlers: IEventHandler[] = [ 
+      storageHandler,
       notificationHandler,
       entityArchivalHandler,
       newSessionHandler,
+      heartbeatHandler,
       rewardHandler,
       slashHandler,
+      offenceHandler,
       bondHandler,
       imOnlineHandler,
-      offenceHandler,
-      heartbeatHandler
     ];
+
     let subscriber: IEventSubscriber<any, any>;
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
       // only handle identities on substrate chains
@@ -112,11 +119,13 @@ const setupChainEventListeners = async (
         nodeUrl,
         node.chain.includes('edgeware') ? Mainnet : {},
       );
-      subscriber = await SubstrateEvents.subscribeEvents({
+
+      await subscribeEvents({
         chain: node.chain,
         handlers,
         skipCatchup,
         archival,
+        startBlock,
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
       });
@@ -138,7 +147,7 @@ const setupChainEventListeners = async (
       if (subscriber) {
         subscriber.unsubscribe();
       }
-    });
+    }); 
     return [ node.chain, subscriber ];
   }));
   return _.object<{ [chain: string]:  IEventSubscriber<any, any> }>(subscribers);
