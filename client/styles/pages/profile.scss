@@ -42,9 +42,6 @@
 
 @mixin comment-level {
     margin: 26px 0 32px;
-    .username {
-        color: $theme-base-color !important;
-    }
     .proposal-title {
         color: black !important;
         font-size: 17px;
@@ -55,7 +52,8 @@
         color: $text-color-light;
         margin-bottom: 6px;
     }
-    .activity {
+    .summary > .User > .username {
+        color: $theme-base-color !important;
     }
     .proposal {
         .proposal-body {

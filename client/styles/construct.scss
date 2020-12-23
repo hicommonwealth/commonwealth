@@ -468,6 +468,11 @@ button, .cui-button {
     z-index: 102;
 }
 
+// prevent overlay from breaking inline text
+.cui-overlay-inline {
+    display: inline-block;
+}
+
 // dialog headers
 .cui-dialog-header {
     padding: 15px 15px 15px 25px;
