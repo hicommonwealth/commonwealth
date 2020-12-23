@@ -25,7 +25,7 @@
         }
         .User .user-avatar {
             position: relative;
-            top: 2px;
+            top: 4px;
         }
         .username, .activity-count {
             font-weight: 500;
@@ -33,7 +33,7 @@
         .activity-count {
             color: $text-color-lighter;
             position: relative;
-            top: 2px;
+            top: 4px;
             padding: 5px 0;
         }
     }

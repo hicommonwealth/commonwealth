@@ -28,7 +28,6 @@ const SubscriptionButton: m.Component<{}> = {
             });
           }
         },
-        size: 'sm',
         fluid: true,
         label: communitySubscription ? 'Notifications on' : 'Notifications off',
         intent: communitySubscription ? 'primary' : 'none',
