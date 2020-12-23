@@ -27,7 +27,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, List } from 'construct-ui';
+import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, List, Icon, Icons } from 'construct-ui';
 import { notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'shared/utils';
 
@@ -331,7 +331,7 @@ export const ProposalEditorPermissions: m.Component<{
   },
   view: (vnode) => {
     const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
-    console.log('viewing');
+    console.log(popoverMenu);
     if (!vnode.state.items?.length) return;
     if (!vnode.state.addedEditors) {
       vnode.state.addedEditors = [];
@@ -348,37 +348,46 @@ export const ProposalEditorPermissions: m.Component<{
         items,
         itemRender: (role: any, idx: number) => {
           const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
+          const selected: boolean = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
           return m(ListItem, {
-            label: m(User, { user }),
-            selected: !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]),
+            label: [
+              selected
+              && m(Icon, { name: Icons.CHECK }),
+              m(User, { user })
+            ],
+            selected,
             key: role.Address.address
           });
         },
-        itemListPredicate: (q, i) => {
-          const itemPredicate = (query, item) => {
-            const address = (item as any).Address;
-            return address.name
-              ? address.name.toLowerCase().includes(q.toLowerCase())
-              : address.address.toLowerCase().includes(q.toLowerCase());
-          };
+        // itemListPredicate: (q, i) => {
+        //   const itemPredicate = (query, item) => {
+        //     const address = (item as any).Address;
+        //     return address.name
+        //       ? address.name.toLowerCase().includes(query.toLowerCase())
+        //       : address.address.toLowerCase().includes(query.toLowerCase());
+        //   };
 
-          const allRoles = i.map((item) => itemPredicate(q, item));
-          const namedRoles = [];
-          const unnamedRoles = allRoles.map((role) => {
-            if ((role as any).Address.name) {
-              namedRoles.push(role);
-            } else {
-              return role;
-            }
-          });
-          return namedRoles.concat(unnamedRoles);
-        },
-        // itemPredicate: (query, item, idx) => {
-        //   const address = (item as any).Address;
-        //   return address.name
-        //     ? address.name.toLowerCase().includes(query.toLowerCase())
-        //     : address.address.toLowerCase().includes(query.toLowerCase());
+        //   const allRoles = i.filter((item) => itemPredicate(q, item));
+        //   const namedRoles = [];
+        //   const unnamedRoles = allRoles.map((role) => {
+        //     if (!(role as any)?.Address) {
+        //       console.log(role);
+        //     }
+        //     if ((role as any).Address.name) {
+        //       namedRoles.push(role);
+        //     } else {
+        //       return role;
+        //     }
+        //   });
+        //   console.log(namedRoles.concat(unnamedRoles));
+        //   return namedRoles.concat(unnamedRoles).slice(0, 10);
         // },
+        itemPredicate: (query, item, idx) => {
+          const address = (item as any).Address;
+          return address.name
+            ? address.name.toLowerCase().includes(query.toLowerCase())
+            : address.address.toLowerCase().includes(query.toLowerCase());
+        },
         onSelect: (item) => {
           const addrItem = (item as any).Address;
           vnode.state.addedEditors[addrItem.address] = addrItem;
@@ -386,17 +395,18 @@ export const ProposalEditorPermissions: m.Component<{
         }
       }),
       hasBackdrop: true,
-      isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
+      isOpen: vnode.attrs.popoverMenu
+        ? true
+        : vnode.state.isOpen,
       inline: false,
-      // onClose: () => {
-      //   // TODO: Assess onClose + openStateHandler role
-      //   if (vnode.attrs.popoverMenu) {
-      //     debugger
-      //     vnode.attrs.openStateHandler(false);
-      //   } else {
-      //     vnode.state.isOpen = false;
-      //   }
-      // },
+      onClose: () => {
+        if (vnode.attrs.popoverMenu) {
+          vnode.attrs.openStateHandler(false);
+          m.redraw();
+        } else {
+          vnode.state.isOpen = false;
+        }
+      },
       title: 'Add editor permissions',
       transitionDuration: 200,
       footer: m(`.${Classes.ALIGN_RIGHT}`, [
@@ -405,6 +415,7 @@ export const ProposalEditorPermissions: m.Component<{
           onclick: () => {
             if (vnode.attrs.popoverMenu) {
               vnode.attrs.openStateHandler(false);
+              m.redraw();
             } else {
               vnode.state.isOpen = false;
             }
@@ -433,6 +444,7 @@ export const ProposalEditorPermissions: m.Component<{
             }
             if (vnode.attrs.popoverMenu) {
               vnode.attrs.openStateHandler(false);
+              m.redraw();
             } else {
               vnode.state.isOpen = false;
             }

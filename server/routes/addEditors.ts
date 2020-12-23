@@ -112,6 +112,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       );
     }));
 
+    // TODO: Examine returned result for relevance
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
     return next(new Error(e));

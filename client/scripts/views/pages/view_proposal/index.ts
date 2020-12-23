@@ -146,8 +146,9 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             vnode.state.editPermissionsIsOpen && proposal instanceof OffchainThread && m(ProposalEditorPermissions, {
               thread: vnode.attrs.proposal as OffchainThread,
               popoverMenu: true,
+              openStateHandler: (v) => { vnode.state.editPermissionsIsOpen = v; console.log('topic ' + v); m.redraw(); },
+              // TODO: Onchange logic
               onChangeHandler: () => {},
-              openStateHandler: () => {},
             }),
             vnode.state.topicEditorIsOpen && proposal instanceof OffchainThread && m(TopicEditor, {
               thread: vnode.attrs.proposal as OffchainThread,
