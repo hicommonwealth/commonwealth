@@ -56,7 +56,7 @@
             color: $text-color-light;
         }
         .explanation a:hover {
-            color: #555;
+            color: $text-color-medium;
         }
         .network-selector {
             margin-top: 12px;
@@ -111,7 +111,7 @@
         min-height: 230px;
     }
     .charts .chart-loading {
-        color: #c0c0c0;
+        color: $text-color-medium;
         text-align: center;
         width: 100%;
         margin-top: 76px;

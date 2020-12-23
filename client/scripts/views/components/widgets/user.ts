@@ -117,8 +117,8 @@ const User: m.Component<{
                 profile
                   ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:',
-                profile ? profile.name : addrShort)
-              : m('a.user-display-name.username', profile ? profile.name : addrShort)
+                profile ? profile.displayName : addrShort)
+              : m('a.user-display-name.username', profile ? profile.displayName : addrShort)
           ],
         getRoleTags(false),
       ]);
@@ -137,12 +137,11 @@ const User: m.Component<{
       m('.user-name', [
         (app.chain && app.chain.base === ChainBase.Substrate && app.cachedIdentityWidget)
           ? m(app.cachedIdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort })
-          : link(`a.user-display-name${
-            (profile && profile.name !== 'Anonymous') ? '.username' : '.anonymous'}`,
+          : link('a.user-display-name',
           profile
             ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
             : 'javascript:',
-          profile ? profile.name : addrShort)
+          profile ? profile.displayName : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
       m('.user-chain', [

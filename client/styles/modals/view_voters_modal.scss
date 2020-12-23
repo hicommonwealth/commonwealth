@@ -42,7 +42,7 @@
 
     // link styling
     text-decoration: none;
-    color: #111;
+    color: $text-color-black;
     @include hoverFloat;
 
     .proposal-pre {
@@ -108,7 +108,7 @@
             word-break: break-word;
             line-height: 1.2;
             text-overflow: ellipsis;
-            color: #text-color-lightest;
+            color: $text-color-lightest;
         }
 
         .proposal-row-metadata {
@@ -120,18 +120,18 @@
 
             .proposal-user {
                 margin-top: 4px;
-                color: #text-color-lightest;
+                color: $text-color-lightest;
                 .username {
-                    color: #text-color-lightest;
+                    color: $text-color-lightest;
                     font-weight: 400;
                 }
             }
             .proposal-user-mobile {
                 display: none;
-                color: #text-color-lightest;
+                color: $text-color-lightest;
                 .user-display-name username {
                     position: relative;
-                    color: #text-color-lightest;
+                    color: $text-color-lightest;
                     font-weight: 400;
                     top: 2px;
                 }

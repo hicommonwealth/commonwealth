@@ -258,7 +258,7 @@
                     background: $primary-bg-color !important;
                     color: $text-color-white;
                     .cui-icon svg {
-                        stroke: #fff;
+                        stroke: $text-color-white;
                     }
                     .proposal-topic-icon {
                         border-color: $text-color-white;

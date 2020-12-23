@@ -7,10 +7,10 @@
         font-weight: 500;
     }
     .error-message {
-        color: #d32e26;
+        color: $negative-text-color;
     }
     .success-message {
-        color: green;
+        color: $positive-text-color;
     }
 
     // shared styles
@@ -66,7 +66,7 @@
             color: $text-color-light;
         }
         .explanation a:hover {
-            color: #555;
+            color: $text-color-medium;
         }
         .network-selector {
             margin-top: 12px;

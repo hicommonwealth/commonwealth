@@ -227,7 +227,7 @@ $discussion-title-font-size: 1.45rem;
     .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
         stroke: $text-color-light;
         &:hover {
-            stroke: #777;
+            stroke: $text-color-medium;
         }
     }
     .ProposalBodyReaction {
