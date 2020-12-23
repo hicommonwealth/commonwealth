@@ -139,11 +139,14 @@
     }
     .ChainIcon, .CommunityIcon {
         cursor: pointer;
-        margin-bottom: 11px;
         opacity: 0.3;
+        height: 50px;
         &:hover {
             opacity: 0.33;
         }
+    }
+    .cui-overlay-inline {
+        display: block;
     }
     .quick-switcher-option.active {
         .ChainIcon, .CommunityIcon {
@@ -154,7 +157,7 @@
 
 .SidebarQuickSwitcherItemTooltip.cui-popover {
     .cui-popover-content {
-        padding: 8px 16px;
+        padding: 11px 16px 4px;
         white-space: nowrap;
     }
 }
