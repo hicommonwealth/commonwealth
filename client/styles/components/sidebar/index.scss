@@ -11,6 +11,9 @@
         &.logged-in {
             max-width: calc(100% - 242px);
         }
+        &.logged-in.no-community {
+            max-width: calc(100% - 142px);
+        }
     }
     .mobile-sidebar-left {
         padding-left: 6px !important;

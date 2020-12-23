@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, ButtonGroup, List, ListItem, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
+  Button, List, ListItem, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
 } from 'construct-ui';
 
 import { selectNode, initChain } from 'app';
@@ -489,7 +489,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           app.isLoggedIn() && m(MobileNewProposalButton),
         ]),
         m('.mobile-sidebar-center', {
-          class: app.isLoggedIn() ? 'logged-in' : '',
+          class: `${app.isLoggedIn() ? 'logged-in' : ''} ${((app.chain || app.community) && !app.chainPreloading) ? '' : 'no-community'}`,
         }, [
           m('.community-label', m(CommunitySelector)),
         ]),

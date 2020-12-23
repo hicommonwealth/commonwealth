@@ -4,7 +4,7 @@
     max-width: 900px;
     margin: 0 auto 80px;
     @include sm-max {
-        margin-top: 30px;
+        padding-top: 30px;
     }
     h1 {
         font-size: 33px;
