@@ -49,7 +49,7 @@ export async function createApi(
  * @returns An active block subscriber.
  */
 export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions<ApiPromise>> = async (options) => {
-  const { chain, api, handlers, skipCatchup, archival, discoverReconnectRange, verbose } = options;
+  const { chain, api, handlers, skipCatchup, archival, startBlock, discoverReconnectRange, verbose } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>) => {
     let prevResult = null;
@@ -104,23 +104,12 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
       offlineRange = { startBlock: lastBlockNumber };
     }
 
-    // if we can't figure out when the last block we saw was,
-    // and we are not running in archival mode, do nothing
-    // (i.e. don't try and fetch all events from block 0 onward)
-    if(!offlineRange || !offlineRange.startBlock){
-      if(archival){
-        offlineRange = {startBlock: 0}
-      }
-      else{
-        log.warn('Unable to determine offline time range.');
-        return;
-      }
-    }
     
     // if running in archival mode then run poller.archive with 
     // batch_size 10 
+    // startBlock 0 if none pased else from startBlock
     if(archival){
-      offlineRange.startBlock = 3139800 // start from last upgrade
+      offlineRange = {startBlock : startBlock? startBlock: 0 };
       log.info(`Executing in archival mode, polling blocks starting from: ${offlineRange.startBlock}`);
       await poller.archive(offlineRange,10,processBlockFn);
     }
