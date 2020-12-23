@@ -28,7 +28,7 @@
     }
     &.has-notifications {
         background: $negative-bg-color !important;
-        color: #fff !important;
+        color: $text-color-white !important;
         padding: 0 7px !important;
         .cui-icon {
             display: none;
@@ -62,7 +62,7 @@
     }
     .notification-list {
         height: 480px;
-        background: #fff;
+        background: $background-color-white;
         width: 340px;
         @include xs-max {
             width: calc(100vw - 20px);
@@ -88,7 +88,7 @@
         list-style: none;
         text-align: center;
         padding-top: 230px;
-        color: #111;
+        color: $text-color-black;
         font-weight: 500;
     }
     .NotificationsTypeSelectorButtons,
@@ -98,7 +98,7 @@
             border-radius: 0 !important;
             .cui-button-label {
                 text-align: center;
-                color: #333;
+                color: $text-color-darker;
             }
             &:after {
                 // suppress button group styling

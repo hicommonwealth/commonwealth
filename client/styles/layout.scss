@@ -15,7 +15,7 @@ html {
     line-height: 1.3;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    background: #fff;
+    background: $background-color-white;
     overflow-y: scroll;
 }
 body {
@@ -71,21 +71,21 @@ a:visited {
     color: lighten($theme-accent-dark, 4%);
 }
 code, pre {
-    font-family: SF Mono, Menlo, Monaco, monospace;
+    font-family: $monospace-fonts;
     font-size: 13.5px;
-    background: #f2f3f4;
+    background: $background-color-white-hover;
     border-radius: 4px;
 }
 code {
     padding: 1px 3px;
-    color: #d72323;
+    color: $negative-text-color;
 }
 pre {
     padding: 10px 12px;
 }
 ::selection {
-    color: #fff;
-    background: #444;
+    color: $text-color-white;
+    background: $background-color-dark-accent;
 }
 
 // shared styles

@@ -22,7 +22,7 @@
             .icon-pin-outline {
                 display: block;
                 font-size: 15px;
-                color: #aaa;
+                color: $text-color-light;
             }
         }
         .title-container {
@@ -31,7 +31,7 @@
             align-self: center;
             .row-header,
             .row-header a {
-                color: $text-color-dark;
+                color: $text-color-black;
                 font-size: $text-size-item-header;
                 text-decoration: none;
                 font-weight: 500;

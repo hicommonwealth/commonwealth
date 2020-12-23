@@ -37,6 +37,8 @@
     }
 }
 
-.cui-popover.cui-tooltip.ReactionButtonTooltip .cui-popover-content .reaction-button-tooltip {
-    // TODO
+.cui-popover.cui-tooltip.ReactionButtonTooltip {
+    .cui-popover-content .reaction-button-tooltip {
+        padding: 7px 8px 2px;
+    }
 }

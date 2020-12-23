@@ -21,14 +21,14 @@
                 }
                 .QuillFormattedText, .MarkdownFormattedText {
                     flex: 5;
-                    color: #4c4c4c;
+                    color: $text-color-darker;
                     .deleted {
-                        background: #e8cccc !important;
-                        color: #d32e26 !important;
+                        background: $negative-text-background !important;
+                        color: $positive-text-background !important;
                     }
                     .added {
-                        background: #cce8cc !important;
-                        color: #41a360 !important;
+                        background: $positive-text-background !important;
+                        color: $positive-text-color !important;
                     }
                 }
             }

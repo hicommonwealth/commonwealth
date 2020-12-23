@@ -6,19 +6,19 @@
         margin-bottom: 3px;
     }
     .proposal-status {
-        color: #999;
+        color: $text-color-light;
         font-weight: 500;
         &.pass {
-            color: #06983a;
+            color: $positive-text-color;
         }
         &.fail {
-            color: #d0021b;
+            color: $negative-text-color;
         }
     }
     .proposal-comments {
         display: inline-block;
         font-weight: 500;
-        color: #999;
+        color: $text-color-light;
     }
 }
 
@@ -48,7 +48,7 @@
     }
     h4.proposals-subheader {
         text-transform: uppercase;
-        color: #999;
+        color: $text-color-light;
         letter-spacing: 0.4px;
         margin-top: 26px;
         font-weight: 500;
@@ -56,10 +56,10 @@
     a.proposals-action {
         float: right;
         margin-left: 10px;
-        color: #999;
+        color: $text-color-light;
         cursor: pointer;
         &:hover {
-            color: #555;
+            color: $text-color-medium-dark;
         }
         @include xs-max {
             float: none;
@@ -89,7 +89,7 @@
 
     // link styling
     text-decoration: none;
-    color: #111;
+    color: $text-color-black;
     @include hoverFloat;
 
     .proposal-pre {
@@ -166,7 +166,7 @@
             word-break: break-word;
             line-height: 1.2;
             text-overflow: ellipsis;
-            color: #bdbdbd;
+            color: $text-color-lightest;
         }
 
         .proposal-row-metadata {
