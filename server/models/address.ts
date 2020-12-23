@@ -284,6 +284,10 @@ export default (
   Address.associate = (models) => {
     models.Address.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
     models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
+    models.Address.belongsToMany(models.OffchainThread, {
+      through: 'editor_permissions',
+      as: 'threads'
+    });
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
   };

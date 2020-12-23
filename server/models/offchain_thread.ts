@@ -3,7 +3,6 @@ import * as Sequelize from 'sequelize';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
-import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 
 export interface OffchainThreadAttributes {
@@ -87,6 +86,10 @@ export default (
       as: 'read_only_roles',
       foreignKey: 'thread_id',
       otherKey: 'id',
+    });
+    models.OffchainThread.belongsToMany(models.Address, {
+      through: 'sharing_permissions',
+      as: 'editors'
     });
   };
 
