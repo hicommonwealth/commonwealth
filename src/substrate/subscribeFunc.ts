@@ -118,10 +118,11 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
     }
     
     // if running in archival mode then run poller.archive with 
-    // batch_size 500 
+    // batch_size 10 
     if(archival){
+      offlineRange.startBlock = 3139800 // start from last upgrade
       log.info(`Executing in archival mode, polling blocks starting from: ${offlineRange.startBlock}`);
-      await poller.archive(offlineRange,500,processBlockFn);
+      await poller.archive(offlineRange,10,processBlockFn);
     }
     // else just run poller normally
     else {

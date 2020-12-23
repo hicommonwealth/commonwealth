@@ -36,6 +36,11 @@ export async function Enrich(
     includeAddresses?: string[],
     excludeAddresses?: string[],
   }> => {
+
+    // get the hash of current block number
+    const hash = await api.rpc.chain.getBlockHash(blockNumber);
+    const sessionIndex = await api.query.session.currentIndex.at(hash);
+
     switch (kind) {
       /**
        * ImOnline Events
@@ -52,7 +57,7 @@ export async function Enrich(
       
       case EventKind.SomeOffline: {
         const [ validators ] = event.data as unknown as [ Vec<IdentificationTuple> ];
-        const sessionIndex = await api.query.session.currentIndex();
+        
         return {
           data: {
             kind,
@@ -62,13 +67,12 @@ export async function Enrich(
         }
       }
       case EventKind.AllGood: {
-        const validators = await api.derive.staking.validators();
-        const sessionIndex = await api.query.session.currentIndex();
+        const validators = await api.query.session.validators.at(hash);
         return {
           data: {
             kind,
             sessionIndex: +sessionIndex - 1,
-            validators: validators.validators?.map((v) => v.toString()),
+            validators: validators?.map((v) => v.toString()),
           }
         }
       }
@@ -109,21 +113,17 @@ export async function Enrich(
        * Session Events
        */
       case EventKind.NewSession: {
-        const [sessionIndex] = event.data as unknown as [SessionIndex] & Codec
-        // get the hash of current block number
-        const hash = await api.rpc.chain.getBlockHash(blockNumber);
 
         const validators = await api.query.session.validators.at(hash);
-
         // get the era of block
         const rawCurrentEra = await api.query.staking.currentEra.at(hash);
         const currentEra = rawCurrentEra.toRawType() === 'u32' ? rawCurrentEra.toString() as unknown as EraIndex: rawCurrentEra.unwrap();
 
-
+        
         // get the nextElected Validators
         const keys = api.query.staking.erasStakers ? 
           await api.query.staking.erasStakers.keysAt(hash,currentEra) :
-          await api.query.staking.stakers.keys() ; //this is wrong as it returns the data for latest header
+          await api.query.staking.stakers.keysAt(hash, currentEra) ; 
         const nextElected = keys.length ? keys.map((key) => key.args[1] as AccountId): validators;
         
 
@@ -137,9 +137,12 @@ export async function Enrich(
 
         for(let i = 0 ;i<validators.length;i++){
           const key = validators[i].toString();
-          // to do remove await use promise resolve
+
+
+          // eraValidatorPrefs does not return comission prior to 3139800
           const preference = api.query.staking.erasValidatorPrefs ? 
             await api.query.staking.erasValidatorPrefs.at(hash, currentEra,key) :
+            // staking.validators cant pull data prior to 3139200
             await api.query.staking.validators.at(hash, key);
 
           const commissionPer =  (Number)(preference.commission || new BN(0)) / 10_000_000;
@@ -155,7 +158,7 @@ export async function Enrich(
             // nextSessionKeysOpt = await api.query.session.queuedKeys(hash,key);
           }
           catch(e){
-            // for new blocks
+            // for new blocks after 3139200
             nextSessionKeysOpt = await api.query.session.nextKeys.at(hash,key);
           }
           const nextSessionKeys = nextSessionKeysOpt.isSome? nextSessionKeysOpt.unwrap(): []
@@ -244,7 +247,8 @@ export async function Enrich(
       case EventKind.Bonded:
       case EventKind.Unbonded: {
         const [ stash, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
-        const controllerOpt = await api.query.staking.bonded<Option<AccountId>>(stash);
+        const hash = await api.rpc.chain.getBlockHash(blockNumber);
+        const controllerOpt = await api.query.staking.bonded.at<Option<AccountId>>(hash,stash);
         if (!controllerOpt.isSome) {
           throw new Error(`could not fetch staking controller for ${stash.toString()}`);
         }

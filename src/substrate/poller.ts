@@ -46,7 +46,7 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
     // fetch blocks from start to end
     const blockNumbers = [ ...Array(range.endBlock - range.startBlock).keys()]
       .map((i) => range.startBlock + i);
-    log.debug(`Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`);
+    log.info(`Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`);
 
     // the hashes are pruned when using api.query.system.blockHash.multi
     // therefore fetching hashes from chain. the downside is that for every
