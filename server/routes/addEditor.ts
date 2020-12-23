@@ -17,8 +17,6 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
-  // TODO: Add member verification logic (InvalidEditor)
-
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
   }
@@ -35,6 +33,25 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     });
     if (!thread) return next(new Error('No thread with that id found'));
     // Editor attachment logic
+    const collaborators = [];
+
+    // Ensure collaborators have community permissions
+    if (collaborators?.length > 0) {
+      await Promise.all(collaborators.map(async (collaborator) => {
+        if (community) {
+          const isMember = collaborator.Roles
+            .find((role) => role.offchain_community_id === community.id);
+          if (!isMember) return next(new Error(Errors.InvalidEditor));
+        } else if (chain) {
+          const isMember = collaborator.Roles
+            .find((role) => role.chain_id === chain.id);
+          if (!isMember) return next(new Error(Errors.InvalidEditor));
+        }
+        thread.addCollaborator(collaborator);
+        collaborator.addCollaboration(thread);
+      }));
+    }
+
     await thread.save();
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
@@ -61,6 +78,38 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     //   req.wss,
     //   [ finalThread.Address.address ],
     // );
+
+    if (collaborators?.length > 0) await Promise.all(collaborators.map(async (collaborator) => {
+      if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
+
+      await models.Subscription.emitNotifications(
+        models,
+        NotificationCategories.NewMention,
+        `user-${collaborator.User.id}`,
+        {
+          created_at: new Date(),
+          root_id: Number(finalThread.id),
+          root_type: ProposalType.OffchainThread,
+          root_title: finalThread.title,
+          comment_text: finalThread.body,
+          chain_id: finalThread.chain,
+          community_id: finalThread.community,
+          author_address: finalThread.Address.address,
+          author_chain: finalThread.Address.chain,
+        },
+        {
+          user: finalThread.Address.address,
+          url: getProposalUrl('discussion', finalThread),
+          title: req.body.title,
+          bodyUrl: req.body.url,
+          chain: finalThread.chain,
+          community: finalThread.community,
+          body: finalThread.body,
+        },
+        req.wss,
+        [ finalThread.Address.address ],
+      );
+    }));
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
