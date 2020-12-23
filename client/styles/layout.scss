@@ -18,6 +18,9 @@ html {
     background: #fff;
     overflow-y: scroll;
 }
+body {
+    overscroll-behavior-y: none;
+}
 .mithril-app {
     height: 100%;
     width: 100%;
@@ -52,10 +55,10 @@ html {
 
 // global css
 h1, h2, h3, h4, h5, h6 {
-    font-weight: 600;
+    font-weight: 500;
 }
 strong {
-    font-weight: 600;
+    font-weight: 500;
 }
 a {
     color: $theme-accent-dark;
