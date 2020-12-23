@@ -12,6 +12,8 @@
     @include sm-max {
         .cui-button-label {
             overflow: visible;
+        }
+        &.has-notifications .cui-button-label {
             position: relative;
             top: -2px !important;
         }
@@ -21,7 +23,7 @@
         position: relative;
         top: -1px;
         @include sm-max {
-            top: 1px;
+            top: 0px;
         }
     }
     &.has-notifications {

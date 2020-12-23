@@ -52,11 +52,21 @@
         > .cui-button .cui-button-label {
             display: inline-block;
             position: relative;
-            top: 2px;
+            top: 1px;
+        }
+        @include xs-max {
+            .MobileNewProposalButton .cui-button {
+                .cui-button-label {
+                    top: 0 !important;
+                }
+            }
         }
         @include sm-max {
             .MobileNewProposalButton .cui-button {
                 padding: 0 12px;
+                .cui-button-label {
+                    top: 2px;
+                }
             }
             .cui-button.mobile-sidebar-trigger {
                 padding-left: 12px;
@@ -79,6 +89,9 @@
                     margin-right: 0;
                 }
                 .user-display-name {
+                    display: none;
+                }
+                .role-icon {
                     display: none;
                 }
                 .LoginSelectorMenu .user-display-name {
