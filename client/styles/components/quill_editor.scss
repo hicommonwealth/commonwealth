@@ -13,6 +13,7 @@
 // 7. preview button
 // 8. mentions container
 // 9. progress bar
+// 10. markdown/rich text switcher tooltip
 //
 
 .QuillEditor {
@@ -319,4 +320,11 @@
     height: 3px;
     width: 80%;
     background-color: red;
+}
+
+// 10. markdown/rich text switcher tooltip
+.quill-editor-tooltip {
+    position: relative;
+    top: 3px;
+    line-height: 1;
 }
