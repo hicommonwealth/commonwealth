@@ -26,21 +26,19 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
     const lastUpdated = app.comments.lastCommented(proposal) || proposal.createdAt;
-
+    const pinned = proposal.pinned;
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
-    const rowHeader = (propType === OffchainThreadKind.Link && proposal.url)
-      ? externalLink('a.external-discussion-link', proposal.url, [
-        m(Tag, {
-          size: 'xs',
-          label: [ extractDomain(proposal.url), m(Icon, { name: Icons.EXTERNAL_LINK }) ]
-        }),
-        proposal.title,
-      ])
-      : link('a', discussionLink, proposal.title);
-
-    const pinned = proposal.pinned;
+    const rowHeader = [
+      (propType === OffchainThreadKind.Link && proposal.url)
+        && externalLink('a.external-discussion-link', proposal.url, [
+          extractDomain(proposal.url),
+        ]),
+      (propType === OffchainThreadKind.Link && proposal.url)
+        && m('span.spacer', ' '),
+      link('a', discussionLink, proposal.title),
+    ];
     const rowSubheader = [
       proposal.readOnly && m('.discussion-locked', [
         m(Tag, {
@@ -119,6 +117,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       rightColSpacing: app.isLoggedIn() ?  [4, 4, 3, 1] : [4, 4, 4],
       onclick: (e) => {
         if ($(e.target).hasClass('cui-tag')) return;
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
         e.preventDefault();
         localStorage[`${app.activeId()}-discussions-scrollY`] = window.scrollY;
         updateRoute(discussionLink);

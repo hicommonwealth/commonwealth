@@ -53,11 +53,11 @@ const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAtt
     }
 
     if (displayName && quality && !hideIdentityIcon) {
-      const name = [ displayName, m(`span.identity-icon${
-        quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
-      }${quality === IdentityQuality.Good
+      const name = [ displayName, m(`span.identity-icon${quality === IdentityQuality.Good
         ? '.green' : quality === IdentityQuality.Bad
-          ? '.red' : '.gray'}`) ];
+          ? '.red' : '.gray'}`, [
+        quality === IdentityQuality.Good ? '✓' : quality === IdentityQuality.Bad ? '✗' : '-'
+      ]) ];
 
       return linkify
         ? link(
@@ -84,11 +84,11 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
     const quality = profile?.isOnchain && profile?.name && getIdentityQuality(Object.values(profile.judgements));
 
     if (profile?.isOnchain && profile?.name && quality && !hideIdentityIcon) {
-      const name = [ profile.displayName, m(`span.identity-icon${
-        quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
-      }${quality === IdentityQuality.Good
+      const name = [ profile.name, m(`span.identity-icon${quality === IdentityQuality.Good
         ? '.green' : quality === IdentityQuality.Bad
-          ? '.red' : '.gray'}`) ];
+          ? '.red' : '.gray'}`, [
+        quality === IdentityQuality.Good ? '✓' : quality === IdentityQuality.Bad ? '✗' : '-'
+      ]) ];
 
       return linkify
         ? link(
