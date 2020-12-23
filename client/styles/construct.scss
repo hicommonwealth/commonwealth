@@ -5,16 +5,16 @@
 // text sizing and typography
 //
 
-$cui-base-size: 12.75px;
+$cui-base-size: 13px;
 $cui-spacer: $cui-base-size * 1.5;
 
-$cui-font-family:           Arial, "Helvetica Neue", Helvetica, sans-serif;
-$cui-font-family-monospace: monospace;
+$cui-font-family:           $fonts;
+$cui-font-family-monospace: $monospace-fonts;
 
 $cui-font-weight-light:           300;
 $cui-font-weight-normal:          400;
 $cui-font-weight-bold:            500;
-$cui-font-weight-heavy:           600; // this is only used in overrides
+$cui-font-weight-heavy:           500; // this is only used in overrides
 $cui-font-weight: $cui-font-weight-normal;
 
 $cui-line-height: 1.5;
@@ -74,13 +74,13 @@ $cui-text-disabled:            $grey200;
 // component styling
 //
 
-$cui-base-height-multiplier: 1;
+$cui-base-height-multiplier: 1.2;
 
-$cui-base-height-xs:  floor($cui-base-size * 2.25);
-$cui-base-height-sm:  floor($cui-base-size * 2.5);
-$cui-base-height:     floor($cui-base-size * 2.9);
-$cui-base-height-lg:  floor($cui-base-size * 3.3);
-$cui-base-height-xl:  floor($cui-base-size * 3.75);
+$cui-base-height-xs:  floor($cui-base-size * 1.9);
+$cui-base-height-sm:  floor($cui-base-size * 2.2);
+$cui-base-height:     floor($cui-base-size * 2.6);
+$cui-base-height-lg:  floor($cui-base-size * 2.8);
+$cui-base-height-xl:  floor($cui-base-size * 3.3);
 
 //
 // component colors
@@ -138,11 +138,27 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
 //
 // construct theme overrides
 //
+.cui-button {
+    font-size: inherit;
+}
+.cui-button .cui-button-sublabel,
+.cui-button .cui-button-label {
+    position: relative;
+    top: 3px;
+    overflow: visible;
+}
+.cui-button.cui-xl .cui-button-sublabel,
+.cui-button.cui-xl .cui-button-label {
+    top: 4px;
+}
+
 
 .cui-button {
     font-weight: $cui-font-weight-bold !important; // fix weight
 }
 .cui-form .cui-form-label {
+    font-size: $cui-font-size * 0.9;
+    margin-bottom: 8px;
     font-weight: $cui-font-weight-bold; // fix weight
 }
 .cui-empty-state .cui-empty-state-header {
@@ -177,6 +193,45 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
     box-sizing: border-box; // fix switch sizing
 }
 
+// cui list items
+.cui-list .cui-list-item {
+    padding: 13px 13px 6.5px !important;
+    .cui-list-item-content-left,
+    .cui-list-item-content-right {
+        position: relative;
+        top: -2px;
+    }
+}
+
+// cui table items
+.cui-table th,
+.cui-table td {
+    padding: 13px 13px 6.5px !important;
+}
+
+// cui toast
+.cui-toast .cui-toast-message {
+    position: relative;
+    top: 3px;
+}
+
+// cui tabs
+.cui-tabs .cui-tabs-item {
+    padding-top: 13px !important;
+    padding-bottom: 7px !important;
+    margin: 0 15px !important;
+    .cui-icon {
+        position: relative;
+        top: -2px;
+    }
+}
+
+// cui control padding
+.cui-control {
+    min-height: 1.5em;
+    line-height: 1.5em;
+}
+
 // button link fixes
 button, .cui-button {
     a:hover {
@@ -186,13 +241,6 @@ button, .cui-button {
 
 // button color fixes
 .cui-button {
-    // adjust label position on xl buttons
-    &.cui-xl .cui-button-label,
-    &.cui-xl .cui-button-sublabel {
-        position: relative;
-        top: -1px;
-    }
-
     // adjust sublabel colors to grey from blue grey
     .cui-button-sublabel {
         color: $grey400;
@@ -206,11 +254,11 @@ button, .cui-button {
     &.cui-basic,
     .cui-button-group.cui-basic & {
         &:hover {
-            background: #f4f4f5;
+            background: $background-color-white-hover;
             color: $cui-base-text-color;
         }
         &:active, &.cui-active {
-            background: #EAEAEC;
+            background: $background-color-light;
             color: $cui-base-text-color;
         }
     }
@@ -220,13 +268,22 @@ button, .cui-button {
 .cui-button.cui-primary,
 .cui-button-group.cui-primary .cui-button {
     a {
-        color: #fff;
+        color: $text-color-white;
     }
 }
 
-// reduce callout spacing
+// adjust callout padding, colors, spacing
 .cui-callout {
     line-height: 1.2;
+    padding: 1.3em 1.2em 1em;
+    @each $size in $cui-sizes {
+        &.cui-#{$size} {
+            padding: 1.3em 1.2em 1em;
+        }
+    }
+    > .cui-icon {
+        top: 1.28em;
+    }
 }
 .cui-callout.cui-primary {
     border-color: $text-color-primary-light;
@@ -236,12 +293,32 @@ button, .cui-button {
     color: $text-color-primary;
 }
 
-// adjust card padding
-.cui-card {
-    padding-bottom: floor($cui-base-padding * 1.25) * 1.2;
+// adjust input padding
+.cui-input input {
+    padding: 22px 15.6px 15.6px;
     @each $size in $cui-sizes {
         &.cui-#{$size} {
-            padding-bottom: floor(map-get($cui-padding-map, $size) * 1.25) * 1.2;
+            padding: 22px 15.6px 15.6px;
+        }
+    }
+}
+
+// adjust textarea padding
+.cui-text-area textarea {
+    padding: 14px 15.6px 15.6px;
+    @each $size in $cui-sizes {
+        &.cui-#{$size} {
+            padding: 22px 15.6px 15.6px;
+        }
+    }
+}
+
+// adjust card padding
+.cui-card {
+    padding: 1.3em 1.2em 1em;
+    @each $size in $cui-sizes {
+        &.cui-#{$size} {
+            padding: 1.3em 1.2em 1em;
         }
     }
 }
@@ -265,6 +342,8 @@ button, .cui-button {
 .cui-tag {
     line-height: 1.2;
     @include cui-tag-sizing($cui-base-height * 0.5, $cui-base-padding, $cui-font-size);
+    padding-top: 0.33em;
+    padding-bottom: 0;
     .cui-icon svg {
         $icon-size: $cui-font-size * 0.75;
         height: $icon-size;
@@ -273,6 +352,9 @@ button, .cui-button {
         max-width: $icon-size;
         min-height: $icon-size;
         min-width: $icon-size;
+        position: relative;
+        top: -3px;
+        margin-right: 0.28em;
     }
     @include cui-tag-style(
         $cui-base-text-color,
@@ -287,6 +369,8 @@ button, .cui-button {
                 map-get($cui-padding-map, $size),
                 map-get($cui-font-size-map, $size)
             );
+            padding-top: 0.3em;
+            padding-bottom: 0;
         }
         &.cui-#{$size} {
             .cui-icon svg {
@@ -297,6 +381,7 @@ button, .cui-button {
                 max-width: $icon-size;
                 min-height: $icon-size;
                 min-width: $icon-size;
+                margin-right: 0.28em;
             }
         }
     }
@@ -307,6 +392,12 @@ button, .cui-button {
     .cui-tabs-item {
         padding: ($cui-base-padding * 0.84) 0;
         margin: 0 ($cui-base-padding * 0.84);
+        &:first-child {
+            margin-left: 0;
+        }
+        &:last-child {
+            margin-right: 0;
+        }
     }
     @each $size in $cui-sizes {
         &.cui-#{$size} {
@@ -321,19 +412,22 @@ button, .cui-button {
 // reduce menu padding
 .cui-menu {
     max-width: 240px; // allow menus to be wider by default
-    padding: 5px 0 6px;
+    padding: 4px 0;
     .cui-menu-item.cui-button {
-        min-height: 30px;
-        height: 30px;
+        min-height: 34px;
+        height: 34px;
+        padding-left: 12px;
+        padding-right: 12px;
+        width: 100%;
     }
     > .cui-button.cui-basic {
-        color: #333;
+        color: $text-color-black;
         .cui-icon svg {
-            stroke: #333;
+            stroke: $text-color-black;
         }
     }
     > .cui-menu-divider {
-        margin: 4px 0 6px;
+        margin: 4px 0;
     }
     .cui-button-label {
         width: 100%;
@@ -374,20 +468,16 @@ button, .cui-button {
     z-index: 102;
 }
 
+// prevent overlay from breaking inline text
+.cui-overlay-inline {
+    display: inline-block;
+}
+
 // dialog headers
 .cui-dialog-header {
     padding: 15px 15px 15px 25px;
     h3 {
         margin: 4px 0 0;
-        font-weight: 500;
+        font-weight: 600;
     }
-    > button.cui-dialog-close-button {
-        position: relative;
-        top: 1px;
-    }
-}
-
-// form labels
-.cui-form .cui-form-label {
-    font-size: $cui-font-size;
 }

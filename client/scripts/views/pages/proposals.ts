@@ -113,12 +113,12 @@ const ProposalsPage: m.Component<{}> = {
     if (!app.chain || !app.chain.loaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
-          message: 'Chain connection timed out.',
+          message: 'Could not connect to chain',
           title: 'Proposals',
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 10s)...',
+        message: 'Connecting to chain',
         title: 'Proposals',
         showNewProposalButton: true,
       });
@@ -133,7 +133,7 @@ const ProposalsPage: m.Component<{}> = {
           || (!chain.signaling.disabled && !chain.signaling.initialized)) {
         if (!chain.democracy.initializing) loadCmd();
         return m(PageLoading, {
-          message: 'Connecting to chain (may take up to 10s)...',
+          message: 'Connecting to chain',
           title: 'Proposals',
           showNewProposalButton: true,
         });

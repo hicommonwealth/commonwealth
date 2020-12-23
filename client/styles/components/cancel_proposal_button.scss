@@ -1,11 +1,13 @@
+@import 'client/styles/shared';
+
 .CancelProposalButton {
     display: inline-block;
     font-size: 15px;
     padding: 5px 10px;
     margin: 12px 0 22px;
-    border: 1px solid #08c;
+    border: 1px solid $theme-base-color;
     border-radius: 4px;
-    color: #08c;
+    color: $theme-base-color;
     cursor: pointer;
     line-height: 1.5;
 }

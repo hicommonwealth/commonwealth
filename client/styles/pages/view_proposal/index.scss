@@ -7,16 +7,16 @@ $discussion-reaction-padding: 18px; // padding between comment content & comment
 $discussion-comment-padding: 28px; // padding between comment content & avatar
 
 $discussion-meta-font-size: 1rem;
-$discussion-meta-color: #999;
+$discussion-meta-color: $text-color-light;
 
 $discussion-title-font-size: 1.45rem;
 
 @mixin supports-jump-highlight() {
     &.highlighted {
-        background-color: #ffd;
+        background-color: $background-color-unread;
     }
     &.highlighted.highlightAnimationComplete {
-        background-color: #fff;
+        background-color: $text-color-white;
         transition: background-color 1s ease-in-out;
     }
 }
@@ -117,7 +117,7 @@ $discussion-title-font-size: 1.45rem;
             a:link,
             a:visited {
                 display: block;
-                padding: 10px 15px;
+                padding: 12px 15px 6px;
                 border-radius: 6px;
                 background: $background-color-light;
                 color: $text-color-primary;
@@ -225,9 +225,9 @@ $discussion-title-font-size: 1.45rem;
         margin-top: 14px;
     }
     .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
-        stroke: #999;
+        stroke: $text-color-light;
         &:hover {
-            stroke: #777;
+            stroke: $text-color-medium;
         }
     }
     .ProposalBodyReaction {
@@ -235,7 +235,7 @@ $discussion-title-font-size: 1.45rem;
     }
     .ProposalBodyText.proposal-body-placeholder {
         &, .User .user-display-name {
-            color: #999;
+            color: $text-color-light;
         }
     }
 

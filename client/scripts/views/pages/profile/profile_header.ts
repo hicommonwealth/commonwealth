@@ -60,7 +60,7 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
       }
     },
     loading: !!vnode.state.chainLoading,
-    label: currentIdentity?.exists ? `Edit ${chainObj.name} identity` : `Set ${chainObj.name} identity`
+    label: currentIdentity?.exists ? 'Edit identity' : 'Set identity'
   });
 };
 
@@ -136,6 +136,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             vnode.state.copied && m('span.copy-done', 'Copied'),
           ]),
         ]),
+        m('.bio-actions-breakpoint'),
         m('.bio-actions', [
           onOwnProfile ? [
             editIdentityAction(account, vnode.state.identity, vnode),
@@ -147,7 +148,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   data: { account, refreshCallback },
                 });
               },
-              label: 'Edit profile'
+              label: 'Edit'
             }),
           ] : (showJoinCommunityButton && app.activeChainId())
             ? m(Button, {

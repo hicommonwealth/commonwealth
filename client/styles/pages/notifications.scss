@@ -3,7 +3,9 @@
 .NotificationsPage {
     .EmailIntervalConfiguration {
         background: $background-color-light;
-        padding: 18px 24px 20px;
+        padding: 18px 24px 8px;
+        border-radius: 5px;
+        margin-top: 8px;
         margin-bottom: 40px;
         display: flex;
         h4 {

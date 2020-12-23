@@ -1,7 +1,9 @@
+@import 'client/styles/shared';
+
 .HedgehogLoginForm {
     .hedgehog-note {
         font-size: 13px;
-        color: #999;
+        color: $text-color-medium;
         margin-bottom: 24px;
         text-align: left;
         p {

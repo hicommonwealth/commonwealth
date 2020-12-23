@@ -7,6 +7,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
   NoAddress: 'Must provide address',
   NoChain: 'Must provide chain',
+  InvalidChain: 'Invalid chain',
   NoSignature: 'Must provide signature',
   AddressNF: 'Address not found',
   ExpiredToken: 'Token has expired, please re-register',
@@ -28,6 +29,9 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain }
   });
+  if (!chain) {
+    return next(new Error(Errors.InvalidChain));
+  }
 
   const existingAddress = await models.Address.findOne({
     where: { chain: req.body.chain, address: req.body.address }
@@ -59,18 +63,21 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
     if (isAddressTransfer) {
       try {
         const user = await models.User.findOne({ where: { id: oldId } });
-        if (!user.email) throw new Error(Errors.NoEmail); // users who register thru github don't have emails by default!
+        if (!user.email) {
+          // users who register thru github don't have emails by default
+          throw new Error(Errors.NoEmail);
+        }
         const msg = {
           to: user.email,
           from: 'Commonwealth <no-reply@commonwealth.im>',
           templateId: DynamicTemplate.VerifyAddress,
           dynamic_template_data: {
             address: req.body.address,
-            chain: req.body.chain,
+            chain: chain.name,
           },
         };
         await sgMail.send(msg);
-        log.info('sent address move email!');
+        log.info(`Sent address move email: ${req.body.address} transferred to a new account`);
       } catch (e) {
         log.error(`Could not send address move email for: ${req.body.address}`);
       }

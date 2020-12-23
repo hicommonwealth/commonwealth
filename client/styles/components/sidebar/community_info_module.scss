@@ -8,7 +8,7 @@
         top: 20px;
         right: 20px;
         svg {
-            stroke: #333;
+            stroke: $text-color-black;
         }
     }
     .community-name {
@@ -48,7 +48,7 @@
         .cui-icon {
             margin-right: 10px;
             svg {
-                stroke: #111;
+                stroke: $text-color-black;
                 position: relative;
                 top: 3px;
                 // icon size
