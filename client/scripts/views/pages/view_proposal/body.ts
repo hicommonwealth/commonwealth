@@ -27,7 +27,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import { MenuItem, Button, Dialog, QueryList, Classes } from 'construct-ui';
+import { MenuItem, Button, Dialog, QueryList, Classes, ListItem } from 'construct-ui';
 import { notifySuccess } from 'controllers/app/notifications';
 
 export enum GlobalStatus {
@@ -320,7 +320,6 @@ export const ProposalEditorPermissions: m.Component<{
     try {
       const req = await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj);
       if (req.status !== 'Success') throw new Error('Could not fetch members');
-      vnode.state.items = req.result;
       m.redraw();
     } catch (err) {
       m.redraw();
@@ -345,7 +344,11 @@ export const ProposalEditorPermissions: m.Component<{
         items,
         itemRender: (role: any, idx: number) => {
           const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
-          return m(User, { user });
+          return m(ListItem, {
+            label: m(User, { user }),
+            selected: !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]),
+            key: role.Address.address
+          });
         },
         itemPredicate: (query, item, idx) => {
           return (item as any).Address.name.toLowerCase().includes(query.toLowerCase());
@@ -360,6 +363,7 @@ export const ProposalEditorPermissions: m.Component<{
       isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
       inline: false,
       onClose: () => {
+        // TODO: Assess onClose + openStateHandler role
         if (vnode.attrs.popoverMenu) {
           debugger
           vnode.attrs.openStateHandler(false);
@@ -384,8 +388,11 @@ export const ProposalEditorPermissions: m.Component<{
           label: 'Save changes',
           intent: 'primary',
           onclick: async () => {
+            console.log('clicked');
             try {
               const req = await $.get(`${app.serverUrl()}/addEditors`, {
+                chain: app.activeChainId(),
+                community: app.activeCommunityId(),
                 thread_id: thread.id,
                 editors: JSON.stringify(vnode.state.addedEditors)
               });
