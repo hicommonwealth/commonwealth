@@ -14,19 +14,12 @@
         border: none !important;
         border-radius: 0 !important;
     }
-    .title-selector .cui-button .cui-button-label {
-        top: 2px;
+    .title-selector > .cui-button > .cui-button-label {
+        top: 1px;
         .community-name {
             position: relative;
-            top: 1px;
+            top: 2px;
         }
-    }
-    .title-selector .ChainIcon {
-        position: relative;
-        top: 2px;
-    }
-    .title-selector .CommunityIcon .community-icon span {
-        font-size: 12px;
     }
 }
 

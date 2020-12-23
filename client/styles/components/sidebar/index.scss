@@ -130,7 +130,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    padding: 12px 14px;
+    padding: 0 14px;
     width: $quick-switcher-width;
     background: $background-color-border;
     z-index: 3;
@@ -140,8 +140,7 @@
     .ChainIcon, .CommunityIcon {
         cursor: pointer;
         opacity: 0.3;
-        height: 50px;
-        padding-top: 6px;
+        margin: 15px 0;
         &:hover {
             opacity: 0.33;
         }
