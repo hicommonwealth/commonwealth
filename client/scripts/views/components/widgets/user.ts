@@ -150,6 +150,7 @@ const User: m.Component<{
 
     return popover
       ? m(Popover, {
+        inline: true,
         interactionType: 'hover',
         content: userPopover,
         trigger: userFinal,
