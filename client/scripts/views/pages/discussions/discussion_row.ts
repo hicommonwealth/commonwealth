@@ -83,6 +83,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       m(UserGallery, {
         avatarSize: 24,
         popover: true,
+        maxUsers: 4,
         users: app.comments.uniqueCommenters(
           proposal,
           proposal.author,

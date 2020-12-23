@@ -43,7 +43,7 @@
             .row-subheader + .row-subheader {
                 margin-top: 1px;
             }
-            .row-subheader a, > span {
+            .row-subheader > a, > span {
                 color: $text-color-light;
                 font-size: $text-size-item-meta;
             }

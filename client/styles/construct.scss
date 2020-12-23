@@ -14,7 +14,7 @@ $cui-font-family-monospace: monospace;
 $cui-font-weight-light:           300;
 $cui-font-weight-normal:          400;
 $cui-font-weight-bold:            500;
-$cui-font-weight-heavy:           600; // this is only used in overrides
+$cui-font-weight-heavy:           500; // this is only used in overrides
 $cui-font-weight: $cui-font-weight-normal;
 
 $cui-line-height: 1.5;
@@ -466,6 +466,11 @@ button, .cui-button {
 // portal z-index
 .cui-portal {
     z-index: 102;
+}
+
+// prevent overlay from breaking inline text
+.cui-overlay-inline {
+    display: inline-block;
 }
 
 // dialog headers

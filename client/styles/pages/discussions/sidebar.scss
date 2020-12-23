@@ -37,23 +37,6 @@
             padding: 5px 0;
         }
     }
-    .forum-activity {
-        margin-bottom: 20px;
-        .MostActiveThread {
-            margin: 4px 0 13px;
-            .active-thread a {
-                color: #111;
-                font-weight: 500;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                display: block;
-                white-space: nowrap;
-            }
-            .User .user-display-name {
-                color: $text-color-light;
-            }
-        }
-    }
     .subscription-button-header {
         margin-bottom: 3px;
     }
