@@ -65,7 +65,7 @@
         .UserBlock span.balance {
             display: block;
             float: right;
-            color: #aaa;
+            color: $text-color-light;
         }
     }
     .SwitchAddress.selected {

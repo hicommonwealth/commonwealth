@@ -34,7 +34,7 @@ $text-size-item-meta: 17px;
         margin-bottom: 3px;
     }
     .proposal-status {
-        color: #999;
+        color: $text-color-light;
         font-weight: 500;
         &.pass {
             color: #06983a;
@@ -46,7 +46,7 @@ $text-size-item-meta: 17px;
     .proposal-comments {
         display: inline-block;
         font-weight: 500;
-        color: #999;
+        color: $text-color-light;
     }
 }
 

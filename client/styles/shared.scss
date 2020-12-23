@@ -11,6 +11,10 @@ $positive-bg-color: #4caf50;
 $negative-bg-color: #d4302f;
 $base-border-radius: 4px;
 
+$intermediate-icon-color: #ffa200;
+$positive-icon-color: #7ed320;
+$failure-icon-color: #db322d;
+
 $theme-base-color: #5b7bf6;
 $theme-accent-dark: darken(#5b7bf6, 7%);
 $theme-focus-border: #3960f4;
@@ -96,7 +100,7 @@ $listing-right-flex: 3;
 @mixin attachments {
     p {
         font-weight: 700;
-        color: #999;
+        color: $text-color-light;
     }
     a.attachment-item {
         display: inline-block;

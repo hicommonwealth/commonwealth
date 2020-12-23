@@ -7,7 +7,7 @@ $discussion-reaction-padding: 18px; // padding between comment content & comment
 $discussion-comment-padding: 28px; // padding between comment content & avatar
 
 $discussion-meta-font-size: 1rem;
-$discussion-meta-color: #999;
+$discussion-meta-color: $text-color-light;
 
 $discussion-title-font-size: 1.45rem;
 
@@ -225,7 +225,7 @@ $discussion-title-font-size: 1.45rem;
         margin-top: 14px;
     }
     .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
-        stroke: #999;
+        stroke: $text-color-light;
         &:hover {
             stroke: #777;
         }
@@ -235,7 +235,7 @@ $discussion-title-font-size: 1.45rem;
     }
     .ProposalBodyText.proposal-body-placeholder {
         &, .User .user-display-name {
-            color: #999;
+            color: $text-color-light;
         }
     }
 

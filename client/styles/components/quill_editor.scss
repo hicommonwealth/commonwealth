@@ -190,7 +190,7 @@
         margin: 10px;
         width: 100%;
         text-align: center;
-        color: #999;
+        color: $text-color-light;
         font-size: 14px;
         .icon-spinner2.animate-spin {
             margin: 0 4px;
@@ -289,13 +289,13 @@
             }
             .ql-mention-addr {
                 float: right;
-                color: #999;
+                color: $text-color-light;
                 font-size: 90%;
                 line-height: 1.6;
             }
             .ql-mention-la {
                 display: block;
-                color: #999;
+                color: $text-color-light;
                 font-size: 90%;
                 white-space: nowrap;
             }

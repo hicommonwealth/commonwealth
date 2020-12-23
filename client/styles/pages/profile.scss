@@ -13,7 +13,7 @@
         margin: 32px 0 30px;
     }
     .no-items {
-        color: #aaa;
+        color: $text-color-light;
         margin-bottom: 20px;
     }
     .QuillFormattedText,
@@ -134,7 +134,7 @@
         color: #111;
     }
     .no-items {
-        color: #aaa;
+        color: $text-color-light;
         margin: 8px 0 20px;
     }
 }
@@ -374,6 +374,6 @@
         margin-top: 16px;
     }
     .placeholder {
-        color: #999;
+        color: $text-color-light;
     }
 }
