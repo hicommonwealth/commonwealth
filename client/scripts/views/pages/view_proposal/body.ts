@@ -29,6 +29,7 @@ import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem } from 'construct-ui';
 import { notifySuccess } from 'controllers/app/notifications';
+import { formatAddressShort } from 'shared/utils';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -320,6 +321,8 @@ export const ProposalEditorPermissions: m.Component<{
     try {
       const req = await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj);
       if (req.status !== 'Success') throw new Error('Could not fetch members');
+      vnode.state.items = req.result;
+      console.log('items fetched');
       m.redraw();
     } catch (err) {
       m.redraw();
@@ -328,6 +331,7 @@ export const ProposalEditorPermissions: m.Component<{
   },
   view: (vnode) => {
     const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
+    console.log('viewing');
     if (!vnode.state.items?.length) return;
     if (!vnode.state.addedEditors) {
       vnode.state.addedEditors = [];
@@ -351,7 +355,10 @@ export const ProposalEditorPermissions: m.Component<{
           });
         },
         itemPredicate: (query, item, idx) => {
-          return (item as any).Address.name.toLowerCase().includes(query.toLowerCase());
+          const address = (item as any).Address;
+          return address.name
+            ? address.name.toLowerCase().includes(query.toLowerCase())
+            : address.address.toLowerCase().includes(query.toLowerCase());
         },
         onSelect: (item) => {
           const addrItem = (item as any).Address;
@@ -362,15 +369,15 @@ export const ProposalEditorPermissions: m.Component<{
       hasBackdrop: true,
       isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
       inline: false,
-      onClose: () => {
-        // TODO: Assess onClose + openStateHandler role
-        if (vnode.attrs.popoverMenu) {
-          debugger
-          vnode.attrs.openStateHandler(false);
-        } else {
-          vnode.state.isOpen = false;
-        }
-      },
+      // onClose: () => {
+      //   // TODO: Assess onClose + openStateHandler role
+      //   if (vnode.attrs.popoverMenu) {
+      //     debugger
+      //     vnode.attrs.openStateHandler(false);
+      //   } else {
+      //     vnode.state.isOpen = false;
+      //   }
+      // },
       title: 'Add editor permissions',
       transitionDuration: 200,
       footer: m(`.${Classes.ALIGN_RIGHT}`, [
