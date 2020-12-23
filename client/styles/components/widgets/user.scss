@@ -195,6 +195,8 @@
         .user-block-selected {
             flex: 1;
             text-align: right;
+            position: relative;
+            top: -2px;
         }
     }
     &.compact {

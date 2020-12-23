@@ -3,6 +3,7 @@
 .PreviewModal {
     .compact-modal-body {
         width: 640px;
+        padding-top: 31px;
         @include xs-max {
             width: initial;
         }

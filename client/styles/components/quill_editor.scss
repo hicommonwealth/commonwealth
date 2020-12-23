@@ -132,8 +132,25 @@
     .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
         border-color: $form-border-color
     }
+    // link popup
     .ql-tooltip {
         z-index: 9999;
+        font-size: 17px;
+        padding: 10px 15px 8px;
+        border-radius: 5px;
+        input[type="text"] {
+            position: relative;
+            top: -1px;
+            padding: 5px 8px 0;
+            margin-left: 4px;
+            border-radius: 3px;
+            // text styles
+            font-size: 17px;
+            height: 31px;
+        }
+        a.ql-action:hover::after {
+            text-decoration: underline;
+        }
     }
     @include xs-max {
         .ql-toolbar .ql-formats:last-child {
@@ -189,7 +206,7 @@
     }
     .ql-formats > .ql-preview:before {
         position: relative;
-        top: -3px;
+        top: -2px;
 
         content: '\e842';
 
