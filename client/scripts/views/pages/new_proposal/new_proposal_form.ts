@@ -303,7 +303,7 @@ const NewProposalForm = {
     if (!dataLoaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
-          message: 'Chain connection timed out.',
+          message: 'Could not connect to chain',
           title: 'Proposals',
         });
       }

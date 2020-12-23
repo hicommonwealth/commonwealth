@@ -6,20 +6,14 @@
     @include xs-max {
         width: 38px;
     }
+    padding: 1px 6px;
     text-align: center;
-
-    .notification-count {
-        background: $negative-bg-color;
-        border-radius: 9999px;
-        padding: 1px 6px;
-        text-align: center;
-        color: #fff;
-        font-size: 97%;
-    }
 
     @include sm-max {
         .cui-button-label {
             overflow: visible;
+        }
+        &.has-notifications .cui-button-label {
             position: relative;
             top: -2px !important;
         }
@@ -29,10 +23,12 @@
         position: relative;
         top: -1px;
         @include sm-max {
-            top: 1px;
+            top: 0px;
         }
     }
     &.has-notifications {
+        background: $negative-bg-color !important;
+        color: #fff !important;
         padding: 0 7px !important;
         .cui-icon {
             display: none;
