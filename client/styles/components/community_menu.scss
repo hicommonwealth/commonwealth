@@ -13,12 +13,12 @@
     $padding: 11px 18px;
 
     background: #2f3136;
-    color: #fff;
+    color: $text-color-white;
 
     .cui-list {
     }
     .cui-list-item {
-        color: #fff !important;
+        color: $text-color-white !important;
         &:hover {
             background: #36393f;
         }
@@ -49,7 +49,7 @@
         padding: $padding;
         text-decoration: none;
         font-weight: 500;
-        color: #fff;
+        color: $text-color-white;
         &:hover {
             background: #36393f;
         }
@@ -70,12 +70,12 @@
             line-height: 1.35;
             .sidebar-user {
                 font-size: 13px;
-                color: #777;
+                color: $text-color-medium;
                 .User .user-avatar {
                     margin-right: 5px;
                 }
                 .User .user-display-name {
-                    color: #777;
+                    color: $text-color-medium;
                 }
             }
         }
@@ -112,13 +112,13 @@
         text-decoration: none;
         padding: $padding;
         font-weight: 500;
-        color: #fff;
+        color: $text-color-white;
         &:hover {
             background: #36393f;
         }
         .cui-icon {
             display: inline-block;
-            color: #fff;
+            color: $text-color-white;
             position: relative;
             top: -2px;
             margin-left: 10px;

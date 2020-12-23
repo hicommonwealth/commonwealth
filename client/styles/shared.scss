@@ -3,7 +3,7 @@
 @import 'mixins/dragula';
 
 $fonts: Calibre, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-$monospace-fonts: Menlo, Monaco, "Courier New", Courier, monospace;
+$monospace-fonts: SF Mono, Menlo, Monaco, "Lucida Sans Typewriter", "Courier New", Courier, monospace;
 
 $base-bg-color:     #ffffff;
 $primary-bg-color:  #4f62bd;
@@ -15,12 +15,18 @@ $intermediate-icon-color: #ffa200;
 $positive-icon-color: #7ed320;
 $failure-icon-color: #db322d;
 
+$last-seen-notification-color: #ea7a60;
+$modal-header-background-color: #4f63be;
+
+// TODO: update these colors, they were from the old styles
+$positive-text-color: #06983a;         // proposal passing
+$negative-text-color: #d0021b;         // proposal failing
+$box-shadow-color: #eef1f2;
+
+// TODO: label these colors
 $theme-base-color: #5b7bf6;
 $theme-accent-dark: darken(#5b7bf6, 7%);
 $theme-focus-border: #3960f4;
-
-$header-color: #4f62bd;           // ?? (TODO)
-$header-text-color: #ffffff;      // ??
 
 $background-color-white: #ffffff;       // white background
 $background-color-white-hover: #f9fafd; // white background with hover
@@ -29,13 +35,19 @@ $background-color-light-hover: #e5e8f7; // light background with hover
 $background-color-medium: #adb7d5;      // medium background for icons
 $background-color-dark: #4f62bd;        // dark background
 $background-color-border: #e0e4f1;      // border color
-$background-color-placeholder: #adb7d5; // placeholder color
 
+$background-color-placeholder: #adb7d5; // placeholder color
+$background-color-unread: #ffffe0;      // notifications color
+$background-color-dark-selection: #ffdd00;
+
+$text-color-white: #fff;
 $text-color-lightest: #b5b7b9;          // light text on white background
-$text-color-lighter: #a3a4a7;           // light text on white background - used for most styles
+$text-color-lighter: #a3a4a7;           // light text on white background
 $text-color-light: #9a9da4;             // light text on light background
 $text-color-medium: #777;               // medium text on any background
-$text-color-dark: #222;                 // black text on any background
+$text-color-medium-dark: #555;          // light off-black text on any background
+$text-color-darker: #333;               // off-black text on any background
+$text-color-black: #222;                 // black text on any background
 
 $text-color-primary-light: tint($primary-bg-color, 75%);
 $text-color-primary: $primary-bg-color;

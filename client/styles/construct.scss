@@ -8,8 +8,8 @@
 $cui-base-size: 13px;
 $cui-spacer: $cui-base-size * 1.5;
 
-$cui-font-family:           Calibre, Arial, "Helvetica Neue", Helvetica, sans-serif;
-$cui-font-family-monospace: monospace;
+$cui-font-family:           $fonts;
+$cui-font-family-monospace: $monospace-fonts;
 
 $cui-font-weight-light:           300;
 $cui-font-weight-normal:          400;
@@ -268,7 +268,7 @@ button, .cui-button {
 .cui-button.cui-primary,
 .cui-button-group.cui-primary .cui-button {
     a {
-        color: #fff;
+        color: $text-color-white;
     }
 }
 
@@ -421,9 +421,9 @@ button, .cui-button {
         width: 100%;
     }
     > .cui-button.cui-basic {
-        color: #333;
+        color: $text-color-black;
         .cui-icon svg {
-            stroke: #333;
+            stroke: $text-color-black;
         }
     }
     > .cui-menu-divider {

@@ -19,7 +19,7 @@
     position: relative;
     ::selection {
         background: $theme-base-color;
-        color: #fff;
+        color: $text-color-white;
     }
 
     // 1. editor typography modifications
@@ -40,7 +40,7 @@
         }
         pre, .ql-code-block-container {
             background: $background-color-light;
-            color: #111;
+            color: $text-color-black;
             font-family: $monospace-fonts;
             font-size: 0.833em;
             white-space: pre-wrap;
@@ -88,12 +88,12 @@
         }
         li[data-list=checked] > .ql-ui::before {
             content: '\f14a';
-            color: #444;
+            color: $text-color-darker;
             font-size: 93%;
         }
         li[data-list=unchecked] > .ql-ui::before {
             content: '\f096';
-            color: #b0bec5;
+            color: $text-color-lightest;
         }
     }
 
@@ -102,8 +102,8 @@
         border: 1px solid $form-border-color;
         border-radius: 0 0 3px 3px;
         // construct-ui input styles
-        color: #37474f;
-        box-shadow: 0px 1px 0px #eef1f2;
+        color: $text-color-darker;
+        box-shadow: 0px 1px 0px $box-shadow-color;
     }
     .ql-bubble .ql-editor {
         padding: 1px 8px 8px 1px;

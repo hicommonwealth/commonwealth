@@ -6,7 +6,7 @@
     margin: -3px 0;
     margin-right: 8px;
     line-height: 0; // ensure icon doesn't get misaligned when base font size changes
-    background: #fff;
+    background: $text-color-white;
     border-radius: 9999px;
     overflow: hidden;
     .avatar-image {
@@ -19,7 +19,7 @@
     border-radius: 9999px;
     overflow: hidden;
     margin: 0;
-    background: #fff;
+    background: $text-color-white;
     box-shadow: 0 0 0 1px rgba(128,128,128,0.2);
     svg {
         margin: 2px;
@@ -48,7 +48,7 @@
     font-size: 10px;
     font-weight: 500;
     background: $background-color-dark;
-    color: #fff;
+    color: $text-color-white;
     &.green {
         background: $positive-bg-color;
     }
@@ -131,7 +131,7 @@
         clear: both;
         a {
             text-decoration: none !important;
-            color: #222 !important;
+            color: $text-color-black !important;
         }
         a:hover {
             text-decoration: underline !important;
@@ -165,8 +165,8 @@
             font-size: 10px;
             font-weight: 500;
             border-radius: 6px;
-            background: #333;
-            color: #fff;
+            background: $text-color-darker;
+            color: $text-color-white;
 
             position: absolute;
             bottom: 4px;

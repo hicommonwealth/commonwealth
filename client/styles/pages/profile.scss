@@ -2,7 +2,7 @@
 
 @mixin profile-module {
     width: 100%;
-    background: #fff;
+    background: $text-color-white;
     border-radius: 2px;
     border: 1px solid $background-color-light;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
@@ -197,7 +197,7 @@
             margin-top: -28px;
             margin-bottom: 18px;
             background-color: #f8f8f8;
-            border: 2px solid #fff;
+            border: 2px solid $text-color-white;
             border-radius: 9999px;
             overflow: hidden;
             box-shadow: 0.5px 0.5px 4px rgba(0,0,0,0.15);
@@ -305,7 +305,7 @@
         .verification-icon.unverified {
             position: relative;
             top: 0;
-            color: #fff;
+            color: $text-color-white;
             background: #a0a0a0;
             position: relative;
             line-height: 1.1;

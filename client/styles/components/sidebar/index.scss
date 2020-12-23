@@ -255,12 +255,12 @@
                 }
                 &.cui-active, &.cui-active:hover {
                     background: $primary-bg-color !important;
-                    color: #fff;
+                    color: $text-color-white;
                     .cui-icon svg {
                         stroke: #fff;
                     }
                     .proposal-topic-icon {
-                        border-color: #fff;
+                        border-color: $text-color-white;
                     }
                 }
                 .cui-icon-action {
@@ -339,7 +339,7 @@
         // background
         font-size: 0.94rem;
         .chain-deferred {
-            color: #777;
+            color: $text-color-medium;
         }
 
         // form stuff
@@ -347,7 +347,7 @@
             margin-bottom: 0;
             select {
                 width: 100%;
-                border-color: #ddd;
+                border-color: $background-color-border;
                 border-radius: 2px;
                 padding: 5px 6px;
             }

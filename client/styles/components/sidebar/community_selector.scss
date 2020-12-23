@@ -76,7 +76,7 @@
         border: none;
         user-select: none;
         &.cui-selected {
-            color: #111;
+            color: $text-color-black;
         }
         &:hover {
             background: $background-color-light-hover;

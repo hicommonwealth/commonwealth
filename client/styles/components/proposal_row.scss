@@ -37,10 +37,10 @@ $text-size-item-meta: 17px;
         color: $text-color-light;
         font-weight: 500;
         &.pass {
-            color: #06983a;
+            color: $positive-text-color;
         }
         &.fail {
-            color: #d0021b;
+            color: $negative-text-color;
         }
     }
     .proposal-comments {
@@ -85,7 +85,7 @@ $text-size-item-meta: 17px;
     display: block !important;
 
     .treasury-row-title {
-        color: $text-color-dark;
+        color: $text-color-black;
         font-size: $text-size-item-header;
         text-decoration: none;
         font-weight: 500;
@@ -117,10 +117,10 @@ $text-size-item-meta: 17px;
             }
             &.treasury-user-mobile {
                 display: none;
-                color: #bdbdbd;
+                color: $text-color-lighter;
                 .user-display-name .username {
                     position: relative;
-                    color: #bdbdbd;
+                    color: $text-color-lighter;
                     font-weight: 400;
                     top: 2px;
                 }

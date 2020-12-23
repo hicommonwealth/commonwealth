@@ -5,8 +5,8 @@ pre.CodeBlock {
     margin-bottom: 20px;
     border-radius: 4px;
     background: #222;
-    color: #fff;
-    font-family: SF Mono, Roboto, Menlo, monospace;
+    color: $text-color-white;
+    font-family: $monospace-fonts;
     font-size: 13px;
     white-space: pre-wrap;
     word-break: break-word;

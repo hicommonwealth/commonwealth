@@ -13,10 +13,10 @@ $discussion-title-font-size: 1.45rem;
 
 @mixin supports-jump-highlight() {
     &.highlighted {
-        background-color: #ffd;
+        background-color: $background-color-unread;
     }
     &.highlighted.highlightAnimationComplete {
-        background-color: #fff;
+        background-color: $text-color-white;
         transition: background-color 1s ease-in-out;
     }
 }
