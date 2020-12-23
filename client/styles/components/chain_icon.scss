@@ -1,10 +1,9 @@
-$icon-background: #111;
-$icon-text: #fff;
+@import 'client/styles/shared';
 
 .ChainIcon {
     img.chain-icon {
         border-radius: 9999px;
-        background: $icon-background;
+        background: $background-color-darker-monochrome;
     }
     &.onclick img.chain-icon {
         cursor: pointer;
@@ -14,16 +13,16 @@ $icon-text: #fff;
 .CommunityIcon {
     img.community-icon {
         border-radius: 9999px;
-        background: $icon-background;
+        background: $background-color-darker-monochrome;
     }
     .community-icon.no-image {
         border-radius: 9999px;
-        background: $icon-background;
+        background: $background-color-darker-monochrome;
         display: flex;
         align-items: center;
         justify-content: center;
         span {
-            color: $icon-text;
+            color: $text-color-white;
             text-align: center;
             font-weight: 500;
             font-size: 16px;

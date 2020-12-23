@@ -254,11 +254,11 @@ button, .cui-button {
     &.cui-basic,
     .cui-button-group.cui-basic & {
         &:hover {
-            background: #f4f4f5;
+            background: $background-color-white-hover;
             color: $cui-base-text-color;
         }
         &:active, &.cui-active {
-            background: #EAEAEC;
+            background: $background-color-light;
             color: $cui-base-text-color;
         }
     }

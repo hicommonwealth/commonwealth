@@ -165,7 +165,7 @@
 
     &.dz-drag-hover {
         border-style: solid;
-        border: 2px solid #08C;
+        border: 2px solid $theme-base-color;
         border-radius: 5px;
         margin: -8px -2px;
     }
@@ -292,8 +292,8 @@
             border-radius: 8px;
             overflow: hidden;
             .dz-upload {
-                background: #333;
-                background: linear-gradient(to bottom, #666, #444);
+                background: $background-color-dark-accent;
+                background: linear-gradient(to bottom, $background-color-dark-accent, $background-color-darker-accent);
                 position: absolute;
                 top: 0;
                 left: 0;

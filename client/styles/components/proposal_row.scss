@@ -15,12 +15,12 @@ $text-size-item-meta: 17px;
         margin: 14px 0 24px;
         width: 100%;
         height: 5px;
-        background: #ddd;
+        background: $intermediate-icon-color;
         border-radius: 99px;
     }
     .proposal-row-turnout-bullet-inner {
         height: 100%;
-        background: #08c;
+        background: $theme-base-color;
         border-radius: 99px;
     }
     .proposal-row-requirement {

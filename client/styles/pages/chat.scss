@@ -3,7 +3,7 @@
 .Chat {
     position: relative;
     height: calc(100vh - 100px);
-    background: #fff;
+    background: $background-color-white;
     border: 1px solid #eee;
 
     .chat-messages,

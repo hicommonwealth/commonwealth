@@ -17,6 +17,6 @@ pre.CodeBlock {
         opacity: 0.9;
     }
     &::selection {
-        background: #ffdd00;
+        background: $background-color-selection-on-dark;
     }
 }

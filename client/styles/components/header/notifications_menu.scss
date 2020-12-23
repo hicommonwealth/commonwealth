@@ -62,7 +62,7 @@
     }
     .notification-list {
         height: 480px;
-        background: #fff;
+        background: $background-color-white;
         width: 340px;
         @include xs-max {
             width: calc(100vw - 20px);

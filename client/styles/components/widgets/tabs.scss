@@ -15,7 +15,7 @@
     }
     a.tab-entry.active {
         color: $text-color-black;
-        border-bottom: 3px solid $background-color-dark;
+        border-bottom: 3px solid $background-color-dark-accent;
         padding-bottom: 6px;
     }
     @include xs-max {

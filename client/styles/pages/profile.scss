@@ -98,10 +98,10 @@
             padding: 8px 0 0 0;
             margin-right: 18px;
             margin-bottom: 10px;
-            color: #a0a0a0;
+            color: $text-color-medium;
         }
         a.tab-entry.active {
-            color: #111;
+            color: $text-color-darker;
         }
     }
     @include sm-max {
@@ -131,7 +131,7 @@
     .header {
         font-size: inherit;
         font-weight: 500;
-        color: #111;
+        color: $text-color-darker;
     }
     .no-items {
         color: $text-color-light;
@@ -196,7 +196,7 @@
             position: relative;
             margin-top: -28px;
             margin-bottom: 18px;
-            background-color: #f8f8f8;
+            background-color: $background-color-white-hover;
             border: 2px solid $text-color-white;
             border-radius: 9999px;
             overflow: hidden;
@@ -216,7 +216,7 @@
             font-size: 21px;
             font-weight: 500;
             .username {
-                color: #111;
+                color: $text-color-darker;
             }
         }
         .role-tag {
@@ -284,13 +284,13 @@
         }
         .no-verification {
             display: inline-block;
-            color: #888;
+            color: $text-color-medium;
         }
         .verification-icon {
             position: relative;
             top: 2px;
             display: inline-block;
-            background: #08c;
+            background: $theme-base-color;
             width: 16px;
             height: 16px;
             border-radius: 8px;
@@ -306,17 +306,17 @@
             position: relative;
             top: 0;
             color: $text-color-white;
-            background: #a0a0a0;
+            background: $text-color-medium;
             position: relative;
             line-height: 1.1;
             padding-left: 4px;
             font-size: 95%;
         }
         .verification-icon.none {
-            background: #a0a0a0;
+            background: $text-color-medium;
         }
         .verification-icon.unverified {
-            background: #fdc360;
+            background: $intermediate-icon-color;
         }
     }
     .info-row {
