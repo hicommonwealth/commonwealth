@@ -86,6 +86,7 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
         popover: true,
         linkify: true,
         hideAvatar: true,
+        showAddressWithDisplayName: true,
       }),
     ]);
   }

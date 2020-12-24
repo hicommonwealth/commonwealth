@@ -57,6 +57,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         linkify: true,
         popover: true,
         hideAvatar: true,
+        showAddressWithDisplayName: true,
       }),
       m('.mobile-comment-count', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
