@@ -1,13 +1,25 @@
 import m from 'mithril';
 import _ from 'lodash';
-import { Button } from 'construct-ui';
+import { Button, Spinner } from 'construct-ui';
 
 import { OffchainThread, Account } from 'models';
 import { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
 import ProfileProposal from './profile_proposal';
 
-const ProfileContent: m.Component<{ account: Account<any>, type: UserContent, content: any}, { count: number }> = {
+const postsRemaining = (content, state) => {
+  return (content.length > 10 && state.count < content.length);
+};
+
+const ProfileContent: m.Component<{
+  account: Account<any>,
+  type: UserContent,
+  content: any
+}, {
+  onscroll: any;
+  count: number
+  previousContent: any;
+}> = {
   // TODO: Add typeguards to ProposalComments so we can avoid the dirty indexing here
   view: (vnode) => {
     if (!vnode.state.count) vnode.state.count = 10;
@@ -16,8 +28,32 @@ const ProfileContent: m.Component<{ account: Account<any>, type: UserContent, co
       allContent,
       proposals,
       comments,
-      proposalHashes
     } = vnode.attrs.content;
+    const content = (type === UserContent.All)
+      ? allContent
+      : (type === UserContent.Threads)
+        ? proposals
+        : comments;
+
+    const newContent = content !== vnode.state.previousContent;
+
+    if (newContent) {
+      $(window).off('scroll');
+
+      vnode.state.onscroll = _.debounce(async () => {
+        if (!postsRemaining(content, vnode.state)) return;
+        console.log('posts remain');
+        const scrollHeight = $(document).height();
+        const scrollPos = $(window).height() + $(window).scrollTop();
+        if (scrollPos > (scrollHeight - 400)) {
+          vnode.state.count += 10;
+          console.log(vnode.state.count);
+        }
+      }, 400);
+
+      vnode.state.previousContent = content;
+    }
+
     return m('.ProfileContent', [
       (type === UserContent.All) && m('.all-content', [
         allContent.length === 0 && m('.no-items', [
@@ -45,20 +81,10 @@ const ProfileContent: m.Component<{ account: Account<any>, type: UserContent, co
           return m(ProfileCommentGroup, { proposal: comment.proposal, comments: [comment], account, });
         }),
       ]),
-      ((type === UserContent.All && allContent.length > 10 && vnode.state.count < allContent.length)
-       || (type === UserContent.Threads && proposals.length > 10 && vnode.state.count < proposals.length)
-       || (type === UserContent.Comments && comments.length > 10 && vnode.state.count < comments.length))
-        && m('.btn-wrap', [
-          m(Button, {
-            intent: 'primary',
-            fluid: true,
-            onclick: (e) => {
-              e.preventDefault();
-              vnode.state.count += 10;
-            },
-            label: 'Load more'
-          })
-        ])
+      postsRemaining(content, vnode.state)
+      && m('.infinite-scroll-spinner-wrap', [
+        m(Spinner, { active: postsRemaining(content, vnode.state) })
+      ])
     ]);
   }
 };
