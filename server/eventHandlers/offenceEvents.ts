@@ -1,7 +1,8 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
 import { computeEventStats } from './computeStats';
 import { sequelize } from '../database';
-
+import Sequelize from 'sequelize';
+const Op = Sequelize.Op;
 
 export default class extends IEventHandler {
   constructor(
@@ -34,6 +35,16 @@ export default class extends IEventHandler {
       return dbEvent;
     }
     const newOffenceEventData = event.data;
+
+    // ignore validators who have committed offence but there records is not available in validators table.
+    const existingValidators = await this._models.Validator.findAll({
+      where: {
+        stash: {
+          [Op.in]: newOffenceEventData.offenders
+        }
+      }
+    });
+    if (!existingValidators || existingValidators.length === 0) return dbEvent;
 
     // 2) Get relevant data from DB for processing.
     // Get last created validator's record from 'HistoricalValidatorStatistic' table. as offence event contains offenders' AccountID.
