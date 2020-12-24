@@ -1,5 +1,7 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
 import { sequelize } from '../database';
+import Sequelize from 'sequelize';
+const Op = Sequelize.Op;
 
 
 const uptimePercent = (noOfTrues: number, noOfFalse: number, currentEventType: number) => {
@@ -27,7 +29,24 @@ export default class extends IEventHandler {
       && event.data.kind !== SubstrateTypes.EventKind.SomeOffline) {
       return dbEvent;
     }
+
     const imOnlineEventData = event.data;
+    let eventValidatorsList: string | any[];
+    if (event.data.kind === SubstrateTypes.EventKind.SomeOffline) {
+      eventValidatorsList = imOnlineEventData.validators?.map(validator=>JSON.parse(validator)[0]);
+    }else{
+      eventValidatorsList = imOnlineEventData.validators;
+    }
+
+    // Get all the records for all validators from database those are in new-session's active and waiting list.
+    const existingValidators = await this._models.Validator.findAll({
+      where: {
+        stash: {
+          [Op.in]: eventValidatorsList
+        }
+      }
+    });
+    if (!existingValidators || existingValidators.length === 0) return dbEvent;
 
     // 2) Get relevant data from DB for processing.
     /*
@@ -44,7 +63,7 @@ export default class extends IEventHandler {
           FROM public."HistoricalValidatorStatistic" as groupTable GROUP by groupTable.stash
           ) joinTable
         ON joinTable.stash = partitionTable.stash
-        WHERE partitionTable.stash IN ('${imOnlineEventData.validators.join("','")}')
+        WHERE partitionTable.stash IN ('${eventValidatorsList.join("','")}')
         )  as validatorQuery
       WHERE  validatorQuery.row_number = 1
     `;
