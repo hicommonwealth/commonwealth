@@ -11,7 +11,7 @@ $discussion-meta-padding: 18px;
             }
             a.external-discussion-link {
                 font-size: 17px;
-                color: $theme-base-color;
+                color: $primary-bg-color;
                 &:hover {
                     text-decoration: underline;
                 }
@@ -68,7 +68,7 @@ $discussion-meta-padding: 18px;
                     text-decoration: underline;
                 }
                 > a.user-display-name {
-                    color: $theme-base-color;
+                    color: $primary-bg-color;
                 }
             }
             .row-excerpt {

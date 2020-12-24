@@ -86,7 +86,7 @@
         @include roleIcon();
     }
     a.user-display-name.verified {
-        // color: $theme-base-color !important;
+        // color: $primary-bg-color !important;
     }
     &.linkified a.user-display-name {
         cursor: pointer;

@@ -53,7 +53,7 @@
         margin-bottom: 6px;
     }
     .summary > .User > .username {
-        color: $theme-base-color !important;
+        color: $primary-bg-color !important;
     }
     .proposal {
         .proposal-body {
@@ -290,7 +290,7 @@
             position: relative;
             top: 2px;
             display: inline-block;
-            background: $theme-base-color;
+            background: $primary-bg-color;
             width: 16px;
             height: 16px;
             border-radius: 8px;
@@ -348,9 +348,9 @@
     }
     a.btn {
         background-color: white !important;
-        border: 1px solid $theme-base-color !important;
+        border: 1px solid $primary-bg-color !important;
         background-image: none !important;
-        color: $theme-base-color;
+        color: $primary-bg-color;
         border-radius: 4px;
     }
 }

@@ -155,7 +155,7 @@
                 .discussion-draft-title-wrap {
                     display: flex;
                     .cui-icon-edit {
-                        color: $negative-text-color;
+                        color: $negative-bg-color;
                         margin: 0 8px 8px 0;
                     }
                 }
@@ -186,7 +186,7 @@
                         text-decoration: none;
                         &:hover {
                             opacity: 1;
-                            color: $negative-text-color;
+                            color: $negative-bg-color;
                         }
                     }
                 }
@@ -203,8 +203,8 @@
             width: calc(100% - 6px);
             padding: 3px 8px 2px;
             line-height: 1.2;
-            color: $negative-text-color;
-            border: 1px solid $negative-text-color;
+            color: $negative-bg-color;
+            border: 1px solid $negative-bg-color;
             border-radius: 9999px;
             text-align: center;
         }

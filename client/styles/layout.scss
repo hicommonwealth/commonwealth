@@ -61,14 +61,14 @@ strong {
     font-weight: 500;
 }
 a {
-    color: $theme-accent-dark;
+    color: $primary-bg-color;
     text-decoration: none;
     &:hover {
         text-decoration: underline;
     }
 }
 a:visited {
-    color: lighten($theme-accent-dark, 4%);
+    color: lighten($primary-bg-color, 5%);
 }
 code, pre {
     font-family: $monospace-fonts;
@@ -78,7 +78,7 @@ code, pre {
 }
 code {
     padding: 1px 3px;
-    color: $negative-text-color;
+    color: $negative-bg-color;
 }
 pre {
     padding: 10px 12px;

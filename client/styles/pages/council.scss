@@ -9,10 +9,10 @@
         color: $text-color-light;
         font-weight: 500;
         &.pass {
-            color: $positive-text-color;
+            color: $positive-bg-color;
         }
         &.fail {
-            color: $negative-text-color;
+            color: $negative-bg-color;
         }
     }
     .proposal-comments {

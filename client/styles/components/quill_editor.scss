@@ -19,7 +19,7 @@
 .QuillEditor {
     position: relative;
     ::selection {
-        background: $theme-base-color;
+        background: $primary-bg-color;
         color: $text-color-white;
     }
 
@@ -120,7 +120,7 @@
     // 4. toolbar
     .ql-toolbar.ql-snow {
         border: 1px solid $form-border-color;
-        border-radius: $base-border-radius $base-border-radius 0 0;
+        border-radius: 4px 4px 0 0;
         box-sizing: border-box;
         padding: 5px 8px;
         white-space: nowrap;

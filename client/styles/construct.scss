@@ -45,7 +45,7 @@ $cui-h6-font-size: $cui-font-size * 0.75;
 //
 
 $cui-body-bg: $blue-grey50;
-$cui-body-color: $blue-grey800;
+$cui-body-color: $text-color-black;
 $cui-body-font-size: $cui-base-size * 1.6;
 
 $cui-text-color:               $cui-body-color;
@@ -86,7 +86,7 @@ $cui-base-height-xl:  floor($cui-base-size * 3.4);
 // component colors
 //
 
-$cui-border-radius: $base-border-radius;
+$cui-border-radius: 4px;
 
 $cui-base-bg-color: $base-bg-color;
 $cui-primary-bg-color: $primary-bg-color;

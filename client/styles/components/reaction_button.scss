@@ -9,8 +9,8 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     &:hover, &.active {
-        color: $theme-accent-dark;
-        border-color: $theme-base-color;
+        color: $primary-bg-color;
+        border-color: $primary-bg-color;
         span {
             color: inherit;
         }

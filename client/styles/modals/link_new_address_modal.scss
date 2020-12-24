@@ -6,7 +6,7 @@
     .link-address-step-header {
         margin: 0 auto;
         padding: 20px 40px 18px;
-        background: $theme-base-color;
+        background: $primary-bg-color;
         color: $background-color-white;
         h3 {
             margin: 0;
@@ -133,7 +133,7 @@
                 // disable CLI and substrate wallets for mobile users
             }
             &.selected {
-                border-color: $theme-base-color;
+                border-color: $primary-bg-color;
             }
             @include xs-max {
                 height: initial;
