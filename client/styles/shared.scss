@@ -48,8 +48,10 @@ $text-color-primary: $primary-bg-color;
 
 $background-color-white: #ffffff;
 $background-color-white-hover: tint($primary-bg-color, 96.5%);
-$background-color-light: tint($primary-bg-color, 90%);
-$background-color-light-hover: tint($primary-bg-color, 83.5%);
+$background-color-light: desaturate(tint($primary-bg-color, 90%), 12%);
+$background-color-light-hover: desaturate(tint($primary-bg-color, 83.5%), 12%);
+$background-color-medium-light: desaturate(tint($primary-bg-color, 75%), 25%);
+
 $background-color-light-positive: #cce8cc;
 $background-color-light-negative: #e8cccc;
 

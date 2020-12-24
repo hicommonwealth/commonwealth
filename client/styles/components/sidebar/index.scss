@@ -132,7 +132,7 @@
     left: 0;
     padding: 0 14px;
     width: $quick-switcher-width;
-    background: $border-color-lightest;
+    background: $background-color-medium-light;
     z-index: 3;
     @include sm-max {
         display: none;
