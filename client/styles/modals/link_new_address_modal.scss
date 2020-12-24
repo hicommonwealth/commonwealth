@@ -76,7 +76,7 @@
     }
     .get-wallet-text {
         margin-top: 15px;
-        color: $text-color-dark;
+        color: $text-color-black;
     }
 
     // for step 1
@@ -234,7 +234,7 @@
         text-align: left;
         display: flex;
         .account-item-address {
-            color: #999;
+            color: $text-color-light;
         }
         .account-item-left {
         }

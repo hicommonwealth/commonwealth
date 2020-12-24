@@ -55,7 +55,6 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
       m('.action-col', [
         m(Button, {
           intent: 'negative',
-          size: 'sm',
           onclick: async () => {
             const confirmed = await confirmationModalWithText('Are you sure you want to remove this account?')();
             if (confirmed) {

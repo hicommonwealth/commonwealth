@@ -24,7 +24,7 @@
         display: flex;
         padding: 0 0 3px;
         span {
-            color: #ea7a60;
+            color: $last-seen-notification-color;
             font-size: 0.94rem;
             font-weight: 500;
             width: max-content;
@@ -35,13 +35,13 @@
         hr {
             height: 1px;
             border: none;
-            border-bottom: 1px solid lighten(#ea7a60, 11%);
+            border-bottom: 1px solid lighten($last-seen-notification-color, 11%);
             width: -webkit-fill-available;
         }
     }
 
     .infinite-scroll-reached-end {
-        color: #aaa;
+        color: $text-color-light;
         font-size: 0.94rem;
         margin: 20px 0;
         text-align: center;

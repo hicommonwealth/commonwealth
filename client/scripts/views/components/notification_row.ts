@@ -252,7 +252,8 @@ const NotificationRow: m.Component<{
 
       if (vnode.state.scrollOrStop) {
         setTimeout(() => {
-          document.getElementById(m.route.param('id')).scrollIntoView();
+          const el = document.getElementById(m.route.param('id'));
+          if (el) el.scrollIntoView();
         }, 1);
         vnode.state.scrollOrStop = false;
       }

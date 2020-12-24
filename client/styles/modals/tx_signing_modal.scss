@@ -57,7 +57,7 @@
             text-align: center;
             display: block;
             font-size: 18px;
-            color: #999;
+            color: $text-color-light;
         }
     }
 
@@ -67,7 +67,7 @@
         margin-top: 15px;
         font-size: 14px;
         a {
-            color: #aaa;
+            color: $text-color-light;
             text-decoration: none;
             &:hover {
                 text-decoration: underline;

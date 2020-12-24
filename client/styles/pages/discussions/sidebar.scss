@@ -15,6 +15,9 @@
     }
     .user-activity, .admins-mods {
         margin-bottom: 20px;
+        .cui-overlay-inline {
+            display: block;
+        }
         .MostActiveUser {
             display: flex;
             justify-content: space-between;
