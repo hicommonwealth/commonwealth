@@ -30,7 +30,6 @@ $positive-icon-color: #7ed320;
 $failure-icon-color: #db322d;
 
 $last-seen-notification-color: #ea7a60;
-$modal-header-background-color: #4f63be;
 
 $text-color-white: #fff;
 $text-color-lightest: #b5b7b9;          // light text on white background
@@ -48,32 +47,29 @@ $text-color-primary: $primary-bg-color;
 // background colors
 
 $background-color-white: #ffffff;
-$background-color-white-hover: #f9fafd;
-$background-color-light: #eef1fa;
-$background-color-light-hover: #e5e8f7;
+$background-color-white-hover: tint($primary-bg-color, 96.5%);
+$background-color-light: tint($primary-bg-color, 90%);
+$background-color-light-hover: tint($primary-bg-color, 83.5%);
 $background-color-light-positive: #cce8cc;
 $background-color-light-negative: #e8cccc;
 
-$background-color-medium-accent: #adb7d5;
+$background-color-medium-accent: tint($primary-bg-color, 50%);
 
-$background-color-dark-accent: #4f62bd;
+$background-color-dark-accent: $primary-bg-color;
 $background-color-dark-monochrome: #36393f;
-$background-color-darker-accent: darken(#4f62bd, 4%);
+$background-color-darker-accent: shade($primary-bg-color, 4%);
 $background-color-darker-monochrome: #2f3136;
 
-$background-color-placeholder: #adb7d5; // placeholder color
 $background-color-unread: #ffffe0;      // notifications color
 $background-color-selection-on-dark: #ffdd00;
 
 //
 // border colors
 
-$form-border-color: #c5cdd1;
-$form-border-color-light: lighten(#c5cdd1, 12%);
-$form-border-color-focus: mix($form-border-color, $primary-bg-color, 50%);
-$background-color-border: #e0e4f1;
-
-$box-shadow-color: #eef1f2; // ?? - TODO: label or refactor
+$border-color: #c5cdd1;
+$border-color-light: #e0e4f1;
+$border-color-lightest: #e0e4f1;
+$border-color-focus: mix($border-color, $primary-bg-color, 50%);
 
 //
 // forum listing components
@@ -96,12 +92,12 @@ $listing-right-flex: 3;
 @mixin formfield-base {
     display: block;
     width: 100%;
-    border: 1px solid $form-border-color;
+    border: 1px solid $border-color;
     border-radius: 4px;
     outline: none;
     box-shadow: none;
     &:focus {
-        border-color: $form-border-color-focus;
+        border-color: $border-color-focus;
     }
 }
 

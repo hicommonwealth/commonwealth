@@ -3,7 +3,7 @@
 .MobileSidebarHeader {
     // only content styles here. layout styles are in layout.scss
     background: $background-color-light;
-    border-bottom: 1px solid $background-color-border;
+    border-bottom: 1px solid $border-color-lightest;
 
     .mobile-sidebar-center {
         flex: 1;
@@ -132,7 +132,7 @@
     left: 0;
     padding: 0 14px;
     width: $quick-switcher-width;
-    background: $background-color-border;
+    background: $border-color-lightest;
     z-index: 3;
     @include sm-max {
         display: none;
@@ -207,7 +207,7 @@
         );
     }
     .SidebarHeader {
-        border-bottom: 1px solid $background-color-border;
+        border-bottom: 1px solid $border-color-lightest;
         .cui-button {
             padding: 0;
             width: 100%;
@@ -344,7 +344,7 @@
         }
         .proposal-topic-icon {
             margin-right: 0;
-            border-color: $background-color-placeholder;
+            border-color: $background-color-medium-accent;
             position: relative;
             top: 2px;
         }
@@ -377,7 +377,7 @@
             margin-bottom: 0;
             select {
                 width: 100%;
-                border-color: $background-color-border;
+                border-color: $border-color-lightest;
                 border-radius: 2px;
                 padding: 5px 6px;
             }

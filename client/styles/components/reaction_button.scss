@@ -18,7 +18,7 @@
     &.disabled {
         background: initial !important;
         color: $text-color-light !important;
-        border-color: $background-color-border !important;
+        border-color: $border-color-lightest !important;
     }
     .reactions-icon {
         position: relative;

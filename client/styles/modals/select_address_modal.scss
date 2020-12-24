@@ -10,19 +10,19 @@
     }
 
     .select-address-options {
-        border-bottom: 1px solid $background-color-border;
+        border-bottom: 1px solid $border-color-lightest;
         margin-bottom: 10px;
     }
     .select-address-placeholder {
         padding: 20px;
         text-align: center;
-        border: 1px solid $background-color-border;
+        border: 1px solid $border-color-lightest;
         border-bottom: none;
         color: $text-color-light;
     }
     .select-address-option {
         position: relative;
-        border: 1px solid $background-color-border;
+        border: 1px solid $border-color-lightest;
         border-bottom: none;
         cursor: pointer;
         &:hover {
