@@ -38,7 +38,7 @@ export default class extends IEventHandler {
       eventValidatorsList = imOnlineEventData.validators;
     }
 
-    // Get all the records for all validators from database those are in new-session's active and waiting list.
+    // ignore validators who were offline but there record is not available in validators table.
     const existingValidators = await this._models.Validator.findAll({
       where: {
         stash: {
