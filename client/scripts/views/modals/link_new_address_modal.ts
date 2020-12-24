@@ -417,9 +417,9 @@ const LinkNewAddressModal: m.Component<{
                 !(app.chain as Substrate || app.chain as Ethereum).webWallet.available
                   ? 'No wallet detected'
                   : (vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected)
-                    ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ]
+                    ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ]
                     : app.chain.networkStatus === ApiStatus.Disconnected
-                      ? 'Could not connect to chain'
+                      ? 'Connecting to chain...'
                       : 'Connect to wallet'
             }),
           !(app.chain as Substrate || app.chain as Ethereum).webWallet.available && m('.get-wallet-text', [
