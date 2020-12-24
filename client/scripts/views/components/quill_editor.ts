@@ -921,7 +921,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                 }
               },
             }),
-            content: 'Click for rich text',
+            content: m('.quill-editor-tooltip', 'Click for rich text'),
           })
           : m(Tooltip, {
             trigger: m(Tag, {
@@ -968,7 +968,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                 }
               },
             }),
-            content: 'Click for Markdown',
+            content: m('.quill-editor-tooltip', 'Click for Markdown'),
           }),
       ]),
     ]);

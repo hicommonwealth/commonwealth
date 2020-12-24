@@ -77,6 +77,7 @@ const NotificationsMenu: m.Component<{ small?: boolean }, { selectedChainEvents:
       hoverCloseDelay: 0,
       trigger: m(Button, {
         class: `NotificationsMenuButton ${unreadNotificationsCount > 0 ? 'has-notifications' : 'no-notifications'}`,
+        intent: unreadNotificationsCount > 0 ? 'primary' : undefined,
         label: [
           m(Icon, { name: Icons.BELL }),
           m('.notification-count', [

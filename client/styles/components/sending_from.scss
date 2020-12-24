@@ -7,7 +7,7 @@
     }
     span.sending-from-balance {
         margin-left: 15px;
-        color: #888;
+        color: $text-color-medium;
     }
     @include xs-max {
         display: block;

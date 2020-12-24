@@ -13,13 +13,14 @@
 // 7. preview button
 // 8. mentions container
 // 9. progress bar
+// 10. markdown/rich text switcher tooltip
 //
 
 .QuillEditor {
     position: relative;
     ::selection {
-        background: $theme-base-color;
-        color: #fff;
+        background: $primary-bg-color;
+        color: $text-color-white;
     }
 
     // 1. editor typography modifications
@@ -40,7 +41,7 @@
         }
         pre, .ql-code-block-container {
             background: $background-color-light;
-            color: #111;
+            color: $text-color-black;
             font-family: $monospace-fonts;
             font-size: 0.833em;
             white-space: pre-wrap;
@@ -88,22 +89,22 @@
         }
         li[data-list=checked] > .ql-ui::before {
             content: '\f14a';
-            color: #444;
+            color: $text-color-darker;
             font-size: 93%;
         }
         li[data-list=unchecked] > .ql-ui::before {
             content: '\f096';
-            color: #b0bec5;
+            color: $text-color-lightest;
         }
     }
 
     // 3. ql-snow form input styles, ql-bubble styles
     .ql-container.ql-snow {
-        border: 1px solid $form-border-color;
+        border: 1px solid $border-color;
         border-radius: 0 0 3px 3px;
         // construct-ui input styles
-        color: #37474f;
-        box-shadow: 0px 1px 0px #eef1f2;
+        color: $text-color-darker;
+        box-shadow: 0px 1px 0px $border-color-lightest;
     }
     .ql-bubble .ql-editor {
         padding: 1px 8px 8px 1px;
@@ -118,8 +119,8 @@
 
     // 4. toolbar
     .ql-toolbar.ql-snow {
-        border: 1px solid $form-border-color;
-        border-radius: $base-border-radius $base-border-radius 0 0;
+        border: 1px solid $border-color;
+        border-radius: 4px 4px 0 0;
         box-sizing: border-box;
         padding: 5px 8px;
         white-space: nowrap;
@@ -127,13 +128,30 @@
         min-height: 39px;
     }
     .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label {
-        border-color: $form-border-color
+        border-color: $border-color;
     }
     .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
-        border-color: $form-border-color
+        border-color: $border-color;
     }
+    // link popup
     .ql-tooltip {
         z-index: 9999;
+        font-size: 17px;
+        padding: 10px 15px 8px;
+        border-radius: 5px;
+        input[type="text"] {
+            position: relative;
+            top: -1px;
+            padding: 5px 8px 0;
+            margin-left: 4px;
+            border-radius: 3px;
+            // text styles
+            font-size: 17px;
+            height: 31px;
+        }
+        a.ql-action:hover::after {
+            text-decoration: underline;
+        }
     }
     @include xs-max {
         .ql-toolbar .ql-formats:last-child {
@@ -173,7 +191,7 @@
         margin: 10px;
         width: 100%;
         text-align: center;
-        color: #999;
+        color: $text-color-light;
         font-size: 14px;
         .icon-spinner2.animate-spin {
             margin: 0 4px;
@@ -189,7 +207,7 @@
     }
     .ql-formats > .ql-preview:before {
         position: relative;
-        top: -3px;
+        top: -2px;
 
         content: '\e842';
 
@@ -272,13 +290,13 @@
             }
             .ql-mention-addr {
                 float: right;
-                color: #999;
+                color: $text-color-light;
                 font-size: 90%;
                 line-height: 1.6;
             }
             .ql-mention-la {
                 display: block;
-                color: #999;
+                color: $text-color-light;
                 font-size: 90%;
                 white-space: nowrap;
             }
@@ -302,4 +320,11 @@
     height: 3px;
     width: 80%;
     background-color: red;
+}
+
+// 10. markdown/rich text switcher tooltip
+.quill-editor-tooltip {
+    position: relative;
+    top: 3px;
+    line-height: 1;
 }

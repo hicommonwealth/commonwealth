@@ -7,7 +7,7 @@ $size: 46px;
     .icon-circle {
         display: inline-block;
         background: $primary-bg-color;
-        color: #fff;
+        color: $text-color-white;
         width: $size;
         height: $size;
         border-radius: $size / 2;
@@ -16,7 +16,7 @@ $size: 46px;
         svg {
             position: relative;
             top: 1px;
-            stroke: #fff;
+            stroke: $text-color-white;
         }
     }
     h1 {

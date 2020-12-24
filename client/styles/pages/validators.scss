@@ -4,7 +4,7 @@
     font-size: 13px;
     font-weight: 500;
     text-transform: uppercase;
-    color: #999;
+    color: $text-color-light;
     letter-spacing: 0.2px;
 }
 
@@ -46,7 +46,7 @@
     h5 {
         font-size: 13px;
         text-transform: uppercase;
-        color: #aaa;
+        color: $text-color-light;
         letter-spacing: 0.3px;
         margin: 0 0 5px;
     }
@@ -55,7 +55,7 @@
         padding: 18px 24px;
         background: $background-color-white-hover;
         &.not-available {
-            color: #999;
+            color: $text-color-light;
         }
     }
     .stash-stat {
@@ -113,7 +113,7 @@
         }
     }
     a.view-nominators {
-        color: #999;
+        color: $text-color-light;
         float: right;
     }
     button.nominate-validator {

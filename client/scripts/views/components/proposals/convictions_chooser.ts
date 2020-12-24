@@ -13,7 +13,6 @@ const ConvictionsChooser: m.Component<{ callback: (number) => void }, {}> = {
     return m(CustomSelect, {
       class: 'ConvictionsChooser',
       name: 'convictions',
-      size: 'sm',
       oncreate: () => {
         vnode.attrs.callback(convictions()[0].toString());
       },
