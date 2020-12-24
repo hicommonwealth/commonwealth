@@ -139,11 +139,11 @@
         }
         li.checked:before {
             content: '\f14a';
-            color: #777;
+            color: $text-color-medium;
         }
         li.unchecked:before {
             content: '\f096';
-            color: #b0bec5;
+            color: $text-color-lightest;
         }
     }
     ul.checklist + ul.checklist {

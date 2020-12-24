@@ -38,7 +38,7 @@ const NEW_REACTIONS_LABEL_SUFFIX = '(new reactions only)';
 // right column - for selecting the notification frequency
 const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (immediate)';
 const NOTIFICATION_ON_OPTION = 'On';
-const NOTIFICATION_ON_SOMETIMES_OPTION = 'Multiple selections';
+const NOTIFICATION_ON_SOMETIMES_OPTION = 'Multiple';
 const NOTIFICATION_OFF_OPTION = 'Off';
 
 const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: boolean }> = {
@@ -226,7 +226,6 @@ const BatchedSubscriptionRow: m.Component<{
             disabled: !app.user.emailVerified || vnode.state.loading,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
-            size: 'sm',
             class: vnode.state.option === NOTIFICATION_ON_SOMETIMES_OPTION ? 'sometimes' : '',
           }),
           onSelect: async (option: string) => {
@@ -428,7 +427,6 @@ const ChainEventSubscriptionRow: m.Component<{
             disabled: !app.user.emailVerified || vnode.state.loading,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
-            size: 'sm',
           }),
           onSelect: async (option: string) => {
             vnode.state.option = option;

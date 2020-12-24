@@ -119,13 +119,12 @@ const LockdropToolsCard: m.Component<{}> = {
       class: 'home-card LockdropToolsCard',
     }, [
       m('.card-right', [
-        m('h3', 'Edgeware Lockdrop Tools'),
+        m('h3', { style: 'margin-top: 4px;' }, 'Edgeware Lockdrop Tools'),
         m(Button, {
           interactive: true,
           compact: true,
           fluid: true,
           intent: 'primary',
-          size: 'sm',
           onclick: (e) => {
             e.preventDefault();
             m.route.set('/edgeware/stats');
@@ -137,7 +136,6 @@ const LockdropToolsCard: m.Component<{}> = {
           compact: true,
           fluid: true,
           intent: 'primary',
-          size: 'sm',
           onclick: (e) => {
             e.preventDefault();
             m.route.set('/edgeware/unlock');
