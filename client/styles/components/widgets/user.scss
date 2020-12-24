@@ -40,7 +40,8 @@
     height: 14px;
     padding-top: 4px;
     margin: 0;
-    margin-left: 4px;
+    margin-left: 4px; // tuned for correct spacing next to inline text and/or identity icons
+    margin-right: 1px;
     border-radius: 9999px;
     // text styling
     text-align: center;

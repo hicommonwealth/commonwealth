@@ -26,6 +26,10 @@
     }
     .comment-body {
         flex: 1;
+        &:first-child {
+            // chain notifications don't have a User/UserGallery
+            margin-top: 8px;
+        }
         .chain-event-notification-top {
             display: flex;
             justify-content: space-between;
