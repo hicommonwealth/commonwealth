@@ -34,6 +34,7 @@ const User: m.Component<{
     let profile; // profile is used to retrieve the chain and address later
     let role;
     const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id);
+    const friendlyChainName = app.config.chains.getById(typeof user.chain === 'string' ? user.chain : user.chain?.id)?.name;
 
     const adminsAndMods = app.chain
       ? app.chain.meta.chain.adminsAndMods
@@ -77,10 +78,10 @@ const User: m.Component<{
       // 'long' makes role tags show as full length text
       profile.isCouncillor && m('.role-icon.role-icon-councillor', {
         class: long ? 'long' : ''
-      }, long ? 'Councillor' : 'C'),
+      }, long ? `${friendlyChainName} Councillor` : 'C'),
       profile.isValidator && m('.role-icon.role-icon-validator', {
         class: long ? 'long' : ''
-      }, long ? 'Validator' : 'V'),
+      }, long ? `${friendlyChainName} Validator` : 'V'),
       // offchain role in commonwealth forum
       showRole && role && m(Tag, {
         class: 'role-tag',
@@ -137,14 +138,14 @@ const User: m.Component<{
       m('.user-name', [
         (app.chain && app.chain.base === ChainBase.Substrate && app.cachedIdentityWidget)
           ? m(app.cachedIdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort })
-          : link(`a.user-display-name${
-            (profile && profile.name !== 'Anonymous') ? '.username' : '.anonymous'}`,
+          : link('a.user-display-name',
           profile
             ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
             : 'javascript:',
-          profile ? profile.name : addrShort)
+          profile ? profile.displayName : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
+      friendlyChainName && m('.user-chain', friendlyChainName),
       getRoleTags(true), // always show roleTags in .UserPopover
     ]);
 

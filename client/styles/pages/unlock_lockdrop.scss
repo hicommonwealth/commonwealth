@@ -7,10 +7,10 @@
         font-weight: 500;
     }
     .error-message {
-        color: #d32e26;
+        color: $negative-bg-color;
     }
     .success-message {
-        color: green;
+        color: $positive-bg-color;
     }
 
     // shared styles
@@ -56,17 +56,17 @@
         }
         .explanation {
             display: block;
-            color: #aaa;
+            color: $text-color-light;
             padding-top: 30px;
         }
         .explanation p {
             margin: 10px 0;
         }
         .explanation a {
-            color: #aaa;
+            color: $text-color-light;
         }
         .explanation a:hover {
-            color: #555;
+            color: $text-color-medium;
         }
         .network-selector {
             margin-top: 12px;

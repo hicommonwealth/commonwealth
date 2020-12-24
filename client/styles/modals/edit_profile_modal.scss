@@ -20,7 +20,7 @@
             label.cui-form-label {
                 display: block;
                 margin-top: 8px;
-                color: $text-color-dark;
+                color: $text-color-black;
             }
             input, textarea {
                 margin: 8px 0;
@@ -43,6 +43,6 @@
     }
     .error-message {
         margin-top: 12px;
-        color: $negative-text-color;
+        color: $negative-bg-color;
     }
 }

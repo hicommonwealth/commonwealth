@@ -3,7 +3,9 @@
 .NotificationsPage {
     .EmailIntervalConfiguration {
         background: $background-color-light;
-        padding: 18px 24px 20px;
+        padding: 18px 24px 8px;
+        border-radius: 5px;
+        margin-top: 8px;
         margin-bottom: 40px;
         display: flex;
         h4 {
@@ -32,7 +34,7 @@
         th {
             font-weight: 500;
             padding: 6px 0 12px;
-            border-bottom-color: $form-border-color-light;
+            border-bottom-color: $border-color-light;
         }
         td {
             border: none;

@@ -12,9 +12,9 @@
       padding: 12px 16px 11px;
       margin-bottom: 20px;
       border-radius: 4px;
-      background: #222;
-      color: #fff;
-      font-family: SF Mono, Roboto, Menlo, monospace;
+      background: $text-color-darker;
+      color: $text-color-white;
+      font-family: $monospace-fonts;
       font-size: 13px;
       white-space: pre;
       &.click-to-select {
@@ -24,7 +24,7 @@
           opacity: 0.9;
       }
       &::selection {
-          background: #ffdd00;
+          background: $background-color-selection-on-dark;
       }
   }
 }
@@ -33,7 +33,7 @@
     display: flex;
     border: 1px solid $background-color-light;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
-    background: #fff;
+    background: $text-color-white;
     border-radius: 3px;
     margin: 10px 0;
     padding: 17px 20px 13px;
@@ -42,7 +42,7 @@
 
     // link styling
     text-decoration: none;
-    color: #111;
+    color: $text-color-black;
     @include hoverFloat;
 
     .proposal-pre {
@@ -108,7 +108,7 @@
             word-break: break-word;
             line-height: 1.2;
             text-overflow: ellipsis;
-            color: #bdbdbd;
+            color: $text-color-lightest;
         }
 
         .proposal-row-metadata {
@@ -120,18 +120,18 @@
 
             .proposal-user {
                 margin-top: 4px;
-                color: #bdbdbd;
+                color: $text-color-lightest;
                 .username {
-                    color: #bdbdbd;
+                    color: $text-color-lightest;
                     font-weight: 400;
                 }
             }
             .proposal-user-mobile {
                 display: none;
-                color: #bdbdbd;
+                color: $text-color-lightest;
                 .user-display-name username {
                     position: relative;
-                    color: #bdbdbd;
+                    color: $text-color-lightest;
                     font-weight: 400;
                     top: 2px;
                 }

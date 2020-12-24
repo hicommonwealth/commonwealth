@@ -108,7 +108,6 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
         ]),
         m(Input, {
           fluid: true,
-          size: 'sm',
           class: 'democracy-referendum-vote-amount',
           placeholder: `Amount to vote (${app.chain?.chain?.denom})`,
           oncreate: (vvnode) => {

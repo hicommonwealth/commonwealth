@@ -456,7 +456,10 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
           }
         }) : nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
           return m(MenuItem, {
-            label: node.label,
+            label: [
+              node.label,
+              app.chain?.meta.id === node.value && ' (Selected)',
+            ],
             onclick: async (e) => {
               e.preventDefault();
               vnode.state.initializing = true;
@@ -532,6 +535,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           (app.chain || app.community) && m(OnchainNavigationModule),
         ]),
         app.chain && m(ChainStatusModule),
+        m('.sidebar-fadeout'),
       ])
     ];
   },
