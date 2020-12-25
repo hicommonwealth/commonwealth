@@ -59,8 +59,15 @@ $discussion-meta-padding: 18px;
                 color: $text-color-light;
                 margin-right: 12px;
             }
+            > .User {
+                display: flex;
+                > .role-icon {
+                    position: relative;
+                    top: -1px;
+                }
+            }
             > .User > a {
-                display: inline-block;
+                display: block;
                 text-decoration: none;
                 color: $text-color-light;
                 &:hover {

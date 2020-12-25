@@ -25,6 +25,9 @@
                 padding: 13px 0;
                 color: $text-color-black;
                 text-decoration: none;
+                &:hover {
+                    background-color: $background-color-white-hover;
+                }
             }
             .search-results-thread-title {
                 font-weight: 500;

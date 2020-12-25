@@ -148,7 +148,7 @@
             max-height: none;
             .cui-list-item {
                 display: block;
-                padding: 16px 20px;
+                padding: 21px 12px 12px !important;
                 border-bottom-color: $border-color-lightest;
                 max-height: 140px;
                 overflow: hidden;
@@ -201,7 +201,6 @@
             display: inline-block;
             margin-right: 12px;
             width: calc(100% - 6px);
-            padding: 3px 8px 2px;
             line-height: 1.2;
             color: $negative-bg-color;
             border: 1px solid $negative-bg-color;
