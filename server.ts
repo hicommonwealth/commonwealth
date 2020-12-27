@@ -34,6 +34,7 @@ import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
+import archivalNodeDBEntryExist  from './server/scripts/checkArchivalNodeEntry';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
@@ -64,12 +65,19 @@ async function main() {
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
-  const ARCHIVAL = process.env.ARCHIVAL === 'true';
+  let ARCHIVAL = process.env.ARCHIVAL === 'true';
   const START_BLOCLK = process.env.START_BLOCK ? +process.env.START_BLOCK : 0;
   const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
+
+  // check if db record exists for archival node execution with chain-events version and starting block number.
+  if (ARCHIVAL) {
+    const archivalNodeDBEntry = await archivalNodeDBEntryExist(models);
+    ARCHIVAL = archivalNodeDBEntry ? false : true;
+    console.log(`Executing process with ARCHIVAL flag set to ${ARCHIVAL}`);
+  }
 
   const identityFetchCache = new IdentityFetchCache(10 * 60);
   const listenChainEvents = async () => {
