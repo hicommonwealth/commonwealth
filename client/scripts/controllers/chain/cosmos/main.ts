@@ -16,7 +16,7 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.chain = new CosmosChain(this.app);
+    this.chain = new CosmosChain(this.app, 'cosmos');
     this.accounts = new CosmosAccounts(this.app);
     this.governance = new CosmosGovernance(this.app);
   }

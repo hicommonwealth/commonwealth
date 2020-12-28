@@ -614,9 +614,9 @@ const LinkNewAddressModal: m.Component<{
                 } catch (err) {
                   vnode.state.error = 'Invalid address';
                 }
-                if (app.user.activeAccounts.find((acct) => acct.address === address)) {
-                  vnode.state.error = 'You have already linked this address';
-                }
+              }
+              if (app.user.activeAccounts.find((acct) => acct.address === address)) {
+                vnode.state.error = 'You have already linked this address';
               }
 
               if (!vnode.state.error) {
@@ -743,7 +743,7 @@ const LinkNewAddressModal: m.Component<{
           m('.create-profile-instructions', vnode.state.isNewLogin
             ? 'Logged in! Now create a profile:'
             : 'Address verified! Now create a profile:'),
-          m('.new-account-userblock', [
+          m('.new-account-userblock', { style: 'text-align: center;' }, [
             m(UserBlock, { user: vnode.state.newAddress }),
           ]),
           m('.avatar-wrap', [

@@ -31,6 +31,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return this._api;
   }
 
+  private _addressPrefix: string;
+  public get addressPrefix() {
+    return this._addressPrefix;
+  }
+
   // TODO: rename this something like "bankDenom" or "gasDenom" or "masterDenom"
   private _denom: string;
   public get denom(): string {
@@ -51,8 +56,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _app: IApp;
   public get app() { return this._app; }
 
-  constructor(app: IApp) {
+  constructor(app: IApp, addressPrefix: string) {
     this._app = app;
+    this._addressPrefix = addressPrefix;
   }
 
   public coins(n: number | BN, inDollars?: boolean) {
@@ -110,9 +116,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     cb?: (success: boolean) => void,
   ): ITXModalData {
     return {
-      author: author,
+      author,
       txType: txName,
-      cb: cb,
+      cb,
       txData: {
         unsignedData: async (): Promise<ICosmosTXData> => {
           const { cmdData: { messageToSign, chainId, accountNumber, gas, sequence } } = await txFunc();
@@ -137,10 +143,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
             signer = (author as CosmosAccount).getLedgerSigner();
           }
           // perform transaction and coerce into compatible observable
-          txFunc(computedGas).then(({ msg, memo, cmdData: { gas }}) => {
-            return msg.send({ gas: '' + gas, memo }, signer);
+          txFunc(computedGas).then(({ msg, memo, cmdData: { gas } }) => {
+            return msg.send({ gas: `${gas}`, memo }, signer);
           }).then(({ hash, sequence, included }) => {
-            subject.next({ status: TransactionStatus.Ready, hash: hash });
+            subject.next({ status: TransactionStatus.Ready, hash });
             // wait for transaction to process
             return included();
           }).then((txObj) => {
