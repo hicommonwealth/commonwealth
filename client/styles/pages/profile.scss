@@ -343,6 +343,9 @@
 
 .ProfileContent {
     @include profile-listing;
+    .infinite-scroll {
+        overflow-y: hidden;
+    }
     .btn-wrap {
         margin: 32px 0;
     }
