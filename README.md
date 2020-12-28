@@ -71,6 +71,13 @@ We also use certain environment variables to configure the application itself:
 - NO_EVENTS: disable chain-event functionality entirely
 - NO_CLIENT: set to true to disable the front-end build
 
+To run the application in archival mode to poll past blocks and execute enrichers against them set the following flags:
+
+- RUN_AS_LISTENER: run the application as event listener
+- ARCHIVAL: to instruct application to run in archival mode
+- ARCHIVAL_NODE_URL: the url of the node running in archival mode
+- START_BLOCK: block from which you want to start archival node from. By default its set to 0
+
 ## Production Database
 
 To download and restore the production database, and run migrations:
