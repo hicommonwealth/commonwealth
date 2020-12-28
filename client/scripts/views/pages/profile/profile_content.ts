@@ -65,7 +65,7 @@ const ProfileContent: m.Component<{
               `Showing ${content.length} of ${pluralize(content.length, type)}.`,
             ])
         ]
-        : m('.no-content', 'No content of this type to display.'),
+        : m('.no-content', `No ${type} to display.`),
     ]);
   }
 };
