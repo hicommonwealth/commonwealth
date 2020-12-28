@@ -1,77 +1,54 @@
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import Infinite from 'mithril-infinite';
+import { pluralize } from 'helpers';
+import { Spinner } from 'construct-ui';
 import { OffchainThread, Account } from 'models';
 import { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
 import ProfileProposal from './profile_proposal';
-import NotificationRow from '../../components/notification_row';
 
-// const postsRemaining = (content, state) => {
-//   console.log({ postsRemaining: content.length > 10 && state.count < content.length })
-//   return (content.length > 10 && state.count < content.length);
-// };
+const postsRemaining = (contentLength, count) => {
+  return (contentLength > 10 && count < contentLength);
+};
 
 const ProfileContent: m.Component<{
   account: Account<any>,
   type: UserContent,
-  content: any
+  content: any[],
 }, {
-  onscroll: any;
   count: number
-  previousContent: any;
+  previousContent: any,
+  onscroll;
 }> = {
   // TODO: Add typeguards to ProposalComments so we can avoid the dirty indexing here
   view: (vnode) => {
-    const { account, type } = vnode.attrs;
-    const {
-      allContent,
-      proposals,
-      comments,
-    } = vnode.attrs.content;
+    const { account, type, content } = vnode.attrs;
 
-    const content = (type === UserContent.All)
-      ? allContent
-      : (type === UserContent.Threads)
-        ? proposals
-        : comments;
-    console.log(content.length);
+    const newContent = type !== vnode.state.previousContent;
+
+    if (newContent) {
+      $(window).off('scroll');
+      if (!vnode.state.count) vnode.state.count = 10;
+      vnode.state.onscroll = _.debounce(async () => {
+        if (!postsRemaining(content.length, vnode.state.count)) return;
+        const scrollHeight = $(document).height();
+        const scrollPos = $(window).height() + $(window).scrollTop();
+        if (scrollPos > (scrollHeight - 400)) {
+          vnode.state.count += 10;
+          console.log(vnode.state.count);
+          m.redraw();
+        }
+      }, 400);
+
+      vnode.state.previousContent = type;
+      $(window).on('scroll', vnode.state.onscroll);
+    }
+    console.log(vnode.state.count);
     return m('.ProfileContent', [
-      // (type === UserContent.All) && m('.all-content', [
-      //   allContent.length === 0 && m('.no-items', [
-      //     (account.profile && account.profile.name) ? account.profile.name : 'This account',
-      //     ' hasn\'t posted any threads or comments'
-      //   ]),
-      //   allContent.slice(0, vnode.state.count).map((obj) => {
-      //     if (obj instanceof OffchainThread) return m(ProfileProposal, { proposal: obj });
-      //     else return m(ProfileCommentGroup, { proposal: obj.proposal, comments: [obj], account, });
-      //   })
-      // ]),
-      // (type === UserContent.Threads) && m('.user-threads', [
-      //   proposals.length === 0 && m('.no-items', [
-      //     (account.profile && account.profile.name) ? account.profile.name : 'This account',
-      //     ' hasn\'t posted any threads'
-      //   ]),
-      //   proposals.slice(0, vnode.state.count).map((proposal) => m(ProfileProposal, { proposal }))
-      // ]),
-      // (type === UserContent.Comments) && m('.user-comments', [
-      //   comments.length === 0 && m('.no-items', [
-      //     (account.profile && account.profile.name) ? account.profile.name : 'This account',
-      //     ' hasn\'t posted any comments'
-      //   ]),
-      //   comments.slice(0, vnode.state.count).map((comment) => {
-      //     return m(ProfileCommentGroup, { proposal: comment.proposal, comments: [comment], account, });
-      //   }),
-      // ]),
       content?.length > 0
-        ? m(Infinite, {
-          class: 'infinite-scroll',
-          key: `${type}-`,
-          maxPages: 1,
-          pageData: () => content,
-          pageChange: () => { console.log('changing'); },
-          item: (data, opts, index) => {
+        ? [
+          content.slice(0, vnode.state.count).map((data) => {
             if (data instanceof OffchainThread) {
               return m(ProfileProposal, { proposal: data });
             } else {
@@ -81,9 +58,16 @@ const ProfileContent: m.Component<{
                 account
               });
             }
-          },
-        })
-        : m('.no-content', 'No content of this type to display.')
+          }),
+          postsRemaining(content.length, vnode.state.count)
+            ? m('.infinite-scroll-spinner-wrap', [
+              m(Spinner, { active: content.length < vnode.state.count })
+            ])
+            : m('.infinite-scroll-reached-end', [
+              `Showing ${content.length} of ${pluralize(content.length, type)}.`,
+            ])
+        ]
+        : m('.no-content', 'No content of this type to display.'),
     ]);
   }
 };

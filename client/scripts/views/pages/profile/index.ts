@@ -146,7 +146,7 @@ const getProfileStatus = (account) => {
 };
 
 export enum UserContent {
-  All = 'all',
+  All = 'posts',
   Threads = 'threads',
   Comments = 'comments'
 }
@@ -334,21 +334,21 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
               content: m(ProfileContent, {
                 account,
                 type: UserContent.All,
-                content: { allContent }
+                content: allContent
               })
             }, {
               name: threadsTabTitle,
               content: m(ProfileContent, {
                 account,
                 type: UserContent.Threads,
-                content: { proposals }
+                content: proposals
               }),
             }, {
               name: commentsTabTitle,
               content: m(ProfileContent, {
                 account,
                 type: UserContent.Comments,
-                content: { comments }
+                content: comments
               }),
             }]),
           ]),
