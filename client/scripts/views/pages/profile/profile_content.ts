@@ -29,14 +29,13 @@ const ProfileContent: m.Component<{
 
     if (newContent) {
       $(window).off('scroll');
-      if (!vnode.state.count) vnode.state.count = 10;
+      vnode.state.count = 10;
       vnode.state.onscroll = _.debounce(async () => {
         if (!postsRemaining(content.length, vnode.state.count)) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
           vnode.state.count += 10;
-          console.log(vnode.state.count);
           m.redraw();
         }
       }, 400);
@@ -44,7 +43,6 @@ const ProfileContent: m.Component<{
       vnode.state.previousContent = type;
       $(window).on('scroll', vnode.state.onscroll);
     }
-    console.log(vnode.state.count);
     return m('.ProfileContent', [
       content?.length > 0
         ? [
