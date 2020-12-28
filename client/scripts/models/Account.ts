@@ -98,11 +98,13 @@ abstract class Account<C extends Coin> {
       // construct signature from private key
       signature = await this.signMessage(`${this._validationToken}\n`);
     } else if (signature) {
-      const withoutNewline = !(await this.isValidSignature(this._validationToken, signature));
-      const withNewline = !(await this.isValidSignature(`${this._validationToken}\n`, signature));
-      if (withNewline && withoutNewline) {
+      const validWithoutNewline = await this.isValidSignature(this._validationToken, signature);
+      const validWithNewline = await this.isValidSignature(`${this._validationToken}\n`, signature);
+      if (!validWithNewline && !validWithoutNewline) {
         throw new Error('invalid signature');
       }
+    } else {
+      throw new Error('no signature or seed provided');
     }
 
     if (signature) {
