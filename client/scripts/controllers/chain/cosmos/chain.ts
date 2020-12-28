@@ -66,9 +66,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   private _blocktimeHelper: BlocktimeHelper = new BlocktimeHelper();
   public async init(node: NodeInfo, reset = false) {
-    const rpcUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1) ?
-      ('ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657') :
-      ('wss://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':36657');
+    // const rpcUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1) ?
+    //   ('ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657') :
+    //   ('wss://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':36657');
+    const rpcUrl = 'ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657/websocket';
 
     // A note on RPC: gaiacli exposes a command line option "rest-server" which
     // creates the endpoint necessary. However, it doesn't send headers correctly
@@ -77,7 +78,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const restUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1) ?
       ('http://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318') :
       ('https://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318');
-    console.log(`Starting Lunie API at ${restUrl} and Tendermint on ${rpcUrl}...`);
+    console.log(`Starting Lunie API at ${restUrl} and Tendermint Websocket API on ${rpcUrl}...`);
     this._api = new CosmosApi(rpcUrl, restUrl);
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
