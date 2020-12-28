@@ -149,20 +149,23 @@ const CosmosLinkAccountItem: m.Component<{
 
         // Get the verification token & placeholder TX to send
         const signerAccount = await createUserWithAddress(account.address);
-        const signDoc = await keyToMsgSend(account.address, signerAccount.validationToken);
-        signDoc.chain_id = 'straightedge-2';
-        signDoc.account_number = '0';
-        signDoc.sequence = '0';
-        signDoc.fee = { gas: '100000', amount: [] };
-        signDoc.msgs = signDoc.msg;
-        delete signDoc.signatures;
-        delete signDoc.msg;
+        const stdTx = await keyToMsgSend(account.address, signerAccount.validationToken);
+        const signDoc = {
+          chain_id: 'straightedge-2',
+          account_number: '0',
+          sequence: '0',
+          fee: { gas: '100000', amount: [] },
+          msgs: [stdTx],
+        };
 
         // Some typing and versioning issues here...signAmino should be available but it's not
-        (await (client as any).signer.signAmino
-          ? (client as any).signer.signAmino(account.address, signDoc)
-          : (client as any).signer.sign(account.address, signDoc)
-        ).then(({ signed, signature }) => {
+        let promise;
+        if ((client as any).signer.signAmino) {
+          promise = (client as any).signer.signAmino(account.address, signDoc);
+        } else {
+          promise = (client as any).signer.sign(account.address, signDoc);
+        }
+        promise.then(({ signed, signature }) => {
           console.log('amino signing:', JSON.stringify(signDoc), account.address, signature);
           return signerAccount.validate(signature);
         }).then(() => {
@@ -583,22 +586,14 @@ const LinkNewAddressModal: m.Component<{
             ]),
           ],
           app.chain.base === ChainBase.CosmosSDK && [
-            m('p', [
-              'Select an address to add. You can generate one using gaiacli, or choose an existing address ',
-              ' by running ',
-              m('code', 'gaiacli keys list'),
-            ]),
-            m(CodeBlock, { clickToSelect: true }, [
-              'gaiacli keys add ',
-              m('span.no-select', '<name>'),
-            ]),
+            m('p.link-address-cli-explainer', 'Enter the address you are using:'),
           ],
           m(Input, {
             name: 'Address',
             fluid: true,
             autocomplete: 'off',
             placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
-              : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here (e.g. cosmos123...)'
+              : app.chain.base === ChainBase.CosmosSDK ? 'e.g. cosmos123...'
                 : 'Paste the address here',
             oninput: async (e) => {
               const address = (e.target as any).value;
@@ -693,6 +688,7 @@ const LinkNewAddressModal: m.Component<{
               name: 'Signature',
               fluid: true,
               autocomplete: 'off',
+              style: 'display: block; margin-bottom: 18px;',
               placeholder: (app.chain.base === ChainBase.CosmosSDK)
                 ? 'Paste the entire output'
                 : 'Paste the signature here',
@@ -731,8 +727,7 @@ const LinkNewAddressModal: m.Component<{
                   // if no exception was raised, account must be valid
                   accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address));
                 }, (err) => {
-                  vnode.state.error = 'Verification failed. There was an inconsistency error; '
-                    + 'please report this to the developers.';
+                  vnode.state.error = 'Verification failed (frontend check passed, backend check failed)';
                   m.redraw();
                 });
               },

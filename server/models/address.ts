@@ -8,6 +8,7 @@ import { stringToU8a, hexToU8a } from '@polkadot/util';
 
 import * as secp256k1 from 'secp256k1';
 import * as CryptoJS from 'crypto-js';
+import { ecdsaVerify } from 'secp256k1/lib/elliptic';
 
 import { getCosmosAddress } from '@lunie/cosmos-keys';
 import nacl from 'tweetnacl';
@@ -215,14 +216,18 @@ export default (
 
       // we generate an address from the actual public key and verify that it matches,
       // this prevents people from using a different key to sign the message than
-      // the account they registered with
-      const bech32Prefix = (
-        chain.network === 'cosmos' ? 'cosmos'
-          : chain.network === 'straightedge' ? 'str' : chain.network);
+      // the account they registered with.
+      //
+      // however, bech32Prefix may be 'cosmos' because gaiacli doesn't handle different prefixes yet
+      const bech32Prefix = chain.network === 'cosmos'
+        ? 'cosmos'
+        : chain.network === 'straightedge' ? 'str' : chain.network;
       const generatedAddress = getCosmosAddress(pk, bech32Prefix);
-      if (generatedAddress === addressModel.address) {
+      const generatedAddressWithCosmosPrefox = getCosmosAddress(pk, 'cosmos');
+
+      if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefox === addressModel.address) {
         const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), 'hex');
-        isValid = secp256k1.ecdsaVerify(signHash, signature, pk);
+        isValid = ecdsaVerify(signHash, signature, pk);
       } else {
         isValid = false;
       }

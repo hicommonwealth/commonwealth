@@ -305,6 +305,11 @@ export class CosmosAccount extends Account<CosmosToken> {
     }
     const stdTx = await keyToMsgSend(this.address, message.trim());
     const signMessage = (await import('@lunie/cosmos-api')).createSignMessage(stdTx, VALIDATION_CHAIN_DATA);
+    console.log('--------------------- frontend verification in progress:');
+    console.log(stdTx);
+    console.log(signMessage);
+    console.log(VALIDATION_CHAIN_DATA);
+    console.log('---------------------');
 
     const sigBuf = Buffer.from(sigObj.signature, 'base64');
     if (sigObj.pub_key.type !== 'tendermint/PubKeySecp256k1') {
@@ -317,7 +322,9 @@ export class CosmosAccount extends Account<CosmosToken> {
       // save the public key as an argument for serverside verification
       this._publicKey = pubKey;
     }
-    return this._Accounts.CosmosKeys.verifySignature(signMessage, sigBuf, pubKey);
+    const result = this._Accounts.CosmosKeys.verifySignature(signMessage, sigBuf, pubKey);
+    console.log(result);
+    return result;
   }
 
   public updateValidatorDelegations = _.throttle(async () => {
