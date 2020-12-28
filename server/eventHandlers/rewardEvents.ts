@@ -30,15 +30,7 @@ export default class extends IEventHandler {
       This query will return the latest new-session event data, as Rewards event will only be triggered after the new-session event.
     */
     const chainEventNewSession = await this._models.ChainEvent.findOne({
-      include: [
-        {
-          model: this._models.ChainEventType,
-          where: {
-            chain: this._chain,
-            event_name: event.data.kind,
-          }
-        }
-      ],
+      where: { chain_event_type_id: `${this._chain}-new-session` },
       order: [
         ['created_at', 'DESC']
       ],
@@ -49,7 +41,7 @@ export default class extends IEventHandler {
       return dbEvent;
     }
 
-    const newSessionEventData = chainEventNewSession.event_data.data;
+    const newSessionEventData = chainEventNewSession.event_data;
     const newRewardEventData = event.data;
 
     // Get last created validator's record from 'HistoricalValidatorStatistic' table. as new reward event will contain validator's AccountID.
