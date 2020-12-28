@@ -5,8 +5,6 @@ import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
 
-import { createApi, subscribeEvents } from '/home/myym/Desktop/Github/chain-events/src/substrate/subscribeFunc';
-
 
 import { Mainnet } from '@edgeware/node-types';
 
@@ -51,12 +49,14 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
 };
 
 const setupChainEventListeners = async (
-  models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean, archival?: boolean, startBlock?: number
+  models, wss: WebSocket.Server, chains: string | string[] | 'all' | 'none', skipCatchup?: boolean, archival?: boolean, startBlock?: number
 ): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
   log.info('Fetching node urls...');
   await sequelize.authenticate();
   const nodes: ChainNodeInstance[] = [];
-  if (chains === 'all') {
+  if (archival) {
+    nodes.push({ url:chains, chain: 'edgeware' } as unknown as ChainNodeInstance);
+  } else if (chains === 'all') {
     const n = (await Promise.all(EventSupportingChains.map((c) => {
       return models.ChainNode.findOne({ where: { chain: c } });
     }))).filter((c) => !!c);
@@ -81,7 +81,6 @@ const setupChainEventListeners = async (
   log.info('Setting up event listeners...');
   const subscribers = await Promise.all(nodes.map(async (node) => {
     const excludedEvents = [
-      SubstrateTypes.EventKind.Reward,
       SubstrateTypes.EventKind.TreasuryRewardMinting,
       SubstrateTypes.EventKind.TreasuryRewardMintingV2,
     ];
@@ -96,7 +95,7 @@ const setupChainEventListeners = async (
     const offenceHandler = new OffenceHandler(models, node.chain);
     const heartbeatHandler = new HeartbeatHandler(models, node.chain);
     const identityHandler = new IdentityHandler(models, node.chain);
-    const handlers: IEventHandler[] = [ 
+    const handlers: IEventHandler[] = [
       storageHandler,
       notificationHandler,
       entityArchivalHandler,
@@ -106,7 +105,7 @@ const setupChainEventListeners = async (
       slashHandler,
       offenceHandler,
       bondHandler,
-      imOnlineHandler,
+      imOnlineHandler
     ];
 
     let subscriber: IEventSubscriber<any, any>;
@@ -120,7 +119,7 @@ const setupChainEventListeners = async (
         node.chain.includes('edgeware') ? Mainnet : {},
       );
 
-      await subscribeEvents({
+      subscriber = await SubstrateEvents.subscribeEvents({
         chain: node.chain,
         handlers,
         skipCatchup,
