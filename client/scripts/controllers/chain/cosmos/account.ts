@@ -222,6 +222,7 @@ export class CosmosAccount extends Account<CosmosToken> {
   public get validatorStake(): number {
     return this._validatorStake.getValue();
   }
+
   constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
     super(app, app.chain.meta.chain, address);
     if (!ChainInfo) {
@@ -236,6 +237,7 @@ export class CosmosAccount extends Account<CosmosToken> {
     this._Accounts = Accounts;
     this._Accounts.store.add(this);
   }
+
   public setMnemonic(mnemonic: string) {
     const { cosmosAddress, privateKey, publicKey } = this._Accounts.CosmosKeys.getNewWalletFromSeed(mnemonic);
     if (cosmosAddress !== this.address) {
@@ -267,6 +269,7 @@ export class CosmosAccount extends Account<CosmosToken> {
       return null;
     }
   }
+
   protected addressFromMnemonic(mnemonic: string): string {
     const { cosmosAddress, privateKey, publicKey } = this._Accounts.CosmosKeys.getNewWalletFromSeed(mnemonic);
     return cosmosAddress;
@@ -275,29 +278,34 @@ export class CosmosAccount extends Account<CosmosToken> {
     const { cosmosAddress, privateKey, publicKey } = this._Accounts.CosmosKeys.getNewWalletFromSeed(seed);
     return cosmosAddress;
   }
+
   public getLedgerSigner() {
     if (!this._privateKey || !this._publicKey) {
       throw new Error('cannot sign transaction without public key');
     }
-    return (signMessage: string) =>
-      ({ signature: this._Accounts.CosmosKeys.signWithPrivateKey(signMessage, this._privateKey),
-         publicKey: this._publicKey });
+    return (signMessage: string) => ({
+      signature: this._Accounts.CosmosKeys.signWithPrivateKey(signMessage, this._privateKey),
+      publicKey: this._publicKey
+    });
   }
+
   public async signMessage(message: string): Promise<string> {
     if (!this._privateKey) {
       throw new Error('Private key required to sign.');
     }
     return this._Accounts.CosmosKeys.signWithPrivateKey(message, this._privateKey).toString('hex');
   }
-  public async isValidSignature(message: string, signature: string): Promise<boolean> {
+
+  public async isValidSignature(message: string, signature: string | object): Promise<boolean> {
     let sigObj;
     try {
-      sigObj = JSON.parse(signature);
+      sigObj = (typeof signature === 'string') ? JSON.parse(signature) : signature;
     } catch (e) {
       return false;
     }
     const stdTx = await keyToMsgSend(this.address, message.trim());
     const signMessage = (await import('@lunie/cosmos-api')).createSignMessage(stdTx, VALIDATION_CHAIN_DATA);
+
     const sigBuf = Buffer.from(sigObj.signature, 'base64');
     if (sigObj.pub_key.type !== 'tendermint/PubKeySecp256k1') {
       throw new Error('invalid pub key type');
@@ -311,6 +319,7 @@ export class CosmosAccount extends Account<CosmosToken> {
     }
     return this._Accounts.CosmosKeys.verifySignature(signMessage, sigBuf, pubKey);
   }
+
   public updateValidatorDelegations = _.throttle(async () => {
     let resp;
     try {
@@ -332,7 +341,7 @@ export class CosmosAccount extends Account<CosmosToken> {
   });
 
   public updateDelegations = _.throttle(async () => {
-    const queryUrl = this._Chain.api.restUrl + '/staking/delegators/' + this.address + '/delegations';
+    const queryUrl = `${this._Chain.api.restUrl}/staking/delegators/${this.address}/delegations`;
     let resp;
     try {
       resp = await this._Chain.api.query.delegations(this.address);
@@ -350,10 +359,12 @@ export class CosmosAccount extends Account<CosmosToken> {
     }
     this._delegations.next(delegations);
   });
+
   public get balance() {
     this.updateBalance();
     return this._balance.asObservable();
   }
+
   public updateBalance = _.throttle(async () => {
     const queryUrl = this._Chain.api.restUrl + '/auth/accounts/' + this.address;
     let resp;

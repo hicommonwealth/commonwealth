@@ -147,48 +147,34 @@ const CosmosLinkAccountItem: m.Component<{
           offlineSigner,
         );
 
+        // Get the verification token & placeholder TX to send
         const signerAccount = await createUserWithAddress(account.address);
         const signDoc = await keyToMsgSend(account.address, signerAccount.validationToken);
-        const fee = { gas: '100000', amount: [] };
-
-        const { accountNumber, sequence } = await client.getSequence();
-        const chainId = await client.getChainId();
-
-        // TODO: remove this.
         signDoc.chain_id = 'straightedge-2';
         signDoc.account_number = '0';
         signDoc.sequence = '0';
-        signDoc.fee = fee;
-        signDoc.msgs = [signDoc.msg];
+        signDoc.fee = { gas: '100000', amount: [] };
+        signDoc.msgs = signDoc.msg;
+        delete signDoc.signatures;
         delete signDoc.msg;
-
-        // We would usually be signing something like:
-        // const signDoc = {
-        //   chain_id: 'straightedge-2', // chainId,
-        //   account_number: Uint53.fromString(accountNumber.toString()).toString(),
-        //   sequence: Uint53.fromString(sequence.toString()).toString(),
-        //   fee,
-        //   msgs: [msg],
-        //   memo: '',
-        // };
 
         // Some typing and versioning issues here...signAmino should be available but it's not
         (await (client as any).signer.signAmino
           ? (client as any).signer.signAmino(account.address, signDoc)
           : (client as any).signer.sign(account.address, signDoc)
-        ).then(({ signed, signature }) => signerAccount.validate(signature))
-          .then(() => {
-            // return if user signs for two addresses
-            if (linkNewAddressModalVnode.state.linkingComplete) return;
-            linkNewAddressModalVnode.state.linkingComplete = true;
-            return accountVerifiedCallback(signerAccount);
-          })
-          .then(() => m.redraw())
-          .catch((err) => {
-            vnode.state.linking = false;
-            errorCallback(`${err.name}: ${err.message}`);
-            m.redraw();
-          });
+        ).then(({ signed, signature }) => {
+          console.log('amino signing:', JSON.stringify(signDoc), account.address, signature);
+          return signerAccount.validate(signature);
+        }).then(() => {
+          // return if user signs for two addresses
+          if (linkNewAddressModalVnode.state.linkingComplete) return;
+          linkNewAddressModalVnode.state.linkingComplete = true;
+          return accountVerifiedCallback(signerAccount);
+        }).then(() => m.redraw()).catch((err) => {
+          vnode.state.linking = false;
+          errorCallback(`${err.name}: ${err.message}`);
+          m.redraw();
+        });
       },
     }, [
       m('.account-item-left', [

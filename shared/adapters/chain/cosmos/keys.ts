@@ -17,7 +17,7 @@ export const keyToMsgSend = async (address: string, token: string) => {
     initialDeposits: [{ denom: 'stake', amount: '0' }]
   }).message;
   const stdTx = CosmosApi.createStdTx({
-    gas: '0',
+    gas: '100000',
     gasPrices: [{ denom: 'stake', amount: '0' }],
     memo: ''
   }, jsonTx);
