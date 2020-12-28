@@ -72,7 +72,8 @@
 .User {
     display: inline-block;
     white-space: nowrap;
-    a {
+    > a {
+        // reset link styles
         &, &:link, &:visited {
             color: inherit;
         }
@@ -83,11 +84,9 @@
     .user-avatar-only {
         @include circledAvatar();
     }
-    span.identity-icon {
-        @include roleIcon();
-    }
-    a.user-display-name.verified {
-        // color: $primary-bg-color !important;
+    a.user-display-name {
+        cursor: inherit;
+        text-decoration: initial;
     }
     &.linkified a.user-display-name {
         cursor: pointer;
@@ -95,11 +94,15 @@
     &.linkified a.user-display-name:hover {
         text-decoration: underline;
     }
-    .role-icon {
+    // role icons and identity icons
+    span.identity-icon {
         @include roleIcon();
     }
     .user-display-name .identity-icon {
         margin-left: 7px !important;
+    }
+    .role-icon {
+        @include roleIcon();
     }
     .role-tag {
         font-size: 14px;

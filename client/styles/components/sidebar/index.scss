@@ -134,6 +134,7 @@
     width: $quick-switcher-width;
     background: $background-color-medium-light;
     z-index: 3;
+    overflow-y: auto;
     @include sm-max {
         display: none;
     }
