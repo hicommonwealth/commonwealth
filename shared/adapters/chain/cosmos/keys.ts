@@ -2,7 +2,9 @@
 // we insert our account registration token into a proposal message, and then verify against the
 // generated signature. But first we need the message to insert.
 export const VALIDATION_CHAIN_DATA = {
-  sequence: '0', accountNumber: '0', chainId: 'validation'
+  sequence: '0',
+  accountNumber: '0',
+  chainId: 'straightedge-2',
 };
 
 export const keyToMsgSend = async (address: string, token: string) => {
@@ -12,9 +14,13 @@ export const keyToMsgSend = async (address: string, token: string) => {
     proposalType: 'cosmos-sdk/TextProposal',
     title: token.trim(),
     description: '',
-    initialDeposits: [{ denom: 'stake', amount: '0'}]
+    initialDeposits: [{ denom: 'stake', amount: '0' }]
   }).message;
-  const stdTx = CosmosApi.createStdTx({ gas: '0', gasPrices: [{ denom: 'stake', amount: '0' }], memo: ''}, jsonTx);
+  const stdTx = CosmosApi.createStdTx({
+    gas: '0',
+    gasPrices: [{ denom: 'stake', amount: '0' }],
+    memo: ''
+  }, jsonTx);
   return stdTx;
 };
 

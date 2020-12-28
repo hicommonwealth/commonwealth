@@ -7,6 +7,8 @@ import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { SigningCosmosClient } from '@cosmjs/launchpad';
+import { toUtf8 } from '@cosmjs/encoding';
+import { Uint53 } from '@cosmjs/math';
 
 import { Button, Callout, Input, TextArea, Icon, Icons, Spinner, Checkbox } from 'construct-ui';
 
@@ -14,6 +16,8 @@ import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
 import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
+
+import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import Cosmos from 'controllers/chain/cosmos/main';
@@ -56,6 +60,7 @@ const EthereumLinkAccountItem: m.Component<{
     return m('.EthereumLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
+        vnode.state.linking = true;
         const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
           address: address.toLowerCase(),
           chain: app.activeChainId(),
@@ -65,6 +70,7 @@ const EthereumLinkAccountItem: m.Component<{
         if (result.exists) {
           if (result.belongsToUser) {
             notifyInfo('This address is already linked to your current account.');
+            vnode.state.linking = false;
             return;
           } else {
             const modalMsg = 'This address is currently linked to another account. Continue?';
@@ -85,12 +91,17 @@ const EthereumLinkAccountItem: m.Component<{
 
         signerAccount.validate(webWalletSignature)
           .then(() => {
-            if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses
+            // return if user signs for two addresses
+            if (linkNewAddressModalVnode.state.linkingComplete) return;
             linkNewAddressModalVnode.state.linkingComplete = true;
             return accountVerifiedCallback(signerAccount);
           })
           .then(() => m.redraw())
-          .catch(errorCallback);
+          .catch((err) => {
+            vnode.state.linking = false;
+            errorCallback(`${err.name}: ${err.message}`);
+            m.redraw();
+          });
       },
     }, [
       m('.account-item-left', [
@@ -130,38 +141,54 @@ const CosmosLinkAccountItem: m.Component<{
           app.chain.meta.chain.network === 'cosmos'
             ? 'https://node-cosmoshub-3.keplr.app/rest'
             : app.chain.meta.chain.network === 'straightedge'
-            ? 'https://node-straightedge-2.keplr.app/rest'
-            : '',
+              ? 'https://node-straightedge-2.keplr.app/rest'
+              : '',
           account.address,
           offlineSigner,
         );
 
         const signerAccount = await createUserWithAddress(account.address);
-        const msg = {
-          "type": "cosmos-sdk/MsgSend",
-          "value": {
-            "amount": [
-              {
-                "amount": "1",
-                "denom": "astr"
-              }
-            ],
-            "from_address": account.address,
-            "to_address": account.address,
-          }
-        }
-        const fee = { gas: 100000, amount: [] };
-        const webWalletSignature = await (client as any).signAndBroadcast([msg], fee);
+        const signDoc = await keyToMsgSend(account.address, signerAccount.validationToken);
+        const fee = { gas: '100000', amount: [] };
 
-        // const webWalletSignature = await webWallet.signMessage(signerAccount.validationToken);
-        // signerAccount.validate(webWalletSignature)
-        //   .then(() => {
-        //     if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses
-        //     linkNewAddressModalVnode.state.linkingComplete = true;
-        //     return accountVerifiedCallback(signerAccount);
-        //   })
-        //   .then(() => m.redraw())
-        //   .catch(errorCallback);
+        const { accountNumber, sequence } = await client.getSequence();
+        const chainId = await client.getChainId();
+
+        // TODO: remove this.
+        signDoc.chain_id = 'straightedge-2';
+        signDoc.account_number = '0';
+        signDoc.sequence = '0';
+        signDoc.fee = fee;
+        signDoc.msgs = [signDoc.msg];
+        delete signDoc.msg;
+
+        // We would usually be signing something like:
+        // const signDoc = {
+        //   chain_id: 'straightedge-2', // chainId,
+        //   account_number: Uint53.fromString(accountNumber.toString()).toString(),
+        //   sequence: Uint53.fromString(sequence.toString()).toString(),
+        //   fee,
+        //   msgs: [msg],
+        //   memo: '',
+        // };
+
+        // Some typing and versioning issues here...signAmino should be available but it's not
+        (await (client as any).signer.signAmino
+          ? (client as any).signer.signAmino(account.address, signDoc)
+          : (client as any).signer.sign(account.address, signDoc)
+        ).then(({ signed, signature }) => signerAccount.validate(signature))
+          .then(() => {
+            // return if user signs for two addresses
+            if (linkNewAddressModalVnode.state.linkingComplete) return;
+            linkNewAddressModalVnode.state.linkingComplete = true;
+            return accountVerifiedCallback(signerAccount);
+          })
+          .then(() => m.redraw())
+          .catch((err) => {
+            vnode.state.linking = false;
+            errorCallback(`${err.name}: ${err.message}`);
+            m.redraw();
+          });
       },
     }, [
       m('.account-item-left', [
@@ -237,7 +264,8 @@ const SubstrateLinkAccountItem: m.Component<{
           }
           signerAccount.validate(signature).then(() => {
             vnode.state.linking = false;
-            if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses
+            // return if user signs for two addresses
+            if (linkNewAddressModalVnode.state.linkingComplete) return;
             linkNewAddressModalVnode.state.linkingComplete = true;
             accountVerifiedCallback(signerAccount);
           }, (err) => {
@@ -297,7 +325,6 @@ const LinkNewAddressModal: m.Component<{
   uploadsInProgress: boolean;
   isEd25519?: boolean;
   enteredAddress?: string;
-  cosmosStdTx?: object;
   initializingWallet: boolean;
   onpopstate;
 }> = {
@@ -518,12 +545,7 @@ const LinkNewAddressModal: m.Component<{
                 (address) => m(EthereumLinkAccountItem, {
                   address,
                   accountVerifiedCallback,
-                  errorCallback: (err) => {
-                    vnode.state.error = 'Verification failed due to an inconsistency error. '
-                      + 'Please report this to the developers.';
-                    notifyError(vnode.state.error);
-                    m.redraw();
-                  },
+                  errorCallback: (error) => { notifyError(error); },
                   linkNewAddressModalVnode: vnode,
                 })
               ),
@@ -532,7 +554,7 @@ const LinkNewAddressModal: m.Component<{
                 (account: InjectedAccountWithMeta) => m(SubstrateLinkAccountItem, {
                   account,
                   accountVerifiedCallback,
-                  errorCallback: (error) => { notifyError(error); vnode.state.error = error; m.redraw(); },
+                  errorCallback: (error) => { notifyError(error); },
                   linkNewAddressModalVnode: vnode,
                 })
               ),
@@ -541,13 +563,13 @@ const LinkNewAddressModal: m.Component<{
                 (account: InjectedAccountWithMeta) => m(CosmosLinkAccountItem, {
                   account,
                   accountVerifiedCallback,
-                  errorCallback: (error) => { notifyError(error); vnode.state.error = error; m.redraw(); },
+                  errorCallback: (error) => { notifyError(error); },
                   linkNewAddressModalVnode: vnode,
                 })
               ),
             ] : [],
-            vnode.state.error && m('.error-message', vnode.state.error),
           ]),
+          vnode.state.error && m('.error-message', vnode.state.error),
         ]),
       ]) : vnode.state.step === LinkNewAddressSteps.Step1VerifyWithCLI ? m('.link-address-step', [
         linkAddressHeader,
@@ -562,8 +584,9 @@ const LinkNewAddressModal: m.Component<{
             name: 'Address',
             fluid: true,
             autocomplete: 'off',
-            placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
-                : 'Paste the address here',
+            placeholder: app.chain.base === ChainBase.Substrate
+              ? 'Paste the address here (e.g. 5Dvq...)'
+              : 'Paste the address here',
             oninput: async (e) => {
               const address = (e.target as any).value;
               vnode.state.error = null;
