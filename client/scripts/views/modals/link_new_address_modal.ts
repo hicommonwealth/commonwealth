@@ -15,6 +15,7 @@ import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
+import Cosmos from 'controllers/chain/cosmos/main';
 import Substrate from 'controllers/chain/substrate/main';
 import Ethereum from 'controllers/chain/ethereum/main';
 import Near from 'controllers/chain/near/main';
@@ -82,6 +83,50 @@ const EthereumLinkAccountItem: m.Component<{
             m(Spinner, { size: 'xs', active: true })
           ])
           : m('.account-user', m(User, { user: app.chain.accounts.get(address) })),
+      ]),
+    ]);
+  }
+};
+
+const CosmosLinkAccountItem: m.Component<{
+  account,
+  accountVerifiedCallback,
+  errorCallback,
+  linkNewAddressModalVnode
+}, { linking }> = {
+  view: (vnode) => {
+    const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode } = vnode.attrs;
+    return m('.CosmosLinkAccountItem.account-item', {
+      onclick: async (e) => {
+        // e.preventDefault();
+        // const api = (app.chain as Cosmos);
+        // const webWallet = api.webWallet;
+
+        // // Sign with the method on eth_webwallet, because we don't have access to the private key
+        // const signerAccount = await createUserWithAddress(address) as CosmosAccount;
+        // const webWalletSignature = await webWallet.signMessage(signerAccount.validationToken);
+
+        // signerAccount.validate(webWalletSignature)
+        //   .then(() => {
+        //     if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses
+        //     linkNewAddressModalVnode.state.linkingComplete = true;
+        //     return accountVerifiedCallback(signerAccount);
+        //   })
+        //   .then(() => m.redraw())
+        //   .catch(errorCallback);
+      },
+    }, [
+      m('.account-item-left', [
+        m('.account-item-name', `${app.chain.meta.chain.name} account`),
+        m('.account-item-address', formatAddressShort(account.address, app.chain.meta.chain.id)),
+      ]),
+      m('.account-item-right', [
+        vnode.state.linking
+          ? m('.account-waiting', [
+            // TODO: show a (?) icon with a tooltip explaining to check your wallet
+            m(Spinner, { size: 'xs', active: true })
+          ])
+          : m('.account-user', m(User, { user: app.chain.accounts.get(account.address) })),
       ]),
     ]);
   }
@@ -332,20 +377,18 @@ const LinkNewAddressModal: m.Component<{
       vnode.state.step === LinkNewAddressSteps.Step1VerifyWithWebWallet ? m('.link-address-step', [
         linkAddressHeader,
         m('.link-address-step-narrow', [
-          (app.chain as Substrate || app.chain as Ethereum).webWallet
-            && (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts
-            && (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length === 0
+          app.chain.webWallet?.accounts?.length === 0
             && m(Button, {
               class: 'account-adder',
               intent: 'primary',
-              disabled: !(app.chain as Substrate || app.chain as Ethereum).webWallet?.available // disable if unavailable
+              disabled: !app.chain.webWallet?.available // disable if unavailable
                 || vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
               oninit: async (vvnode) => {
                 // initialize API if needed before starting webwallet
                 if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
                 await app.chain.initApi();
-                await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
+                await app.chain.webWallet?.enable();
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },
@@ -354,12 +397,12 @@ const LinkNewAddressModal: m.Component<{
                 if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
                 await app.chain.initApi();
-                await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
+                await app.chain.webWallet?.enable();
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },
               label:
-                !(app.chain as Substrate || app.chain as Ethereum).webWallet?.available
+                !app.chain.webWallet?.available
                   ? 'No wallet detected'
                   : (vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected)
                     ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ]
@@ -367,65 +410,77 @@ const LinkNewAddressModal: m.Component<{
                       ? 'Could not connect to chain'
                       : 'Connect to wallet'
             }),
-          !(app.chain as Substrate || app.chain as Ethereum).webWallet?.available && m('.get-wallet-text', [
-            'Install a ',
+          !app.chain.webWallet?.available && m('.get-wallet-text', [
+            'Install a compatible wallet to continue',
+            m('br'),
             app.chain.base === ChainBase.Substrate
-              && link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', { target: '_blank' }),
+              && link('a', 'https://polkadot.js.org/extension/', 'Get polkadot-js', { target: '_blank' }),
             app.chain.base === ChainBase.Ethereum
-              && link('a', 'https://metamask.io/', 'Metamask', { target: '_blank' }),
-            ' compatible wallet to continue'
+              && link('a', 'https://metamask.io/', 'Get Metamask', { target: '_blank' }),
+            app.chain.base === ChainBase.CosmosSDK
+              && link('a', 'https://wallet.keplr.app/', 'Get Keplr', { target: '_blank' }),
           ]),
-          (app.chain as Substrate || app.chain as Ethereum).webWallet
-            && (app.chain as Substrate || app.chain as Ethereum).webWallet.enabled && m('.accounts-caption', [
-            (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length ? [
+          app.chain.webWallet?.enabled && m('.accounts-caption', [
+            app.chain.webWallet?.accounts.length ? [
               m('p', 'Select an address:'),
               m('p.small-text', 'If a popup does not appear, check your wallet/browser extension.'),
             ] : [
               m('p', 'Wallet connected, but no accounts were found.'),
             ],
           ]),
-          m('.accounts-list', app.chain.base === ChainBase.NEAR ? [
-            m(Button, {
-              intent: 'primary',
-              onclick: async (e) => {
-                // redirect to NEAR page for login
-                const WalletAccount = (await import('nearlib')).WalletAccount;
-                const wallet = new WalletAccount((app.chain as Near).chain.api, null);
-                if (wallet.isSignedIn()) {
-                  // get rid of pre-existing wallet info to make way for new account
-                  wallet.signOut();
-                }
-                const redirectUrl = `${window.location.origin}/${app.activeChainId()}/finishNearLogin`;
-                wallet.requestSignIn('commonwealth', 'commonwealth', redirectUrl, redirectUrl);
-              },
-              label: 'Continue to NEAR wallet'
-            }),
-          ] : app.chain.networkStatus !== ApiStatus.Connected ? [] : [
-            [ChainBase.Ethereum
-            ].indexOf(app.chain.base) !== -1 && (app.chain as Ethereum).webWallet.accounts.map(
-              (address) => m(EthereumLinkAccountItem, {
-                address,
-                accountVerifiedCallback,
-                errorCallback: (err) => {
-                  vnode.state.error = 'Verification failed due to an inconsistency error. '
-                    + 'Please report this to the developers.';
-                  notifyError(vnode.state.error);
-                  m.redraw();
+          m('.accounts-list', [
+            app.chain.base === ChainBase.NEAR ? [
+              m(Button, {
+                intent: 'primary',
+                onclick: async (e) => {
+                  // redirect to NEAR page for login
+                  const WalletAccount = (await import('nearlib')).WalletAccount;
+                  const wallet = new WalletAccount((app.chain as Near).chain.api, null);
+                  if (wallet.isSignedIn()) {
+                    // get rid of pre-existing wallet info to make way for new account
+                    wallet.signOut();
+                  }
+                  const redirectUrl = `${window.location.origin}/${app.activeChainId()}/finishNearLogin`;
+                  wallet.requestSignIn('commonwealth', 'commonwealth', redirectUrl, redirectUrl);
                 },
-                linkNewAddressModalVnode: vnode,
-              })
-            ),
-            [ChainBase.Substrate
-            ].indexOf(app.chain.base) !== -1 && (app.chain as Substrate).webWallet.accounts.map(
-              (account: InjectedAccountWithMeta) => m(SubstrateLinkAccountItem, {
-                account,
-                accountVerifiedCallback,
-                errorCallback: (error) => { notifyError(error); vnode.state.error = error; m.redraw(); },
-                linkNewAddressModalVnode: vnode,
-              })
-            ),
+                label: 'Continue to NEAR wallet'
+              }),
+            ] : app.chain.networkStatus !== ApiStatus.Connected ? [
+            ] : app.chain.base === ChainBase.Ethereum ? [
+              app.chain.webWallet?.accounts.map(
+                (address) => m(EthereumLinkAccountItem, {
+                  address,
+                  accountVerifiedCallback,
+                  errorCallback: (err) => {
+                    vnode.state.error = 'Verification failed due to an inconsistency error. '
+                      + 'Please report this to the developers.';
+                    notifyError(vnode.state.error);
+                    m.redraw();
+                  },
+                  linkNewAddressModalVnode: vnode,
+                })
+              ),
+            ] : app.chain.base === ChainBase.Substrate ? [
+              app.chain.webWallet?.accounts.map(
+                (account: InjectedAccountWithMeta) => m(SubstrateLinkAccountItem, {
+                  account,
+                  accountVerifiedCallback,
+                  errorCallback: (error) => { notifyError(error); vnode.state.error = error; m.redraw(); },
+                  linkNewAddressModalVnode: vnode,
+                })
+              ),
+            ] : app.chain.base === ChainBase.CosmosSDK ? [
+              app.chain.webWallet?.accounts.map(
+                (account: InjectedAccountWithMeta) => m(CosmosLinkAccountItem, {
+                  account,
+                  accountVerifiedCallback,
+                  errorCallback: (error) => { notifyError(error); vnode.state.error = error; m.redraw(); },
+                  linkNewAddressModalVnode: vnode,
+                })
+              ),
+            ] : [],
+            vnode.state.error && m('.error-message', vnode.state.error),
           ]),
-          vnode.state.error && m('.error-message', vnode.state.error),
         ]),
       ]) : vnode.state.step === LinkNewAddressSteps.Step1VerifyWithCLI ? m('.link-address-step', [
         linkAddressHeader,

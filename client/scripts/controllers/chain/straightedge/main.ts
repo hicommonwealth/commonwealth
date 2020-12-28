@@ -4,6 +4,7 @@ import { IApp } from 'state';
 import { CosmosAccount, CosmosAccounts } from '../cosmos/account';
 import CosmosChain from '../cosmos/chain';
 import CosmosGovernance from '../cosmos/governance';
+import KeplrWebWalletController from '../../app/keplr_web_wallet';
 
 class Straightedge extends IChainAdapter<CosmosToken, CosmosAccount> {
   public chain: CosmosChain;
@@ -11,6 +12,7 @@ class Straightedge extends IChainAdapter<CosmosToken, CosmosAccount> {
   public governance: CosmosGovernance;
   public readonly base = ChainBase.CosmosSDK;
   public readonly class = ChainClass.CosmosHub;
+  public readonly webWallet: KeplrWebWalletController = new KeplrWebWalletController();
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
