@@ -60,7 +60,7 @@ const argv = yargs.options({
     description: 'run listener in archival mode or not',
   },
   startBlock: {
-    alias: 's',
+    alias: 'b',
     type: 'number',
     description: 'when running in archival mode, which block should we start from',
   },
