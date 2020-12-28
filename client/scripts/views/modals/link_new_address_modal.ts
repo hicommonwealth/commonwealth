@@ -122,16 +122,36 @@ const CosmosLinkAccountItem: m.Component<{
         e.preventDefault();
         const offlineSigner = app.chain.webWallet?.offlineSigner;
         if (!offlineSigner) return notifyError('Missing or misconfigured web wallet');
+        vnode.state.linking = true;
+        m.redraw();
 
         const client = new SigningCosmosClient(
-          app.chain.meta.url,
+          // TODO: Figure out our own nodes, these are ported from the Keplr example code.
+          app.chain.meta.chain.network === 'cosmos'
+            ? 'https://node-cosmoshub-3.keplr.app/rest'
+            : app.chain.meta.chain.network === 'straightedge'
+            ? 'https://node-straightedge-2.keplr.app/rest'
+            : '',
           account.address,
           offlineSigner,
         );
 
         const signerAccount = await createUserWithAddress(account.address);
-        const fee = {};
-        const webWalletSignature = await (client as any).signer.sign(['hello!'], fee);
+        const msg = {
+          "type": "cosmos-sdk/MsgSend",
+          "value": {
+            "amount": [
+              {
+                "amount": "1",
+                "denom": "astr"
+              }
+            ],
+            "from_address": account.address,
+            "to_address": account.address,
+          }
+        }
+        const fee = { gas: 100000, amount: [] };
+        const webWalletSignature = await (client as any).signAndBroadcast([msg], fee);
 
         // const webWalletSignature = await webWallet.signMessage(signerAccount.validationToken);
         // signerAccount.validate(webWalletSignature)
