@@ -165,7 +165,7 @@ export async function Enrich(
             commissionPer,
             controllerId: controllerId.toString() == ''? key: controllerId.toString(),
             rewardDestination: rewardDestination.toString(),
-            nextSessionIds: nextSessionKeys,
+            nextSessionIds: nextSessionKeys.map(key => key.toString()),
             eraPoints: eraPointsIndividual[key]? Number(eraPointsIndividual[key]): 0
           };
         };

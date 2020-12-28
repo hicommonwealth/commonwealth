@@ -79,7 +79,7 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
    * @param batchSize size of the batch in which blocks are to be fetched from chain
    * @param processBlockFn an optional function to process the blocks
    */
-  public async archive(range: IDisconnectedRange, batchSize: number = 10, processBlockFn: (block: Block) => any = null): Promise<Block[]> {
+  public async archive(range: IDisconnectedRange, batchSize: number = 10, processBlockFn: (block: Block) => any = null) {
     const syncWithHead = !range.endBlock? true:false;
 
     // if the endBlock is not provided then we will run archival mode until we reach the head
@@ -88,14 +88,12 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
       range.endBlock =  +header.number;
     }
     
-    const blocks = [];
     for (let block = range.startBlock; block < range.endBlock; block = Math.min(block + batchSize, range.endBlock)) {
       try {
         let currentBlocks = await this.poll({startBlock: block, endBlock: Math.min(block + batchSize, range.endBlock)}, batchSize); 
         if(processBlockFn){
           await Promise.all(currentBlocks.map(processBlockFn));
         }
-        blocks.push(...currentBlocks);
       } catch (e) {
         log.error(`Block polling failed after disconnect at block ${range.startBlock}`);
         return;
@@ -106,6 +104,5 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
         range.endBlock =  +header.number;
       }
     }
-    return blocks;
   }
 }
