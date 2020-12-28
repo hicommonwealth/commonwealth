@@ -36,7 +36,7 @@ const ProfileContent: m.Component<{
       : (type === UserContent.Threads)
         ? proposals
         : comments;
-
+    console.log(content.length);
     return m('.ProfileContent', [
       // (type === UserContent.All) && m('.all-content', [
       //   allContent.length === 0 && m('.no-items', [
@@ -64,23 +64,26 @@ const ProfileContent: m.Component<{
       //     return m(ProfileCommentGroup, { proposal: comment.proposal, comments: [comment], account, });
       //   }),
       // ]),
-      m(Infinite, {
-        class: 'infinite-scroll',
-        pageData: () => content,
-        pageChange: () => { console.log('changing'); },
-        item: (data, opts, index) => {
-          if (data instanceof OffchainThread) {
-            return m(ProfileProposal, { proposal: data });
-          } else {
-            console.log(data);
-            return m(ProfileCommentGroup, {
-              proposal: data.proposal,
-              comments: [data],
-              account
-            });
-          }
-        },
-      })
+      content?.length > 0
+        ? m(Infinite, {
+          class: 'infinite-scroll',
+          key: `${type}-`,
+          maxPages: 1,
+          pageData: () => content,
+          pageChange: () => { console.log('changing'); },
+          item: (data, opts, index) => {
+            if (data instanceof OffchainThread) {
+              return m(ProfileProposal, { proposal: data });
+            } else {
+              return m(ProfileCommentGroup, {
+                proposal: data.proposal,
+                comments: [data],
+                account
+              });
+            }
+          },
+        })
+        : m('.no-content', 'No content of this type to display.')
     ]);
   }
 };

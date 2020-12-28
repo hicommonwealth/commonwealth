@@ -41,18 +41,17 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
         ]
       ]),
       m('.activity', [
-        comments.map((comment) => { console.log(comment); return m('.proposal-comment', [
+        comments.map((comment) => m('.proposal-comment', [
           m('.comment-text', (() => {
             try {
               const doc = JSON.parse(comment.text);
               if (!doc.ops) throw new Error();
               return m(QuillFormattedText, { doc, collapse: true });
             } catch (e) {
-              console.log(`Markdown formatting ${comment.text} instead`);
               return m(MarkdownFormattedText, { doc: comment.text, collapse: true });
             }
           })()),
-        ])}),
+        ])),
       ])
     ]);
   }
