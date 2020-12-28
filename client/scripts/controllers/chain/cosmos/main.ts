@@ -11,6 +11,7 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public governance: CosmosGovernance;
   public readonly base = ChainBase.CosmosSDK;
   public readonly class = ChainClass.CosmosHub;
+  // public readonly webWallet: CosmosWebWalletController = new CosmosWebWalletController();
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);

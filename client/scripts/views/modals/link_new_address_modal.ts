@@ -13,7 +13,6 @@ import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
 import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
-import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
 import Substrate from 'controllers/chain/substrate/main';
@@ -235,21 +234,6 @@ const LinkNewAddressModal: m.Component<{
       }
     }
 
-    // TODO: add a step to help users install wallets
-    // gaiacli 'https://cosmos.network/docs/cosmos-hub/installation.html',
-    // subkey 'https://substrate.dev/docs/en/ecosystem/subkey'
-    // polkadot-js 'https://github.com/polkadot-js/extension'
-
-    // TODO: hack to fix linking now that keyToMsgSend is async
-    if (vnode.state.newAddress) {
-      keyToMsgSend(
-        vnode.state.newAddress.address,
-        vnode.state.newAddress.validationToken,
-      ).then((stdTx) => {
-        vnode.state.cosmosStdTx = stdTx;
-      });
-    }
-
     const accountVerifiedCallback = async (account: Account<any>) => {
       if (app.isLoggedIn()) {
         // existing user
@@ -354,7 +338,7 @@ const LinkNewAddressModal: m.Component<{
             && m(Button, {
               class: 'account-adder',
               intent: 'primary',
-              disabled: !(app.chain as Substrate || app.chain as Ethereum).webWallet.available // disable if unavailable
+              disabled: !(app.chain as Substrate || app.chain as Ethereum).webWallet?.available // disable if unavailable
                 || vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
               oninit: async (vvnode) => {
                 // initialize API if needed before starting webwallet
@@ -375,7 +359,7 @@ const LinkNewAddressModal: m.Component<{
                 m.redraw();
               },
               label:
-                !(app.chain as Substrate || app.chain as Ethereum).webWallet.available
+                !(app.chain as Substrate || app.chain as Ethereum).webWallet?.available
                   ? 'No wallet detected'
                   : (vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected)
                     ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ]
@@ -383,7 +367,7 @@ const LinkNewAddressModal: m.Component<{
                       ? 'Could not connect to chain'
                       : 'Connect to wallet'
             }),
-          !(app.chain as Substrate || app.chain as Ethereum).webWallet.available && m('.get-wallet-text', [
+          !(app.chain as Substrate || app.chain as Ethereum).webWallet?.available && m('.get-wallet-text', [
             'Install a ',
             app.chain.base === ChainBase.Substrate
               && link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', { target: '_blank' }),
@@ -452,23 +436,11 @@ const LinkNewAddressModal: m.Component<{
               m('code', vnode.state.isEd25519 ? 'subkey generate --scheme ed25519' : 'subkey generate'),
             ]),
           ],
-          app.chain.base === ChainBase.CosmosSDK && [
-            m('p', [
-              'Select an address to add. You can generate one using gaiacli, or choose an existing address ',
-              ' by running ',
-              m('code', 'gaiacli keys list'),
-            ]),
-            m(CodeBlock, { clickToSelect: true }, [
-              'gaiacli keys add ',
-              m('span.no-select', '<name>'),
-            ]),
-          ],
           m(Input, {
             name: 'Address',
             fluid: true,
             autocomplete: 'off',
             placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
-              : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here (e.g. cosmos123...)'
                 : 'Paste the address here',
             oninput: async (e) => {
               const address = (e.target as any).value;
@@ -545,27 +517,11 @@ const LinkNewAddressModal: m.Component<{
                 '"',
               ]),
             ],
-            app.chain.base === ChainBase.CosmosSDK && m('p', [
-              'Use the following command to save the JSON to a file: ',
-              m(CodeBlock, { clickToSelect: true }, `echo '${JSON.stringify({
-                type: 'cosmos-sdk/StdTx',
-                value: vnode.state.cosmosStdTx,
-              })}' > tx.json`),
-              m('p', 'Sign the saved transaction, using your keys in gaiacli: '),
-              m(CodeBlock, { clickToSelect: true }, [
-                `gaiacli tx sign --offline --chain-id=${VALIDATION_CHAIN_DATA.chainId} `
-                  + `--sequence=${VALIDATION_CHAIN_DATA.sequence} `
-                  + `--account-number=${VALIDATION_CHAIN_DATA.accountNumber} --signature-only --from=`,
-                m('span.no-select', '<key name> <tx.json>'),
-              ]),
-            ]),
             m(Input, {
               name: 'Signature',
               fluid: true,
               autocomplete: 'off',
-              placeholder: (app.chain.base === ChainBase.CosmosSDK)
-                ? 'Paste the entire output'
-                : 'Paste the signature here',
+              placeholder: 'Paste the signature here',
               oninput: async (e) => {
                 const signature = (e.target as any).value;
                 const unverifiedAcct = vnode.state.newAddress;
