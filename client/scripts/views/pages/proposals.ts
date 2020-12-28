@@ -82,16 +82,23 @@ async function loadCmd() {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base !== ChainBase.Substrate) {
+  if (app.chain.base === ChainBase.Substrate) {
+    const chain = (app.chain as Substrate);
+    await Promise.all([
+      chain.council.init(chain.chain, chain.accounts),
+      chain.signaling.init(chain.chain, chain.accounts),
+      chain.democracyProposals.init(chain.chain, chain.accounts),
+      chain.democracy.init(chain.chain, chain.accounts),
+    ]);
+  } else if (app.chain.base === ChainBase.CosmosSDK) {
+    const chain = (app.chain as Cosmos);
+    await Promise.all([
+      chain.governance.init(chain.chain, chain.accounts),
+    ]);
+    return;
+  } else {
     return;
   }
-  const chain = (app.chain as Substrate);
-  await Promise.all([
-    chain.council.init(chain.chain, chain.accounts),
-    chain.signaling.init(chain.chain, chain.accounts),
-    chain.democracyProposals.init(chain.chain, chain.accounts),
-    chain.democracy.init(chain.chain, chain.accounts),
-  ]);
 }
 
 const ProposalsPage: m.Component<{}> = {
