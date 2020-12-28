@@ -206,7 +206,7 @@ export default (
         : hexToU8a(`0x${signatureString}`);
       isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
         || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
-    } else if (chain.network === 'cosmos') {
+    } else if (chain.network === 'cosmos' || chain.network === 'straightedge') {
       const signatureData = JSON.parse(signatureString);
       // this saved "address" is actually just the address
       const msg = keyToSignMsg(addressModel.address, addressModel.verification_token);
@@ -216,9 +216,12 @@ export default (
       // we generate an address from the actual public key and verify that it matches,
       // this prevents people from using a different key to sign the message than
       // the account they registered with
-      const generatedAddress = getCosmosAddress(pk);
+      const bech32Prefix = (
+        chain.network === 'cosmos' ? 'cosmos'
+          : chain.network === 'straightedge' ? 'str' : chain.network);
+      const generatedAddress = getCosmosAddress(pk, bech32Prefix);
       if (generatedAddress === addressModel.address) {
-        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), `hex`);
+        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), 'hex');
         isValid = secp256k1.ecdsaVerify(signHash, signature, pk);
       } else {
         isValid = false;
