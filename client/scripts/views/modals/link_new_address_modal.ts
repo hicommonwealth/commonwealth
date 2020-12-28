@@ -6,6 +6,7 @@ import mixpanel from 'mixpanel-browser';
 import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
+import { SigningCosmosClient } from '@cosmjs/launchpad';
 
 import { Button, Callout, Input, TextArea, Icon, Icons, Spinner, Checkbox } from 'construct-ui';
 
@@ -98,14 +99,21 @@ const CosmosLinkAccountItem: m.Component<{
     const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode } = vnode.attrs;
     return m('.CosmosLinkAccountItem.account-item', {
       onclick: async (e) => {
-        // e.preventDefault();
-        // const api = (app.chain as Cosmos);
-        // const webWallet = api.webWallet;
+        e.preventDefault();
+        const offlineSigner = app.chain.webWallet?.offlineSigner;
+        if (!offlineSigner) return notifyError('Missing or misconfigured web wallet');
 
-        // // Sign with the method on eth_webwallet, because we don't have access to the private key
-        // const signerAccount = await createUserWithAddress(address) as CosmosAccount;
+        const client = new SigningCosmosClient(
+          app.chain.meta.url,
+          account.address,
+          offlineSigner,
+        );
+
+        const signerAccount = await createUserWithAddress(account.address);
+        const fee = {};
+        const webWalletSignature = await (client as any).signer.sign(['hello!'], fee);
+
         // const webWalletSignature = await webWallet.signMessage(signerAccount.validationToken);
-
         // signerAccount.validate(webWalletSignature)
         //   .then(() => {
         //     if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses

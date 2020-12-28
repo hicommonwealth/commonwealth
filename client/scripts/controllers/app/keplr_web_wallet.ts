@@ -20,6 +20,9 @@ class KeplrWebWalletController {
   public get accounts() {
     return this._accounts || [];
   }
+  public get offlineSigner() {
+    return this._offlineSigner;
+  }
 
   // ACTIONS
   public async enable() {
@@ -34,6 +37,7 @@ class KeplrWebWalletController {
 
     // enable
     await window.keplr.enable(chainId);
+    console.log(`Enabled web wallet for ${chainId}`);
     this._offlineSigner = window.getOfflineSigner(chainId);
     this._accounts = await this._offlineSigner.getAccounts();
     this._enabled = true;
