@@ -59,7 +59,7 @@ const ProfileContent: m.Component<{
           }),
           postsRemaining(content.length, vnode.state.count)
             ? m('.infinite-scroll-spinner-wrap', [
-              m(Spinner, { active: content.length < vnode.state.count })
+              m(Spinner, { active: true })
             ])
             : m('.infinite-scroll-reached-end', [
               `Showing ${content.length} of ${pluralize(content.length, type)}.`,

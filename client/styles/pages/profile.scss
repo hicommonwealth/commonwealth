@@ -343,9 +343,6 @@
 
 .ProfileContent {
     @include profile-listing;
-    .infinite-scroll {
-        overflow-y: hidden;
-    }
     .btn-wrap {
         margin: 32px 0;
     }
@@ -355,6 +352,21 @@
         background-image: none !important;
         color: $primary-bg-color;
         border-radius: 4px;
+    }
+    .infinite-scroll {
+        overflow-y: hidden;
+    }
+    .infinite-scroll-spinner-wrap {
+        height: 70px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .infinite-scroll-reached-end {
+        padding: 15px 0 8px 0;
+        text-align: center;
+        border-top: 1px solid $border-color;
     }
 }
 
