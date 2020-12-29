@@ -13,12 +13,13 @@
 // 7. preview button
 // 8. mentions container
 // 9. progress bar
+// 10. markdown/rich text switcher tooltip
 //
 
 .QuillEditor {
     position: relative;
     ::selection {
-        background: $theme-base-color;
+        background: $primary-bg-color;
         color: $text-color-white;
     }
 
@@ -99,11 +100,11 @@
 
     // 3. ql-snow form input styles, ql-bubble styles
     .ql-container.ql-snow {
-        border: 1px solid $form-border-color;
+        border: 1px solid $border-color;
         border-radius: 0 0 3px 3px;
         // construct-ui input styles
         color: $text-color-darker;
-        box-shadow: 0px 1px 0px $box-shadow-color;
+        box-shadow: 0px 1px 0px $border-color-lightest;
     }
     .ql-bubble .ql-editor {
         padding: 1px 8px 8px 1px;
@@ -118,8 +119,8 @@
 
     // 4. toolbar
     .ql-toolbar.ql-snow {
-        border: 1px solid $form-border-color;
-        border-radius: $base-border-radius $base-border-radius 0 0;
+        border: 1px solid $border-color;
+        border-radius: 4px 4px 0 0;
         box-sizing: border-box;
         padding: 5px 8px;
         white-space: nowrap;
@@ -127,10 +128,10 @@
         min-height: 39px;
     }
     .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label {
-        border-color: $form-border-color
+        border-color: $border-color;
     }
     .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
-        border-color: $form-border-color
+        border-color: $border-color;
     }
     // link popup
     .ql-tooltip {
@@ -319,4 +320,11 @@
     height: 3px;
     width: 80%;
     background-color: red;
+}
+
+// 10. markdown/rich text switcher tooltip
+.quill-editor-tooltip {
+    position: relative;
+    top: 3px;
+    line-height: 1;
 }

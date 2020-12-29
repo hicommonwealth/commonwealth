@@ -101,9 +101,9 @@
                 border-bottom:  1px darken($color: $background-color-white-hover, $amount: 5%) solid;
             }
             &.selected {
-                border-bottom: 3px $positive-text-color solid;
+                border-bottom: 3px $positive-bg-color solid;
                 @include sm-min {
-                    border-left: 8px $positive-text-color solid;
+                    border-left: 8px $positive-bg-color solid;
                     border-bottom:  1px darken($color: $background-color-white-hover, $amount: 5%) solid;
                     padding-left: 13px;
                     background-color: darken($color: $background-color-white-hover, $amount: 3%);

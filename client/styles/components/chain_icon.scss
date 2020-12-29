@@ -2,6 +2,7 @@
 
 .ChainIcon {
     img.chain-icon {
+        display: flex;
         border-radius: 9999px;
         background: $background-color-darker-monochrome;
     }
@@ -12,6 +13,7 @@
 
 .CommunityIcon {
     img.community-icon {
+        display: flex;
         border-radius: 9999px;
         background: $background-color-darker-monochrome;
     }

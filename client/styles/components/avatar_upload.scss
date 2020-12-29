@@ -47,6 +47,8 @@
         }
         .icon-plus {
             font-size: 16px;
+            position: relative;
+            top: 3px;
         }
     }
     .dropzone-previews {
@@ -165,7 +167,7 @@
 
     &.dz-drag-hover {
         border-style: solid;
-        border: 2px solid $theme-base-color;
+        border: 2px solid $primary-bg-color;
         border-radius: 5px;
         margin: -8px -2px;
     }
@@ -315,7 +317,7 @@
 
         .dz-error-message {
             $width: $image-size + 20px;
-            $color: $negative-text-color;
+            $color: $negative-bg-color;
 
             pointer-events: none;
             z-index: 1000;

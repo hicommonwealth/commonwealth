@@ -45,7 +45,7 @@ $cui-h6-font-size: $cui-font-size * 0.75;
 //
 
 $cui-body-bg: $blue-grey50;
-$cui-body-color: $blue-grey800;
+$cui-body-color: $text-color-black;
 $cui-body-font-size: $cui-base-size * 1.6;
 
 $cui-text-color:               $cui-body-color;
@@ -78,15 +78,15 @@ $cui-base-height-multiplier: 1.2;
 
 $cui-base-height-xs:  floor($cui-base-size * 1.9);
 $cui-base-height-sm:  floor($cui-base-size * 2.2);
-$cui-base-height:     floor($cui-base-size * 2.6);
-$cui-base-height-lg:  floor($cui-base-size * 2.8);
-$cui-base-height-xl:  floor($cui-base-size * 3.3);
+$cui-base-height:     floor($cui-base-size * 2.8);
+$cui-base-height-lg:  floor($cui-base-size * 3.1);
+$cui-base-height-xl:  floor($cui-base-size * 3.4);
 
 //
 // component colors
 //
 
-$cui-border-radius: $base-border-radius;
+$cui-border-radius: 4px;
 
 $cui-base-bg-color: $base-bg-color;
 $cui-primary-bg-color: $primary-bg-color;
@@ -414,10 +414,8 @@ button, .cui-button {
     max-width: 240px; // allow menus to be wider by default
     padding: 4px 0;
     .cui-menu-item.cui-button {
-        min-height: 34px;
-        height: 34px;
-        padding-left: 12px;
-        padding-right: 12px;
+        padding-left: 14px;
+        padding-right: 14px;
         width: 100%;
     }
     > .cui-button.cui-basic {
@@ -427,7 +425,7 @@ button, .cui-button {
         }
     }
     > .cui-menu-divider {
-        margin: 4px 0;
+        margin: 6px 0 5px;
     }
     .cui-button-label {
         width: 100%;

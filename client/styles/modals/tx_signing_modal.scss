@@ -90,10 +90,10 @@
             word-break: break-word;
         }
         .txbox-content.txbox-success {
-            color: $positive-text-color;
+            color: $positive-bg-color;
         }
         .txbox-content.txbox-fail {
-            color: $negative-text-color;
+            color: $negative-bg-color;
         }
     }
 }
