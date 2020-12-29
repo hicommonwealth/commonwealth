@@ -296,31 +296,6 @@ export class CosmosAccount extends Account<CosmosToken> {
     return this._Accounts.CosmosKeys.signWithPrivateKey(message, this._privateKey).toString('hex');
   }
 
-  public async isValidSignature(message: string, signature: string | object): Promise<boolean> {
-    let sigObj;
-    try {
-      sigObj = (typeof signature === 'string') ? JSON.parse(signature) : signature;
-    } catch (e) {
-      return false;
-    }
-    const stdTx = await keyToMsgSend(this.address, message.trim());
-    const signMessage = (await import('@lunie/cosmos-api')).createSignMessage(stdTx, VALIDATION_CHAIN_DATA);
-
-    const sigBuf = Buffer.from(sigObj.signature, 'base64');
-    if (sigObj.pub_key.type !== 'tendermint/PubKeySecp256k1') {
-      throw new Error('invalid pub key type');
-    }
-    const pubKey = Buffer.from(sigObj.pub_key.value, 'base64');
-    if (this._publicKey && !pubKey.equals(this._publicKey)) {
-      throw new Error('public key mismatch');
-    } else if (!this._publicKey) {
-      // save the public key as an argument for serverside verification
-      this._publicKey = pubKey;
-    }
-    const result = this._Accounts.CosmosKeys.verifySignature(signMessage, sigBuf, pubKey);
-    return result;
-  }
-
   public updateValidatorDelegations = _.throttle(async () => {
     let resp;
     try {

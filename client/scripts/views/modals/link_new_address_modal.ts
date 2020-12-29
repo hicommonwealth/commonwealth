@@ -264,12 +264,6 @@ const SubstrateLinkAccountItem: m.Component<{
             type: 'bytes',
           };
           const signature = (await signer.signRaw(payload)).signature;
-          const verified = await signerAccount.isValidSignature(token, signature);
-
-          if (!verified) {
-            vnode.state.linking = false;
-            errorCallback('Verification failed');
-          }
           signerAccount.validate(signature).then(() => {
             vnode.state.linking = false;
             // return if user signs for two addresses
@@ -321,7 +315,7 @@ const LinkNewAddressModal: m.Component<{
   error;
   selectedWallet: LinkNewAddressWallets;
   // step 1 - validate address
-  validSig: string;
+  userProvidedSignature: string;
   secretPhraseSaved: boolean;
   newAddress: Account<any>; // true if account was already initialized, otherwise it's the Account
   linkingComplete: boolean;
@@ -685,15 +679,7 @@ const LinkNewAddressModal: m.Component<{
                 const unverifiedAcct = vnode.state.newAddress;
                 const validationToken = unverifiedAcct.validationToken;
                 vnode.state.error = null;
-                try {
-                  if (await unverifiedAcct.isValidSignature(`${validationToken}\n`, signature)) {
-                    vnode.state.validSig = signature;
-                  } else {
-                    vnode.state.error = 'Invalid signature';
-                  }
-                } catch (err) {
-                  vnode.state.error = 'Invalid signature (2)';
-                }
+                vnode.state.userProvidedSignature = signature;
                 m.redraw();
               },
             }),
@@ -711,16 +697,16 @@ const LinkNewAddressModal: m.Component<{
               onclick: async (e) => {
                 e.preventDefault();
                 const unverifiedAcct: Account<any> = vnode.state.newAddress;
-                unverifiedAcct.validate(vnode.state.validSig).then(() => {
+                unverifiedAcct.validate(vnode.state.userProvidedSignature).then(() => {
                   // if no exception was raised, account must be valid
                   accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address));
                 }, (err) => {
-                  vnode.state.error = 'Verification failed (frontend check passed, backend check failed)';
+                  vnode.state.error = 'Verification failed';
                   m.redraw();
                 });
               },
               label: 'Continue',
-              disabled: !(vnode.state.validSig
+              disabled: !(vnode.state.userProvidedSignature
                           && (app.chain.base !== ChainBase.Substrate || vnode.state.secretPhraseSaved))
             }),
           ]),

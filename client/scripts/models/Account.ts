@@ -20,7 +20,6 @@ abstract class Account<C extends Coin> {
   public abstract balance: Observable<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
   public async abstract signMessage(message: string): Promise<string>;
-  public abstract async isValidSignature(message: string, signature: string): Promise<boolean>;
   protected abstract addressFromMnemonic(mnemonic: string): string;
   protected abstract addressFromSeed(seed: string): string;
 
@@ -97,13 +96,7 @@ abstract class Account<C extends Coin> {
     if (!signature && (this.seed || this.mnemonic || this.chainBase === ChainBase.NEAR)) {
       // construct signature from private key
       signature = await this.signMessage(`${this._validationToken}\n`);
-    } else if (signature) {
-      const validWithoutNewline = await this.isValidSignature(this._validationToken, signature);
-      const validWithNewline = await this.isValidSignature(`${this._validationToken}\n`, signature);
-      if (!validWithNewline && !validWithoutNewline) {
-        throw new Error('invalid signature');
-      }
-    } else {
+    } else if (!signature) {
       throw new Error('no signature or seed provided');
     }
 
@@ -114,7 +107,14 @@ abstract class Account<C extends Coin> {
         jwt: this.app.user.jwt,
         signature,
       };
-      return Promise.resolve($.post(`${this.app.serverUrl()}/verifyAddress`, params));
+      return new Promise((resolve, reject) => {
+        $.post(`${this.app.serverUrl()}/verifyAddress`, params).then((result) => {
+          if (result.status === 'Success') return resolve();
+          else reject();
+        }).catch((error) => {
+          reject();
+        });
+      });
     } else {
       throw new Error('signature or key required for validation');
     }
