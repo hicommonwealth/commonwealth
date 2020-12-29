@@ -13,15 +13,18 @@ export const Errors = {
 
 const addEditors = async (models, req: Request, res: Response, next: NextFunction) => {
   const { thread_id } = req.body;
-  const editors = JSON.parse(req.body.editors);
-  console.log(editors);
+  try {
+    const editors = JSON.parse(req.body.editors);
+    console.log(editors);
+  } catch (e) {
+    console.log(e);
+  }
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
   }
-
 
   try {
     const userOwnedAddressIds = await (req.user as any).getAddresses()
@@ -35,7 +38,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     if (!thread) return next(new Error('No thread with that id found'));
     // Editor attachment logic
     const collaborators = [];
-    console.log(editors);
+
     try {
       //
     } catch (e) {

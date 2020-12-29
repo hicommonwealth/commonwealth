@@ -149,7 +149,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/createThread', passport.authenticate('jwt', { session: false }), createThread.bind(this, models));
   // TODO: Change to PUT /thread
   router.put('/editThread', passport.authenticate('jwt', { session: false }), editThread.bind(this, models));
-  router.put('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this.models));
+  router.post('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this, models));
   // TODO: Change to DELETE /thread
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads

@@ -2,7 +2,7 @@ import m from 'mithril';
 import moment from 'moment';
 import lity from 'lity';
 import $ from 'jquery';
-
+import 'pages/view_proposal/editor_permissions.scss';
 import { updateRoute } from 'app';
 import app from 'state';
 import {
@@ -334,7 +334,7 @@ export const ProposalEditorPermissions: m.Component<{
     console.log(popoverMenu);
     if (!vnode.state.items?.length) return;
     if (!vnode.state.addedEditors) {
-      vnode.state.addedEditors = [];
+      vnode.state.addedEditors = {};
     }
     const { items } = vnode.state;
     return m(Dialog, {
@@ -424,12 +424,14 @@ export const ProposalEditorPermissions: m.Component<{
           intent: 'primary',
           onclick: async () => {
             console.log('clicked');
+            console.log(vnode.state.addedEditors);
             try {
-              const req = await $.get(`${app.serverUrl()}/addEditors`, {
+              const req = await $.post(`${app.serverUrl()}/addEditors`, {
                 chain: app.activeChainId(),
                 community: app.activeCommunityId(),
                 thread_id: thread.id,
-                editors: JSON.stringify(vnode.state.addedEditors)
+                editors: JSON.stringify(vnode.state.addedEditors),
+                jwt: app.user.jwt,
               });
               if (req.status !== '200') {
                 // TODO
