@@ -73,6 +73,11 @@ export enum ProposalStatus {
   Failed = 'failed',
   None = 'none',
 }
+
+export enum BountyStatus {
+  // TODO: Fill in
+}
+
 export enum VotingType {
   SimpleYesNoVoting = 'binary',
   ConvictionYesNoVoting = 'binary_conviction',
