@@ -2,11 +2,13 @@ import 'pages/discussions/discussion_row_menu.scss';
 
 import m from 'mithril';
 import app from 'state';
+import { MenuItem, PopoverMenu, Icon, Icons, MenuDivider } from 'construct-ui';
 
 import { NotificationCategories } from 'types';
 import { OffchainThread, OffchainTopic } from 'models';
+
 import TopicEditor from 'views/components/topic_editor';
-import { MenuItem, PopoverMenu, Icon, Icons, MenuDivider } from 'construct-ui';
+import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }> = {
@@ -29,14 +31,17 @@ export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }>
             app.user.notifications.subscribe(NotificationCategories.NewReaction, proposal.uniqueIdentifier),
             app.user.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier),
           ]);
+          notifySuccess('Subscribed!');
         } else if (bothActive) {
           await app.user.notifications.disableSubscriptions([commentSubscription, reactionSubscription]);
+          notifySuccess('Unsubscribed!');
         } else {
           await app.user.notifications.enableSubscriptions([commentSubscription, reactionSubscription]);
+          notifySuccess('Subscribed!');
         }
         m.redraw();
       },
-      label: (bothActive) ? 'Turn off notifications' : 'Turn on notifications',
+      label: (bothActive) ? 'Unsubscribe from notifications' : 'Subscribe to notifications',
     });
   },
 };

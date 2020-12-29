@@ -25,32 +25,30 @@ body {
     height: 100%;
     width: 100%;
 }
+$gradient-base-color: saturate(lighten($primary-bg-color, 20%), 14%);
 .home-gradient {
     position: absolute;
-    top: -16px;
+    top: 0;
     left: 0;
     width: 100%;
     height: 80px;
     background-image: linear-gradient(
-        180deg, #6788F9 0%,
-        rgba(108,141,249,0.91) 4%,
-        rgba(112,145,249,0.83) 9%,
-        rgba(117,149,249,0.75) 13%,
-        rgba(121,153,249,0.67) 18%,
-        rgba(124,156,249,0.60) 23%,
-        rgba(128,160,249,0.53) 29%,
-        rgba(131,163,250,0.45) 35%,
-        rgba(134,166,250,0.39) 42%,
-        rgba(137,169,250,0.32) 49%,
-        rgba(139,171,250,0.25) 57%,
-        rgba(142,174,250,0.19) 66%,
-        rgba(145,177,250,0.13) 77%,
-        rgba(147,179,250,0.06) 88%,
-        rgba(150,182,250,0.00) 100%
+        180deg, mix($gradient-base-color, #fff, 100%) 0%,
+        mix($gradient-base-color, #fff, 91%) 4%,
+        mix($gradient-base-color, #fff, 83%) 9%,
+        mix($gradient-base-color, #fff, 75%) 13%,
+        mix($gradient-base-color, #fff, 67%) 18%,
+        mix($gradient-base-color, #fff, 60%) 23%,
+        mix($gradient-base-color, #fff, 53%) 29%,
+        mix($gradient-base-color, #fff, 45%) 35%,
+        mix($gradient-base-color, #fff, 39%) 42%,
+        mix($gradient-base-color, #fff, 32%) 49%,
+        mix($gradient-base-color, #fff, 25%) 57%,
+        mix($gradient-base-color, #fff, 19%) 66%,
+        mix($gradient-base-color, #fff, 13%) 77%,
+        mix($gradient-base-color, #fff, 6%) 88%,
+        mix($gradient-base-color, #fff, 0%) 100%
     );
-    @include sm-max {
-        top: 0px;
-    }
 }
 
 // global css
@@ -61,14 +59,14 @@ strong {
     font-weight: 500;
 }
 a {
-    color: $theme-accent-dark;
+    color: $primary-bg-color;
     text-decoration: none;
     &:hover {
         text-decoration: underline;
     }
 }
 a:visited {
-    color: lighten($theme-accent-dark, 4%);
+    color: lighten($primary-bg-color, 5%);
 }
 code, pre {
     font-family: $monospace-fonts;
@@ -78,7 +76,7 @@ code, pre {
 }
 code {
     padding: 1px 3px;
-    color: $negative-text-color;
+    color: $negative-bg-color;
 }
 pre {
     padding: 10px 12px;

@@ -2,51 +2,34 @@
 @import 'mixins/animation';
 @import 'mixins/responsive';
 @import 'mixins/dragula';
+@import 'construct-ui/src/_shared/_colors';
+
+//
+// layout parameters
+
+$sidebar-width: 230px;
+$quick-switcher-width: 64px;
+$layout-max-width: 970px;
+
+//
+// base fonts
 
 $fonts: Calibre, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 $monospace-fonts: SF Mono, Menlo, Monaco, "Lucida Sans Typewriter", "Courier New", Courier, monospace;
 
+//
+// base colors
+
 $base-bg-color:     #ffffff;
-$primary-bg-color:  #4f62bd;
-$positive-bg-color: #4caf50;
-$negative-bg-color: #d4302f;
-$base-border-radius: 4px;
+$primary-bg-color:  #4f6dbd; // also used for text
+$positive-bg-color: #41a360; // also used for text
+$negative-bg-color: #d4302f; // also used for text
 
 $intermediate-icon-color: #ffa200;
 $positive-icon-color: #7ed320;
 $failure-icon-color: #db322d;
 
 $last-seen-notification-color: #ea7a60;
-$modal-header-background-color: #4f63be;
-
-$positive-text-color: #41a360;         // proposal passing, diff adds
-$positive-text-background: #cce8cc;
-$negative-text-color: #d32e26;         // proposal failing, diff removes
-$negative-text-background: #e8cccc;
-$box-shadow-color: #eef1f2;
-
-// TODO: label these colors
-$theme-base-color: #5b7bf6;
-$theme-accent-dark: darken(#5b7bf6, 7%);
-$theme-focus-border: #3960f4;
-
-$background-color-white: #ffffff;       // white background
-$background-color-white-hover: #f9fafd; // white background with hover
-$background-color-light: #eef1fa;       // light background
-$background-color-light-hover: #e5e8f7; // light background with hover
-
-$background-color-medium-accent: #adb7d5;
-
-$background-color-dark-accent: #4f62bd;
-$background-color-dark-monochrome: #36393f;
-$background-color-darker-accent: darken(#4f62bd, 4%);
-$background-color-darker-monochrome: #2f3136;
-
-$background-color-border: #e0e4f1;      // border color
-
-$background-color-placeholder: #adb7d5; // placeholder color
-$background-color-unread: #ffffe0;      // notifications color
-$background-color-selection-on-dark: #ffdd00;
 
 $text-color-white: #fff;
 $text-color-lightest: #b5b7b9;          // light text on white background
@@ -55,26 +38,49 @@ $text-color-light: #9a9da4;             // light text on light background
 $text-color-medium: #777;               // medium text on any background
 $text-color-medium-dark: #555;          // light off-black text on any background
 $text-color-darker: #333;               // off-black text on any background
-$text-color-black: #222;                 // black text on any background
+$text-color-black: #222;                // black text on any background
 
 $text-color-primary-light: tint($primary-bg-color, 75%);
 $text-color-primary: $primary-bg-color;
 
-$form-border-color: #c5cdd1;
-$form-border-color-light: lighten(#c5cdd1, 12%);
+//
+// background colors
 
-$positive-text-color: $positive-bg-color;
-$negative-text-color: $negative-bg-color;
+$background-color-white: #ffffff;
+$background-color-white-hover: tint($primary-bg-color, 96.5%);
+$background-color-light: desaturate(tint($primary-bg-color, 90%), 12%);
+$background-color-light-hover: desaturate(tint($primary-bg-color, 83.5%), 12%);
+$background-color-medium-light: desaturate(tint($primary-bg-color, 75%), 25%);
 
-$sidebar-width: 230px;
-$quick-switcher-width: 64px;
-$layout-max-width: 970px;
+$background-color-light-positive: #cce8cc;
+$background-color-light-negative: #e8cccc;
 
+$background-color-medium-accent: tint($primary-bg-color, 50%);
+
+$background-color-dark-accent: $primary-bg-color;
+$background-color-dark-monochrome: #36393f;
+$background-color-darker-accent: shade($primary-bg-color, 4%);
+$background-color-darker-monochrome: #2f3136;
+
+$background-color-unread: #ffffe0;      // notifications color
+$background-color-selection-on-dark: #ffdd00;
+
+//
+// border colors
+
+$border-color: #c5cdd1;
+$border-color-light: #e0e4f1;
+$border-color-lightest: #e0e4f1;
+$border-color-focus: mix($border-color, $primary-bg-color, 50%);
+
+//
 // forum listing components
+
 $text-size-item-header: 19px;
 $text-size-item-meta: 17px;
 $listing-left-flex: 4;
 $listing-right-flex: 3;
+
 @mixin listing-row-base {
     display: flex;
     padding: 12px 20px;
@@ -88,12 +94,12 @@ $listing-right-flex: 3;
 @mixin formfield-base {
     display: block;
     width: 100%;
-    border: 1px solid $form-border-color;
-    border-radius: $base-border-radius;
+    border: 1px solid $border-color;
+    border-radius: 4px;
     outline: none;
     box-shadow: none;
     &:focus {
-        border-color: $theme-focus-border;
+        border-color: $border-color-focus;
     }
 }
 
@@ -119,7 +125,7 @@ $listing-right-flex: 3;
 
 @mixin attachments {
     p {
-        font-weight: 700;
+        font-weight: 500;
         color: $text-color-light;
     }
     a.attachment-item {

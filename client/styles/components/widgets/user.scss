@@ -40,7 +40,8 @@
     height: 14px;
     padding-top: 4px;
     margin: 0;
-    margin-left: 5px;
+    margin-left: 4px; // tuned for correct spacing next to inline text and/or identity icons
+    margin-right: 1px;
     border-radius: 9999px;
     // text styling
     text-align: center;
@@ -71,7 +72,8 @@
 .User {
     display: inline-block;
     white-space: nowrap;
-    a {
+    > a {
+        // reset link styles
         &, &:link, &:visited {
             color: inherit;
         }
@@ -82,11 +84,9 @@
     .user-avatar-only {
         @include circledAvatar();
     }
-    span.identity-icon {
-        @include roleIcon();
-    }
-    a.user-display-name.verified {
-        // color: $theme-base-color !important;
+    a.user-display-name {
+        cursor: inherit;
+        text-decoration: initial;
     }
     &.linkified a.user-display-name {
         cursor: pointer;
@@ -94,11 +94,15 @@
     &.linkified a.user-display-name:hover {
         text-decoration: underline;
     }
-    .role-icon {
+    // role icons and identity icons
+    span.identity-icon {
         @include roleIcon();
     }
     .user-display-name .identity-icon {
         margin-left: 7px !important;
+    }
+    .role-icon {
+        @include roleIcon();
     }
     .role-tag {
         font-size: 14px;

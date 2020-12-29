@@ -20,7 +20,7 @@ $text-size-item-meta: 17px;
     }
     .proposal-row-turnout-bullet-inner {
         height: 100%;
-        background: $theme-base-color;
+        background: $primary-bg-color;
         border-radius: 99px;
     }
     .proposal-row-requirement {
@@ -37,10 +37,10 @@ $text-size-item-meta: 17px;
         color: $text-color-light;
         font-weight: 500;
         &.pass {
-            color: $positive-text-color;
+            color: $positive-bg-color;
         }
         &.fail {
-            color: $negative-text-color;
+            color: $negative-bg-color;
         }
     }
     .proposal-comments {

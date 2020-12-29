@@ -23,12 +23,12 @@
                     flex: 5;
                     color: $text-color-darker;
                     .deleted {
-                        background: $negative-text-background !important;
-                        color: $positive-text-background !important;
+                        background: $background-color-light-negative !important;
+                        color: $negative-bg-color !important;
                     }
                     .added {
-                        background: $positive-text-background !important;
-                        color: $positive-text-color !important;
+                        background: $background-color-light-positive !important;
+                        color: $positive-bg-color !important;
                     }
                 }
             }

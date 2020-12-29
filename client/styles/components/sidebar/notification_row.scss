@@ -3,11 +3,11 @@
 .NotificationRow {
     display: flex;
     flex-direction: column;
-    padding: 17px 22px 19px;
+    padding: 17px 22px;
     line-height: 1.2;
     margin: 0;
     cursor: pointer;
-    border-bottom: 1px solid #background-color-border;
+    border-bottom: 1px solid $border-color-lightest;
     &:hover {
         background: $background-color-white-hover;
     }
@@ -26,6 +26,10 @@
     }
     .comment-body {
         flex: 1;
+        &:first-child {
+            // chain notifications don't have a User/UserGallery
+            margin-top: 8px;
+        }
         .chain-event-notification-top {
             display: flex;
             justify-content: space-between;

@@ -15,7 +15,7 @@ import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import Substrate from 'controllers/chain/substrate/main';
 import Ethereum from 'controllers/chain/ethereum/main';
 import Near from 'controllers/chain/near/main';
@@ -55,6 +55,26 @@ const EthereumLinkAccountItem: m.Component<{
     return m('.EthereumLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
+        const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+          address: address.toLowerCase(),
+          chain: app.activeChainId(),
+          jwt: app.user.jwt,
+        });
+
+        if (result.exists) {
+          if (result.belongsToUser) {
+            notifyInfo('This address is already linked to your current account.');
+            return;
+          } else {
+            const modalMsg = 'This address is currently linked to another account. Continue?';
+            const confirmed = await confirmationModalWithText(modalMsg)();
+            if (!confirmed) {
+              vnode.state.linking = false;
+              return;
+            }
+          }
+        }
+
         const api = (app.chain as Ethereum);
         const webWallet = api.webWallet;
 
@@ -104,6 +124,25 @@ const SubstrateLinkAccountItem: m.Component<{
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
+        const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+          address,
+          chain: app.activeChainId(),
+          jwt: app.user.jwt,
+        });
+
+        if (result.exists) {
+          if (result.belongsToUser) {
+            notifyInfo('This address is already linked to your current account.');
+            return;
+          } else {
+            const modalMsg = 'This address is currently linked to another account. Continue?';
+            const confirmed = await confirmationModalWithText(modalMsg)();
+            if (!confirmed) {
+              vnode.state.linking = false;
+              return;
+            }
+          }
+        }
 
         try {
           const signerAccount = await createUserWithAddress(address) as SubstrateAccount;
@@ -378,9 +417,9 @@ const LinkNewAddressModal: m.Component<{
                 !(app.chain as Substrate || app.chain as Ethereum).webWallet.available
                   ? 'No wallet detected'
                   : (vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected)
-                    ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain (may take up to 10s)...' ]
+                    ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ]
                     : app.chain.networkStatus === ApiStatus.Disconnected
-                      ? 'Could not connect to chain'
+                      ? 'Connecting to chain...'
                       : 'Connect to wallet'
             }),
           !(app.chain as Substrate || app.chain as Ethereum).webWallet.available && m('.get-wallet-text', [

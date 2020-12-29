@@ -53,7 +53,7 @@
             margin-top: 6px;
             margin-bottom: 8px;
             padding-right: 28px;
-            border-bottom: 1px solid $background-color-border;
+            border-bottom: 1px solid $border-color-lightest;
             .cui-tabs-item {
                 padding: 11px 0 7px !important;
                 margin-left: 1px !important;
@@ -142,20 +142,20 @@
         display: flex;
         flex-direction: column;
         flex: 3;
-        border-left: 1px solid $background-color-border;
+        border-left: 1px solid $border-color-lightest;
         padding-bottom: 10px;
         .cui-list {
             max-height: none;
             .cui-list-item {
                 display: block;
-                padding: 16px 20px;
-                border-bottom-color: $background-color-border;
+                padding: 21px 12px 12px !important;
+                border-bottom-color: $border-color-lightest;
                 max-height: 140px;
                 overflow: hidden;
                 .discussion-draft-title-wrap {
                     display: flex;
                     .cui-icon-edit {
-                        color: $negative-text-color;
+                        color: $negative-bg-color;
                         margin: 0 8px 8px 0;
                     }
                 }
@@ -186,7 +186,7 @@
                         text-decoration: none;
                         &:hover {
                             opacity: 1;
-                            color: $negative-text-color;
+                            color: $negative-bg-color;
                         }
                     }
                 }
@@ -201,10 +201,9 @@
             display: inline-block;
             margin-right: 12px;
             width: calc(100% - 6px);
-            padding: 3px 8px 2px;
             line-height: 1.2;
-            color: $negative-text-color;
-            border: 1px solid $negative-text-color;
+            color: $negative-bg-color;
+            border: 1px solid $negative-bg-color;
             border-radius: 9999px;
             text-align: center;
         }
