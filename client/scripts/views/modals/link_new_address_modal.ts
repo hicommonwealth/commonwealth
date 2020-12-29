@@ -7,10 +7,7 @@ import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
-import { SigningCosmosClient, serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
-import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import { toUtf8, fromBase64 } from '@cosmjs/encoding';
-import { Uint53 } from '@cosmjs/math';
+import { SigningCosmosClient } from '@cosmjs/launchpad';
 
 import { Button, Callout, Input, TextArea, Icon, Icons, Spinner, Checkbox } from 'construct-ui';
 
@@ -19,7 +16,7 @@ import { isSameAccount, link } from 'helpers';
 import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 
-import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
+import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import Cosmos from 'controllers/chain/cosmos/main';
@@ -151,38 +148,14 @@ const CosmosLinkAccountItem: m.Component<{
 
         // Get the verification token & placeholder TX to send
         const signerAccount = await createUserWithAddress(account.address);
-        const stdTx = await keyToMsgSend(account.address, signerAccount.validationToken);
-        delete stdTx.fee;
-        delete stdTx.memo;
-        const signDoc = {
-          chain_id: 'straightedge-2',
-          account_number: '0',
-          sequence: '0',
-          fee: { gas: '100000', amount: [{ denom: 'astr', amount: '2500000000000000' }] },
-          memo: '',
-          msgs: stdTx.msg,
-        };
+        const signDoc = await validationTokenToSignDoc(account.address, signerAccount.validationToken);
 
         // Some typing and versioning issues here...signAmino should be available but it's not
         ((client as any).signer.signAmino
           ? (client as any).signer.signAmino(account.address, signDoc)
           : (client as any).signer.sign(account.address, signDoc)
-        ).then(async (aminoResults) => {
-          // frontend check for signature validity (this could be removed...)
-          // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
-          const { pubkey, signature } = decodeSignature(aminoResults.signature);
-          const hexSignature = Buffer.from(signature).toString('hex');
-          const secpSignature = Secp256k1Signature.fromFixedLength(fromBase64(aminoResults.signature.signature));
-          if (serializeSignDoc(aminoResults.signed).toString() !== serializeSignDoc(signDoc).toString()) {
-            throw new Error('Invalid signed transaction! Keplr may have been updated');
-          }
-          const messageHash = new Sha256(serializeSignDoc(signDoc)).digest();
-          const result = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
-          if (!result) {
-            throw new Error('Invalid signature!');
-          }
-
-          return signerAccount.validate(hexSignature).then(() => {
+        ).then(async (signature) => {
+          return signerAccount.validate(JSON.stringify(signature)).then(() => {
             // return if user signs for two addresses
             if (linkNewAddressModalVnode.state.linkingComplete) return;
             linkNewAddressModalVnode.state.linkingComplete = true;
