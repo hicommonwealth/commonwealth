@@ -125,9 +125,9 @@ export class SubstrateBounty
     this._Accounts = Accounts;
     this._Treasury = Treasury;
 
-    this.value = this._Chain.coins(this.data.value);
-    this.bond = this._Chain.coins(this.data.bond);
-    // this.beneficiaryAddress = this.data.beneficiary;
+    this._value = this._Chain.coins(this.data.value);
+    this._bond = this._Chain.coins(this.data.bond);
+
     this._author = this._Accounts.fromAddress(this.data.proposer);
     this.createdAt = entity.createdAt;
 
