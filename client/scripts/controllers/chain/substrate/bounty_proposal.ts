@@ -18,10 +18,11 @@ const backportEventToAdapter = (
   event: SubstrateTypes.ITreasuryBountyProposed
 ): ISubstrateBounty => {
   return {
-    identifier: event.proposalIndex.toString(),
-    index: event.proposalIndex,
-    value: '',
-    beneficiary: event.beneficiary,
+    identifier: event.bountyIndex.toString(),
+    index: event.bountyIndex,
+    value: ChainInfo.createType('u128', event.value),
+    fee: ChainInfo.createType('u128', event.fee),
+    curator_deposit: ChainInfo.createType('u128', event.curatorDeposit),
     bond: ChainInfo.createType('u128', event.bond),
     proposer: event.proposer,
   };
