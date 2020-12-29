@@ -7,17 +7,17 @@ import { NotificationCategories, ProposalType } from '../../shared/types';
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',
-  InvalidEditor: 'Must provide a valid address of a community member',
+  InvalidEditor: 'Must provide valid addresses of community members',
   IncorrectOwner: 'Not owned by this user',
 };
 
 const addEditors = async (models, req: Request, res: Response, next: NextFunction) => {
   const { thread_id } = req.body;
+  let editors;
   try {
-    const editors = JSON.parse(req.body.editors);
-    console.log(editors);
+    editors = JSON.parse(req.body.editors);
   } catch (e) {
-    console.log(e);
+    console.log('Editors attribute improperly formatted.');
   }
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
@@ -40,9 +40,16 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     const collaborators = [];
 
     try {
-      //
+      Promise.all(Object.values(editors).map(async (editor: any) => {
+        const collaborator = await models.Address.findOne({
+          where: { id: editor.id }
+        });
+        if (collaborator) {
+          collaborators.push(collaborator);
+        }
+      }));
     } catch (e) {
-      console.log(e);
+      return next(new Error(Errors.InvalidEditor));
     }
 
     // Ensure collaborators have community permissions
@@ -62,6 +69,8 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
         console.log(thread);
         console.log(collaborator);
       }));
+    } else {
+      return next(new Error(Errors.InvalidEditor));
     }
 
     await thread.save();
