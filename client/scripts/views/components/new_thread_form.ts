@@ -99,6 +99,7 @@ export const loadDraft = async (dom, state, draft) => {
   if (draft.body) {
     try {
       newDraftDelta = JSON.parse(draft.body);
+      if (!newDraftDelta.ops) throw new Error();
     } catch (e) {
       newDraftMarkdown = draft.body;
     }
