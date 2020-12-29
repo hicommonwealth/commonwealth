@@ -357,13 +357,14 @@
         overflow-y: hidden;
     }
     .infinite-scroll-spinner-wrap {
+        margin: -26px 0 0 0;
         height: 70px;
         width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
     }
-    .infinite-scroll-reached-end {
+    .infinite-scroll-reached-end, .no-content {
         padding: 15px 0 8px 0;
         text-align: center;
         border-top: 1px solid $border-color;
