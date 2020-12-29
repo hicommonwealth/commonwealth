@@ -37,25 +37,25 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     });
     if (!thread) return next(new Error('No thread with that id found'));
     // Editor attachment logic
-    const collaborators = [];
+    let collaborators;
 
     try {
-      Promise.all(Object.values(editors).map(async (editor: any) => {
-        const collaborator = await models.Address.findOne({
+      collaborators = await Promise.all(Object.values(editors).map(async (editor: any) => {
+        const collaborator =  models.Address.findOne({
           where: { id: editor.id },
           include: [ models.Role ]
         });
-        if (collaborator) {
-          collaborators.push(collaborator);
-        }
+        return collaborator;
       }));
     } catch (e) {
+      console.log(e);
       return next(new Error(Errors.InvalidEditor));
     }
-
+    console.log(collaborators);
     // Ensure collaborators have community permissions
     if (collaborators?.length > 0) {
       await Promise.all(collaborators.map(async (collaborator) => {
+        console.log(collaborator.Roles);
         if (community) {
           const isMember = collaborator.Roles
             .find((role) => role.offchain_community_id === community.id);
@@ -65,10 +65,11 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
             .find((role) => role.chain_id === chain.id);
           if (!isMember) return next(new Error(Errors.InvalidEditor));
         }
-        thread.addAddress(collaborator);
-        collaborator.addOffchainThread(thread);
-        console.log(thread);
-        console.log(collaborator);
+        const collaboration = await models.SharingPermissions.create({
+          thread_id: thread.id,
+          address_id: collaborator.id
+        });
+        console.log(collaboration);
       }));
     } else {
       return next(new Error(Errors.InvalidEditor));
