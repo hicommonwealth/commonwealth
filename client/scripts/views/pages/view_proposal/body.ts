@@ -427,6 +427,7 @@ export const ProposalEditorPermissions: m.Component<{
             console.log(vnode.state.addedEditors);
             try {
               const req = await $.post(`${app.serverUrl()}/addEditors`, {
+                author_chain: app.user.activeAccount.chain.id,
                 chain: app.activeChainId(),
                 community: app.activeCommunityId(),
                 thread_id: thread.id,

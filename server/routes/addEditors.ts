@@ -42,7 +42,8 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     try {
       Promise.all(Object.values(editors).map(async (editor: any) => {
         const collaborator = await models.Address.findOne({
-          where: { id: editor.id }
+          where: { id: editor.id },
+          include: [ models.Role ]
         });
         if (collaborator) {
           collaborators.push(collaborator);
