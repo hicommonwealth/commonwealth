@@ -3,6 +3,7 @@
 .PreviewModal {
     .compact-modal-body {
         width: 640px;
+        padding-top: 31px;
         @include xs-max {
             width: initial;
         }
@@ -15,7 +16,7 @@
     }
     .empty-preview {
         text-align: center;
-        color: #888;
+        color: $text-color-medium;
         padding: 65px 25px;
     }
 }

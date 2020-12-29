@@ -35,7 +35,9 @@ const EdgewareFunctionPicker = {
       return m('.FunctionPicker', 'Invalid function!');
     }
 
-    return m('.FunctionPicker', [
+    return m('.FunctionPicker', {
+      style: 'margin-bottom: 19.5px',
+    }, [
       m('div', [
         m(DropdownFormField, {
           title: 'Module',

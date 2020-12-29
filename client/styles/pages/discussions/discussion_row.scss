@@ -5,18 +5,15 @@ $discussion-meta-padding: 18px;
 .DiscussionRow {
     .row-left {
         .row-header {
+            .spacer {
+                display: inline-block;
+                width: 5px;
+            }
             a.external-discussion-link {
-                .cui-tag {
-                    position: relative;
-                    top: -2px;
-                    padding-top: 1px;
-                    padding-bottom: 1px;
-                    margin-right: 9px;
-                    text-decoration: none;
-                }
-                .cui-icon {
-                    color: #111;
-                    margin-left: 3px;
+                font-size: 17px;
+                color: $primary-bg-color;
+                &:hover {
+                    text-decoration: underline;
                 }
             }
         }
@@ -62,16 +59,23 @@ $discussion-meta-padding: 18px;
                 color: $text-color-light;
                 margin-right: 12px;
             }
-            .User a {
-                display: inline-block;
+            > .User {
+                display: flex;
+                > .role-icon {
+                    position: relative;
+                    top: -1px;
+                }
+            }
+            > .User > a {
+                display: block;
                 text-decoration: none;
                 color: $text-color-light;
                 &:hover {
                     color: darken($text-color-light, 8%);
                     text-decoration: underline;
                 }
-                a.user-display-name {
-                    color: $theme-base-color;
+                > a.user-display-name {
+                    color: $primary-bg-color;
                 }
             }
             .row-excerpt {

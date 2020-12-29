@@ -252,7 +252,8 @@ const NotificationRow: m.Component<{
 
       if (vnode.state.scrollOrStop) {
         setTimeout(() => {
-          document.getElementById(m.route.param('id')).scrollIntoView();
+          const el = document.getElementById(m.route.param('id'));
+          if (el) el.scrollIntoView();
         }, 1);
         vnode.state.scrollOrStop = false;
       }
@@ -335,12 +336,10 @@ const NotificationRow: m.Component<{
             ),
             avatarOnly: true,
             avatarSize: 26,
-            popover: true,
           })
           : m(UserGallery, {
             users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
             avatarSize: 26,
-            popover: true,
           }),
         m('.comment-body', [
           m('.comment-body-title', notificationHeader),

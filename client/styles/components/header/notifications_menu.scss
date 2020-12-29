@@ -6,20 +6,14 @@
     @include xs-max {
         width: 38px;
     }
+    padding: 1px 6px;
     text-align: center;
-
-    .notification-count {
-        background: $negative-bg-color;
-        border-radius: 9999px;
-        padding: 1px 6px;
-        text-align: center;
-        color: #fff;
-        font-size: 97%;
-    }
 
     @include sm-max {
         .cui-button-label {
             overflow: visible;
+        }
+        &.has-notifications .cui-button-label {
             position: relative;
             top: -2px !important;
         }
@@ -29,7 +23,7 @@
         position: relative;
         top: -1px;
         @include sm-max {
-            top: 1px;
+            top: 0px;
         }
     }
     &.has-notifications {
@@ -66,7 +60,7 @@
     }
     .notification-list {
         height: 480px;
-        background: #fff;
+        background: $background-color-white;
         width: 340px;
         @include xs-max {
             width: calc(100vw - 20px);
@@ -92,7 +86,7 @@
         list-style: none;
         text-align: center;
         padding-top: 230px;
-        color: #111;
+        color: $text-color-black;
         font-weight: 500;
     }
     .NotificationsTypeSelectorButtons,
@@ -102,7 +96,7 @@
             border-radius: 0 !important;
             .cui-button-label {
                 text-align: center;
-                color: #333;
+                color: $text-color-darker;
             }
             &:after {
                 // suppress button group styling
@@ -119,7 +113,7 @@
     }
     .NotificationsTypeSelectorButtons {
         .cui-button {
-            height: 42px;
+            height: 45px;
             border-bottom: 1px #d8dee0 solid !important;
             &.cui-active, &:hover {
                 background: $background-color-light;
@@ -128,7 +122,7 @@
     }
     .NotificationButtons {
         .cui-button {
-            height: 44px;
+            height: 45px;
             border-top: 1px #d8dee0 solid !important;
         }
     }

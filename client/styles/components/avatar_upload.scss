@@ -20,7 +20,7 @@
         align-items: center;
         height: 100%;
         width: 100%;
-        color: #999;
+        color: $text-color-light;
         z-index: 1;
         &.hidden {
             display: none;
@@ -39,7 +39,7 @@
         font-size: 14px;
         cursor: pointer;
         &:hover {
-            color: #666;
+            color: $text-color-medium;
         }
         > svg {
             margin: -3px 0;
@@ -47,6 +47,8 @@
         }
         .icon-plus {
             font-size: 16px;
+            position: relative;
+            top: 3px;
         }
     }
     .dropzone-previews {
@@ -165,7 +167,7 @@
 
     &.dz-drag-hover {
         border-style: solid;
-        border: 2px solid #08C;
+        border: 2px solid $primary-bg-color;
         border-radius: 5px;
         margin: -8px -2px;
     }
@@ -187,7 +189,7 @@
                 height: 100%;
                 width: 100%;
                 border-radius: $image-border-radius;
-                background: #999;
+                background: $text-color-light;
                 background: linear-gradient(to bottom, $background-color-light, #ddd);
             }
             .dz-details {
@@ -292,8 +294,8 @@
             border-radius: 8px;
             overflow: hidden;
             .dz-upload {
-                background: #333;
-                background: linear-gradient(to bottom, #666, #444);
+                background: $background-color-dark-accent;
+                background: linear-gradient(to bottom, $background-color-dark-accent, $background-color-darker-accent);
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -315,7 +317,7 @@
 
         .dz-error-message {
             $width: $image-size + 20px;
-            $color: rgb(190, 38, 38);
+            $color: $negative-bg-color;
 
             pointer-events: none;
             z-index: 1000;
@@ -332,7 +334,7 @@
             background: $color;
             background: linear-gradient(to bottom, $color, darken($color, 5%));
             padding: 0.5em 1.2em;
-            color: white;
+            color: $text-color-white;
 
             // The triangle pointing up
             &:after {

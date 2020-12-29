@@ -1,5 +1,5 @@
-@import 'client/styles/components/widgets/user';
 @import 'client/styles/shared';
+@import 'client/styles/components/widgets/user';
 
 .UserGallery {
     .overflow-users-wrap {
@@ -8,22 +8,12 @@
         margin-right: -16px;
         margin-top: 5px;
         white-space: nowrap;
-        background-color: $text-color-lightest;
+        background-color: $background-color-medium-accent;
         .overflow-users {
             text-align: center;
             color: white;
-        }
-    }
-}
-
-.HomepageCommunityCards {
-    .UserGallery {
-        .User {
-            margin-top: 5px;
-            margin-right: -8px;
-        }
-        .overflow-users {
-            font-size: 13.5px;
+            position: relative;
+            top: 2px;
         }
     }
 }

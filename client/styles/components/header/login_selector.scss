@@ -35,7 +35,7 @@
     .icon-globe, .icon-lock {
         margin-left: 2px;
         font-size: 12px;
-        color: #aaa;
+        color: $text-color-light;
     }
 
     .ChainStatusIndicator {
@@ -48,22 +48,22 @@
 }
 
 .LoginSelector {
-    button.cui-button .cui-icon:last-child {
+    > button.cui-button .cui-icon:last-child {
         position: relative;
         top: -2px;
     }
-    button.cui-button {
+    > button.cui-button {
         padding: 0 10px;
     }
-    button.cui-button.login-selector-right {
+    > button.cui-button.login-selector-right {
         flex: initial !important;
         border-radius: 0 4px 4px 0 !important;
         margin-right: 0 !important;
     }
-    button.cui-button.login-selector-right:first-child {
+    > button.cui-button.login-selector-right:first-child {
         border-radius: 4px !important;
     }
-    .user-display-name {
+    > .User > .user-display-name {
         max-width: 190px;
         display: inline-block;
         text-overflow: ellipsis;
@@ -79,11 +79,15 @@
     .cui-popover-content {
         padding: 0;
         .cui-menu.LoginSelectorMenu {
+            padding-top: 5px;
             min-width: 260px;
             border: none;
+            .cui-button .cui-button-label {
+                overflow: visible;
+            }
             .cui-menu-item.cui-button.switch-user {
-                height: 40px;
-                max-height: 40px;
+                height: 44px;
+                max-height: 44px;
             }
         }
     }

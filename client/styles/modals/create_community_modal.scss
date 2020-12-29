@@ -1,7 +1,6 @@
 @import 'client/styles/shared';
 
 .CreateCommunityModal {
-    background: #f9f8f6;
     padding: 6px 28px 10px;
 
     h3 {
@@ -42,5 +41,5 @@
     }
 }
 .CompactModalExitButton {
-    color: #777;
+    color: $text-color-medium;
 }

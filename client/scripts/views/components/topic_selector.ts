@@ -81,6 +81,7 @@ const TopicSelector: m.Component<{
       checkmark: false,
       closeOnSelect: true,
       emptyContent: [
+        // TODO: This should be unused now that we allow communities without topics
         m(Callout, {
           size: 'sm',
           class: 'no-matching-topics',

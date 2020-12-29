@@ -14,12 +14,12 @@
         border: none !important;
         border-radius: 0 !important;
     }
-    .title-selector .ChainIcon {
-        position: relative;
-        top: 2px;
-    }
-    .title-selector .CommunityIcon .community-icon span {
-        font-size: 12px;
+    .title-selector > .cui-button > .cui-button-label {
+        top: 1px;
+        .community-name {
+            position: relative;
+            top: 2px;
+        }
     }
 }
 
@@ -38,18 +38,18 @@
         }
     }
     .cui-menu {
-        background: $background-color-light;
+        background: $background-color-white-hover;
         border: none;
         max-width: 360px;
         width: 360px;
-        padding: 20px 0;
+        padding: 24px 4px 8px;
         @include xs-max {
             max-width: 100%;
             width: 100%;
         }
         h4 {
             margin: 20px 24px 10px;
-            color: #999;
+            color: $text-color-light;
             font-weight: 400;
             font-size: 16px;
         }
@@ -59,23 +59,32 @@
         .community-placeholder {
             margin: 0 24px;
             font-size: 16px;
-            color: #999;
+            color: $text-color-light;
         }
     }
     .cui-list-item {
         padding: 4px 10px;
         margin: 0 14px;
         border-radius: 4px;
+        min-height: 35px;
         border: none;
         user-select: none;
         &.cui-selected {
-            color: #111;
+            color: $text-color-black;
         }
         &:hover {
             background: $background-color-light-hover;
         }
+        .ChainIcon, .CommunityIcon {
+            position: relative;
+            top: -1px;
+        }
         .CommunityLabel {
             min-width: 200px;
+            .community-name-row {
+                position: relative;
+                top: 2px;
+            }
         }
         .cui-list-item-content-right {
             white-space: nowrap;
@@ -83,25 +92,22 @@
             text-overflow: ellipsis;
             .User {
                 position: relative;
-                top: 2px;
+                top: 4px;
                 margin-left: 4px;
             }
             .star-icon {
                 display: inline-block;
                 position: relative;
-                top: -2px;
+                top: -1px;
                 margin-left: 10px;
             }
-        }
-        .CommunityLabel .community-name-row {
-            position: relative;
-            top: -1px;
         }
     }
     .cui-list-item.select-list-back-home {
         margin-top: 15px;
         margin-bottom: 15px;
         font-size: 16px;
+        padding-top: 9px;
     }
 
     // stars

@@ -352,7 +352,7 @@ export const NewThreadForm: m.Component<{
         }),
         postType === PostType.Link && m(Form, [
           hasTopics
-            ? m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
+            ? m(FormGroup, { span: { xs: 12, sm: 5 }, order: 1 }, [
               m(TopicSelector, {
                 defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
                 topics: app.topics.getByCommunity(app.activeId()),
@@ -363,10 +363,11 @@ export const NewThreadForm: m.Component<{
               }),
             ])
             : null,
-          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 8 : 12) }, order: 2 }, [
+          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 7 : 12) }, order: 2 }, [
             m(Input, {
               placeholder: 'https://',
               oninput: (e) => {
+                e.redraw = false; // do not redraw on input
                 const { value } = e.target as any;
                 vnode.state.form.url = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
@@ -383,6 +384,7 @@ export const NewThreadForm: m.Component<{
               name: 'new-link-title',
               autocomplete: 'off',
               oninput: (e) => {
+                e.redraw = false; // do not redraw on input
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
                 vnode.state.form.linkTitle = value;
@@ -453,7 +455,7 @@ export const NewThreadForm: m.Component<{
             ])
             : null,
           hasTopics
-            ? m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 2, sm: 2 } }, [
+            ? m(FormGroup, { span: { xs: 12, sm: 5 }, order: { xs: 2, sm: 2 } }, [
               m(TopicSelector, {
                 defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
                   ? vnode.state.activeTopic
@@ -466,12 +468,13 @@ export const NewThreadForm: m.Component<{
               }),
             ])
             : null,
-          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 8 : 12) + (fromDraft ? -2 : 0) }, order: 3 }, [
+          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 7 : 12) + (fromDraft ? -2 : 0) }, order: 3 }, [
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
               autocomplete: 'off',
               oninput: (e) => {
+                e.redraw = false; // do not redraw on input
                 const { value } = (e as any).target;
                 if (vnode.state.quillEditorState && !vnode.state.quillEditorState.alteredText) {
                   vnode.state.quillEditorState.alteredText = true;

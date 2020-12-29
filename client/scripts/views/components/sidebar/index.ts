@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, ButtonGroup, List, ListItem, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
+  Button, List, ListItem, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
 } from 'construct-ui';
 
 import { selectNode, initChain } from 'app';
@@ -39,7 +39,6 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
         transitionDuration: 0,
         position: 'right',
         restoreFocus: false,
-        inline: true,
         content: m('.quick-switcher-option-text', item.name),
         class: 'SidebarQuickSwitcherItemTooltip',
         trigger: m('.quick-switcher-option', {
@@ -78,7 +77,10 @@ const SidebarQuickSwitcher: m.Component<{}> = {
       return true;
     });
 
-    const quickSwitcherCommunities = starredCommunities.length > 0 ? starredCommunities : allCommunities;
+    const quickSwitcherCommunities = starredCommunities.length > 0 ? starredCommunities : allCommunities.filter((item) => {
+      if (item instanceof CommunityInfo && item.collapsedOnHomepage) return false;
+      return true;
+    });
 
     const size = 36;
     return m('.SidebarQuickSwitcher', [
@@ -428,7 +430,6 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
         closeOnOutsideClick: true,
         content: app.chain.deferred ? m(MenuItem, {
           label: 'Connect to chain',
-          size: 'sm',
           onclick: async (e) => {
             e.preventDefault();
             vnode.state.initializing = true;
@@ -438,8 +439,10 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
           }
         }) : nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
           return m(MenuItem, {
-            label: node.label,
-            size: 'sm',
+            label: [
+              node.label,
+              app.chain?.meta.id === node.value && ' (Selected)',
+            ],
             onclick: async (e) => {
               e.preventDefault();
               vnode.state.initializing = true;
@@ -453,7 +456,6 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
           });
         }),
         trigger: m(Button, {
-          size: 'sm',
           class: 'chain-status-main',
           fluid: true,
           disabled: vnode.state.initializing,
@@ -492,7 +494,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           app.isLoggedIn() && m(MobileNewProposalButton),
         ]),
         m('.mobile-sidebar-center', {
-          class: app.isLoggedIn() ? 'logged-in' : '',
+          class: `${app.isLoggedIn() ? 'logged-in' : ''} ${((app.chain || app.community) && !app.chainPreloading) ? '' : 'no-community'}`,
         }, [
           m('.community-label', m(CommunitySelector)),
         ]),
@@ -516,6 +518,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           (app.chain || app.community) && m(OnchainNavigationModule),
         ]),
         app.chain && m(ChainStatusModule),
+        m('.sidebar-fadeout'),
       ])
     ];
   },

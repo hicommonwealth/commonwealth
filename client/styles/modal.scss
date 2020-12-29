@@ -22,7 +22,7 @@
         min-width: 380px;
         max-width: 800px;
         max-height: 96%;
-        background: white;
+        background: $text-color-white;
         overflow: hidden;
         overflow-y: auto;
         max-width: 92%;
@@ -37,9 +37,9 @@
     }
 
     .compact-modal-title {
-        padding: 18px 27px;
-        background: #4f63be;
-        color: #fff;
+        padding: 23px 27px 15px;
+        background: $primary-bg-color;
+        color: $text-color-white;
         line-height: 1.2;
         h1, h2, h3 {
             font-size: 1.1rem;
@@ -53,7 +53,8 @@
         }
     }
     .compact-modal-body {
-        padding: 20px 28px 0;
+        padding: 22px 28px 0;
+        line-height: 1.2;
         &:last-child {
             padding-bottom: 28px;
         }
@@ -79,7 +80,7 @@
     right: 0.75em;
     font-size: 1.65rem;
     cursor: pointer;
-    color: #fff;
+    color: $text-color-white;
     opacity: 0.4;
     &:hover {
         opacity: 0.6;
