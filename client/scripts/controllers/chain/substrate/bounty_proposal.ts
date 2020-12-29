@@ -114,8 +114,7 @@ export class SubstrateBounty
     super('bountyproposal', backportEventToAdapter( // TODO: check if this is the right backport string
       ChainInfo,
       entity.chainEvents
-        // TODO: Set SubstrateTypes.EventKind.
-        .find((e) => e.data.kind === SubstrateTypes.EventKind.TreasuryProposed).data as SubstrateTypes.ITreasuryProposed
+        .find((e) => e.data.kind === SubstrateTypes.EventKind.TreasuryBountyProposed).data as SubstrateTypes.ITreasuryBountyProposed
     ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -123,7 +122,7 @@ export class SubstrateBounty
 
     this.value = this._Chain.coins(this.data.value);
     this.bond = this._Chain.coins(this.data.bond);
-    this.beneficiaryAddress = this.data.beneficiary;
+    // this.beneficiaryAddress = this.data.beneficiary;
     this._author = this._Accounts.fromAddress(this.data.proposer);
     this.createdAt = entity.createdAt;
 
