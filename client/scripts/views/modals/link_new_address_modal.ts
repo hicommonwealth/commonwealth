@@ -6,8 +6,10 @@ import mixpanel from 'mixpanel-browser';
 import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
-import { SigningCosmosClient } from '@cosmjs/launchpad';
-import { toUtf8 } from '@cosmjs/encoding';
+
+import { SigningCosmosClient, serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
+import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
+import { toUtf8, fromBase64 } from '@cosmjs/encoding';
 import { Uint53 } from '@cosmjs/math';
 
 import { Button, Callout, Input, TextArea, Icon, Icons, Spinner, Checkbox } from 'construct-ui';
@@ -150,30 +152,47 @@ const CosmosLinkAccountItem: m.Component<{
         // Get the verification token & placeholder TX to send
         const signerAccount = await createUserWithAddress(account.address);
         const stdTx = await keyToMsgSend(account.address, signerAccount.validationToken);
+        delete stdTx.fee;
+        delete stdTx.memo;
         const signDoc = {
           chain_id: 'straightedge-2',
           account_number: '0',
           sequence: '0',
-          fee: { gas: '100000', amount: [] },
-          msgs: [stdTx],
+          fee: { gas: '100000', amount: [{ denom: 'astr', amount: '2500000000000000' }] },
+          memo: '',
+          msgs: stdTx.msg,
         };
 
         // Some typing and versioning issues here...signAmino should be available but it's not
-        let promise;
-        if ((client as any).signer.signAmino) {
-          promise = (client as any).signer.signAmino(account.address, signDoc);
-        } else {
-          promise = (client as any).signer.sign(account.address, signDoc);
-        }
-        promise.then(({ signed, signature }) => {
-          console.log('amino signing:', JSON.stringify(signDoc), account.address, signature);
-          return signerAccount.validate(signature);
-        }).then(() => {
-          // return if user signs for two addresses
-          if (linkNewAddressModalVnode.state.linkingComplete) return;
-          linkNewAddressModalVnode.state.linkingComplete = true;
-          return accountVerifiedCallback(signerAccount);
-        }).then(() => m.redraw()).catch((err) => {
+        ((client as any).signer.signAmino
+          ? (client as any).signer.signAmino(account.address, signDoc)
+          : (client as any).signer.sign(account.address, signDoc)
+        ).then(async (aminoResults) => {
+          // frontend check for signature validity (this could be removed...)
+          // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
+          const { pubkey, signature } = decodeSignature(aminoResults.signature);
+          const hexSignature = Buffer.from(signature).toString('hex');
+          const secpSignature = Secp256k1Signature.fromFixedLength(fromBase64(aminoResults.signature.signature));
+          if (serializeSignDoc(aminoResults.signed).toString() !== serializeSignDoc(signDoc).toString()) {
+            throw new Error('Invalid signed transaction! Keplr may have been updated');
+          }
+          const messageHash = new Sha256(serializeSignDoc(signDoc)).digest();
+          const result = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
+          if (!result) {
+            throw new Error('Invalid signature!');
+          }
+
+          return signerAccount.validate(hexSignature).then(() => {
+            // return if user signs for two addresses
+            if (linkNewAddressModalVnode.state.linkingComplete) return;
+            linkNewAddressModalVnode.state.linkingComplete = true;
+            return accountVerifiedCallback(signerAccount).then(() => m.redraw());
+          }).catch((err) => {
+            vnode.state.linking = false;
+            errorCallback(`${err.name}: ${err.message}`);
+            m.redraw();
+          });
+        }).catch((err) => {
           vnode.state.linking = false;
           errorCallback(`${err.name}: ${err.message}`);
           m.redraw();
