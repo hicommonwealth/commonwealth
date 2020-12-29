@@ -351,8 +351,6 @@ export const ProposalEditorPermissions: m.Component<{
           const selected: boolean = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
           return m(ListItem, {
             label: [
-              selected
-              && m(Icon, { name: Icons.CHECK }),
               m(User, { user })
             ],
             selected,

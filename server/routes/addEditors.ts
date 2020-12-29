@@ -35,6 +35,12 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     if (!thread) return next(new Error('No thread with that id found'));
     // Editor attachment logic
     const collaborators = [];
+    console.log(editors);
+    try {
+      //
+    } catch (e) {
+      console.log(e);
+    }
 
     // Ensure collaborators have community permissions
     if (collaborators?.length > 0) {
@@ -50,6 +56,8 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
         }
         thread.addAddress(collaborator);
         collaborator.addOffchainThread(thread);
+        console.log(thread);
+        console.log(collaborator);
       }));
     }
 
