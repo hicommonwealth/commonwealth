@@ -586,6 +586,7 @@ export const NewThreadForm: m.Component<{
           if (body) {
             try {
               const doc = JSON.parse(body);
+              if (!doc.ops) throw new Error();
               doc.ops = doc.ops.slice(0, 3);
               bodyComponent = m(QuillFormattedText, {
                 doc,
