@@ -12,7 +12,6 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 const CHAINS_WITH_CLI = [
   'edgeware', 'kulupu', 'kusama', 'cosmos', 'edgeware-local', 'edgeware-testnet',
   'darwinia', 'phala', 'plasm', 'polkadot', 'centrifuge',
-  'straightedge', 'cosmos',
 ];
 
 const LoginWithWalletDropdown: m.Component<{

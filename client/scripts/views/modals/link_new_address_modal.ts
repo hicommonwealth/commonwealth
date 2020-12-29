@@ -325,7 +325,6 @@ const LinkNewAddressModal: m.Component<{
   secretPhraseSaved: boolean;
   newAddress: Account<any>; // true if account was already initialized, otherwise it's the Account
   linkingComplete: boolean;
-  cosmosStdTx: any;
   // step 2 - create a profile
   isNewLogin: boolean;
   // step 3 - complete
@@ -386,16 +385,6 @@ const LinkNewAddressModal: m.Component<{
     // gaiacli 'https://cosmos.network/docs/cosmos-hub/installation.html',
     // subkey 'https://substrate.dev/docs/en/ecosystem/subkey'
     // polkadot-js 'https://github.com/polkadot-js/extension'
-
-    // TODO: hack to fix linking now that keyToMsgSend is async
-    if (vnode.state.newAddress) {
-      keyToMsgSend(
-        vnode.state.newAddress.address,
-        vnode.state.newAddress.validationToken,
-      ).then((stdTx) => {
-        vnode.state.cosmosStdTx = stdTx;
-      });
-    }
 
     const accountVerifiedCallback = async (account: Account<any>) => {
       if (app.isLoggedIn()) {
@@ -604,15 +593,11 @@ const LinkNewAddressModal: m.Component<{
               m('code', vnode.state.isEd25519 ? 'subkey generate --scheme ed25519' : 'subkey generate'),
             ]),
           ],
-          app.chain.base === ChainBase.CosmosSDK && [
-            m('p.link-address-cli-explainer', 'Enter the address you are using:'),
-          ],
           m(Input, {
             name: 'Address',
             fluid: true,
             autocomplete: 'off',
             placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
-              : app.chain.base === ChainBase.CosmosSDK ? 'e.g. cosmos123...'
                 : 'Paste the address here',
             oninput: async (e) => {
               const address = (e.target as any).value;
@@ -689,28 +674,12 @@ const LinkNewAddressModal: m.Component<{
                 '"',
               ]),
             ],
-            app.chain.base === ChainBase.CosmosSDK && m('p', [
-              'Use the following command to save the JSON to a file: ',
-              m(CodeBlock, { clickToSelect: true }, `echo '${JSON.stringify({
-                type: 'cosmos-sdk/StdTx',
-                value: vnode.state.cosmosStdTx,
-              })}' > tx.json`),
-              m('p', 'Sign the saved transaction, using your keys in gaiacli: '),
-              m(CodeBlock, { clickToSelect: true }, [
-                `gaiacli tx sign --offline --chain-id=${VALIDATION_CHAIN_DATA.chainId} `
-                  + `--sequence=${VALIDATION_CHAIN_DATA.sequence} `
-                  + `--account-number=${VALIDATION_CHAIN_DATA.accountNumber} --signature-only --from=`,
-                m('span.no-select', '<key name> <tx.json>'),
-              ]),
-            ]),
             m(Input, {
               name: 'Signature',
               fluid: true,
               autocomplete: 'off',
               style: 'display: block; margin-bottom: 18px;',
-              placeholder: (app.chain.base === ChainBase.CosmosSDK)
-                ? 'Paste the entire output'
-                : 'Paste the signature here',
+              placeholder: 'Paste the signature here',
               oninput: async (e) => {
                 const signature = (e.target as any).value;
                 const unverifiedAcct = vnode.state.newAddress;
