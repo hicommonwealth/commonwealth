@@ -105,7 +105,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async deinit(): Promise<void> {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
-    this._api.deinit();
+    if (this._api) this._api.deinit();
   }
 
   public createTXModalData(
