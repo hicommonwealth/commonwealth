@@ -34,11 +34,11 @@ export class SubstrateBounty
     return `#${this.identifier.toString()}`;
   }
   public get title() {
-    const account = this._Accounts.fromAddress(this.beneficiaryAddress);
+    const account = this._Accounts.fromAddress(this._beneficiaryAddress);
     const displayName = account.profile && account.profile.name
-      ? `${account.profile.name} (${formatAddressShort(this.beneficiaryAddress, account.chain.id)})`
-      : formatAddressShort(this.beneficiaryAddress, account.chain.id);
-    return `Proposed spend: ${formatCoin(this.value)} to ${displayName}`;
+      ? `${account.profile.name} (${formatAddressShort(this._beneficiaryAddress, account.chain.id)})`
+      : formatAddressShort(this._beneficiaryAddress, account.chain.id);
+    return `Proposed spend: ${formatCoin(this._value)} to ${displayName}`;
   }
   public get description() { return null; }
 
@@ -47,9 +47,14 @@ export class SubstrateBounty
 
   private _awarded: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  public readonly value: SubstrateCoin;
-  public readonly bond: SubstrateCoin;
-  public readonly beneficiaryAddress: string;
+  public readonly _value: SubstrateCoin;
+  public get value() { return this._value; }
+
+  public readonly _bond: SubstrateCoin;
+  public get bond() { return this._bond; }
+
+  public readonly _beneficiaryAddress: string;
+  public get beneficaryAddress() { return this._beneficiaryAddress; }
 
   public get votingType() {
     return VotingType.None;
