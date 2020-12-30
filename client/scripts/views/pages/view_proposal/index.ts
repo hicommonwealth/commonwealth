@@ -28,7 +28,6 @@ import TopicEditor from 'views/components/topic_editor';
 import { TopicEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
-import User from 'views/components/widgets/user';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
@@ -56,8 +55,8 @@ interface IProposalHeaderAttrs {
 }
 
 interface IProposalHeaderState {
-  isOp: boolean;
-  canEdit: boolean;
+  isAuthor: boolean;
+  isEditor: boolean;
   isAdmin: boolean;
   savedEdit: string;
   editing: boolean;
@@ -84,26 +83,20 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
-    const a = app;
-    vnode.state.isOp = (app.user.activeAccount?.address === proposal.author
+    vnode.state.isAuthor = (app.user.activeAccount?.address === proposal.author
           && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain);
-    vnode.state.canEdit = (proposal as OffchainThread).collaborators.includes(app.user.activeAccount.address)
-      || vnode.state.isOp;
-    debugger
+    vnode.state.isEditor = (proposal as OffchainThread).collaborators.includes(app.user.activeAccount.address)
+      || vnode.state.isAuthor;
   },
   view: (vnode) => {
     const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
-    const { isOp, canEdit, isAdmin } = vnode.state;
-    console.log({ isOp, canEdit });
+    const { isAuthor, isEditor, isAdmin } = vnode.state;
+    console.log({ isAuthor, isEditor });
     const isThread = proposal instanceof OffchainThread;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
-    // There are three tiers of editing access: admins and OPs can make edits to any part of the post.
-    // Added collaborators can only edit the body + title.
-    const fullAccess = vnode.state.isOp;
-    const limitedAccess = vnode.state.canEdit || fullAccess;
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
@@ -125,40 +118,51 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
               closeOnContentClick: true,
               menuAttrs: { size: 'default' },
               content: [
-                limitedAccess && m(ProposalBodyEditMenuItem, {
-                  item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
-                }),
-                fullAccess && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                fullAccess && m(EditPermissionsButton, {
-                  openEditPermissions: () => {
-                    vnode.state.editPermissionsIsOpen = true;
-                  }
-                }),
+                (isEditor || isAuthor || isAdmin)
+                  && m(ProposalBodyEditMenuItem, {
+                    item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+                  }),
+                (isAuthor || isAdmin)
+                  && m(ProposalBodyDeleteMenuItem, { item: proposal }),
+                (isAuthor || isAdmin)
+                  && m(EditPermissionsButton, {
+                    openEditPermissions: () => {
+                      vnode.state.editPermissionsIsOpen = true;
+                    }
+                  }),
                 isAdmin && proposal instanceof OffchainThread && m(TopicEditorButton, {
                   openTopicEditor: () => {
                     vnode.state.topicEditorIsOpen = true;
                   }
                 }),
-                fullAccess && m(ProposalHeaderPrivacyButtons, { proposal }),
-                fullAccess && m(MenuDivider),
+                (isAuthor || isAdmin)
+                  && m(ProposalHeaderPrivacyButtons, { proposal }),
+                (isAuthor || isAdmin)
+                  && m(MenuDivider),
                 m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
               ],
               inline: true,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
             }),
-            vnode.state.editPermissionsIsOpen && proposal instanceof OffchainThread && m(ProposalEditorPermissions, {
-              thread: vnode.attrs.proposal as OffchainThread,
-              popoverMenu: true,
-              openStateHandler: (v) => { vnode.state.editPermissionsIsOpen = v; console.log('topic ' + v); m.redraw(); },
-              // TODO: Onchange logic
-              onChangeHandler: () => {},
-            }),
-            vnode.state.topicEditorIsOpen && proposal instanceof OffchainThread && m(TopicEditor, {
-              thread: vnode.attrs.proposal as OffchainThread,
-              popoverMenu: true,
-              onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
-              openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
-            })
+            vnode.state.editPermissionsIsOpen
+              && proposal instanceof OffchainThread
+              && m(ProposalEditorPermissions, {
+                thread: vnode.attrs.proposal as OffchainThread,
+                popoverMenu: true,
+                openStateHandler: (v) => {
+                  vnode.state.editPermissionsIsOpen = v;
+                },
+                // TODO: Onchange logic
+                onChangeHandler: () => {},
+              }),
+            vnode.state.topicEditorIsOpen
+              && proposal instanceof OffchainThread
+              && m(TopicEditor, {
+                thread: vnode.attrs.proposal as OffchainThread,
+                popoverMenu: true,
+                onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
+                openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
+              })
           ] : [
             m(ProposalHeaderOnchainId, { proposal }),
             m(ProposalHeaderOnchainStatus, { proposal }),
