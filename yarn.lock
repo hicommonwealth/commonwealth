@@ -12721,10 +12721,10 @@ tar@^4.0.2:
     safe-buffer "^5.1.2"
     yallist "^3.0.3"
 
-tendermint@^4.0.8:
-  version "4.0.8"
-  resolved "https://registry.yarnpkg.com/tendermint/-/tendermint-4.0.8.tgz#5acc1d7f7e971a60b5d70a8f1c9c42cd7be92992"
-  integrity sha512-K9lnePVrKxRj2ju47NVaDgbXMvkIOcfS+XXukVnyoUztEj8hcgu2Bfe6CB6O1R+FyjOu83tB+9nL8+jy+J05ZQ==
+tendermint@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/tendermint/-/tendermint-5.0.2.tgz#bfb4c282eba8e3928a2a3e58cb58c4a243823b48"
+  integrity sha512-ZHoz/azpd9xxfV7Q3W51ZJh/8AC+GRoRu0If778uyjakhkFR8dRfhV2RNC4PFXVmH3EIkLOXVkLJB7rELulxTQ==
   dependencies:
     axios "^0.19.0"
     camelcase "^4.0.0"
