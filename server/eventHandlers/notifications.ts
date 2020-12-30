@@ -2,7 +2,7 @@
  * Generic handler that transforms events into notifications.
  */
 import WebSocket from 'ws';
-import { IEventHandler, CWEvent } from '@commonwealth/chain-events';
+import { IEventHandler, CWEvent, IChainEventKind } from '@commonwealth/chain-events';
 import { NotificationCategories } from '../../shared/types';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -12,6 +12,7 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _wss?: WebSocket.Server,
+    private readonly _excludedEvents: IChainEventKind[] = [],
   ) {
     super();
   }
@@ -24,6 +25,10 @@ export default class extends IEventHandler {
     if (!dbEvent) {
       log.trace('No db event received! Ignoring.');
       return;
+    }
+    if (this._excludedEvents.includes(event.data.kind)) {
+      log.trace('Skipping event!');
+      return dbEvent;
     }
     const dbEventType = await dbEvent.getChainEventType();
     if (!dbEventType) {
