@@ -283,6 +283,7 @@ class ThreadsController {
       page_size: pageSize,
     };
     if (topicId) params['topic_id'] = topicId;
+    console.log('loading next page');
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
