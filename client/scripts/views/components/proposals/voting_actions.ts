@@ -500,17 +500,17 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
     // cosmos: abstain
     const abstainButton = m('.abstain-button', [
       m(Button, {
-        intent: 'none',
+        intent: 'warning',
         disabled: !canVote || hasVotedAbstain || votingModalOpen,
         onclick: voteAbstain,
-        label: hasVotedAbstain ? 'Voted abstain' : 'Vote abstain',
+        label: hasVotedAbstain ? 'Abstained' : 'Abstain',
         compact: true,
       }),
     ]);
-    // cosmos: abstain
+    // cosmos: veto
     const noWithVetoButton = m('.veto-button', [
       m(Button, {
-        intent: 'negative',
+        intent: 'warning',
         disabled: !canVote || hasVotedVeto || votingModalOpen,
         onclick: voteVeto,
         label: hasVotedVeto ? 'Vetoed' : 'Veto',
@@ -573,7 +573,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       ];
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       votingActionObj = [
-        m('.button-row', [yesButton, abstainButton, noButton, noWithVetoButton]),
+        m('.button-row', [yesButton, noButton, abstainButton, noWithVetoButton]),
         m(ProposalExtensions, { proposal }),
       ];
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting

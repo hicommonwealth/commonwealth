@@ -31,6 +31,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return this._api;
   }
 
+  private _addressPrefix: string;
+  public get addressPrefix() {
+    return this._addressPrefix;
+  }
+
   // TODO: rename this something like "bankDenom" or "gasDenom" or "masterDenom"
   private _denom: string;
   public get denom(): string {
@@ -51,8 +56,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _app: IApp;
   public get app() { return this._app; }
 
-  constructor(app: IApp) {
+  constructor(app: IApp, addressPrefix: string) {
     this._app = app;
+    this._addressPrefix = addressPrefix;
   }
 
   public coins(n: number | BN, inDollars?: boolean) {
@@ -66,18 +72,19 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   private _blocktimeHelper: BlocktimeHelper = new BlocktimeHelper();
   public async init(node: NodeInfo, reset = false) {
-    const rpcUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1) ?
-      ('ws://' + node.url.split(':')[0] + ':26657') :
-      ('wss://' + node.url.split(':')[0] + ':36657');
+    // const rpcUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1) ?
+    //   ('ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657') :
+    //   ('wss://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':36657');
+    const rpcUrl = 'ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657/websocket';
 
     // A note on RPC: gaiacli exposes a command line option "rest-server" which
     // creates the endpoint necessary. However, it doesn't send headers correctly
     // on its own, so you need to configure a reverse-proxy server (I did it with nginx)
     // that forwards the requests to it, and adds the header 'Access-Control-Allow-Origin: *'
     const restUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1) ?
-      ('http://' + node.url.split(':')[0] + ':1318') :
-      ('https://' + node.url.split(':')[0] + ':11318');
-    console.log(`Starting Lunie API at ${restUrl} and Tendermint on ${rpcUrl}...`);
+      ('http://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318') :
+      ('https://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318');
+    console.log(`Starting Lunie API at ${restUrl} and Tendermint Websocket API on ${rpcUrl}...`);
     this._api = new CosmosApi(rpcUrl, restUrl);
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
@@ -98,7 +105,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async deinit(): Promise<void> {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
-    this._api.deinit();
+    if (this._api) this._api.deinit();
   }
 
   public createTXModalData(
@@ -109,9 +116,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     cb?: (success: boolean) => void,
   ): ITXModalData {
     return {
-      author: author,
+      author,
       txType: txName,
-      cb: cb,
+      cb,
       txData: {
         unsignedData: async (): Promise<ICosmosTXData> => {
           const { cmdData: { messageToSign, chainId, accountNumber, gas, sequence } } = await txFunc();
@@ -136,10 +143,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
             signer = (author as CosmosAccount).getLedgerSigner();
           }
           // perform transaction and coerce into compatible observable
-          txFunc(computedGas).then(({ msg, memo, cmdData: { gas }}) => {
-            return msg.send({ gas: '' + gas, memo }, signer);
+          txFunc(computedGas).then(({ msg, memo, cmdData: { gas } }) => {
+            return msg.send({ gas: `${gas}`, memo }, signer);
           }).then(({ hash, sequence, included }) => {
-            subject.next({ status: TransactionStatus.Ready, hash: hash });
+            subject.next({ status: TransactionStatus.Ready, hash });
             // wait for transaction to process
             return included();
           }).then((txObj) => {
