@@ -99,6 +99,7 @@ export const loadDraft = async (dom, state, draft) => {
   if (draft.body) {
     try {
       newDraftDelta = JSON.parse(draft.body);
+      if (!newDraftDelta.ops) throw new Error();
     } catch (e) {
       newDraftMarkdown = draft.body;
     }
@@ -586,6 +587,7 @@ export const NewThreadForm: m.Component<{
           if (body) {
             try {
               const doc = JSON.parse(body);
+              if (!doc.ops) throw new Error();
               doc.ops = doc.ops.slice(0, 3);
               bodyComponent = m(QuillFormattedText, {
                 doc,
