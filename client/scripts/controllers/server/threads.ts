@@ -36,6 +36,7 @@ export const modelFromServer = (thread) => {
     thread.url,
     thread.Address.chain,
     thread.pinned,
+    thread.collaborator
   );
 };
 
@@ -100,7 +101,7 @@ class ThreadsController {
     url?: string,
     attachments?: string[],
     mentions?: string[],
-    readOnly?: boolean
+    readOnly?: boolean,
   ) {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body };
@@ -370,6 +371,7 @@ class ThreadsController {
   }
 
   public initialize(initialThreads: any[], reset = true) {
+    console.log(initialThreads);
     if (reset) {
       this._store.clear();
       this._listingStore.clear();

@@ -6,6 +6,7 @@ import OffchainTopic from './OffchainTopic';
 
 class OffchainThread implements IUniqueId {
   public readonly author: string;
+  public readonly collaborators?: string[];
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
@@ -48,6 +49,7 @@ class OffchainThread implements IUniqueId {
     url?: string,
     authorChain?: string,
     pinned?: boolean,
+    collaborators?: string[],
   ) {
     this.author = author;
     this.title = title;
@@ -66,6 +68,7 @@ class OffchainThread implements IUniqueId {
     this.community = community;
     this.chain = chain;
     this.readOnly = readOnly;
+    this.collaborators = collaborators;
   }
 }
 
