@@ -34,10 +34,10 @@ export class SubstrateBounty
     return `#${this.identifier.toString()}`;
   }
   public get title() {
-    const account = this._Accounts.fromAddress(this._beneficiaryAddress);
+    const account = this._Accounts.fromAddress(this._proposer.address);
     const displayName = account.profile && account.profile.name
-      ? `${account.profile.name} (${formatAddressShort(this._beneficiaryAddress, account.chain.id)})`
-      : formatAddressShort(this._beneficiaryAddress, account.chain.id);
+      ? `${account.profile.name} (${formatAddressShort(this._proposer.address, account.chain.id)})`
+      : formatAddressShort(this._proposer.address, account.chain.id);
     return `Proposed spend: ${formatCoin(this._value)} to ${displayName}`;
   }
   public get description() { return null; }
@@ -53,18 +53,24 @@ export class SubstrateBounty
   public readonly _bond: SubstrateCoin;
   public get bond() { return this._bond; }
 
-  public readonly _beneficiaryAddress: string;
-  public get beneficaryAddress() { return this._beneficiaryAddress; }
+  public readonly _fee: SubstrateCoin;
+  public get fee() { return this._fee; }
+
+  public readonly _curatorDeposit: SubstrateCoin;
+  public get curatorDeposit() { return this._curatorDeposit; }
 
   public get votingType() {
     return VotingType.None;
   }
+
   public get votingUnit() {
     return VotingUnit.None;
   }
+
   public canVoteFrom(account) {
     return false;
   }
+
   public get support() {
     return null;
   }
@@ -76,6 +82,7 @@ export class SubstrateBounty
     if (this.awarded) return ProposalStatus.Passed;
     return ProposalStatus.None;
   }
+
   get endTime() : ProposalEndTime {
     return { kind: 'unavailable' };
   }
@@ -127,7 +134,7 @@ export class SubstrateBounty
 
     this._value = this._Chain.coins(this.data.value);
     this._bond = this._Chain.coins(this.data.bond);
-
+    this._curatorDeposit = this._Chain.coins(this.data.curator_deposit);
     this._author = this._Accounts.fromAddress(this.data.proposer);
     this.createdAt = entity.createdAt;
 
