@@ -324,7 +324,6 @@ export const ProposalEditorPermissions: m.Component<{
       vnode.state.items = req.result.filter((role) => {
         return role.Address.address !== app.user.activeAccount.address;
       });
-      console.log('items fetched');
       m.redraw();
     } catch (err) {
       m.redraw();
@@ -332,8 +331,7 @@ export const ProposalEditorPermissions: m.Component<{
     }
   },
   view: (vnode) => {
-    const { thread, popoverMenu, onChangeHandler, openStateHandler } = vnode.attrs;
-    console.log(popoverMenu);
+    const { thread, popoverMenu } = vnode.attrs;
     if (!vnode.state.items?.length) return;
     if (!vnode.state.addedEditors) {
       vnode.state.addedEditors = {};
@@ -350,38 +348,16 @@ export const ProposalEditorPermissions: m.Component<{
         items,
         itemRender: (role: any, idx: number) => {
           const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
-          const selected: boolean = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
+          const recentlyAdded: boolean = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
+          const existingEditor: boolean = (thread as OffchainThread).collaborators?.includes(role.Address.address);
           return m(ListItem, {
             label: [
               m(User, { user })
             ],
-            selected,
+            selected: recentlyAdded || existingEditor,
             key: role.Address.address
           });
         },
-        // itemListPredicate: (q, i) => {
-        //   const itemPredicate = (query, item) => {
-        //     const address = (item as any).Address;
-        //     return address.name
-        //       ? address.name.toLowerCase().includes(query.toLowerCase())
-        //       : address.address.toLowerCase().includes(query.toLowerCase());
-        //   };
-
-        //   const allRoles = i.filter((item) => itemPredicate(q, item));
-        //   const namedRoles = [];
-        //   const unnamedRoles = allRoles.map((role) => {
-        //     if (!(role as any)?.Address) {
-        //       console.log(role);
-        //     }
-        //     if ((role as any).Address.name) {
-        //       namedRoles.push(role);
-        //     } else {
-        //       return role;
-        //     }
-        //   });
-        //   console.log(namedRoles.concat(unnamedRoles));
-        //   return namedRoles.concat(unnamedRoles).slice(0, 10);
-        // },
         itemPredicate: (query, item, idx) => {
           const address = (item as any).Address;
           return address.name
@@ -425,8 +401,6 @@ export const ProposalEditorPermissions: m.Component<{
           label: 'Save changes',
           intent: 'primary',
           onclick: async () => {
-            console.log('clicked');
-            console.log(vnode.state.addedEditors);
             try {
               const req = await $.post(`${app.serverUrl()}/addEditors`, {
                 address: app.user.activeAccount.address,

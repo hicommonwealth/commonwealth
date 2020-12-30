@@ -85,8 +85,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
     // merely have access to the body and title
     vnode.state.isAuthor = (app.user.activeAccount?.address === proposal.author
           && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain);
-    vnode.state.isEditor = (proposal as OffchainThread).collaborators.includes(app.user.activeAccount.address)
-      || vnode.state.isAuthor;
+    vnode.state.isEditor = (proposal as OffchainThread).collaborators?.includes(app.user.activeAccount.address);
   },
   view: (vnode) => {
     const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
