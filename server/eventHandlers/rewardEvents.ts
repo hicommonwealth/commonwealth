@@ -23,7 +23,6 @@ export default class extends IEventHandler {
     if (event.data.kind !== SubstrateTypes.EventKind.Reward) {
       return dbEvent;
     }
-
     // 2) Get relevant data from DB for processing.
     /*
       For rewards calculation of the validators, latest new-session event data needs to be present in the ChainEvents table.
@@ -68,7 +67,7 @@ export default class extends IEventHandler {
     const activeValidatorsInfo = newSessionEventData.validatorInfo[validator.stash];
     const newExposure = newSessionEventData.activeExposures[validator.stash];
 
-    // Check from the validator preferences whether the reward will be added to the own's exposure or not.
+    // Check fro`m the validator preferences whether the reward will be added to the own's exposure or not.
     if (activeValidatorsInfo.rewardDestination === 'Staked') {
       // Rewards amount calculation for the current validator. Reference: https://github.com/hicommonwealth/commonwealth/blob/staking-ui/client/scripts/controllers/chain/substrate/staking.ts#L468-L472
       const commission = (Number(activeValidatorsInfo.commissionPer) / 10_000_000) / 100; // Calculate commission percentage value
@@ -79,19 +78,17 @@ export default class extends IEventHandler {
       newExposure.own = (newExposure.own + totalReward).toString();
       newExposure.total = (newExposure.total + totalReward).toString();
     }
-
     validator.block = event.blockNumber.toString();
     validator.eventType = newRewardEventData.kind;
     validator.commissionPer = activeValidatorsInfo.commissionPer;
     validator.eraPoints = activeValidatorsInfo.eraPoints;
-    validator.apr = await getAPR(this._chain, event.data.kind, validator.stash, 30);
+    validator.apr = await getAPR(this._chain, event.data.kind, validator.stash.toString(), 30);
     validator.created_at = new Date().toISOString();
     validator.updated_at = new Date().toISOString();
     delete validator.id;
 
     // 4) create/update event data in database.
     await this._models.HistoricalValidatorStatistic.create(validator);
-
     return dbEvent;
   }
 }

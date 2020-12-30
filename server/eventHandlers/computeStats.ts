@@ -3,22 +3,21 @@ import moment from 'moment';
 import BN from 'bn.js';
 import { sequelize } from '../database';
 
-
 export const computeEventStats = async (chain: String, event: String, stash: String, noOfDays: number) => {
   let eventStatsSum = 0;
   let eventStatsAvg = 0;
   let eventStatsCount = 0;
 
-  const todayDate = moment();
-  const startDate = todayDate.format('YYYY-MM-DD');
-  const endDate = todayDate.subtract(noOfDays, 'days').format('YYYY-MM-DD');
-
   // If other event type ignore and do nothing.
   if (event !== SubstrateTypes.EventKind.Reward
     && event !== SubstrateTypes.EventKind.Slash
     && event !== SubstrateTypes.EventKind.Offence) {
-    return [ eventStatsSum, eventStatsAvg, eventStatsCount ];
+    return [eventStatsSum, eventStatsAvg, eventStatsCount];
   }
+
+  const todayDate = moment();
+  const endDate = todayDate.add(1, 'days').format('YYYY-MM-DD');
+  const startDate = todayDate.subtract(noOfDays, 'days').format('YYYY-MM-DD');
 
   // Get ChainEvents based on event type and last 30 days interval per validator.
   let rawQuery = `
@@ -29,13 +28,14 @@ export const computeEventStats = async (chain: String, event: String, stash: Str
   `;
   switch (event) {
     case SubstrateTypes.EventKind.Reward:
-    case  SubstrateTypes.EventKind.Slash: {
+    case SubstrateTypes.EventKind.Slash: {
       rawQuery += ` AND event_data ->>  'validator' LIKE '%${stash}%'`;
       const [validators, metadata] = await sequelize.query(rawQuery);
 
       eventStatsCount = validators.length;
       eventStatsSum = validators.reduce((total, reward) => Number(total) + Number(reward.event_data.amount), 0);
-      eventStatsAvg = Number((eventStatsSum / eventStatsCount).toFixed(2));
+      const avgStats = Number((eventStatsSum / eventStatsCount).toFixed(2));
+      eventStatsAvg = Number.isNaN(avgStats) ? 0 : avgStats;
       break;
     }
     case SubstrateTypes.EventKind.Offence: {
@@ -45,38 +45,40 @@ export const computeEventStats = async (chain: String, event: String, stash: Str
       break;
     }
     default: {
-      return [ eventStatsSum, eventStatsAvg, eventStatsCount ];
+      return [eventStatsSum, eventStatsAvg, eventStatsCount];
     }
   }
-  return [ eventStatsSum, eventStatsAvg, eventStatsCount ];
+  return [eventStatsSum, eventStatsAvg, eventStatsCount];
 };
+
+const numberToBn = (n) => new BN(n.toLocaleString().replace(/,/g, ''));
 
 const computeAPR = (commissionPer, rewardAmount, ownedAmount, totalStakeAmount, rewardsTimeIntervals) => {
   /*
     APR calculation for the current validator. Reference: https://github.com/hicommonwealth/commonwealth/blob/staking-ui/client/scripts/controllers/chain/substrate/staking.ts#L468-L472
-
-    commissionPer: Percentage (commission percentage is set by the validator and it will be in percent like 20%, 25.7%)
-    rewardAmount: Actual Reward amount awarded in the end of the session.
-    ownedAmount: Actual amount owned by the validator itself.
-    totalStakeAmount: Actual total stake amount which were staked during the session (It's is combination of Own Amount + nominator's staked amount).
-    rewardsTimeIntervals: Total Reward time intervals in seconds.
   */
-  const rewardCommissionAmount = new BN(rewardAmount.toString()).muln(Number(commissionPer)).divn(100);
-  const secondReward = ownedAmount.toBn().mul((new BN(rewardAmount.toString())).sub(rewardCommissionAmount)).div(totalStakeAmount.toBn() || new BN(1));
-  const totalReward = rewardCommissionAmount.add(secondReward);
-
+  const rewardCommissionAmount = numberToBn(rewardAmount).muln(commissionPer).divn(100);
   const periodsInYear = (60 * 60 * 24 * 7 * 52) / rewardsTimeIntervals;
-  const percentage = (new BN(totalReward)).div(totalStakeAmount || new BN(1)).toNumber();
-  const apr = percentage * periodsInYear;
+  const apr = Number(((+rewardCommissionAmount) * (periodsInYear)) / +totalStakeAmount);
   return apr;
 };
 
-export const getAPR = async (chain: String, event: String, stash: String, noOfDays: number) => {
+export const getAPR = async (chain: String, event: String, stash: string, noOfDays: number) => {
   let computedAPR = 0;
 
   const todayDate = moment();
-  const startDate = todayDate.format('YYYY-MM-DD');
-  const endDate = todayDate.subtract(noOfDays, 'days').format('YYYY-MM-DD');
+  const endDate = todayDate.add(1, 'days').format('YYYY-MM-DD');
+  const startDate = todayDate.subtract(noOfDays, 'days').format('YYYY-MM-DD');
+
+  const sessionRawQuery = `
+  SELECT  event_data, created_at 
+  FROM "ChainEvents" 
+  WHERE chain_event_type_id  = '${chain}-new-session' 
+  AND created_at >= '${startDate}' AND created_at <= '${endDate}'
+  AND event_data::text LIKE '%${stash}%'
+  `;
+  const [sessionEvents, sessionEventsMetadata] = await sequelize.query(sessionRawQuery);
+
 
   const rewardRawQuery = `
     SELECT  event_data, created_at
@@ -84,29 +86,43 @@ export const getAPR = async (chain: String, event: String, stash: String, noOfDa
     WHERE chain_event_type_id  = '${chain}-${event}'
     AND created_at >= '${startDate}' AND created_at <= '${endDate}'
     AND event_data ->>  'validator' LIKE '%${stash}%'
+    ORDER BY created_at ASC
   `;
   const [rewardEvents, rewardEventsMetadata] = await sequelize.query(rewardRawQuery);
 
-  const rewardsTimeDiffs = rewardEvents.slice(1).map((reward, index) => {
+  const rewardsTimeDiffs = rewardEvents.map((reward, index) => {
     const currRewardTime = moment(reward.created_at);
-    const preRewardTime = moment(rewardEvents[index].created_at);
+    const preRewardTime = moment(
+      index === 0
+        ? sessionEvents[sessionEvents.length - 1].created_at
+        : rewardEvents[index - 1].created_at
+    );
     return currRewardTime.diff(preRewardTime, 'seconds');
   });
-  const totalRewardTimeAvg = rewardsTimeDiffs.reduce((total, timeDiff) => Number(total) + Number(timeDiff), 0) / rewardsTimeDiffs.length;
-  const rewardAmountAvg = rewardEvents.reduce((total, reward) => Number(total) + Number(reward.event_data.amount), 0) / rewardEvents.length;
 
-  const sessionRawQuery = `
-    SELECT  event_data, created_at 
-    FROM "ChainEvents" 
-    WHERE chain_event_type_id  = '${chain}-${event}' 
-    AND created_at >= '${startDate}' AND created_at <= '${endDate}'
-    AND event_data ->> 'data' LIKE '%${stash}%'
-  `;
-  const [sessionEvents, sessionEventsMetadata] = await sequelize.query(sessionRawQuery);
-  const commissionsAvg = sessionEvents.reduce((total, commission) => Number(total) + Number(commission.event_data.data.validatorInfo.stash.commissionPer), 0) / sessionEvents.length;
-  const ownAmountAvg = sessionEvents.reduce((total, ownAmount) => Number(total) + Number(ownAmount.event_data.data.activeExposures.stash.own), 0) / sessionEvents.length;
-  const totalStakeAmountAvg = sessionEvents.reduce((total, totalStake) => Number(total) + Number(totalStake.event_data.data.activeExposures.stash.total), 0) / sessionEvents.length;
+  const rewardTimeAvg = rewardsTimeDiffs.reduce(
+    (total, timeDiff) => Number(total) + Number(timeDiff), 0
+  ) / rewardsTimeDiffs.length;
 
-  computedAPR = computeAPR(commissionsAvg, rewardAmountAvg, ownAmountAvg, totalStakeAmountAvg, totalRewardTimeAvg);
+  const rewardAmountAvg = rewardEvents.reduce(
+    (total, reward) => Number(total) + Number(reward.event_data.amount), 0
+  ) / rewardEvents.length;
+
+  const commissionsAvg = sessionEvents.reduce(
+    (total, commission) => Number(total) + Number(commission.event_data.validatorInfo[stash].commissionPer), 0
+  ) / sessionEvents.length;
+
+  const ownAmountAvg = sessionEvents.reduce(
+    (total, ownAmount) => Number(total) + Number(ownAmount.event_data.activeExposures[stash].own), 0
+  ) / sessionEvents.length;
+
+  const stakeAmountAvg = sessionEvents.reduce(
+    (total, totalStake) => Number(total) + Number(totalStake.event_data.activeExposures[stash].total), 0
+  ) / sessionEvents.length;
+
+  const totalStakeAmountAvg = Number.isNaN(stakeAmountAvg) ? 0 : stakeAmountAvg;
+
+  computedAPR = computeAPR(commissionsAvg, rewardAmountAvg, ownAmountAvg, totalStakeAmountAvg, rewardTimeAvg);
+
   return computedAPR;
 };

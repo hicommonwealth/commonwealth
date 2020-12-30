@@ -78,7 +78,7 @@ async function main() {
   if (ARCHIVAL) {
     const archivalNodeDBEntry = await archivalNodeDBEntryExist(models);
     ARCHIVAL = !archivalNodeDBEntry;
-    console.log(`Executing process with ARCHIVAL flag set to ${ARCHIVAL}`);
+    log.info(`Executing process with ARCHIVAL flag set to ${ARCHIVAL}`);
     if (ARCHIVAL && !ARCHIVAL_NODE_URL) {
       log.error('ARCHIVAL NODE URL is necessary to execute in archival mode');
       process.exit(1);
