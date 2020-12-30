@@ -412,7 +412,13 @@ export const ProposalEditorPermissions: m.Component<{
                 jwt: app.user.jwt,
               });
               if (req.status !== '200') {
-                // TODO
+                if (thread.collaborators?.length) {
+                  Object.keys(vnode.state.addedEditors).forEach((addr) => {
+                    thread.collaborators.push(addr);
+                  });
+                } else {
+                  thread.collaborators = Object.keys(vnode.state.addedEditors);
+                }
               }
             } catch (err) {
               console.log('Failed to add editors');

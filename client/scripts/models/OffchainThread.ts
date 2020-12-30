@@ -6,7 +6,7 @@ import OffchainTopic from './OffchainTopic';
 
 class OffchainThread implements IUniqueId {
   public readonly author: string;
-  public readonly collaborators?: string[];
+  public collaborators?: string[];
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
