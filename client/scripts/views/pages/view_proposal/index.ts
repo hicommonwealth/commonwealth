@@ -56,6 +56,7 @@ interface IProposalHeaderAttrs {
 }
 
 interface IProposalHeaderState {
+  isOp: boolean;
   canEdit: boolean;
   isAdmin: boolean;
   savedEdit: string;
@@ -80,29 +81,29 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
       chain: app.activeChainId(),
       community: app.activeCommunityId()
     }));
-    vnode.state.canEdit = (app.user.activeAccount?.address === proposal.author
-          && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain)
-      || vnode.state.isAdmin;
+
+    // Original posters have full editorial control, while added collaborators
+    // merely have access to the body and title
+    const a = app;
+    vnode.state.isOp = (app.user.activeAccount?.address === proposal.author
+          && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain);
+    vnode.state.canEdit = (proposal as OffchainThread).collaborators.includes(app.user.activeAccount.address)
+      || vnode.state.isOp;
+    debugger
   },
   view: (vnode) => {
     const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
-    const { canEdit, isAdmin } = vnode.state;
+    const { isOp, canEdit, isAdmin } = vnode.state;
+    console.log({ isOp, canEdit });
     const isThread = proposal instanceof OffchainThread;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;
-    const versionHistory = (proposal as OffchainThread).versionHistory;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
-    const description = isThread ? false : (proposal as AnyProposal).description;
-    const body = isThread ? (proposal as OffchainThread).body : false;
-    const lastEdit = versionHistory?.length > 1 ? JSON.parse(versionHistory[0]) : null;
-    const author : Account<any> = proposal instanceof OffchainThread
-      ? (!app.community
-        ? app.chain.accounts.get(proposal.author)
-        : app.community.accounts.get(proposal.author, proposal.authorChain))
-      : proposal.author;
 
-    const a = app;
-    debugger
+    // There are three tiers of editing access: admins and OPs can make edits to any part of the post.
+    // Added collaborators can only edit the body + title.
+    const fullAccess = vnode.state.isOp;
+    const limitedAccess = vnode.state.canEdit || fullAccess;
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
@@ -124,11 +125,11 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
               closeOnContentClick: true,
               menuAttrs: { size: 'default' },
               content: [
-                canEdit && m(ProposalBodyEditMenuItem, {
+                limitedAccess && m(ProposalBodyEditMenuItem, {
                   item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
-                canEdit && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                canEdit && m(EditPermissionsButton, {
+                fullAccess && m(ProposalBodyDeleteMenuItem, { item: proposal }),
+                fullAccess && m(EditPermissionsButton, {
                   openEditPermissions: () => {
                     vnode.state.editPermissionsIsOpen = true;
                   }
@@ -138,8 +139,8 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                     vnode.state.topicEditorIsOpen = true;
                   }
                 }),
-                canEdit && m(ProposalHeaderPrivacyButtons, { proposal }),
-                canEdit && m(MenuDivider),
+                fullAccess && m(ProposalHeaderPrivacyButtons, { proposal }),
+                fullAccess && m(MenuDivider),
                 m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
               ],
               inline: true,
