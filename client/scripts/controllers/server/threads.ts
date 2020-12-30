@@ -36,7 +36,7 @@ export const modelFromServer = (thread) => {
     thread.url,
     thread.Address.chain,
     thread.pinned,
-    thread.collaborator
+    thread.collaborators
   );
 };
 

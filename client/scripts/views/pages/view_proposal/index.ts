@@ -101,6 +101,8 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         : app.community.accounts.get(proposal.author, proposal.authorChain))
       : proposal.author;
 
+    const a = app;
+    debugger
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [

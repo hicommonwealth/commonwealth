@@ -53,7 +53,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
             t.created_at AS thread_created, t.community AS thread_community,
             t.chain AS thread_chain, t.version_history, t.read_only, t.body,
-            t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG ( editors.address_id ) collaborators
+            t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG ( editors.address ) collaborators
           FROM "OffchainThreads" t
           LEFT JOIN (
             SELECT root_id, MAX(created_at) AS comm_created_at
@@ -64,8 +64,10 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             GROUP BY root_id
             ) c
           ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
-          LEFT JOIN "SharingPermissions" editors
-          ON thread_id = editors.thread_id
+          LEFT JOIN "SharingPermissions" collaborations
+          ON thread_id = collaborations.thread_id
+          LEFT JOIN "Addresses" editors
+          ON collaborations.address_id = editors.id
           WHERE t.${communityOptions}
           AND t.deleted_at IS NULL
           AND t.pinned = false
@@ -105,7 +107,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           community: t.thread_community,
           chain: t.thread_chain,
           created_at: t.thread_created,
-          collaborator: t.collaborator,
+          collaborators: t.collaborators,
           Address: {
             id: t.addr_id,
             address: t.addr_address,
