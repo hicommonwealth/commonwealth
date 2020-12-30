@@ -37,13 +37,13 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         threads.version_history, threads.read_only, threads.body,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
-        topics.community_id AS topic_community
+        topics.community_id AS topic_community, collaborator 
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
           t.created_at AS thread_created, t.community AS thread_community,
           t.chain AS thread_chain, t.version_history, t.read_only, t.body,
-          t.url, t.pinned, t.topic_id, t.kind
+          t.url, t.pinned, t.topic_id, t.kind, editors.address_id AS collaborator
         FROM "OffchainThreads" t
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS comm_created_at
@@ -55,6 +55,8 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           GROUP BY root_id
           ) c
         ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
+        LEFT JOIN "SharingPermissions" editors
+        ON t.id = editors.thread_id
         WHERE t.deleted_at IS NULL
           AND t.${communityOptions}
           ${topicOptions}

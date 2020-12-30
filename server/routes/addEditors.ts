@@ -65,7 +65,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
             .find((role) => role.chain_id === chain.id);
           if (!isMember) return next(new Error(Errors.InvalidEditor));
         }
-        const collaboration = await models.SharingPermissions.create({
+        const collaboration = await models.SharingPermission.create({
           thread_id: thread.id,
           address_id: collaborator.id
         });

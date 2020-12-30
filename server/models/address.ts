@@ -287,7 +287,7 @@ export default (
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
     models.Address.belongsToMany(models.OffchainThread, {
-      through: 'SharingPermissions',
+      through: models.SharingPermission,
       as: 'threads'
     });
   };

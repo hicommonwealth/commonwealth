@@ -3,8 +3,22 @@
 module.exports = {
   up: (queryInterface, DataTypes) => {
     return queryInterface.createTable('SharingPermissions', {
-      thread_id: { type: DataTypes.INTEGER, allowNull: false },
-      address_id: { type: DataTypes.INTEGER, allowNull: false },
+      thread_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'OffchainThreads',
+          key: 'id'
+        }
+      },
+      address_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Addresses',
+          key: 'id'
+        }
+      },
       created_at: { type: DataTypes.DATE, allowNull: false },
       updated_at: { type: DataTypes.DATE, allowNull: false },
     });
