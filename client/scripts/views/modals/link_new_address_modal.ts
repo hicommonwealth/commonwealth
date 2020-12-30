@@ -98,7 +98,7 @@ const EthereumLinkAccountItem: m.Component<{
           .then(() => m.redraw())
           .catch((err) => {
             vnode.state.linking = false;
-            errorCallback(`${err.name}: ${err.message}`);
+            errorCallback(`${err.name || 'Error'}: ${err.message}`);
             m.redraw();
           });
       },
@@ -162,12 +162,12 @@ const CosmosLinkAccountItem: m.Component<{
             return accountVerifiedCallback(signerAccount).then(() => m.redraw());
           }).catch((err) => {
             vnode.state.linking = false;
-            errorCallback(`${err.name}: ${err.message}`);
+            errorCallback(`${err.name || 'Error'}: ${err.message}`);
             m.redraw();
           });
         }).catch((err) => {
           vnode.state.linking = false;
-          errorCallback(`${err.name}: ${err.message}`);
+          errorCallback(`${err.name || 'Error'}: ${err.message}`);
           m.redraw();
         });
       },
