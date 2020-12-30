@@ -57,7 +57,7 @@ const ProfileContent: m.Component<{
               });
             }
           }),
-          !postsRemaining(content.length, vnode.state.count)
+          postsRemaining(content.length, vnode.state.count)
             ? m('.infinite-scroll-spinner-wrap', [
               m(Spinner, { active: true })
             ])
