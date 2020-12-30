@@ -294,27 +294,12 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         // proposals (substrate, cosmos, moloch only)
         m(ListItem, {
           active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
-          label: 'Proposals & Motions',
+          label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
           contentLeft: m(Icon, { name: Icons.SEND }),
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/proposals`);
           },
-          // contentRight: [
-          //   (app.chain?.base === ChainBase.Substrate)
-          //     && m(Tag, {
-          //       rounded: true,
-          //       label: app.chain?.loaded ? allSubstrateGovernanceProposals : '-',
-          //     }),
-          //   (app.chain?.base === ChainBase.CosmosSDK) && m(Tag, {
-          //     rounded: true,
-          //     label: app.chain?.loaded ? cosmosGovernanceProposals : '-',
-          //   }),
-          //   (app.chain?.class === ChainClass.Moloch) && m(Tag, {
-          //     rounded: true,
-          //     label: app.chain?.loaded ? molochProposals : '-',
-          //   }),
-          // ],
         }),
         // treasury (substrate only)
         !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
@@ -326,7 +311,6 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
               e.preventDefault();
               m.route.set(`/${app.activeChainId()}/treasury`);
             },
-            contentRight: [], // TODO
           }),
         // council (substrate only)
         !app.community && app.chain?.base === ChainBase.Substrate
@@ -338,7 +322,6 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
               e.preventDefault();
               m.route.set(`/${app.activeChainId()}/council`);
             },
-            contentRight: [], // TODO
           }),
         // validators (substrate and cosmos only)
         // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&

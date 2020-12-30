@@ -163,10 +163,4 @@ export default class EthereumAccount extends Account<EthereumCoin> {
     const msgHash = hashPersonalMessage(Buffer.from(message));
     return ecrecover(Buffer.from(msgHash), recovered.v, recovered.r, recovered.s);
   }
-
-  public async isValidSignature(message: string, signature: string): Promise<boolean> {
-    const address = bufferToHex(publicToAddress(this.recoverSigner(message, signature)));
-    return (address === this.address.toLowerCase());
-    // Match hex which is not case sensitive, but representation is case sen
-  }
 }
