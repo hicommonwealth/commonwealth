@@ -497,7 +497,12 @@ const LinkNewAddressModal: m.Component<{
           app.chain.webWallet?.enabled && m('.accounts-caption', [
             app.chain.webWallet?.accounts.length ? [
               m('p', 'Select an address:'),
-              m('p.small-text', 'If a popup does not appear, check your wallet/browser extension.'),
+              m('p.small-text', 'Look for a popup, or check your wallet/browser extension.'),
+              app.chain.base === ChainBase.CosmosSDK
+                && m('p.small-text', [
+                  `Because ${app.chain.meta.chain.name} does not support signed verification messages, `,
+                  'you will be asked to sign a no-op transaction. It will not be submitted to the chain.'
+                ]),
             ] : [
               m('p', 'Wallet connected, but no accounts were found.'),
             ],
