@@ -46,17 +46,6 @@ class SubstrateBountyTreasury extends ProposalModule<
   private _bondPct: number = null;
   get bondPct() { return this._bondPct; }
 
-  // The percentage of treasury funds that are burnt every spend period, if left unspent
-  private _burnPct: number = null;
-  get burnPct() { return this._burnPct; }
-
-  // How often (in blocks) spend periods occur
-  private _spendPeriod: number = null;
-  get spendPeriod() { return this._spendPeriod; }
-
-  get nextSpendBlock(): number {
-    return (Math.floor(this.app.chain.block.height / this.spendPeriod) + 1) * this.spendPeriod;
-  }
 
   // public computeBond(amount: SubstrateCoin): SubstrateCoin {
   //   const computed = amount.muln(this.bondPct);
@@ -97,8 +86,6 @@ class SubstrateBountyTreasury extends ProposalModule<
         this._bountyDepositPayoutDelay = this._Chain.coins(api.consts.treasury.bountyDepositPayoutDelay);
         this._bountyValueMinimum = this._Chain.coins(api.consts.treasury.bountyValueMinimum);
 
-        this._spendPeriod = +(api.consts.treasury.spendPeriod as BlockNumber);
-        this._burnPct = +(api.consts.treasury.burn as Permill) / 1_000_000;
         // kick off subscriptions
         const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
         await new Promise((innerResolve) => {
@@ -111,7 +98,7 @@ class SubstrateBountyTreasury extends ProposalModule<
 
         // register new chain-event handlers
         this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.TreasuryProposal, (entity, event) => {
+          SubstrateTypes.EntityKind.TreasuryBounty, (entity, event) => {
             this.updateProposal(entity, event);
           }
         );
@@ -119,7 +106,7 @@ class SubstrateBountyTreasury extends ProposalModule<
         // fetch proposals from chain
         await this.app.chain.chainEntities.fetchEntities(
           this.app.chain.id,
-          () => this._Chain.fetcher.fetchTreasuryProposals(this.app.chain.block.height),
+          () => this._Chain.fetcher.fetchTreasuryBounties(this.app.chain.block.height),
         );
 
         this._initialized = true;
