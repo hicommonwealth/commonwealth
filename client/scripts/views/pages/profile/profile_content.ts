@@ -62,7 +62,7 @@ const ProfileContent: m.Component<{
               m(Spinner, { active: true })
             ])
             : m('.infinite-scroll-reached-end', [
-              `Showing ${content.length} of ${pluralize(content.length, type)}.`,
+              `Showing ${content.length} of ${pluralize(content.length, type)}`,
             ])
         ]
         : m('.no-content', `No ${type} to display.`),

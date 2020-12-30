@@ -365,9 +365,10 @@
         align-items: center;
     }
     .infinite-scroll-reached-end, .no-content {
-        padding: 15px 0 8px 0;
+        padding: 20px 0 10px 0;
         text-align: center;
-        border-top: 1px solid $border-color;
+        border-top: 1px solid $border-color-lightest;
+        color: $text-color-light;
     }
 }
 
