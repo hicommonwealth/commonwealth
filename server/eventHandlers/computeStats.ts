@@ -120,9 +120,7 @@ export const getAPR = async (chain: String, event: String, stash: string, noOfDa
     (total, totalStake) => Number(total) + Number(totalStake.event_data.activeExposures[stash].total), 0
   ) / sessionEvents.length;
 
-  const totalStakeAmountAvg = Number.isNaN(stakeAmountAvg) ? 0 : stakeAmountAvg;
-
-  computedAPR = computeAPR(commissionsAvg, rewardAmountAvg, ownAmountAvg, totalStakeAmountAvg, rewardTimeAvg);
+  computedAPR = computeAPR(commissionsAvg, rewardAmountAvg, ownAmountAvg, stakeAmountAvg, rewardTimeAvg);
 
   return computedAPR;
 };

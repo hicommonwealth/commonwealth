@@ -66,17 +66,19 @@ export default class extends IEventHandler {
     // Getting updated validator info from the new-session event data related to rewards calculation (e.g. exposure(s) for each validator, commissionPer, eraPoints, rewardDestination)
     const activeValidatorsInfo = newSessionEventData.validatorInfo[validator.stash];
     const newExposure = newSessionEventData.activeExposures[validator.stash];
+    const ownStake = new BN(newExposure.own.toLocaleString().replace(/,/g, ''))  || new BN(1);
+    const totalStake = new BN(newExposure.total.toLocaleString().replace(/,/g, '')) || new BN(1);
+    const rewardAmount =  new BN(newRewardEventData.amount.toLocaleString().replace(/,/g, ''));
 
-    // Check fro`m the validator preferences whether the reward will be added to the own's exposure or not.
+    // Check from the validator preferences whether the reward will be added to the own's exposure or not.
     if (activeValidatorsInfo.rewardDestination === 'Staked') {
       // Rewards amount calculation for the current validator. Reference: https://github.com/hicommonwealth/commonwealth/blob/staking-ui/client/scripts/controllers/chain/substrate/staking.ts#L468-L472
-      const commission = (Number(activeValidatorsInfo.commissionPer) / 10_000_000) / 100; // Calculate commission percentage value
-      const firstReward = new BN(newRewardEventData.amount.toString()).muln(Number(commission)).divn(100);
-      const secondReward = newExposure.own.toBn().mul((new BN(newRewardEventData.amount.toString())).sub(firstReward)).div(newExposure.total.toBn() || new BN(1));
+      const firstReward = rewardAmount.muln(Number(activeValidatorsInfo.commissionPer)).divn(100);
+      const secondReward = ownStake.mul(rewardAmount.sub(firstReward)).div(totalStake);
       const totalReward = firstReward.add(secondReward);
-
-      newExposure.own = (newExposure.own + totalReward).toString();
-      newExposure.total = (newExposure.total + totalReward).toString();
+      newExposure.own = (ownStake.add(totalReward)).toString();
+      newExposure.total = (totalStake.add(totalReward)).toString();
+      validator.exposure = newExposure;
     }
     validator.block = event.blockNumber.toString();
     validator.eventType = newRewardEventData.kind;
