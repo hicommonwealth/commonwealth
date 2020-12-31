@@ -6,7 +6,7 @@ import { getProposalUrl } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
 export const Errors = {
-  NoThreadId: 'Must provide thread_id',
+  InvalidThread: 'Must provide a valid thread_id',
   InvalidEditor: 'Must provide valid addresses of community members',
   IncorrectOwner: 'Not owned by this user',
 };
@@ -23,20 +23,19 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
   if (!thread_id) {
-    return next(new Error(Errors.NoThreadId));
+    return next(new Error(Errors.InvalidThread));
   }
 
-  let thread;
   try {
     const userOwnedAddressIds = await (req.user as any).getAddresses()
       .filter((addr) => !!addr.verified).map((addr) => addr.id);
-    thread = await models.OffchainThread.findOne({
+    const thread = await models.OffchainThread.findOne({
       where: {
         id: thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    if (!thread) return next(new Error('No thread with that id found'));
+    if (!thread) return next(new Error(Errors.InvalidThread));
     // Editor attachment logic
     let collaborators;
 
@@ -46,14 +45,13 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
           where: { id: editor.id },
           include: [ models.Role, models.User ]
         });
-        console.log(collaborator);
         return collaborator;
       }));
     } catch (e) {
       console.log(e);
       return next(new Error(Errors.InvalidEditor));
     }
-    console.log(collaborators);
+
     // Ensure collaborators have community permissions
     if (collaborators?.length > 0) {
       await Promise.all(collaborators.map(async (collaborator) => {
@@ -103,6 +101,17 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       return next(new Error(Errors.InvalidEditor));
     }
 
+    await thread.save();
+    const finalThread = await models.OffchainThread.findOne({
+      where: { id: thread.id },
+      include: [
+        models.Address,
+        models.OffchainAttachment,
+        { model: models.SharingPermission, as: 'collaborators' },
+        { model: models.OffchainTopic, as: 'topic' },
+      ],
+    });
+
     if (collaborators?.length > 0) await Promise.all(collaborators.map(async (collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
@@ -112,26 +121,26 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
         `user-${collaborator.User.id}`,
         {
           created_at: new Date(),
-          root_id: Number(thread.id),
+          root_id: Number(finalThread.id),
           root_type: ProposalType.OffchainThread,
-          root_title: thread.title,
-          comment_text: thread.body,
-          chain_id: thread.chain,
-          community_id: thread.community,
-          author_address: thread.Address.address,
-          author_chain: thread.Address.chain,
+          root_title: finalThread.title,
+          comment_text: finalThread.body,
+          chain_id: finalThread.chain,
+          community_id: finalThread.community,
+          author_address: finalThread.Address.address,
+          author_chain: finalThread.Address.chain,
         },
         {
-          user: thread.Address.address,
-          url: getProposalUrl('discussion', thread),
+          user: finalThread.Address.address,
+          url: getProposalUrl('discussion', finalThread),
           title: req.body.title,
           bodyUrl: req.body.url,
-          chain: thread.chain,
-          community: thread.community,
-          body: thread.body,
+          chain: finalThread.chain,
+          community: finalThread.community,
+          body: finalThread.body,
         },
         req.wss,
-        [ thread.Address.address ],
+        [ finalThread.Address.address ],
       );
     }));
 

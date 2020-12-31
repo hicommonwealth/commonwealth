@@ -422,6 +422,7 @@ export const ProposalEditorPermissions: m.Component<{
                 editors: JSON.stringify(vnode.state.addedEditors),
                 jwt: app.user.jwt,
               });
+              console.log(req.result);
               if (req.status !== '200') {
                 if (thread.collaborators?.length) {
                   Object.keys(vnode.state.addedEditors).forEach((addr) => {
