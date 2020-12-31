@@ -19,7 +19,7 @@ module.exports = {
 
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'straightedge',
-        url: 'ws://straightedge.rpc.sikka.tech:26657',
+        url: 'wss://straightedge.commonwealth.im',
       }], { transaction: t });
     });
   },
