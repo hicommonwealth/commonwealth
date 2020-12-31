@@ -27,6 +27,7 @@ const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
+    if (!doc.ops) throw new Error();
     decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
   } catch (e) {
     let doc = decodeURIComponent(comment_text);

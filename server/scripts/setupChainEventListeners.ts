@@ -81,7 +81,10 @@ const setupChainEventListeners = async (
 
     // emits notifications by writing into the db's Notifications table, and also optionally
     // sending a notification to the client via websocket
-    const notificationHandler = new EventNotificationHandler(models, wss);
+    const excludedNotificationEvents = [
+      SubstrateTypes.EventKind.DemocracyTabled,
+    ];
+    const notificationHandler = new EventNotificationHandler(models, wss, excludedNotificationEvents);
 
     // creates and updates ChainEntity rows corresponding with entity-related events
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);

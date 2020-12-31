@@ -1,12 +1,12 @@
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
-import { CosmosAccount, CosmosAccounts } from './account';
-import CosmosChain from './chain';
-import CosmosGovernance from './governance';
+import { CosmosAccount, CosmosAccounts } from '../cosmos/account';
+import CosmosChain from '../cosmos/chain';
+import CosmosGovernance from '../cosmos/governance';
 import KeplrWebWalletController from '../../app/keplr_web_wallet';
 
-class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
+class Straightedge extends IChainAdapter<CosmosToken, CosmosAccount> {
   public chain: CosmosChain;
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;
@@ -16,7 +16,7 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.chain = new CosmosChain(this.app, 'cosmos');
+    this.chain = new CosmosChain(this.app, 'str');
     this.accounts = new CosmosAccounts(this.app);
     this.governance = new CosmosGovernance(this.app);
   }
@@ -37,8 +37,8 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
     await this.governance.deinit();
     await this.accounts.deinit();
     await this.chain.deinit();
-    console.log('Cosmos stopped.');
+    console.log('Straightedge stopped.');
   }
 }
 
-export default Cosmos;
+export default Straightedge;

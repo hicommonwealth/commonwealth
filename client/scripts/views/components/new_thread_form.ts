@@ -99,6 +99,7 @@ export const loadDraft = async (dom, state, draft) => {
   if (draft.body) {
     try {
       newDraftDelta = JSON.parse(draft.body);
+      if (!newDraftDelta.ops) throw new Error();
     } catch (e) {
       newDraftMarkdown = draft.body;
     }
@@ -334,7 +335,7 @@ export const NewThreadForm: m.Component<{
           class: 'no-profile-callout',
           intent: 'primary',
           content: [
-            'You haven\'t set a display name yet, so other people can\'t see who you are. ',
+            'You haven\'t set a display name yet, so other people can only see your address. ',
             m('a', {
               href: `/${app.activeId()}/account/${app.user.activeAccount.address}?base=${app.user.activeAccount.chain}`,
               onclick: (e) => {
@@ -347,7 +348,7 @@ export const NewThreadForm: m.Component<{
                   },
                 });
               }
-            }, 'Complete your profile'),
+            }, 'Add your name'),
           ],
         }),
         postType === PostType.Link && m(Form, [
@@ -586,6 +587,7 @@ export const NewThreadForm: m.Component<{
           if (body) {
             try {
               const doc = JSON.parse(body);
+              if (!doc.ops) throw new Error();
               doc.ops = doc.ops.slice(0, 3);
               bodyComponent = m(QuillFormattedText, {
                 doc,

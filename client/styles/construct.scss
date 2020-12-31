@@ -411,7 +411,7 @@ button, .cui-button {
 
 // reduce menu padding
 .cui-menu {
-    max-width: 240px; // allow menus to be wider by default
+    max-width: none;
     padding: 4px 0;
     .cui-menu-item.cui-button {
         padding-left: 14px;

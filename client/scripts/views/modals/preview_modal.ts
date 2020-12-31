@@ -17,6 +17,7 @@ const PreviewModal: m.Component<{ title: string, doc: string }> = {
       m('.compact-modal-body', (() => {
         try {
           const doc = JSON.parse(vnode.attrs.doc);
+          if (!doc.ops) throw new Error();
           if (doc.ops.length === 1 && doc.ops[0].insert === '\n') {
             return m('.empty-preview', 'Nothing to preview');
           }

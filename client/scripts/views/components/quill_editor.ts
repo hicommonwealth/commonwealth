@@ -843,6 +843,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
       && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
       try {
         contentsDoc = JSON.parse(localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`));
+        if (!contentsDoc.ops) throw new Error();
         vnode.state.markdownMode = false;
       } catch (e) {
         contentsDoc = localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`);
