@@ -21,10 +21,6 @@ class SubstrateBountyTreasury extends ProposalModule<
   ISubstrateBounty,
   SubstrateBounty
 > {
-  // TODO: understand Pot behavior
-  private _pot = new BehaviorSubject<SubstrateCoin>(null);
-  get pot() { return this._pot.value; }
-
   // The minimum curator deposit for a bounty
   private _bountyCuratorDeposit: SubstrateCoin = null;
   get bountyCuratorDeposit() { return this._bountyCuratorDeposit; }
@@ -52,14 +48,6 @@ class SubstrateBountyTreasury extends ProposalModule<
   //   return this.bondMinimum.gt(computed) ? this.bondMinimum : this._Chain.coins(computed);
   // }
 
-  private _potSubscription: Unsubscribable;
-  public deinit() {
-    if (this._potSubscription) {
-      this._potSubscription.unsubscribe();
-    }
-    super.deinit();
-  }
-
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
@@ -80,21 +68,13 @@ class SubstrateBountyTreasury extends ProposalModule<
     return new Promise((resolve, reject) => {
       this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
         // save parameters
-        // this._bondPct = +(api.query.treasury.bounties as Permill) / 1_000_000;
         this._bountyCuratorDeposit = this._Chain.coins(api.consts.treasury.bountyCuratorDeposit);
         this._bountyDepositBase = this._Chain.coins(api.consts.treasury.bountyDepositBase);
         this._bountyDepositPayoutDelay = this._Chain.coins(api.consts.treasury.bountyDepositPayoutDelay);
         this._bountyValueMinimum = this._Chain.coins(api.consts.treasury.bountyValueMinimum);
 
         // kick off subscriptions
-        const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
-        await new Promise((innerResolve) => {
-          this._potSubscription = api.derive.balances.account(TREASURY_ACCOUNT)
-            .subscribe((pot: DeriveBalancesAccount) => {
-              this._pot.next(this._Chain.coins(pot.freeBalance));
-              innerResolve();
-            });
-        });
+        // const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
 
         // register new chain-event handlers
         this.app.chain.chainEntities.registerEntityHandler(
