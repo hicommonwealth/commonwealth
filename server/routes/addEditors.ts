@@ -26,10 +26,11 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     return next(new Error(Errors.NoThreadId));
   }
 
+  let thread;
   try {
     const userOwnedAddressIds = await (req.user as any).getAddresses()
       .filter((addr) => !!addr.verified).map((addr) => addr.id);
-    const thread = await models.OffchainThread.findOne({
+    thread = await models.OffchainThread.findOne({
       where: {
         id: thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -102,41 +103,35 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       return next(new Error(Errors.InvalidEditor));
     }
 
-    await thread.save();
-    const finalThread = await models.OffchainThread.findOne({
-      where: { id: thread.id },
-      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTopic, as: 'topic' } ],
-    });
-
     if (collaborators?.length > 0) await Promise.all(collaborators.map(async (collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
       await models.Subscription.emitNotifications(
         models,
-        NotificationCategories.NewMention,
+        NotificationCategories.NewCollaboration,
         `user-${collaborator.User.id}`,
         {
           created_at: new Date(),
-          root_id: Number(finalThread.id),
+          root_id: Number(thread.id),
           root_type: ProposalType.OffchainThread,
-          root_title: finalThread.title,
-          comment_text: finalThread.body,
-          chain_id: finalThread.chain,
-          community_id: finalThread.community,
-          author_address: finalThread.Address.address,
-          author_chain: finalThread.Address.chain,
+          root_title: thread.title,
+          comment_text: thread.body,
+          chain_id: thread.chain,
+          community_id: thread.community,
+          author_address: thread.Address.address,
+          author_chain: thread.Address.chain,
         },
         {
-          user: finalThread.Address.address,
-          url: getProposalUrl('discussion', finalThread),
+          user: thread.Address.address,
+          url: getProposalUrl('discussion', thread),
           title: req.body.title,
           bodyUrl: req.body.url,
-          chain: finalThread.chain,
-          community: finalThread.community,
-          body: finalThread.body,
+          chain: thread.chain,
+          community: thread.community,
+          body: thread.body,
         },
         req.wss,
-        [ finalThread.Address.address ],
+        [ thread.Address.address ],
       );
     }));
 
