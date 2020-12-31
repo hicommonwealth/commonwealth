@@ -42,11 +42,14 @@ class SubstrateBountyTreasury extends ProposalModule<
   private _bondPct: number = null;
   get bondPct() { return this._bondPct; }
 
+  // The minimum bond for a proposal
+  private _bondMinimum: SubstrateCoin = null;
+  get bondMinimum() { return this._bondMinimum; }
 
-  // public computeBond(amount: SubstrateCoin): SubstrateCoin {
-  //   const computed = amount.muln(this.bondPct);
-  //   return this.bondMinimum.gt(computed) ? this.bondMinimum : this._Chain.coins(computed);
-  // }
+  public computeBond(amount: SubstrateCoin): SubstrateCoin {
+    const computed = amount.muln(this.bondPct);
+    return this.bondMinimum.gt(computed) ? this.bondMinimum : this._Chain.coins(computed);
+  }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
@@ -68,6 +71,8 @@ class SubstrateBountyTreasury extends ProposalModule<
     return new Promise((resolve, reject) => {
       this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
         // save parameters
+        this._bondPct = +(api.consts.treasury.proposalBond as Permill) / 1_000_000;
+        this._bondMinimum = this._Chain.coins(api.consts.treasury.proposalBondMinimum as BalanceOf);
         this._bountyCuratorDeposit = this._Chain.coins(api.consts.treasury.bountyCuratorDeposit);
         this._bountyDepositBase = this._Chain.coins(api.consts.treasury.bountyDepositBase);
         this._bountyDepositPayoutDelay = this._Chain.coins(api.consts.treasury.bountyDepositPayoutDelay);
