@@ -43,8 +43,9 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       collaborators = await Promise.all(Object.values(editors).map(async (editor: any) => {
         const collaborator =  models.Address.findOne({
           where: { id: editor.id },
-          include: [ models.Role ]
+          include: [ models.Role, models.User ]
         });
+        console.log(collaborator);
         return collaborator;
       }));
     } catch (e) {
@@ -55,7 +56,6 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     // Ensure collaborators have community permissions
     if (collaborators?.length > 0) {
       await Promise.all(collaborators.map(async (collaborator) => {
-        console.log(collaborator.Roles);
         if (community) {
           const isMember = collaborator.Roles
             .find((role) => role.offchain_community_id === community.id);
@@ -69,7 +69,34 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
           thread_id: thread.id,
           address_id: collaborator.id
         });
-        console.log(collaboration);
+
+        // auto-subscribe collaborator to comments & reactions
+        if (collaborator.User) {
+          try {
+            await models.Subscription.create({
+              subscriber_id: collaborator.User.id,
+              category_id: NotificationCategories.NewComment,
+              object_id: `discussion_${thread.id}`,
+              offchain_thread_id: thread.id,
+              community_id: thread.community || null,
+              chain_id: thread.chain || null,
+              is_active: true,
+            });
+            await models.Subscription.create({
+              subscriber_id: req.user.id,
+              category_id: NotificationCategories.NewReaction,
+              object_id: `discussion_${thread.id}`,
+              offchain_thread_id: thread.id,
+              community_id: thread.community || null,
+              chain_id: thread.chain || null,
+              is_active: true,
+            });
+          } catch (err) {
+            return next(new Error(err));
+          }
+        } else {
+          console.log(collaborator);
+        }
       }));
     } else {
       return next(new Error(Errors.InvalidEditor));
@@ -80,27 +107,6 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       where: { id: thread.id },
       include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTopic, as: 'topic' } ],
     });
-
-    // TODO: Hook up editor notifications
-    // dispatch notifications to subscribers of the given chain/community
-    // await models.Subscription.emitNotifications(
-    //   models,
-    //   NotificationCategories.ThreadEditorAdded,
-    //   '',
-    //   {
-    //     created_at: new Date(),
-    //     root_id: Number(finalThread.id),
-    //     root_type: ProposalType.OffchainThread,
-    //     root_title: finalThread.title,
-    //     chain_id: finalThread.chain,
-    //     community_id: finalThread.community,
-    //     author_address: finalThread.Address.address
-    //   },
-    //   // don't send webhook notifications for edits
-    //   null,
-    //   req.wss,
-    //   [ finalThread.Address.address ],
-    // );
 
     if (collaborators?.length > 0) await Promise.all(collaborators.map(async (collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address

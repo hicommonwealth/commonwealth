@@ -314,6 +314,7 @@ export const ProposalEditorPermissions: m.Component<{
 }, {
   items: any[],
   addedEditors: any,
+  removedEditors: any,
   isOpen: boolean,
 }> = {
   oninit: async (vnode) => {
@@ -331,10 +332,13 @@ export const ProposalEditorPermissions: m.Component<{
     }
   },
   view: (vnode) => {
-    const { thread, popoverMenu } = vnode.attrs;
+    const { thread } = vnode.attrs;
     if (!vnode.state.items?.length) return;
     if (!vnode.state.addedEditors) {
       vnode.state.addedEditors = {};
+    }
+    if (!vnode.state.removedEditors) {
+      vnode.state.removedEditors = {};
     }
     const { items } = vnode.state;
     return m(Dialog, {
@@ -349,7 +353,7 @@ export const ProposalEditorPermissions: m.Component<{
         itemRender: (role: any, idx: number) => {
           const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
           const recentlyAdded: boolean = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
-          const existingEditor: boolean = (thread as OffchainThread).collaborators?.includes(role.Address.address);
+          const existingEditor: boolean = thread.collaborators?.includes(role.Address.address);
           return m(ListItem, {
             label: [
               m(User, { user })
@@ -366,7 +370,13 @@ export const ProposalEditorPermissions: m.Component<{
         },
         onSelect: (item) => {
           const addrItem = (item as any).Address;
-          vnode.state.addedEditors[addrItem.address] = addrItem;
+          if (thread.collaborators?.includes(addrItem.address)) {
+            vnode.state.removedEditors[addrItem.address] = addrItem;
+          } else if (vnode.state.addedEditors[addrItem.address]) {
+            delete vnode.state.addedEditors[addrItem.address];
+          } else {
+            vnode.state.addedEditors[addrItem.address] = addrItem;
+          }
           console.log(vnode.state.addedEditors);
         }
       }),
@@ -402,6 +412,7 @@ export const ProposalEditorPermissions: m.Component<{
           intent: 'primary',
           onclick: async () => {
             try {
+              // TODO: Add editor removal logic
               const req = await $.post(`${app.serverUrl()}/addEditors`, {
                 address: app.user.activeAccount.address,
                 author_chain: app.user.activeAccount.chain.id,
