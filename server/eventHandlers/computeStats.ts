@@ -75,8 +75,9 @@ export const getAPR = async (chain: String, event: String, stash: string, noOfDa
   FROM "ChainEvents" 
   WHERE chain_event_type_id  = '${chain}-new-session' 
   AND created_at >= '${startDate}' AND created_at <= '${endDate}'
-  AND event_data::text LIKE '%${stash}%'
+  AND event_data ->> 'active' LIKE '%${stash}%'
   `;
+
   const [sessionEvents, sessionEventsMetadata] = await sequelize.query(sessionRawQuery);
 
 
@@ -100,6 +101,13 @@ export const getAPR = async (chain: String, event: String, stash: string, noOfDa
     return currRewardTime.diff(preRewardTime, 'seconds');
   });
 
+
+  for (const session of sessionEvents) {
+    if (session.event_data.validatorInfo.hasOwnProperty(stash) === false) {
+      console.log('mil gaya!');
+    }
+  }
+  
   const rewardTimeAvg = rewardsTimeDiffs.reduce(
     (total, timeDiff) => Number(total) + Number(timeDiff), 0
   ) / rewardsTimeDiffs.length;

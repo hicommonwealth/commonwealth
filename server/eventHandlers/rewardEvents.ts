@@ -25,7 +25,7 @@ export default class extends IEventHandler {
     }
     // 2) Get relevant data from DB for processing.
     /*
-      For rewards calculation of the validators, latest new-session event data needs to be present in the ChainEvents table.
+      For rewards calculation of the validators, latest new-session event da  ta needs to be present in the ChainEvents table.
       This query will return the latest new-session event data, as Rewards event will only be triggered after the new-session event.
     */
     const chainEventNewSession = await this._models.ChainEvent.findOne({
@@ -69,7 +69,6 @@ export default class extends IEventHandler {
     const ownStake = new BN(newExposure.own.toLocaleString().replace(/,/g, ''))  || new BN(1);
     const totalStake = new BN(newExposure.total.toLocaleString().replace(/,/g, '')) || new BN(1);
     const rewardAmount =  new BN(newRewardEventData.amount.toLocaleString().replace(/,/g, ''));
-
     // Check from the validator preferences whether the reward will be added to the own's exposure or not.
     if (activeValidatorsInfo.rewardDestination === 'Staked') {
       // Rewards amount calculation for the current validator. Reference: https://github.com/hicommonwealth/commonwealth/blob/staking-ui/client/scripts/controllers/chain/substrate/staking.ts#L468-L472
