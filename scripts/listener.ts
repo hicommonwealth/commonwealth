@@ -1,6 +1,6 @@
 import * as yargs from 'yargs';
 
-import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 import {
   chainSupportedBy, IEventHandler, CWEvent, SubstrateEvents, MolochEvents, EventSupportingChains
 } from '../dist/index';
@@ -17,16 +17,6 @@ const networks = {
   'moloch-local': 'ws://127.0.0.1:9545',
 } as const;
 
-const specs = {
-  'dev': dev,
-  'edgeware-local': dev,
-  'beresheet': Beresheet,
-  'edgeware-testnet': Beresheet,
-  'mainnet': Mainnet,
-  'edgeware': Mainnet,
-  'none': {},
-}
-
 const contracts = {
   'moloch': '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1',
   'moloch-local': '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
@@ -38,11 +28,6 @@ const argv = yargs.options({
     choices: EventSupportingChains,
     demandOption: true,
     description: 'chain to listen on',
-  },
-  spec: {
-    alias: 's',
-    choices: ['dev', 'beresheet', 'mainnet', 'none'] as const,
-    description: 'edgeware spec to use'
   },
   url: {
     alias: 'u',
@@ -70,8 +55,6 @@ const argv = yargs.options({
 }).argv;
 const archival: boolean = argv.archival;
 const network = argv.network;
-// if running archival mode, the archival node requires mainnet specs
-const spec = specs[argv.spec] || archival == true? specs['mainnet']:specs[network] || {};
 const url: string = argv.url || networks[network];
 const contract: string | undefined = argv.contractAddress || contracts[network];
 

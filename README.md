@@ -44,8 +44,6 @@ Options:
           [required] [choices: "edgeware", "edgeware-local", "edgeware-testnet",
      "kusama", "kusama-local", "polkadot", "polkadot-local", "kulupu", "moloch",
                                                                  "moloch-local"]
-  -s, --spec             edgeware spec to use
-                                [choices: "dev", "beresheet", "mainnet", "none"]
   -u, --url              node url                                       [string]
   -c, --contractAddress  eth contract address                           [string]
 ```
@@ -55,7 +53,7 @@ Options:
 The easiest usage of the package involves calling `subscribeEvents` directly, which initializes the various components automatically. Do this for Substrate as follows.
 
 ```typescript
-import { Mainnet } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 import { SubstrateEvents, CWEvent, IEventHandler } from '@commonwealth/chain-events';
 
 // This is an example event handler that processes events as they are emitted.
@@ -68,7 +66,7 @@ class ExampleEventHandler extends IEventHandler {
 
 async function subscribe(url) {
   // Populate with chain spec type overrides
-  const api = await SubstrateEvents.createApi(url, Mainnet);
+  const api = await SubstrateEvents.createApi(url, spec);
 
   const handlers = [ new ExampleEventHandler() ];
   const subscriber = await SubstrateEvents.subscribeEvents({
