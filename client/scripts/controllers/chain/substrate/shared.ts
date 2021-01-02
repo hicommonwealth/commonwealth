@@ -20,7 +20,8 @@ import {
   ActiveEraInfo,
   EraIndex,
   SessionIndex,
-  AccountInfo
+  AccountInfo,
+  Call
 } from '@polkadot/types/interfaces';
 
 import { Vec, Compact } from '@polkadot/types/codec';
@@ -297,12 +298,12 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return this._api.tx[mod][func](...args);
   }
 
-  public getTxMethod(mod: string, func: string): SubmittableExtrinsicFunction<'rxjs'> {
+  public getTxMethod(mod: string, func: string, args: any[]): Call {
     const result = this._api.tx[mod][func];
     if (!result) {
       throw new Error(`unsupported transaction: ${mod}::${func}`);
     }
-    return result;
+    return this._api.findCall(result.callIndex)(...args);
   }
 
   public deinitMetadata() {

@@ -13,7 +13,7 @@ const EdgewareFunctionPicker = {
     const func = this.form.function;
     const args = this.form.args;
     try {
-      return (app.chain as Substrate).chain.getTxMethod(mod, func)(...args);
+      return (app.chain as Substrate).chain.getTxMethod(mod, func, args);
     } catch (error) {
       // eslint-disable-next-line
       return;
@@ -117,7 +117,7 @@ const EdgewareFunctionPicker = {
         m(Input, {
           disabled: true,
           value: (EdgewareFunctionPicker.getMethod())
-            ? blake2AsHex(EdgewareFunctionPicker.getMethod().method.toHex())
+            ? blake2AsHex(EdgewareFunctionPicker.getMethod().toHex())
             : '',
         }),
       ]),
