@@ -1,6 +1,6 @@
 {
   "name": "@commonwealth/chain-events",
-  "version": "0.3.17-beta.2",
+  "version": "0.3.17-beta.3",
   "description": "Listen to various chains for events.",
   "license": "GPL-3.0",
   "files": [
@@ -40,9 +40,6 @@
     "underscore": "^1.10.2",
     "web3": "^1.2.9",
     "web3-utils": "^1.2.9"
-  },
-  "resolutions": {
-    "**/@polkadot/wasm-crypto": "hicommonwealth/wasm-crypto#c5ee2ea5ed0edd87da792e758832edfd1d9072bd"
   },
   "devDependencies": {
     "@babel/core": "^7.10.3",
