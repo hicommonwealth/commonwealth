@@ -784,12 +784,12 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@0.3.17-beta.1":
-  version "0.3.17-beta.1"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.3.17-beta.1.tgz#dc2386eb54e366dcb6e612a191c4a62e2e4b412d"
-  integrity sha512-vibexATxsP6IvLjlgULAGpXw0BIH4cc2fnUWHkdN3duhXJ6N5fAy2LVue/eqmVkQ1R5Z1Jwxawho8MJfCzejRQ==
+"@commonwealth/chain-events@0.3.17-beta.4":
+  version "0.3.17-beta.4"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.3.17-beta.4.tgz#94322e7f61eb113f577c8aa0d197ef9461a96100"
+  integrity sha512-d8jfiYW1Y7ndgV5+uZtph35ak6EhoQFIt+vu/KXNbtvNc/6lzJwBvJbQoaBwomm84vQ1xwT7VgTFg19Sfs279Q==
   dependencies:
-    "@edgeware/node-types" "3.1.0-beta.10"
+    "@edgeware/node-types" "3.1.0-beta.11"
     "@polkadot/api" "3.2.4-5"
     bn.js "^5.1.3"
     ethereum-block-by-date "^1.2.2"
@@ -864,10 +864,10 @@
     memoizee "^0.4.14"
     rxjs "^6.6.2"
 
-"@edgeware/node-types@3.1.0-beta.10":
-  version "3.1.0-beta.10"
-  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.1.0-beta.10.tgz#5c57fa125c594babe2f9c4fb421e4aa3b569e0a2"
-  integrity sha512-56DQowyqyQb8yrE7A/4Cp2bCmVovrndT8jTlzGPGZoVJXl7CEmmee7b6R9LQ6N3T4vPAGDq5QMbvgTs27spchQ==
+"@edgeware/node-types@3.1.0-beta.11":
+  version "3.1.0-beta.11"
+  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.1.0-beta.11.tgz#52e10dab867cbbd2896b5fd5e493d702d000f65a"
+  integrity sha512-60+6B8Dl/Ca4evER0ogVqv421fDeRnZ1STiaLmRDC0W/MLfzNAggAOyWmnWRno6oJEt0XpJGgRo/zK8tCYDKfw==
 
 "@ethersproject/abi@5.0.0-beta.153":
   version "5.0.0-beta.153"

@@ -193,7 +193,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     this._removeErrorCb = provider.on('error', errorCb);
 
     let unsubscribe: () => void;
-    await new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       unsubscribe = provider.on('connected', () => resolve());
     });
     if (unsubscribe) unsubscribe();
