@@ -30,8 +30,8 @@
   },
   "homepage": "https://github.com/hicommonwealth/chain-events#readme",
   "dependencies": {
-    "@edgeware/node-types": "git+https://git@github.com/hicommonwealth/edgeware-node-types.git#2248a43",
-    "@polkadot/api": "2.10.2-18",
+    "@edgeware/node-types": "3.1.0-beta.10",
+    "@polkadot/api": "3.2.4-5",
     "bn.js": "^5.1.3",
     "ethereum-block-by-date": "^1.2.2",
     "ethers": "^4.0.39",
