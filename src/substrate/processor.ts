@@ -36,8 +36,8 @@ export class Processor extends IEventProcessor<ApiPromise, Block> {
         : ParseType(
           block.versionName,
           block.versionNumber,
-          data.method.sectionName,
-          data.method.methodName
+          data.method.section,
+          data.method.method
         );
       if (kind !== null) {
         try {

@@ -89,8 +89,8 @@ const api = constructFakeApi({
       at: '10',
       proposer: 'Alice',
       proposal: {
-        methodName: 'method-1',
-        sectionName: 'section-1',
+        method: 'method-1',
+        section: 'section-1',
         args: [ 'arg-1-1', 'arg-1-2' ],
       }
     })
@@ -99,8 +99,8 @@ const api = constructFakeApi({
         at: '20',
         proposer: 'Bob',
         proposal: {
-          methodName: 'method-2',
-          sectionName: 'section-2',
+          method: 'method-2',
+          section: 'section-2',
           args: [ 'arg-2-1', 'arg-2-2' ],
         }
       })
@@ -134,8 +134,8 @@ const api = constructFakeApi({
       throw new Error('invalid council proposal');
     } else {
       return constructOption({
-        methodName: 'proposal-method',
-        sectionName: 'proposal-section',
+        method: 'proposal-method',
+        section: 'proposal-section',
         args: [ 'proposal-arg-1', 'proposal-arg-2' ],
       } as unknown as Proposal);
     }

@@ -73,8 +73,8 @@ describe('Edgeware Event Processor Tests', () => {
     const fakeExtrinsics = [
       {
         method: {
-          sectionName: 'elections',
-          methodName: 'submitCandidacy',
+          section: 'elections',
+          method: 'submitCandidacy',
           args: [],
         },
         signer: 'Alice',
@@ -212,8 +212,8 @@ describe('Edgeware Event Processor Tests', () => {
     const fakeExtrinsics = [
       {
         method: {
-          sectionName: 'elections',
-          methodName: 'submitBetterCandidacy',
+          section: 'elections',
+          method: 'submitBetterCandidacy',
           args: [],
         },
         signer: 'Alice',
@@ -315,8 +315,8 @@ describe('Edgeware Event Processor Tests', () => {
     const fakeExtrinsics = [
       {
         method: {
-          sectionName: 'elections',
-          methodName: 'submitCandidacy',
+          section: 'elections',
+          method: 'submitCandidacy',
           args: [],
         },
         signer: 'Alice',
@@ -346,8 +346,8 @@ describe('Edgeware Event Processor Tests', () => {
     const fakeExtrinsics = [
       {
         method: {
-          sectionName: 'elections',
-          methodName: 'submitCandidacy',
+          section: 'elections',
+          method: 'submitCandidacy',
           args: [],
         },
         signer: 'Alice',

@@ -360,8 +360,8 @@ export async function Enrich(
             proposalHash: hash.toString(),
             noter: noter.toString(),
             preimage: {
-              method: image.proposal.methodName,
-              section: image.proposal.sectionName,
+              method: image.proposal.method,
+              section: image.proposal.section,
               args: image.proposal.args.map((a) => a.toString()),
             }
           }
@@ -520,8 +520,8 @@ export async function Enrich(
             proposalHash: hash.toString(),
             threshold: +threshold,
             call: {
-              method: proposalOpt.unwrap().methodName,
-              section: proposalOpt.unwrap().sectionName,
+              method: proposalOpt.unwrap().method,
+              section: proposalOpt.unwrap().section,
               args: proposalOpt.unwrap().args.map((c) => c.toString()),
             }
           }

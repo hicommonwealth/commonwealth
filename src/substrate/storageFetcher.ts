@@ -205,8 +205,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
           proposalHash: hash,
           noter: preimage.proposer.toString(),
           preimage: {
-            method: preimage.proposal.methodName,
-            section: preimage.proposal.sectionName,
+            method: preimage.proposal.method,
+            section: preimage.proposal.section,
             args: preimage.proposal.args.map((arg) => arg.toString()),
           }
         } as IPreimageNoted ];
@@ -275,8 +275,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
           proposalHash: hash.toString(),
           threshold: +votes.threshold,
           call: {
-            method: proposal.methodName,
-            section: proposal.sectionName,
+            method: proposal.method,
+            section: proposal.section,
             args: proposal.args.map((arg) => arg.toString()),
           },
   
