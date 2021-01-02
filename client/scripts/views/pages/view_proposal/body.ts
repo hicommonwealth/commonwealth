@@ -126,7 +126,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainT
     if (!item) return;
 
     if (item instanceof OffchainThread || item instanceof OffchainComment) {
-      if (item.versionHistory.length === 0) return;
+      if (!item.versionHistory || item.versionHistory.length === 0) return;
       const isThread = item instanceof OffchainThread;
       const lastEdit = item.versionHistory?.length > 1 ? JSON.parse(item.versionHistory[0]) : null;
       if (!lastEdit) return;

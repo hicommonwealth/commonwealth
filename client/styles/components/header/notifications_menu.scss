@@ -38,6 +38,8 @@
         }
     }
     .notification-count {
+        position: relative;
+        top: 4px;
         .visible-xs {
             @include sm-min {
                 display: none;
