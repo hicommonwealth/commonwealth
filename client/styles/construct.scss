@@ -454,6 +454,19 @@ button, .cui-button {
     z-index: initial;
 }
 
+// make large spinners bigger
+.cui-spinner.cui-lg .cui-spinner-icon,
+.cui-lg .cui-spinner .cui-spinner-icon {
+    height: 24px;
+    width: 24px;
+}
+.cui-spinner.cui-xl .cui-spinner-icon,
+.cui-xl .cui-spinner .cui-spinner-icon {
+    height: 36px;
+    width: 36px;
+    border-width: 3px;
+}
+
 // the declarative construct-ui toaster doesn't allow position to be set by default, so we override it here
 .cui-toaster.cui-toaster-top {
     top: auto;

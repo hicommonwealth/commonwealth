@@ -7,7 +7,7 @@ import _ from 'lodash';
 import moment from 'moment-twitter';
 import Chart from 'chart.js';
 import mixpanel from 'mixpanel-browser';
-import { Button, Input } from 'construct-ui';
+import { Button, Input, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { pluralize } from 'helpers';
@@ -208,7 +208,7 @@ const EdgewareStatsPage = {
               ]),
             ]),
             m('.charts', !state.participationSummary ? [
-              state.loading && m('.chart-loading', m('span.icon-spinner2.animate-spin')),
+              state.loading && m('.chart-loading', m(Spinner, { active: true })),
               state.noData && m('.chart-loading', [
                 m('p', 'No data - You may be over the API limit.'),
                 m('p', 'Wait 15 seconds and try again.'),

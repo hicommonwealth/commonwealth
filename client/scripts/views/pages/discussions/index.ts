@@ -290,7 +290,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
-          // m(InlineThreadComposer),
           (!activeEntity || !activeEntity.serverLoaded || stillFetching)
             ? m('.discussions-main', [
               m(ProposalsLoadingRow),
@@ -299,7 +298,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               // TODO: Ensure that this doesn't get shown on first render
               ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
               : listing.length === 0
-                ? m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true }) ])
+                ? m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
                 : m(Listing, {
                   content: listing,
                   rightColSpacing: [4, 4, 4],
@@ -319,7 +318,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             ])
             : (allThreads.length)
               ? m('.infinite-scroll-spinner-wrap', [
-                m(Spinner, { active: !vnode.state.postsDepleted[subpage] })
+                m(Spinner, { active: !vnode.state.postsDepleted[subpage], size: 'lg' })
               ])
               : null
         ])
