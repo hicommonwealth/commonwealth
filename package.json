@@ -47,7 +47,6 @@
     "@babel/register": "^7.4.0",
     "@commonwealth/chain-events": "0.3.17-beta.4",
     "@cosmjs/launchpad": "^0.24.0-alpha.13",
-    "@darwinia/types": "^1.0.2",
     "@edgeware/node-types": "3.1.0-beta.11",
     "@lunie/cosmos-api": "git+https://git@github.com/hicommonwealth/cosmos-api.git#develop",
     "@lunie/cosmos-keys": "^0.3.2",
