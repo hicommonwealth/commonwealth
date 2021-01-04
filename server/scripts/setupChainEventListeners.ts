@@ -4,7 +4,7 @@ import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
-import { Mainnet } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
@@ -113,10 +113,7 @@ const setupChainEventListeners = async (
       handlers.push(identityHandler, userFlagsHandler);
 
       const nodeUrl = constructSubstrateUrl(node.url);
-      const api = await SubstrateEvents.createApi(
-        nodeUrl,
-        node.chain.includes('edgeware') ? Mainnet : {},
-      );
+      const api = await SubstrateEvents.createApi(nodeUrl, spec);
       subscriber = await SubstrateEvents.subscribeEvents({
         chain: node.chain,
         handlers,

@@ -8,6 +8,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
 const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
+  const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
   const { cutoff_date, topic_id } = req.query;
   // Threads
@@ -135,11 +136,23 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     });
   }
 
+  const reactions = await models.OffchainReaction.findAll({
+    where: {
+      [Op.or]: [
+        { thread_id: threads.map((thread) => thread.id) },
+        { comment_id: comments.map((comment) => comment.id) },
+      ],
+    },
+    include: [ models.Address ],
+    order: [['created_at', 'DESC']],
+  });
+
   return res.json({
     status: 'Success',
     result: {
       threads: cutoff_date ? threads : threads.map((t) => t.toJSON()),
-      comments: comments.map((c) => c.toJSON())
+      comments: comments.map((c) => c.toJSON()),
+      reactions: reactions.map((r) => r.toJSON()),
     }
   });
 };

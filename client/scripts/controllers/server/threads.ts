@@ -11,6 +11,7 @@ import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo, OffchainTo
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
+import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 
 export const DEFAULT_PAGE_SIZE = 20;
 export const MAX_PAGE_SIZE = 50;
@@ -287,7 +288,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const { threads, comments } = response.result;
+    const { threads, comments, reactions } = response.result;
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -311,6 +312,17 @@ class ThreadsController {
       }
       try {
         app.comments.store.add(modelCommentFromServer(comment));
+      } catch (e) {
+        console.error(e.message);
+      }
+    }
+    for (const reaction of reactions) {
+      const existing = app.reactions.store.getById(reaction.id);
+      if (existing) {
+        app.reactions.store.remove(existing);
+      }
+      try {
+        app.reactions.store.add(modelReactionFromServer(reaction));
       } catch (e) {
         console.error(e.message);
       }

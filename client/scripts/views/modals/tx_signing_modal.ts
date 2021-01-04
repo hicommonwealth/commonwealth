@@ -3,7 +3,7 @@ import 'modals/tx_signing_modal.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import { mnemonicValidate } from '@polkadot/util-crypto';
-import { Button, TextArea, Grid, Col } from 'construct-ui';
+import { Button, TextArea, Grid, Col, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { formatAsTitleCase, link } from 'helpers';
@@ -420,7 +420,7 @@ const TXSigningModalStates = {
         m('.compact-modal-title', [ m('h3', 'Confirm transaction') ]),
         m('.compact-modal-body', [
           m('.TXSigningBodyText', 'Waiting for your transaction to be confirmed by the network...'),
-          m('span.icon-spinner2.animate-spin'),
+          m(Spinner, { active: true }),
           m('br'),
           m(Button, {
             intent: 'primary',

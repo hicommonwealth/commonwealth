@@ -47,30 +47,24 @@ import {
 } from './body';
 import CreateComment from './create_comment';
 
-interface IProposalHeaderAttrs {
+const ProposalHeader: m.Component<{
   commentCount: number;
   viewCount: number;
   getSetGlobalEditingStatus: CallableFunction;
   getSetGlobalReplyStatus: CallableFunction;
   proposal: AnyProposal | OffchainThread;
-}
-
-interface IProposalHeaderState {
-  canEdit: boolean;
-  isAdmin: boolean;
+}, {
   savedEdit: string;
   editing: boolean;
   saving: boolean;
   quillEditorState: any;
   currentText: any;
-  updatedTitle: string;
   topicEditorIsOpen: boolean;
-}
+}> = {
+  view: (vnode) => {
+    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
 
-const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
-  oninit: (vnode) => {
-    const { proposal } = vnode.attrs;
-    vnode.state.isAdmin = (app.user.isRoleOfCommunity({
+    const isAdmin = (app.user.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
       community: app.activeCommunityId()
@@ -79,13 +73,9 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
       chain: app.activeChainId(),
       community: app.activeCommunityId()
     }));
-    vnode.state.canEdit = (app.user.activeAccount?.address === proposal.author
-          && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain)
-      || vnode.state.isAdmin;
-  },
-  view: (vnode) => {
-    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
-    const { canEdit, isAdmin } = vnode.state;
+    const canEdit = app.user.activeAccount?.address === proposal.author
+      && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain;
+
     const isThread = proposal instanceof OffchainThread;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;
     const versionHistory = (proposal as OffchainThread).versionHistory;
@@ -124,14 +114,15 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                 canEdit && m(ProposalBodyEditMenuItem, {
                   item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
-                canEdit && m(ProposalBodyDeleteMenuItem, { item: proposal }),
+                (canEdit || isAdmin) && m(ProposalBodyDeleteMenuItem, { item: proposal }),
                 isAdmin && proposal instanceof OffchainThread && m(TopicEditorButton, {
                   openTopicEditor: () => {
                     vnode.state.topicEditorIsOpen = true;
                   }
                 }),
-                canEdit && m(ProposalHeaderPrivacyButtons, { proposal }),
-                canEdit && m(MenuDivider),
+                (canEdit || isAdmin) && m(ProposalHeaderPrivacyButtons, { proposal }),
+                // TODO: needs a callback, to mark vnode.state.proposal as recentlyEdited
+                (canEdit || isAdmin) && m(MenuDivider),
                 m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
               ],
               inline: true,
@@ -192,14 +183,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
   }
 };
 
-interface IProposalCommentState {
-  editing: boolean;
-  saving: boolean;
-  replying: boolean;
-  quillEditorState: any;
-}
-
-interface IProposalCommentAttrs {
+const ProposalComment: m.Component<{
   comment: OffchainComment<any>;
   getSetGlobalEditingStatus: CallableFunction;
   getSetGlobalReplyStatus: CallableFunction;
@@ -207,9 +191,12 @@ interface IProposalCommentAttrs {
   proposal: AnyProposal | OffchainThread;
   callback?: Function;
   isLast: boolean,
-}
-
-const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState> = {
+}, {
+  editing: boolean;
+  saving: boolean;
+  replying: boolean;
+  quillEditorState: any;
+}> = {
   view: (vnode) => {
     const {
       comment,
@@ -322,13 +309,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
   }
 };
 
-interface IProposalCommentsState {
-  commentError: any;
-  dom;
-  highlightedComment: boolean;
-}
-
-interface IProposalCommentsAttrs {
+const ProposalComments: m.Component<{
   proposal: OffchainThread | AnyProposal;
   comments: Array<OffchainComment<any>>;
   createdCommentCallback: CallableFunction;
@@ -336,10 +317,11 @@ interface IProposalCommentsAttrs {
   getSetGlobalReplyStatus: CallableFunction;
   replyParent: number | boolean;
   user?: any;
-}
-
-// TODO: clarify that 'user' = user who is commenting
-const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsState> = {
+}, {
+  commentError: any;
+  dom;
+  highlightedComment: boolean;
+}> = {
   view: (vnode) => {
     const {
       proposal, comments, createdCommentCallback, getSetGlobalEditingStatus,

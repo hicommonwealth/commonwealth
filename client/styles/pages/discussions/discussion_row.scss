@@ -21,6 +21,9 @@ $discussion-meta-padding: 18px;
             // Styling specific to DiscussionRow subheader content
             .discussion-locked {
                 margin-right: 12px;
+                .cui-tag.cui-xs .cui-icon svg {
+                    margin-right: 0;
+                }
             }
             a.proposal-topic {
                 @include proposal-topic-inline;
