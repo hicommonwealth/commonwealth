@@ -306,13 +306,11 @@ class ThreadsController {
       page_size: pageSize,
     };
     if (topicId) params['topic_id'] = topicId;
-    console.log('loading next page');
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads, comments } = response.result;
-    console.log(threads);
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -366,7 +364,6 @@ class ThreadsController {
         // Threads that are posted in an offchain community are still linked to a chain / author address,
         // so when we want just chain threads, then we have to filter away those that have a community
         const { threads } = response.result;
-        console.log(threads);
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
           if (!thread.Address) {
@@ -393,7 +390,6 @@ class ThreadsController {
   }
 
   public initialize(initialThreads: any[], reset = true) {
-    console.log(initialThreads);
     if (reset) {
       this._store.clear();
       this._listingStore.clear();

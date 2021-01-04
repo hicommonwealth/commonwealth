@@ -55,6 +55,10 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
   const lines = [];
   for (const node of nodes) {
     if (typeof node.insert === 'string') {
+      if (node.insert.match(/[^\n]+\n?|\n/g) === null) {
+        console.log(node);
+        return;
+      }
       node.insert.match(/[^\n]+\n?|\n/g).forEach((line) => {
         lines.push({ attributes: node.attributes, insert: line });
       });
