@@ -8,11 +8,16 @@ import { stringToU8a, hexToU8a } from '@polkadot/util';
 
 import * as secp256k1 from 'secp256k1';
 import * as CryptoJS from 'crypto-js';
+import { ecdsaVerify } from 'secp256k1/lib/elliptic';
 
-import { getCosmosAddress } from '@lunie/cosmos-keys';
+import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
+import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
+import { toUtf8, fromBase64 } from '@cosmjs/encoding';
+import { Uint53 } from '@cosmjs/math';
+import { getCosmosAddress } from '@lunie/cosmos-keys'; // used to check address validity. TODO: remove
+
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
-import { keyToSignMsg } from '../../shared/adapters/chain/cosmos/keys';
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
@@ -20,6 +25,7 @@ import { UserAttributes } from './user';
 import { OffchainProfileAttributes } from './offchain_profile';
 import { RoleAttributes } from './role';
 import { factory, formatFilename } from '../../shared/logging';
+import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
 
 // tslint:disable-next-line
@@ -168,6 +174,9 @@ export default (
     if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot'
         || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi'
         || chain.network === 'darwinia' || chain.network === 'phala' || chain.network === 'centrifuge') {
+      //
+      // substrate address handling
+      //
       const address = decodeAddress(addressModel.address);
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
       if (addressModel.keytype) {
@@ -206,27 +215,46 @@ export default (
         : hexToU8a(`0x${signatureString}`);
       isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
         || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
-    } else if (chain.network === 'cosmos') {
+    } else if (chain.network === 'cosmos' || chain.network === 'straightedge') {
+      //
+      // cosmos-sdk address handling
+      //
       const signatureData = JSON.parse(signatureString);
-      // this saved "address" is actually just the address
-      const msg = keyToSignMsg(addressModel.address, addressModel.verification_token);
-      const signature = Buffer.from(signatureData.signature, 'base64');
-      const pk = Buffer.from(signatureData.pub_key.value, 'base64');
+      const pk = Buffer.from(signatureData.signature.pub_key.value, 'base64');
 
       // we generate an address from the actual public key and verify that it matches,
       // this prevents people from using a different key to sign the message than
-      // the account they registered with
-      const generatedAddress = getCosmosAddress(pk);
-      if (generatedAddress === addressModel.address) {
-        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), `hex`);
-        isValid = secp256k1.ecdsaVerify(signHash, signature, pk);
+      // the account they registered with.
+      const bech32Prefix = chain.network === 'cosmos'
+        ? 'cosmos'
+        : chain.network === 'straightedge' ? 'str' : chain.network;
+      const generatedAddress = getCosmosAddress(pk, bech32Prefix);
+      const generatedAddressWithCosmosPrefix = getCosmosAddress(pk, 'cosmos');
+
+      if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
+        // get tx doc that was signed
+        const signDoc = await validationTokenToSignDoc(addressModel.address, addressModel.verification_token.trim());
+
+        // check for signature validity
+        // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
+        const { pubkey, signature } = decodeSignature(signatureData.signature);
+        const secpSignature = Secp256k1Signature.fromFixedLength(fromBase64(signatureData.signature.signature));
+        if (serializeSignDoc(signatureData.signed).toString() !== serializeSignDoc(signDoc).toString()) {
+          isValid = false;
+        } else {
+          const messageHash = new Sha256(serializeSignDoc(signDoc)).digest();
+          isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
+        }
       } else {
         isValid = false;
       }
     } else if (chain.network === 'ethereum'
       || chain.network === 'moloch'
-      || chain.network === 'metacart'
+      || chain.network === 'metacartel'
     ) {
+      //
+      // ethereum address handling
+      //
       const msgBuffer = Buffer.from(addressModel.verification_token.trim());
       // toBuffer() doesn't work if there is a newline
       const msgHash = ethUtil.hashPersonalMessage(msgBuffer);

@@ -252,6 +252,11 @@ export class SubstrateDemocracyReferendum
         this._passed.next(true);
         this._executionBlock = e.data.dispatchBlock;
         this._endBlock = e.data.dispatchBlock; // fix timer if in dispatch queue
+
+        // hack to complete proposals that didn't get an execution event for some reason
+        if (this._executionBlock < this._Democracy.app.chain.block.height) {
+          this.complete();
+        }
         break;
       }
       case SubstrateTypes.EventKind.DemocracyExecuted: {

@@ -7,9 +7,9 @@ import { Button, Callout } from 'construct-ui';
 import app from 'state';
 
 import { OffchainThread, OffchainComment, AnyProposal } from 'models';
+import { parseMentionsForServer } from 'helpers/threads';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
-import { parseMentionsForServer } from 'views/pages/threads';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
@@ -139,7 +139,7 @@ const CreateComment: m.Component<{
               class: 'no-profile-callout',
               intent: 'primary',
               content: [
-                'You haven\'t set a display name yet, so other people can\'t see who you are. ',
+                'You haven\'t set a display name yet, so other people can only see your address. ',
                 m('a', {
                   href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
                     + `?base=${app.user.activeAccount.chain}`,
@@ -153,7 +153,7 @@ const CreateComment: m.Component<{
                       },
                     });
                   }
-                }, 'Complete your profile'),
+                }, 'Add your name'),
               ],
             }),
             m(QuillEditor, {

@@ -141,11 +141,14 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       });
 
       // Reactions
-      // TODO: this fetches all reactions, we can just fetch associated reactions
+      const matchThreadsOrComments = [
+        { thread_id: allThreads.map((thread) => thread.id) },
+        { comment_id: comments.map((comment) => comment.id) },
+      ];
       const reactions = await models.OffchainReaction.findAll({
         where: community
-          ? { community: community.id }
-          : { chain: chain.id },
+          ? { community: community.id, [Op.or]: matchThreadsOrComments }
+          : { chain: chain.id, [Op.or]: matchThreadsOrComments },
         include: [ models.Address ],
         order: [['created_at', 'DESC']],
       });

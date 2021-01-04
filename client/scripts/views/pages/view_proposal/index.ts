@@ -46,15 +46,13 @@ import {
 } from './body';
 import CreateComment from './create_comment';
 
-interface IProposalHeaderAttrs {
+const ProposalHeader: m.Component<{
   commentCount: number;
   viewCount: number;
   getSetGlobalEditingStatus: CallableFunction;
   getSetGlobalReplyStatus: CallableFunction;
   proposal: AnyProposal | OffchainThread;
-}
-
-interface IProposalHeaderState {
+}, {
   isAuthor: boolean;
   isEditor: boolean;
   isAdmin: boolean;
@@ -63,14 +61,12 @@ interface IProposalHeaderState {
   saving: boolean;
   quillEditorState: any;
   currentText: any;
-  updatedTitle: string;
   topicEditorIsOpen: boolean;
   editPermissionsIsOpen: boolean;
-}
-
-const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
+}> = {
   view: (vnode) => {
     const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
+
     vnode.state.isAdmin = (app.user.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
@@ -209,14 +205,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
   }
 };
 
-interface IProposalCommentState {
-  editing: boolean;
-  saving: boolean;
-  replying: boolean;
-  quillEditorState: any;
-}
-
-interface IProposalCommentAttrs {
+const ProposalComment: m.Component<{
   comment: OffchainComment<any>;
   getSetGlobalEditingStatus: CallableFunction;
   getSetGlobalReplyStatus: CallableFunction;
@@ -224,9 +213,12 @@ interface IProposalCommentAttrs {
   proposal: AnyProposal | OffchainThread;
   callback?: Function;
   isLast: boolean,
-}
-
-const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState> = {
+}, {
+  editing: boolean;
+  saving: boolean;
+  replying: boolean;
+  quillEditorState: any;
+}> = {
   view: (vnode) => {
     const {
       comment,
@@ -339,13 +331,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
   }
 };
 
-interface IProposalCommentsState {
-  commentError: any;
-  dom;
-  highlightedComment: boolean;
-}
-
-interface IProposalCommentsAttrs {
+const ProposalComments: m.Component<{
   proposal: OffchainThread | AnyProposal;
   comments: Array<OffchainComment<any>>;
   createdCommentCallback: CallableFunction;
@@ -353,10 +339,11 @@ interface IProposalCommentsAttrs {
   getSetGlobalReplyStatus: CallableFunction;
   replyParent: number | boolean;
   user?: any;
-}
-
-// TODO: clarify that 'user' = user who is commenting
-const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsState> = {
+}, {
+  commentError: any;
+  dom;
+  highlightedComment: boolean;
+}> = {
   view: (vnode) => {
     const {
       proposal, comments, createdCommentCallback, getSetGlobalEditingStatus,

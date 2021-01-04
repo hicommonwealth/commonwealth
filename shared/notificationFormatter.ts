@@ -56,6 +56,7 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
     try {
       // return rendered quill doc
       const doc = JSON.parse(text);
+      if (!doc.ops) throw new Error();
       const finalText = renderQuillDeltaToText(doc);
       return smartTrim(finalText);
     } catch (e) {

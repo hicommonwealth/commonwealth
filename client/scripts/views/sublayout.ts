@@ -59,7 +59,7 @@ const Sublayout: m.Component<{
       !hideSidebar && m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m('.LoadingLayout', [
-          m(Spinner, { active: true, fill: true, size: 'lg' }),
+          m(Spinner, { active: true, fill: true, size: 'xl' }),
         ]),
       ]),
       m(RightSidebar, { rightSidebar }),

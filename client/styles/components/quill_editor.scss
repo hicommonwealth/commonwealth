@@ -9,11 +9,10 @@
 // 3. ql-snow form input styles, ql-bubble styles
 // 4. toolbar
 // 5. toolbar (markdown mode)
-// 6. image upload spinner
-// 7. preview button
-// 8. mentions container
-// 9. progress bar
-// 10. markdown/rich text switcher tooltip
+// 6. preview button
+// 7. mentions container
+// 8. progress bar
+// 9. markdown/rich text switcher tooltip
 //
 
 .QuillEditor {
@@ -186,19 +185,7 @@
         }
     }
 
-    // 6. image upload spinner
-    .spinner-wrap.img-spinner {
-        margin: 10px;
-        width: 100%;
-        text-align: center;
-        color: $text-color-light;
-        font-size: 14px;
-        .icon-spinner2.animate-spin {
-            margin: 0 4px;
-        }
-    }
-
-    // 7. preview button
+    // 6. preview button
     .ql-formats > .ql-preview {
         width: initial !important;
     }
@@ -246,7 +233,7 @@
     }
 }
 
-// 8. mentions container
+// 7. mentions container
 .ql-mention-list-container {
     background: white;
     border-top: 1px solid $background-color-light;
@@ -315,14 +302,14 @@
     }
 }
 
-// 9. progress bar
+// 8. progress bar
 .progress-bar {
     height: 3px;
     width: 80%;
     background-color: red;
 }
 
-// 10. markdown/rich text switcher tooltip
+// 9. markdown/rich text switcher tooltip
 .quill-editor-tooltip {
     position: relative;
     top: 3px;

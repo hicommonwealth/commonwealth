@@ -157,6 +157,7 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
                   (() => {
                     try {
                       const doc = JSON.parse(decodeURIComponent(result.body));
+                      if (!doc.ops) throw new Error();
                       return m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
                     } catch (e) {
                       const doc = decodeURIComponent(result.body);
@@ -177,6 +178,7 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
                   (() => {
                     try {
                       const doc = JSON.parse(decodeURIComponent(result.body));
+                      if (!doc.ops) throw new Error();
                       return m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
                     } catch (e) {
                       const doc = decodeURIComponent(result.body);

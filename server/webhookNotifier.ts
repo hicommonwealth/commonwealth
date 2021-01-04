@@ -49,10 +49,11 @@ const getFilteredContent = (content, address) => {
         : content.notificationCategory === NotificationCategories.NewReaction ? 'Reaction on: '
           : 'Activity on: ';
     const notificationExcerpt = (() => {
-      let bodytext = decodeURIComponent(content.body);
+      const bodytext = decodeURIComponent(content.body);
       try {
         // parse and use quill document
         const doc = JSON.parse(bodytext);
+        if (!doc.ops) throw new Error();
         const text = renderQuillDeltaToText(doc);
         return smartTrim(text);
       } catch (err) {

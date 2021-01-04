@@ -48,7 +48,7 @@ export class CosmosApi {
     console.log('headers');
     this._initHeaders(headerListener);
     console.log('chain id');
-    this._chainId = await this._lunieApi.setChainId();
+    // this._chainId = await this._lunieApi.setChainId(); // TODO: replace deprecated call
     this._initialized = true;
   }
 
