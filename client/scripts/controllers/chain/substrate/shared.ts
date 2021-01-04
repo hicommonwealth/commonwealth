@@ -20,7 +20,6 @@ import {
   ActiveEraInfo,
   EraIndex,
   SessionIndex,
-  AccountInfo,
   Call
 } from '@polkadot/types/interfaces';
 
@@ -44,8 +43,7 @@ import { SubstrateEvents } from '@commonwealth/chain-events';
 import { notifySuccess, notifyError, notifyInfo } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
-import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
-import { u128, TypeRegistry } from '@polkadot/types';
+import { u128 } from '@polkadot/types';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateAccount } from './account';
@@ -207,19 +205,14 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
     // note that we reuse the same provider and type registry to create both an rxjs
     // and a promise-based API -- this avoids creating multiple connections to the node
-    const registry = new TypeRegistry();
     const options: ApiOptions = {
       provider,
-      registry,
       ...additionalOptions,
     };
-    const apiRx = new ApiRx(options);
-    this._api = apiRx;
-    await this._api.isReady.toPromise();
+    this._api = await ApiRx.create(options).toPromise();
 
-    // clone API as promise
-    const apiPromise = new ApiPromise({ source: apiRx, ...options });
-    this._apiPromise = apiPromise;
+    // clone API as promise (reuse type registry)
+    this._apiPromise = await ApiPromise.create({ source: this._api, ...options });
     return this._api;
   }
 
