@@ -38,8 +38,10 @@
         }
     }
     .notification-count {
-        position: relative;
-        top: 4px;
+        @include sm-max {
+            position: relative;
+            top: 4px;
+        }
         .visible-xs {
             @include sm-min {
                 display: none;
