@@ -1,21 +1,35 @@
 import * as yargs from 'yargs';
 
-import { spec } from '@edgeware/node-types';
+import { spec as EdgewareSpec } from '@edgeware/node-types';
 import {
   chainSupportedBy, IEventHandler, CWEvent, SubstrateEvents, MolochEvents, EventSupportingChains
 } from '../dist/index';
 
-const networks = {
+const networkUrls = {
   'edgeware': 'ws://mainnet1.edgewa.re:9944',
   'edgeware-local': 'ws://localhost:9944',
   'edgeware-testnet': 'wss://beresheet1.edgewa.re',
   'kusama': 'wss://kusama-rpc.polkadot.io',
   'polkadot': 'wss://rpc.polkadot.io',
   'kulupu': 'ws://rpc.kulupu.corepaper.org/ws',
+  'stafi': 'wss://scan-rpc.stafi.io/ws',
 
   'moloch': 'wss://mainnet.infura.io/ws',
   'moloch-local': 'ws://127.0.0.1:9545',
 } as const;
+
+const networkSpecs = {
+  'edgeware': EdgewareSpec,
+  'edgeware-local': EdgewareSpec,
+  'edgeware-testnet': EdgewareSpec,
+  'stafi': {
+    types: {
+      ChainId: 'u8',
+      DepositNonce: 'u64',
+      ResourceId: '[u8; 32]',
+    }
+  }
+}
 
 const contracts = {
   'moloch': '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1',
@@ -55,7 +69,8 @@ const argv = yargs.options({
 }).argv;
 const archival: boolean = argv.archival;
 const network = argv.network;
-const url: string = argv.url || networks[network];
+const url: string = argv.url || networkUrls[network];
+const spec = networkSpecs[network] || {};
 const contract: string | undefined = argv.contractAddress || contracts[network];
 
 class StandaloneEventHandler extends IEventHandler {

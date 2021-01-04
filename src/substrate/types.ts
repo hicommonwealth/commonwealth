@@ -11,6 +11,7 @@ export const EventChains = [
   'polkadot',
   'polkadot-local',
   'kulupu',
+  'stafi',
 ] as const;
 
 /**

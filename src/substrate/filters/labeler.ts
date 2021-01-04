@@ -13,6 +13,7 @@ function fmtAddr(addr : string) {
 const EDG_DECIMAL = 18;
 const KUSAMA_DECIMAL = 12;
 const KLP_DECIMAL = 12;
+const FIS_DECIMAL = 12;
 
 function formatNumberShort(num: number) {
   const round = (n, digits?) => {
@@ -44,6 +45,7 @@ const getDenom = (chain: EventSupportingChainT): string => {
     case 'kusama': return 'KSM';
     case 'kusama-local': return 'tKSM';
     case 'kulupu': return 'KLP';
+    case 'stafi': return 'FIS';
     case 'polkadot': return 'DOT';
     case 'polkadot-local': return 'tDOT';
     case 'moloch': return 'Shares';
@@ -64,6 +66,8 @@ const edgBalanceFormatter = (chain, balance: BalanceString): string => {
     dollar = (new BN(10)).pow(new BN(KUSAMA_DECIMAL));
   } else if (chain.startsWith('kulupu')) {
     dollar = (new BN(10)).pow(new BN(KLP_DECIMAL));
+  } else if (chain.startsWith('stafi')) {
+    dollar = (new BN(10)).pow(new BN(FIS_DECIMAL));
   } else {
     throw new Error('unexpected chain');
   }
