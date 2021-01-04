@@ -235,20 +235,22 @@
         border-bottom: none;
         text-align: left;
         display: flex;
+        .account-item-avatar {
+            width: 56px;
+        }
         .account-item-address {
             color: $text-color-light;
         }
         .account-item-left {
+            flex: 1;
         }
         .account-item-right {
             text-align: right;
-            flex: 1;
-            margin: 11px 0;
         }
         .account-waiting {
             .cui-spinner {
                 position: relative;
-                top: -2px;
+                top: 10px;
             }
         }
 

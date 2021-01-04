@@ -103,17 +103,20 @@ const EthereumLinkAccountItem: m.Component<{
           });
       },
     }, [
+      m('.account-item-avatar', [
+        m('.account-user', m(User, { user: app.chain.accounts.get(address), avatarOnly: true, avatarSize: 40 })),
+      ]),
       m('.account-item-left', [
-        m('.account-item-name', 'Ethereum account'),
-        m('.account-item-address', `${address.slice(0, 16)}...`),
+        m('.account-item-name', `${app.chain.meta.chain.name} account`),
+        m('.account-item-address', [
+          m('.account-user', m(User, { user: app.chain.accounts.get(address), hideAvatar: true })),
+        ]),
       ]),
       m('.account-item-right', [
-        vnode.state.linking
-          ? m('.account-waiting', [
-            // TODO: show a (?) icon with a tooltip explaining to check your wallet
-            m(Spinner, { size: 'xs', active: true })
-          ])
-          : m('.account-user', m(User, { user: app.chain.accounts.get(address) })),
+        vnode.state.linking && m('.account-waiting', [
+          // TODO: show a (?) icon with a tooltip explaining to check your wallet
+          m(Spinner, { size: 'xs', active: true })
+        ])
       ]),
     ]);
   }
@@ -172,17 +175,20 @@ const CosmosLinkAccountItem: m.Component<{
         });
       },
     }, [
+      m('.account-item-avatar', [
+        m('.account-user', m(User, { user: app.chain.accounts.get(account.address), avatarOnly: true, avatarSize: 40 })),
+      ]),
       m('.account-item-left', [
         m('.account-item-name', `${app.chain.meta.chain.name} account`),
-        m('.account-item-address', formatAddressShort(account.address, app.chain.meta.chain.id)),
+        m('.account-item-address', [
+          m('.account-user', m(User, { user: app.chain.accounts.get(account.address), hideAvatar: true })),
+        ]),
       ]),
       m('.account-item-right', [
-        vnode.state.linking
-          ? m('.account-waiting', [
-            // TODO: show a (?) icon with a tooltip explaining to check your wallet
-            m(Spinner, { size: 'xs', active: true })
-          ])
-          : m('.account-user', m(User, { user: app.chain.accounts.get(account.address) })),
+        vnode.state.linking && m('.account-waiting', [
+          // TODO: show a (?) icon with a tooltip explaining to check your wallet
+          m(Spinner, { size: 'xs', active: true })
+        ])
       ]),
     ]);
   }
@@ -259,17 +265,20 @@ const SubstrateLinkAccountItem: m.Component<{
         }
       }
     }, [
+      m('.account-item-avatar', [
+        m('.account-user', m(User, { user: app.chain.accounts.get(address), avatarOnly: true, avatarSize: 40 })),
+      ]),
       m('.account-item-left', [
-        m('.account-item-name', account.meta.name),
-        m('.account-item-address', formatAddressShort(address, account.chain)),
+        m('.account-item-name', `${account.meta.name}`),
+        m('.account-item-address', [
+          m('.account-user', m(User, { user: app.chain.accounts.get(address), hideAvatar: true })),
+        ]),
       ]),
       m('.account-item-right', [
-        vnode.state.linking
-          ? m('.account-waiting', [
-            // TODO: show a (?) icon with a tooltip explaining to check your wallet
-            m(Spinner, { size: 'xs', active: true })
-          ])
-          : m('.account-user', m(User, { user: app.chain.accounts.get(address) })),
+        vnode.state.linking && m('.account-waiting', [
+          // TODO: show a (?) icon with a tooltip explaining to check your wallet
+          m(Spinner, { size: 'xs', active: true })
+        ])
       ]),
     ]);
   }
