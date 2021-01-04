@@ -296,20 +296,19 @@ button, .cui-button {
 // adjust input padding
 .cui-input input {
     padding: 22px 15.6px 15.6px;
-    @each $size in $cui-sizes {
-        &.cui-#{$size} {
-            padding: 22px 15.6px 15.6px;
-        }
-    }
 }
-
-// adjust textarea padding
 .cui-text-area textarea {
     padding: 14px 15.6px 15.6px;
     @each $size in $cui-sizes {
         &.cui-#{$size} {
-            padding: 22px 15.6px 15.6px;
+            padding: 22px 15.6px 15.6px !important;
         }
+    }
+}
+@each $size in $cui-sizes {
+    .cui-input.cui-#{$size} input,
+    .cui-input.cui-#{$size} textarea {
+        padding: 22px 15.6px 15.6px !important;
     }
 }
 
