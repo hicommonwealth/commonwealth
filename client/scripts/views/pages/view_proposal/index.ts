@@ -69,8 +69,8 @@ interface IProposalHeaderState {
 }
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
-  oninit: (vnode) => {
-    const { proposal } = vnode.attrs;
+  view: (vnode) => {
+    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
     vnode.state.isAdmin = (app.user.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
@@ -86,10 +86,8 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
     vnode.state.isAuthor = (app.user.activeAccount?.address === proposal.author
           && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain);
     vnode.state.isEditor = (proposal as OffchainThread).collaborators?.includes(app.user.activeAccount.address);
-  },
-  view: (vnode) => {
-    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
     const { isAuthor, isEditor, isAdmin } = vnode.state;
+
     console.log({ isAuthor, isEditor });
     const isThread = proposal instanceof OffchainThread;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;

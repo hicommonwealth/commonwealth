@@ -107,10 +107,11 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       include: [
         models.Address,
         models.OffchainAttachment,
-        { model: models.SharingPermission, as: 'collaborators' },
+        // { model: models.SharingPermission, as: 'collaborators' },
         { model: models.OffchainTopic, as: 'topic' },
       ],
     });
+    console.log(finalThread);
 
     if (collaborators?.length > 0) await Promise.all(collaborators.map(async (collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
