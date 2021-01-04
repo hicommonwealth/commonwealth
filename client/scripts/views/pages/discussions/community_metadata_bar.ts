@@ -94,34 +94,40 @@ const CommunityMetadataBar: m.Component<{ entity: string }> = {
     // available: thread.title, thread.address, thread.authorChain, ...
     //   m.route.set(`/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-${slugify(thread.title)}`);
     return m('.CommunityMetadataBar', [
-      activeAddresses.length > 0
-      && m('.user-activity', [
-        m('.user-activity-header', 'Active members'),
-        m('.active-members', activeAddresses.map((user) => {
-          return m(User, {
-            user: user.info,
-            avatarSize: 24,
-            avatarOnly: true,
-            linkify: true,
-            popover: true,
-          });
-          // TODO: show user.count
-        })),
+      m('h2', [
+        'Edgeware is a next-generation smart contract platform.',
       ]),
-      m('.admins-mods', [
-        m('.admins-mods-header', 'Admins and mods'),
-        (app.chain || app.community) && m('.active-members', [
-          (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((role) => {
-            return m(User, {
-              user: new AddressInfo(null, role.address, role.address_chain, null),
-              avatarSize: 24,
-              avatarOnly: true,
-              linkify: true,
-              popover: true,
-            });
-          }),
-        ]),
+      m('p', [
+        'Use this forum to discuss projects, make proposals, and petition the community.',
       ]),
+      // activeAddresses.length > 0
+      // && m('.user-activity', [
+      //   m('.user-activity-header', 'Active members'),
+      //   m('.active-members', activeAddresses.map((user) => {
+      //     return m(User, {
+      //       user: user.info,
+      //       avatarSize: 24,
+      //       avatarOnly: true,
+      //       linkify: true,
+      //       popover: true,
+      //     });
+      //     // TODO: show user.count
+      //   })),
+      // ]),
+      // m('.admins-mods', [
+      //   m('.admins-mods-header', 'Admins and mods'),
+      //   (app.chain || app.community) && m('.active-members', [
+      //     (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((role) => {
+      //       return m(User, {
+      //         user: new AddressInfo(null, role.address, role.address_chain, null),
+      //         avatarSize: 24,
+      //         avatarOnly: true,
+      //         linkify: true,
+      //         popover: true,
+      //       });
+      //     }),
+      //   ]),
+      // ]),
     ]);
   }
 };

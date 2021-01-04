@@ -299,17 +299,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
               : listing.length === 0
                 ? m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
-                : m(Listing, {
-                  content: listing,
-                  rightColSpacing: [4, 4, 4],
-                  columnHeaders: [
-                    'Title',
-                    'Comments',
-                    'Likes',
-                    'Updated'
-                  ],
-                  menuCarat: true,
-                }),
+                : m(Listing, { content: listing }),
           // TODO: Incorporate infinite scroll into generic Listing component
           (allThreads.length && vnode.state.postsDepleted[subpage])
             ? m('.infinite-scroll-reached-end', [

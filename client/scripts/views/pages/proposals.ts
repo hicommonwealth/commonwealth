@@ -211,16 +211,8 @@ const ProposalsPage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
-      m(Listing, {
-        content: activeProposalContent,
-        columnHeaders: ['Active Proposals', 'Comments', 'Likes', 'Updated'],
-        rightColSpacing: [4, 4, 4]
-      }),
-      m(Listing, {
-        content: inactiveProposalContent,
-        columnHeaders: ['Inactive Proposals', 'Comments', 'Likes', 'Updated'],
-        rightColSpacing: [4, 4, 4]
-      }),
+      m(Listing, { content: activeProposalContent }),
+      m(Listing, { content: inactiveProposalContent }),
     ]);
   }
 };
