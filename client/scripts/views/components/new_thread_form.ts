@@ -11,11 +11,10 @@ import {
   Callout, Tabs, TabItem, Form, FormGroup, Input, Button,
   Icon, Icons, List, ListItem, Tag,
 } from 'construct-ui';
-import { re_weburl } from 'lib/url-validation';
 
 import app from 'state';
 import { link } from 'helpers';
-import { detectURL, getLinkTitle, parseMentionsForServer } from 'helpers/threads';
+import { detectURL, parseMentionsForServer } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -390,18 +389,6 @@ export const NewThreadForm: m.Component<{
     if (vnode.state.quillEditorState?.container) {
       vnode.state.quillEditorState.container.tabIndex = 8;
     }
-    const getUrlForLinkPost = _.debounce(async () => {
-      try {
-        const title = await getLinkTitle(vnode.state.form.url);
-        if (!vnode.state.autoTitleOverride && title) {
-          localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, title);
-          vnode.state.form.linkTitle = title;
-        }
-      } catch (err) {
-        notifyError(err.message);
-      }
-      m.redraw();
-    }, 750);
 
     const updateTopicState = (topicName: string, topicId?: number) => {
       localStorage.setItem(`${app.activeId()}-active-tag`, topicName);
@@ -542,7 +529,6 @@ export const NewThreadForm: m.Component<{
                 const { value } = e.target as any;
                 vnode.state.form.url = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
-                if (detectURL(value)) getUrlForLinkPost();
               },
               defaultValue: vnode.state.form.url,
               tabindex: 2,
