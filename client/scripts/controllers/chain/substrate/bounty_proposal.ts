@@ -34,10 +34,10 @@ export class SubstrateBounty
     return `#${this.identifier.toString()}`;
   }
   public get title() {
-    const account = this._Accounts.fromAddress(this._proposer.address);
+    const account = this._Accounts.fromAddress(this.author.address);
     const displayName = account.profile && account.profile.name
-      ? `${account.profile.name} (${formatAddressShort(this._proposer.address, account.chain.id)})`
-      : formatAddressShort(this._proposer.address, account.chain.id);
+      ? `${account.profile.name} (${formatAddressShort(this.author.address, account.chain.id)})`
+      : formatAddressShort(this.author.address, account.chain.id);
     return `Proposed spend: ${formatCoin(this._value)} to ${displayName}`;
   }
   public get description() { return null; }
