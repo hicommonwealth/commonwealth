@@ -9,6 +9,7 @@ import { CommentsStore } from 'stores';
 import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from '../app/login';
+import { Moment } from 'moment';
 // tslint:disable: object-literal-key-quotes
 
 export enum CommentParent {
@@ -50,6 +51,11 @@ export const modelFromServer = (comment) => {
     comment?.Address?.chain || comment.authorChain,
   );
 };
+
+interface VersionHistory {
+  timestamp: Moment;
+  body: string;
+}
 
 
 class CommentsController {
@@ -103,7 +109,7 @@ class CommentsController {
     attachments?: string[], mentions?: string[]
   ) {
     const timestamp = moment();
-    const firstVersion : any = { timestamp, body: unescapedText };
+    const firstVersion : VersionHistory = { timestamp, body: unescapedText };
     const versionHistory : string = JSON.stringify(firstVersion);
     try {
       // TODO: Change to POST /comment
@@ -141,7 +147,7 @@ class CommentsController {
 
   public async edit(comment: OffchainComment<any>, body?: string, attachments?: string[]) {
     const newBody = body || comment.text;
-    const recentEdit : any = { timestamp: moment(), body };
+    const recentEdit : VersionHistory = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
     try {
       // TODO: Change to PUT /comment
