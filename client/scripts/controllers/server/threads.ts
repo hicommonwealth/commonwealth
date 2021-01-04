@@ -6,11 +6,19 @@ import $ from 'jquery';
 
 import app from 'state';
 import { ProposalStore, TopicScopedThreadStore } from 'stores';
-import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo, OffchainTopic } from 'models';
+import {
+  OffchainThread,
+  OffchainAttachment,
+  CommunityInfo,
+  NodeInfo,
+  OffchainTopic,
+  Account
+} from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
+import { Moment } from 'moment';
 
 export const DEFAULT_PAGE_SIZE = 20;
 export const MAX_PAGE_SIZE = 50;
@@ -67,6 +75,12 @@ would break the listingStore's careful chronology.
 
 */
 
+interface VersionHistory {
+  author: Account<any>;
+  timestamp: Moment;
+  body: string;
+}
+
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
   private _listingStore = new TopicScopedThreadStore();
@@ -104,7 +118,11 @@ class ThreadsController {
     readOnly?: boolean,
   ) {
     const timestamp = moment();
-    const firstVersion : any = { timestamp, body };
+    const firstVersion : VersionHistory = {
+      author: app.user.activeAccount,
+      timestamp,
+      body,
+    };
     const versionHistory : string = JSON.stringify(firstVersion);
 
     try {
@@ -152,7 +170,11 @@ class ThreadsController {
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
-    const recentEdit : any = { timestamp: moment(), body };
+    const recentEdit : VersionHistory = {
+      author: app.user.activeAccount,
+      timestamp: moment(),
+      body
+    };
     const versionHistory = JSON.stringify(recentEdit);
     await $.ajax({
       url: `${app.serverUrl()}/editThread`,

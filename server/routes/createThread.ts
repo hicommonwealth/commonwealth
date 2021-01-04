@@ -71,8 +71,8 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
-  const versionHistory = [];
-  versionHistory.push(req.body.versionHistory);
+  const version_history = [];
+  version_history.push(req.body.versionHistory);
 
   const threadContent = community ? {
     community: community.id,
@@ -80,7 +80,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     title,
     body,
     plaintext,
-    version_history: versionHistory,
+    version_history,
     kind,
     url,
     read_only: readOnly,
@@ -90,7 +90,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     title,
     body,
     plaintext,
-    version_history: versionHistory,
+    version_history,
     kind,
     url,
     read_only: readOnly || false,
