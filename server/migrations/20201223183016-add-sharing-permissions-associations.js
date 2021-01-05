@@ -3,7 +3,7 @@
 module.exports = {
   up: (queryInterface, DataTypes) => {
     return queryInterface.createTable('SharingPermissions', {
-      thread_id: {
+      offchain_thread_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {

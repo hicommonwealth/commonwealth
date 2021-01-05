@@ -28,6 +28,7 @@ export const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
+  console.log(thread.collaborators);
   return new OffchainThread(
     thread.Address.address,
     decodeURIComponent(thread.title),

@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 
 export interface SharingPermissionAttributes {
   address_id: number;
-  thread_id: number;
+  offchain_thread_id: number;
   created_at: Date;
   updated_at: Date;
 }
@@ -25,7 +25,7 @@ export default (
   const SharingPermission = sequelize.define<SharingPermissionInstance, SharingPermissionAttributes>(
     'SharingPermission', {
       address_id: { type: dataTypes.INTEGER, allowNull: false },
-      thread_id: { type: dataTypes.INTEGER, allowNull: false },
+      offchain_thread_id: { type: dataTypes.INTEGER, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     }, {
@@ -33,5 +33,11 @@ export default (
       underscored: true,
     }
   );
+
+  SharingPermission.associate = (models) => {
+    models.SharingPermission.belongsTo(models.Address);
+    models.SharingPermission.belongsTo(models.OffchainThread);
+  };
+
   return SharingPermission;
 };

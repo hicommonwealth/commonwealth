@@ -70,31 +70,27 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
         });
 
         // auto-subscribe collaborator to comments & reactions
-        if (collaborator.User) {
-          try {
-            await models.Subscription.create({
-              subscriber_id: collaborator.User.id,
-              category_id: NotificationCategories.NewComment,
-              object_id: `discussion_${thread.id}`,
-              offchain_thread_id: thread.id,
-              community_id: thread.community || null,
-              chain_id: thread.chain || null,
-              is_active: true,
-            });
-            await models.Subscription.create({
-              subscriber_id: req.user.id,
-              category_id: NotificationCategories.NewReaction,
-              object_id: `discussion_${thread.id}`,
-              offchain_thread_id: thread.id,
-              community_id: thread.community || null,
-              chain_id: thread.chain || null,
-              is_active: true,
-            });
-          } catch (err) {
-            return next(new Error(err));
-          }
-        } else {
-          console.log(collaborator);
+        try {
+          await models.Subscription.create({
+            subscriber_id: collaborator.User.id,
+            category_id: NotificationCategories.NewComment,
+            object_id: `discussion_${thread.id}`,
+            offchain_thread_id: thread.id,
+            community_id: thread.community || null,
+            chain_id: thread.chain || null,
+            is_active: true,
+          });
+          await models.Subscription.create({
+            subscriber_id: req.user.id,
+            category_id: NotificationCategories.NewReaction,
+            object_id: `discussion_${thread.id}`,
+            offchain_thread_id: thread.id,
+            community_id: thread.community || null,
+            chain_id: thread.chain || null,
+            is_active: true,
+          });
+        } catch (err) {
+          return next(new Error(err));
         }
       }));
     } else {
@@ -107,12 +103,11 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       include: [
         models.Address,
         models.OffchainAttachment,
-        // { model: models.SharingPermission, as: 'collaborators' },
         { model: models.OffchainTopic, as: 'topic' },
       ],
     });
-    console.log(finalThread);
 
+    // TODO: Build and test notifications
     if (collaborators?.length > 0) await Promise.all(collaborators.map(async (collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
@@ -146,7 +141,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     }));
 
     // TODO: Examine returned result for relevance
-    return res.json({ status: 'Success', result: finalThread.toJSON() });
+    return res.json({ status: 'Success' });
   } catch (e) {
     return next(new Error(e));
   }

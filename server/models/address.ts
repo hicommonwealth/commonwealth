@@ -316,8 +316,9 @@ export default (
     models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
     models.Address.belongsToMany(models.OffchainThread, {
       through: models.SharingPermission,
-      as: 'threads'
+      as: 'collaboration'
     });
+    models.Address.hasMany(models.SharingPermission);
   };
 
   return Address;

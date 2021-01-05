@@ -82,9 +82,9 @@ const ProposalHeader: m.Component<{
     vnode.state.isAuthor = (app.user.activeAccount?.address === proposal.author
           && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain);
     vnode.state.isEditor = (proposal as OffchainThread).collaborators?.includes(app.user.activeAccount.address);
+    console.log((proposal as OffchainThread));
     const { isAuthor, isEditor, isAdmin } = vnode.state;
 
-    console.log({ isAuthor, isEditor });
     const isThread = proposal instanceof OffchainThread;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
@@ -522,7 +522,8 @@ const ViewProposalPage: m.Component<{
     // load proposal
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
-        vnode.state.proposal = idToProposal(proposalType, proposalId);
+        throw new Error();
+        // vnode.state.proposal = idToProposal(proposalType, proposalId);
       } catch (e) {
         // proposal might be loading, if it's not an offchain thread
         if (proposalType === ProposalType.OffchainThread) {

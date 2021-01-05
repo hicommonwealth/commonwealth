@@ -65,7 +65,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             ) c
           ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
           LEFT JOIN "SharingPermissions" collaborations
-          ON thread_id = collaborations.thread_id
+          ON thread_id = collaborations.offchain_thread_id
           LEFT JOIN "Addresses" editors
           ON collaborations.address_id = editors.id
           WHERE t.${communityOptions}
@@ -92,9 +92,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       const threads = preprocessedThreads.map((t) => {
         const root_id = `discussion_${t.thread_id}`;
         root_ids.push(root_id);
-        if (t.thread_id == 880) {
-          console.log(t);
-        }
+
         const data = {
           id: t.thread_id,
           title: t.thread_title,

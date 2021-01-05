@@ -341,6 +341,9 @@ export const ProposalEditorPermissions: m.Component<{
       vnode.state.removedEditors = {};
     }
     const { items } = vnode.state;
+    // const existingEditors = m('.existing-editors', thread.collaborators.map((user) => {
+    //   return m(User, { user });
+    // }));
     return m(Dialog, {
       basic: false,
       class: 'ProposalEditorPermissions',
@@ -353,12 +356,11 @@ export const ProposalEditorPermissions: m.Component<{
         itemRender: (role: any, idx: number) => {
           const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
           const recentlyAdded: boolean = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
-          const existingEditor: boolean = thread.collaborators?.includes(role.Address.address);
           return m(ListItem, {
             label: [
               m(User, { user })
             ],
-            selected: recentlyAdded || existingEditor,
+            selected: recentlyAdded,
             key: role.Address.address
           });
         },
@@ -422,7 +424,6 @@ export const ProposalEditorPermissions: m.Component<{
                 editors: JSON.stringify(vnode.state.addedEditors),
                 jwt: app.user.jwt,
               });
-              console.log(req.result);
               if (req.status !== '200') {
                 if (thread.collaborators?.length) {
                   Object.keys(vnode.state.addedEditors).forEach((addr) => {
@@ -431,6 +432,8 @@ export const ProposalEditorPermissions: m.Component<{
                 } else {
                   thread.collaborators = Object.keys(vnode.state.addedEditors);
                 }
+              } else {
+                throw new Error();
               }
             } catch (err) {
               console.log('Failed to add editors');

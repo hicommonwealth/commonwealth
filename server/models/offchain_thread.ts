@@ -89,8 +89,9 @@ export default (
     });
     models.OffchainThread.belongsToMany(models.Address, {
       through: models.SharingPermission,
-      as: 'editors'
+      as: 'collaborator'
     });
+    models.OffchainThread.hasMany(models.SharingPermission);
   };
 
   return OffchainThread;

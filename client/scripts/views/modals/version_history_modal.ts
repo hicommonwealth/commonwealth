@@ -45,7 +45,6 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
 
     const getVersion = (edit, prevEdit) => {
       const parsedEdit = JSON.parse(edit);
-      console.log(parsedEdit);
       const author = parsedEdit.author
         ? app.profiles.getProfile(parsedEdit.author.chain, parsedEdit.author.address)
         : app.profiles.getProfile(proposal.author, proposal.authorChain);
