@@ -8,9 +8,9 @@ const uptimePercent = (noOfTrues: number, noOfFalse: number, currentEventType: n
   /*
     This formula is used to calculate the uptime percentage of the validators based on previous sessions' uptime.
     upTimePercentage = ((No. isOnline True(s) + Current Execution Mode [1 for AllGood, 0 for SomeOffline]) /
-                        (No. isOnline True(s) + No. isOnline False(s) - 1 + 1)) * 100
+                        (No. isOnline True(s) + No. isOnline False(s))) * 100
   */
-  const upTimePercentage = (((noOfTrues + currentEventType) / (noOfTrues + noOfFalse - 1 + 1)) * 100)
+  const upTimePercentage = (((noOfTrues + currentEventType) / (noOfTrues + noOfFalse)) * 100)
     .toFixed(2);
 
   return upTimePercentage;
@@ -60,7 +60,7 @@ export default class extends IEventHandler {
         FROM public."HistoricalValidatorStatistic" as partitionTable
         JOIN( 
           SELECT stash, SUM(case when "isOnline" then 1 else 0 end) as "onlineCount", SUM(case when "isOnline"  then 0 else 1 end) as "offlineCount" 
-          FROM public."HistoricalValidatorStatistic" as groupTable GROUP by groupTable.stash
+          FROM public."HistoricalValidatorStatistic" as groupTable where "eventType" in ('all-good', 'some-offline') GROUP by groupTable.stash
           ) joinTable
         ON joinTable.stash = partitionTable.stash
         WHERE partitionTable.stash IN ('${eventValidatorsList.join("','")}')
