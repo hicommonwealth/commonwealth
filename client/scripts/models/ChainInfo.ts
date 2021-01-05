@@ -15,6 +15,8 @@ class ChainInfo {
   public chat: string;
   public telegram: string;
   public github: string;
+  public introTitle: string;
+  public introText: string;
   public readonly blockExplorerIds: object;
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
@@ -23,8 +25,8 @@ class ChainInfo {
   public adminsAndMods: RoleInfo[];
 
   constructor(
-    id, network, symbol, name, iconUrl, description, website, chat, telegram,
-    github, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
+    id, network, symbol, name, iconUrl, description, website, chat, telegram, github, introTitle, introText,
+    blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
     this.network = network;
@@ -36,6 +38,8 @@ class ChainInfo {
     this.chat = chat;
     this.telegram = telegram;
     this.github = github;
+    this.introTitle = introTitle;
+    this.introText = introText;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
@@ -61,6 +65,8 @@ class ChainInfo {
       json.chat,
       json.telegram,
       json.github,
+      json.introTitle,
+      json.introText,
       blockExplorerIds,
       json.collapsed_on_homepage,
       json.featured_topics,
@@ -99,7 +105,8 @@ class ChainInfo {
   }
 
   public async updateChainData(
-    name: string, description: string, website: string, chat: string, telegram: string, github: string
+    name: string, description: string, website: string, chat: string, telegram: string, github: string,
+    introTitle: string, introText: string,
   ) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -110,6 +117,8 @@ class ChainInfo {
       'chat': chat,
       'telegram': telegram,
       'github': github,
+      'introTitle': introTitle,
+      'introText': introText,
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
@@ -119,6 +128,8 @@ class ChainInfo {
     this.chat = updatedChain.chat;
     this.telegram = telegram;
     this.github = github;
+    this.introTitle = introTitle;
+    this.introText = introText;
   }
 
   public addFeaturedTopic(topic: string) {

@@ -38,7 +38,9 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     }
   }
 
-  const { active, chat, description, icon_url, name, symbol, type, website, telegram, github } = req.body;
+  const {
+    active, chat, description, icon_url, name, symbol, type, website, telegram, github, introTitle, introText
+  } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -60,6 +62,8 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.chat = chat;
   chain.telegram = telegram;
   chain.github = github;
+  chain.introTitle = introTitle;
+  chain.introText = introText;
   if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
 
   await chain.save();

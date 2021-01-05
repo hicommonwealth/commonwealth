@@ -49,6 +49,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           chat: community.chat,
           telegram: community.telegram,
           github: community.github,
+          introTitle: community.introTitle,
+          introText: community.introText,
           default_chain: app.config.chains.getById(community.default_chain),
           visible: community.visible,
           collapsed_on_homepage: community.collapsed_on_homepage,

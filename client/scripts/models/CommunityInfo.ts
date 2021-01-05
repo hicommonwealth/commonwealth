@@ -26,6 +26,8 @@ class CommunityInfo {
   public website: string;
   public telegram: string;
   public github: string;
+  public introTitle: string;
+  public introText: string;
   public readonly defaultChain: ChainInfo;
   public readonly visible: boolean;
   public invitesEnabled: boolean;
@@ -36,7 +38,7 @@ class CommunityInfo {
   public adminsAndMods: RoleInfo[];
 
   constructor(
-    id, name, description, iconUrl, website, chat, telegram, github, defaultChain,
+    id, name, description, iconUrl, website, chat, telegram, github, introTitle, introText, defaultChain,
     visible, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
@@ -47,6 +49,8 @@ class CommunityInfo {
     this.chat = chat;
     this.telegram = telegram;
     this.github = github;
+    this.introTitle = introTitle;
+    this.introText = introText;
     this.defaultChain = defaultChain;
     this.visible = visible;
     this.invitesEnabled = invitesEnabled;
@@ -67,6 +71,8 @@ class CommunityInfo {
       json.chat,
       json.telegram,
       json.github,
+      json.introTitle,
+      json.introText,
       json.default_chain,
       json.visible,
       json.invitesEnabled,
@@ -117,6 +123,8 @@ class CommunityInfo {
     chat,
     telegram,
     github,
+    introTitle,
+    introText,
   }) {
     // TODO: Change to PUT /community
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
@@ -128,6 +136,8 @@ class CommunityInfo {
       'chat': chat,
       'telegram': telegram,
       'github': github,
+      'introTitle': introTitle,
+      'introText': introText,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
       'jwt': app.user.jwt,
@@ -140,6 +150,8 @@ class CommunityInfo {
     this.chat = updatedCommunity.chat;
     this.telegram = updatedCommunity.telegram;
     this.github = updatedCommunity.github;
+    this.introTitle = introTitle;
+    this.introText = introText;
     this.privacyEnabled = updatedCommunity.privacyEnabled;
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }

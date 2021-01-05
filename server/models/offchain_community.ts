@@ -17,6 +17,8 @@ export interface OffchainCommunityAttributes {
   chat?: string;
   telegram?: string;
   github?: string;
+  introTitle?: string;
+  introText?: string;
   featured_topics?: string[];
   privacyEnabled?: boolean;
   invitesEnabled?: boolean;
@@ -57,6 +59,8 @@ export default (
       website: { type: dataTypes.STRING, allowNull: true },
       chat: { type: dataTypes.STRING, allowNull: true },
       telegram: { type: dataTypes.STRING, allowNull: true },
+      introTitle: { type: dataTypes.STRING, allowNull: true },
+      introText: { type: dataTypes.STRING, allowNull: true },
       github: { type: dataTypes.STRING, allowNull: true },
       featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
       // auth_forum: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },

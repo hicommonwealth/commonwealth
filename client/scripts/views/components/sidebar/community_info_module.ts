@@ -21,7 +21,7 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
     });
 
     const meta = app.chain ? app.chain.meta.chain : app.community.meta;
-    const { name, description, website, chat, telegram, github } = meta;
+    const { name, description, website, chat, telegram, github, introTitle, introText } = meta;
 
     return m('.CommunityInfoModule.SidebarModule', [
       m('.community-name', [
