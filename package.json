@@ -84,7 +84,7 @@
     "async-rwlock": "^1.1.1",
     "autoprefixer": "^9.7.3",
     "aws-sdk": "^2.482.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.4",
     "bcrypt-nodejs": "^0.0.3",
