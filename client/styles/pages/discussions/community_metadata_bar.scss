@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
 .CommunityMetadataBar {
-    margin-bottom: 24px;
+    margin-bottom: 30px;
     padding: 15px 24px;
     border-radius: 4px;
     background: $background-color-light;
@@ -9,14 +9,29 @@
     > h2 {
         font-size: 21px;
         margin: 0;
-        margin-top: 4px;
+        margin-top: 8px;
+        line-height: 1.1;
     }
     > p {
         margin: 0;
-        margin-top: 4px;
+        margin-top: 8px;
         margin-bottom: 2px;
+        line-height: 1.2;
     }
 
+    .cui-icon {
+        margin-right: 10px;
+        svg {
+            stroke: $text-color-black;
+            position: relative;
+            top: 3px;
+            // icon size
+            height: 14px;
+            width: 14px;
+            min-width: 14px;
+            min-height: 14px;
+        }
+    }
 
     /* .user-activity-header, */
     /* .forum-activity-header, */
