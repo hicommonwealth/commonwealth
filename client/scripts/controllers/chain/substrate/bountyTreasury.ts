@@ -14,7 +14,7 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { formatAddressShort } from '../../../../../shared/utils';
-import { SubstrateBounty } from './bounty_proposal';
+import { SubstrateBounty } from './bounty';
 
 class SubstrateBountyTreasury extends ProposalModule<
   ApiRx,
