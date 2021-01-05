@@ -1,6 +1,6 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
-import { sequelize } from '../database';
 import Sequelize from 'sequelize';
+import { sequelize } from '../database';
 const Op = Sequelize.Op;
 
 
@@ -60,8 +60,10 @@ export default class extends IEventHandler {
         SELECT * ,ROW_NUMBER() OVER( PARTITION BY partitionTable.stash ORDER BY created_at DESC ) 
         FROM public."HistoricalValidatorStatistic" as partitionTable
         JOIN( 
-          SELECT stash, SUM(case when "isOnline" then 1 else 0 end) as "onlineCount", SUM(case when "isOnline"  then 0 else 1 end) as "offlineCount" 
-          FROM public."HistoricalValidatorStatistic" as groupTable where "eventType" in ('all-good', 'some-offline') GROUP by groupTable.stash
+          SELECT stash, SUM(case when "isOnline" then 1 else 0 end) as "onlineCount", 
+          SUM(case when "isOnline"  then 0 else 1 end) as "offlineCount" 
+          FROM public."HistoricalValidatorStatistic" as groupTable 
+          where "eventType" in ('all-good', 'some-offline') GROUP by groupTable.stash
           ) joinTable
         ON joinTable.stash = partitionTable.stash
         WHERE partitionTable.stash IN ('${eventValidatorsList.join("','")}')
@@ -75,14 +77,22 @@ export default class extends IEventHandler {
     switch (imOnlineEventData.kind) {
       case SubstrateTypes.EventKind.AllGood: {
         validatorsList.forEach((validator: any) => {
-          validator.uptime = uptimePercent(Number(validator.onlineCount), Number(validator.offlineCount), 1).toString();  // 1 for AllGood event
+          validator.uptime = uptimePercent(
+            Number(validator.onlineCount),
+            Number(validator.offlineCount),
+            1 // 1 for AllGood event
+          ).toString();
           validator.isOnline = true;
         });
         break;
       }
       case SubstrateTypes.EventKind.SomeOffline: {
         validatorsList.forEach((validator: any) => {
-          validator.uptime = uptimePercent(Number(validator.onlineCount), Number(validator.offlineCount), 0).toString();  // 0 for SomeOffline event
+          validator.uptime = uptimePercent(
+            Number(validator.onlineCount),
+            Number(validator.offlineCount),
+            0  // 0 for SomeOffline event
+          ).toString();
           validator.isOnline = false;
         });
         break;
