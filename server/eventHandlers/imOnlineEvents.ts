@@ -22,7 +22,6 @@ export default class extends IEventHandler {
   ) {
     super();
   }
-  
   public async handle(event: CWEvent < IChainEventData >, dbEvent) {
     // 1) if other event type ignore and do nothing.
     if (event.data.kind !== SubstrateTypes.EventKind.AllGood
@@ -33,8 +32,8 @@ export default class extends IEventHandler {
     const imOnlineEventData = event.data;
     let eventValidatorsList: string | any[];
     if (event.data.kind === SubstrateTypes.EventKind.SomeOffline) {
-      eventValidatorsList = imOnlineEventData.validators?.map(validator=>JSON.parse(validator)[0]);
-    }else{
+      eventValidatorsList = imOnlineEventData.validators?.map((validator) => JSON.parse(validator)[0]);
+    } else {
       eventValidatorsList = imOnlineEventData.validators;
     }
 
@@ -50,8 +49,10 @@ export default class extends IEventHandler {
 
     // 2) Get relevant data from DB for processing.
     /*
-      This query will return the last created record for validators in 'HistoricalValidatorStatistic' table and return the data for each validator with there onlineCount and offlineCount counts iff any.
-      since all new and active validators records has been created by new-session event handler, it'll return the the last created records of them.
+      This query will return the last created record for validators in 'HistoricalValidatorStatistic' 
+      table and return the data for each validator with there onlineCount and offlineCount counts if any.
+      since all new and active validators records has been created by new-session event handler, 
+      it'll return the the last created records of them.
     */
     const rawQuery = `
       SELECT *
