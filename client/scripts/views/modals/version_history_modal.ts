@@ -45,10 +45,18 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
 
     const getVersion = (edit, prevEdit) => {
       const parsedEdit = JSON.parse(edit);
+      console.log(parsedEdit);
       const author = parsedEdit.author
-        ? parsedEdit.author
+        ? app.profiles.getProfile(parsedEdit.author.chain, parsedEdit.author.address)
         : app.profiles.getProfile(proposal.author, proposal.authorChain);
       const timestamp = moment(parsedEdit.timestamp).format('dddd, MMMM Do YYYY, h:mm a');
+      const userOptions = {
+        user: author,
+        showRole: false,
+        linkify: true,
+        popover: true,
+        hideAvatar: true
+      };
       // TODO: Add diffing algorithm for Markdown posts
       try {
         const doc = new Delta(JSON.parse(parsedEdit.body));
@@ -67,7 +75,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         const diffedDoc = (quillDiff && prevDoc) ? prevDoc.compose(quillDiff) : doc;
         return m('.version', [
           m('.panel-left', [
-            m(User, { user: author }),
+            m(User, userOptions),
             m('span.timestamp', timestamp),
           ]),
           m('.panel-right', [
@@ -77,7 +85,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
       } catch {
         return m('.version', [
           m('.panel-left', [
-            m(User, { user: author }),
+            m(User, userOptions),
             m('span.timestamp', timestamp),
           ]),
           m('.panel-right', [
