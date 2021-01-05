@@ -1,7 +1,6 @@
 import 'modals/version_history_modal.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
 import app from 'state';
 import Quill from 'quill';
 import moment from 'moment';
@@ -10,7 +9,7 @@ import { formatAddressShort } from 'utils';
 import { CompactModalExitButton } from '../modal';
 import QuillFormattedText from '../components/quill_formatted_text';
 import MarkdownFormattedText from '../components/markdown_formatted_text';
-import { UserBlock } from '../components/widgets/user';
+import User, { UserBlock } from '../components/widgets/user';
 const Delta = Quill.import('delta');
 
 interface IVersionHistoryAttrs {
@@ -48,7 +47,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
       const parsedEdit = JSON.parse(edit);
       const author = parsedEdit.author
         ? parsedEdit.author
-        : formatAddressShort(proposal.author, proposal.authorChain);
+        : app.profiles.getProfile(proposal.author, proposal.authorChain);
       const timestamp = moment(parsedEdit.timestamp).format('dddd, MMMM Do YYYY, h:mm a');
       // TODO: Add diffing algorithm for Markdown posts
       try {
@@ -68,20 +67,20 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         const diffedDoc = (quillDiff && prevDoc) ? prevDoc.compose(quillDiff) : doc;
         return m('.version', [
           m('.panel-left', [
+            m(User, { user: author }),
             m('span.timestamp', timestamp),
           ]),
           m('.panel-right', [
-            m(UserBlock, { user: author }),
             m(QuillFormattedText, { doc: diffedDoc }),
           ])
         ]);
       } catch {
         return m('.version', [
           m('.panel-left', [
+            m(User, { user: author }),
             m('span.timestamp', timestamp),
           ]),
           m('.panel-right', [
-            m(UserBlock, { user: author }),
             m(MarkdownFormattedText, { doc: parsedEdit.body })
           ])
         ]);

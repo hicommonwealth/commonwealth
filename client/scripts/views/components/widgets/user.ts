@@ -139,10 +139,10 @@ const User: m.Component<{
         (app.chain && app.chain.base === ChainBase.Substrate && app.cachedIdentityWidget)
           ? m(app.cachedIdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort })
           : link('a.user-display-name',
-          profile
-            ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
-            : 'javascript:',
-          profile ? profile.displayName : addrShort)
+            profile
+              ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+              : 'javascript:',
+            profile ? profile.displayName : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
       friendlyChainName && m('.user-chain', friendlyChainName),

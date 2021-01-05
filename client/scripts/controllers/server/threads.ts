@@ -12,7 +12,7 @@ import {
   CommunityInfo,
   NodeInfo,
   OffchainTopic,
-  Account
+  Profile
 } from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -77,7 +77,7 @@ would break the listingStore's careful chronology.
 */
 
 interface VersionHistory {
-  author: Account<any>;
+  author: Profile;
   timestamp: Moment;
   body: string;
 }
@@ -119,13 +119,15 @@ class ThreadsController {
     readOnly?: boolean,
   ) {
     const timestamp = moment();
+    const author = app.user.activeAccount.profile;
     const firstVersion : VersionHistory = {
-      author: app.user.activeAccount,
+      author,
       timestamp,
       body,
     };
+    console.log(firstVersion);
     const versionHistory : string = JSON.stringify(firstVersion);
-
+    console.log(versionHistory);
     try {
       // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {
@@ -172,7 +174,7 @@ class ThreadsController {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
     const recentEdit : VersionHistory = {
-      author: app.user.activeAccount,
+      author: app.user.activeAccount.profile,
       timestamp: moment(),
       body
     };
