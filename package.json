@@ -196,7 +196,7 @@
     "eslint-plugin-import": "^2.20.0",
     "ganache-cli": "^6.9.1",
     "mocha": "^6.2.2",
-    "nyc": "^14.1.1",
+    "nyc": "^15.1.0",
     "source-map-support": "^0.5.13",
     "stylelint": "^12.0.0",
     "tslint-config-airbnb": "^5.11.2",
