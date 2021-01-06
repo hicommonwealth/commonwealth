@@ -49,7 +49,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
               )
             ) AS collaborators
-          editors.chain AS editor_chain
         FROM "OffchainThreads" t
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS comm_created_at
@@ -68,7 +67,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         WHERE t.deleted_at IS NULL
           AND t.${communityOptions}
           ${topicOptions}
-          AND t.id = 624
           AND t.created_at < :created_at
           AND t.pinned = false
           GROUP BY (t.id, c.comm_created_at, t.created_at)
@@ -142,7 +140,18 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
     threads = await models.OffchainThread.findAll({
       where: whereOptions,
-      include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
+      include: [
+        models.Address,
+        {
+          model: models.Address,
+          through: models.SharingPermission,
+          as: 'collaborators'
+        },
+        {
+          model: models.OffchainTopic,
+          as: 'topic'
+        }
+      ],
       order: [['created_at', 'DESC']],
     });
 

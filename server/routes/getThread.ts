@@ -1,21 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import { factory, formatFilename } from '../../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const getThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
 
   let thread;
-  let collaboration;
   try {
     thread = await models.OffchainThread.findOne({
       where: {
         id: req.query.id,
       },
       include: [
-        models.Address,
+        {
+          model: models.Address,
+          as: 'Address'
+        },
         {
           model: models.Address,
           through: models.SharingPermission,

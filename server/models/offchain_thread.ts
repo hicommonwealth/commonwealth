@@ -69,7 +69,11 @@ export default (
   });
 
   OffchainThread.associate = (models) => {
-    models.OffchainThread.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.OffchainThread.belongsTo(models.Chain, {
+      foreignKey: 'chain',
+      targetKey: 'id',
+      as: 'Address'
+    });
     models.OffchainThread.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
     models.OffchainThread.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
     models.OffchainThread.hasMany(models.OffchainAttachment, {
@@ -89,7 +93,7 @@ export default (
     });
     models.OffchainThread.belongsToMany(models.Address, {
       through: models.SharingPermission,
-      as: 'collaborator'
+      as: 'collaborators'
     });
     models.OffchainThread.hasMany(models.SharingPermission);
   };

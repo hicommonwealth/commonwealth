@@ -73,7 +73,6 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           LEFT JOIN "Addresses" editors
           ON collaborations.address_id = editors.id
           WHERE t.${communityOptions}
-          AND t.id = 624
           AND t.deleted_at IS NULL
           AND t.pinned = false
           GROUP BY (t.id, c.comm_created_at, t.created_at)
