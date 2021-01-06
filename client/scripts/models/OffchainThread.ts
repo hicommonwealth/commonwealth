@@ -6,7 +6,7 @@ import OffchainTopic from './OffchainTopic';
 
 class OffchainThread implements IUniqueId {
   public readonly author: string;
-  public collaborators?: string[];
+  public collaborators?: any;
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
@@ -40,7 +40,7 @@ class OffchainThread implements IUniqueId {
     createdAt: moment.Moment,
     topic: OffchainTopic,
     kind: OffchainThreadKind,
-    versionHistory: string[],
+    versionHistory: any,
     community: string,
     chain: string,
     readOnly: boolean,

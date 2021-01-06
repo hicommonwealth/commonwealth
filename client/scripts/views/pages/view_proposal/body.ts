@@ -7,17 +7,11 @@ import { updateRoute } from 'app';
 import app from 'state';
 import {
   OffchainThread,
-  OffchainThreadKind,
   OffchainComment,
-  Proposal,
   AnyProposal,
   Account,
   Profile,
-  ChainBase,
-  AddressInfo,
-  RoleInfo,
 } from 'models';
-import { CommentParent } from 'controllers/server/comments';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
@@ -27,9 +21,8 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, List, Icon, Icons } from 'construct-ui';
+import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, ControlGroup } from 'construct-ui';
 import { notifySuccess } from 'controllers/app/notifications';
-import { formatAddressShort } from 'shared/utils';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -341,47 +334,53 @@ export const ProposalEditorPermissions: m.Component<{
       vnode.state.removedEditors = {};
     }
     const { items } = vnode.state;
-    // const existingEditors = m('.existing-editors', thread.collaborators.map((user) => {
-    //   return m(User, { user });
-    // }));
+    const existingEditors = m('.existing-editors', thread.collaborators.map((c) => {
+      const user : Profile = new Profile(c.chain, c.address);
+      return m(User, { user });
+    }));
+
+    // TODO: Existing editor deletion
     return m(Dialog, {
       basic: false,
       class: 'ProposalEditorPermissions',
       closeOnEscapeKey: true,
       closeOnOutsideClick: true,
-      content: m(QueryList, {
-        initialContent: 'Enter an address',
-        checkmark: true,
-        items,
-        itemRender: (role: any, idx: number) => {
-          const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
-          const recentlyAdded: boolean = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
-          return m(ListItem, {
-            label: [
-              m(User, { user })
-            ],
-            selected: recentlyAdded,
-            key: role.Address.address
-          });
-        },
-        itemPredicate: (query, item, idx) => {
-          const address = (item as any).Address;
-          return address.name
-            ? address.name.toLowerCase().includes(query.toLowerCase())
-            : address.address.toLowerCase().includes(query.toLowerCase());
-        },
-        onSelect: (item) => {
-          const addrItem = (item as any).Address;
-          if (thread.collaborators?.includes(addrItem.address)) {
-            vnode.state.removedEditors[addrItem.address] = addrItem;
-          } else if (vnode.state.addedEditors[addrItem.address]) {
-            delete vnode.state.addedEditors[addrItem.address];
-          } else {
-            vnode.state.addedEditors[addrItem.address] = addrItem;
+      content: m(ControlGroup, [
+        existingEditors,
+        m('QueryList', {
+          initialContent: 'Enter an address',
+          checkmark: true,
+          items,
+          itemRender: (role: any, idx: number) => {
+            const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
+            const recentlyAdded: boolean = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
+            return m(ListItem, {
+              label: [
+                m(User, { user })
+              ],
+              selected: recentlyAdded,
+              key: role.Address.address
+            });
+          },
+          itemPredicate: (query, item, idx) => {
+            const address = (item as any).Address;
+            return address.name
+              ? address.name.toLowerCase().includes(query.toLowerCase())
+              : address.address.toLowerCase().includes(query.toLowerCase());
+          },
+          onSelect: (item) => {
+            const addrItem = (item as any).Address;
+            if (thread.collaborators?.includes(addrItem.address)) {
+              vnode.state.removedEditors[addrItem.address] = addrItem;
+            } else if (vnode.state.addedEditors[addrItem.address]) {
+              delete vnode.state.addedEditors[addrItem.address];
+            } else {
+              vnode.state.addedEditors[addrItem.address] = addrItem;
+            }
+            console.log(vnode.state.addedEditors);
           }
-          console.log(vnode.state.addedEditors);
-        }
-      }),
+        }),
+      ]),
       hasBackdrop: true,
       isOpen: vnode.attrs.popoverMenu
         ? true
@@ -430,7 +429,7 @@ export const ProposalEditorPermissions: m.Component<{
                     thread.collaborators.push(addr);
                   });
                 } else {
-                  thread.collaborators = Object.keys(vnode.state.addedEditors);
+                  thread.collaborators = Object.values(vnode.state.addedEditors);
                 }
               } else {
                 throw new Error();

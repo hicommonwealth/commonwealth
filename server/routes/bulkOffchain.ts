@@ -110,13 +110,12 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           community: t.thread_community,
           chain: t.thread_chain,
           created_at: t.thread_created,
-          collaborators: t.collaborators,
+          collaborators: JSON.parse(t.collaborators || '{}'),
           Address: {
             id: t.addr_id,
             address: t.addr_address,
             chain: t.addr_chain,
           },
-          Collaborator
         };
         if (t.topic_id) {
           data['topic'] = {

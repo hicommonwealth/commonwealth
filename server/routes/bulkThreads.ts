@@ -105,7 +105,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         community: t.thread_community,
         chain: t.thread_chain,
         created_at: t.thread_created,
-        collaborator: t.collaborators,
+        collaborators: JSON.parse(t.collaborators || '{}'),
         Address: {
           id: t.addr_id,
           address: t.addr_address,
