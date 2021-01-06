@@ -55,7 +55,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             t.chain AS thread_chain, t.version_history, t.read_only, t.body,
             t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(
               CONCAT(
-                '{ address: ', editors.address, ', chain: ', editors.chain, ' }'
+                '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
                 )
               ) AS collaborators
           FROM "OffchainThreads" t
@@ -97,7 +97,9 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       const threads = preprocessedThreads.map((t) => {
         const root_id = `discussion_${t.thread_id}`;
         root_ids.push(root_id);
-
+        const collaborators = t.collaborators
+          ? t.collaborators.map((c) => JSON.parse(c))
+          : [];
         const data = {
           id: t.thread_id,
           title: t.thread_title,
@@ -110,7 +112,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           community: t.thread_community,
           chain: t.thread_chain,
           created_at: t.thread_created,
-          collaborators: JSON.parse(t.collaborators || '{}'),
+          collaborators,
           Address: {
             id: t.addr_id,
             address: t.addr_address,
