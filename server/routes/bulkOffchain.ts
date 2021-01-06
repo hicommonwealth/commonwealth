@@ -37,7 +37,21 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       const threadParams = Object.assign(replacements, { pinned: true });
       const pinnedThreads = await models.OffchainThread.findAll({
         where: threadParams,
-        include: [models.Address, { model: models.OffchainTopic, as: 'topic' }]
+        include: [
+          {
+            model: models.Address,
+            as: 'Address'
+          },
+          {
+            model: models.Address,
+            through: models.SharingPermission,
+            as: 'collaborators'
+          },
+          {
+            model: models.OffchainTopic,
+            as: 'topic'
+          }
+        ]
       });
 
       const query = `
