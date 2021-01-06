@@ -110,9 +110,10 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       const threads = preprocessedThreads.map((t) => {
         const root_id = `discussion_${t.thread_id}`;
         root_ids.push(root_id);
-        const collaborators = t.collaborators
+        const collaborators = JSON.parse(t.collaborators[0]).address?.length
           ? t.collaborators.map((c) => JSON.parse(c))
           : [];
+
         const data = {
           id: t.thread_id,
           title: t.thread_title,

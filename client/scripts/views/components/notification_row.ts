@@ -74,6 +74,8 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationHeader = m('span', [ actorName, ' created a new thread ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
+  } else if (category === `${NotificationCategories.NewCollaboration}`) {
+    notificationHeader = m('span', [actorName, ' added you as editor on ', m('span.commented-obj', decoded_title)])
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
       ? m('span', [ actorName, ' liked the post ', m('span.commented-obj', decoded_title) ])
