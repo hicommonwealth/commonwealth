@@ -56,8 +56,8 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           GROUP BY root_id
           ) c
         ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
-        LEFT JOIN "SharingPermissions" collaborations
-        ON thread_id = collaborations.offchain_thread_id
+        LEFT JOIN "SharingPermissions" AS collaborations
+        ON t.id = collaborations.offchain_thread_id
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
         WHERE t.deleted_at IS NULL
