@@ -1,4 +1,8 @@
 .ProposalEditorPermissions {
+    .proposal-editor-permissions-wrap {
+        display: flex;
+        flex-direction: column;
+    }
     .username:hover {
         text-decoration: none;
     }

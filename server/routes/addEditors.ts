@@ -65,8 +65,10 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
           if (!isMember) return next(new Error(Errors.InvalidEditor));
         }
         const collaboration = await models.SharingPermission.findOrCreate({
-          offchain_thread_id: thread.id,
-          address_id: collaborator.id
+          where: {
+            offchain_thread_id: thread.id,
+            address_id: collaborator.id
+          }
         });
 
         // auto-subscribe collaborator to comments & reactions
@@ -141,7 +143,6 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       );
     }));
 
-    // TODO: Examine returned result for relevance
     return res.json({ status: 'Success' });
   } catch (e) {
     return next(new Error(e));
