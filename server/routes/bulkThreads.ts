@@ -44,7 +44,12 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
           t.created_at AS thread_created, t.community AS thread_community,
           t.chain AS thread_chain, t.version_history, t.read_only, t.body,
-          t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG ( editors.address ) collaborators
+          t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(
+            CONCAT(
+              '{ address: ', editors.address, ', chain: ', editors.chain, ' }'
+              )
+            ) AS collaborators
+          editors.chain AS editor_chain
         FROM "OffchainThreads" t
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS comm_created_at
@@ -63,6 +68,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         WHERE t.deleted_at IS NULL
           AND t.${communityOptions}
           ${topicOptions}
+          AND t.id = 624
           AND t.created_at < :created_at
           AND t.pinned = false
           GROUP BY (t.id, c.comm_created_at, t.created_at)
@@ -82,7 +88,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       console.log(e);
     }
 
-
     const root_ids = [];
     threads = preprocessedThreads.map((t) => {
       const root_id = `discussion_${t.thread_id}`;
@@ -100,7 +105,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         community: t.thread_community,
         chain: t.thread_chain,
         created_at: t.thread_created,
-        collaborators: t.collaborators,
+        collaborator: t.collaborators,
         Address: {
           id: t.addr_id,
           address: t.addr_address,

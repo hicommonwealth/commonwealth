@@ -82,7 +82,7 @@ const ProposalHeader: m.Component<{
     vnode.state.isAuthor = (app.user.activeAccount?.address === proposal.author
           && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain);
     vnode.state.isEditor = (proposal as OffchainThread).collaborators?.includes(app.user.activeAccount.address);
-    console.log((proposal as OffchainThread));
+
     const { isAuthor, isEditor, isAdmin } = vnode.state;
 
     const isThread = proposal instanceof OffchainThread;

@@ -65,7 +65,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
           if (!isMember) return next(new Error(Errors.InvalidEditor));
         }
         const collaboration = await models.SharingPermission.create({
-          thread_id: thread.id,
+          offchain_thread_id: thread.id,
           address_id: collaborator.id
         });
 
@@ -104,6 +104,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
         models.Address,
         models.OffchainAttachment,
         { model: models.OffchainTopic, as: 'topic' },
+        { model: models.Address, through: models.SharingPermission, as: 'collaborator' },
       ],
     });
 

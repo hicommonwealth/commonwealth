@@ -16,25 +16,20 @@ const getThread = async (models, req: Request, res: Response, next: NextFunction
       },
       include: [
         models.Address,
-        { model: models.Address, through: models.SharingPermission, as: 'collaborator' },
-        { model: models.OffchainTopic, as: 'topic' },
-      ]
+        {
+          model: models.Address,
+          through: models.SharingPermission,
+          as: 'collaborators'
+        },
+        {
+          model: models.OffchainTopic,
+          as: 'topic'
+        },
+      ],
     });
-    // collaboration = await models.SharingPermission.findAll({
-    //   where: {
-    //     thread_id: req.body.id
-    //   },
-    //   include: [
-    //     { model: models.Address },
-    //     { model: models.OffchainThread }
-    //   ]
-    // });
   } catch (e) {
     console.log(e);
   }
-
-  // console.log({collaboration});
-  console.log({thread});
 
   return thread
     ? res.json({ status: 'Success', result: thread.toJSON() })
