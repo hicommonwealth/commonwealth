@@ -364,7 +364,7 @@ export const ProposalEditorPermissions: m.Component<{
                 notifySuccess('Collaborator successfully removed');
                 console.log(thread.collaborators);
               } catch (err) {
-                const errMsg = err.responseJSON?.error || 'Failed to alter role.';
+                const errMsg = err.responseJSON?.error || 'Failed to remove editor.';
                 notifyError(errMsg);
               }
             },
@@ -472,10 +472,9 @@ export const ProposalEditorPermissions: m.Component<{
                 throw new Error();
               }
             } catch (err) {
-              console.log('Failed to add editors');
               throw new Error((err.responseJSON && err.responseJSON.error)
                 ? err.responseJSON.error
-                : 'Failed to update topic');
+                : 'Failed to add editors.');
             }
             if (vnode.attrs.popoverMenu) {
               vnode.attrs.openStateHandler(false);

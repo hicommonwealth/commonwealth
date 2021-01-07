@@ -103,8 +103,8 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
       include: [
-        models.Address,
         models.OffchainAttachment,
+        { model: models.Address, as: 'Address' },
         { model: models.OffchainTopic, as: 'topic' },
         { model: models.Address, through: models.SharingPermission, as: 'collaborator' },
       ],
