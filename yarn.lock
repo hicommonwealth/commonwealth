@@ -1086,7 +1086,7 @@
   dependencies:
     "@babel/runtime" "^7.12.5"
 
-"@polkadot/keyring@^5.2.2", "@polkadot/keyring@^5.2.3":
+"@polkadot/keyring@^5.2.3":
   version "5.2.3"
   resolved "https://registry.yarnpkg.com/@polkadot/keyring/-/keyring-5.2.3.tgz#b555424a553b945893b107d7cf6dd1cf8599465f"
   integrity sha512-IypWNJkZ+NaaYA/lMNqt1eQu+4Pwmi8KitDWwRaZIqeL8pjHzvoRoUN9qqEU504Ohbbe1Z9OE2CtSK2r41QP9g==
@@ -1163,7 +1163,7 @@
     "@types/bn.js" "^4.11.6"
     bn.js "^4.11.9"
 
-"@polkadot/util-crypto@5.2.3", "@polkadot/util-crypto@^5.0.2-7", "@polkadot/util-crypto@^5.2.2", "@polkadot/util-crypto@^5.2.3":
+"@polkadot/util-crypto@5.2.3", "@polkadot/util-crypto@^5.0.2-7", "@polkadot/util-crypto@^5.2.3":
   version "5.2.3"
   resolved "https://registry.yarnpkg.com/@polkadot/util-crypto/-/util-crypto-5.2.3.tgz#36dd46c6a494da36a6994d92a93f7974d47b1a4f"
   integrity sha512-gU52s/TDhr48L9QMMCNyb5pRRwmc2TRC8aVpcBGklOY0gOUzAliZP8P8NpLAjQJuPINwYh3aPhQtbB0PVn0ONA==
@@ -1184,7 +1184,7 @@
     tweetnacl "^1.0.3"
     xxhashjs "^0.2.2"
 
-"@polkadot/util@5.2.3", "@polkadot/util@^5.0.2-7", "@polkadot/util@^5.2.2", "@polkadot/util@^5.2.3":
+"@polkadot/util@5.2.3", "@polkadot/util@^5.0.2-7", "@polkadot/util@^5.2.3":
   version "5.2.3"
   resolved "https://registry.yarnpkg.com/@polkadot/util/-/util-5.2.3.tgz#843712ca10456c1036b3a3cc01281709e5e58e97"
   integrity sha512-5DC+iaSxLpwYluE3R1RIGqegxSU6PnmdyoPiAVC5ZNj31C8fE3U7E7lQguoeX4/2dIjaPC6zAbYLSAGLMjfxgA==
