@@ -7,7 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
 import app from 'state';
 
-import { Spinner } from 'construct-ui';
+import { Spinner, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
 import { pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo } from 'models';
 
@@ -18,6 +18,7 @@ import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import Listing from 'views/pages/listing';
+import EditTopicModal from 'views/modals/edit_topic_modal';
 
 import { DEFAULT_PAGE_SIZE } from 'controllers/server/threads';
 import CommunityMetadataBar from './community_metadata_bar';
@@ -271,9 +272,13 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     }
 
     let topicDescription;
+    let topicId;
+    let topicName;
     if (topic && app.activeId()) {
       const topics = app.topics.getByCommunity(app.activeId());
       const topicObject = topics.find((t) => t.name === topic);
+      topicName = topicObject?.name;
+      topicId = topicObject?.id;
       topicDescription = topicObject?.description;
     }
 
@@ -281,14 +286,90 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
     const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true);
 
+    const featuredTopics = {};
+    const otherTopics = {};
+    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
+
+    const getTopicRow = (topicId, name, description) => m('.discussions-topic', {
+      key: topicId,
+      class: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+              || (topic && topic === id)) ? 'active' : '',
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeId()}/discussions/${name}`);
+      },
+    }, [
+      m('.proposal-topic-icon'),
+      m('.proposal-topic-name', name),
+    ]);
+
+    app.topics.getByCommunity(app.activeId()).forEach((topic) => {
+      const { id, name, description } = topic;
+      if (featuredTopicIds.includes(`${topic.id}`)) {
+        featuredTopics[topic.name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
+      } else {
+        otherTopics[topic.name] = { id, name, description };
+      }
+    });
+    const otherTopicListItems = Object.keys(otherTopics)
+      .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
+      .map((name, idx) => getTopicRow(otherTopics[name].id, name, otherTopics[name].description));
+    const featuredTopicListItems = Object.keys(featuredTopics)
+      .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
+      .map((name, idx) => getTopicRow(featuredTopics[name].id, name, featuredTopics[name].description));
+
+
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      title: topic || 'Discussions',
+      title: topic ? [
+        topic,
+        m.route.get() === `/${app.activeId()}/discussions/${encodeURI(topicName)}`
+          && app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+          && m(PopoverMenu, {
+            class: 'sidebar-edit-topic',
+            position: 'bottom',
+            transitionDuration: 0,
+            hoverCloseDelay: 0,
+            closeOnContentClick: true,
+            trigger: m(Icon, {
+              name: Icons.CHEVRON_DOWN,
+              style: 'margin-left: 6px;',
+            }),
+            content: m(MenuItem, {
+              label: 'Edit topic',
+              onclick: (e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: EditTopicModal,
+                  data: { description: topicDescription, id: topicId, name: topicName }
+                });
+              }
+            })
+          }),
+      ] : 'Discussions',
       description: topicDescription,
       showNewProposalButton: true,
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
+          // topics
+          m('.discussions-topics', {
+            // onupdate: (vvnode) => {
+            //   if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+            //       && !vnode.state.dragulaInitialized) {
+            //     vnode.state.dragulaInitialized = true;
+            //     dragula([vvnode.dom]).on('drop', async (el, target, source) => {
+            //       const reorder = Array.from(source.children).map((child) => {
+            //         return (child as HTMLElement).id;
+            //       });
+            //       await app.community.meta.updateFeaturedTopics(reorder);
+            //     });
+            //   }
+            // }
+          }, [
+            featuredTopicListItems,
+            otherTopicListItems,
+          ]),
           m(CommunityMetadataBar),
           (!activeEntity || !activeEntity.serverLoaded || stillFetching)
             ? m('.discussions-main', [
