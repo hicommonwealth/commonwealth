@@ -1,7 +1,9 @@
 /* eslint-disable guard-for-in */
 import 'components/new_thread_form.scss';
+import 'pages/new_thread.scss';
 
 import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import _ from 'lodash';
 import $ from 'jquery';
 import Quill from 'quill-2.0-dev/quill';
@@ -12,12 +14,13 @@ import {
 
 import app from 'state';
 import { link } from 'helpers';
-import { OffchainTopic } from 'models';
+import { detectURL, parseMentionsForServer } from 'helpers/threads';
+import { OffchainTopic, OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
+import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
-import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pages/threads';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
 import QuillFormattedText from './quill_formatted_text';
@@ -36,7 +39,173 @@ enum PostType {
   Link = 'Link',
 }
 
-export const checkForModifications = async (state, modalMsg) => {
+enum NewThreadErrors {
+  NoBody = 'Thread body cannot be blank',
+  NoTopic = 'Thread must have a topic',
+  NoTitle = 'Title cannot be blank',
+  NoUrl = 'URL cannot be blank',
+}
+
+enum NewDraftErrors {
+  InsufficientData = 'Draft must have a title, body, or attachment'
+}
+
+const saveDraft = async (
+  form,
+  quillEditorState,
+  author,
+  existingDraft?
+) => {
+  const bodyText = !quillEditorState ? ''
+    : quillEditorState.markdownMode
+      ? quillEditorState.editor.getText()
+      : JSON.stringify(quillEditorState.editor.getContents());
+  const { threadTitle, topicName } = form;
+  if (quillEditorState.editor.getText().length <= 1 && !threadTitle) {
+    throw new Error(NewDraftErrors.InsufficientData);
+  }
+  const attachments = [];
+  if (existingDraft) {
+    let result;
+    try {
+      result = await app.user.discussionDrafts.edit(
+        existingDraft,
+        threadTitle,
+        bodyText,
+        topicName,
+        attachments
+      );
+    } catch (err) {
+      throw new Error(err);
+    }
+    mixpanel.track('Update discussion draft', {
+      'Step No': 2,
+      Step: 'Filled in Proposal and Discussion',
+    });
+  } else {
+    let result;
+    try {
+      result = await app.user.discussionDrafts.create(
+        threadTitle,
+        bodyText,
+        topicName,
+        attachments
+      );
+    } catch (err) {
+      notifyError(err);
+      throw new Error(err);
+    }
+    mixpanel.track('Save discussion draft', {
+      'Step No': 2,
+      Step: 'Filled in Proposal and Discussion',
+    });
+  }
+};
+
+const newThread = async (
+  form,
+  quillEditorState,
+  author,
+  kind = OffchainThreadKind.Forum,
+  readOnly?: boolean
+) => {
+  const topics = app.chain
+    ? app.chain.meta.chain.topics
+    : app.community.meta.topics;
+
+  if (kind === OffchainThreadKind.Forum) {
+    if (!form.threadTitle) {
+      throw new Error(NewThreadErrors.NoTitle);
+    }
+  }
+  if (kind === OffchainThreadKind.Link) {
+    if (!form.linkTitle) {
+      throw new Error(NewThreadErrors.NoTitle);
+    }
+    if (!form.url) {
+      throw new Error(NewThreadErrors.NoUrl);
+    }
+  }
+  if (!form.topicName && topics.length > 0) {
+    throw new Error(NewThreadErrors.NoTopic);
+  }
+  if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
+    throw new Error(NewThreadErrors.NoBody);
+  }
+
+  quillEditorState.editor.enable(false);
+
+  const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
+  if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
+  const bodyText = !quillEditorState ? ''
+    : quillEditorState.markdownMode
+      ? quillEditorState.editor.getText()
+      : JSON.stringify(quillEditorState.editor.getContents());
+  const mentions = !quillEditorState ? []
+    : quillEditorState.markdownMode
+      ? parseMentionsForServer(quillEditorState.editor.getText(), true)
+      : parseMentionsForServer(quillEditorState.editor.getContents(), false);
+
+  const { topicName, topicId, threadTitle, linkTitle, url } = form;
+  const title = threadTitle || linkTitle;
+  const attachments = [];
+  const chainId = app.activeCommunityId() ? null : app.activeChainId();
+  const communityId = app.activeCommunityId();
+
+  let result;
+  try {
+    result = await app.threads.create(
+      author.address,
+      kind,
+      chainId,
+      communityId,
+      title,
+      topicName,
+      topicId,
+      bodyText,
+      url,
+      attachments,
+      mentions,
+      readOnly,
+    );
+  } catch (e) {
+    console.error(e);
+    quillEditorState.editor.enable();
+    throw new Error(e);
+  }
+  const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+  updateLastVisited(app.activeCommunityId()
+    ? (activeEntity.meta as CommunityInfo)
+    : (activeEntity.meta as NodeInfo).chain, true);
+  await app.user.notifications.refresh();
+  m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
+
+  if (result.topic) {
+    try {
+      const topicNames = Array.isArray(activeEntity?.meta?.topics)
+        ? activeEntity.meta.topics.map((t) => t.name)
+        : [];
+      if (!topicNames.includes(result.topic.name)) {
+        activeEntity.meta.topics.push(result.topic);
+      }
+    } catch (e) {
+      console.log(`Error adding new topic to ${activeEntity}.`);
+    }
+  }
+
+  mixpanel.track('Create Thread', {
+    'Step No': 2,
+    Step: 'Filled in Proposal and Discussion',
+    'Thread Type': kind,
+  });
+};
+
+const newLink = async (form, quillEditorState, author, kind = OffchainThreadKind.Link) => {
+  const errors = await newThread(form, quillEditorState, author, kind);
+  return errors;
+};
+
+const checkForModifications = async (state, modalMsg) => {
   const { fromDraft } = state;
   const quill = state.quillEditorState.editor;
   const Delta = Quill.import('delta');
@@ -220,18 +389,6 @@ export const NewThreadForm: m.Component<{
     if (vnode.state.quillEditorState?.container) {
       vnode.state.quillEditorState.container.tabIndex = 8;
     }
-    const getUrlForLinkPost = _.debounce(async () => {
-      try {
-        const title = await getLinkTitle(vnode.state.form.url);
-        if (!vnode.state.autoTitleOverride && title) {
-          localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, title);
-          vnode.state.form.linkTitle = title;
-        }
-      } catch (err) {
-        notifyError(err.message);
-      }
-      m.redraw();
-    }, 750);
 
     const updateTopicState = (topicName: string, topicId?: number) => {
       localStorage.setItem(`${app.activeId()}-active-tag`, topicName);
@@ -372,7 +529,6 @@ export const NewThreadForm: m.Component<{
                 const { value } = e.target as any;
                 vnode.state.form.url = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
-                if (detectURL(value)) getUrlForLinkPost();
               },
               defaultValue: vnode.state.form.url,
               tabindex: 2,

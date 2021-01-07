@@ -7,9 +7,9 @@ import { Button, Callout } from 'construct-ui';
 import app from 'state';
 
 import { OffchainThread, OffchainComment, AnyProposal } from 'models';
+import { parseMentionsForServer } from 'helpers/threads';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
-import { parseMentionsForServer } from 'views/pages/threads';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
