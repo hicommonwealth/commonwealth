@@ -335,35 +335,43 @@ export const ProposalEditorPermissions: m.Component<{
       vnode.state.removedEditors = {};
     }
     const { items } = vnode.state;
-    const existingEditors = m('.existing-editors', thread.collaborators.map((c) => {
-      const user : Profile = app.profiles.getProfile(c.chain, c.address);
-      console.log({ user, c });
-      return m('.user-wrap', [
-        m(User, { user }),
-        m(Icon, {
-          name: Icons.X,
-          size: 'xs',
-          class: 'role-x-icon',
-          onclick: async () => {
-            try {
-              const req = await $.post(`${app.serverUrl()}/deleteEditor`, {
-                address: app.user.activeAccount.address,
-                author_chain: app.user.activeAccount.chain.id,
-                chain: app.activeChainId(),
-                community: app.activeCommunityId(),
-                thread_id: thread.id,
-                editor_address: c.address,
-                editor_chain: c.chain,
-                jwt: app.user.jwt,
-              });
-            } catch (err) {
-              const errMsg = err.responseJSON?.error || 'Failed to alter role.';
-              notifyError(errMsg);
-            }
-          },
-        }),
-      ]);
-    }));
+    const existingEditors = m('.existing-editors', [
+      m('div', 'Existing editors'),
+      m('.editor-listing', thread.collaborators.map((c) => {
+        const user : Profile = app.profiles.getProfile(c.chain, c.address);
+        return m('.user-wrap', [
+          m(User, { user }),
+          m(Icon, {
+            name: Icons.X,
+            size: 'xs',
+            class: 'role-x-icon',
+            onclick: async () => {
+              try {
+                const req = await $.post(`${app.serverUrl()}/deleteEditor`, {
+                  address: app.user.activeAccount.address,
+                  author_chain: app.user.activeAccount.chain.id,
+                  chain: app.activeChainId(),
+                  community: app.activeCommunityId(),
+                  thread_id: thread.id,
+                  editor_address: c.address,
+                  editor_chain: c.chain,
+                  jwt: app.user.jwt,
+                });
+
+                const proposalIndex = thread.collaborators.indexOf(c);
+                if (proposalIndex === -1) return;
+                thread.collaborators.splice(proposalIndex, 1);
+                notifySuccess('Collaborator successfully removed');
+                console.log(thread.collaborators);
+              } catch (err) {
+                const errMsg = err.responseJSON?.error || 'Failed to alter role.';
+                notifyError(errMsg);
+              }
+            },
+          }),
+        ]);
+      }))
+    ]);
 
     // TODO: Existing editor deletion
     return m(Dialog, {
@@ -396,9 +404,7 @@ export const ProposalEditorPermissions: m.Component<{
           },
           onSelect: (item) => {
             const addrItem = (item as any).Address;
-            if (thread.collaborators?.includes(addrItem.address)) {
-              vnode.state.removedEditors[addrItem.address] = addrItem;
-            } else if (vnode.state.addedEditors[addrItem.address]) {
+            if (vnode.state.addedEditors[addrItem.address]) {
               delete vnode.state.addedEditors[addrItem.address];
             } else {
               vnode.state.addedEditors[addrItem.address] = addrItem;
@@ -457,6 +463,7 @@ export const ProposalEditorPermissions: m.Component<{
                 } else {
                   thread.collaborators = Object.values(vnode.state.addedEditors);
                 }
+                notifySuccess('Collaborators successfully added');
               } else {
                 throw new Error();
               }

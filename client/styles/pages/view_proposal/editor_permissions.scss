@@ -2,11 +2,24 @@
     .proposal-editor-permissions-wrap {
         display: flex;
         flex-direction: column;
-    }
-    .username:hover {
-        text-decoration: none;
-    }
-    .cui-list-item-content-left {
-        position: static !important;
+        .existing-editors {
+            display: flex;
+            flex-direction: column;
+            margin: 10px 0 15px 0;
+            .existing-editor-list {
+                .user-wrap {
+                    margin-right: 7px;
+                    .cui-icon {
+                        margin-left: 3px;
+                    }
+                }
+            }
+        }
+        .username:hover {
+            text-decoration: none;
+        }
+        .cui-list-item-content-left {
+            position: static !important;
+        }
     }
 }
