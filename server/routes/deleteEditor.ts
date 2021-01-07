@@ -42,37 +42,43 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       }
     });
 
-    const collaboration = await models.SharingPermission.findOrCreate({
+    const collaboration = await models.SharingPermission.findOne({
       where: {
         offchain_thread_id: thread.id,
         address_id: address.id
       }
     });
-    collaboration.delete();
+
+    await collaboration.destroy();
 
     // TODO: Delete subscriptions
-    // try {
-    //   await models.Subscription.create({
-    //     subscriber_id: collaborator.User.id,
-    //     category_id: NotificationCategories.NewComment,
-    //     object_id: `discussion_${thread.id}`,
-    //     offchain_thread_id: thread.id,
-    //     community_id: thread.community || null,
-    //     chain_id: thread.chain || null,
-    //     is_active: true,
-    //   });
-    //   await models.Subscription.create({
-    //     subscriber_id: req.user.id,
-    //     category_id: NotificationCategories.NewReaction,
-    //     object_id: `discussion_${thread.id}`,
-    //     offchain_thread_id: thread.id,
-    //     community_id: thread.community || null,
-    //     chain_id: thread.chain || null,
-    //     is_active: true,
-    //   });
-    // } catch (err) {
-    //   return next(new Error(err));
-    // }
+
+    let commentSubscription;
+    let reactionSubscription;
+    try {
+      commentSubscription = await models.Subscription.findOne({
+        subscriber_id: address.User.id,
+        category_id: NotificationCategories.NewComment,
+        object_id: `discussion_${thread.id}`,
+        offchain_thread_id: thread.id,
+        community_id: thread.community || null,
+        chain_id: thread.chain || null,
+        is_active: true,
+      });
+      reactionSubscription = await models.Subscription.create({
+        subscriber_id: req.user.id,
+        category_id: NotificationCategories.NewReaction,
+        object_id: `discussion_${thread.id}`,
+        offchain_thread_id: thread.id,
+        community_id: thread.community || null,
+        chain_id: thread.chain || null,
+        is_active: true,
+      });
+      await commentSubscription.destroy();
+      await reactionSubscription.destroy();
+    } catch (err) {
+      return next(new Error(err));
+    }
 
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
