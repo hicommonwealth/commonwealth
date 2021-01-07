@@ -55,7 +55,7 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
     let reactionSubscription;
     try {
       commentSubscription = await models.Subscription.findOne({
-        subscriber_id: address.User.id,
+        subscriber_id: address.user_id,
         category_id: NotificationCategories.NewComment,
         object_id: `discussion_${thread.id}`,
         offchain_thread_id: thread.id,
@@ -64,7 +64,7 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
         is_active: true,
       });
       reactionSubscription = await models.Subscription.create({
-        subscriber_id: req.user.id,
+        subscriber_id: address.user_id,
         category_id: NotificationCategories.NewReaction,
         object_id: `discussion_${thread.id}`,
         offchain_thread_id: thread.id,
