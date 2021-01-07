@@ -8,16 +8,20 @@ import { NotificationCategories, ProposalType } from '../../shared/types';
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
   InvalidEditor: 'Must provide valid addresses of community members',
+  InvalidEditorFormat: 'Editors attribute improperly formatted.',
   IncorrectOwner: 'Not owned by this user',
 };
 
 const addEditors = async (models, req: Request, res: Response, next: NextFunction) => {
+  if (!req.body.thread_id) {
+    return next(new Error(Errors.InvalidThread));
+  }
   const { thread_id } = req.body;
   let editors;
   try {
     editors = JSON.parse(req.body.editors);
   } catch (e) {
-    console.log('Editors attribute improperly formatted.');
+    return next(new Error(Errors.InvalidEditorFormat));
   }
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);

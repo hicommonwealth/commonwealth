@@ -2,27 +2,25 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl } from '../../shared/utils';
-import { NotificationCategories, ProposalType } from '../../shared/types';
+import { NotificationCategories } from '../../shared/types';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
   InvalidEditor: 'Must provide valid addresses of community members',
   IncorrectOwner: 'Not owned by this user',
+  InvalidAddress: 'Must provide editor address and chain'
 };
 
-const addEditors = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { thread_id } = req.body;
-
-  if (!req.body.editor_chain || !req.body.editor_address) {
-    console.log('Must provide editor address and chain.');
-  }
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
-
-  if (!thread_id) {
+const deleteEditor = async (models, req: Request, res: Response, next: NextFunction) => {
+  if (!req.body.thread_id) {
     return next(new Error(Errors.InvalidThread));
   }
+  if (!req.body.editor_chain || !req.body.editor_address) {
+    return next(new Error(Errors.InvalidAddress));
+  }
+  const { thread_id } = req.body;
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const author = await lookupAddressIsOwnedByUser(models, req, next);
 
   try {
     const userOwnedAddressIds = await (req.user as any).getAddresses()
@@ -96,4 +94,4 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
   }
 };
 
-export default addEditors;
+export default deleteEditor;
