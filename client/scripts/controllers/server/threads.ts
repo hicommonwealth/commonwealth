@@ -127,9 +127,7 @@ class ThreadsController {
       timestamp,
       body,
     };
-    console.log(firstVersion);
     const versionHistory : string = JSON.stringify(firstVersion);
-    console.log(versionHistory);
     try {
       // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {

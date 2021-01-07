@@ -459,7 +459,7 @@ export const ProposalEditorPermissions: m.Component<{
                 editors: JSON.stringify(vnode.state.addedEditors),
                 jwt: app.user.jwt,
               });
-              if (req.status !== '200') {
+              if (req.status === '200') {
                 if (thread.collaborators?.length) {
                   Object.keys(vnode.state.addedEditors).forEach((addr) => {
                     thread.collaborators.push(addr);
@@ -469,6 +469,7 @@ export const ProposalEditorPermissions: m.Component<{
                 }
                 notifySuccess('Collaborators successfully added');
               } else {
+                // todo: message
                 throw new Error();
               }
             } catch (err) {

@@ -13,7 +13,7 @@ export const Errors = {
 };
 
 const addEditors = async (models, req: Request, res: Response, next: NextFunction) => {
-  if (!req.body.thread_id) {
+  if (!req.body?.thread_id) {
     return next(new Error(Errors.InvalidThread));
   }
   const { thread_id } = req.body;
@@ -26,10 +26,6 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
-  if (!thread_id) {
-    return next(new Error(Errors.InvalidThread));
-  }
-
   try {
     const userOwnedAddressIds = await (req.user as any).getAddresses()
       .filter((addr) => !!addr.verified).map((addr) => addr.id);
@@ -40,21 +36,15 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       },
     });
     if (!thread) return next(new Error(Errors.InvalidThread));
-    // Editor attachment logic
-    let collaborators;
 
-    try {
-      collaborators = await Promise.all(Object.values(editors).map(async (editor: any) => {
-        const collaborator =  models.Address.findOne({
-          where: { id: editor.id },
-          include: [ models.Role, models.User ]
-        });
-        return collaborator;
-      }));
-    } catch (e) {
-      console.log(e);
-      return next(new Error(Errors.InvalidEditor));
-    }
+    const collaborators = await Promise.all(Object.values(editors).map((editor: any) => {
+      return models.Address.findOne({
+        where: { id: editor.id },
+        include: [ models.Role, models.User ]
+      });
+    }));
+    // if any of collab array is null, throw error?
+    // if () return next(new Error(Errors.InvalidEditor));
 
     // Ensure collaborators have community permissions
     if (collaborators?.length > 0) {
