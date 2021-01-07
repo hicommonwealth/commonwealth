@@ -10,7 +10,7 @@ const uptimePercent = (noOfTrues: number, noOfFalse: number, currentEventType: n
     upTimePercentage = ((No. isOnline True(s) + Current Execution Mode [1 for AllGood, 0 for SomeOffline]) /
                         (No. isOnline True(s) + No. isOnline False(s))) * 100
   */
-  const upTimePercentage = (((noOfTrues + currentEventType) / (noOfTrues + noOfFalse)) * 100)
+  const upTimePercentage = (((noOfTrues + currentEventType) / (noOfTrues + noOfFalse + 1)) * 100)
     .toFixed(2);
 
   return upTimePercentage;
@@ -49,27 +49,31 @@ export default class extends IEventHandler {
 
     // 2) Get relevant data from DB for processing.
     /*
-      This query will return the last created record for validators in 'HistoricalValidatorStatistic' 
+      This query will return the last created record for validators in 'HistoricalValidatorStatistic'
       table and return the data for each validator with there onlineCount and offlineCount counts if any.
-      since all new and active validators records has been created by new-session event handler, 
+      since all new and active validators records has been created by new-session event handler,
       it'll return the the last created records of them.
     */
     const rawQuery = `
-      SELECT *
+    SELECT *
       FROM( 
         SELECT * ,ROW_NUMBER() OVER( PARTITION BY partitionTable.stash ORDER BY created_at DESC ) 
         FROM public."HistoricalValidatorStatistic" as partitionTable
         JOIN( 
-          SELECT stash, SUM(case when "isOnline" then 1 else 0 end) as "onlineCount", 
-          SUM(case when "isOnline"  then 0 else 1 end) as "offlineCount" 
+          SELECT stash, 
+          COALESCE ( SUM ( case when "eventType" in ('all-good', 'some-offline') then 
+          (case when "isOnline"  then 1 else 0 end) else null end),0) as "onlineCount", 
+          COALESCE (SUM ( case when "eventType" in ('all-good', 'some-offline') then
+          (case when "isOnline"  then 0 else 1 end) else null end),0) as "offlineCount" 
           FROM public."HistoricalValidatorStatistic" as groupTable 
-          where "eventType" in ('all-good', 'some-offline') GROUP by groupTable.stash
+          GROUP by groupTable.stash
           ) joinTable
         ON joinTable.stash = partitionTable.stash
         WHERE partitionTable.stash IN ('${eventValidatorsList.join("','")}')
         )  as validatorQuery
       WHERE  validatorQuery.row_number = 1
     `;
+
     const [validators, metadata] = await sequelize.query(rawQuery);
     const validatorsList = JSON.parse(JSON.stringify(validators));
 
