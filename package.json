@@ -1,7 +1,4 @@
 {
-  "name": "commonwealth-ui",
-  "version": "0.1.0",
-  "description": "",
   "private": true,
   "scripts": {
     "build": "webpack --config webpack/webpack.config.prod.js --progress",
@@ -17,7 +14,7 @@
     "test-select": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json",
     "test-api": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/unit/api/*.spec.ts",
     "test-suite": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/**/*.spec.ts",
-    "start": "nodemon --delay 0.25 --watch 'server/**/*.ts' --ignore 'server/**/*.spec.ts' --exec 'ts-node --project tsconfig.node.json' server.ts",
+    "start": "nodemon --delay 0.25 --watch 'server/**/*.ts' --ignore 'server/**/*.spec.ts' --exec 'node --max-old-space-size=4096 -- node_modules/.bin/ts-node -P tsconfig.node.json' server.ts",
     "start-prerender": "ts-node --project tsconfig.node.json server/scripts/runPrerenderService.ts",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.node.json server.ts",
     "migrate-events": "NO_CLIENT=true NO_PRERENDER=true ENTITY_MIGRATION=all ts-node --project tsconfig.node.json server.ts",
