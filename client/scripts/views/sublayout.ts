@@ -88,11 +88,10 @@ const Sublayout: m.Component<{
               class: 'sublayout-grid-col sublayout-grid-col-wide'
             }, [
               m('.sublayout-header', {
-                class: (!title && !description) ? 'no-title' : '',
+                class: (!title) ? 'no-title' : '',
               }, [
                 m('.sublayout-header-left', [
                   title && m('h4.sublayout-header-heading', title),
-                  description && m('.sublayout-header-description', description),
                 ]),
                 sublayoutHeaderRight,
               ]),
