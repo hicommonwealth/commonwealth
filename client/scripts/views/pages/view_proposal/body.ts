@@ -22,7 +22,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, ControlGroup, Icon, Icons } from 'construct-ui';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -336,8 +336,8 @@ export const ProposalEditorPermissions: m.Component<{
     }
     const { items } = vnode.state;
     const existingEditors = m('.existing-editors', [
-      m('div', 'Existing editors'),
-      m('.editor-listing', thread.collaborators.map((c) => {
+      m('span', 'Existing editors'),
+      m('.editor-listing', thread.collaborators.concat(Object.values(vnode.state.addedEditors)).map((c) => {
         const user : Profile = app.profiles.getProfile(c.chain, c.address);
         return m('.user-wrap', [
           m(User, { user }),
@@ -380,7 +380,6 @@ export const ProposalEditorPermissions: m.Component<{
       closeOnEscapeKey: true,
       closeOnOutsideClick: true,
       content: m('.proposal-editor-permissions-wrap', [
-        existingEditors,
         m(QueryList, {
           initialContent: 'Enter an address',
           checkmark: true,
@@ -406,12 +405,17 @@ export const ProposalEditorPermissions: m.Component<{
             const addrItem = (item as any).Address;
             if (vnode.state.addedEditors[addrItem.address]) {
               delete vnode.state.addedEditors[addrItem.address];
-            } else {
+            } else if (thread.collaborators.filter((c) => {
+              return c.address === addrItem.address && c.chain === addrItem.chain;
+            }).length === 0) {
               vnode.state.addedEditors[addrItem.address] = addrItem;
+            } else {
+              notifyInfo('Already a collaborator');
             }
             console.log(vnode.state.addedEditors);
           }
         }),
+        existingEditors,
       ]),
       hasBackdrop: true,
       isOpen: vnode.attrs.popoverMenu
