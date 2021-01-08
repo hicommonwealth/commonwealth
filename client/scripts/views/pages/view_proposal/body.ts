@@ -342,11 +342,23 @@ export const ProposalEditorPermissions: m.Component<{
             name: Icons.X,
             size: 'xs',
             class: 'role-x-icon',
-            onclick: _.debounce(async () => {
+            onclick: async () => {
+              console.log(`deleting ${c.address}`);
               if (vnode.state.addedEditors[c.address]) {
                 delete vnode.state.addedEditors[c.address];
                 console.log(vnode.state.addedEditors);
               } else {
+                if (thread.collaborators.filter((c_) => {
+                  return c.address === c_.address;
+                }).length === 0) {
+                  console.log('dupe deletion avoided?');
+                  return;
+                }
+                const collaboratorsCopy = thread.collaborators;
+                const proposalIndex = thread.collaborators.indexOf(c);
+                if (proposalIndex === -1) return;
+                thread.collaborators.splice(proposalIndex, 1);
+                m.redraw();
                 try {
                   const res = await $.post(`${app.serverUrl()}/deleteEditor`, {
                     address: app.user.activeAccount.address,
@@ -359,20 +371,19 @@ export const ProposalEditorPermissions: m.Component<{
                     jwt: app.user.jwt,
                   });
                   if (res.status === 'Success') {
-                    const proposalIndex = thread.collaborators.indexOf(c);
-                    if (proposalIndex === -1) return;
-                    thread.collaborators.splice(proposalIndex, 1);
                     notifySuccess('Editor successfully removed.');
                     console.log(thread.collaborators);
                   } else {
-                    notifyError('Failed to remove editor.');
+                    throw new Error('Failed to remove editor.');
                   }
                 } catch (err) {
+                  thread.collaborators = collaboratorsCopy;
+                  m.redraw();
                   const errMsg = err.responseJSON?.error || 'Failed to remove editor.';
                   notifyError(errMsg);
                 }
               }
-            }, 600),
+            },
           }),
         ]);
       }))
@@ -450,10 +461,10 @@ export const ProposalEditorPermissions: m.Component<{
           },
         }),
         m(Button, {
+          disabled: $.isEmptyObject(vnode.state.addedEditors),
           label: 'Save changes',
           intent: 'primary',
           onclick: async () => {
-            console.log(vnode.state.addedEditors);
             if (!$.isEmptyObject(vnode.state.addedEditors)) {
               try {
                 const res = await $.post(`${app.serverUrl()}/addEditors`, {
