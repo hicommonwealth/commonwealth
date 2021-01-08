@@ -439,7 +439,7 @@ export const ProposalEditorPermissions: m.Component<{
       footer: m(`.${Classes.ALIGN_RIGHT}`, [
         m(Button, {
           label: 'Close',
-          onclick: () => {
+          onclick: async () => {
             if (vnode.attrs.popoverMenu) {
               vnode.attrs.openStateHandler(false);
               m.redraw();
@@ -453,36 +453,35 @@ export const ProposalEditorPermissions: m.Component<{
           intent: 'primary',
           onclick: async () => {
             console.log(vnode.state.addedEditors);
-            if ($.isEmptyObject(vnode.state.addedEditors)) {
-              return;
-            }
-            try {
-              const res = await $.post(`${app.serverUrl()}/addEditors`, {
-                address: app.user.activeAccount.address,
-                author_chain: app.user.activeAccount.chain.id,
-                chain: app.activeChainId(),
-                community: app.activeCommunityId(),
-                thread_id: thread.id,
-                editors: JSON.stringify(vnode.state.addedEditors),
-                jwt: app.user.jwt,
-              });
-              console.log(res.status);
-              if (res.status === 'Success') {
-                if (thread.collaborators?.length) {
-                  Object.values(vnode.state.addedEditors).forEach((addr) => {
-                    thread.collaborators.push(addr);
-                  });
+            if (!$.isEmptyObject(vnode.state.addedEditors)) {
+              try {
+                const res = await $.post(`${app.serverUrl()}/addEditors`, {
+                  address: app.user.activeAccount.address,
+                  author_chain: app.user.activeAccount.chain.id,
+                  chain: app.activeChainId(),
+                  community: app.activeCommunityId(),
+                  thread_id: thread.id,
+                  editors: JSON.stringify(vnode.state.addedEditors),
+                  jwt: app.user.jwt,
+                });
+                console.log(res.status);
+                if (res.status === 'Success') {
+                  if (thread.collaborators?.length) {
+                    Object.values(vnode.state.addedEditors).forEach((addr) => {
+                      thread.collaborators.push(addr);
+                    });
+                  } else {
+                    thread.collaborators = Object.values(vnode.state.addedEditors);
+                  }
+                  notifySuccess('Editors successfully added');
                 } else {
-                  thread.collaborators = Object.values(vnode.state.addedEditors);
+                  notifyError('Failed to add editors');
                 }
-                notifySuccess('Editors successfully added');
-              } else {
-                notifyError('Failed to add editors');
+              } catch (err) {
+                throw new Error((err.responseJSON && err.responseJSON.error)
+                  ? err.responseJSON.error
+                  : 'Failed to add editors.');
               }
-            } catch (err) {
-              throw new Error((err.responseJSON && err.responseJSON.error)
-                ? err.responseJSON.error
-                : 'Failed to add editors.');
             }
             if (vnode.attrs.popoverMenu) {
               vnode.attrs.openStateHandler(false);
