@@ -89,15 +89,6 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
   }
 
   await thread.save();
-  const finalThread = await models.OffchainThread.findOne({
-    where: { id: thread.id },
-    include: [
-      models.OffchainAttachment,
-      { model: models.Address, as: 'Address' },
-      { model: models.OffchainTopic, as: 'topic' },
-      { model: models.Address, through: models.SharingPermission, as: 'collaborator' },
-    ],
-  });
 
   // TODO: Build and test notifications
   if (collaborators?.length > 0) await Promise.all(collaborators.map(async (collaborator) => {
@@ -109,26 +100,26 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       `user-${collaborator.User.id}`,
       {
         created_at: new Date(),
-        root_id: +finalThread.id,
+        root_id: +thread.id,
         root_type: ProposalType.OffchainThread,
-        root_title: finalThread.title,
-        comment_text: finalThread.body,
-        chain_id: finalThread.chain,
-        community_id: finalThread.community,
-        author_address: finalThread.Address.address,
-        author_chain: finalThread.Address.chain,
+        root_title: thread.title,
+        comment_text: thread.body,
+        chain_id: thread.chain,
+        community_id: thread.community,
+        author_address: author.address,
+        author_chain: author.chain,
       },
       {
-        user: finalThread.Address.address,
-        url: getProposalUrl('discussion', finalThread),
+        user: author.address,
+        url: getProposalUrl('discussion', thread),
         title: req.body.title,
         bodyUrl: req.body.url,
-        chain: finalThread.chain,
-        community: finalThread.community,
-        body: finalThread.body,
+        chain: thread.chain,
+        community: thread.community,
+        body: thread.body,
       },
       req.wss,
-      [ finalThread.Address.address ],
+      [ author.address ],
     );
   }));
 

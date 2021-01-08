@@ -55,22 +55,26 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
   try {
     await models.sequelize.transaction(async (t) => {
       commentSubscription = await models.Subscription.findOne({
-        subscriber_id: address.user_id,
-        category_id: NotificationCategories.NewComment,
-        object_id: `discussion_${thread.id}`,
-        offchain_thread_id: thread.id,
-        community_id: thread.community || null,
-        chain_id: thread.chain || null,
-        is_active: true,
+        where: {
+          subscriber_id: address.user_id,
+          category_id: NotificationCategories.NewComment,
+          object_id: `discussion_${thread.id}`,
+          offchain_thread_id: thread.id,
+          community_id: thread.community || null,
+          chain_id: thread.chain || null,
+          is_active: true,
+        }
       }, { transaction: t });
       reactionSubscription = await models.Subscription.findOne({
-        subscriber_id: address.user_id,
-        category_id: NotificationCategories.NewReaction,
-        object_id: `discussion_${thread.id}`,
-        offchain_thread_id: thread.id,
-        community_id: thread.community || null,
-        chain_id: thread.chain || null,
-        is_active: true,
+        where: {
+          subscriber_id: address.user_id,
+          category_id: NotificationCategories.NewReaction,
+          object_id: `discussion_${thread.id}`,
+          offchain_thread_id: thread.id,
+          community_id: thread.community || null,
+          chain_id: thread.chain || null,
+          is_active: true,
+        }
       }, { transaction: t });
       await commentSubscription.destroy({}, { transaction: t });
       await reactionSubscription.destroy({}, { transaction: t });
@@ -79,17 +83,7 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
     return next(new Error('Removing editor subscriptions failed'));
   }
 
-  const finalThread = await models.OffchainThread.findOne({
-    where: { id: thread.id },
-    include: [
-      { model: models.Address, as: 'Address' },
-      models.OffchainAttachment,
-      { model: models.OffchainTopic, as: 'topic' },
-      { model: models.Address, through: models.SharingPermission, as: 'collaborator' },
-    ],
-  });
-
-  return res.json({ status: 'Success', result: finalThread.toJSON() });
+  return res.json({ status: 'Success' });
 };
 
 export default deleteEditor;

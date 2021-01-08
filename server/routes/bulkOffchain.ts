@@ -195,7 +195,10 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       else where['chain'] = chain.id;
 
       const monthlyComments = await models.OffchainComment.findAll({ where, include: [ models.Address ] });
-      const monthlyThreads = await models.OffchainThread.findAll({ where, include: [ models.Address ] });
+      const monthlyThreads = await models.OffchainThread.findAll({
+        where,
+        include: [ { model: models.Address, as: 'Address' } ]
+      });
 
       monthlyComments.concat(monthlyThreads).forEach((post) => {
         if (!post.Address) return;

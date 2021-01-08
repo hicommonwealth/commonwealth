@@ -72,10 +72,13 @@ export default (
     models.OffchainThread.belongsTo(models.Chain, {
       foreignKey: 'chain',
       targetKey: 'id',
-      as: 'Address'
     });
     models.OffchainThread.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
-    models.OffchainThread.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
+    models.OffchainThread.belongsTo(models.Address, {
+      as: 'Address',
+      foreignKey: 'address_id',
+      targetKey: 'id'
+    });
     models.OffchainThread.hasMany(models.OffchainAttachment, {
       foreignKey: 'attachment_id',
       constraints: false,
