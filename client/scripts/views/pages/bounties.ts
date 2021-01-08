@@ -19,10 +19,10 @@ import Substrate from 'controllers/chain/substrate/main';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import { Grid, Col, List } from 'construct-ui';
 import moment from 'moment';
+import { SubstrateBounty } from 'client/scripts/controllers/chain/substrate/bounty';
 import Listing from './listing';
 import ErrorPage from './error';
 import User from '../components/widgets/user';
-import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/substrate/treasury_proposal';
 
 
 const SubstrateBountyStats: m.Component<{}> = {
@@ -73,7 +73,7 @@ const BountyRow: m.Component<{bounty: AnyProposal}> = {
     const { bounty } = vnode.attrs;
     return m('', [
       m('h4', `${bounty.title}`),
-      m('span', `${(bounty as SubstrateTreasuryProposal).bond.format(true)} `),
+      m('span', `${(bounty as SubstrateBounty).bond.format(true)} `),
       m('span', 'managed by '),
       m(User, { user: bounty.author }),
     ]);
