@@ -302,6 +302,16 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       m('.proposal-topic-icon'),
       m('.proposal-topic-name', name),
     ]);
+    const allTopicsListItem = m('.discussions-topic', {
+      class: (m.route.get() === `/${app.activeId()}` || !topic) ? 'active' : '',
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeId()}`);
+      },
+    }, [
+      m('.proposal-topic-icon'),
+      m('.proposal-topic-name', 'All Discussions'),
+    ]);
 
     app.topics.getByCommunity(app.activeId()).forEach((topic) => {
       const { id, name, description } = topic;
@@ -353,7 +363,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       (app.chain || app.community) && [
         m('.discussions-main', [
           // topics
-          m('.discussions-topics', {
+          app.topics.getByCommunity(app.activeId()).length > 0 && m('.discussions-topics', {
             // onupdate: (vvnode) => {
             //   if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
             //       && !vnode.state.dragulaInitialized) {
@@ -367,6 +377,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             //   }
             // }
           }, [
+            allTopicsListItem,
             featuredTopicListItems,
             otherTopicListItems,
           ]),

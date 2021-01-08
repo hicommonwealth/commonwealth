@@ -93,8 +93,10 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
     const { sidebarTopic } = vnode.attrs;
 
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
-      || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+      || p.startsWith(`/${app.activeId()}/discussions/`)
+      || p.startsWith(`/${app.activeId()}/proposal/discussions/`);
     const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
+    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     return m('.OffchainNavigationModule.SidebarModule', [
@@ -121,8 +123,7 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
         }),
         m(ListItem, {
           active: onDiscussionsPage(m.route.get())
-            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true)
-            && (sidebarTopic === null || !m.route.get().startsWith(`/${app.activeId()}/proposal/discussion/`)),
+            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
           label: 'Discussions',
           onclick: (e) => {
             e.preventDefault();
@@ -139,6 +140,16 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
             m.route.set(`/${app.activeId()}/search`);
           },
           contentLeft: m(Icon, { name: Icons.SEARCH }),
+        }),
+        m(ListItem, {
+          active: onMembersPage(m.route.get())
+            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          label: 'Members',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeId()}/members`);
+          },
+          contentLeft: m(Icon, { name: Icons.USERS }),
         }),
         // m(ListItem, {
         //   active: onChatPage(m.route.get()),
