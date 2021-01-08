@@ -307,7 +307,6 @@ export const ProposalEditorPermissions: m.Component<{
 }, {
   items: any[],
   addedEditors: any,
-  removedEditors: any,
   isOpen: boolean,
 }> = {
   oninit: async (vnode) => {
@@ -331,9 +330,6 @@ export const ProposalEditorPermissions: m.Component<{
     if (!vnode.state.addedEditors) {
       vnode.state.addedEditors = {};
     }
-    if (!vnode.state.removedEditors) {
-      vnode.state.removedEditors = {};
-    }
     const { items } = vnode.state;
     const existingEditors = m('.existing-editors', [
       m('span', 'Existing editors'),
@@ -346,26 +342,31 @@ export const ProposalEditorPermissions: m.Component<{
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
-              try {
-                const req = await $.post(`${app.serverUrl()}/deleteEditor`, {
-                  address: app.user.activeAccount.address,
-                  author_chain: app.user.activeAccount.chain.id,
-                  chain: app.activeChainId(),
-                  community: app.activeCommunityId(),
-                  thread_id: thread.id,
-                  editor_address: c.address,
-                  editor_chain: c.chain,
-                  jwt: app.user.jwt,
-                });
+              if (vnode.state.addedEditors[c.address]) {
+                delete vnode.state.addedEditors[c.address];
+                console.log(vnode.state.addedEditors);
+              } else {
+                try {
+                  const req = await $.post(`${app.serverUrl()}/deleteEditor`, {
+                    address: app.user.activeAccount.address,
+                    author_chain: app.user.activeAccount.chain.id,
+                    chain: app.activeChainId(),
+                    community: app.activeCommunityId(),
+                    thread_id: thread.id,
+                    editor_address: c.address,
+                    editor_chain: c.chain,
+                    jwt: app.user.jwt,
+                  });
 
-                const proposalIndex = thread.collaborators.indexOf(c);
-                if (proposalIndex === -1) return;
-                thread.collaborators.splice(proposalIndex, 1);
-                notifySuccess('Collaborator successfully removed');
-                console.log(thread.collaborators);
-              } catch (err) {
-                const errMsg = err.responseJSON?.error || 'Failed to remove editor.';
-                notifyError(errMsg);
+                  const proposalIndex = thread.collaborators.indexOf(c);
+                  if (proposalIndex === -1) return;
+                  thread.collaborators.splice(proposalIndex, 1);
+                  notifySuccess('Collaborator successfully removed');
+                  console.log(thread.collaborators);
+                } catch (err) {
+                  const errMsg = err.responseJSON?.error || 'Failed to remove editor.';
+                  notifyError(errMsg);
+                }
               }
             },
           }),

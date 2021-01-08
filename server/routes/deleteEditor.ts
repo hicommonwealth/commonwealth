@@ -6,9 +6,9 @@ import { NotificationCategories } from '../../shared/types';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
-  InvalidEditor: 'Must provide valid addresses of community members',
+  InvalidEditor: 'Must provide valid addresses of existing editor',
   IncorrectOwner: 'Not owned by this user',
-  InvalidAddress: 'Must provide editor address and chain'
+  InvalidAddress: 'Must provide editor address and chain',
 };
 
 const deleteEditor = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -32,7 +32,7 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
   });
   if (!thread) return next(new Error(Errors.InvalidThread));
 
-  const address = await models.Address.find({
+  const address = await models.Address.findOne({
     where: {
       chain: req.body.editor_chain,
       address: req.body.editor_address,
@@ -46,7 +46,11 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
     }
   });
 
-  await collaboration.destroy();
+  if (collaboration) {
+    await collaboration.destroy();
+  } else {
+    return next(new Error(Errors.InvalidEditor));
+  }
 
   // TODO: Delete subscriptions
 
@@ -64,7 +68,7 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
           chain_id: thread.chain || null,
           is_active: true,
         }
-      }, { transaction: t });
+      });
       reactionSubscription = await models.Subscription.findOne({
         where: {
           subscriber_id: address.user_id,
@@ -75,9 +79,13 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
           chain_id: thread.chain || null,
           is_active: true,
         }
-      }, { transaction: t });
-      await commentSubscription.destroy({}, { transaction: t });
-      await reactionSubscription.destroy({}, { transaction: t });
+      });
+      if (commentSubscription) {
+        await commentSubscription.destroy({}, { transaction: t });
+      }
+      if (reactionSubscription) {
+        await reactionSubscription.destroy({}, { transaction: t });
+      }
     });
   } catch (err) {
     return next(new Error('Removing editor subscriptions failed'));
