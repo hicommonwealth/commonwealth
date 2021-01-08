@@ -211,7 +211,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       });
       const mostActiveUsers_ = Object.values(activeUsers).sort((a, b) => {
         return ((b as any).count - (a as any).count);
-      }).slice(0, 3);
+      });
       return mostActiveUsers_;
     })(),
   ]);

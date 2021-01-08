@@ -38,21 +38,21 @@ const SubscriptionButton: m.Component<{}> = {
           : (app.user.emailInterval === 'daily' && (!app.user.email || !app.user.emailVerified))
             ? [
               'You will be notified in the app. ',
-              link('a', `${app.activeId()}/settings`, app.user.email ? 'Verify your email' : 'Add an email'),
+              link('a', `/${app.activeId()}/settings`, app.user.email ? 'Verify your email' : 'Add an email'),
             ]
             : (app.user.emailInterval === 'daily' && communitySubscription.immediateEmail)
               ? [
                 'You will be notified in the app & immediately by email. ',
-                link('a', `${app.activeId()}/notifications`, 'Manage'),
+                link('a', `/${app.activeId()}/notifications`, 'Manage'),
               ]
               : app.user.emailInterval === 'daily'
                 ? [
                   'You will be notified in the app & daily emails. ',
-                  link('a', `${app.activeId()}/notifications`, 'Manage'),
+                  link('a', `/${app.activeId()}/notifications`, 'Manage'),
                 ]
                 : app.user.emailInterval === 'never' ? [
                   'You will be notified in the app. ',
-                  link('a', `${app.activeId()}/notifications`, 'Manage'),
+                  link('a', `/${app.activeId()}/notifications`, 'Manage'),
                 ] : '',
       ]),
     ]);

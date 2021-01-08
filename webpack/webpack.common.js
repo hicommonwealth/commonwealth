@@ -59,7 +59,7 @@ module.exports = {
     },
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.svg'],
+    extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx', '.svg'],
     modules: ['../client/scripts', '../client/styles', '../shared', '../node_modules', '../eth/types'],
   },
   module: {
