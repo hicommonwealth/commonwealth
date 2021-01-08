@@ -152,7 +152,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
       include: [
-        models.Address,
+        { model: models.Address, as: 'Address' },
         models.OffchainAttachment,
         { model: models.OffchainTopic, as: 'topic' }
       ],
