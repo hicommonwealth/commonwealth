@@ -364,7 +364,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       (app.chain || app.community) && [
         m('.discussions-main', [
           // topics
-          m('.discussions-topics', {
+          app.topics.getByCommunity(app.activeId()).length > 0 && m('.discussions-topics', {
             // onupdate: (vvnode) => {
             //   if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
             //       && !vnode.state.dragulaInitialized) {
