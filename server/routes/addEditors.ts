@@ -135,7 +135,12 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
 
   console.log(finalEditors);
 
-  return res.json({ status: 'Success', result: finalEditors.Address.toJSON() });
+  return res.json({
+    status: 'Success',
+    result: {
+      collaborators: finalEditors.map((e) => e.toJSON())
+    },
+  });
 };
 
 export default addEditors;

@@ -97,7 +97,12 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
 
   console.log(finalEditors);
 
-  return res.json({ status: 'Success', result: finalEditors.Address.toJSON() });
+  return res.json({
+    status: 'Success',
+    result: {
+      collaborators: finalEditors.map((e) => e.toJSON())
+    },
+  });
 };
 
 export default deleteEditors;

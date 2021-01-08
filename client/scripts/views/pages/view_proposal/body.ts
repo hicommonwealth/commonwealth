@@ -464,13 +464,7 @@ export const ProposalEditorPermissions: m.Component<{
                 });
                 console.log(res);
                 if (res.status === 'Success') {
-                  if (thread.collaborators?.length) {
-                    Object.values(vnode.state.addedEditors).forEach((addr) => {
-                      thread.collaborators.push(addr);
-                    });
-                  } else {
-                    thread.collaborators = Object.values(vnode.state.addedEditors);
-                  }
+                  thread.collaborators = res.result.collaborators;
                   notifySuccess('Editors successfully added');
                 } else {
                   notifyError('Failed to add editors');
@@ -492,10 +486,9 @@ export const ProposalEditorPermissions: m.Component<{
                   editors: JSON.stringify(vnode.state.removedEditors),
                   jwt: app.user.jwt,
                 });
-                console.log(res);
                 if (res.status === 'Success') {
+                  thread.collaborators = res.result.collaborators;
                   notifySuccess('Editors successfully removed.');
-                  console.log(thread.collaborators);
                 } else {
                   throw new Error('Failed to remove editor.');
                 }
