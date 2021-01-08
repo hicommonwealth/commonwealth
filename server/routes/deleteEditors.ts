@@ -100,7 +100,7 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
   return res.json({
     status: 'Success',
     result: {
-      collaborators: finalEditors.map((e) => e.toJSON())
+      collaborators: finalEditors.map((e) => e.Address.toJSON())
     },
   });
 };

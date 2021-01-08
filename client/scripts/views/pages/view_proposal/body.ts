@@ -492,9 +492,6 @@ export const ProposalEditorPermissions: m.Component<{
                 } else {
                   throw new Error('Failed to remove editor.');
                 }
-                // const proposalIndex = thread.collaborators.indexOf(c);
-                // if (proposalIndex === -1) return;
-                // thread.collaborators.splice(proposalIndex, 1);
                 m.redraw();
               } catch (err) {
                 const errMsg = err.responseJSON?.error || 'Failed to remove editor.';

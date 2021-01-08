@@ -138,7 +138,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
   return res.json({
     status: 'Success',
     result: {
-      collaborators: finalEditors.map((e) => e.toJSON())
+      collaborators: finalEditors.map((e) => e.Address.toJSON())
     },
   });
 };
