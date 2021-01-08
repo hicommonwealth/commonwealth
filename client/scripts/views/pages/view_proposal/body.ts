@@ -347,7 +347,7 @@ export const ProposalEditorPermissions: m.Component<{
                 console.log(vnode.state.addedEditors);
               } else {
                 try {
-                  const req = await $.post(`${app.serverUrl()}/deleteEditor`, {
+                  const res = await $.post(`${app.serverUrl()}/deleteEditor`, {
                     address: app.user.activeAccount.address,
                     author_chain: app.user.activeAccount.chain.id,
                     chain: app.activeChainId(),
@@ -357,12 +357,15 @@ export const ProposalEditorPermissions: m.Component<{
                     editor_chain: c.chain,
                     jwt: app.user.jwt,
                   });
-
-                  const proposalIndex = thread.collaborators.indexOf(c);
-                  if (proposalIndex === -1) return;
-                  thread.collaborators.splice(proposalIndex, 1);
-                  notifySuccess('Collaborator successfully removed');
-                  console.log(thread.collaborators);
+                  if (res.status === 'Success') {
+                    const proposalIndex = thread.collaborators.indexOf(c);
+                    if (proposalIndex === -1) return;
+                    thread.collaborators.splice(proposalIndex, 1);
+                    notifySuccess('Editor successfully removed.');
+                    console.log(thread.collaborators);
+                  } else {
+                    notifyError('Failed to remove editor.');
+                  }
                 } catch (err) {
                   const errMsg = err.responseJSON?.error || 'Failed to remove editor.';
                   notifyError(errMsg);
@@ -449,9 +452,12 @@ export const ProposalEditorPermissions: m.Component<{
           label: 'Save changes',
           intent: 'primary',
           onclick: async () => {
+            console.log(vnode.state.addedEditors);
+            if ($.isEmptyObject(vnode.state.addedEditors)) {
+              return;
+            }
             try {
-              // TODO: Add editor removal logic
-              const req = await $.post(`${app.serverUrl()}/addEditors`, {
+              const res = await $.post(`${app.serverUrl()}/addEditors`, {
                 address: app.user.activeAccount.address,
                 author_chain: app.user.activeAccount.chain.id,
                 chain: app.activeChainId(),
@@ -460,18 +466,18 @@ export const ProposalEditorPermissions: m.Component<{
                 editors: JSON.stringify(vnode.state.addedEditors),
                 jwt: app.user.jwt,
               });
-              if (req.status === '200') {
+              console.log(res.status);
+              if (res.status === 'Success') {
                 if (thread.collaborators?.length) {
-                  Object.keys(vnode.state.addedEditors).forEach((addr) => {
+                  Object.values(vnode.state.addedEditors).forEach((addr) => {
                     thread.collaborators.push(addr);
                   });
                 } else {
                   thread.collaborators = Object.values(vnode.state.addedEditors);
                 }
-                notifySuccess('Collaborators successfully added');
+                notifySuccess('Editors successfully added');
               } else {
-                // todo: message
-                throw new Error();
+                notifyError('Failed to add editors');
               }
             } catch (err) {
               throw new Error((err.responseJSON && err.responseJSON.error)
