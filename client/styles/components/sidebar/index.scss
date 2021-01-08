@@ -323,33 +323,6 @@
             }
         }
     }
-
-    .OffchainNavigationModule {
-        > .cui-list {
-            .cui-list.more-topics-list {
-                border-top: 1px solid $background-color-light-hover;
-                margin-top: 10px;
-                padding: 10px 0;
-                max-height: 230px;
-                margin-bottom: -10px;
-            }
-        }
-
-        // tag icons
-        .topic-row.cui-list-item {
-            @include proposal-topic-inline;
-        }
-        .cui-list .topic-row.cui-list-item .cui-list-item-content-left {
-            padding-left: 3px !important;
-            padding-right: 8px !important;
-        }
-        .proposal-topic-icon {
-            margin-right: 0;
-            border-color: $background-color-medium-accent;
-            position: relative;
-            top: 2px;
-        }
-    }
 }
 
 .MobileSidebarHeader,

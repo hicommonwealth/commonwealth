@@ -1,0 +1,43 @@
+@import 'client/styles/shared';
+
+.MembersPage {
+    padding-bottom: 10px;
+
+    .members-list {
+        margin: 20px -16px;
+    }
+    a.members-item {
+        display: flex;
+        color: #111;
+        text-decoration: none;
+        padding: 10px 16px 4px;
+        border-radius: 4px;
+        &:hover {
+            background: $background-color-white-hover;
+        }
+    }
+    .members-item-icon {
+        width: 52px;
+        padding-top: 3px;
+    }
+    .members-item-left {
+        flex: 1;
+        .User {
+            font-weight: 500;
+        }
+        .members-item-headline {
+        }
+        .members-item-address {
+            color: $text-color-light;
+        }
+    }
+    .members-item-right {
+        padding-right: 4px;
+        margin-top: 13px;
+        font-size: 95%;
+        color: $text-color-light;
+        @include sm-max {
+            display: none;
+        }
+    }
+}
