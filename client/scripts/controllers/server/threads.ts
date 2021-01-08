@@ -29,7 +29,6 @@ export const modelFromServer = (thread) => {
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
-  console.log(thread);
   return new OffchainThread(
     thread.Address.address,
     decodeURIComponent(thread.title),
@@ -282,9 +281,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
-    console.log(response.result);
     const thread = modelFromServer(response.result);
-    console.log(thread);
     const existing = this._store.getByIdentifier(thread.id);
     if (existing) this._store.remove(existing);
     this._store.update(thread);

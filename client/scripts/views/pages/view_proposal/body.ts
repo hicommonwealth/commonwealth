@@ -2,6 +2,7 @@ import m from 'mithril';
 import moment from 'moment';
 import lity from 'lity';
 import $ from 'jquery';
+import _ from 'lodash';
 import 'pages/view_proposal/editor_permissions.scss';
 import { updateRoute } from 'app';
 import app from 'state';
@@ -341,7 +342,7 @@ export const ProposalEditorPermissions: m.Component<{
             name: Icons.X,
             size: 'xs',
             class: 'role-x-icon',
-            onclick: async () => {
+            onclick: _.debounce(async () => {
               if (vnode.state.addedEditors[c.address]) {
                 delete vnode.state.addedEditors[c.address];
                 console.log(vnode.state.addedEditors);
@@ -371,7 +372,7 @@ export const ProposalEditorPermissions: m.Component<{
                   notifyError(errMsg);
                 }
               }
-            },
+            }, 600),
           }),
         ]);
       }))
