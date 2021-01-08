@@ -68,7 +68,7 @@ class OffchainThread implements IUniqueId {
     this.community = community;
     this.chain = chain;
     this.readOnly = readOnly;
-    this.collaborators = collaborators;
+    this.collaborators = collaborators || [];
   }
 }
 

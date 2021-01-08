@@ -540,6 +540,7 @@ const IndividualCommunityNotifications: m.Component<{
       (s) => (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id)
         && s.category !== NotificationCategories.NewThread
         && s.category !== NotificationCategories.NewMention
+        && s.category !== NotificationCategories.NewCollaboration
         && s.category !== NotificationCategories.ChainEvent
         && !s.OffchainComment
     );

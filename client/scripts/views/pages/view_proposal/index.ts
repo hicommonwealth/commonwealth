@@ -81,9 +81,12 @@ const ProposalHeader: m.Component<{
     // merely have access to the body and title
     vnode.state.isAuthor = (app.user.activeAccount?.address === proposal.author
           && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain);
-    vnode.state.isEditor = (proposal as OffchainThread).collaborators?.includes(app.user.activeAccount.address);
+    vnode.state.isEditor = (proposal as OffchainThread).collaborators?.filter((c) => {
+      return (c.address === app.user.activeAccount.address && c.chain === app.user.activeAccount.chain.id);
+    }).length > 0;
 
     const { isAuthor, isEditor, isAdmin } = vnode.state;
+    console.log({ isAuthor, isEditor, isAdmin });
 
     const isThread = proposal instanceof OffchainThread;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;
