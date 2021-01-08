@@ -7,18 +7,23 @@ import { NotificationCategories } from '../../shared/types';
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
   InvalidEditor: 'Must provide valid addresses of existing editor',
+  InvalidEditorFormat: 'Editors attribute improperly formatted.',
   IncorrectOwner: 'Not owned by this user',
   InvalidAddress: 'Must provide editor address and chain',
 };
 
-const deleteEditor = async (models, req: Request, res: Response, next: NextFunction) => {
+const deleteEditors = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.thread_id) {
     return next(new Error(Errors.InvalidThread));
   }
-  if (!req.body.editor_chain || !req.body.editor_address) {
-    return next(new Error(Errors.InvalidAddress));
-  }
   const { thread_id } = req.body;
+  let editors;
+  try {
+    const editorsObj = JSON.parse(req.body.editors);
+    editors = Object.values(editorsObj);
+  } catch (e) {
+    return next(new Error(Errors.InvalidEditorFormat));
+  }
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
@@ -32,31 +37,25 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
   });
   if (!thread) return next(new Error(Errors.InvalidThread));
 
-  const address = await models.Address.findOne({
-    where: {
-      chain: req.body.editor_chain,
-      address: req.body.editor_address,
+  await Promise.all(editors.map(async (editor: any) => {
+    const address = await models.Address.findOne({
+      where: {
+        chain: req.body.editor_chain,
+        address: req.body.editor_address,
+      }
+    });
+    const collaboration = await models.SharingPermission.findOne({
+      where: {
+        offchain_thread_id: thread.id,
+        address_id: address.id
+      }
+    });
+    if (collaboration) {
+      await collaboration.destroy();
     }
-  });
 
-  const collaboration = await models.SharingPermission.findOne({
-    where: {
-      offchain_thread_id: thread.id,
-      address_id: address.id
-    }
-  });
-
-  if (collaboration) {
-    await collaboration.destroy();
-  } else {
-    return next(new Error(Errors.InvalidEditor));
-  }
-
-  // TODO: Delete subscriptions
-
-  let commentSubscription;
-  let reactionSubscription;
-  try {
+    let commentSubscription;
+    let reactionSubscription;
     await models.sequelize.transaction(async (t) => {
       commentSubscription = await models.Subscription.findOne({
         where: {
@@ -87,11 +86,17 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
         await reactionSubscription.destroy({}, { transaction: t });
       }
     });
-  } catch (err) {
-    return next(new Error('Removing editor subscriptions failed'));
-  }
+  }));
 
-  return res.json({ status: 'Success' });
+  const finalEditors = await models.SharingPermission.findOne({
+    where: { offchain_thread_id: thread.id },
+    include: [{
+      model: models.Address,
+      as: 'collaborations',
+    }]
+  });
+
+  return res.json({ status: 'Success', result: finalEditors.collaborations.toJSON() });
 };
 
-export default deleteEditor;
+export default deleteEditors;

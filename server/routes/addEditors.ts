@@ -123,7 +123,15 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     );
   }));
 
-  return res.json({ status: 'Success' });
+  const finalEditors = await models.SharingPermission.findOne({
+    where: { offchain_thread_id: thread.id },
+    include: [{
+      model: models.Address,
+      as: 'collaborations',
+    }]
+  });
+
+  return res.json({ status: 'Success', result: finalEditors.collaborations.toJSON() });
 };
 
 export default addEditors;

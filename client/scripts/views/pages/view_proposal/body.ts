@@ -308,6 +308,7 @@ export const ProposalEditorPermissions: m.Component<{
 }, {
   items: any[],
   addedEditors: any,
+  removedEditors: any,
   isOpen: boolean,
 }> = {
   oninit: async (vnode) => {
@@ -331,10 +332,16 @@ export const ProposalEditorPermissions: m.Component<{
     if (!vnode.state.addedEditors) {
       vnode.state.addedEditors = {};
     }
+    if (!vnode.state.removedEditors) {
+      vnode.state.removedEditors = {};
+    }
     const { items } = vnode.state;
+    const allCollaborators = thread.collaborators
+      .concat(Object.values(vnode.state.addedEditors))
+      .filter((c) => !Object.keys(vnode.state.removedEditors).includes(c.address));
     const existingEditors = m('.existing-editors', [
       m('span', 'Existing editors'),
-      m('.editor-listing', thread.collaborators.concat(Object.values(vnode.state.addedEditors)).map((c) => {
+      m('.editor-listing', allCollaborators.map((c) => {
         const user : Profile = app.profiles.getProfile(c.chain, c.address);
         return m('.user-wrap', [
           m(User, { user }),
@@ -344,44 +351,14 @@ export const ProposalEditorPermissions: m.Component<{
             class: 'role-x-icon',
             onclick: async () => {
               console.log(`deleting ${c.address}`);
+              // If already scheduled for addition, un-schedule
               if (vnode.state.addedEditors[c.address]) {
                 delete vnode.state.addedEditors[c.address];
                 console.log(vnode.state.addedEditors);
               } else {
-                if (thread.collaborators.filter((c_) => {
-                  return c.address === c_.address;
-                }).length === 0) {
-                  console.log('dupe deletion avoided?');
-                  return;
-                }
-                const collaboratorsCopy = thread.collaborators;
-                const proposalIndex = thread.collaborators.indexOf(c);
-                if (proposalIndex === -1) return;
-                thread.collaborators.splice(proposalIndex, 1);
-                m.redraw();
-                try {
-                  const res = await $.post(`${app.serverUrl()}/deleteEditor`, {
-                    address: app.user.activeAccount.address,
-                    author_chain: app.user.activeAccount.chain.id,
-                    chain: app.activeChainId(),
-                    community: app.activeCommunityId(),
-                    thread_id: thread.id,
-                    editor_address: c.address,
-                    editor_chain: c.chain,
-                    jwt: app.user.jwt,
-                  });
-                  if (res.status === 'Success') {
-                    notifySuccess('Editor successfully removed.');
-                    console.log(thread.collaborators);
-                  } else {
-                    throw new Error('Failed to remove editor.');
-                  }
-                } catch (err) {
-                  thread.collaborators = collaboratorsCopy;
-                  m.redraw();
-                  const errMsg = err.responseJSON?.error || 'Failed to remove editor.';
-                  notifyError(errMsg);
-                }
+              // If already an existing editor, schedule for removal
+                vnode.state.removedEditors[c.address] = c;
+                console.log(vnode.state.removedEditors);
               }
             },
           }),
@@ -418,20 +395,29 @@ export const ProposalEditorPermissions: m.Component<{
               : address.address.toLowerCase().includes(query.toLowerCase());
           },
           onSelect: (item) => {
+            console.log(vnode.state.addedEditors);
             const addrItem = (item as any).Address;
+            // If already scheduled for removal, un-schedule
+            if (vnode.state.removedEditors[addrItem.address]) {
+              delete vnode.state.removedEditors[addrItem.address];
+              console.log(vnode.state.removedEditors);
+            }
+            // If already scheduled for addition, un-schedule
             if (vnode.state.addedEditors[addrItem.address]) {
               delete vnode.state.addedEditors[addrItem.address];
             } else if (thread.collaborators.filter((c) => {
               return c.address === addrItem.address && c.chain === addrItem.chain;
             }).length === 0) {
+            // If unscheduled for addition, and not an existing editor, schedule
               vnode.state.addedEditors[addrItem.address] = addrItem;
             } else {
-              notifyInfo('Already a collaborator');
+              notifyInfo('Already an editor');
             }
             console.log(vnode.state.addedEditors);
           }
         }),
-        existingEditors,
+        allCollaborators.length > 0
+        && existingEditors,
       ]),
       hasBackdrop: true,
       isOpen: vnode.attrs.popoverMenu
@@ -493,6 +479,32 @@ export const ProposalEditorPermissions: m.Component<{
                 throw new Error((err.responseJSON && err.responseJSON.error)
                   ? err.responseJSON.error
                   : 'Failed to add editors.');
+              }
+            }
+            if (!$.isEmptyObject(vnode.state.removedEditors)) {
+              try {
+                const res = await $.post(`${app.serverUrl()}/deleteEditors`, {
+                  address: app.user.activeAccount.address,
+                  author_chain: app.user.activeAccount.chain.id,
+                  chain: app.activeChainId(),
+                  community: app.activeCommunityId(),
+                  thread_id: thread.id,
+                  editors: JSON.stringify(vnode.state.removedEditors),
+                  jwt: app.user.jwt,
+                });
+                if (res.status === 'Success') {
+                  notifySuccess('Editors successfully removed.');
+                  console.log(thread.collaborators);
+                } else {
+                  throw new Error('Failed to remove editor.');
+                }
+                const proposalIndex = thread.collaborators.indexOf(c);
+                if (proposalIndex === -1) return;
+                thread.collaborators.splice(proposalIndex, 1);
+                m.redraw();
+              } catch (err) {
+                const errMsg = err.responseJSON?.error || 'Failed to remove editor.';
+                notifyError(errMsg);
               }
             }
             if (vnode.attrs.popoverMenu) {

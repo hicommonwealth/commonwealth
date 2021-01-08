@@ -70,7 +70,7 @@ import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
-import deleteEditor from './routes/deleteEditor';
+import deleteEditors from './routes/deleteEditors';
 import bulkThreads from './routes/bulkThreads';
 import getThread from './routes/getThread';
 import search from './routes/search';
@@ -151,7 +151,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to PUT /thread
   router.put('/editThread', passport.authenticate('jwt', { session: false }), editThread.bind(this, models));
   router.post('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this, models));
-  router.post('/deleteEditor', passport.authenticate('jwt', { session: false }), deleteEditor.bind(this, models));
+  router.post('/deleteEditors', passport.authenticate('jwt', { session: false }), deleteEditors.bind(this, models));
   // TODO: Change to DELETE /thread
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
