@@ -53,26 +53,28 @@ const deleteEditor = async (models, req: Request, res: Response, next: NextFunct
   let commentSubscription;
   let reactionSubscription;
   try {
-    commentSubscription = await models.Subscription.findOne({
-      subscriber_id: address.user_id,
-      category_id: NotificationCategories.NewComment,
-      object_id: `discussion_${thread.id}`,
-      offchain_thread_id: thread.id,
-      community_id: thread.community || null,
-      chain_id: thread.chain || null,
-      is_active: true,
+    await models.sequelize.transaction(async (t) => {
+      commentSubscription = await models.Subscription.findOne({
+        subscriber_id: address.user_id,
+        category_id: NotificationCategories.NewComment,
+        object_id: `discussion_${thread.id}`,
+        offchain_thread_id: thread.id,
+        community_id: thread.community || null,
+        chain_id: thread.chain || null,
+        is_active: true,
+      }, { transaction: t });
+      reactionSubscription = await models.Subscription.findOne({
+        subscriber_id: address.user_id,
+        category_id: NotificationCategories.NewReaction,
+        object_id: `discussion_${thread.id}`,
+        offchain_thread_id: thread.id,
+        community_id: thread.community || null,
+        chain_id: thread.chain || null,
+        is_active: true,
+      }, { transaction: t });
+      await commentSubscription.destroy({}, { transaction: t });
+      await reactionSubscription.destroy({}, { transaction: t });
     });
-    reactionSubscription = await models.Subscription.findOne({
-      subscriber_id: address.user_id,
-      category_id: NotificationCategories.NewReaction,
-      object_id: `discussion_${thread.id}`,
-      offchain_thread_id: thread.id,
-      community_id: thread.community || null,
-      chain_id: thread.chain || null,
-      is_active: true,
-    });
-    await commentSubscription.destroy();
-    await reactionSubscription.destroy();
   } catch (err) {
     return next(new Error('Removing editor subscriptions failed'));
   }
