@@ -42,9 +42,12 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       include: [ models.Role, models.User ]
     });
   }));
-  // if any of collab array is null, throw error?
-  // if () return next(new Error(Errors.InvalidEditor));
 
+  if (collaborators.includes(null)) {
+    return next(new Error(Errors.InvalidEditor));
+  }
+
+  console.log(collaborators);
   // Ensure collaborators have community permissions
   if (collaborators?.length > 0) {
     await Promise.all(collaborators.map(async (collaborator) => {
@@ -123,15 +126,16 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     );
   }));
 
-  const finalEditors = await models.SharingPermission.findOne({
+  const finalEditors = await models.SharingPermission.findAll({
     where: { offchain_thread_id: thread.id },
     include: [{
       model: models.Address,
-      as: 'collaborations',
     }]
   });
 
-  return res.json({ status: 'Success', result: finalEditors.collaborations.toJSON() });
+  console.log(finalEditors);
+
+  return res.json({ status: 'Success', result: finalEditors.Address.toJSON() });
 };
 
 export default addEditors;

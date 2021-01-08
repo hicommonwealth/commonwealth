@@ -447,7 +447,7 @@ export const ProposalEditorPermissions: m.Component<{
           },
         }),
         m(Button, {
-          disabled: $.isEmptyObject(vnode.state.addedEditors),
+          disabled: $.isEmptyObject(vnode.state.addedEditors) && $.isEmptyObject(vnode.state.removedEditors),
           label: 'Save changes',
           intent: 'primary',
           onclick: async () => {
@@ -462,7 +462,7 @@ export const ProposalEditorPermissions: m.Component<{
                   editors: JSON.stringify(vnode.state.addedEditors),
                   jwt: app.user.jwt,
                 });
-                console.log(res.status);
+                console.log(res);
                 if (res.status === 'Success') {
                   if (thread.collaborators?.length) {
                     Object.values(vnode.state.addedEditors).forEach((addr) => {
@@ -492,15 +492,16 @@ export const ProposalEditorPermissions: m.Component<{
                   editors: JSON.stringify(vnode.state.removedEditors),
                   jwt: app.user.jwt,
                 });
+                console.log(res);
                 if (res.status === 'Success') {
                   notifySuccess('Editors successfully removed.');
                   console.log(thread.collaborators);
                 } else {
                   throw new Error('Failed to remove editor.');
                 }
-                const proposalIndex = thread.collaborators.indexOf(c);
-                if (proposalIndex === -1) return;
-                thread.collaborators.splice(proposalIndex, 1);
+                // const proposalIndex = thread.collaborators.indexOf(c);
+                // if (proposalIndex === -1) return;
+                // thread.collaborators.splice(proposalIndex, 1);
                 m.redraw();
               } catch (err) {
                 const errMsg = err.responseJSON?.error || 'Failed to remove editor.';

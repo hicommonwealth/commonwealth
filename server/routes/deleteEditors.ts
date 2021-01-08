@@ -40,8 +40,8 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
   await Promise.all(editors.map(async (editor: any) => {
     const address = await models.Address.findOne({
       where: {
-        chain: req.body.editor_chain,
-        address: req.body.editor_address,
+        chain: editor.chain,
+        address: editor.address,
       }
     });
     const collaboration = await models.SharingPermission.findOne({
@@ -88,15 +88,16 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
     });
   }));
 
-  const finalEditors = await models.SharingPermission.findOne({
+  const finalEditors = await models.SharingPermission.findAll({
     where: { offchain_thread_id: thread.id },
     include: [{
       model: models.Address,
-      as: 'collaborations',
     }]
   });
 
-  return res.json({ status: 'Success', result: finalEditors.collaborations.toJSON() });
+  console.log(finalEditors);
+
+  return res.json({ status: 'Success', result: finalEditors.Address.toJSON() });
 };
 
 export default deleteEditors;
