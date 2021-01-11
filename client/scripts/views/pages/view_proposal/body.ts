@@ -318,7 +318,7 @@ export const ProposalEditorPermissions: m.Component<{
       const req = await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj);
       if (req.status !== 'Success') throw new Error('Could not fetch members');
       vnode.state.items = req.result.filter((role) => {
-        return role.Address.address !== app.user.activeAccount.address;
+        return role.Address.address !== app.user.activeAccount?.address;
       });
       m.redraw();
     } catch (err) {

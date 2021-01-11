@@ -53,11 +53,11 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       if (community) {
         const isMember = collaborator.Roles
           .find((role) => role.offchain_community_id === community.id);
-        if (!isMember) return next(new Error(Errors.InvalidEditor));
+        if (!isMember) throw new Error(Errors.InvalidEditor);
       } else if (chain) {
         const isMember = collaborator.Roles
           .find((role) => role.chain_id === chain.id);
-        if (!isMember) return next(new Error(Errors.InvalidEditor));
+        if (!isMember) throw new Error(Errors.InvalidEditor);
       }
       const collaboration = await models.SharingPermission.findOrCreate({
         where: {
@@ -85,7 +85,9 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
         chain_id: thread.chain || null,
         is_active: true,
       });
-    }));
+    })).catch((e) => {
+      return next(new Error(e));
+    });
   } else {
     return next(new Error(Errors.InvalidEditor));
   }

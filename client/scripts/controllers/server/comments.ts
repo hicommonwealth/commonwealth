@@ -10,6 +10,7 @@ import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityI
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from '../app/login';
 import { Moment } from 'moment';
+import { VersionHistory } from './threads';
 // tslint:disable: object-literal-key-quotes
 
 export enum CommentParent {
@@ -51,12 +52,6 @@ export const modelFromServer = (comment) => {
     comment?.Address?.chain || comment.authorChain,
   );
 };
-
-interface VersionHistory {
-  timestamp: Moment;
-  body: string;
-}
-
 
 class CommentsController {
   private _store: CommentsStore = new CommentsStore();
@@ -109,7 +104,10 @@ class CommentsController {
     attachments?: string[], mentions?: string[]
   ) {
     const timestamp = moment();
-    const firstVersion : VersionHistory = { timestamp, body: unescapedText };
+    const firstVersion : VersionHistory = {
+      timestamp,
+      body: unescapedText
+    };
     const versionHistory : string = JSON.stringify(firstVersion);
     try {
       // TODO: Change to POST /comment

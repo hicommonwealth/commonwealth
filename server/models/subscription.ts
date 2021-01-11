@@ -105,7 +105,9 @@ export default (
         { is_active: true },
       ],
     };
-
+    console.log(category_id);
+    console.log(object_id);
+    console.log(notification_data);
     // typeguard function to differentiate between chain event notifications as needed
     const isChainEventData = (
       n: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData

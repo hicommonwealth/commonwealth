@@ -50,10 +50,6 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
         address_id: address.id
       }
     });
-    if (collaboration) {
-      await collaboration.destroy();
-    }
-
     let commentSubscription;
     let reactionSubscription;
     await models.sequelize.transaction(async (t) => {
@@ -79,6 +75,9 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
           is_active: true,
         }
       });
+      if (collaboration) {
+        await collaboration.destroy({}, { transaction: t });
+      }
       if (commentSubscription) {
         await commentSubscription.destroy({}, { transaction: t });
       }

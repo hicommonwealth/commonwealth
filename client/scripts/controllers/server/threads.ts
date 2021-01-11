@@ -77,8 +77,8 @@ would break the listingStore's careful chronology.
 
 */
 
-interface VersionHistory {
-  author: Profile;
+export interface VersionHistory {
+  author?: Profile;
   timestamp: Moment;
   body: string;
 }

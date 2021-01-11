@@ -3,6 +3,7 @@ import { IUniqueId } from './interfaces';
 import { OffchainThreadKind } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import OffchainTopic from './OffchainTopic';
+import { VersionHistory } from '../controllers/server/threads';
 
 class OffchainThread implements IUniqueId {
   public readonly author: string;
@@ -24,7 +25,7 @@ class OffchainThread implements IUniqueId {
   public topic: OffchainTopic;
   public readonly slug = 'discussion';
   public readonly url: string;
-  public readonly versionHistory: string[];
+  public readonly versionHistory: VersionHistory[];
   public readonly community: string;
   public readonly chain: string;
 
@@ -40,7 +41,7 @@ class OffchainThread implements IUniqueId {
     createdAt: moment.Moment,
     topic: OffchainTopic,
     kind: OffchainThreadKind,
-    versionHistory: any,
+    versionHistory: VersionHistory[],
     community: string,
     chain: string,
     readOnly: boolean,
