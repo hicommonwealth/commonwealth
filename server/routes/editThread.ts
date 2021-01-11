@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { renderQuillDeltaToText } from '../../shared/utils';
+import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 
@@ -93,6 +93,78 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       req.wss,
       [ finalThread.Address.address ],
     );
+
+    const mentions = typeof req.body['mentions[]'] === 'string'
+      ? [req.body['mentions[]']]
+      : typeof req.body['mentions[]'] === 'undefined'
+        ? []
+        : req.body['mentions[]'];
+    // grab mentions to notify tagged users
+    let mentionedAddresses;
+    if (mentions?.length > 0) {
+      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+        mention = mention.split(',');
+        try {
+          const user = await models.Address.findOne({
+            where: {
+              chain: mention[0],
+              address: mention[1],
+            },
+            include: [ models.User, models.Role ]
+          });
+          return user;
+        } catch (err) {
+          return next(new Error(err));
+        }
+      }));
+      // filter null results
+      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+    }
+
+    // notify mentioned users, given permissions are in place
+    if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
+      if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
+
+      let shouldNotifyMentionedUser = true;
+      if (finalThread.community) {
+        const originCommunity = await models.OffchainCommunity.findOne({
+          where: { id: finalThread.community }
+        });
+        if (originCommunity.privacyEnabled) {
+          const destinationCommunity = mentionedAddress.Roles
+            .find((role) => role.offchain_community_id === originCommunity.id);
+          if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
+        }
+      }
+      if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
+        models,
+        NotificationCategories.NewMention,
+        `user-${mentionedAddress.User.id}`,
+        {
+          created_at: new Date(),
+          root_id: Number(finalThread.id),
+          root_type: ProposalType.OffchainThread,
+          root_title: finalThread.title,
+          comment_text: finalThread.body,
+          chain_id: finalThread.chain,
+          community_id: finalThread.community,
+          author_address: finalThread.Address.address,
+          author_chain: finalThread.Address.chain,
+        },
+        {
+          user: finalThread.Address.address,
+          url: getProposalUrl('discussion', finalThread),
+          title: req.body.title,
+          bodyUrl: req.body.url,
+          chain: finalThread.chain,
+          community: finalThread.community,
+          body: finalThread.body,
+        },
+        req.wss,
+        [ finalThread.Address.address ],
+      );
+    }));
+
     // TODO: dispatch notifications for new mention(s)
     // TODO: update author.last_active
 
