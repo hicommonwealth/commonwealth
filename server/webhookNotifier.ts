@@ -38,7 +38,7 @@ const getFilteredContent = (content, address) => {
     const actor = `${address?.name || content.user}`;
     const action = ((content.notificationCategory === NotificationCategories.NewComment) ? 'commented on'
       : (content.notificationCategory === NotificationCategories.NewMention) ? 'mentioned you in the thread'
-        : (content.notificationCategory === NotificationCategories.NewCollaboration) ? 'added you as editor to the thread'
+        : (content.notificationCategory === NotificationCategories.NewCollaboration) ? 'invited you to collaborate on'
           : (content.notificationCategory === NotificationCategories.NewThread) ? 'created a new thread'
             : '');
     const actedOn = decodeURIComponent(content.title);
