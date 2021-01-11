@@ -1,5 +1,6 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
 import Sequelize from 'sequelize';
+import { sequelize } from '../database';
 const Op = Sequelize.Op;
 
 
@@ -10,47 +11,6 @@ export default class extends IEventHandler {
     super();
   }
 
-  /**
-    Event handler to store new-session's validators details in DB.
-    Sample Payload:
-                  {
-                    "data": {
-                      "kind": "new-session",
-                      "activeExposures": {
-                        "nBEPWLmcAoSDPNoFKuKZXyAwEMtfhz7RU9nzRAZfjD5v9Eb": {
-                          "own": "0x000000000000005d59ea50d4ae28b3f0",
-                          "total": "0x00000000000045695e3f39b202770ee8",
-                          "others": [
-                            {
-                              "who": "jdxmHQWrvgFhzLtWzvpHHvc496J3bR98ZAvNKEkVHGV3gsT",
-                              "value": "0x00000000000004e68ea14311bf263b90"
-                            },
-                            ...
-                          ]
-                        },
-                        ...
-                      },
-                      "active": [
-                        "nBEPWLmcAoSDPNoFKuKZXyAwEMtfhz7RU9nzRAZfjD5v9Eb",
-                        ...
-                      ],
-                      "waiting": [],
-                      "sessionIndex": 6,
-                      "currentEra": 1,
-                      "validatorInfo": {
-                        "nBEPWLmcAoSDPNoFKuKZXyAwEMtfhz7RU9nzRAZfjD5v9Eb": {
-                          "commissionPer": 0,
-                          "controllerId": "mVkyikJBD8P6XPpsdVMTXzbSBsPD1U1oD9EYqTgpiWxUctx",
-                          "rewardDestination": "Staked",
-                          "nextSessionIds": [],
-                          "eraPoints": 0
-                        },
-                        ...
-                      }
-                    },
-                    "blockNumber": 600
-                  }
-  */
   public async handle(event: CWEvent < IChainEventData >, dbEvent) {
     // 1) if other event type ignore and do nothing.
     if (event.data.kind !== SubstrateTypes.EventKind.NewSession) {
@@ -67,7 +27,6 @@ export default class extends IEventHandler {
         visited: false
       };
     });
-    
     newSessionEventData.active.forEach((validator: any) => {
       newValidators[validator] = {
         state: 'Active',
@@ -134,13 +93,16 @@ export default class extends IEventHandler {
       return this._models.Validator.upsert(row);
     }));
 
-    const existingHistoricalValidators = await this._models.HistoricalValidatorStatistic.findAll({
-      where: {
-        stash: {
-          [Op.in]: Object.keys(newSessionEventData.activeExposures)
-        }
-      }
-    });
+    const rawQuery = `
+    SELECT * FROM (
+      SELECT *, ROW_NUMBER() OVER(PARTITION BY stash ORDER BY created_at DESC) 
+      FROM public."HistoricalValidatorStatistic" 
+      WHERE stash IN ('${Object.keys(newSessionEventData.activeExposures).join("','")}')
+    ) as q
+    WHERE row_number = 1
+  `;
+    const [existingHistoricalValidators, metadata] = await sequelize.query(rawQuery);
+
     const existingHistoricalValidatorsData = JSON.parse(JSON.stringify(existingHistoricalValidators));
     const allExistingHistoricalValidators = [];
     existingHistoricalValidatorsData.forEach((validator: any) => {
@@ -173,16 +135,14 @@ export default class extends IEventHandler {
         updated_at: new Date().toISOString(),
       };
       if (validator in allExistingHistoricalValidators) {
-        validatorEntry = allExistingHistoricalValidators[validator];
-        
-        validatorEntry.exposure         = exposure;
-        validatorEntry.block            = event.blockNumber.toString();
-        validatorEntry.commissionPer    = (newSessionEventData as any).validatorInfo[validator].commissionPer;
-        validatorEntry.eraPoints        = (newSessionEventData as any).validatorInfo[validator].eraPoints;
-        validatorEntry.isOnline         = false,
-        validatorEntry.created_at       = new Date().toISOString();
-        validatorEntry.updated_at       = new Date().toISOString();
-      };
+        const record = allExistingHistoricalValidators[validator];
+        validatorEntry.apr = record.apr;
+        validatorEntry.uptime = record.uptime;
+        validatorEntry.rewardsStats = record.rewardsStats;
+        validatorEntry.slashesStats = record.slashesStats;
+        validatorEntry.offencesStats = record.offencesStats;
+      }
+
       newValidatorForHistoricalStats.push(validatorEntry);
     }
 
