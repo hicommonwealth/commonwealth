@@ -51,20 +51,7 @@ export const computeEventStats = async (chain: String, event: String, stash: Str
   return [eventStatsSum, eventStatsAvg, eventStatsCount];
 };
 
-const numberToBn = (n) => new BN(n.toLocaleString().replace(/,/g, ''));
-
-const computeAPR = (commissionPer, rewardAmount, ownedAmount, totalStakeAmount, rewardsTimeIntervals) => {
-  /*
-    APR calculation for the current validator. Reference: https://github.com/hicommonwealth/commonwealth/blob/staking-ui/client/scripts/controllers/chain/substrate/staking.ts#L468-L472
-  */
-  const rewardCommissionAmount = numberToBn(rewardAmount).muln(commissionPer).divn(100);
-  const periodsInYear = (60 * 60 * 24 * 7 * 52) / rewardsTimeIntervals;
-  const apr = Number(((+rewardCommissionAmount) * (periodsInYear)) / +totalStakeAmount);
-  return apr;
-};
-
 export const getAPR = async (chain: String, event: String, stash: string, noOfDays: number) => {
-  let computedAPR = 0;
 
   const todayDate = moment();
   const endDate = todayDate.add(1, 'days').format('YYYY-MM-DD');
@@ -91,27 +78,6 @@ export const getAPR = async (chain: String, event: String, stash: string, noOfDa
   `;
   const [rewardEvents, rewardEventsMetadata] = await sequelize.query(rewardRawQuery);
 
-  const rewardsTimeDiffs = rewardEvents.map((reward, index) => {
-    const currRewardTime = moment(reward.created_at);
-    const preRewardTime = moment(
-      index === 0
-        ? sessionEvents[sessionEvents.length - 1].created_at
-        : rewardEvents[index - 1].created_at
-    );
-    return currRewardTime.diff(preRewardTime, 'seconds');
-  });
-
-
-  for (const session of sessionEvents) {
-    if (session.event_data.validatorInfo.hasOwnProperty(stash) === false) {
-      console.log('mil gaya!');
-    }
-  }
-  
-  const rewardTimeAvg = rewardsTimeDiffs.reduce(
-    (total, timeDiff) => Number(total) + Number(timeDiff), 0
-  ) / rewardsTimeDiffs.length;
-
   const rewardAmountAvg = rewardEvents.reduce(
     (total, reward) => Number(total) + Number(reward.event_data.amount), 0
   ) / rewardEvents.length;
@@ -120,15 +86,16 @@ export const getAPR = async (chain: String, event: String, stash: string, noOfDa
     (total, commission) => Number(total) + Number(commission.event_data.validatorInfo[stash].commissionPer), 0
   ) / sessionEvents.length;
 
-  const ownAmountAvg = sessionEvents.reduce(
-    (total, ownAmount) => Number(total) + Number(ownAmount.event_data.activeExposures[stash].own), 0
-  ) / sessionEvents.length;
-
   const stakeAmountAvg = sessionEvents.reduce(
     (total, totalStake) => Number(total) + Number(totalStake.event_data.activeExposures[stash].total), 0
   ) / sessionEvents.length;
 
-  computedAPR = computeAPR(commissionsAvg, rewardAmountAvg, ownAmountAvg, stakeAmountAvg, rewardTimeAvg);
+  const ownAmountAvg = sessionEvents.reduce(
+    (total, ownAmount) => Number(total) + Number(ownAmount.event_data.activeExposures[stash].own), 0
+  ) / sessionEvents.length;
 
+  const computedAPR = (1 - commissionsAvg / 100)
+    * (rewardAmountAvg / (+stakeAmountAvg))
+    * (365 * (24 / 6)) * 100; // number of periods in year
   return computedAPR;
 };
