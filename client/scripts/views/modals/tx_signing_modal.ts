@@ -42,10 +42,6 @@ const createProposalTransactionLabels = {
   removeProxy: 'Remove proxy',
   delegate: 'Set delegate',
   undelegate: 'Remove delegate',
-  // edgeware: signaling
-  createSignalingProposal: 'Create signaling proposal',
-  advanceSignalingProposal: 'Start/finish polling',
-  submitSignalingVote: 'Vote in signaling proposal',
   // edgeware: treasury
   proposeSpend: 'Propose treasury spend',
   contractInteraction: 'Interact with contract',

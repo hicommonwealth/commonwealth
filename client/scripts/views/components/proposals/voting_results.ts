@@ -8,18 +8,10 @@ import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only
 import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
-import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling_proposal';
 import { first } from 'rxjs/operators';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
-
-const signalingVoteToString = (v: VoteOutcome): string => {
-  const outcomeArray = v.toU8a();
-  // cut off trailing 0s
-  const sliceEnd = outcomeArray.indexOf(0);
-  return u8aToString(outcomeArray.slice(0, sliceEnd));
-};
 
 const VoteListing: m.Component<{
   proposal: AnyProposal,
@@ -66,11 +58,7 @@ const VoteListing: m.Component<{
                 balance = '--';
               }
             }
-            return vote instanceof SignalingVote ? m('.vote', [
-              m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-              m('.vote-choice', signalingVoteToString(vote.choices[0])),
-              (balanceWeighted && balance) && m('.vote-balance', balance),
-            ]) : vote instanceof BinaryVote ? m('.vote', [
+            return vote instanceof BinaryVote ? m('.vote', [
               m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
               (balanceWeighted && balance)
                 ? m('.vote-balance', balance)
@@ -114,21 +102,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
     const votes = proposal.getVotes();
 
     // TODO: fix up this function for cosmos votes
-    if (proposal instanceof EdgewareSignalingProposal) {
-      return m('.ProposalVotingResults', [
-        proposal.data.choices.map((outcome) => {
-          return m('.results-column', [
-            m('.results-header', signalingVoteToString(outcome)),
-            m('.results-cell', [
-              m(VoteListing, {
-                proposal,
-                votes: votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))
-              })
-            ])
-          ]);
-        }),
-      ]);
-    } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
+    if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.ProposalVotingResults', [
         m('.results-column', [
           m('.results-header', `Voted yes (${votes.filter((v) => v.choice === true).length})`),
