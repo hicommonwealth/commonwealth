@@ -291,7 +291,7 @@ export const EditPermissionsButton: m.Component<{
   view: (vnode) => {
     const { openEditPermissions } = vnode.attrs;
     return m(MenuItem, {
-      label: 'Add editors',
+      label: 'Manage collaborators',
       onclick: async (e) => {
         e.preventDefault();
         openEditPermissions();
@@ -340,7 +340,7 @@ export const ProposalEditorPermissions: m.Component<{
       .concat(Object.values(vnode.state.addedEditors))
       .filter((c) => !Object.keys(vnode.state.removedEditors).includes(c.address));
     const existingEditors = m('.existing-editors', [
-      m('span', 'Existing editors'),
+      m('span', 'Selected collaborators'),
       m('.editor-listing', allCollaborators.map((c) => {
         const user : Profile = app.profiles.getProfile(c.chain, c.address);
         return m('.user-wrap', [
@@ -374,9 +374,11 @@ export const ProposalEditorPermissions: m.Component<{
       closeOnOutsideClick: true,
       content: m('.proposal-editor-permissions-wrap', [
         m(QueryList, {
-          initialContent: 'Enter an address',
           checkmark: true,
           items,
+          inputAttrs: {
+            placeholder: 'Enter username or address...',
+          },
           itemRender: (role: any, idx: number) => {
             const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
             const recentlyAdded: boolean = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
@@ -432,11 +434,11 @@ export const ProposalEditorPermissions: m.Component<{
           vnode.state.isOpen = false;
         }
       },
-      title: 'Add editor permissions',
+      title: 'Manage collaborators',
       transitionDuration: 200,
       footer: m(`.${Classes.ALIGN_RIGHT}`, [
         m(Button, {
-          label: 'Close',
+          label: 'Cancel',
           onclick: async () => {
             if (vnode.attrs.popoverMenu) {
               vnode.attrs.openStateHandler(false);
@@ -465,14 +467,14 @@ export const ProposalEditorPermissions: m.Component<{
                 console.log(res);
                 if (res.status === 'Success') {
                   thread.collaborators = res.result.collaborators;
-                  notifySuccess('Editors successfully added');
+                  notifySuccess('Collaborators successfully added');
                 } else {
-                  notifyError('Failed to add editors');
+                  notifyError('Failed to add collaborators');
                 }
               } catch (err) {
                 throw new Error((err.responseJSON && err.responseJSON.error)
                   ? err.responseJSON.error
-                  : 'Failed to add editors.');
+                  : 'Failed to add collaborators');
               }
             }
             if (!$.isEmptyObject(vnode.state.removedEditors)) {
@@ -488,13 +490,13 @@ export const ProposalEditorPermissions: m.Component<{
                 });
                 if (res.status === 'Success') {
                   thread.collaborators = res.result.collaborators;
-                  notifySuccess('Editors successfully removed.');
+                  notifySuccess('Collaborators successfully removed');
                 } else {
-                  throw new Error('Failed to remove editor.');
+                  throw new Error('Failed to remove collaborator');
                 }
                 m.redraw();
               } catch (err) {
-                const errMsg = err.responseJSON?.error || 'Failed to remove editor.';
+                const errMsg = err.responseJSON?.error || 'Failed to remove collaborator';
                 notifyError(errMsg);
               }
             }

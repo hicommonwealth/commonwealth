@@ -7,6 +7,11 @@
             flex-direction: column;
             flex: 2;
             margin-right: 25px;
+            min-height: 270px;
+            max-height: 270px;
+            &:last-child {
+                margin-right: 0;
+            }
         }
         .existing-editors {
             display: flex;
@@ -20,7 +25,9 @@
                 display: flex;
                 flex-direction: column;
                 .user-wrap {
-                    margin-right: 7px;
+                    margin-right: 10px;
+                    margin-bottom: 3px;
+                    white-space: nowrap;
                     .cui-icon {
                         margin-left: 3px;
                     }
