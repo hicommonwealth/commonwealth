@@ -148,8 +148,8 @@ class ThreadsController {
     proposal: OffchainThread,
     body?: string,
     title?: string,
-    attachments?: string[],
     mentions?: string[],
+    attachments?: string[],
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
@@ -164,6 +164,7 @@ class ThreadsController {
         'body': encodeURIComponent(newBody),
         'title': newTitle,
         'version_history': versionHistory,
+        'mentions[]': mentions,
         'attachments[]': attachments,
         'jwt': app.user.jwt
       },

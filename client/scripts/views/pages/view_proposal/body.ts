@@ -352,13 +352,9 @@ export const ProposalBodySaveEdit: m.Component<{
             try {
               const previousDraftQuill = new Delta(JSON.parse(previousDraft.body));
               previousDraftMentions = parseMentionsForServer(previousDraftQuill, false);
-              console.log(previousDraftMentions);
             } catch {
-              console.log(previousDraft.body);
               previousDraftMentions = parseMentionsForServer(previousDraft.body, true);
             }
-            console.log(currentDraftMentions);
-            console.log(previousDraftMentions);
             mentions = currentDraftMentions.filter((addrArray) => {
               let alreadyExists = false;
               previousDraftMentions.forEach((addrArray_) => {
@@ -366,13 +362,13 @@ export const ProposalBodySaveEdit: m.Component<{
                   alreadyExists = true;
                 }
               });
-              return alreadyExists;
+              return !alreadyExists;
             });
             console.log(mentions);
           }
           parentState.saving = true;
           if (item instanceof OffchainThread) {
-            app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {
+            app.threads.edit(item, itemText, parentState.updatedTitle, mentions).then(() => {
               m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;

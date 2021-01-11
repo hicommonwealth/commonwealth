@@ -1,8 +1,6 @@
 import { re_weburl } from 'lib/url-validation';
 
 export const parseMentionsForServer = (text, isMarkdown) => {
-  console.log(text);
-  debugger
   // Extract links to Commonwealth profiles, so they can be processed by the server as mentions
   const regexp = RegExp('\\[\\@.+?\\]\\(.+?\\)', 'g');
   if (isMarkdown) {
