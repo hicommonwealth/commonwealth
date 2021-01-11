@@ -153,16 +153,29 @@ export class SubstrateBounty
       return;
     }
     switch (e.data.kind) {
-      case SubstrateTypes.EventKind.TreasuryProposed: {
+      case SubstrateTypes.EventKind.TreasuryBountyProposed: {
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryAwarded: {
-        this._awarded.next(true);
+      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
+        break;
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
         this.complete();
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryRejected: {
-        this._awarded.next(false);
+      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
+        break;
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
+        this._awarded.next(true);
+        break;
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
+        this.complete();
+        break;
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
+        this._awarded.next(true);
         this.complete();
         break;
       }
