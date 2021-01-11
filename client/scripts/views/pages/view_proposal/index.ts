@@ -86,7 +86,6 @@ const ProposalHeader: m.Component<{
     }).length > 0;
 
     const { isAuthor, isEditor, isAdmin } = vnode.state;
-    console.log({ isAuthor, isEditor, isAdmin });
 
     const isThread = proposal instanceof OffchainThread;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;

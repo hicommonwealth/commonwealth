@@ -354,11 +354,9 @@ export const ProposalEditorPermissions: m.Component<{
               // If already scheduled for addition, un-schedule
               if (vnode.state.addedEditors[c.address]) {
                 delete vnode.state.addedEditors[c.address];
-                console.log(vnode.state.addedEditors);
               } else {
               // If already an existing editor, schedule for removal
                 vnode.state.removedEditors[c.address] = c;
-                console.log(vnode.state.removedEditors);
               }
             },
           }),
@@ -397,12 +395,10 @@ export const ProposalEditorPermissions: m.Component<{
               : address.address.toLowerCase().includes(query.toLowerCase());
           },
           onSelect: (item) => {
-            console.log(vnode.state.addedEditors);
             const addrItem = (item as any).Address;
             // If already scheduled for removal, un-schedule
             if (vnode.state.removedEditors[addrItem.address]) {
               delete vnode.state.removedEditors[addrItem.address];
-              console.log(vnode.state.removedEditors);
             }
             // If already scheduled for addition, un-schedule
             if (vnode.state.addedEditors[addrItem.address]) {
@@ -415,7 +411,6 @@ export const ProposalEditorPermissions: m.Component<{
             } else {
               notifyInfo('Already an editor');
             }
-            console.log(vnode.state.addedEditors);
           }
         }),
         allCollaborators.length > 0
@@ -464,7 +459,6 @@ export const ProposalEditorPermissions: m.Component<{
                   editors: JSON.stringify(vnode.state.addedEditors),
                   jwt: app.user.jwt,
                 });
-                console.log(res);
                 if (res.status === 'Success') {
                   thread.collaborators = res.result.collaborators;
                   notifySuccess('Collaborators successfully added');

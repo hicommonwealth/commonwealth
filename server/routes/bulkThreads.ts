@@ -90,8 +90,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     threads = preprocessedThreads.map((t) => {
       const root_id = `discussion_${t.thread_id}`;
       root_ids.push(root_id);
-      console.log(t.collaborators);
-      console.log(t.collaborators[0]);
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];

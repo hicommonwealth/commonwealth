@@ -47,7 +47,6 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     return next(new Error(Errors.InvalidEditor));
   }
 
-  console.log(collaborators);
   // Ensure collaborators have community permissions
   if (collaborators?.length > 0) {
     await Promise.all(collaborators.map(async (collaborator) => {
@@ -132,8 +131,6 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       model: models.Address,
     }]
   });
-
-  console.log(finalEditors);
 
   return res.json({
     status: 'Success',
