@@ -306,28 +306,31 @@ export const ProposalEditorPermissions: m.Component<{
   onChangeHandler: any,
   openStateHandler: any
 }, {
+  membersLoaded: boolean,
   items: any[],
   addedEditors: any,
   removedEditors: any,
   isOpen: boolean,
 }> = {
-  oninit: async (vnode) => {
-    // TODO: Break into view
-    const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
-    try {
-      const req = await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj);
-      if (req.status !== 'Success') throw new Error('Could not fetch members');
-      vnode.state.items = req.result.filter((role) => {
-        return role.Address.address !== app.user.activeAccount?.address;
-      });
-      m.redraw();
-    } catch (err) {
-      m.redraw();
-      console.error(err);
-    }
-  },
   view: (vnode) => {
     const { thread } = vnode.attrs;
+    if (!vnode.state.membersLoaded) {
+      // TODO: Break into view
+      const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
+      $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
+        .then((res) => {
+          if (res.status !== 'Success') throw new Error('Could not fetch members');
+          vnode.state.items = res.result.filter((role) => {
+            return role.Address.address !== app.user.activeAccount?.address;
+          });
+          vnode.state.membersLoaded = true;
+          m.redraw();
+        })
+        .catch((err) => {
+          m.redraw();
+          console.error(err);
+        });
+    }
     if (!vnode.state.items?.length) return;
     if (!vnode.state.addedEditors) {
       vnode.state.addedEditors = {};
@@ -364,7 +367,6 @@ export const ProposalEditorPermissions: m.Component<{
       }))
     ]);
 
-    // TODO: Existing editor deletion
     return m(Dialog, {
       basic: false,
       class: 'ProposalEditorPermissions',
