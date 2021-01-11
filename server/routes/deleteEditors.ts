@@ -95,8 +95,6 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
     }]
   });
 
-  console.log(finalEditors);
-
   return res.json({
     status: 'Success',
     result: {
