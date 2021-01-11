@@ -347,17 +347,28 @@ export const ProposalBodySaveEdit: m.Component<{
               : quillEditorState.markdownMode
                 ? parseMentionsForServer(quillEditorState.editor.getText(), true)
                 : parseMentionsForServer(quillEditorState.editor.getContents(), false);
-            const previousDraft = (item as OffchainThread).versionHistory[0];
+            const previousDraft = JSON.parse((item as OffchainThread).versionHistory[0]);
             let previousDraftMentions;
             try {
-              console.log(previousDraft);
-              const previousDraftQuill = new Delta(JSON.parse(previousDraft));
-              previousDraftMentions = parseMentionsForServer(previousDraftQuill, true);
+              const previousDraftQuill = new Delta(JSON.parse(previousDraft.body));
+              previousDraftMentions = parseMentionsForServer(previousDraftQuill, false);
+              console.log(previousDraftMentions);
             } catch {
-              previousDraftMentions = parseMentionsForServer(previousDraft, false);
+              console.log(previousDraft.body);
+              previousDraftMentions = parseMentionsForServer(previousDraft.body, true);
             }
             console.log(currentDraftMentions);
             console.log(previousDraftMentions);
+            mentions = currentDraftMentions.filter((addrArray) => {
+              let alreadyExists = false;
+              previousDraftMentions.forEach((addrArray_) => {
+                if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+                  alreadyExists = true;
+                }
+              });
+              return alreadyExists;
+            });
+            console.log(mentions);
           }
           parentState.saving = true;
           if (item instanceof OffchainThread) {
