@@ -72,7 +72,7 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
                 'APR')),
             m('.info-row-block',
               m('.profile-data-block',
-                vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse.apr}%` : m('spinner', itemLoadingSpinner())))),
+                vnode.attrs.apiResponse ? `${Number(vnode.attrs.apiResponse.apr).toFixed(2)}%` : m('spinner', itemLoadingSpinner())))),
           m('.own-total-offences',
             m('.data-row-block',
               m('.profile-header-block',

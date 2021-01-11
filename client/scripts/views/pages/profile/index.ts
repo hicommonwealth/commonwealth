@@ -27,9 +27,11 @@ const ySteps = 4;
 
 // 30 days start and endDate
 const todayDate = new Date();
+todayDate.setDate(new Date().getDate() + 1);
+const _endDate = todayDate.toDateString();
 todayDate.setDate(new Date().getDate() - 30);
 const _startDate = todayDate.toDateString();
-const _endDate = new Date().toDateString();
+
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
@@ -192,7 +194,6 @@ function generateBuckets(v, bucketCount, jumpIdx, recentBlockNum) {
   const bucket = new Array(bucketCount).fill(0);
   const bk = [];
   buildBucketKeys(bk, bucket, recentBlockNum, jumpIdx);
-
   Object.keys(v).forEach((vk) => {
     addInDesiredBucket(bucketCount, recentBlockNum, bucket, jumpIdx, v, vk);
   });
@@ -205,13 +206,14 @@ function generateBuckets(v, bucketCount, jumpIdx, recentBlockNum) {
 async function assignApiValues(route, obj: IGraphData, addr, latestBlock) {
   try {
     const apiRes = await $.get(`${app.serverUrl()}/${route}`, {
-      chain: app.chain.class,
+      chain: app.chain.meta.chain.id,
       stash: addr,
       onlyValue: true,
       version: 38,
       startDate: _startDate,
       endDate: _endDate
     });
+    console.log('assignApiValues', { route, apiRes });
     const bucket = generateBuckets(apiRes.result[addr],
       numBuckets,
       bucketSize,
@@ -225,7 +227,7 @@ async function assignApiValues(route, obj: IGraphData, addr, latestBlock) {
     obj.yStepSize = obj.maxValue / ySteps;
   } catch (e) {
     obj.blocks = [];
-    // /console.error(e);
+    console.error(e);
   }
 }
 
@@ -351,7 +353,7 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
       if (!vnode.state.apiCalled) {
         vnode.state.apiCalled = true;
         $.get(`${app.serverUrl()}/getValidatorHeaderDetails`, {
-          chain: app.chain.class,
+          chain: app.chain.meta.chain.id,
           stash: vnode.attrs.address,
           onlyValue: true,
           version: 38
