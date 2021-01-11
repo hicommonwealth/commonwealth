@@ -134,12 +134,25 @@ export default class extends IEventHandler {
       return this._models.Validator.upsert(row);
     }));
 
+    const existingHistoricalValidators = await this._models.HistoricalValidatorStatistic.findAll({
+      where: {
+        stash: {
+          [Op.in]: Object.keys(newSessionEventData.activeExposures)
+        }
+      }
+    });
+    const existingHistoricalValidatorsData = JSON.parse(JSON.stringify(existingHistoricalValidators));
+    const allExistingHistoricalValidators = [];
+    existingHistoricalValidatorsData.forEach((validator: any) => {
+      allExistingHistoricalValidators[validator.stash] = validator;
+    });
+
     // 5) Create new Historical validator statistics record for new validators.
     const newValidatorForHistoricalStats = [];
     for (const validator of Object.keys(newSessionEventData.activeExposures)) {
       const exposure = newSessionEventData.activeExposures[validator];
 
-      const validatorEntry = {
+      let validatorEntry = {
         name: null,
         stash: validator,
         exposure,
@@ -159,8 +172,20 @@ export default class extends IEventHandler {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
+      if (validator in allExistingHistoricalValidators) {
+        validatorEntry = allExistingHistoricalValidators[validator];
+        
+        validatorEntry.exposure         = exposure;
+        validatorEntry.block            = event.blockNumber.toString();
+        validatorEntry.commissionPer    = (newSessionEventData as any).validatorInfo[validator].commissionPer;
+        validatorEntry.eraPoints        = (newSessionEventData as any).validatorInfo[validator].eraPoints;
+        validatorEntry.isOnline         = false,
+        validatorEntry.created_at       = new Date().toISOString();
+        validatorEntry.updated_at       = new Date().toISOString();
+      };
       newValidatorForHistoricalStats.push(validatorEntry);
     }
+
     // 4) Add validators records HistoricalValidatorStatistic in table.
     await Promise.all(newValidatorForHistoricalStats.map((row: any) => {
       return this._models.HistoricalValidatorStatistic.create(row, { ignoreDuplicates: true });
