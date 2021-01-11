@@ -1,4 +1,5 @@
 import moment from 'moment-twitter';
+import { VersionHistory } from '../controllers/server/threads';
 import { IUniqueId } from './interfaces';
 import OffchainAttachment from './OffchainAttachment';
 
@@ -17,7 +18,7 @@ class OffchainComment<T extends IUniqueId> {
   public readonly parentComment: number;
   public readonly rootProposal: number;
   public readonly childComments: number[];
-  public readonly versionHistory: string[];
+  public readonly versionHistory: VersionHistory[];
 
   constructor(
     chain,

@@ -10,6 +10,7 @@ import { CompactModalExitButton } from '../modal';
 import QuillFormattedText from '../components/quill_formatted_text';
 import MarkdownFormattedText from '../components/markdown_formatted_text';
 import User, { UserBlock } from '../components/widgets/user';
+import { VersionHistory } from 'client/scripts/controllers/server/threads';
 const Delta = Quill.import('delta');
 
 interface IVersionHistoryAttrs {
@@ -43,12 +44,11 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
       return diff;
     };
 
-    const getVersion = (edit, prevEdit) => {
-      const parsedEdit = JSON.parse(edit);
-      const author = parsedEdit.author
-        ? app.profiles.getProfile(parsedEdit.author.chain, parsedEdit.author.address)
+    const getVersion = (edit: VersionHistory, prevEdit: VersionHistory) => {
+      const author = edit.author
+        ? app.profiles.getProfile(edit.author.chain, edit.author.address)
         : app.profiles.getProfile(proposal.author, proposal.authorChain);
-      const timestamp = moment(parsedEdit.timestamp).format('dddd, MMMM Do YYYY, h:mm a');
+      const timestamp = moment(edit.timestamp).format('dddd, MMMM Do YYYY, h:mm a');
       const userOptions = {
         user: author,
         showRole: false,
@@ -58,11 +58,11 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
       };
       // TODO: Add diffing algorithm for Markdown posts
       try {
-        const doc = new Delta(JSON.parse(parsedEdit.body));
+        const doc = new Delta(JSON.parse(edit.body));
         let diff; let quillDiff; let prevDoc;
         if (prevEdit) {
           try {
-            prevDoc = new Delta(JSON.parse(JSON.parse(prevEdit).body));
+            prevDoc = new Delta(JSON.parse(prevEdit.body));
           } catch (e) {
             prevDoc = false;
           }
@@ -88,7 +88,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
             m('span.timestamp', timestamp),
           ]),
           m('.panel-right', [
-            m(MarkdownFormattedText, { doc: parsedEdit.body })
+            m(MarkdownFormattedText, { doc: edit.body })
           ])
         ]);
       }
