@@ -906,78 +906,105 @@ describe('Thread Tests', () => {
     });
   });
 
-  describe('/addEditors', () => {
-    it('successfully add a community member address as editor', async () => {
-      const { result } = await modelUtils.createThread({
-        address: userAddress,
-        kind,
-        chainId: null,
-        communityId: community,
-        title,
-        topicName,
-        topicId,
-        body,
-        jwt: userJWT,
-      });
-      const collaboration = result;
-      const editors = {};
-      editors[adminAddress] = {
-        id: adminAddressId,
-        chain,
-        address: adminAddress,
-      };
-      console.log(editors);
-      const res = await chai.request(app)
-        .post('/api/addEditors')
-        .set('Accept', 'application/json')
-        .send({
-          address: userAddress,
-          author_chain: chain,
-          chain: null,
-          community,
-          thread_id: result.id,
-          editors: JSON.stringify(editors),
-          jwt: userJWT,
-        });
-      console.log(res);
-      expect(res.status).to.equal(200);
-      expect(res.body).to.not.be.null;
-    });
-    it('successfully fail to add a non-community member address as editor', async () => {
-      const { result } = await modelUtils.createThread({
-        address: adminAddress,
-        kind,
-        chainId: null,
-        communityId: community,
-        title,
-        topicName,
-        topicId,
-        body,
-        jwt: adminJWT,
-      });
-      const collaboration = result;
-      const editors = {};
-      editors[userAddress] = {
-        id: userAddressId,
-        chain,
-        address: userAddress,
-      };
-      console.log(editors);
-      const res = await chai.request(app)
-        .post('/api/addEditors')
-        .set('Accept', 'application/json')
-        .send({
-          address: adminAddress,
-          author_chain: chain,
-          chain: null,
-          community,
-          thread_id: result.id,
-          editors: JSON.stringify(editors),
-          jwt: userJWT,
-        });
-      console.log(res);
-      expect(res.status).to.not.equal(200);
-      expect(res.body).to.not.be.null;
-    });
-  });
+  // let collaborativeThread;
+  // describe('/addEditors', () => {
+  //   it('successfully add a community member address as editor', async () => {
+  //     const { result } = await modelUtils.createThread({
+  //       address: userAddress,
+  //       kind,
+  //       chainId: null,
+  //       communityId: community,
+  //       title,
+  //       topicName,
+  //       topicId,
+  //       body,
+  //       jwt: userJWT,
+  //     });
+  //     collaborativeThread = result;
+  //     const editors = {};
+  //     editors[adminAddress] = {
+  //       id: adminAddressId,
+  //       chain,
+  //       address: adminAddress,
+  //     };
+  //     console.log(editors);
+  //     const res = await chai.request(app)
+  //       .post('/api/addEditors')
+  //       .set('Accept', 'application/json')
+  //       .send({
+  //         address: userAddress,
+  //         author_chain: chain,
+  //         chain: null,
+  //         community,
+  //         thread_id: collaborativeThread.id,
+  //         editors: JSON.stringify(editors),
+  //         jwt: userJWT,
+  //       });
+  //     console.log(res);
+  //     expect(res.status).to.equal(200);
+  //     expect(res.body).to.not.be.null;
+  //   });
+  //   it('fail to add a non-community member address as editor', async () => {
+  //     const { result } = await modelUtils.createThread({
+  //       address: adminAddress,
+  //       kind,
+  //       chainId: null,
+  //       communityId: community,
+  //       title,
+  //       topicName,
+  //       topicId,
+  //       body,
+  //       jwt: adminJWT,
+  //     });
+  //     const collaboration = result;
+  //     const editors = {};
+  //     editors[userAddress] = {
+  //       id: userAddressId,
+  //       chain,
+  //       address: userAddress,
+  //     };
+  //     console.log(editors);
+  //     const res = await chai.request(app)
+  //       .post('/api/addEditors')
+  //       .set('Accept', 'application/json')
+  //       .send({
+  //         address: adminAddress,
+  //         author_chain: chain,
+  //         chain: null,
+  //         community,
+  //         thread_id: result.id,
+  //         editors: JSON.stringify(editors),
+  //         jwt: userJWT,
+  //       });
+  //     console.log(res);
+  //     expect(res.status).to.not.equal(200);
+  //     expect(res.body).to.not.be.null;
+  //   });
+  // });
+  // describe('/deleteEditors', () => {
+  //   it('successfully delete an editor', async () => {
+  //     const editors = {};
+  //     editors[adminAddress] = {
+  //       id: adminAddressId,
+  //       chain,
+  //       address: adminAddress,
+  //     };
+  //     console.log(editors);
+  //     const res = await chai.request(app)
+  //       .post('/api/addEditors')
+  //       .set('Accept', 'application/json')
+  //       .send({
+  //         address: userAddress,
+  //         author_chain: chain,
+  //         chain: null,
+  //         community,
+  //         thread_id: collaborativeThread.id,
+  //         editors: JSON.stringify(editors),
+  //         jwt: userJWT,
+  //       });
+  //     console.log(res);
+  //     expect(res.status).to.equal(200);
+  //     expect(res.body).to.not.be.null;
+  //   });
+  // });
 });
