@@ -165,7 +165,6 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       );
     }));
 
-    // TODO: dispatch notifications for new mention(s)
     // TODO: update author.last_active
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });

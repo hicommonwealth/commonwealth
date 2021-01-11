@@ -1,20 +1,16 @@
 import m from 'mithril';
 import moment from 'moment';
 import lity from 'lity';
+import Quill from 'quill';
 
 import { updateRoute } from 'app';
 import app from 'state';
 import {
   OffchainThread,
-  OffchainThreadKind,
   OffchainComment,
-  Proposal,
   AnyProposal,
-  Account,
-  Profile,
-  ChainBase,
+  Account
 } from 'models';
-import { CommentParent } from 'controllers/server/comments';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
@@ -26,6 +22,8 @@ import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button } from 'construct-ui';
 import { notifySuccess } from 'controllers/app/notifications';
+import { parseMentionsForServer } from 'helpers/threads';
+const Delta = Quill.import('delta');
 
 export enum GlobalStatus {
   Get = 'get',
@@ -338,9 +336,29 @@ export const ProposalBodySaveEdit: m.Component<{
           e.preventDefault();
           parentState.saving = true;
           parentState.quillEditorState.editor.enable(false);
-          const itemText = parentState.quillEditorState.markdownMode
-            ? parentState.quillEditorState.editor.getText()
-            : JSON.stringify(parentState.quillEditorState.editor.getContents());
+          const { quillEditorState } = parentState;
+          const itemText = quillEditorState.markdownMode
+            ? quillEditorState.editor.getText()
+            : JSON.stringify(quillEditorState.editor.getContents());
+          let mentions;
+          if (isThread) {
+            const currentDraftMentions = !quillEditorState
+              ? []
+              : quillEditorState.markdownMode
+                ? parseMentionsForServer(quillEditorState.editor.getText(), true)
+                : parseMentionsForServer(quillEditorState.editor.getContents(), false);
+            const previousDraft = (item as OffchainThread).versionHistory[0];
+            let previousDraftMentions;
+            try {
+              console.log(previousDraft);
+              const previousDraftQuill = new Delta(JSON.parse(previousDraft));
+              previousDraftMentions = parseMentionsForServer(previousDraftQuill, true);
+            } catch {
+              previousDraftMentions = parseMentionsForServer(previousDraft, false);
+            }
+            console.log(currentDraftMentions);
+            console.log(previousDraftMentions);
+          }
           parentState.saving = true;
           if (item instanceof OffchainThread) {
             app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {

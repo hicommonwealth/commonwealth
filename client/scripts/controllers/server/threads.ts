@@ -149,6 +149,7 @@ class ThreadsController {
     body?: string,
     title?: string,
     attachments?: string[],
+    mentions?: string[],
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
