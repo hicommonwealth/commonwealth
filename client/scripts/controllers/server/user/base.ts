@@ -87,7 +87,7 @@ export default class {
   constructor() {}
 
   // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
-  public ephemerallySetActiveAccount(account: Account<any>): void { this._setActiveAccount(account); }
+  public ephemerallySetActiveAccount(account: Account<any>): void { debugger; this._setActiveAccount(account); }
   public setEmail(email: string): void { this._setEmail(email); }
   public setEmailInterval(emailInterval: string): void { this._setEmailInterval(emailInterval); }
   public setEmailVerified(verified: boolean): void { this._setEmailVerified(verified); }
@@ -119,7 +119,7 @@ export default class {
   }
 
   public setActiveAccounts(activeAccounts: Account<any>[]): void { this._setActiveAccounts(activeAccounts); }
-  public addActiveAddress(address: Account<any>): void { this._activeAccounts.push(address); }
+  public addActiveAddress(address: Account<any>): void { debugger; this._activeAccounts.push(address); }
   public removeActiveAddress(address: Account<any>): void {
     this._activeAccounts.splice(this._activeAccounts.findIndex((a) => a.address === address.address), 1);
   }

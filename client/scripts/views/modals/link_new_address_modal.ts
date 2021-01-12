@@ -98,7 +98,7 @@ const EthereumLinkAccountItem: m.Component<{
           .then(() => m.redraw())
           .catch((err) => {
             vnode.state.linking = false;
-            errorCallback(`${err.name || 'Error'}: ${err.message}`);
+            errorCallback(`${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}`);
             m.redraw();
           });
       },
@@ -107,7 +107,7 @@ const EthereumLinkAccountItem: m.Component<{
         m('.account-user', m(User, { user: app.chain.accounts.get(address), avatarOnly: true, avatarSize: 40 })),
       ]),
       m('.account-item-left', [
-        m('.account-item-name', `${app.chain.meta.chain.name} account`),
+        m('.account-item-name', 'Ethereum address'), // always Ethereum, not app.chain.meta.chain.name
         m('.account-item-address', [
           m('.account-user', m(User, { user: app.chain.accounts.get(address), hideAvatar: true })),
         ]),
@@ -165,12 +165,12 @@ const CosmosLinkAccountItem: m.Component<{
             return accountVerifiedCallback(signerAccount).then(() => m.redraw());
           }).catch((err) => {
             vnode.state.linking = false;
-            errorCallback(`${err.name || 'Error'}: ${err.message}`);
+            errorCallback(`${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}`);
             m.redraw();
           });
         }).catch((err) => {
           vnode.state.linking = false;
-          errorCallback(`${err.name || 'Error'}: ${err.message}`);
+          errorCallback(`${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}`);
           m.redraw();
         });
       },
@@ -218,13 +218,16 @@ const SubstrateLinkAccountItem: m.Component<{
 
         if (result.exists) {
           if (result.belongsToUser) {
+            vnode.state.linking = false;
             notifyInfo('This address is already linked to your current account.');
+            m.redraw();
             return;
           } else {
             const modalMsg = 'This address is currently linked to another account. Continue?';
             const confirmed = await confirmationModalWithText(modalMsg)();
             if (!confirmed) {
               vnode.state.linking = false;
+              m.redraw();
               return;
             }
           }
@@ -245,6 +248,7 @@ const SubstrateLinkAccountItem: m.Component<{
           const signature = (await signer.signRaw(payload)).signature;
           signerAccount.validate(signature).then(() => {
             vnode.state.linking = false;
+            m.redraw();
             // return if user signs for two addresses
             if (linkNewAddressModalVnode.state.linkingComplete) return;
             linkNewAddressModalVnode.state.linkingComplete = true;
@@ -257,11 +261,13 @@ const SubstrateLinkAccountItem: m.Component<{
           }).catch((err) => {
             vnode.state.linking = false;
             errorCallback('Verification failed');
+            m.redraw();
           });
         } catch (err) {
           // catch when the user rejects the sign message prompt
           vnode.state.linking = false;
           errorCallback('Verification failed');
+          m.redraw();
         }
       }
     }, [
@@ -503,7 +509,8 @@ const LinkNewAddressModal: m.Component<{
             app.chain.base === ChainBase.CosmosSDK
               && link('a', 'https://wallet.keplr.app/', 'Get Keplr', { target: '_blank' }),
           ]),
-          app.chain.webWallet?.enabled && m('.accounts-caption', [
+          // don't show the accounts caption for Ethereum, which uses a differently styled LinkAccountItem
+          app.chain.webWallet?.enabled && app.chain.base !== ChainBase.Ethereum && m('.accounts-caption', [
             app.chain.webWallet?.accounts.length ? [
               m('p', 'Select an address:'),
               m('p.small-text', 'Look for a popup, or check your wallet/browser extension.'),
