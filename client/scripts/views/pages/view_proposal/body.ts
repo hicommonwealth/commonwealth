@@ -364,7 +364,6 @@ export const ProposalBodySaveEdit: m.Component<{
               });
               return !alreadyExists;
             });
-            console.log(mentions);
           }
           parentState.saving = true;
           if (item instanceof OffchainThread) {
