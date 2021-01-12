@@ -298,6 +298,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
+  } else if (n.chain.network === ChainNetwork.Commonwealth) {
+    const Commonwealth = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/commonwealth/adapter'
+    )).default;
+    newChain = new Commonwealth(n, app);
   } else {
     throw new Error('Invalid chain');
   }
