@@ -42,7 +42,8 @@ import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
   ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
-  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem, EditPermissionsButton, ProposalEditorPermissions
+  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, EditPermissionsButton,
+  ProposalEditorPermissions
 } from './body';
 import CreateComment from './create_comment';
 
@@ -67,7 +68,7 @@ const ProposalHeader: m.Component<{
   view: (vnode) => {
     const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
 
-    vnode.state.isAdmin = (app.user.isRoleOfCommunity({
+    const isAdmin = (app.user.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
       community: app.activeCommunityId()
@@ -79,13 +80,11 @@ const ProposalHeader: m.Component<{
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
-    vnode.state.isAuthor = (app.user.activeAccount?.address === proposal.author
+    const isAuthor = (app.user.activeAccount?.address === proposal.author
           && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain);
-    vnode.state.isEditor = (proposal as OffchainThread).collaborators?.filter((c) => {
+    const isEditor = (proposal as OffchainThread).collaborators?.filter((c) => {
       return (c.address === app.user.activeAccount?.address && c.chain === app.user.activeAccount?.chain.id);
     }).length > 0;
-
-    const { isAuthor, isEditor, isAdmin } = vnode.state;
 
     const isThread = proposal instanceof OffchainThread;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;

@@ -95,10 +95,10 @@ export default (
       otherKey: 'id',
     });
     models.OffchainThread.belongsToMany(models.Address, {
-      through: models.SharingPermission,
+      through: models.Collaboration,
       as: 'collaborators'
     });
-    models.OffchainThread.hasMany(models.SharingPermission);
+    models.OffchainThread.hasMany(models.Collaboration);
   };
 
   return OffchainThread;

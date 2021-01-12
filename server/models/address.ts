@@ -321,10 +321,10 @@ export default (
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
     models.Address.belongsToMany(models.OffchainThread, {
-      through: models.SharingPermission,
+      through: models.Collaboration,
       as: 'collaboration'
     });
-    models.Address.hasMany(models.SharingPermission);
+    models.Address.hasMany(models.Collaboration);
   };
 
   return Address;

@@ -59,7 +59,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
           .find((role) => role.chain_id === chain.id);
         if (!isMember) throw new Error(Errors.InvalidEditor);
       }
-      const collaboration = await models.SharingPermission.findOrCreate({
+      const collaboration = await models.Collaboration.findOrCreate({
         where: {
           offchain_thread_id: thread.id,
           address_id: collaborator.id
@@ -127,7 +127,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     );
   }));
 
-  const finalEditors = await models.SharingPermission.findAll({
+  const finalEditors = await models.Collaboration.findAll({
     where: { offchain_thread_id: thread.id },
     include: [{
       model: models.Address,

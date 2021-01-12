@@ -13,7 +13,7 @@
                 margin-right: 0;
             }
         }
-        .existing-editors {
+        .existing-collaborators {
             display: flex;
             flex-direction: column;
             flex: 1;
@@ -21,7 +21,7 @@
                 font-weight: bold;
                 margin-bottom: 7px;
             }
-            .editor-listing {
+            .collaborator-listing {
                 display: flex;
                 flex-direction: column;
                 .user-wrap {
