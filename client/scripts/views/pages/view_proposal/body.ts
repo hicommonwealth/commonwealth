@@ -343,7 +343,7 @@ export const ProposalEditorPermissions: m.Component<{
       .filter((c) => !Object.keys(vnode.state.removedEditors).includes(c.address));
     const existingCollaborators = m('.existing-collaborators', [
       m('span', 'Selected collaborators'),
-      m('.editor-listing', allCollaborators.map((c) => {
+      m('.collaborator-listing', allCollaborators.map((c) => {
         const user : Profile = app.profiles.getProfile(c.chain, c.address);
         return m('.user-wrap', [
           m(User, { user }),
@@ -352,7 +352,6 @@ export const ProposalEditorPermissions: m.Component<{
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
-              console.log(`deleting ${c.address}`);
               // If already scheduled for addition, un-schedule
               if (vnode.state.addedEditors[c.address]) {
                 delete vnode.state.addedEditors[c.address];

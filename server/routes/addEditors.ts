@@ -94,7 +94,6 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
 
   await thread.save();
 
-  // TODO: Build and test notifications
   if (collaborators?.length > 0) await Promise.all(collaborators.map(async (collaborator) => {
     if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
