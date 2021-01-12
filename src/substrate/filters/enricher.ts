@@ -186,11 +186,11 @@ export async function Enrich(
         let activeExposures: { [key: string]: any } = {}
         if (validators && currentEra) { // if currentEra isn't empty
           await Promise.all(validators.map(async (validator) => {
-            const tmp_exposure = (await stakersCall(validator)) as Exposure;
+            const tmpExposure = (await stakersCall(validator)) as Exposure;
             const exposure = {
-              own: tmp_exposure.own,
-              total: tmp_exposure.total,
-              others: tmp_exposure.others
+              own: tmpExposure.own,
+              total: tmpExposure.total,
+              others: tmpExposure.others
             }
             activeExposures[validator.toString()] = exposure;
           }));
