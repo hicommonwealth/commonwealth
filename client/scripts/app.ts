@@ -508,6 +508,11 @@ $(() => {
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
     '/edgeware/stats':           importRoute('views/stats/edgeware', { scoped: false }),
 
+    // Commonwealth protocol
+    '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
+    '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
+    '/:scope/stakes':            importRoute('views/pages/commonwealth/stakes', { scoped: true }),
+
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),

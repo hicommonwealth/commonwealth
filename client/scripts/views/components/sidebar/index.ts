@@ -184,11 +184,12 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || app.chain.class === ChainClass.Moloch);
+        || app.chain.class === ChainClass.Moloch || app.chain.class === ChainClass.Commonwealth);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
+    const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
@@ -225,15 +226,18 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
             contentRight: [], // TODO
           }),
         // proposals (substrate, cosmos, moloch only)
-        m(ListItem, {
-          active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
-          label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
-          contentLeft: m(Icon, { name: Icons.SEND }),
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/proposals`);
-          },
-        }),
+        !app.community && (app.chain?.base === ChainBase.Substrate
+                           || app.chain?.base === ChainBase.CosmosSDK
+                           || app.chain?.class === ChainClass.Moloch)
+          && m(ListItem, {
+            active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
+            label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
+            contentLeft: m(Icon, { name: Icons.SEND }),
+            onclick: (e) => {
+              e.preventDefault();
+              m.route.set(`/${app.activeChainId()}/proposals`);
+            },
+          }),
         // treasury (substrate only)
         !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
           && m(ListItem, {
@@ -306,6 +310,27 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           },
           label: 'Approve tokens',
           contentLeft: m(Icon, { name: Icons.POWER }),
+        }),
+        showCommonwealthMenuOptions && m(ListItem, {
+          label: 'Projects',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/projects`);
+          },
+        }),
+        showCommonwealthMenuOptions && m(ListItem, {
+          label: 'Backers',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/backers`);
+          },
+        }),
+        showCommonwealthMenuOptions && m(ListItem, {
+          label: 'Stakes',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/stakes`);
+          },
         }),
       ]),
     ]);
