@@ -22,7 +22,7 @@ module.exports = {
         description: 'A protocol for funding public goods',
         symbol: 'CWT',
         network: 'commonwealth',
-        icon_url: '/static/img/protocols/cw.png',
+        icon_url: '/static/img/protocols/commonwealth.png',
         active: true,
         type: 'dao',
       }], { transaction: t });
