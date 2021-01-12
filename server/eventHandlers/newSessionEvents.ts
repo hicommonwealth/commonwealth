@@ -60,7 +60,6 @@ export default class extends IEventHandler {
     // update existing validators with new state and other details of all validators.
     allValidators.forEach((validator: any) => {
       const stashId = newValidators[validator.stash];
-
       if (stashId && stashId.length > 0) {
         const validatorsInfo = (newSessionEventData as any).validatorInfo[validator.stash];
         validator.state = stashId.state;
@@ -113,7 +112,6 @@ export default class extends IEventHandler {
     const newValidatorForHistoricalStats = [];
     for (const validator of Object.keys(newSessionEventData.activeExposures)) {
       const exposure = newSessionEventData.activeExposures[validator];
-
       let validatorEntry = {
         name: null,
         stash: validator,
@@ -142,7 +140,6 @@ export default class extends IEventHandler {
         validatorEntry.slashesStats = record.slashesStats;
         validatorEntry.offencesStats = record.offencesStats;
       }
-
       newValidatorForHistoricalStats.push(validatorEntry);
     }
 

@@ -55,7 +55,7 @@ const setupChainEventListeners = async (
   await sequelize.authenticate();
   const nodes: ChainNodeInstance[] = [];
   if (archival) {
-    nodes.push({ url:chains, chain: 'edgeware' } as unknown as ChainNodeInstance);
+    nodes.push({ url:chains[0], chain: chains[1] } as unknown as ChainNodeInstance);
   } else if (chains === 'all') {
     const n = (await Promise.all(EventSupportingChains.map((c) => {
       return models.ChainNode.findOne({ where: { chain: c } });
@@ -97,8 +97,8 @@ const setupChainEventListeners = async (
     const identityHandler = new IdentityHandler(models, node.chain);
     const handlers: IEventHandler[] = [
       storageHandler,
-      notificationHandler,
-      entityArchivalHandler,
+      // notificationHandler,
+      // entityArchivalHandler,
       newSessionHandler,
       heartbeatHandler,
       rewardHandler,
@@ -119,7 +119,7 @@ const setupChainEventListeners = async (
         node.chain.includes('edgeware') ? Mainnet : {},
       );
 
-      subscriber = await SubstrateEvents.subscribeEvents({
+      subscriber =  await SubstrateEvents.subscribeEvents({
         chain: node.chain,
         handlers,
         skipCatchup,
@@ -146,7 +146,7 @@ const setupChainEventListeners = async (
       if (subscriber) {
         subscriber.unsubscribe();
       }
-    }); 
+    });
     return [ node.chain, subscriber ];
   }));
   return _.object<{ [chain: string]:  IEventSubscriber<any, any> }>(subscribers);

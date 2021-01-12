@@ -72,15 +72,15 @@ async function main() {
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
   const ARCHIVAL_NODE_URL = process.env.ARCHIVAL_NODE_URL;
+  const ARCHIVAL_CHAIN = process.env.ARCHIVAL_CHAIN;
 
   // check if db record exists for archival node execution with chain-events version and starting block number.
-  let ARCHIVAL_CHAIN;
   if (ARCHIVAL) {
     const archivalNodeDBEntry = await archivalNodeDBEntryExist(models);
     ARCHIVAL = !archivalNodeDBEntry;
     log.info(`Executing process with ARCHIVAL flag set to ${ARCHIVAL}`);
-    if (ARCHIVAL && !ARCHIVAL_NODE_URL) {
-      log.error('ARCHIVAL NODE URL is necessary to execute in archival mode');
+    if (ARCHIVAL && !ARCHIVAL_NODE_URL && !ARCHIVAL_CHAIN) {
+      log.error('ARCHIVAL NODE URL and ARCHIVAL_CHAIN name is necessary to execute in archival mode');
       process.exit(1);
     }
   }
@@ -91,7 +91,7 @@ async function main() {
       // configure chain list from events
       let chains: string | string[] | 'all' | 'none' = 'all';
       if (ARCHIVAL) {
-        chains = ARCHIVAL_NODE_URL;
+        chains = [ARCHIVAL_NODE_URL, ARCHIVAL_CHAIN];
       } else if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
         chains = CHAIN_EVENTS;
       } else if (CHAIN_EVENTS) {
