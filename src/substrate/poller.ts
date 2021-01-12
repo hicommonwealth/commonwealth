@@ -92,7 +92,9 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
       try {
         let currentBlocks = await this.poll({startBlock: block, endBlock: Math.min(block + batchSize, range.endBlock)}, batchSize); 
         if(processBlockFn){
-          await Promise.all(currentBlocks.map(processBlockFn));
+          // process all blocks sequentially
+          for(let block of currentBlocks) await processBlockFn(block); 
+
         }
       } catch (e) {
         log.error(`Block polling failed after disconnect at block ${range.startBlock}`);

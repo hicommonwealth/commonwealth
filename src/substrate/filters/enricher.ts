@@ -123,15 +123,22 @@ export async function Enrich(
         const keys = api.query.staking.erasStakers ? 
           await api.query.staking.erasStakers.keysAt(hash,currentEra) :
           await api.query.staking.stakers.keysAt(hash, currentEra) ; 
+      
         const nextElected = keys.length ? keys.map((key) => key.args[1] as AccountId): validators;
         
+        // get current stashes
+        const stashes = await api.query.staking.validators.keysAt(hash);
+
+        // find the waiting validator
+        const nextElectedStr = nextElected.map((v) => v.toString())
+        const stashesStr =stashes.map((v) => v.args[0].toString())
+        const waiting = stashesStr.filter((v) => !nextElectedStr.includes(v));
+
 
         // get validators current era reward points
         const validatorEraPoints: EraRewardPoints = await currentPoints(api, currentEra, hash, validators) as EraRewardPoints;
         const eraPointsIndividual = validatorEraPoints.get('individual').toJSON();
 
-        let active: Array<ValidatorId>
-        let waiting: Array<ValidatorId>
         const validatorInfo = {};
 
         for(let validator of validators){
@@ -178,9 +185,7 @@ export async function Enrich(
 
         let activeExposures: { [key: string]: any } = {}
         if (validators && currentEra) { // if currentEra isn't empty
-          active = validators;
-          waiting = nextElected;
-          await Promise.all(active.map(async (validator) => {
+          await Promise.all(validators.map(async (validator) => {
             const tmp_exposure = (await stakersCall(validator)) as Exposure;
             const exposure = {
               own: tmp_exposure.own,
@@ -195,8 +200,8 @@ export async function Enrich(
           data: {
             kind,
             activeExposures,
-            active: active?.map((v) => v.toString()),
-            waiting: waiting?.map((v) => v.toString()),
+            active: validators?.map((v) => v.toString()),
+            waiting: waiting,
             sessionIndex: +sessionIndex,
             currentEra: +currentEra,
             validatorInfo,
