@@ -7,7 +7,7 @@ import { VersionHistory } from '../controllers/server/threads';
 
 class OffchainThread implements IUniqueId {
   public readonly author: string;
-  public collaborators?: any;
+  public collaborators?: any[];
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
@@ -50,7 +50,7 @@ class OffchainThread implements IUniqueId {
     url?: string,
     authorChain?: string,
     pinned?: boolean,
-    collaborators?: string[],
+    collaborators?: any[],
   ) {
     this.author = author;
     this.title = title;

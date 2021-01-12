@@ -44,15 +44,31 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     }
   };
 
-  try {
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
-    const thread = await models.OffchainThread.findOne({
+  let thread;
+  const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const collaboration = await models.SharingPermission.findOne({
+    where: {
+      offchain_thread_id: thread_id,
+      address_id: { [Op.in]: userOwnedAddressIds }
+    }
+  });
+  if (collaboration) {
+    thread = await models.OffchainThread.findOne({
+      where: {
+        id: thread_id
+      }
+    });
+  } else {
+    thread = await models.OffchainThread.findOne({
       where: {
         id: thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    if (!thread) return next(new Error('No thread with that id found'));
+  }
+  if (!thread) return next(new Error('No thread with that id found'));
+
+  try {
     const arr = thread.version_history;
     arr.unshift(version_history);
     thread.version_history = arr;
