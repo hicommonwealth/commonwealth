@@ -75,7 +75,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewCollaboration}`) {
-    notificationHeader = m('span', [actorName, ' added you as collaborator on ', m('span.commented-obj', decoded_title)]);
+    notificationHeader = m('span', [actorName, ' added you as a collaborator on ', m('span.commented-obj', decoded_title)]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
       ? m('span', [ actorName, ' liked the post ', m('span.commented-obj', decoded_title) ])

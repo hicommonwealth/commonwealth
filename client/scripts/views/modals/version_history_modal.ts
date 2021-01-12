@@ -6,10 +6,10 @@ import Quill from 'quill';
 import moment from 'moment';
 import { OffchainThread, OffchainComment } from 'models';
 import { formatAddressShort } from 'utils';
-import { CompactModalExitButton } from '../modal';
-import QuillFormattedText from '../components/quill_formatted_text';
-import MarkdownFormattedText from '../components/markdown_formatted_text';
-import User, { UserBlock } from '../components/widgets/user';
+import { CompactModalExitButton } from 'views/modal';
+import QuillFormattedText from 'views/components/quill_formatted_text';
+import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import User, { UserBlock } from 'views/components/widgets/user';
 import { VersionHistory } from 'client/scripts/controllers/server/threads';
 const Delta = Quill.import('delta');
 
