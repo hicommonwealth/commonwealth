@@ -86,7 +86,7 @@ export async function getRewardsFunc(models, req, next) {
     if (stash) {
       validators = { stash_id: validators[stash] };
     }
-  } else if (chain === 'kusama' || (chain === 'edgeware' && version === 38)) {
+  } else if (chain === 'kusama' || ((chain === 'edgeware' || chain === 'edgeware-local') && version === 38)) {
     // if using kusama chain or new version of edgeware
 
     let where: any = {
@@ -117,10 +117,13 @@ export async function getRewardsFunc(models, req, next) {
       if (!Object.prototype.hasOwnProperty.call(validators, validator_id)) {
         validators[validator_id] = {};
       }
-      validators[validator_id][block_number] = event_data['amount'];
+      if (!validators[validator_id][block_number]) {
+        validators[validator_id][block_number] = 0;
+      }
+      validators[validator_id][block_number] += Number(event_data['amount']);
     });
   }
-
+  validators.totalRewards = rewards.length;
   return { status: 'Success', result: validators || {}, denom: 'EDG' };
 }
 

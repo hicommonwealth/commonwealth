@@ -105,7 +105,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     const valCount = globalStatistics.elected
       ? `${globalStatistics?.elected}/${globalStatistics?.count}`
       : `${Object.keys(validators).length}/${vnode.attrs.valCount}`;
-    let waitingCt;
+    let waitingCt = 0;
 
     if (validators) {
       waitingCt = Object.keys(validators).filter((v) => !validators[v].isElected && !validators[v].toBeElected).length;
@@ -141,13 +141,12 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           value: sessionProgress,
           currentBlock: formatNumber(currentIndex)
         })),
-        eraProgress
-        && m(CardSummary, {
+        (eraProgress === true ? m(CardSummary, {
           title: 'Era',
           total: eraLength,
           value: eraProgress,
           currentBlock: formatNumber(currentEra)
-        }),
+        }) : ''),
         m('.validators-preheader-item', [
           m('h3', 'Est. APR'),
           globalStatistics.aprPercentage

@@ -83,10 +83,12 @@ const getOtherStakeOverTime = async (models, req: Request, res: Response, next: 
     let nominatorValue: any = event_data.exposure.others;
     // eslint-disable-next-line max-len
     if (onlyValue) {
-      nominatorValue = event_data.exposure.others.map(
+      const _res =  event_data.exposure.others.map(
         (q) => typeof (q.value) === 'string' ? parseInt(q.value, 16) : Number(q.value)
-      )
-        .reduce((a: number, b: number) => a + b);
+      );
+      if (_res.length > 0) {
+        nominatorValue =  _res.reduce((a: number, b: number) => a + b);
+      }
     }
     validators[key][event_data.block.toString()] = nominatorValue;
   });
