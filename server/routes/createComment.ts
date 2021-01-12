@@ -231,6 +231,11 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
   }
 
+  console.log(mentionedAddresses);
+  const excludedAddrs = mentionedAddresses.map((addr) => addr.address);
+  excludedAddrs.push(finalComment.Address.address);
+  console.log(excludedAddrs);
+
   // dispatch notifications to root thread
   await models.Subscription.emitNotifications(
     models,
@@ -258,7 +263,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       body: finalComment.text,
     },
     req.wss,
-    [ finalComment.Address.address ],
+    excludedAddrs
   );
 
   // if child comment, dispatch notification to parent author
@@ -291,7 +296,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
         body: finalComment.text,
       },
       req.wss,
-      [ finalComment.Address.address ],
+      excludedAddrs
     );
   }
 

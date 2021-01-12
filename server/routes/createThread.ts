@@ -206,7 +206,33 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       },
     });
   }));
+
+  // grab mentions to notify tagged users
+  let mentionedAddresses;
+  if (mentions?.length > 0) {
+    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+      mention = mention.split(',');
+      try {
+        return models.Address.findOne({
+          where: {
+            chain: mention[0],
+            address: mention[1],
+          },
+          include: [ models.User, models.Role ]
+        });
+      } catch (err) {
+        return next(new Error(err));
+      }
+    }));
+    // filter null results
+    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+  }
+
+  console.log(mentionedAddresses);
   // dispatch notifications to subscribers of the given chain/community
+  const excludedAddrs = mentionedAddresses.map((addr) => addr.address);
+  excludedAddrs.push(finalThread.Address.address);
+  console.log(excludedAddrs);
   await models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewThread,
@@ -233,30 +259,8 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       body: finalThread.body,
     },
     req.wss,
-    [ finalThread.Address.address ],
+    excludedAddrs,
   );
-
-  // grab mentions to notify tagged users
-  let mentionedAddresses;
-  if (mentions?.length > 0) {
-    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-      mention = mention.split(',');
-      try {
-        const user = await models.Address.findOne({
-          where: {
-            chain: mention[0],
-            address: mention[1],
-          },
-          include: [ models.User, models.Role ]
-        });
-        return user;
-      } catch (err) {
-        return next(new Error(err));
-      }
-    }));
-    // filter null results
-    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-  }
 
   // notify mentioned users, given permissions are in place
   if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
