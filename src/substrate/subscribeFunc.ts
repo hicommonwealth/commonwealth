@@ -115,6 +115,14 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
     }
     // else just run poller normally
     else {
+
+        // if we can't figure out when the last block we saw was,
+        // do nothing
+        // (i.e. don't try and fetch all events from block 0 onward)
+      if (!offlineRange || !offlineRange.startBlock) {
+        log.warn('Unable to determine offline time range.');
+        return;
+      }
       try {
         const blocks = await poller.poll(offlineRange);
         await Promise.all(blocks.map(processBlockFn));
