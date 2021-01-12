@@ -123,7 +123,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
         body: thread.body,
       },
       req.wss,
-      [ author.address ],
+      [ author.address ]
     );
   }));
 

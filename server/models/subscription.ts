@@ -105,9 +105,7 @@ export default (
         { is_active: true },
       ],
     };
-    console.log(category_id);
-    console.log(object_id);
-    console.log(notification_data);
+
     // typeguard function to differentiate between chain event notifications as needed
     const isChainEventData = (
       n: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData
@@ -179,6 +177,7 @@ export default (
         msg.dynamic_template_data.notification.path = `${SERVER_URL}/${notification_data.chainEventType.chain}/notificationsList?id=${notification.id}`;
       }
       if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
+      return notification;
     }));
 
     // send data to relevant webhooks
@@ -212,6 +211,7 @@ export default (
     //   const userNotificationMap = _.object(subscriberIds, notifications);
     //   wss.emit(WebsocketMessageType.Notification, payload, userNotificationMap);
     // }
+
     return notifications;
   };
 

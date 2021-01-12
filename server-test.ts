@@ -176,6 +176,10 @@ const resetServer = (debug=false): Promise<void> => {
         description: 'someone @ mentions a user',
       });
       await models['NotificationCategory'].create({
+        name: NotificationCategories.NewCollaboration,
+        description: 'someone collaborates with a user',
+      });
+      await models['NotificationCategory'].create({
         name: NotificationCategories.ChainEvent,
         description: 'a chain event occurs',
       });
