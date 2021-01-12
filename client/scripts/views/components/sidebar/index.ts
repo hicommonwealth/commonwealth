@@ -313,6 +313,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
         showCommonwealthMenuOptions && m(ListItem, {
           label: 'Projects',
+          active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/projects`);
@@ -320,6 +321,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
         showCommonwealthMenuOptions && m(ListItem, {
           label: 'Backers',
+          active: m.route.get().startsWith(`/${app.activeChainId()}/backers`),
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/backers`);
@@ -327,6 +329,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
         showCommonwealthMenuOptions && m(ListItem, {
           label: 'Stakes',
+          active: m.route.get().startsWith(`/${app.activeChainId()}/stakes`),
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/stakes`);
