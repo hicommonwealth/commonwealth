@@ -252,14 +252,23 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   // load existing events and subscribe to future via client node connection
   public initChainEntities(): Promise<void> {
+    // @ts-nocheck
+    /* tslint:disable */
+    // @ts-ignore-start
     this._fetcher = new SubstrateEvents.StorageFetcher(this._apiPromise);
+    /* tslint:disable */
+    // @ts-ignore-start
     const subscriber = new SubstrateEvents.Subscriber(this._apiPromise);
+    /* tslint:disable */
+    // @ts-ignore-start
     const processor = new SubstrateEvents.Processor(this._apiPromise);
     return this._app.chain.chainEntities.subscribeEntities(
       this._app.chain.id,
       subscriber,
       processor,
     );
+    // @ts-ignore-end
+    /* tslint:enable */
   }
 
   public query<T>(fn: (api: ApiRx) => Observable<T>): Observable<T> {

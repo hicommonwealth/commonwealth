@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { sequelize } from '../database';
 
 export const Errors = {
   InvalidChain: 'Invalid chain',
@@ -15,8 +16,7 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
   let apr = 0.0;
   const nominators: string[] = [];
 
-  let { chain, stash } = req.query;
-  chain = 'edgeware-local';
+  const { chain } = req.query;
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
 
   const chainInfo = await models.Chain.findOne({
@@ -31,18 +31,28 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
     where
   });
 
-  result = await models.Validator.findAndCountAll({
-    include: {
-      model: models.HistoricalValidatorStatistic,
-      required: true,
-      limit: 1,
-      order: [['created_at', 'DESC']],
-    }
-  });
+  const rawQuery = `
+    select p.*, v.state, v."lastUpdate", v."sessionKeys" , v."name"  from (
+      SELECT * ,ROW_NUMBER() OVER( PARTITION BY partitionTable.stash ORDER BY created_at DESC )
+      FROM public."HistoricalValidatorStatistic" as partitionTable
+    ) p
+    join "Validator" v  
+    on v.stash  = p.stash
+    where p.row_number = 1
+    ORDER BY block desc;
+  `;
 
-  result.rows.forEach((stats) => {
-    stats.exposure = stats.HistoricalValidatorStatistics[0]?.exposure;
-    stats.apr = stats.HistoricalValidatorStatistics[0]?.apr;
+  result = await sequelize.query(rawQuery);
+  //  await models.Validator.findAndCountAll({
+  //   include: {
+  //     model: models.HistoricalValidatorStatistic,
+  //     required: true,
+  //     limit: 1,
+  //     order: [['created_at', 'DESC']],
+  //   }
+  // });
+
+  result[0].forEach((stats) => {
     const { exposure = {}, state = '' } = stats;
     if (exposure.total) {
       totalStaked += parseInt(exposure.total, 16);
@@ -69,12 +79,13 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
     status: 'Success',
     result: {
       elected,
-      count: result.rows.length,
+      count: result[0].length,
       waiting,
       nominators: nominators.length,
       totalStaked,
       offences,
-      aprPercentage: apr / elected
+      aprPercentage: apr / elected,
+      lastBlockNumber: result[0][0].block
     }
   });
 };
