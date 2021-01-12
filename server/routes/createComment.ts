@@ -231,10 +231,8 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
   }
 
-  console.log(mentionedAddresses);
   const excludedAddrs = mentionedAddresses.map((addr) => addr.address);
   excludedAddrs.push(finalComment.Address.address);
-  console.log(excludedAddrs);
 
   // dispatch notifications to root thread
   await models.Subscription.emitNotifications(

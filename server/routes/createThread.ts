@@ -228,11 +228,10 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
   }
 
-  console.log(mentionedAddresses);
-  // dispatch notifications to subscribers of the given chain/community
   const excludedAddrs = mentionedAddresses.map((addr) => addr.address);
   excludedAddrs.push(finalThread.Address.address);
-  console.log(excludedAddrs);
+
+  // dispatch notifications to subscribers of the given chain/community
   await models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewThread,
