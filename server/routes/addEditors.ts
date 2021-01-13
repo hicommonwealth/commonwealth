@@ -8,7 +8,7 @@ import { NotificationCategories, ProposalType } from '../../shared/types';
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
   InvalidEditor: 'Must provide valid addresses of community members',
-  InvalidEditorFormat: 'Editors attribute improperly formatted.',
+  InvalidEditorFormat: 'Editors attribute improperly formatted',
   IncorrectOwner: 'Not owned by this user',
 };
 
