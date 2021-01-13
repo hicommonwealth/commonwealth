@@ -1,11 +1,10 @@
 import 'components/proposals/voting_results.scss';
-
+import app from 'state';
 import m from 'mithril';
 import { VoteOutcome } from '@edgeware/node-types';
 import { u8aToString } from '@polkadot/util';
 
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
-import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
 import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling_proposal';
@@ -13,6 +12,8 @@ import { first } from 'rxjs/operators';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
+import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
+import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 
 const signalingVoteToString = (v: VoteOutcome): string => {
   const outcomeArray = v.toU8a();
@@ -66,33 +67,48 @@ const VoteListing: m.Component<{
                 balance = '--';
               }
             }
-            return vote instanceof SignalingVote ? m('.vote', [
-              m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-              m('.vote-choice', signalingVoteToString(vote.choices[0])),
-              (balanceWeighted && balance) && m('.vote-balance', balance),
-            ]) : vote instanceof BinaryVote ? m('.vote', [
-              m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-              (balanceWeighted && balance)
-                ? m('.vote-balance', balance)
-                : m('.vote-balance', (vote as BinaryVote<any>).amount),
-              m('.vote-weight', vote.weight && `${vote.weight}x`),
-            ]) : vote instanceof DepositVote ? m('.vote', [
-              m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-              m('.vote-deposit', formatCoin(vote.deposit, true)),
-            ])
-              : vote instanceof CosmosVote ? m('.vote', [
+            return vote instanceof SignalingVote
+              ? m('.vote', [
                 m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                m('.vote-choice', vote.choice.toString()),
-                // (balanceWeighted && balance) && m('.vote-balance', balance),
+                m('.vote-choice', signalingVoteToString(vote.choices[0])),
+                (balanceWeighted && balance) && m('.vote-balance', balance),
               ])
-                : vote instanceof MolochProposalVote ? m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  m('.vote-choice', vote.choice.toString()),
-                  balance && m('.vote-balance', balance),
-                ])
-                  : m('.vote', [
+              : vote instanceof BinaryVote
+                ? vote instanceof SubstrateDemocracyVote
+                  ? m('.vote', [
                     m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                  ]);
+                    m('.vote-balance', formatCoin(vote.balance, true)),
+                    m('.vote-weight', vote.weight && `${vote.weight}x`),
+                  ])
+                  : vote instanceof SubstrateCollectiveVote
+                    ? m('.vote', [
+                      m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                    ])
+                    : m('.vote', [
+                      m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                      m('.vote-balance', vote.amount && vote.amount),
+                      m('.vote-weight', vote.weight && `${vote.weight}x`),
+                    ])
+                : vote instanceof DepositVote
+                  ? m('.vote', [
+                    m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                    m('.vote-deposit', formatCoin(vote.deposit, true)),
+                  ])
+                  : vote instanceof CosmosVote
+                    ? m('.vote', [
+                      m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                      m('.vote-choice', vote.choice.toString()),
+                      // (balanceWeighted && balance) && m('.vote-balance', balance),
+                    ])
+                    : vote instanceof MolochProposalVote
+                      ? m('.vote', [
+                        m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                        m('.vote-choice', vote.choice.toString()),
+                        balance && m('.vote-balance', balance),
+                      ])
+                      : m('.vote', [
+                        m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
+                      ]);
           }
         ),
       !vnode.state.expanded

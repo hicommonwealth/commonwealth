@@ -93,7 +93,7 @@ export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
     balance: SubstrateCoin,
     weight: number
   ) {
-    super(account, choice, weight);
+    super(account, choice, null, weight);
     this.balance = balance;
   }
 
