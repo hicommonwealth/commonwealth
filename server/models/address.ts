@@ -251,6 +251,7 @@ export default (
     } else if (chain.network === 'ethereum'
       || chain.network === 'moloch'
       || chain.network === 'metacartel'
+      || chain.network === 'commonwealth'
     ) {
       //
       // ethereum address handling

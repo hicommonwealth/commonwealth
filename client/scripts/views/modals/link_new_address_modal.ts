@@ -98,7 +98,9 @@ const EthereumLinkAccountItem: m.Component<{
           .then(() => m.redraw())
           .catch((err) => {
             vnode.state.linking = false;
-            errorCallback(`${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}`);
+            errorCallback(
+              err ? `${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}` : 'Unknown error'
+            );
             m.redraw();
           });
       },
@@ -165,12 +167,16 @@ const CosmosLinkAccountItem: m.Component<{
             return accountVerifiedCallback(signerAccount).then(() => m.redraw());
           }).catch((err) => {
             vnode.state.linking = false;
-            errorCallback(`${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}`);
+            errorCallback(
+              err ? `${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}` : 'Unknown error'
+            );
             m.redraw();
           });
         }).catch((err) => {
           vnode.state.linking = false;
-          errorCallback(`${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}`);
+          errorCallback(
+            err ? `${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}` : 'Unknown error'
+          );
           m.redraw();
         });
       },
