@@ -1,6 +1,6 @@
 import 'sublayout.scss';
 
-import m from 'mithril';
+import m, { Vnode } from 'mithril';
 import app from 'state';
 import { EmptyState, Button, Icons, Grid, Col, Spinner } from 'construct-ui';
 
@@ -21,9 +21,9 @@ const Sublayout: m.Component<{
 
   // content
   class?: string,
-  title?,                          // displayed at the top of the layout
-  description?: string,            // displayed at the top of the layout
-  sidebarTopic?: number,           // used to override the sidebar
+  title?: any,                        // displayed at the top of the layout
+  description?: string,               // displayed at the top of the layout
+  sidebarTopic?: number,              // used to override the sidebar
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
   hideSidebar?: boolean,

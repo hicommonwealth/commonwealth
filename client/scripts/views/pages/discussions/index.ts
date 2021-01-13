@@ -362,6 +362,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
+          m(CommunityMetadataBar),
           // topics
           app.topics.getByCommunity(app.activeId()).length > 0 && m('.discussions-topics', {
             // onupdate: (vvnode) => {
@@ -381,7 +382,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             featuredTopicListItems,
             otherTopicListItems,
           ]),
-          m(CommunityMetadataBar),
           (!activeEntity || !activeEntity.serverLoaded || stillFetching)
             ? m('.discussions-main', [
               m(ProposalsLoadingRow),

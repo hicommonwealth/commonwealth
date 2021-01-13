@@ -16,6 +16,7 @@ import { link } from 'helpers';
 import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo, NodeInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 
+import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
@@ -433,6 +434,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
           (app.chain || app.community) && m(OnchainNavigationModule),
         ]),
+        (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
         m('.sidebar-fadeout'),
       ])

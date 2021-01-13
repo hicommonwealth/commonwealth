@@ -7,7 +7,6 @@ import { Icon, Icons } from 'construct-ui';
 import app from 'state';
 import { AddressInfo, AbridgedThread } from 'models';
 import User from 'views/components/widgets/user';
-import SubscriptionButton from 'views/components/sidebar/subscription_button';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 
 const CommunityMetadataBar: m.Component<{ entity: string }> = {

@@ -6,7 +6,7 @@ import { Spinner } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 
 const LoadingPage: m.Component<{
-  title?: string,
+  title?,
   message?: string,
   narrow?: boolean,
   showNewProposalButton?: boolean
