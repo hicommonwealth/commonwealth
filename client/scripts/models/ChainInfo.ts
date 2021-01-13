@@ -21,6 +21,7 @@ class ChainInfo {
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
+  public members: RoleInfo[];
 
   constructor(
     id, network, symbol, name, iconUrl, description, website, chat, telegram,
@@ -69,9 +70,11 @@ class ChainInfo {
     );
   }
 
+  // TODO: get operation should not have side effects
   public async getAdminsAndMods(id: string) {
     try {
       const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id, });
+      this.setMembers(res.result);
       const roles = res.result.filter((r) => {
         return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
       });
@@ -80,6 +83,22 @@ class ChainInfo {
     } catch {
       console.log('Failed to fetch admins/mods');
     }
+  }
+
+  public setMembers(roles) {
+    this.members = [];
+    roles.forEach((r) => {
+      this.members.push(new RoleInfo(
+        r.id,
+        r.address_id,
+        r.Address.address,
+        r.Address.chain,
+        r.chain_id,
+        r.offchain_community_id,
+        r.permission,
+        r.is_user_default
+      ));
+    });
   }
 
   public setAdmins(roles) {
