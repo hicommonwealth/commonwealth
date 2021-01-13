@@ -515,9 +515,12 @@ const LinkNewAddressModal: m.Component<{
             app.chain.base === ChainBase.CosmosSDK
               && link('a', 'https://wallet.keplr.app/', 'Get Keplr', { target: '_blank' }),
           ]),
-          // don't show the accounts caption for Ethereum, which uses a differently styled LinkAccountItem
-          app.chain.webWallet?.enabled && app.chain.base !== ChainBase.Ethereum && m('.accounts-caption', [
-            app.chain.webWallet?.accounts.length ? [
+          app.chain.webWallet?.enabled && m('.accounts-caption', [
+            app.chain.webWallet?.accounts.length === 0 ? [
+              m('p', 'Wallet connected, but no accounts were found.'),
+            ] : app.chain.base === ChainBase.Ethereum ? [
+              m('p.small-text', 'To connect with a different account, select it in your wallet, and refresh the page.'),
+            ] : [
               m('p', 'Select an address:'),
               m('p.small-text', 'Look for a popup, or check your wallet/browser extension.'),
               app.chain.base === ChainBase.CosmosSDK
@@ -525,8 +528,6 @@ const LinkNewAddressModal: m.Component<{
                   `Because ${app.chain.meta.chain.name} does not support signed verification messages, `,
                   'you will be asked to sign a no-op transaction. It will not be submitted to the chain.'
                 ]),
-            ] : [
-              m('p', 'Wallet connected, but no accounts were found.'),
             ],
           ]),
           m('.accounts-list', [
