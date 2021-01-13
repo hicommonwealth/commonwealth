@@ -70,8 +70,8 @@ class ChainInfo {
     );
   }
 
-  // TODO: get operation should not have side effects
-  public async getAdminsAndMods(id: string) {
+  // TODO: get operation should not have side effects, and either way this shouldn't be here
+  public async getMembers(id: string) {
     try {
       const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id, });
       this.setMembers(res.result);
