@@ -45,8 +45,9 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   };
 
   let thread;
-  const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
-  const collaboration = await models.SharingPermission.findOne({
+  const userOwnedAddresses = await req.user.getAddresses();
+  const userOwnedAddressIds = userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const collaboration = await models.Collaboration.findOne({
     where: {
       offchain_thread_id: thread_id,
       address_id: { [Op.in]: userOwnedAddressIds }
@@ -91,7 +92,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
         { model: models.Address, as: 'Address' },
         {
           model: models.Address,
-          through: models.SharingPermission,
+          through: models.Collaboration,
           as: 'collaborators'
         },
         models.OffchainAttachment,
@@ -116,7 +117,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       // don't send webhook notifications for edits
       null,
       req.wss,
-      [ finalThread.Address.address ],
+      [ userOwnedAddresses[0] ],
     );
     // TODO: dispatch notifications for new mention(s)
     // TODO: update author.last_active

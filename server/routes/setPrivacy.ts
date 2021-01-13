@@ -51,7 +51,7 @@ const setPrivacy = async (models, req: Request, res: Response, next: NextFunctio
         },
         {
           model: models.Address,
-          through: models.SharingPermission,
+          through: models.Collaboration,
           as: 'collaborators'
         },
         models.OffchainAttachment,

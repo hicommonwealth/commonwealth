@@ -306,7 +306,7 @@ export const ProposalEditorPermissions: m.Component<{
   onChangeHandler: any,
   openStateHandler: any
 }, {
-  membersLoaded: boolean,
+  membersFetched: boolean,
   items: any[],
   addedEditors: any,
   removedEditors: any,
@@ -314,8 +314,8 @@ export const ProposalEditorPermissions: m.Component<{
 }> = {
   view: (vnode) => {
     const { thread } = vnode.attrs;
-    if (!vnode.state.membersLoaded) {
-      // TODO: Break into view
+    if (!vnode.state.membersFetched) {
+      vnode.state.membersFetched = true;
       const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
       $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
         .then((res) => {
@@ -323,7 +323,6 @@ export const ProposalEditorPermissions: m.Component<{
           vnode.state.items = res.result.filter((role) => {
             return role.Address.address !== app.user.activeAccount?.address;
           });
-          vnode.state.membersLoaded = true;
           m.redraw();
         })
         .catch((err) => {
@@ -342,9 +341,9 @@ export const ProposalEditorPermissions: m.Component<{
     const allCollaborators = thread.collaborators
       .concat(Object.values(vnode.state.addedEditors))
       .filter((c) => !Object.keys(vnode.state.removedEditors).includes(c.address));
-    const existingEditors = m('.existing-editors', [
+    const existingCollaborators = m('.existing-collaborators', [
       m('span', 'Selected collaborators'),
-      m('.editor-listing', allCollaborators.map((c) => {
+      m('.collaborator-listing', allCollaborators.map((c) => {
         const user : Profile = app.profiles.getProfile(c.chain, c.address);
         return m('.user-wrap', [
           m(User, { user }),
@@ -353,7 +352,6 @@ export const ProposalEditorPermissions: m.Component<{
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
-              console.log(`deleting ${c.address}`);
               // If already scheduled for addition, un-schedule
               if (vnode.state.addedEditors[c.address]) {
                 delete vnode.state.addedEditors[c.address];
@@ -416,7 +414,7 @@ export const ProposalEditorPermissions: m.Component<{
           }
         }),
         allCollaborators.length > 0
-        && existingEditors,
+        && existingCollaborators,
       ]),
       hasBackdrop: true,
       isOpen: vnode.attrs.popoverMenu

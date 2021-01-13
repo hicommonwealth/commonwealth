@@ -59,7 +59,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
           .find((role) => role.chain_id === chain.id);
         if (!isMember) throw new Error(Errors.InvalidEditor);
       }
-      const collaboration = await models.SharingPermission.findOrCreate({
+      const collaboration = await models.Collaboration.findOrCreate({
         where: {
           offchain_thread_id: thread.id,
           address_id: collaborator.id
@@ -94,7 +94,6 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
 
   await thread.save();
 
-  // TODO: Build and test notifications
   if (collaborators?.length > 0) await Promise.all(collaborators.map(async (collaborator) => {
     if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
@@ -127,7 +126,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
     );
   }));
 
-  const finalEditors = await models.SharingPermission.findAll({
+  const finalEditors = await models.Collaboration.findAll({
     where: { offchain_thread_id: thread.id },
     include: [{
       model: models.Address,

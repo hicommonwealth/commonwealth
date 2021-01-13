@@ -17,7 +17,7 @@ const getThread = async (models, req: Request, res: Response, next: NextFunction
         },
         {
           model: models.Address,
-          through: models.SharingPermission,
+          through: models.Collaboration,
           as: 'collaborators'
         },
         {

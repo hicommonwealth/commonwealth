@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, DataTypes) => {
-    return queryInterface.createTable('SharingPermissions', {
+    return queryInterface.createTable('Collaborations', {
       offchain_thread_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -25,6 +25,6 @@ module.exports = {
   },
 
   down: (queryInterface, DataTypes) => {
-    return queryInterface.dropTable('SharingPermissions');
+    return queryInterface.dropTable('Collaborations');
   }
 };
