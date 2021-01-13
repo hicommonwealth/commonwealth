@@ -1,4 +1,7 @@
+import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
+
+const Op = Sequelize.Op;
 
 export const Errors = {
   NeedAddress: 'Must provide address',
@@ -21,7 +24,7 @@ const getAddress = async (models, req: Request, res: Response, next: NextFunctio
   }
 
   const existingAddress = await models.Address.findOne({
-    where: { chain: req.body.chain, address: req.body.address }
+    where: { chain: req.body.chain, address: req.body.address, verified: { [Op.ne]: null } }
   });
 
   let result;

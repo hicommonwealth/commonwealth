@@ -323,7 +323,7 @@ const NotificationRow: m.Component<{
         id: notification.id,
         onclick: async () => {
           app.user.notifications.markAsRead(notifications);
-          await m.route.set(path);
+          await m.route.set(path.replace(/ /g, '%20')); // fix for improperly generated notification paths
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
