@@ -461,7 +461,7 @@ export const ProposalEditorPermissions: m.Component<{
                 });
                 if (res.status === 'Success') {
                   thread.collaborators = res.result.collaborators;
-                  notifySuccess('Collaborators successfully added');
+                  notifySuccess('Collaborators added');
                 } else {
                   notifyError('Failed to add collaborators');
                 }
@@ -484,13 +484,13 @@ export const ProposalEditorPermissions: m.Component<{
                 });
                 if (res.status === 'Success') {
                   thread.collaborators = res.result.collaborators;
-                  notifySuccess('Collaborators successfully removed');
+                  notifySuccess('Collaborators removed');
                 } else {
-                  throw new Error('Failed to remove collaborator');
+                  throw new Error('Failed to remove collaborators');
                 }
                 m.redraw();
               } catch (err) {
-                const errMsg = err.responseJSON?.error || 'Failed to remove collaborator';
+                const errMsg = err.responseJSON?.error || 'Failed to remove collaborators';
                 notifyError(errMsg);
               }
             }
