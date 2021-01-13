@@ -337,6 +337,11 @@
             font-weight: 400;
             font-size: 0.94rem;
         }
+        @include sm-max {
+            position: relative;
+            bottom: initial;
+            margin-bottom: 10px !important;
+        }
     }
     .ChainStatusModule {
         position: absolute;

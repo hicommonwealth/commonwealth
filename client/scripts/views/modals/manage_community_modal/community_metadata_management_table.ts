@@ -16,8 +16,6 @@ interface ICommunityMetadataManagementState {
   chat: string;
   telegram: string;
   github: string;
-  introTitle: string;
-  introText: string;
 }
 
 export interface IChainOrCommMetadataManagementAttrs {
@@ -38,8 +36,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.chat = vnode.attrs.community.chat;
     vnode.state.telegram = vnode.attrs.community.telegram;
     vnode.state.github = vnode.attrs.community.github;
-    vnode.state.introTitle = vnode.attrs.community.introTitle;
-    vnode.state.introText = vnode.attrs.community.introText;
   },
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [m(Table, {
@@ -83,18 +79,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         placeholder: 'https://github.com',
         onChangeHandler: (v) => { vnode.state.github = v; },
       }),
-      m(InputPropertyRow, {
-        title: 'Intro Title',
-        defaultValue: vnode.state.introTitle,
-        onChangeHandler: (v) => { vnode.state.introTitle = v; },
-        textarea: true,
-      }),
-      m(InputPropertyRow, {
-        title: 'Intro Text',
-        defaultValue: vnode.state.introText,
-        onChangeHandler: (v) => { vnode.state.introText = v; },
-        textarea: true,
-      }),
       m(TogglePropertyRow, {
         title: 'Privacy',
         defaultValue: vnode.attrs.community.privacyEnabled,
@@ -135,8 +119,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           chat,
           telegram,
           github,
-          introTitle,
-          introText,
           invitesEnabled,
           privacyEnabled,
         } = vnode.state;
@@ -149,8 +131,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             chat,
             telegram,
             github,
-            introTitle,
-            introText,
             privacyEnabled,
             invitesEnabled,
           });

@@ -14,8 +14,6 @@ interface IChainMetadataManagementState {
   chat: string;
   telegram: string;
   github: string;
-  introTitle: string;
-  introText: string;
   url: string;
   loadingFinished: boolean;
   loadingStarted: boolean;
@@ -32,8 +30,6 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.chat = vnode.attrs.chain.chat;
     vnode.state.telegram = vnode.attrs.chain.telegram;
     vnode.state.github = vnode.attrs.chain.github;
-    vnode.state.introTitle = vnode.attrs.chain.introTitle;
-    vnode.state.introText = vnode.attrs.chain.introText;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
     vnode.state.symbol = vnode.attrs.chain.symbol;
@@ -81,18 +77,6 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           placeholder: 'https://github.com',
           onChangeHandler: (v) => { vnode.state.github = v; },
         }),
-        m(InputPropertyRow, {
-          title: 'Intro Title',
-          defaultValue: vnode.state.introTitle,
-          onChangeHandler: (v) => { vnode.state.introTitle = v; },
-          textarea: true,
-        }),
-        m(InputPropertyRow, {
-          title: 'Intro Text',
-          defaultValue: vnode.state.introText,
-          onChangeHandler: (v) => { vnode.state.introText = v; },
-          textarea: true,
-        }),
         m('tr', [
           m('td', 'Admins'),
           m('td', [ m(ManageRolesRow, {
@@ -114,11 +98,9 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         label: 'Save changes',
         intent: 'primary',
         onclick: async (e) => {
-          const { name, description, website, chat, telegram, github, introTitle, introText } = vnode.state;
+          const { name, description, website, chat, telegram, github } = vnode.state;
           try {
-            await vnode.attrs.chain.updateChainData(
-              name, description, website, chat, telegram, github, introTitle, introText
-            );
+            await vnode.attrs.chain.updateChainData(name, description, website, chat, telegram, github);
             $(e.target).trigger('modalexit');
           } catch (err) {
             notifyError(err.responseJSON?.error || 'Chain update failed');

@@ -16,8 +16,6 @@ export interface ChainAttributes {
   website?: string;
   telegram?: string;
   github?: string;
-  introTitle?: string;
-  introText?: string;
   featured_topics: string[];
   symbol: string;
   network: string;
@@ -59,8 +57,6 @@ export default (
     chat: { type: dataTypes.STRING, allowNull: true },
     telegram: { type: dataTypes.STRING, allowNull: true },
     github: { type: dataTypes.STRING, allowNull: true },
-    introTitle: { type: dataTypes.STRING, allowNull: true },
-    introText: { type: dataTypes.STRING, allowNull: true },
     featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
     symbol: { type: dataTypes.STRING, allowNull: false },
     network: { type: dataTypes.STRING, allowNull: false },

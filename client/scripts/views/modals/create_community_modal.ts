@@ -128,8 +128,6 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 null,
                 null,
                 null,
-                null, // TODO: have introTitle specified upon community creation
-                null, // TODO: have introText specified upon community creation
                 result.result.default_chain,
                 false,
                 result.result.invitesEnabled,
