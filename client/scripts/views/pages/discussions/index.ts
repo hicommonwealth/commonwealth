@@ -19,9 +19,9 @@ import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import Listing from 'views/pages/listing';
 import EditTopicModal from 'views/modals/edit_topic_modal';
+import ManageCommunityModal from 'views/modals/manage_community_modal';
 
 import { DEFAULT_PAGE_SIZE } from 'controllers/server/threads';
-import CommunityMetadataBar from './community_metadata_bar';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
@@ -356,13 +356,33 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               }
             })
           }),
-      ] : 'Discussions',
+      ] : [
+        'Discussions',
+        app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+          && m(PopoverMenu, {
+            class: 'sidebar-edit-topic',
+            position: 'bottom',
+            transitionDuration: 0,
+            hoverCloseDelay: 0,
+            closeOnContentClick: true,
+            trigger: m(Icon, {
+              name: Icons.CHEVRON_DOWN,
+              style: 'margin-left: 6px;',
+            }),
+            content: m(MenuItem, {
+              label: 'Manage community',
+              onclick: (e) => {
+                e.preventDefault();
+                app.modals.create({ modal: ManageCommunityModal });
+              }
+            })
+          }),
+      ],
       description: topicDescription,
       showNewProposalButton: true,
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
-          m(CommunityMetadataBar),
           // topics
           app.topics.getByCommunity(app.activeId()).length > 0 && m('.discussions-topics', {
             // onupdate: (vvnode) => {
