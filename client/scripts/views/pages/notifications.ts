@@ -30,6 +30,7 @@ const ALL_COMMUNITIES = 'All communities';
 
 // left column - for identifying the notification type
 const NEW_MENTIONS_LABEL = 'When someone mentions me';
+const NEW_COLLABORATIONS_LABEL = 'When someone adds me as an editor to a thread';
 const NEW_THREADS_LABEL = 'When a thread is created';
 const NEW_ACTIVITY_LABEL = 'When there is new activity on...';
 const NEW_COMMENTS_LABEL_SUFFIX = '(new comments only)';
@@ -584,6 +585,7 @@ const AllCommunitiesNotifications: m.Component<{
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
+    const collaborationsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewCollaboration);
     const chainIds = app.config.chains.getAll().map((c) => c.id);
     // const communityIds = communities.map((c) => c.id);
     const communityIds = communities;
@@ -602,6 +604,10 @@ const AllCommunitiesNotifications: m.Component<{
       mentionsSubscription && m(BatchedSubscriptionRow, {
         subscriptions: [mentionsSubscription],
         label: NEW_MENTIONS_LABEL,
+      }),
+      collaborationsSubscription && m(BatchedSubscriptionRow, {
+        subscriptions: [collaborationsSubscription],
+        label: NEW_COLLABORATIONS_LABEL,
       }),
       batchedSubscriptions.length > 0 && m('tr.NewActivityRow', [
         m('td', NEW_ACTIVITY_LABEL),
