@@ -60,23 +60,27 @@ const EthereumLinkAccountItem: m.Component<{
       onclick: async (e) => {
         e.preventDefault();
         vnode.state.linking = true;
-        const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
-          address: address.toLowerCase(),
-          chain: app.activeChainId(),
-          jwt: app.user.jwt,
-        });
 
-        if (result.exists) {
-          if (result.belongsToUser) {
-            notifyInfo('This address is already linked to your current account.');
-            vnode.state.linking = false;
-            return;
-          } else {
-            const modalMsg = 'This address is currently linked to another account. Continue?';
-            const confirmed = await confirmationModalWithText(modalMsg)();
-            if (!confirmed) {
+        // check address status if currently logged in
+        if (app.isLoggedIn()) {
+          const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+            address: address.toLowerCase(),
+            chain: app.activeChainId(),
+            jwt: app.user.jwt,
+          });
+
+          if (result.exists) {
+            if (result.belongsToUser) {
+              notifyInfo('This address is already linked to your current account.');
               vnode.state.linking = false;
               return;
+            } else {
+              const modalMsg = 'This address is currently linked to another account. Continue?';
+              const confirmed = await confirmationModalWithText(modalMsg)();
+              if (!confirmed) {
+                vnode.state.linking = false;
+                return;
+              }
             }
           }
         }
