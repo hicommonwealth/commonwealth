@@ -510,8 +510,8 @@ $(() => {
 
     // Commonwealth protocol
     '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
-    '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
-    '/:scope/stakes':            importRoute('views/pages/commonwealth/stakes', { scoped: true }),
+    // '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
+    '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),

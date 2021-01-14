@@ -319,20 +319,20 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
             m.route.set(`/${app.activeChainId()}/projects`);
           },
         }),
+        // showCommonwealthMenuOptions && m(ListItem, {
+        //   label: 'Backers',
+        //   active: m.route.get().startsWith(`/${app.activeChainId()}/backers`),
+        //   onclick: (e) => {
+        //     e.preventDefault();
+        //     m.route.set(`/${app.activeChainId()}/backers`);
+        //   },
+        // }),
         showCommonwealthMenuOptions && m(ListItem, {
-          label: 'Backers',
-          active: m.route.get().startsWith(`/${app.activeChainId()}/backers`),
+          label: 'Collectives',
+          active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/backers`);
-          },
-        }),
-        showCommonwealthMenuOptions && m(ListItem, {
-          label: 'Stakes',
-          active: m.route.get().startsWith(`/${app.activeChainId()}/stakes`),
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/stakes`);
+            m.route.set(`/${app.activeChainId()}/collectives`);
           },
         }),
       ]),
