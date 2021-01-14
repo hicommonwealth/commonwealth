@@ -2,6 +2,7 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
 import BN from 'bn.js';
 import { computeEventStats, getAPR } from './computeStats';
+import { sequelize } from '../database';
 
 
 export default class extends IEventHandler {
@@ -23,40 +24,37 @@ export default class extends IEventHandler {
     if (event.data.kind !== SubstrateTypes.EventKind.Reward) {
       return dbEvent;
     }
-    // 2) Get relevant data from DB for processing.
-    /*
-      For rewards calculation of the validators, latest new-session event da  ta needs to be present in the ChainEvents table.
-      This query will return the latest new-session event data, as Rewards event will only be triggered after the new-session event.
-    */
-    const chainEventNewSession = await this._models.ChainEvent.findOne({
-      where: { chain_event_type_id: `${this._chain}-new-session` },
-      order: [
-        ['created_at', 'DESC']
-      ],
-      attributes: ['event_data']
-    });
-
-    if (!chainEventNewSession) { // if no new-session data, do nothing
-      return dbEvent;
-    }
-
-    const newSessionEventData = chainEventNewSession.event_data;
     const newRewardEventData = event.data;
 
-    // Get last created validator's record from 'HistoricalValidatorStatistic' table. as new reward event will contain validator's AccountID.
-    const latestValidatorStat = await this._models.HistoricalValidatorStatistic.findOne({
-      where: {
-        stash: newRewardEventData.validator
-      },
-      order: [
-        ['created_at', 'DESC']
-      ]
-    });
-    if (!latestValidatorStat) {
+    // 2) Get relevant data from DB for processing.
+    /*
+      For rewards calculation of the validators, latest new-session event data needs to be present in the ChainEvents table.
+      This query will return the latest new-session event data in which the validator was active, as Rewards event will only be triggered after the new-session event.
+    */
+    const sessionRawQuery = ` SELECT  event_data FROM "ChainEvents" 
+    WHERE chain_event_type_id  = '${this._chain}-new-session' 
+    AND event_data ->> 'active' LIKE '%${newRewardEventData.validator}%'
+    AND block_number <
+    ORDER BY created_at desc limit 1`;
+    const [chainEventNewSession, sessionEventsMetadata] = await sequelize.query(sessionRawQuery);
+
+    if (!chainEventNewSession.length) { // if no new-session data, do nothing
       return dbEvent;
     }
 
-    const validator = JSON.parse(JSON.stringify(latestValidatorStat));
+    const newSessionEventData = chainEventNewSession[0].event_data;
+
+    // Get last created validator's record from 'HistoricalValidatorStatistic' table. as new reward event will contain validator's AccountID.
+    const validatorRawQuery = ` SELECT  * FROM "HistoricalValidatorStatistic" 
+    WHERE stash LIKE '%${newRewardEventData.validator}%' 
+    order by created_at desc limit 1`;
+    const [latestValidatorStat, validatorStatMetadata] = await sequelize.query(validatorRawQuery);
+
+    if (!latestValidatorStat.length) {
+      return dbEvent;
+    }
+
+    const validator = latestValidatorStat[0];
 
     // Added Last 30 days Rewards count and averages for a validator.
     const [rewardsStatsSum, rewardsStatsAvg, rewardsStatsCount] = await computeEventStats(this._chain, newRewardEventData.kind, validator.stash, 30);
