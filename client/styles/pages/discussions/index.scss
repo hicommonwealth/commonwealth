@@ -27,7 +27,7 @@
         margin-right: 24px;
         cursor: pointer;
         @include proposal-topic-inline;
-        &:hover .proposal-topic-name {
+        .proposal-topic-name:hover {
             text-decoration: underline;
         }
         .sidebar-edit-topic {
