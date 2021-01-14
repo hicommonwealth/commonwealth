@@ -117,7 +117,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       // don't send webhook notifications for edits
       null,
       req.wss,
-      [ userOwnedAddresses[0] ],
+      [ userOwnedAddresses[0].address ],
     );
     // TODO: dispatch notifications for new mention(s)
     // TODO: update author.last_active
