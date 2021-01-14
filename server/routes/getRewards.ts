@@ -123,7 +123,12 @@ export async function getRewardsFunc(models, req, next) {
       validators[validator_id][block_number] += Number(event_data['amount']);
     });
   }
-  validators.totalRewards = rewards.length;
+  try {
+    validators.totalRewards = rewards.length;
+  } catch (e) {
+    validators.totalRewards = (-1 as any);
+    console.warn('unable to find total rewards count');
+  }
   return { status: 'Success', result: validators || {}, denom: 'EDG' };
 }
 

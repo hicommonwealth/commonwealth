@@ -66,7 +66,7 @@ const model = {
       if (model.state === 'Active') {
         mapNamesAddress = temp.filter((row) => row.state === 'Active');
       } else {
-        mapNamesAddress = temp.filter((row) => row.state === 'Waiting');
+        mapNamesAddress = temp.filter((row) => row.state === 'Inactive');
       }
       mapNamesAddress = mapNamesAddress.map((ele) => { return { name: ele.name, address: ele.address }; });
       for (const i of mapNamesAddress) {
@@ -205,7 +205,7 @@ const model = {
       // console.log("validatorstashes ", validatorStashes)
       model.isLoadingData = true;
       m.redraw();
-      result = await (app.staking as any).validatorDetail(model.state, validatorStashes.slice(model.prevIndex, model.nextIndex));
+      result = await (app.staking as any).validatorDetail(model.state === 'Active' ? model.state : 'Inactive', validatorStashes.slice(model.prevIndex, model.nextIndex));
       result.validators.forEach((e) => {
         e.exposure = e.HistoricalValidatorStatistics[0]?.exposure;
         e.commissionPer = e.HistoricalValidatorStatistics[0]?.commissionPer;
@@ -252,7 +252,7 @@ const model = {
       window.scrollTo(0, 0);
       model.scroll = false;
       console.log('state ', model.state);
-      model.waitingStashes = model.profile.filter((row) => row.state === 'Waiting').map((addr) => addr.address);
+      model.waitingStashes = model.profile.filter((row) => row.state === 'Inactive').map((addr) => addr.address);
       model.refresh();
       m.redraw();
     }
@@ -276,7 +276,7 @@ const model = {
       model.activeStashes = model.profile.filter((row) => row.state === 'Active').map((addr) => addr.address);
     } else {
       // console.log(model.waitingStashes, "waitingStashes");
-      model.waitingStashes = model.profile.filter((row) => row.state === 'Waiting').map((addr) => addr.address);
+      model.waitingStashes = model.profile.filter((row) => row.state === 'Inactive').map((addr) => addr.address);
     }
     model.prevIndex = 0;
     model.searchIsOn = false;
@@ -298,7 +298,7 @@ export const PresentationComponent_ = {
     // console.log("prevIndex", model.prevIndex);
     // console.log("nextIndex", model.nextIndex);
     model.activeStashes = model.profile.filter((row) => row.state === 'Active').map((addr) => addr.address);
-    model.waitingStashes = model.profile.filter((row) => row.state === 'Waiting').map((addr) => addr.address);
+    model.waitingStashes = model.profile.filter((row) => row.state === 'Inactive').map((addr) => addr.address);
     model.refresh();
   },
   view: (vnode) => {
@@ -490,29 +490,31 @@ export const PresentationComponent_ = {
           m('th.val-waiting-commission', 'Commission'),
           m('th.val-action', ''),
         ]), m('table.validators-table', [
-          result.validators.filter((v) => !v.toBeElected && !v.isElected).map((validator) => {
-            const stash = validator.stash;
-            const controller = validator.controller;
-            const eraPoints = validator.eraPoints;
-            const toBeElected = validator.toBeElected;
-            const blockCount = validator.blockCount;
-            const hasMessage = validator?.hasMessage;
-            const isOnline = validator?.isOnline;
-            const commission = validator?.commissionPer;
-            const name = validator?.name;
-            return m(ValidatorRowWaiting, {
-              stash,
-              controller,
-              waiting: true,
-              eraPoints,
-              toBeElected,
-              blockCount,
-              hasMessage,
-              isOnline,
-              commission,
-              name
-            });
-          }),
+          result.validators
+          // .filter((v) => !v.toBeElected && !v.isElected)
+            .map((validator) => {
+              const stash = validator.stash;
+              const controller = validator.controller;
+              const eraPoints = validator.eraPoints;
+              const toBeElected = validator.toBeElected;
+              const blockCount = validator.blockCount;
+              const hasMessage = validator?.hasMessage;
+              const isOnline = validator?.isOnline;
+              const commission = validator?.commissionPer;
+              const name = validator?.name;
+              return m(ValidatorRowWaiting, {
+                stash,
+                controller,
+                waiting: true,
+                eraPoints,
+                toBeElected,
+                blockCount,
+                hasMessage,
+                isOnline,
+                commission,
+                name
+              });
+            }),
         ])]
       }, {
         callback: reset,

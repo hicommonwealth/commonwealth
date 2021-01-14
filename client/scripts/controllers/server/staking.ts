@@ -8,9 +8,9 @@ class StakingController {
     // do nothing
   }
 
-  public globalStatistics() {
+  public globalStatistics(chain) {
     return new Promise((resolve) => {
-      return get('/getGlobalStatistics', {}, resolve);
+      return get('/getGlobalStatistics', { chain }, resolve);
     });
   }
   public validatorNamesAddress() {

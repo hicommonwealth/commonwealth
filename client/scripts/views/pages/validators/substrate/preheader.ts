@@ -31,7 +31,7 @@ const itemLoadingSpinner = () => m(Spinner, { active: true, fill: false, size: '
 
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
   oncreate: async (vnode) => {
-    vnode.state.dynamic.globalStatistics = await app.staking.globalStatistics();
+    vnode.state.dynamic.globalStatistics = await app.staking.globalStatistics(app.chain.meta.chain.id);
     vnode.state.dynamic.sender = app.user.activeAccount as SubstrateAccount;
   },
   getObservables: (attrs) => ({
@@ -45,7 +45,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     const nominators: string[] = [];
     const stDynamic = vnode.state.dynamic;
     let sessionInfo,
-      globalStatistics: { waiting?: any; totalStaked?: any; elected?: any; count?: any; nominators?: any; offences?: any; aprPercentage?: any; },
+      globalStatistics: { waiting?: any; totalStaked?: any; elected?: any; count?: any; nominators?: any; offences?: any; aprPercentage?: any; lastBlockNumber?:any; },
       sender,
       validators: IValidators,
       currentEra: number,
@@ -103,12 +103,13 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     }
 
     const valCount = globalStatistics.elected
-      ? `${globalStatistics?.elected}/${globalStatistics?.count}`
+      ? `${globalStatistics?.elected}/${vnode.attrs.valCount}`
       : `${Object.keys(validators).length}/${vnode.attrs.valCount}`;
     let waitingCt = 0;
 
-    if (validators) {
-      waitingCt = Object.keys(validators).filter((v) => !validators[v].isElected && !validators[v].toBeElected).length;
+
+    if (globalStatistics) {
+      waitingCt = globalStatistics?.waiting;
     }
 
     return m('div.validator-preheader-container', [
@@ -136,11 +137,11 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         ]),
         (isEpoch
           && sessionProgress && m(CardSummary, {
-          title: 'Epoch',
-          total: sessionLength,
-          value: sessionProgress,
-          currentBlock: formatNumber(currentIndex)
-        })),
+            title: 'Epoch',
+            total: sessionLength,
+            value: sessionProgress,
+            currentBlock: formatNumber(currentIndex)
+          })),
         (eraProgress === true ? m(CardSummary, {
           title: 'Era',
           total: eraLength,
@@ -213,12 +214,12 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                 createTXModal((nominators.length === 0)
                   ? sender.chillTx()
                   : sender.nominateTx(nominators)).then(() => {
-                  // vnode.attrs.sending = false;
-                  m.redraw();
-                }, () => {
-                  // vnode.attrs.sending = false;
-                  m.redraw();
-                });
+                    // vnode.attrs.sending = false;
+                    m.redraw();
+                  }, () => {
+                    // vnode.attrs.sending = false;
+                    m.redraw();
+                  });
               },
               disabled: !app.user.activeAccount
             })

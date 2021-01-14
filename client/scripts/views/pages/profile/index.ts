@@ -368,172 +368,168 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
 
-    if (!vnode.state.latestBlock || !vnode.state.apiResponse)
-      return m(Spinner, { active: true, fill: true, size: 'default', message: 'Loading...' });
-
     return m(Sublayout, {
       class: 'ProfilePage',
-    }, [
-      m('.forum-container-alt', [
-        m(ProfileHeader, { account }),
-        // Quick stats for a validator section
-        m(ValidatorStats, { address: account.address, account, apiResponse: vnode.state.apiResponse }),
-        m('.row.graph-row', [
-          // TOTAL STAKE OVER TIME
-          totalStakeGraph && totalStakeGraph.blocks[0] !== -9 ? (totalStakeGraph.blocks.length ? m(chartComponent, {
-            title: 'TOTAL STAKE (000,000\'s)', // Title
-            model: lineModel(totalStakeGraph.maxValue, totalStakeGraph.minValue, totalStakeGraph.yStepSize),
-            xvalues: totalStakeGraph.blocks,
-            yvalues: totalStakeGraph.values,
-            addColorStop0: 'rgba(99, 113, 209, 0.23)',
-            addColorStop1: 'rgba(99, 113, 209, 0)',
-            color: 'rgb(99, 113, 209)'
-          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'TOTAL STAKE (000,000\'s)')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'TOTAL STAKE (000,000\'s)')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
-          // OWN STAKE OVER TIME
-          ownStakeGraph && ownStakeGraph.blocks[0] !== -9 ? (ownStakeGraph.blocks.length ? m(chartComponent, {
-            title: 'OWN STAKE (000,000\'s)', // Title
-            model: lineModel(ownStakeGraph.maxValue, ownStakeGraph.minValue, ownStakeGraph.yStepSize),
-            xvalues: ownStakeGraph.blocks,
-            yvalues: ownStakeGraph.values,
-            addColorStop0: 'rgba(53, 212, 19, 0.23)',
-            addColorStop1: 'rgba(53, 212, 19, 0)',
-            color: 'rgb(53, 212, 19)',
-          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OWN STAKE (000,000\'s)')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OWN STAKE (000,000\'s)')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
-          // OTHER STAKE OVER TIME
-          otherStakeGraph && otherStakeGraph.blocks[0] !== -9 ? (otherStakeGraph.blocks.length ? m(chartComponent, {
-            title: 'OTHER STAKE (000,000\'s)', // Title
-            model: lineModel(otherStakeGraph.maxValue, otherStakeGraph.minValue, otherStakeGraph.yStepSize),
-            xvalues: otherStakeGraph.blocks,
-            yvalues: otherStakeGraph.values,
-            addColorStop0: 'rgba(83, 110, 124, 0.23)',
-            addColorStop1: 'rgba(83, 110, 124, 0)',
-            color: 'rgb(83, 110, 124)'
-          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OTHER STAKE (000,000\'s)')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OTHER STAKE (000,000\'s)')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
-          // NOMINATORS OVER TIME
-          nominatorGraph && nominatorGraph.blocks[0] !== -9 ? (nominatorGraph.blocks.length ? m(chartComponent, {
-            title: 'NOMINATORS', // Title
-            model: lineModel(nominatorGraph.maxValue, nominatorGraph.minValue, nominatorGraph.yStepSize),
-            xvalues: nominatorGraph.blocks,
-            yvalues: nominatorGraph.values,
-            addColorStop0: 'rgba(237, 146, 61, 0.23)',
-            addColorStop1: 'rgba(237, 146, 61, 0)',
-            color: 'rgb(237, 146, 61)'
-          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'NOMINATORS')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'NOMINATORS')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
-          // SLASHES OVER TIME
-          slashesGraph && slashesGraph.blocks[0] !== -9 ? (slashesGraph.blocks.length ? m(chartComponent, {
-            title: 'SLASHES (000,000\'s)', // Title
-            model: lineModel(slashesGraph.maxValue, slashesGraph.minValue, slashesGraph.yStepSize),
-            xvalues: slashesGraph.blocks,
-            yvalues: slashesGraph.values,
-            addColorStop0: 'rgba(53, 212, 19, 0.23)',
-            addColorStop1: 'rgba(53, 212, 19, 0)',
-            color: 'rgb(53, 212, 19)'
-          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'SLASHES (000,000\'s)')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'SLASHES (000,000\'s)')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
-          // IMONLINE OVER TIME
-          imOnlineGraph && imOnlineGraph.blocks[0] !== -9 ? (imOnlineGraph.blocks.length ? m(chartComponent, {
-            title: 'IMONLINE Percentage', // Title
-            model: lineModel(imOnlineGraph.maxValue, imOnlineGraph.minValue, imOnlineGraph.yStepSize),
-            xvalues: imOnlineGraph.blocks,
-            yvalues: imOnlineGraph.values,
-            addColorStop0: 'rgba(99, 113, 209, 0.23)',
-            addColorStop1: 'rgba(99, 113, 209, 0)',
-            color: 'rgb(99, 113, 209)'
-          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'IMONLINE Percentage')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'IMONLINE Percentage')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
-          // REWARDS OVER TIME
-          rewardsGraph && rewardsGraph.blocks[0] !== -9 ? (rewardsGraph.blocks.length ? m(chartComponent, {
-            title: 'REWARDS (000,000\'s)', // Title
-            model: lineModel(rewardsGraph.maxValue, rewardsGraph.minValue, rewardsGraph.yStepSize),
-            xvalues: rewardsGraph.blocks,
-            yvalues: rewardsGraph.values,
-            addColorStop0: 'rgba(237, 146, 61, 0.23)',
-            addColorStop1: 'rgba(237, 146, 61, 0)',
-            color: 'rgb(237, 146, 61)'
-          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'REWARDS (000,000\'s)')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'REWARDS (000,000\'s)')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+    }, [(!vnode.state.latestBlock || !vnode.state.apiResponse) ? m(Spinner, { active: true, fill: true, size: 'default', message: 'Loading...' }) : m('.forum-container-alt', [
+      m(ProfileHeader, { account }),
+      // Quick stats for a validator section
+      m(ValidatorStats, { address: account.address, account, apiResponse: vnode.state.apiResponse }),
+      m('.row.graph-row', [
+        // TOTAL STAKE OVER TIME
+        totalStakeGraph && totalStakeGraph.blocks[0] !== -9 ? (totalStakeGraph.blocks.length ? m(chartComponent, {
+          title: 'TOTAL STAKE (000,000\'s)', // Title
+          model: lineModel(totalStakeGraph.maxValue, totalStakeGraph.minValue, totalStakeGraph.yStepSize),
+          xvalues: totalStakeGraph.blocks,
+          yvalues: totalStakeGraph.values,
+          addColorStop0: 'rgba(99, 113, 209, 0.23)',
+          addColorStop1: 'rgba(99, 113, 209, 0)',
+          color: 'rgb(99, 113, 209)'
+        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'TOTAL STAKE (000,000\'s)')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'TOTAL STAKE (000,000\'s)')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+            fill: false,
+            message: ' Loading...',
+            size: 'xl',
+            style: 'visibility: visible; opacity: 1;'
+          })))]),
+        // OWN STAKE OVER TIME
+        ownStakeGraph && ownStakeGraph.blocks[0] !== -9 ? (ownStakeGraph.blocks.length ? m(chartComponent, {
+          title: 'OWN STAKE (000,000\'s)', // Title
+          model: lineModel(ownStakeGraph.maxValue, ownStakeGraph.minValue, ownStakeGraph.yStepSize),
+          xvalues: ownStakeGraph.blocks,
+          yvalues: ownStakeGraph.values,
+          addColorStop0: 'rgba(53, 212, 19, 0.23)',
+          addColorStop1: 'rgba(53, 212, 19, 0)',
+          color: 'rgb(53, 212, 19)',
+        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'OWN STAKE (000,000\'s)')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'OWN STAKE (000,000\'s)')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+            fill: false,
+            message: ' Loading...',
+            size: 'xl',
+            style: 'visibility: visible; opacity: 1;'
+          })))]),
+        // OTHER STAKE OVER TIME
+        otherStakeGraph && otherStakeGraph.blocks[0] !== -9 ? (otherStakeGraph.blocks.length ? m(chartComponent, {
+          title: 'OTHER STAKE (000,000\'s)', // Title
+          model: lineModel(otherStakeGraph.maxValue, otherStakeGraph.minValue, otherStakeGraph.yStepSize),
+          xvalues: otherStakeGraph.blocks,
+          yvalues: otherStakeGraph.values,
+          addColorStop0: 'rgba(83, 110, 124, 0.23)',
+          addColorStop1: 'rgba(83, 110, 124, 0)',
+          color: 'rgb(83, 110, 124)'
+        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'OTHER STAKE (000,000\'s)')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'OTHER STAKE (000,000\'s)')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+            fill: false,
+            message: ' Loading...',
+            size: 'xl',
+            style: 'visibility: visible; opacity: 1;'
+          })))]),
+        // NOMINATORS OVER TIME
+        nominatorGraph && nominatorGraph.blocks[0] !== -9 ? (nominatorGraph.blocks.length ? m(chartComponent, {
+          title: 'NOMINATORS', // Title
+          model: lineModel(nominatorGraph.maxValue, nominatorGraph.minValue, nominatorGraph.yStepSize),
+          xvalues: nominatorGraph.blocks,
+          yvalues: nominatorGraph.values,
+          addColorStop0: 'rgba(237, 146, 61, 0.23)',
+          addColorStop1: 'rgba(237, 146, 61, 0)',
+          color: 'rgb(237, 146, 61)'
+        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'NOMINATORS')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'NOMINATORS')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+            fill: false,
+            message: ' Loading...',
+            size: 'xl',
+            style: 'visibility: visible; opacity: 1;'
+          })))]),
+        // SLASHES OVER TIME
+        slashesGraph && slashesGraph.blocks[0] !== -9 ? (slashesGraph.blocks.length ? m(chartComponent, {
+          title: 'SLASHES (000,000\'s)', // Title
+          model: lineModel(slashesGraph.maxValue, slashesGraph.minValue, slashesGraph.yStepSize),
+          xvalues: slashesGraph.blocks,
+          yvalues: slashesGraph.values,
+          addColorStop0: 'rgba(53, 212, 19, 0.23)',
+          addColorStop1: 'rgba(53, 212, 19, 0)',
+          color: 'rgb(53, 212, 19)'
+        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'SLASHES (000,000\'s)')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'SLASHES (000,000\'s)')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+            fill: false,
+            message: ' Loading...',
+            size: 'xl',
+            style: 'visibility: visible; opacity: 1;'
+          })))]),
+        // IMONLINE OVER TIME
+        imOnlineGraph && imOnlineGraph.blocks[0] !== -9 ? (imOnlineGraph.blocks.length ? m(chartComponent, {
+          title: 'IMONLINE Percentage', // Title
+          model: lineModel(imOnlineGraph.maxValue, imOnlineGraph.minValue, imOnlineGraph.yStepSize),
+          xvalues: imOnlineGraph.blocks,
+          yvalues: imOnlineGraph.values,
+          addColorStop0: 'rgba(99, 113, 209, 0.23)',
+          addColorStop1: 'rgba(99, 113, 209, 0)',
+          color: 'rgb(99, 113, 209)'
+        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'IMONLINE Percentage')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'IMONLINE Percentage')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+            fill: false,
+            message: ' Loading...',
+            size: 'xl',
+            style: 'visibility: visible; opacity: 1;'
+          })))]),
+        // REWARDS OVER TIME
+        rewardsGraph && rewardsGraph.blocks[0] !== -9 ? (rewardsGraph.blocks.length ? m(chartComponent, {
+          title: 'REWARDS (000,000\'s)', // Title
+          model: lineModel(rewardsGraph.maxValue, rewardsGraph.minValue, rewardsGraph.yStepSize),
+          xvalues: rewardsGraph.blocks,
+          yvalues: rewardsGraph.values,
+          addColorStop0: 'rgba(237, 146, 61, 0.23)',
+          addColorStop1: 'rgba(237, 146, 61, 0)',
+          color: 'rgb(237, 146, 61)'
+        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'REWARDS (000,000\'s)')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'REWARDS (000,000\'s)')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+            fill: false,
+            message: ' Loading...',
+            size: 'xl',
+            style: 'visibility: visible; opacity: 1;'
+          })))]),
 
-          offenceGraph && offenceGraph.blocks[0] !== -9 ? (offenceGraph.blocks.length ? m(chartComponent, {
-            title: 'OFFENCES', // Title
-            model: lineModel(offenceGraph.maxValue, offenceGraph.minValue, offenceGraph.yStepSize),
-            xvalues: offenceGraph.blocks,
-            yvalues: offenceGraph.values,
-            addColorStop0: 'rgba(83, 110, 124, 0.23)',
-            addColorStop1: 'rgba(83, 110, 124, 0)',
-            color: 'rgb(83, 110, 124)'
-          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OFFENCES')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-            m('div.row.graph-title', m('p', 'OFFENCES')), // Give same Title here
-            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-              fill: false,
-              message: ' Loading...',
-              size: 'xl',
-              style: 'visibility: visible; opacity: 1;'
-            })))]),
+        offenceGraph && offenceGraph.blocks[0] !== -9 ? (offenceGraph.blocks.length ? m(chartComponent, {
+          title: 'OFFENCES', // Title
+          model: lineModel(offenceGraph.maxValue, offenceGraph.minValue, offenceGraph.yStepSize),
+          xvalues: offenceGraph.blocks,
+          yvalues: offenceGraph.values,
+          addColorStop0: 'rgba(83, 110, 124, 0.23)',
+          addColorStop1: 'rgba(83, 110, 124, 0)',
+          color: 'rgb(83, 110, 124)'
+        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'OFFENCES')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+          m('div.row.graph-title', m('p', 'OFFENCES')), // Give same Title here
+          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+            fill: false,
+            message: ' Loading...',
+            size: 'xl',
+            style: 'visibility: visible; opacity: 1;'
+          })))]),
 
-        ])
-      ]),
+      ])
+    ]),
     ]);
   },
 });
