@@ -75,6 +75,7 @@ export interface ThreadArgs {
   jwt: any,
   address: string,
   kind: string,
+  stage: string,
   chainId: string,
   communityId: string,
   title: string,
@@ -87,8 +88,10 @@ export interface ThreadArgs {
   readOnly?: boolean
 }
 export const createThread = async (args: ThreadArgs) => {
-  const { chainId, communityId, address, jwt, title, body, topicName, topicId,
-    readOnly, kind, url, mentions, attachments } = args;
+  const {
+    chainId, communityId, address, jwt, title, body, topicName, topicId,
+    readOnly, kind, stage, url, mentions, attachments
+  } = args;
   const timestamp = moment();
   const res = await chai.request.agent(app)
     .post('/api/createThread')

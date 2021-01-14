@@ -10,7 +10,7 @@ import { updateRoute } from 'app';
 import app from 'state';
 import { formatLastUpdated, slugify, link, externalLink, extractDomain } from 'helpers';
 
-import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
+import { OffchainThread, OffchainThreadKind, OffchainThreadStage, AddressInfo } from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import QuillFormattedText from 'views/components/quill_formatted_text';

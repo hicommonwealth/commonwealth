@@ -32,6 +32,7 @@ describe('Thread Tests', () => {
   const topicName = 'test topic';
   const topicId = undefined;
   const kind = 'forum';
+  const stage = 'discussion';
 
   const markdownThread = require('../../util/fixtures/markdownThread');
   let adminJWT;
@@ -81,6 +82,7 @@ describe('Thread Tests', () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
         kind: null,
+        stage,
         chainId: chain,
         communityId: community,
         title,
@@ -98,6 +100,7 @@ describe('Thread Tests', () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: community,
         title: '',
@@ -115,6 +118,7 @@ describe('Thread Tests', () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
         kind: 'question',
+        stage,
         chainId: chain,
         communityId: community,
         title: '',
@@ -132,6 +136,7 @@ describe('Thread Tests', () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
         kind: 'request',
+        stage,
         chainId: chain,
         communityId: community,
         title: '',
@@ -149,6 +154,7 @@ describe('Thread Tests', () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
         kind: 'link',
+        stage,
         chainId: chain,
         communityId: community,
         title: '',
@@ -167,6 +173,7 @@ describe('Thread Tests', () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
         kind: 'link',
+        stage,
         chainId: chain,
         communityId: community,
         title,
@@ -185,6 +192,7 @@ describe('Thread Tests', () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: community,
         title,
@@ -225,6 +233,7 @@ describe('Thread Tests', () => {
       const tRes = await modelUtils.createThread({
         address: adminAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: c.id,
         title,
@@ -239,6 +248,7 @@ describe('Thread Tests', () => {
       const res = await modelUtils.createThread({
         address: userAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: community,
         title,
@@ -259,6 +269,7 @@ describe('Thread Tests', () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: community,
         title,
@@ -273,6 +284,7 @@ describe('Thread Tests', () => {
       const res = await modelUtils.createThread({
         address: userAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: community,
         title,
@@ -339,6 +351,7 @@ describe('Thread Tests', () => {
       const res2 = await modelUtils.createThread({
         address: userAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: community,
         title,
@@ -459,6 +472,7 @@ describe('Thread Tests', () => {
       const res2 = await modelUtils.createThread({
         address: adminAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: undefined,
         title,
@@ -475,6 +489,9 @@ describe('Thread Tests', () => {
     it('should fail to edit an admin\'s post as a user', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
+      const thread_stage = thread.stage;
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
+      const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const res = await chai.request(app)
         .put('/api/editThread')
@@ -482,6 +499,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread_id,
           'kind': thread_kind,
+          'stage': thread_stage,
           'body': thread.body,
           'attachments[]': null,
           'read_only': readOnly,
@@ -493,6 +511,9 @@ describe('Thread Tests', () => {
 
     it('should fail to edit a thread without passing a thread id', async () => {
       const thread_kind = thread.kind;
+      const thread_stage = thread.stage;
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
+      const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const res = await chai.request(app)
         .put('/api/editThread')
@@ -500,6 +521,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': null,
           'kind': thread_kind,
+          'stage': thread_stage,
           'body': thread.body,
           'attachments[]': null,
           'read_only': readOnly,
@@ -513,6 +535,9 @@ describe('Thread Tests', () => {
     it('should fail to edit a thread without passing a body', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
+      const thread_stage = thread.stage;
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
+      const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const res = await chai.request(app)
         .put('/api/editThread')
@@ -520,6 +545,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread_id,
           'kind': thread_kind,
+          'stage': thread_stage,
           'body': null,
           'attachments[]': null,
           'read_only': readOnly,
@@ -533,6 +559,7 @@ describe('Thread Tests', () => {
     it('should succeed in updating a thread body', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
+      const thread_stage = thread.stage;
       const newBody = 'new Body';
       const readOnly = false;
       const res = await chai.request(app)
@@ -541,6 +568,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread_id,
           'kind': thread_kind,
+          'stage': thread_stage,
           'body': newBody,
           'attachments[]': null,
           'read_only': readOnly,
@@ -553,6 +581,7 @@ describe('Thread Tests', () => {
     it('should succeed in updating a thread title', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
+      const thread_stage = thread.stage;
       const newTitle = 'new Title';
       const readOnly = false;
       const res = await chai.request(app)
@@ -561,6 +590,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread_id,
           'kind': thread_kind,
+          'stage': thread_stage,
           'body': thread.body,
           'title': newTitle,
           'attachments[]': null,
@@ -579,6 +609,7 @@ describe('Thread Tests', () => {
       const res1 = await modelUtils.createThread({
         address: userAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: community,
         title,
@@ -698,6 +729,7 @@ describe('Thread Tests', () => {
         topicName,
         topicId,
         kind,
+        stage,
       });
       const cRes = await modelUtils.createComment({
         chain,
@@ -727,6 +759,7 @@ describe('Thread Tests', () => {
       let res = await modelUtils.createThread({
         address: userAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: undefined,
         title,
@@ -776,6 +809,7 @@ describe('Thread Tests', () => {
       let res = await modelUtils.createThread({
         address: userAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: community,
         title,
@@ -845,6 +879,7 @@ describe('Thread Tests', () => {
       const res = await modelUtils.createThread({
         address: userAddress,
         kind,
+        stage,
         chainId: chain,
         communityId: community,
         title,

@@ -15,7 +15,7 @@ import {
 import app from 'state';
 import { link } from 'helpers';
 import { detectURL, parseMentionsForServer } from 'helpers/threads';
-import { OffchainTopic, OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
+import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -107,6 +107,7 @@ const newThread = async (
   quillEditorState,
   author,
   kind = OffchainThreadKind.Forum,
+  stage = OffchainThreadStage.Discussion,
   readOnly?: boolean
 ) => {
   const topics = app.chain
@@ -157,6 +158,7 @@ const newThread = async (
     result = await app.threads.create(
       author.address,
       kind,
+      stage,
       chainId,
       communityId,
       title,

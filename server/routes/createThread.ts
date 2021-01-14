@@ -21,7 +21,7 @@ export const Errors = {
 const createThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { topic_name, topic_id, title, body, kind, url, readOnly } = req.body;
+  const { topic_name, topic_id, title, body, kind, stage, url, readOnly } = req.body;
 
   const mentions = typeof req.body['mentions[]'] === 'string'
     ? [req.body['mentions[]']]
@@ -87,6 +87,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     plaintext,
     version_history,
     kind,
+    stage,
     url,
     read_only: readOnly,
   } : {
@@ -97,6 +98,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     plaintext,
     version_history,
     kind,
+    stage,
     url,
     read_only: readOnly || false,
   };

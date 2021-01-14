@@ -16,7 +16,7 @@ export const Errors = {
 };
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, title, kind, thread_id } = req.body;
+  const { body, title, kind, stage, thread_id, version_history, } = req.body;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
@@ -91,6 +91,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       thread.version_history = arr;
     }
     thread.body = body;
+    thread.stage = stage;
     thread.plaintext = (() => {
       try {
         return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
