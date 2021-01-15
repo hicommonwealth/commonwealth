@@ -36,15 +36,18 @@ describe('Thread Tests', () => {
   const markdownThread = require('../../util/fixtures/markdownThread');
   let adminJWT;
   let adminAddress;
+  let adminAddressId;
   let userJWT;
   let userId;
   let userAddress;
+  let userAddressId;
   let thread;
 
   before(async () => {
     await resetDatabase();
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
+    adminAddressId = res.address_id;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     const isAdmin = await modelUtils.assignRole({
       address_id: res.address_id,
@@ -65,6 +68,7 @@ describe('Thread Tests', () => {
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
     userId = res.user_id;
+    userAddressId = res.address_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -901,4 +905,106 @@ describe('Thread Tests', () => {
       expect(res2.body.error).to.be.equal(pinThreadErrors.MustBeAdmin);
     });
   });
+
+  // let collaborativeThread;
+  // describe('/addEditors', () => {
+  //   it('successfully add a community member address as editor', async () => {
+  //     const { result } = await modelUtils.createThread({
+  //       address: userAddress,
+  //       kind,
+  //       chainId: null,
+  //       communityId: community,
+  //       title,
+  //       topicName,
+  //       topicId,
+  //       body,
+  //       jwt: userJWT,
+  //     });
+  //     collaborativeThread = result;
+  //     const editors = {};
+  //     editors[adminAddress] = {
+  //       id: adminAddressId,
+  //       chain,
+  //       address: adminAddress,
+  //     };
+  //     console.log(editors);
+  //     const res = await chai.request(app)
+  //       .post('/api/addEditors')
+  //       .set('Accept', 'application/json')
+  //       .send({
+  //         address: userAddress,
+  //         author_chain: chain,
+  //         chain: null,
+  //         community,
+  //         thread_id: collaborativeThread.id,
+  //         editors: JSON.stringify(editors),
+  //         jwt: userJWT,
+  //       });
+  //     console.log(res);
+  //     expect(res.status).to.equal(200);
+  //     expect(res.body).to.not.be.null;
+  //   });
+  //   it('fail to add a non-community member address as editor', async () => {
+  //     const { result } = await modelUtils.createThread({
+  //       address: adminAddress,
+  //       kind,
+  //       chainId: null,
+  //       communityId: community,
+  //       title,
+  //       topicName,
+  //       topicId,
+  //       body,
+  //       jwt: adminJWT,
+  //     });
+  //     const collaboration = result;
+  //     const editors = {};
+  //     editors[userAddress] = {
+  //       id: userAddressId,
+  //       chain,
+  //       address: userAddress,
+  //     };
+  //     console.log(editors);
+  //     const res = await chai.request(app)
+  //       .post('/api/addEditors')
+  //       .set('Accept', 'application/json')
+  //       .send({
+  //         address: adminAddress,
+  //         author_chain: chain,
+  //         chain: null,
+  //         community,
+  //         thread_id: result.id,
+  //         editors: JSON.stringify(editors),
+  //         jwt: userJWT,
+  //       });
+  //     console.log(res);
+  //     expect(res.status).to.not.equal(200);
+  //     expect(res.body).to.not.be.null;
+  //   });
+  // });
+  // describe('/deleteEditors', () => {
+  //   it('successfully delete an editor', async () => {
+  //     const editors = {};
+  //     editors[adminAddress] = {
+  //       id: adminAddressId,
+  //       chain,
+  //       address: adminAddress,
+  //     };
+  //     console.log(editors);
+  //     const res = await chai.request(app)
+  //       .post('/api/addEditors')
+  //       .set('Accept', 'application/json')
+  //       .send({
+  //         address: userAddress,
+  //         author_chain: chain,
+  //         chain: null,
+  //         community,
+  //         thread_id: collaborativeThread.id,
+  //         editors: JSON.stringify(editors),
+  //         jwt: userJWT,
+  //       });
+  //     console.log(res);
+  //     expect(res.status).to.equal(200);
+  //     expect(res.body).to.not.be.null;
+  //   });
+  // });
 });
