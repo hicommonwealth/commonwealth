@@ -112,13 +112,13 @@ const ProposalHeader: m.Component<{
               closeOnContentClick: true,
               menuAttrs: { size: 'default' },
               content: [
-                (isEditor || isAuthor || isAdmin)
+                (isEditor || isAuthor)
                   && m(ProposalBodyEditMenuItem, {
                     item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                   }),
                 (isAuthor || isAdmin)
                   && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                (isAuthor || isAdmin)
+                (isAuthor)
                   && m(EditPermissionsButton, {
                     openEditPermissions: () => {
                       vnode.state.editPermissionsIsOpen = true;
