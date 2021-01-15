@@ -9,8 +9,8 @@ module.exports = {
       .query(`SELECT * FROM "NotificationCategories" WHERE name='new-collaboration'`);
     const users = await queryInterface.sequelize.query(`SELECT * FROM "Users"`);
     await Promise.all(users[0].map(async (user) => {
-      const columns = `(subscriber_id, category_id, object_id, is_active, created_at, updated_at)`;
-      const values = `('${user.id}', '${category[0][0].name}', 'user-${user.id}', '1', '${Sequelize.NOW()}', '${Sequelize.NOW()}')`;
+      const columns = `(subscriber_id, category_id, object_id, is_active, created_at, updated_at, immediate)`;
+      const values = `('${user.id}', '${category[0][0].name}', 'user-${user.id}', '1', '${Sequelize.NOW()}', '${Sequelize.NOW()}', true)`;
       await queryInterface.sequelize
         .query(`INSERT INTO "Subscriptions" ${columns} VALUES ${values}`);
     }));
