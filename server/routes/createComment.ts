@@ -78,7 +78,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   // the comment's first version, formatted on the backend with timestamps
   const firstVersion = {
     timestamp: moment(),
-    body: req.body.text
+    body: decodeURIComponent(req.body.text)
   };
   const version_history : string[] = [ JSON.stringify(firstVersion) ];
   const commentContent = {

@@ -47,7 +47,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
     const getVersion = (edit: VersionHistory, prevEdit: VersionHistory) => {
       const author = edit.author
         ? app.profiles.getProfile(edit.author.chain, edit.author.address)
-        : app.profiles.getProfile(proposal.author, proposal.authorChain);
+        : app.profiles.getProfile(post.author, post.authorChain);
       const timestamp = moment(edit.timestamp).format('dddd, MMMM Do YYYY, h:mm a');
       const userOptions = {
         user: author,
@@ -93,7 +93,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         ]);
       }
     };
-
+    console.log(post.versionHistory);
     return m('.VersionHistoryModal', [
       m('.compact-modal-title', [
         m('h3', 'Version History'),

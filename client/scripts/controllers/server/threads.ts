@@ -37,7 +37,7 @@ export const modelFromServer = (thread) => {
     moment(thread.created_at),
     thread.topic,
     thread.kind,
-    thread.version_history,
+    thread.version_history.map((v) => JSON.parse(v)),
     thread.community,
     thread.chain,
     thread.read_only,

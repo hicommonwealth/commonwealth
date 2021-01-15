@@ -49,12 +49,15 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    const recentEdit = {
-      timestamp: moment(),
-      body: decodeURIComponent(req.body.body)
-    };
-    comment.version_history.unshift(JSON.stringify(recentEdit));
-    console.log(comment.version_history);
+    if (req.body.new_version_history) {
+      const recentEdit = {
+        timestamp: moment(),
+        body: decodeURIComponent(req.body.body)
+      };
+      const arr = comment.version_history;
+      arr.unshift(JSON.stringify(recentEdit));
+      comment.version_history = arr;
+    }
     comment.text = req.body.body;
     comment.plaintext = (() => {
       try {

@@ -9,8 +9,6 @@ import { CommentsStore } from 'stores';
 import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from '../app/login';
-import { Moment } from 'moment';
-import { VersionHistory } from './threads';
 // tslint:disable: object-literal-key-quotes
 
 export enum CommentParent {
@@ -40,7 +38,7 @@ export const modelFromServer = (comment) => {
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
     comment.plaintext,
-    comment.version_history,
+    comment.version_history.map((v) => JSON.parse(v)),
     attachments,
     proposal,
     comment.id,

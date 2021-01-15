@@ -69,7 +69,6 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   if (!thread) return next(new Error('No thread with that id found'));
   try {
     // Only add a new version to the history if the body has been updated
-    console.log(new_version_history);
     if (new_version_history) {
       const recentEdit : any = {
         timestamp: moment(),
@@ -77,8 +76,9 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
         body: decodeURIComponent(req.body.body)
       };
       const versionHistory : string = JSON.stringify(recentEdit);
-      thread.version_history.unshift(versionHistory);
-      console.log(thread.version_history);
+      const arr = thread.version_history;
+      arr.unshift(versionHistory);
+      thread.version_history = arr;
     }
     thread.body = body;
     thread.plaintext = (() => {
