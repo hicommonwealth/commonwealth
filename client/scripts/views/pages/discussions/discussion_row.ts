@@ -58,6 +58,8 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         popover: true,
         hideAvatar: true,
       }),
+      proposal instanceof OffchainThread && proposal.collaborators && proposal.collaborators.length > 0
+        && m('span.proposal-collaborators', [ ' +', proposal.collaborators.length ]),
       m('.mobile-comment-count', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         app.comments.nComments(proposal),

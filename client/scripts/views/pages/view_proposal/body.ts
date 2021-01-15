@@ -1,11 +1,14 @@
+import 'pages/view_proposal/editor_permissions.scss';
+
 import m from 'mithril';
 import moment from 'moment';
 import lity from 'lity';
 import $ from 'jquery';
 import _ from 'lodash';
-import 'pages/view_proposal/editor_permissions.scss';
+
 import { updateRoute } from 'app';
 import app from 'state';
+import { pluralize } from 'helpers';
 import {
   OffchainThread,
   OffchainComment,
@@ -85,6 +88,8 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
         linkify: true,
         hideAvatar: true,
       }),
+      item instanceof OffchainThread && item.collaborators && item.collaborators.length > 0
+        && m('span.proposal-collaborators', ` and ${pluralize(item.collaborators?.length, 'other')}`),
     ]);
   }
 };
