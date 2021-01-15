@@ -105,48 +105,45 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
     }
 
     
-    // if running in archival mode then run poller.archive with 
-    // batch_size 50 
-    // startBlock 0 if none pased else from startBlock
-    if(archival){
-      offlineRange = {startBlock : startBlock? startBlock: 0 };
-      log.info(`Executing in archival mode, polling blocks starting from: ${offlineRange.startBlock}`);
-      await poller.archive(offlineRange,50,processBlockFn);
+    // if we can't figure out when the last block we saw was,
+    // do nothing
+    // (i.e. don't try and fetch all events from block 0 onward)
+    if (!offlineRange || !offlineRange.startBlock) {
+      log.warn('Unable to determine offline time range.');
+      return;
     }
-    // else just run poller normally
-    else {
-
-        // if we can't figure out when the last block we saw was,
-        // do nothing
-        // (i.e. don't try and fetch all events from block 0 onward)
-      if (!offlineRange || !offlineRange.startBlock) {
-        log.warn('Unable to determine offline time range.');
-        return;
-      }
-      try {
-        const blocks = await poller.poll(offlineRange);
-        await Promise.all(blocks.map(processBlockFn));
-      } catch (e) {
-        log.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
-      }
+    try {
+      const blocks = await poller.poll(offlineRange);
+      await Promise.all(blocks.map(processBlockFn));
+    } catch (e) {
+      log.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
     }
   };
 
-  if (!skipCatchup || archival) {
-    await pollMissedBlocksFn();
-  } else {
-    log.info('Skipping event catchup on startup!');
+  if (archival) {
+    // if running in archival mode then run poller.archive with 
+    // batch_size 50 
+    // startBlock 0 if none pased else from startBlock
+    const offlineRange: IDisconnectedRange = {startBlock : startBlock? startBlock: 0 };
+    log.info(`Executing in archival mode, polling blocks starting from: ${offlineRange.startBlock}`);
+    await poller.archive(offlineRange,50,processBlockFn);
   }
+  else { 
+    if (!skipCatchup ) {
+      await pollMissedBlocksFn();
+    } else {
+      log.info('Skipping event catchup on startup!');
+    }
 
-  try {
-    log.info(`Subscribing to ${chain} endpoint...`);
-    await subscriber.subscribe(processBlockFn);
+    try {
+      log.info(`Subscribing to ${chain} endpoint...`);
+      await subscriber.subscribe(processBlockFn);
 
-    // handle reconnects with poller
-    api.on('connected', pollMissedBlocksFn);
-  } catch (e) {
-    log.error(`Subscription error: ${e.message}`);
+      // handle reconnects with poller
+      api.on('connected', pollMissedBlocksFn);
+    } catch (e) {
+      log.error(`Subscription error: ${e.message}`);
+    }
   }
-
   return subscriber;
 };
