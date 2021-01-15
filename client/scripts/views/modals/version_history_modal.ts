@@ -47,13 +47,13 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
     const getVersion = (edit: VersionHistory, prevEdit: VersionHistory) => {
       const author = edit.author
         ? app.profiles.getProfile(edit.author.chain, edit.author.address)
-        : app.profiles.getProfile(post.author, post.authorChain);
-      const timestamp = moment(edit.timestamp).format('dddd, MMMM Do YYYY, h:mm a');
+        : app.profiles.getProfile(post.authorChain, post.author);
+      const timestamp = edit.timestamp.format('dddd, MMMM Do YYYY, h:mm a');
       const userOptions = {
         user: author,
         showRole: false,
         linkify: true,
-        popover: true,
+        popover: false,
         hideAvatar: true
       };
       // TODO: Add diffing algorithm for Markdown posts

@@ -26,6 +26,12 @@ export const modelFromServer = (comment) => {
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
+  const versionHistory = comment.version_history.map((v) => {
+    const history = JSON.parse(v);
+    history.timestamp = moment(history.timestamp);
+    return history;
+  });
+
   let proposal;
   try {
     proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
@@ -38,7 +44,7 @@ export const modelFromServer = (comment) => {
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
     comment.plaintext,
-    comment.version_history.map((v) => JSON.parse(v)),
+    versionHistory,
     attachments,
     proposal,
     comment.id,

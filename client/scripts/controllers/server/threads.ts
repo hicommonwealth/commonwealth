@@ -29,6 +29,13 @@ export const modelFromServer = (thread) => {
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
+  const versionHistory = thread.version_history.map((v) => {
+    const history = JSON.parse(v || {});
+    history.author = JSON.parse(history.author || {});
+    history.timestamp = moment(history.timestamp);
+    return history;
+  });
+
   return new OffchainThread(
     thread.Address.address,
     decodeURIComponent(thread.title),
@@ -37,7 +44,7 @@ export const modelFromServer = (thread) => {
     moment(thread.created_at),
     thread.topic,
     thread.kind,
-    thread.version_history.map((v) => JSON.parse(v)),
+    versionHistory,
     thread.community,
     thread.chain,
     thread.read_only,
@@ -123,7 +130,7 @@ class ThreadsController {
       // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {
         'author_chain': app.user.activeAccount.chain.id,
-        'author': app.user.activeAccount.profile,
+        'author': JSON.stringify(app.user.activeAccount.profile),
         'chain': chainId,
         'community': communityId,
         'address': address,
@@ -170,7 +177,7 @@ class ThreadsController {
       url: `${app.serverUrl()}/editThread`,
       type: 'PUT',
       data: {
-        'author': app.user.activeAccount.profile,
+        'author': JSON.stringify(app.user.activeAccount.profile),
         'thread_id': proposal.id,
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),

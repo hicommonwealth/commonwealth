@@ -70,6 +70,7 @@ class OffchainThread implements IUniqueId {
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];
+    if (versionHistory.length) console.log(this);
   }
 }
 
