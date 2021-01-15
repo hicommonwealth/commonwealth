@@ -6,7 +6,7 @@
         width: 100%;
     }
     .cui-button-label {
-        width: 90%;
+        width: calc(100% - 20px);
         text-align: left;
     }
 }

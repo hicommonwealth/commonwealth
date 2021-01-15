@@ -441,17 +441,6 @@ const ProposalComments: m.Component<{
   }
 };
 
-const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (proposal instanceof OffchainThread) return;
-
-    return m('.ProposalSidebar.forum-container.proposal-sidebar', [
-      m(ProposalVotingActions, { proposal }),
-    ]);
-  }
-};
-
 interface IPrefetch {
   [identifier: string]: {
     commentsStarted: boolean,
@@ -726,11 +715,10 @@ const ViewProposalPage: m.Component<{
         getSetGlobalEditingStatus,
         getSetGlobalReplyStatus
       }),
-      !(proposal instanceof OffchainThread) && m('.proposal-mobile-sidebar', [
-        m(ProposalVotingActions, { proposal }),
-      ]),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingResults, { proposal }),
+      !(proposal instanceof OffchainThread)
+        && m(ProposalVotingActions, { proposal }),
       m(ProposalComments, {
         proposal,
         comments,
