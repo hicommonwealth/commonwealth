@@ -22,7 +22,7 @@
     }
     .collective-metadata {
         margin-bottom: 10px;
-        .collective-metadata-backing,
+        .collective-metadata-members,
         .collective-metadata-beneficiary {
             display: inline-block;
         }
@@ -30,7 +30,7 @@
             color: $text-color-medium;
             margin-right: 18px;
         }
-        .collective-metadata-backing {
+        .collective-metadata-members {
             color: $text-color-medium;
         }
     }

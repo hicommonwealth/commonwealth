@@ -5,6 +5,7 @@ import { Card, Button, Input } from 'construct-ui';
 
 import app from 'state';
 import { AddressInfo } from 'models';
+import { pluralize } from 'helpers';
 
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
@@ -13,6 +14,7 @@ import PageLoading from 'views/pages/loading';
 interface CWCollectiveStub {
   name: string;
   description: string;
+  numMembers: number;
   ownerAddress: string;
   ownerChain: string;
   amountBacking: number;
@@ -23,6 +25,7 @@ interface CWCollectiveStub {
 const COLLECTIVES: CWCollectiveStub[] = [{
   name: 'Commonwealth Collective',
   description: 'Lorem ipsum',
+  numMembers: 12,
   ownerAddress: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
   ownerChain: 'commonwealth',
   amountBacking: 140.12,
@@ -57,6 +60,9 @@ const CollectivesPage: m.Component<{}> = {
               m(User, {
                 user: new AddressInfo(null, collective.ownerAddress, collective.ownerChain, null)
               }),
+            ]),
+            m('.collective-metadata-members', [
+              pluralize(collective.numMembers, 'backer'),
             ]),
           ]),
           m('.collective-metrics', [
