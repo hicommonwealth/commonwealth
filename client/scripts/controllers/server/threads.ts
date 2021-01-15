@@ -30,9 +30,16 @@ export const modelFromServer = (thread) => {
     : [];
 
   const versionHistory = thread.version_history.map((v) => {
-    const history = JSON.parse(v || {});
-    history.author = JSON.parse(history.author || {});
-    history.timestamp = moment(history.timestamp);
+    let history;
+    try {
+      history = JSON.parse(v || '{}');
+      history.author = history.author
+        ? JSON.parse(history.author)
+        : null;
+      history.timestamp = moment(history.timestamp);
+    } catch (e) {
+      console.log(e);
+    }
     return history;
   });
 

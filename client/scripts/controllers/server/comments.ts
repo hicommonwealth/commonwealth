@@ -27,8 +27,13 @@ export const modelFromServer = (comment) => {
     : [];
 
   const versionHistory = comment.version_history.map((v) => {
-    const history = JSON.parse(v);
-    history.timestamp = moment(history.timestamp);
+    let history;
+    try {
+      history = JSON.parse(v || '{}');
+      history.timestamp = moment(history.timestamp);
+    } catch (e) {
+      console.log(e);
+    }
     return history;
   });
 
@@ -122,7 +127,6 @@ class CommentsController {
         'jwt': app.user.jwt,
       });
       const { result } = res;
-      console.log(result);
       this._store.add(modelFromServer(result));
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
@@ -156,7 +160,6 @@ class CommentsController {
         'attachments[]': attachments,
         'jwt': app.user.jwt,
       });
-      console.log(response.result);
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));

@@ -3,13 +3,11 @@ import 'modals/version_history_modal.scss';
 import m from 'mithril';
 import app from 'state';
 import Quill from 'quill';
-import moment from 'moment';
 import { OffchainThread, OffchainComment } from 'models';
-import { formatAddressShort } from 'utils';
 import { CompactModalExitButton } from 'views/modal';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-import User, { UserBlock } from 'views/components/widgets/user';
+import User from 'views/components/widgets/user';
 import { VersionHistory } from 'client/scripts/controllers/server/threads';
 const Delta = Quill.import('delta');
 
@@ -93,7 +91,6 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         ]);
       }
     };
-    console.log(post.versionHistory);
     return m('.VersionHistoryModal', [
       m('.compact-modal-title', [
         m('h3', 'Version History'),
@@ -103,6 +100,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         m('.versions', [
           post.versionHistory.map((edit, idx) => {
             const prevEdit = post.versionHistory[idx + 1];
+            if (!edit) return null;
             return getVersion(edit, prevEdit);
           })
         ]),
