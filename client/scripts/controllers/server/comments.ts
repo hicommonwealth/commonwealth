@@ -118,6 +118,7 @@ class CommentsController {
         'jwt': app.user.jwt,
       });
       const { result } = res;
+      console.log(result);
       this._store.add(modelFromServer(result));
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
@@ -138,8 +139,6 @@ class CommentsController {
 
   public async edit(comment: OffchainComment<any>, body?: string, attachments?: string[]) {
     const newBody = body || comment.text;
-    const recentEdit : VersionHistory = { timestamp: moment(), body };
-    const versionHistory = JSON.stringify(recentEdit);
     try {
       // TODO: Change to PUT /comment
       const response = await $.post(`${app.serverUrl()}/editComment`, {
@@ -149,10 +148,11 @@ class CommentsController {
         'chain': comment.chain,
         'community': comment.community,
         'body': encodeURIComponent(newBody),
-        'version_history': versionHistory,
+        'new_version_history': !!body,
         'attachments[]': attachments,
         'jwt': app.user.jwt,
       });
+      console.log(response.result);
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
