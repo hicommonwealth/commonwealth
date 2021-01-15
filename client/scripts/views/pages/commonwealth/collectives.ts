@@ -1,3 +1,5 @@
+import 'pages/commonwealth/collectives.scss';
+
 import m from 'mithril';
 import { Card, Button, Input } from 'construct-ui';
 
@@ -50,21 +52,44 @@ const CollectivesPage: m.Component<{}> = {
         }, [
           m('h4', collective.name),
           m('.collective-description', collective.description),
-          m('.collective-backing', [
-            `${collective.amountBacking} ETH`,
-            m(User, { user: new AddressInfo(null, collective.ownerAddress, collective.ownerChain, null) }),
+          m('.collective-metadata', [
+            m('.collective-metadata-beneficiary', [
+              m(User, {
+                user: new AddressInfo(null, collective.ownerAddress, collective.ownerChain, null)
+              }),
+            ]),
+          ]),
+          m('.collective-metrics', [
+            m('.collective-metric', [
+              m('.collective-metric-figure', collective.amountBacking),
+              m('.collective-metric-title', 'Backing'),
+            ]),
+            m('.collective-metric', [
+              m('.collective-metric-figure', collective.amountWithdrawableBacking),
+              m('.collective-metric-title', 'Your Backing'),
+            ]),
           ]),
           m('.collective-action', [
-            m(Button, { label: 'Back Collective', rounded: true }),
-            m(Input, { placeholder: 'ETH balance to stake...' }),
-          ]),
-          m('.collective-action', [
-            m(Button, { label: 'Withdraw Amount', rounded: true }),
-            m('.collective-action-text', `Current interest: ${collective.amountWithdrawableBacking} ETH`),
-          ]),
-          m('.collective-action', [
-            m(Button, { label: 'Withdraw Interest', rounded: true }),
-            m('.collective-action-text', `Current interest: ${collective.amountWithdrawableInterest} ETH`),
+            m(Input, {
+              fluid: true,
+              placeholder: 'Amount of ETH to back',
+            }),
+            m(Button, {
+              label: 'Back Collective',
+              rounded: true,
+              fluid: true,
+              intent: 'primary',
+            }),
+            m(Button, {
+              label: 'Withdraw Backing',
+              rounded: true,
+              fluid: true,
+            }),
+            m(Button, {
+              label: `Withdraw Interest (${collective.amountWithdrawableInterest} ETH)`,
+              rounded: true,
+              fluid: true,
+            }),
           ]),
         ]);
       }),
