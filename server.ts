@@ -34,7 +34,7 @@ import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
-import archivalNodeDBEntryExist  from './server/scripts/checkArchivalNodeEntry';
+import { archivalNodeDbEntry }  from './server/util/archivalNodeHelpers';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
@@ -76,8 +76,8 @@ async function main() {
 
   // check if db record exists for archival node execution with chain-events version and starting block number.
   if (ARCHIVAL) {
-    const archivalNodeDBEntry = await archivalNodeDBEntryExist(models);
-    ARCHIVAL = !archivalNodeDBEntry;
+    const archivalNodeDBEntryExist = await archivalNodeDbEntry(models);
+    ARCHIVAL = !archivalNodeDBEntryExist;
     log.info(`Executing process with ARCHIVAL flag set to ${ARCHIVAL}`);
     if (ARCHIVAL && !ARCHIVAL_NODE_URL && !ARCHIVAL_CHAIN) {
       log.error('ARCHIVAL NODE URL and ARCHIVAL_CHAIN name is necessary to execute in archival mode');

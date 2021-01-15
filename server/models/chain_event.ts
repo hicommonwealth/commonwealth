@@ -9,6 +9,7 @@ export interface ChainEventAttributes {
   block_number: number;
   entity_id?: number;
   event_data: object;
+  active: boolean;
   created_at?: Date;
   updated_at?: Date;
 
@@ -35,6 +36,7 @@ export default (
     block_number: { type: dataTypes.INTEGER, allowNull: false },
     entity_id: { type: dataTypes.INTEGER, allowNull: true },
     event_data: { type: dataTypes.JSONB, allowNull: false },
+    active: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
