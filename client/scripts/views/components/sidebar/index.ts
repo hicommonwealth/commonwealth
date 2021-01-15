@@ -184,15 +184,15 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
       ]),
       m(List, [
         featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && !app.threads.initialized
-          && m(ListItem, {
-            class: 'section-callout',
-            label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
-          }),
+        && m(ListItem, {
+          class: 'section-callout',
+          label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
+        }),
       ]),
       m(List, {
         onupdate: (vvnode) => {
           if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-              && !vnode.state.dragulaInitialized) {
+            && !vnode.state.dragulaInitialized) {
             vnode.state.dragulaInitialized = true;
             dragula([vvnode.dom]).on('drop', async (el, target, source) => {
               const reorder = Array.from(source.children).map((child) => {
@@ -226,8 +226,8 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
-        || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || app.chain.class === ChainClass.Moloch);
+      || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
+      || app.chain.class === ChainClass.Moloch);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
@@ -235,10 +235,10 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
-        || p.startsWith(`/${app.activeChainId()}/signaling`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`));
+      || p.startsWith(`/${app.activeChainId()}/signaling`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`));
     const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
       || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
     const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
@@ -260,13 +260,13 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
         // referenda (substrate only)
         !app.community && app.chain?.base === ChainBase.Substrate
-          && m(ListItem, {
-            active: onReferendaPage(m.route.get()),
-            label: 'Referenda',
-            contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/referenda`),
-            contentRight: [], // TODO
-          }),
+        && m(ListItem, {
+          active: onReferendaPage(m.route.get()),
+          label: 'Referenda',
+          contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
+          onclick: (e) => m.route.set(`/${app.activeChainId()}/referenda`),
+          contentRight: [], // TODO
+        }),
         // proposals (substrate, cosmos, moloch only)
         m(ListItem, {
           active: onProposalPage(m.route.get()),
@@ -291,30 +291,22 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
         // treasury (substrate only)
         !app.community && app.chain?.base === ChainBase.Substrate
-          && m(ListItem, {
-            active: onTreasuryPage(m.route.get()),
-            label: 'Treasury',
-            contentLeft: m(Icon, { name: Icons.TRUCK }),
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/treasury`),
-            contentRight: [], // TODO
-          }),
+        && m(ListItem, {
+          active: onTreasuryPage(m.route.get()),
+          label: 'Treasury',
+          contentLeft: m(Icon, { name: Icons.TRUCK }),
+          onclick: (e) => m.route.set(`/${app.activeChainId()}/treasury`),
+          contentRight: [], // TODO
+        }),
         // council (substrate only)
         !app.community && app.chain?.base === ChainBase.Substrate
-          && m(ListItem, {
-            active: onCouncilPage(m.route.get()),
-            label: 'Council',
-            contentLeft: m(Icon, { name: Icons.AWARD }),
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
-            contentRight: [], // TODO
-          }),
-        // validators (substrate and cosmos only)
-        !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
-          && m(ListItem, {
-            contentLeft: m(Icon, { name: Icons.SHARE_2 }),
-            active: onValidatorsPage(m.route.get()),
-            label: 'Validators',
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
-          }),
+        && m(ListItem, {
+          active: onCouncilPage(m.route.get()),
+          label: 'Council',
+          contentLeft: m(Icon, { name: Icons.AWARD }),
+          onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
+          contentRight: [], // TODO
+        }),
         showMolochMemberOptions && m(ListItem, {
           onclick: (e) => {
             m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
@@ -345,23 +337,49 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           label: 'Approve tokens',
           contentLeft: m(Icon, { name: Icons.POWER }),
         }),
+      ]),
+    ]);
+  }
+};
+
+const StakingNavigationModule: m.Component<{}, {}> = {
+  view: (vnode) => {
+    const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    const onManageStakingPage = (p) => p.startsWith(`/${app.activeChainId()}/manageStaking`);
+    const onStakingCalculatorPage = (p) => p.startsWith(`/${app.activeChainId()}/stakingCalculator`);
+
+    const hasProposals = app.chain && !app.community && (
+      app.chain.base === ChainBase.CosmosSDK
+      || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
+      || app.chain.class === ChainClass.Moloch);
+    if (!hasProposals) return;
+
+    return m('.StakingNavigationModule.SidebarModule', [
+      m(List, [
         (app.community || app.chain)
-        && m('h4', 'Staking'),
+        && m(ListItem, {
+          label: 'Staking',
+          class: 'section-header',
+        }),
         // validators (substrate and cosmos only)
         !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
         && [
-          m(ListItem, {
+          // validators (substrate and cosmos only)
+          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+          && m(ListItem, {
+            contentLeft: m(Icon, { name: Icons.SHARE_2 }),
             active: onValidatorsPage(m.route.get()),
             label: 'Validators',
             onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
-            contentLeft: m(Icon, { name: Icons.BOX }),
           }),
           m(ListItem, {
+            contentLeft: m(Icon, { name: Icons.BOX }),
             active: onManageStakingPage(m.route.get()),
             label: 'Manage Staking',
             onclick: (e) => m.route.set(`/${app.activeChainId()}/manageStaking`),
           }),
           m(ListItem, {
+            contentLeft: m(Icon, { name: Icons.ZAP }),
             active: onStakingCalculatorPage(m.route.get()),
             label: 'Staking Calculator',
             onclick: (e) => m.route.set(`/${app.activeChainId()}/stakingCalculator`),
@@ -371,7 +389,6 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     ]);
   }
 };
-
 const ChainStatusModule: m.Component<{}> = {
   view: (vnode) => {
     const url = app.chain?.meta?.url;
@@ -437,6 +454,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
         m('.SidebarHeader', m(CommunitySelector)),
         (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
         (app.chain || app.community) && m(OnchainNavigationModule),
+        (app.chain || app.community) && m(StakingNavigationModule),
         app.chain && m(ChainStatusModule),
       ])
     ];

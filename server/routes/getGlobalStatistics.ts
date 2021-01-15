@@ -32,14 +32,14 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
   });
 
   const rawQuery = `
-    select p.*, v.state, v."lastUpdate", v."sessionKeys" , v."name"  from (
-      SELECT * ,ROW_NUMBER() OVER( PARTITION BY partitionTable.stash ORDER BY created_at DESC )
-      FROM public."HistoricalValidatorStatistic" as partitionTable
-    ) p
-    join "Validator" v  
-    on v.stash  = p.stash
-    where p.row_number = 1
-    ORDER BY block desc;
+  select p.*, v.state, v."lastUpdate", v."sessionKeys" , v."name"
+  from "Validator" v  
+  left join (
+    SELECT * ,ROW_NUMBER() OVER( PARTITION BY partitionTable.stash ORDER BY created_at DESC )
+    FROM public."HistoricalValidatorStatistic" as partitionTable
+  ) p
+  on p.row_number = 1
+  and p.stash = v.stash 
   `;
 
   result = await sequelize.query(rawQuery);
@@ -54,8 +54,8 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
 
   result[0].forEach((stats) => {
     const { exposure = {}, state = '' } = stats;
-    if (exposure.total) {
-      totalStaked += parseInt(exposure.total, 16);
+    if (exposure?.total) {
+      totalStaked += parseInt(exposure?.total, 16);
     }
     // count total nominators
     const others = exposure?.others || [];
@@ -68,7 +68,7 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
 
     if (state === 'Active') {
       elected++;
-    } else {
+    } else if (state === 'Waiting') {
       waiting++;
     }
     // calculate est. apr

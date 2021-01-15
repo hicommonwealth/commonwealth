@@ -3,6 +3,7 @@ import 'pages/validators.scss';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { from } from 'rxjs';
+import { first } from 'rxjs/operators';
 import app, { ApiStatus } from 'state';
 import { formatAddressShort } from 'helpers/index';
 import { Coin, formatCoin, formatNumberShort } from 'adapters/currency';
@@ -60,6 +61,8 @@ export interface IValidatorPageState {
     lastHeader: HeaderExtended,
     annualPercentRate: ICommissionInfo;
     valCount: Number;
+    globalStatistics: { waiting?: any; totalStaked?: any; elected?: any; count?: any; nominators?: any; offences?: any; aprPercentage?: any; lastBlockNumber?: string; };
+    sender: SubstrateAccount;
   };
 }
 
@@ -111,11 +114,28 @@ export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiti
   }
 };
 
+const shouldFetchFromDB = (chain:Substrate, dbBlockNumber:string) => {
+  const pad = 1000;
+  return parseInt(dbBlockNumber, 10) >= (chain.block.height - pad);
+};
+
 export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
+  oncreate: async (vnode) => {
+    vnode.state.dynamic.globalStatistics = await app.staking.globalStatistics(app.chain.meta.chain.id);
+    vnode.state.dynamic.validators = undefined;
+    // Only fetch data from DB when HistoricalValidatorStatistics table is synced with chain
+    if (shouldFetchFromDB(app.chain as Substrate, vnode.state.dynamic.globalStatistics.lastBlockNumber)) {
+      const validatorsFromDB = await app.staking.validatorNamesAddress() as any;
+      const vfdb = {};
+      validatorsFromDB.profileData.forEach((q) => { vfdb[q.address] = ({ state: q.state } as IValidators); });
+      vnode.state.dynamic.validators = validatorsFromDB.profileData;
+    }
+    vnode.state.dynamic.sender = app.user.activeAccount as SubstrateAccount;
+  },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
+    // validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
     valCount: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validatorCount : null,
     currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
     currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
@@ -134,6 +154,14 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
       : null
   }),
   view: (vnode) => {
+    if (vnode.state.dynamic.globalStatistics
+        && !shouldFetchFromDB(app.chain as Substrate, vnode.state.dynamic.globalStatistics.lastBlockNumber)
+        && !vnode.state.dynamic.validators) {
+      vnode.state.dynamic.validators = {};
+      (app.chain as Substrate).staking.validators.pipe(first()).subscribe((val) => {
+        vnode.state.dynamic.validators = val;
+      });
+    }
     let vComponents = [];
     switch (app.chain.class) {
       case ChainClass.Edgeware:
@@ -143,6 +171,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
             annualPercentRate: vnode.state.dynamic.annualPercentRate,
             validators: vnode.state.dynamic.validators as IValidators,
             valCount: vnode.state.dynamic.valCount,
+            globalStatistics: vnode.state.dynamic.globalStatistics,
           }),
           m(SubstratePresentationComponent, {
             validators: vnode.state.dynamic.validators as IValidators,
@@ -159,6 +188,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
             annualPercentRate: vnode.state.dynamic.annualPercentRate,
             validators: vnode.state.dynamic.validators as IValidators,
             valCount: vnode.state.dynamic.valCount,
+            globalStatistics: vnode.state.dynamic.globalStatistics,
           }),
           m(SubstratePresentationComponent, {
             validators: vnode.state.dynamic.validators as IValidators,
@@ -181,7 +211,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   }
 });
 
-const ValidatorPage : m.Component<{}> = {
+const ValidatorPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ValidatorPage' });
   },

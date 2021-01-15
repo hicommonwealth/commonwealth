@@ -49,6 +49,7 @@ export interface IValidatorValue {
   hasMessage?: boolean,
   isOnline?: boolean,
   otherTotal?: BN,
+  state?: string,
 }
 export interface IValidators {
   [address: string]: IValidatorValue;

@@ -24,6 +24,7 @@ interface IPreHeaderAttrs {
   validators: IValidators;
   valCount: Number;
   sender: SubstrateAccount;
+  globalStatistics: any;
   annualPercentRate: ICommissionInfo;
 }
 
@@ -31,7 +32,7 @@ const itemLoadingSpinner = () => m(Spinner, { active: true, fill: false, size: '
 
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
   oncreate: async (vnode) => {
-    vnode.state.dynamic.globalStatistics = await app.staking.globalStatistics(app.chain.meta.chain.id);
+    // vnode.state.dynamic.globalStatistics = await app.staking.globalStatistics(app.chain.meta.chain.id);
     vnode.state.dynamic.sender = app.user.activeAccount as SubstrateAccount;
   },
   getObservables: (attrs) => ({
@@ -58,14 +59,16 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     const waiting: number = 0;
     let totalStaked;
     let hasClaimablePayouts = false;
-    sessionInfo = globalStatistics = sender = validators = {};
+    sessionInfo = sender = validators = {};
     currentEra = currentIndex = sessionLength = sessionProgress = 0;
 
-    if (stDynamic.globalStatistics) {
-      globalStatistics = stDynamic.globalStatistics;
+    if (vnode.attrs.globalStatistics) {
+      globalStatistics = vnode.attrs.globalStatistics;
+    } else {
+      return;
     }
 
-    if (app.chain && stDynamic && stDynamic.sessionInfo && stDynamic.globalStatistics) {
+    if (app.chain && stDynamic && stDynamic.sessionInfo && vnode.attrs.globalStatistics) {
       sessionInfo = stDynamic.sessionInfo;
 
       sender = vnode.state.dynamic.sender;

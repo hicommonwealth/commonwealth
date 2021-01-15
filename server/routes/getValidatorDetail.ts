@@ -16,6 +16,7 @@ const getValidatorDetail = async (models, req: Request, res: Response, next: Nex
     where,
     include: {
       model: models.HistoricalValidatorStatistic,
+      limit: 1,
       order: [['created_at', 'DESC']],
     }
   });
@@ -23,6 +24,7 @@ const getValidatorDetail = async (models, req: Request, res: Response, next: Nex
   validators = JSON.parse(JSON.stringify(validators));
   validators = validators.map((row) => {
     row = { ...row.HistoricalValidatorStatistic?.[0], ...row };
+    row.HistoricalValidatorStatistic = null;
     delete row.HistoricalValidatorStatistic;
     return row;
   });
