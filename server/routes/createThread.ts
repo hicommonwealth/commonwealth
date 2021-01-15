@@ -5,6 +5,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
+import moment from 'moment';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -71,8 +72,9 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
-  const versionHistory = [];
-  versionHistory.push(req.body.versionHistory);
+  const timestamp = moment();
+  const firstVersion : any = { timestamp, body: req.body.body };
+  const versionHistory : string[] = [ JSON.stringify(firstVersion) ];
 
   const threadContent = community ? {
     community: community.id,

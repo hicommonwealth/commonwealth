@@ -103,10 +103,6 @@ class ThreadsController {
     mentions?: string[],
     readOnly?: boolean
   ) {
-    const timestamp = moment();
-    const firstVersion : any = { timestamp, body };
-    const versionHistory : string = JSON.stringify(firstVersion);
-
     try {
       // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {
@@ -117,7 +113,6 @@ class ThreadsController {
         'title': encodeURIComponent(title),
         'body': encodeURIComponent(body),
         'kind': kind,
-        'versionHistory': versionHistory,
         'attachments[]': attachments,
         'mentions[]': mentions,
         'topic_name': topicName,
