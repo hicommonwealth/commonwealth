@@ -95,7 +95,7 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
       if (!vnode.attrs.setDemocracyVoteAmount) return 'Misconfigured';
       if (!app.user.activeAccount) return 'Misconfigured';
       return m('.ProposalExtensions', [
-        m('div', { style: 'font-size: 90%; line-height: 1.3;' }, [
+        m('div', { style: 'font-size: 90%; line-height: 1.2;' }, [
           'The winning side\'s coins will be timelocked according to the weight of their vote:'
         ]),
         m('div', { style: 'margin: 16px 0 12px;' }, [
@@ -117,7 +117,7 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
       ]);
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyProposal) {
       return m('.ProposalExtensions', [
-        m('p', 'Cost to second: ', proposal.deposit.format())
+        m('.proposal-second', 'Cost to second: ', proposal.deposit.format())
       ]);
     } else if (vnode.attrs.proposal instanceof SubstratePhragmenElection) {
       const votingBond = (app.chain as Substrate).phragmenElections.votingBond;
@@ -126,8 +126,8 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
         m('strong', votingBond ? votingBond.format() : '--'),
         ', which is returned when the election is completed.',
         // TODO XXX: check whether user has deposited a voting bond
-        // m('p', 'You have not deposited a voting bond for the current election.'),
-        // m('p', 'You have already deposited a voting bond for the current election.'),
+        // m('.proposal-bond', 'You have not deposited a voting bond for the current election.'),
+        // m('.proposal-bond', 'You have already deposited a voting bond for the current election.'),
       ]);
     }
   }

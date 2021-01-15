@@ -22,14 +22,14 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
       community: this.id,
       jwt: this.app.user.jwt,
     });
-    
+
     // If user is no longer on the initializing community, abort initialization
     // and return false, so that the invoking selectCommunity fn can similarly
     // break, rather than complete.
     if (this.meta.id !== m.route.param('scope')) {
       return false;
     }
-    
+
     const { threads, comments, reactions, topics, admins, activeUsers } = response.result;
     this.app.threads.initialize(threads, true);
     this.app.comments.initialize(comments, true);

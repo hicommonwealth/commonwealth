@@ -24,7 +24,6 @@ import PageLoading from 'views/pages/loading';
 import ViewVotersModal from 'views/modals/view_voters_modal';
 import { Grid, Col, Button, MenuItem } from 'construct-ui';
 import CouncilRow from './council_row';
-import ListingHeader from '../../components/listing_header';
 import Listing from '../listing';
 import ErrorPage from '../error';
 
@@ -298,10 +297,7 @@ const CouncilPage: m.Component<{}> = {
             ),
             m('.clear'),
           ])],
-        rightColSpacing: [0],
-        columnHeaders: [
-          'Councillors',
-        ],
+        columnHeader: 'Councillors',
       }),
       // candidates
       m(Listing, {
@@ -312,10 +308,7 @@ const CouncilPage: m.Component<{}> = {
               .map(([account, slot]) => m(CouncilRow, { account })),
             m('.clear'),
           ],
-        rightColSpacing: [4, 6],
-        columnHeaders: [
-          'Runners-up',
-        ]
+        columnHeader: 'Runners-up',
       })
     ]);
   },
