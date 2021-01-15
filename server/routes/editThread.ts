@@ -67,7 +67,9 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    if (!thread) return next(new Error('No thread with that id found'));
+  }
+  if (!thread) return next(new Error('No thread with that id found'));
+  try {
     if (new_version_history) {
       const recentEdit : any = {
         timestamp: moment(),

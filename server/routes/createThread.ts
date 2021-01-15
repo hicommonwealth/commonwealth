@@ -72,9 +72,8 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
-  const timestamp = moment();
   const firstVersion : any = {
-    timestamp,
+    timestamp: moment(),
     author: req.body.author,
     body: decodeURIComponent(req.body.body)
   };
