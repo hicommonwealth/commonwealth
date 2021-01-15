@@ -231,7 +231,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
   }
 
-  const excludedAddrs = mentionedAddresses.map((addr) => addr.address);
+  const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(finalComment.Address.address);
 
   // dispatch notifications to root thread
