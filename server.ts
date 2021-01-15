@@ -90,13 +90,15 @@ async function main() {
     try {
       // configure chain list from events
       let chains: string | string[] | 'all' | 'none' = 'all';
-      if (ARCHIVAL) {
-        chains = [ARCHIVAL_NODE_URL, ARCHIVAL_CHAIN];
-      } else if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
+      // if (ARCHIVAL) {
+      //  chains = [ARCHIVAL_NODE_URL, ARCHIVAL_CHAIN];
+      // }
+      if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
         chains = CHAIN_EVENTS;
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
+
       const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP, ARCHIVAL, START_BLOCLK);
       // construct storageFetchers needed for the identity cache
       const fetchers = {};

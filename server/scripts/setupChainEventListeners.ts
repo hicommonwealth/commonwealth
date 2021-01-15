@@ -5,6 +5,7 @@ import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
 
+import { createApi, subscribeEvents } from '/home/myym/Desktop/Github/chain-events/src/substrate/subscribeFunc';
 
 import { Mainnet } from '@edgeware/node-types';
 
@@ -54,17 +55,12 @@ const setupChainEventListeners = async (
   log.info('Fetching node urls...');
   await sequelize.authenticate();
   const nodes: ChainNodeInstance[] = [];
-  if (archival) {
-    nodes.push({ url:chains[0], chain: chains[1] } as unknown as ChainNodeInstance);
-  } else if (chains === 'all') {
-    const n = (await Promise.all(EventSupportingChains.map((c) => {
-      return models.ChainNode.findOne({ where: { chain: c } });
+  if (chains === 'all') {
+    const n = (await Promise.all(EventSupportingChains.map((c) => {return models.ChainNode.findOne({ where: { chain: c } });
     }))).filter((c) => !!c);
     nodes.push(...n);
   } else if (chains !== 'none') {
-    const n = (await Promise.all(EventSupportingChains
-      .filter((c) => chains.includes(c))
-      .map((c) => {
+    const n = (await Promise.all(EventSupportingChains.filter((c) => chains.includes(c)).map((c) => {
         return models.ChainNode.findOne({ where: { chain: c } });
       })))
       .filter((c) => !!c);
@@ -73,10 +69,16 @@ const setupChainEventListeners = async (
     log.info('No event listeners configured.');
     return {};
   }
+
   if (nodes.length === 0) {
     log.info('No event listeners found.');
     return {};
   }
+
+  // Read the archival node url and archival chain name from env
+  const ARCHIVAL_NODE_URL = process.env.ARCHIVAL_NODE_URL;
+  const ARCHIVAL_CHAIN = process.env.ARCHIVAL_CHAIN;
+ 
 
   log.info('Setting up event listeners...');
   const subscribers = await Promise.all(nodes.map(async (node) => {
@@ -97,8 +99,8 @@ const setupChainEventListeners = async (
     const identityHandler = new IdentityHandler(models, node.chain);
     const handlers: IEventHandler[] = [
       storageHandler,
-      // notificationHandler,
-      // entityArchivalHandler,
+      notificationHandler,
+      entityArchivalHandler,
       newSessionHandler,
       heartbeatHandler,
       rewardHandler,
@@ -110,9 +112,48 @@ const setupChainEventListeners = async (
 
     let subscriber: IEventSubscriber<any, any>;
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
+      
+      // if running in archival mode and we are supposed to execute archival mode for the chain
+      // then first execute the archival mode using the ARCHIVAL_NODE_URL provided in env  
+      // and syncup with the head of the chain and then use the URL for the chain provided in db 
+      // and use it to subscribe to head of the chain to continue normal execution. 
+      if ( archival && node.chain == ARCHIVAL_CHAIN ) {
+        // handlers needed for staking ui
+          const _handlers: IEventHandler[] = [
+            storageHandler,
+            newSessionHandler,
+            heartbeatHandler,
+            rewardHandler,
+            slashHandler,
+            offenceHandler,
+            bondHandler,
+            imOnlineHandler
+          ];
+        
+
+        // mark all the events in ChaineEvents db for the archival_chain >= provided blockNumber as INACTIVE
+      // await changeChainEventStatus('INACTIVE', chain, eventsList, blockNumber,)
+
+       const nodeUrl = constructSubstrateUrl(ARCHIVAL_NODE_URL);
+       const api = await SubstrateEvents.createApi(
+         nodeUrl,
+         node.chain.includes('edgeware') ? Mainnet : {},
+       );
+ 
+       await SubstrateEvents.subscribeEvents({
+         chain: node.chain,
+         handlers,
+         skipCatchup,
+         archival,
+         startBlock,
+         discoverReconnectRange: () => discoverReconnectRange(models, ARCHIVAL_CHAIN),
+         api,
+       });
+       log.info(`Finished archival syncing for chain ${ARCHIVAL_CHAIN}...`);
+      }
+
       // only handle identities on substrate chains
       handlers.push(identityHandler);
-
       const nodeUrl = constructSubstrateUrl(node.url);
       const api = await SubstrateEvents.createApi(
         nodeUrl,
@@ -128,6 +169,8 @@ const setupChainEventListeners = async (
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
       });
+
+
     } else if (chainSupportedBy(node.chain, MolochTypes.EventChains)) {
       const contractVersion = 1;
       const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
