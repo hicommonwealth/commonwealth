@@ -23,9 +23,6 @@ export class OffchainAccount extends Account<Coin> {
   public async signMessage(message: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
-  public async isValidSignature(message: string, signature: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
-  }
   protected addressFromMnemonic(mnemonic: string): string {
     throw new Error('Method not implemented.');
   }

@@ -132,6 +132,8 @@ $cui-negative-border-color:        $cui-negative-bg-color;
 $cui-negative-border-color-hover:  $cui-negative-bg-color-hover;
 $cui-negative-border-color-active: $cui-negative-bg-color-active;
 
+$cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
+
 @import 'construct-ui/src/utils/focus-manager/index.scss';
 @import 'construct-ui/src/components/index.scss';
 
@@ -152,6 +154,13 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
     top: 4px;
 }
 
+
+.cui-popover-content {
+    border-color: $cui-popover-arrow-border-color;
+}
+.cui-menu .cui-menu-divider {
+    border-color: lighten($cui-popover-arrow-border-color, 2%);
+}
 
 .cui-button {
     font-weight: $cui-font-weight-bold !important; // fix weight
@@ -296,20 +305,19 @@ button, .cui-button {
 // adjust input padding
 .cui-input input {
     padding: 22px 15.6px 15.6px;
-    @each $size in $cui-sizes {
-        &.cui-#{$size} {
-            padding: 22px 15.6px 15.6px;
-        }
-    }
 }
-
-// adjust textarea padding
 .cui-text-area textarea {
     padding: 14px 15.6px 15.6px;
     @each $size in $cui-sizes {
         &.cui-#{$size} {
-            padding: 22px 15.6px 15.6px;
+            padding: 22px 15.6px 15.6px !important;
         }
+    }
+}
+@each $size in $cui-sizes {
+    .cui-input.cui-#{$size} input,
+    .cui-input.cui-#{$size} textarea {
+        padding: 22px 15.6px 15.6px !important;
     }
 }
 
@@ -411,7 +419,7 @@ button, .cui-button {
 
 // reduce menu padding
 .cui-menu {
-    max-width: 240px; // allow menus to be wider by default
+    max-width: none;
     padding: 4px 0;
     .cui-menu-item.cui-button {
         padding-left: 14px;
@@ -454,6 +462,19 @@ button, .cui-button {
     z-index: initial;
 }
 
+// make large spinners bigger
+.cui-spinner.cui-lg .cui-spinner-icon,
+.cui-lg .cui-spinner .cui-spinner-icon {
+    height: 24px;
+    width: 24px;
+}
+.cui-spinner.cui-xl .cui-spinner-icon,
+.cui-xl .cui-spinner .cui-spinner-icon {
+    height: 36px;
+    width: 36px;
+    border-width: 3px;
+}
+
 // the declarative construct-ui toaster doesn't allow position to be set by default, so we override it here
 .cui-toaster.cui-toaster-top {
     top: auto;
@@ -475,7 +496,46 @@ button, .cui-button {
 .cui-dialog-header {
     padding: 15px 15px 15px 25px;
     h3 {
-        margin: 4px 0 0;
+        margin: 6px 0 0;
         font-weight: 600;
+    }
+}
+
+// dialog entry animation
+.cui-overlay-backdrop {
+    .fade-enter & {
+        opacity: 0.01;
+        transition: opacity 0.05s ease;
+    }
+    .fade-enter-active & {
+        opacity: 1;
+    }
+    .fade-exit & {
+        opacity: 0.01;
+        transition: opacity 0.05s ease;
+    }
+    .fade-exit-active & {
+        opacity: 0;
+    }
+}
+
+.cui-dialog-content {
+    .fade-enter & {
+        opacity: 0.01;
+        transform: scale(0.95);
+        transition: opacity 0.05s ease, popout 0.05s ease,
+                    transform 0.05s cubic-bezier(0.54, 1.12, 0.38, 1.11);
+    }
+    .fade-enter-active & {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .fade-exit & {
+        transition: opacity 0.05s ease, popout 0.05s ease,
+                    transform 0.05s cubic-bezier(0.54, 1.12, 0.38, 1.11);
+    }
+    .fade-exit-active & {
+        opacity: 0;
+        transform: scale(0.95);
     }
 }

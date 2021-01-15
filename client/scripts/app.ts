@@ -269,6 +269,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/cosmos/main'
     )).default;
     newChain = new Cosmos(n, app);
+  } else if (n.chain.network === ChainNetwork.Straightedge) {
+    const Straightedge = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "straightedge-main" */
+      './controllers/chain/straightedge/main'
+    )).default;
+    newChain = new Straightedge(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import(
       /* webpackMode: "lazy" */
@@ -501,7 +508,8 @@ $(() => {
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
-    '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
+    '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
+    '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),

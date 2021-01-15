@@ -63,7 +63,7 @@ class SubstrateCollective extends ProposalModule<
           () => this._Chain.fetcher.fetchCollectiveProposals(this.moduleName, this.app.chain.block.height)
         );
 
-        await new Promise((memberResolve) => {
+        await new Promise<void>((memberResolve) => {
           this._memberSubscription = api.query[this.moduleName].members().subscribe((members: Vec<AccountId>) => {
             this._members = members.toArray().map((v) => this._Accounts.fromAddress(v.toString()));
             memberResolve();
@@ -78,33 +78,33 @@ class SubstrateCollective extends ProposalModule<
   }
 
   public createEmergencyCancellation(author: SubstrateAccount, threshold: number, referendumId: number) {
-    const func = this._Chain.getTxMethod('democracy', 'emergencyCancel');
-    return this.createTx(author, threshold, func(referendumId).method, func(referendumId).method.encodedLength);
+    const func = this._Chain.getTxMethod('democracy', 'emergencyCancel', [ referendumId ]);
+    return this.createTx(author, threshold, func, func.encodedLength);
   }
   public vetoNextExternal(author: SubstrateAccount, hash: string) {
-    const func = this._Chain.getTxMethod('democracy', 'vetoExternal');
-    return this.createTx(author, 1, func(hash).method, func(hash).encodedLength);
+    const func = this._Chain.getTxMethod('democracy', 'vetoExternal', [ hash ]);
+    return this.createTx(author, 1, func, func.encodedLength);
   }
   public createTreasuryApprovalMotion(author: SubstrateAccount, threshold: number, treasuryIdx: number) {
-    const func = this._Chain.getTxMethod('treasury', 'approveProposal');
-    return this.createTx(author, threshold, func(treasuryIdx).method, func(treasuryIdx).encodedLength);
+    const func = this._Chain.getTxMethod('treasury', 'approveProposal', [ treasuryIdx ]);
+    return this.createTx(author, threshold, func, func.encodedLength);
   }
   public createTreasuryRejectionMotion(author: SubstrateAccount, threshold: number, treasuryIdx: number) {
-    const func = this._Chain.getTxMethod('treasury', 'rejectProposal');
-    return this.createTx(author, threshold, func(treasuryIdx).method, func(treasuryIdx).method.encodedLength);
+    const func = this._Chain.getTxMethod('treasury', 'rejectProposal', [ treasuryIdx ]);
+    return this.createTx(author, threshold, func, func.encodedLength);
   }
   public createExternalProposal(author: SubstrateAccount, threshold: number, action: Call, length: number) {
-    const func = this._Chain.getTxMethod('democracy', 'externalPropose');
-    return this.createTx(author, threshold, func(action.hash).method, length);
+    const func = this._Chain.getTxMethod('democracy', 'externalPropose', [ action.hash ]);
+    return this.createTx(author, threshold, func, length);
   }
   public createExternalProposalMajority(author: SubstrateAccount, threshold: number, action: Call, length) {
-    const func = this._Chain.getTxMethod('democracy', 'externalProposeMajority');
-    return this.createTx(author, threshold, func(action.hash).method, length);
+    const func = this._Chain.getTxMethod('democracy', 'externalProposeMajority', [ action.hash ]);
+    return this.createTx(author, threshold, func, length);
   }
   public createExternalProposalDefault(author: SubstrateAccount, threshold: number, action: Call, length) {
     // only on kusama
-    const func = this._Chain.getTxMethod('democracy', 'externalProposeDefault');
-    return this.createTx(author, threshold, func(action.hash).method, length);
+    const func = this._Chain.getTxMethod('democracy', 'externalProposeDefault', [ action.hash ]);
+    return this.createTx(author, threshold, func, length);
   }
   public createFastTrack(
     author: SubstrateAccount,
@@ -116,16 +116,22 @@ class SubstrateCollective extends ProposalModule<
     // only on kusama
     // TODO: we must check if Instant is allowed and if
     // votingPeriod is valid wrt FastTrackVotingPeriod
-    const func = (this._Chain.getTxMethod('democracy', 'fastTrack'));
+    const func = (this._Chain.getTxMethod('democracy', 'fastTrack', [ hash, votingPeriod, delay ]));
     return this.createTx(
       author,
       threshold,
-      func(hash, votingPeriod, delay).method,
-      func(hash, votingPeriod, delay).method.encodedLength
+      func,
+      func.encodedLength,
     );
   }
 
-  public createTx(author: SubstrateAccount, threshold: number, action: Call, length?: number, fromTechnicalCommittee?: boolean) {
+  public createTx(
+    author: SubstrateAccount,
+    threshold: number,
+    action: Call,
+    length?: number,
+    fromTechnicalCommittee?: boolean,
+  ) {
     // TODO: check council status
     const title = this._Chain.methodToTitle(action);
 

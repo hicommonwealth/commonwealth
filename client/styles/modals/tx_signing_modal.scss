@@ -51,15 +51,6 @@
     &.Intro {
         width: 710px;
     }
-    &.WaitingToConfirmTransaction {
-        .icon-spinner2.animate-spin {
-            margin: 40px auto 10px;
-            text-align: center;
-            display: block;
-            font-size: 18px;
-            color: $text-color-light;
-        }
-    }
 
     // reusable components
     .TXSigningCancelAction {

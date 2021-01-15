@@ -48,7 +48,7 @@ export class CosmosProposal extends Proposal<
   CosmosApi, CosmosToken, ICosmosProposal, CosmosVote
 > {
   public get shortIdentifier() {
-    return `COS-${this.identifier.toString()}`;
+    return `#${this.identifier.toString()}`;
   }
   public get title() { return this._title; }
   public get description() { return this.data.description; }

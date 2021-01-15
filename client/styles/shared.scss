@@ -9,7 +9,7 @@
 
 $sidebar-width: 230px;
 $quick-switcher-width: 64px;
-$layout-max-width: 970px;
+$layout-max-width: 920px;
 
 //
 // base fonts
@@ -152,8 +152,10 @@ $listing-right-flex: 3;
         background: transparent;
         border: 1.5px solid $text-color-lightest;
         border-radius: 99px;
-        width: 9px;
-        height: 9px;
+        width: 7px;
+        height: 7px;
         margin-right: 6px;
+        position: relative;
+        top: -1px;
     }
 }

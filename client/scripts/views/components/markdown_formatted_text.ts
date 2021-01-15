@@ -56,13 +56,37 @@ const applyInlineFormatters = (text, hideFormatting) => {
     formatter: (captures) => m('s', captures[0])
   }, {
     pattern: '\\[(.+?)\\]\\((.+?)\\)',
-    formatter: (captures) => m('a', { target: '_blank', href: captures[1] }, captures[0] || 'Link'),
+    formatter: (captures) => m('a', {
+      target: '_blank',
+      href: captures[1],
+      onclick: (e) => {
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+        if (captures[1].startsWith(document.location.origin + '/')) {
+          // don't open a new window if the link is on Commonwealth
+          e.preventDefault();
+          e.stopPropagation();
+          m.route.set(captures[1]);
+        }
+      },
+    }, captures[0] || 'Link'),
   }, {
     pattern: '\\[(https?:\\/\\/[\\w|\\.\\;\\/\\?\\:\\@\\=\\&\\%\\"\\<\\>\\#\\{\\}\\|\\~\\[\\]\\\'\\*\\+\\,\\-\\!]+)\\]',
     formatter: (captures) => m('img', { src: captures[0] })
   }, {
     pattern: '(https?:\\/\\/[\\w|\\.\\;\\/\\?\\:\\@\\=\\&\\%\\"\\<\\>\\#\\{\\}\\|\\~\\[\\]\\\'\\*\\+\\,\\-\\!]+)',
-    formatter: (captures) => m('a', { target: '_blank', href: captures[0] }, captures[0])
+    formatter: (captures) => m('a', {
+      target: '_blank',
+      href: captures[0],
+      onclick: (e) => {
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+        if (captures[0].startsWith(document.location.origin + '/')) {
+          // don't open a new window if the link is on Commonwealth
+          e.preventDefault();
+          e.stopPropagation();
+          m.route.set(captures[0]);
+        }
+      },
+    }, captures[0])
   }];
   const regexp = new RegExp(inlineFormatters.map((p) => p.pattern).join('|'), 'g');
 
@@ -187,7 +211,7 @@ function applyBlockFormatters(parentText, hideFormatting, collapse) {
         );
       } else {
         // otherwise, push the previous group onto `results` and start anew
-        results.push(
+        if (lastGroup.length > 0) results.push(
           (blockFormatters[lastLineFormat])
             ? blockFormatters[lastLineFormat].formatMany(lastGroup)
             : defaultGroup(lastGroup)
