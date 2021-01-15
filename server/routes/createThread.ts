@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
@@ -5,7 +6,6 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
-import moment from 'moment';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -73,8 +73,12 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
   const timestamp = moment();
-  const firstVersion : any = { timestamp, body: req.body.body };
-  const versionHistory : string[] = [ JSON.stringify(firstVersion) ];
+  const firstVersion : any = {
+    timestamp,
+    author: req.body.author,
+    body: decodeURIComponent(req.body.body)
+  };
+  const version_history : string[] = [ JSON.stringify(firstVersion) ];
 
   const threadContent = community ? {
     community: community.id,
@@ -82,7 +86,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     title,
     body,
     plaintext,
-    version_history: versionHistory,
+    version_history,
     kind,
     url,
     read_only: readOnly,
@@ -92,7 +96,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     title,
     body,
     plaintext,
-    version_history: versionHistory,
+    version_history,
     kind,
     url,
     read_only: readOnly || false,
@@ -154,7 +158,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
       include: [
-        models.Address,
+        { model: models.Address, as: 'Address' },
         models.OffchainAttachment,
         { model: models.OffchainTopic, as: 'topic' }
       ],

@@ -19,8 +19,9 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   // email subject line
   const emailSubjectLine = ((category_id === NotificationCategories.NewComment) ? `Comment on: ${decodedTitle}`
     : (category_id === NotificationCategories.NewMention) ? `You were mentioned in: ${decodedTitle}`
-      : (category_id === NotificationCategories.NewThread) ? `New thread: ${decodedTitle}`
-        : 'New activity on Commonwealth');
+      : (category_id === NotificationCategories.NewCollaboration) ? `You were added as a collaborator on: ${decodedTitle}`
+        : (category_id === NotificationCategories.NewThread) ? `New thread: ${decodedTitle}`
+          : 'New activity on Commonwealth');
 
   // author
   const authorProfile = await models.OffchainProfile.findOne({
@@ -44,8 +45,9 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   // action and community
   const actionCopy = (([NotificationCategories.NewComment, NotificationCategories.CommentEdit].includes(category_id)) ? 'commented on'
     : (category_id === NotificationCategories.NewMention) ? 'mentioned you in the thread'
-      : [NotificationCategories.ThreadEdit, NotificationCategories.NewThread].includes(category_id) ? 'created a new thread'
-        : null);
+      : (category_id === NotificationCategories.NewCollaboration) ? 'invited you to collaborate on'
+        : [NotificationCategories.ThreadEdit, NotificationCategories.NewThread].includes(category_id) ? 'created a new thread'
+          : null);
   const objectCopy = decodeURIComponent(root_title).trim();
   const communityObject = chain_id
     ? await models.Chain.findOne({ where: { id: chain_id } })

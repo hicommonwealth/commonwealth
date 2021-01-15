@@ -17,7 +17,7 @@ const BalanceInfo = makeDynamicComponent<{ account }, IState>({
     balance: (attrs.account as SubstrateAccount).balance,
   }),
   view: (vnode) => {
-    return m('p.BalanceInfo', { style: 'font-size: 90%; line-height: 1.3;' }, [
+    return m('.BalanceInfo', { style: 'font-size: 90%; line-height: 1.3;' }, [
       m('div', [
         'Free: ',
         vnode.state.dynamic?.freeBalance ? formatCoin(vnode.state.dynamic?.freeBalance) : '--',

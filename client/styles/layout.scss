@@ -120,7 +120,7 @@ pre {
 
 .layout-container {
     padding-left: $sidebar-width + $quick-switcher-width;
-    padding-right: $sidebar-width;
+    padding-right: 0;
     @include sm-max {
         padding-left: $sidebar-width;
     }
@@ -130,7 +130,7 @@ pre {
         padding-left: 0;
         padding-right: 0;
     }
-    .Sidebar, .RightSidebar {
+    .Sidebar {
         display: none;
     }
 }

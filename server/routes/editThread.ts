@@ -21,12 +21,12 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
   }
-
   if (kind === 'forum') {
     if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
       return next(new Error(Errors.NoBodyOrAttachment));
     }
   }
+
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
       await models.OffchainAttachment.create({
@@ -45,9 +45,23 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     }
   };
 
-  try {
-    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
-    const thread = await models.OffchainThread.findOne({
+  let thread;
+  const userOwnedAddresses = await req.user.getAddresses();
+  const userOwnedAddressIds = userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const collaboration = await models.Collaboration.findOne({
+    where: {
+      offchain_thread_id: thread_id,
+      address_id: { [Op.in]: userOwnedAddressIds }
+    }
+  });
+  if (collaboration) {
+    thread = await models.OffchainThread.findOne({
+      where: {
+        id: thread_id
+      }
+    });
+  } else {
+    thread = await models.OffchainThread.findOne({
       where: {
         id: thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -55,7 +69,11 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     });
     if (!thread) return next(new Error('No thread with that id found'));
     if (new_version_history) {
-      const recentEdit : any = { timestamp: moment(), body };
+      const recentEdit : any = {
+        timestamp: moment(),
+        author: req.body.author,
+        body: decodeURIComponent(req.body.body)
+      };
       const versionHistory : string = JSON.stringify(recentEdit);
       thread.version_history.unshift(versionHistory);
     }
@@ -74,7 +92,16 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     await attachFiles();
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
-      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTopic, as: 'topic' } ],
+      include: [
+        { model: models.Address, as: 'Address' },
+        {
+          model: models.Address,
+          through: models.Collaboration,
+          as: 'collaborators'
+        },
+        models.OffchainAttachment,
+        { model: models.OffchainTopic, as: 'topic' },
+      ],
     });
 
     // dispatch notifications to subscribers of the given chain/community
@@ -94,7 +121,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       // don't send webhook notifications for edits
       null,
       req.wss,
-      [ finalThread.Address.address ],
+      [ userOwnedAddresses[0].address ],
     );
     // TODO: dispatch notifications for new mention(s)
     // TODO: update author.last_active

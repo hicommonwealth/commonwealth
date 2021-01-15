@@ -176,6 +176,10 @@ const resetServer = (debug=false): Promise<void> => {
         description: 'someone @ mentions a user',
       });
       await models['NotificationCategory'].create({
+        name: NotificationCategories.NewCollaboration,
+        description: 'someone collaborates with a user',
+      });
+      await models['NotificationCategory'].create({
         name: NotificationCategories.ChainEvent,
         description: 'a chain event occurs',
       });
@@ -184,10 +188,16 @@ const resetServer = (debug=false): Promise<void> => {
         description: 'someone reacts to a post',
       });
 
-      // Admins need to be subscribed to mentions
+      // Admins need to be subscribed to mentions and collaborations
       await models['Subscription'].create({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewMention,
+        object_id: `user-${drew.id}`,
+        is_active: true,
+      });
+      await models['Subscription'].create({
+        subscriber_id: drew.id,
+        category_id: NotificationCategories.NewCollaboration,
         object_id: `user-${drew.id}`,
         is_active: true,
       });
