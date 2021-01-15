@@ -5,7 +5,7 @@
     margin-top: 25px;
     flex-wrap: wrap;
     border-radius: 3px;
-    padding: 24px 24px 4px;
+    padding: 24px 24px 16px;
 
     .button-row {
         margin: 0 -5px 10px;
@@ -54,4 +54,8 @@
     .cui-custom-select .cui-popover-content {
         min-width: 200px;
     }
+}
+
+.BalanceInfo {
+    margin-top: 18px;
 }
