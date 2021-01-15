@@ -147,8 +147,6 @@ class ThreadsController {
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
-    const recentEdit : any = { timestamp: moment(), body };
-    const versionHistory = JSON.stringify(recentEdit);
     await $.ajax({
       url: `${app.serverUrl()}/editThread`,
       type: 'PUT',
@@ -157,7 +155,7 @@ class ThreadsController {
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
-        'version_history': versionHistory,
+        'new_version_history': !!body,
         'attachments[]': attachments,
         'jwt': app.user.jwt
       },
