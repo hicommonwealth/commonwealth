@@ -1,11 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import moment from 'moment';
 import { renderQuillDeltaToText } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
-import moment from 'moment';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,7 +14,7 @@ export const Errors = {
 };
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, title, kind, thread_id, new_version_history, } = req.body;
+  const { body, title, kind, thread_id, new_version_history } = req.body;
 
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
@@ -70,6 +68,8 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   }
   if (!thread) return next(new Error('No thread with that id found'));
   try {
+    // Only add a new version to the history if the body has been updated
+    console.log(new_version_history);
     if (new_version_history) {
       const recentEdit : any = {
         timestamp: moment(),
@@ -78,6 +78,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       };
       const versionHistory : string = JSON.stringify(recentEdit);
       thread.version_history.unshift(versionHistory);
+      console.log(thread.version_history);
     }
     thread.body = body;
     thread.plaintext = (() => {

@@ -103,12 +103,6 @@ class CommentsController {
     community: string, unescapedText: string, parentCommentId: any = null,
     attachments?: string[], mentions?: string[]
   ) {
-    const timestamp = moment();
-    const firstVersion : VersionHistory = {
-      timestamp,
-      body: unescapedText
-    };
-    const versionHistory : string = JSON.stringify(firstVersion);
     try {
       // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
@@ -121,7 +115,6 @@ class CommentsController {
         'attachments[]': attachments,
         'mentions[]': mentions,
         'text': encodeURIComponent(unescapedText),
-        'versionHistory': versionHistory,
         'jwt': app.user.jwt,
       });
       const { result } = res;

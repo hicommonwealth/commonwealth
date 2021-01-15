@@ -8,6 +8,7 @@ import proposalIdToEntity from '../util/proposalIdToEntity';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
+import moment from 'moment';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -74,15 +75,18 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   }
 
   // New comments get an empty version history initialized, which is passed
-  // the comment's first version, formatted on the frontend with timestamps
-  const versionHistory = [];
-  versionHistory.push(req.body.versionHistory);
+  // the comment's first version, formatted on the backend with timestamps
+  const firstVersion = {
+    timestamp: moment(),
+    body: req.body.text
+  };
+  const version_history : string[] = [ JSON.stringify(firstVersion) ];
   const commentContent = {
     root_id,
     child_comments: [],
     text,
     plaintext,
-    version_history: versionHistory,
+    version_history,
     address_id: author.id,
     chain: null,
     community: null,

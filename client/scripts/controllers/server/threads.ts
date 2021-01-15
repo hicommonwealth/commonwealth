@@ -138,7 +138,9 @@ class ThreadsController {
         'readOnly': readOnly,
         'jwt': app.user.jwt,
       });
+      console.log(response.result.version_history);
       const result = modelFromServer(response.result);
+      console.log(result.versionHistory);
       this._store.add(result);
 
       // New posts are added to both the topic and allProposals sub-store
@@ -178,7 +180,9 @@ class ThreadsController {
         'jwt': app.user.jwt
       },
       success: (response) => {
+        console.log(response.result.version_history);
         const result = modelFromServer(response.result);
+        console.log(result.versionHistory);
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
