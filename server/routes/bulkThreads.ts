@@ -38,13 +38,17 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         threads.version_history, threads.read_only, threads.body,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
-        topics.community_id AS topic_community
+        topics.community_id AS topic_community, collaborators
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
           t.created_at AS thread_created, t.community AS thread_community,
           t.chain AS thread_chain, t.version_history, t.read_only, t.body,
-          t.url, t.pinned, t.topic_id, t.kind
+          t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(
+            CONCAT(
+              '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
+              )
+            ) AS collaborators
         FROM "OffchainThreads" t
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS comm_created_at
@@ -56,11 +60,16 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           GROUP BY root_id
           ) c
         ON CAST(TRIM('discussion_' FROM c.root_id) AS int) = t.id
+        LEFT JOIN "Collaborations" AS collaborations
+        ON t.id = collaborations.offchain_thread_id
+        LEFT JOIN "Addresses" editors
+        ON collaborations.address_id = editors.id
         WHERE t.deleted_at IS NULL
           AND t.${communityOptions}
           ${topicOptions}
           AND t.created_at < :created_at
           AND t.pinned = false
+          GROUP BY (t.id, c.comm_created_at, t.created_at)
           ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT 20
         ) threads
       ON threads.address_id = addr.id
@@ -81,6 +90,10 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     threads = preprocessedThreads.map((t) => {
       const root_id = `discussion_${t.thread_id}`;
       root_ids.push(root_id);
+      const collaborators = JSON.parse(t.collaborators[0]).address?.length
+        ? t.collaborators.map((c) => JSON.parse(c))
+        : [];
+
       const data = {
         id: t.thread_id,
         title: t.thread_title,
@@ -93,6 +106,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         community: t.thread_community,
         chain: t.thread_chain,
         created_at: t.thread_created,
+        collaborators,
         Address: {
           id: t.addr_id,
           address: t.addr_address,
@@ -125,7 +139,18 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
     threads = await models.OffchainThread.findAll({
       where: whereOptions,
-      include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
+      include: [
+        models.Address,
+        {
+          model: models.Address,
+          through: models.Collaboration,
+          as: 'collaborators'
+        },
+        {
+          model: models.OffchainTopic,
+          as: 'topic'
+        }
+      ],
       order: [['created_at', 'DESC']],
     });
 

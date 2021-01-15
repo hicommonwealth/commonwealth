@@ -12,15 +12,16 @@ import { pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
+import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import Listing from 'views/pages/listing';
 import EditTopicModal from 'views/modals/edit_topic_modal';
+import ManageCommunityModal from 'views/modals/manage_community_modal';
 
 import { DEFAULT_PAGE_SIZE } from 'controllers/server/threads';
-import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
@@ -207,7 +208,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             class: 'DiscussionsPage',
             title: topic || 'Discussions',
             showNewProposalButton: true,
-            rightSidebar: m(ListingSidebar, { entity: app.activeId() })
           }, [
             m(EmptyTopicPlaceholder, {
               communityName: app.activeId(),
@@ -356,10 +356,30 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               }
             })
           }),
-      ] : 'Discussions',
+      ] : [
+        'Discussions',
+        app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+          && m(PopoverMenu, {
+            class: 'sidebar-edit-topic',
+            position: 'bottom',
+            transitionDuration: 0,
+            hoverCloseDelay: 0,
+            closeOnContentClick: true,
+            trigger: m(Icon, {
+              name: Icons.CHEVRON_DOWN,
+              style: 'margin-left: 6px;',
+            }),
+            content: m(MenuItem, {
+              label: 'Manage community',
+              onclick: (e) => {
+                e.preventDefault();
+                app.modals.create({ modal: ManageCommunityModal });
+              }
+            })
+          }),
+      ],
       description: topicDescription,
       showNewProposalButton: true,
-      rightSidebar: m(ListingSidebar, { entity: app.activeId() })
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
@@ -391,17 +411,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
               : listing.length === 0
                 ? m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
-                : m(Listing, {
-                  content: listing,
-                  rightColSpacing: [4, 4, 4],
-                  columnHeaders: [
-                    'Title',
-                    'Comments',
-                    'Likes',
-                    'Updated'
-                  ],
-                  menuCarat: true,
-                }),
+                : m(Listing, { content: listing }),
           // TODO: Incorporate infinite scroll into generic Listing component
           (allThreads.length && vnode.state.postsDepleted[subpage])
             ? m('.infinite-scroll-reached-end', [

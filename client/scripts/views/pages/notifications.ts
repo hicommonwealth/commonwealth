@@ -30,6 +30,7 @@ const ALL_COMMUNITIES = 'All communities';
 
 // left column - for identifying the notification type
 const NEW_MENTIONS_LABEL = 'When someone mentions me';
+const NEW_COLLABORATIONS_LABEL = 'When someone adds me as an editor to a thread';
 const NEW_THREADS_LABEL = 'When a thread is created';
 const NEW_ACTIVITY_LABEL = 'When there is new activity on...';
 const NEW_COMMENTS_LABEL_SUFFIX = '(new comments only)';
@@ -366,10 +367,9 @@ const ChainEventSubscriptionRow: m.Component<{
   title: string;
   notificationTypeArray: string[];
   recommended?: boolean;
-  noisy?: boolean;
 }, { option: string; loading: boolean, }> = {
   view: (vnode) => {
-    const { title, notificationTypeArray, recommended, noisy } = vnode.attrs;
+    const { title, notificationTypeArray, recommended } = vnode.attrs;
     const subscriptions = app.user.notifications.subscriptions.filter((s) => {
       return (
         s.category === NotificationCategories.ChainEvent
@@ -394,7 +394,6 @@ const ChainEventSubscriptionRow: m.Component<{
       m('td.subscription-label', [
         title,
         recommended && m(Tag, { size: 'xs', label: 'Recommended' }),
-        noisy && m(Tag, { size: 'xs', label: 'Noisy', intent: 'negative' }),
         m('.ChainEventDetails', [
           notificationTypeArray
             .filter((s) => s.indexOf('reward') === -1) // filter out treasury-reward and reward events (they are silent)
@@ -482,7 +481,6 @@ const EdgewareChainEventNotifications: m.Component = {
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Signaling events', notificationTypeArray: EdgewareChainNotificationTypes.Signaling, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: EdgewareChainNotificationTypes.Treasury, recommended: true }),
-      m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: EdgewareChainNotificationTypes.Validator, noisy: true }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: EdgewareChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: EdgewareChainNotificationTypes.VotingDelegation, }),
     ];
@@ -495,7 +493,6 @@ const KusamaChainEventNotifications: m.Component = {
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KusamaChainNotificationTypes.Council, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KusamaChainNotificationTypes.Democracy, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KusamaChainNotificationTypes.Treasury, recommended: true }),
-      m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KusamaChainNotificationTypes.Validator, noisy: true }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KusamaChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: KusamaChainNotificationTypes.VotingDelegation, }),
     ];
@@ -508,7 +505,6 @@ const PolkadotChainEventNotifications: m.Component = {
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: PolkadotChainNotificationTypes.Council, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: PolkadotChainNotificationTypes.Democracy, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: PolkadotChainNotificationTypes.Treasury, recommended: true }),
-      m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: PolkadotChainNotificationTypes.Validator, noisy: true }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: PolkadotChainNotificationTypes.VotingDelegation, }),
     ];
@@ -521,7 +517,6 @@ const KulupuChainEventNotifications: m.Component = {
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KulupuChainNotificationTypes.Council, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KulupuChainNotificationTypes.Democracy, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KulupuChainNotificationTypes.Treasury, recommended: true }),
-      m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KulupuChainNotificationTypes.Validator, noisy: true }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KulupuChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: KulupuChainNotificationTypes.VotingDelegation, }),
     ];
@@ -540,6 +535,7 @@ const IndividualCommunityNotifications: m.Component<{
       (s) => (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id)
         && s.category !== NotificationCategories.NewThread
         && s.category !== NotificationCategories.NewMention
+        && s.category !== NotificationCategories.NewCollaboration
         && s.category !== NotificationCategories.ChainEvent
         && !s.OffchainComment
     );
@@ -583,6 +579,7 @@ const AllCommunitiesNotifications: m.Component<{
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
+    const collaborationsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewCollaboration);
     const chainIds = app.config.chains.getAll().map((c) => c.id);
     // const communityIds = communities.map((c) => c.id);
     const communityIds = communities;
@@ -601,6 +598,10 @@ const AllCommunitiesNotifications: m.Component<{
       mentionsSubscription && m(BatchedSubscriptionRow, {
         subscriptions: [mentionsSubscription],
         label: NEW_MENTIONS_LABEL,
+      }),
+      collaborationsSubscription && m(BatchedSubscriptionRow, {
+        subscriptions: [collaborationsSubscription],
+        label: NEW_COLLABORATIONS_LABEL,
       }),
       batchedSubscriptions.length > 0 && m('tr.NewActivityRow', [
         m('td', NEW_ACTIVITY_LABEL),

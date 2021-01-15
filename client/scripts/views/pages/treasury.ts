@@ -146,13 +146,11 @@ const TreasuryPage: m.Component<{}> = {
       onSubstrate && m(SubstrateProposalStats),
       m(Listing, {
         content: activeTreasuryContent,
-        columnHeaders: ['Active Treasury Proposals'],
-        rightColSpacing: [0]
+        columnHeader: 'Active Treasury Proposals',
       }),
       m(Listing, {
         content: inactiveTreasuryContent,
-        columnHeaders: ['Inactive Treasury Proposals'],
-        rightColSpacing: [0]
+        columnHeader: 'Inactive Treasury Proposals',
       })
     ]);
   }
