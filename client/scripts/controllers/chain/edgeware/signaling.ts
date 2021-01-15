@@ -85,13 +85,15 @@ class EdgewareSignaling extends ProposalModule<
     voteOutcomes: any[] = [0, 1],
     voteType: 'binary' | 'multioption' | 'rankedchoice' = 'binary',
     tallyType: 'onecoin' | 'oneperson' = 'onecoin',
+    votingScheme: 'simple' | 'commitreveal' = 'simple',
   ) {
     const vOutcomes = voteOutcomes.map((o) => this._Chain.createType('VoteOutcome', o));
     const vType = this._Chain.createType('VoteType', voteType);
     const tType = this._Chain.createType('TallyType', tallyType);
+    const scheme = this._Chain.createType('VotingScheme', votingScheme);
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => api.tx.signaling.createProposal(title, description, vOutcomes, vType, tType),
+      (api: ApiRx) => api.tx.signaling.createProposal(title, description, vOutcomes, vType, tType, scheme),
       'createSignalingProposal',
       title
     );

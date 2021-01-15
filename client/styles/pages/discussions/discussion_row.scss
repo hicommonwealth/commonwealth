@@ -21,6 +21,9 @@ $discussion-meta-padding: 18px;
             // Styling specific to DiscussionRow subheader content
             .discussion-locked {
                 margin-right: 12px;
+                .cui-tag.cui-xs .cui-icon svg {
+                    margin-right: 0;
+                }
             }
             a.proposal-topic {
                 @include proposal-topic-inline;
@@ -59,8 +62,21 @@ $discussion-meta-padding: 18px;
                 color: $text-color-light;
                 margin-right: 12px;
             }
+            .proposal-collaborators {
+                margin-left: 8px;
+                color: $text-color-light;
+                position: relative;
+                font-size: 17px;
+            }
+            > .User {
+                display: flex;
+                > .role-icon {
+                    position: relative;
+                    top: -1px;
+                }
+            }
             > .User > a {
-                display: inline-block;
+                display: block;
                 text-decoration: none;
                 color: $text-color-light;
                 &:hover {

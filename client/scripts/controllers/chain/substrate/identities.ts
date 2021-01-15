@@ -265,8 +265,8 @@ class SubstrateIdentities implements StorageModule {
 
   // requires RegistrarOrigin or Root!
   public addRegistrarMethod(account: SubstrateAccount): Call {
-    const func = this._Chain.getTxMethod('identity', 'addRegistrar');
-    return func(account.address).method;
+    const func = this._Chain.getTxMethod('identity', 'addRegistrar', [ account.address ]);
+    return func;
   }
 
   // requires ForceOrigin or Root!
@@ -274,8 +274,8 @@ class SubstrateIdentities implements StorageModule {
     if (!target.exists) {
       throw new Error('target identity does not exist');
     }
-    const func = this._Chain.getTxMethod('identity', 'killIdentity');
-    return func(target.account.address).method;
+    const func = this._Chain.getTxMethod('identity', 'killIdentity', [ target.account.address ]);
+    return func;
   }
 }
 

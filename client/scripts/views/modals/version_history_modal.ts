@@ -1,14 +1,16 @@
 import 'modals/version_history_modal.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
 import app from 'state';
 import Quill from 'quill';
 import moment from 'moment';
 import { OffchainThread, OffchainComment } from 'models';
-import { CompactModalExitButton } from '../modal';
-import QuillFormattedText from '../components/quill_formatted_text';
-import MarkdownFormattedText from '../components/markdown_formatted_text';
+import { formatAddressShort } from 'utils';
+import { CompactModalExitButton } from 'views/modal';
+import QuillFormattedText from 'views/components/quill_formatted_text';
+import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import User, { UserBlock } from 'views/components/widgets/user';
+import { VersionHistory } from 'client/scripts/controllers/server/threads';
 const Delta = Quill.import('delta');
 
 interface IVersionHistoryAttrs {
@@ -42,16 +44,25 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
       return diff;
     };
 
-    const getVersion = (edit, prevEdit) => {
-      edit = JSON.parse(edit);
+    const getVersion = (edit: VersionHistory, prevEdit: VersionHistory) => {
+      const author = edit.author
+        ? app.profiles.getProfile(edit.author.chain, edit.author.address)
+        : app.profiles.getProfile(proposal.author, proposal.authorChain);
       const timestamp = moment(edit.timestamp).format('dddd, MMMM Do YYYY, h:mm a');
+      const userOptions = {
+        user: author,
+        showRole: false,
+        linkify: true,
+        popover: true,
+        hideAvatar: true
+      };
       // TODO: Add diffing algorithm for Markdown posts
       try {
         const doc = new Delta(JSON.parse(edit.body));
         let diff; let quillDiff; let prevDoc;
         if (prevEdit) {
           try {
-            prevDoc = new Delta(JSON.parse(JSON.parse(prevEdit).body));
+            prevDoc = new Delta(JSON.parse(prevEdit.body));
           } catch (e) {
             prevDoc = false;
           }
@@ -62,13 +73,23 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         }
         const diffedDoc = (quillDiff && prevDoc) ? prevDoc.compose(quillDiff) : doc;
         return m('.version', [
-          m('span.timestamp', timestamp),
-          m(QuillFormattedText, { doc: diffedDoc }),
+          m('.panel-left', [
+            m(User, userOptions),
+            m('span.timestamp', timestamp),
+          ]),
+          m('.panel-right', [
+            m(QuillFormattedText, { doc: diffedDoc }),
+          ])
         ]);
       } catch {
         return m('.version', [
-          m('span.timestamp', timestamp),
-          m(MarkdownFormattedText, { doc: edit.body })
+          m('.panel-left', [
+            m(User, userOptions),
+            m('span.timestamp', timestamp),
+          ]),
+          m('.panel-right', [
+            m(MarkdownFormattedText, { doc: edit.body })
+          ])
         ]);
       }
     };

@@ -15,8 +15,8 @@ import { ProposalType } from 'identifiers';
 import { link } from 'helpers';
 import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo, NodeInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
-import EditTopicModal from 'views/modals/edit_topic_modal';
 
+import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
@@ -39,7 +39,6 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
         transitionDuration: 0,
         position: 'right',
         restoreFocus: false,
-        inline: true,
         content: m('.quick-switcher-option-text', item.name),
         class: 'SidebarQuickSwitcherItemTooltip',
         trigger: m('.quick-switcher-option', {
@@ -78,7 +77,10 @@ const SidebarQuickSwitcher: m.Component<{}> = {
       return true;
     });
 
-    const quickSwitcherCommunities = starredCommunities.length > 0 ? starredCommunities : allCommunities;
+    const quickSwitcherCommunities = starredCommunities.length > 0 ? starredCommunities : allCommunities.filter((item) => {
+      if (item instanceof CommunityInfo && item.collapsedOnHomepage) return false;
+      return true;
+    });
 
     const size = 36;
     return m('.SidebarQuickSwitcher', [
@@ -92,64 +94,11 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
     const { sidebarTopic } = vnode.attrs;
 
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
-      || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+      || p.startsWith(`/${app.activeId()}/discussions/`)
+      || p.startsWith(`/${app.activeId()}/proposal/discussions/`);
     const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
+    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
-
-    const featuredTopics = {};
-    const otherTopics = {};
-    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
-
-    const getTopicRow = (id, name, description) => m(ListItem, {
-      class: 'topic-row',
-      key: id,
-      contentLeft: m('.proposal-topic-icon'),
-      contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
-        && app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-        && m(PopoverMenu, {
-          class: 'sidebar-edit-topic',
-          position: 'bottom',
-          transitionDuration: 0,
-          hoverCloseDelay: 0,
-          closeOnContentClick: true,
-          trigger: m(Icon, {
-            name: Icons.CHEVRON_DOWN,
-          }),
-          content: m(MenuItem, {
-            label: 'Edit topic',
-            onclick: (e) => {
-              app.modals.create({
-                modal: EditTopicModal,
-                data: { description, id, name }
-              });
-            }
-          })
-        }),
-      label: [
-        name,
-      ],
-      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-        || (sidebarTopic && sidebarTopic === id),
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeId()}/discussions/${name}`);
-      },
-    });
-
-    app.topics.getByCommunity(app.activeId()).forEach((topic) => {
-      const { id, name, description } = topic;
-      if (featuredTopicIds.includes(`${topic.id}`)) {
-        featuredTopics[topic.name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
-      } else {
-        otherTopics[topic.name] = { id, name, description };
-      }
-    });
-    const otherTopicListItems = Object.keys(otherTopics)
-      .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
-      .map((name, idx) => getTopicRow(otherTopics[name].id, name, otherTopics[name].description));
-    const featuredTopicListItems = Object.keys(featuredTopics)
-      .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
-      .map((name, idx) => getTopicRow(featuredTopics[name].id, name, featuredTopics[name].description));
 
     return m('.OffchainNavigationModule.SidebarModule', [
       m(List, [
@@ -175,9 +124,8 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
         }),
         m(ListItem, {
           active: onDiscussionsPage(m.route.get())
-            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true)
-            && (sidebarTopic === null || !m.route.get().startsWith(`/${app.activeId()}/proposal/discussion/`)),
-          label: 'All Discussions',
+            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          label: 'Discussions',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeId()}`);
@@ -194,6 +142,16 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
           },
           contentLeft: m(Icon, { name: Icons.SEARCH }),
         }),
+        m(ListItem, {
+          active: onMembersPage(m.route.get())
+            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          label: 'Members',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeId()}/members`);
+          },
+          contentLeft: m(Icon, { name: Icons.USERS }),
+        }),
         // m(ListItem, {
         //   active: onChatPage(m.route.get()),
         //   label: 'Chat',
@@ -204,28 +162,6 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
         //   contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
         // }),
       ]),
-      m(List, [
-        featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && !app.threads.initialized
-          && m(ListItem, {
-            class: 'section-callout',
-            label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
-          }),
-      ]),
-      m(List, {
-        onupdate: (vvnode) => {
-          if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-              && !vnode.state.dragulaInitialized) {
-            vnode.state.dragulaInitialized = true;
-            dragula([vvnode.dom]).on('drop', async (el, target, source) => {
-              const reorder = Array.from(source.children).map((child) => {
-                return (child as HTMLElement).id;
-              });
-              await app.community.meta.updateFeaturedTopics(reorder);
-            });
-          }
-        }
-      }, featuredTopicListItems),
-      m(List, { class: 'more-topics-list' }, otherTopicListItems),
     ]);
   }
 };
@@ -292,27 +228,12 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
         // proposals (substrate, cosmos, moloch only)
         m(ListItem, {
           active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
-          label: 'Proposals & Motions',
+          label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
           contentLeft: m(Icon, { name: Icons.SEND }),
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/proposals`);
           },
-          // contentRight: [
-          //   (app.chain?.base === ChainBase.Substrate)
-          //     && m(Tag, {
-          //       rounded: true,
-          //       label: app.chain?.loaded ? allSubstrateGovernanceProposals : '-',
-          //     }),
-          //   (app.chain?.base === ChainBase.CosmosSDK) && m(Tag, {
-          //     rounded: true,
-          //     label: app.chain?.loaded ? cosmosGovernanceProposals : '-',
-          //   }),
-          //   (app.chain?.class === ChainClass.Moloch) && m(Tag, {
-          //     rounded: true,
-          //     label: app.chain?.loaded ? molochProposals : '-',
-          //   }),
-          // ],
         }),
         // treasury (substrate only)
         !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
@@ -324,7 +245,6 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
               e.preventDefault();
               m.route.set(`/${app.activeChainId()}/treasury`);
             },
-            contentRight: [], // TODO
           }),
         // council (substrate only)
         !app.community && app.chain?.base === ChainBase.Substrate
@@ -336,7 +256,6 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
               e.preventDefault();
               m.route.set(`/${app.activeChainId()}/council`);
             },
-            contentRight: [], // TODO
           }),
         // validators (substrate and cosmos only)
         // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
@@ -515,6 +434,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
           (app.chain || app.community) && m(OnchainNavigationModule),
         ]),
+        (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
         m('.sidebar-fadeout'),
       ])

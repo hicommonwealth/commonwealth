@@ -11,6 +11,11 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
 
+  // trim beginning content...
+  if (typeof delta.ops[0]?.insert === 'string') {
+    delta.ops[0].insert = delta.ops[0].insert.trimLeft();
+  }
+
   // first, concatenate parent nodes for <ul> and <ol> into groups
   const groups = [];
   preprocessQuillDeltaForRendering(delta.ops).forEach((parent) => {
@@ -86,8 +91,22 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
               target: '_blank',
               noreferrer: 'noreferrer',
               noopener: 'noopener',
+              onclick: (e) => {
+                if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+                if (child.attributes.link.startsWith(document.location.origin + '/')) {
+                  // don't open a new window if the link is on Commonwealth
+                  e.preventDefault();
+                  e.stopPropagation();
+                  m.route.set(child.attributes.link);
+                }
+              },
             }, `${child.insert}`);
-            return m('span', `${child.insert}`);
+            if (child.insert.match(/[A-Za-z0-9]$/)) {
+              // add a period and space after lines that end on a word or number, like Google does in search previews
+              return m('span', `${child.insert}. `);
+            } else {
+              return m('span', `${child.insert}`);
+            }
           })
         ]);
       }));
@@ -150,6 +169,15 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
             target: '_blank',
             noreferrer: 'noreferrer',
             noopener: 'noopener',
+            onclick: (e) => {
+              if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+              if (child.attributes.link.startsWith(document.location.origin + '/')) {
+                // don't open a new window if the link is on Commonwealth
+                e.preventDefault();
+                e.stopPropagation();
+                m.route.set(child.attributes.link);
+              }
+            },
           }, `${child.insert}`);
         } else {
           result = m('span', `${child.insert}`);

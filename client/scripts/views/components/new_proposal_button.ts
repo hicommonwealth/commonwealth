@@ -25,7 +25,7 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
       onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
         type: ProposalType.CosmosProposal
       }),
-      label: 'New proposal'
+      label: 'New text proposal'
     }),
     app.chain?.base === ChainBase.Substrate && app.chain?.class === ChainClass.Edgeware && m(MenuItem, {
       onclick: () => { m.route.set(`/${app.chain.id}/new/signaling`); },

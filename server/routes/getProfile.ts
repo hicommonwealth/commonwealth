@@ -63,7 +63,7 @@ const getProfile = async (models, req: Request, res: Response, next: NextFunctio
         chain: { [Op.in]: visibleChainIds }
       }]
     },
-    include: [ models.Address, ],
+    include: [ { model: models.Address, as: 'Address' } ],
   });
 
   const comments = await models.OffchainComment.findAll({

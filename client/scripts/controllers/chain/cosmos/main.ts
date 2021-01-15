@@ -4,6 +4,7 @@ import { IApp } from 'state';
 import { CosmosAccount, CosmosAccounts } from './account';
 import CosmosChain from './chain';
 import CosmosGovernance from './governance';
+import KeplrWebWalletController from '../../app/keplr_web_wallet';
 
 class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public chain: CosmosChain;
@@ -11,10 +12,11 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public governance: CosmosGovernance;
   public readonly base = ChainBase.CosmosSDK;
   public readonly class = ChainClass.CosmosHub;
+  public readonly webWallet: KeplrWebWalletController = new KeplrWebWalletController();
 
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
-    this.chain = new CosmosChain(this.app);
+    this.chain = new CosmosChain(this.app, 'cosmos');
     this.accounts = new CosmosAccounts(this.app);
     this.governance = new CosmosGovernance(this.app);
   }

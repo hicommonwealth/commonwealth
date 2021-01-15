@@ -8,6 +8,16 @@ class Stafi extends Substrate {
 
     this.signaling.disable();
   }
+
+  public async initApi() {
+    await super.initApi({
+      types: {
+        ChainId: 'u8',
+        DepositNonce: 'u64',
+        ResourceId: '[u8; 32]',
+      }
+    });
+  }
 }
 
 export default Stafi;

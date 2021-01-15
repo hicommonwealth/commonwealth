@@ -28,7 +28,6 @@ import TopicEditor from 'views/components/topic_editor';
 import { TopicEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
-import User from 'views/components/widgets/user';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
@@ -43,34 +42,33 @@ import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
   ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
   ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
-  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
+  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, EditPermissionsButton,
+  ProposalEditorPermissions
 } from './body';
 import CreateComment from './create_comment';
 
-interface IProposalHeaderAttrs {
+const ProposalHeader: m.Component<{
   commentCount: number;
   viewCount: number;
   getSetGlobalEditingStatus: CallableFunction;
   getSetGlobalReplyStatus: CallableFunction;
   proposal: AnyProposal | OffchainThread;
-}
-
-interface IProposalHeaderState {
-  canEdit: boolean;
+}, {
+  isAuthor: boolean;
+  isEditor: boolean;
   isAdmin: boolean;
   savedEdit: string;
   editing: boolean;
   saving: boolean;
   quillEditorState: any;
   currentText: any;
-  updatedTitle: string;
   topicEditorIsOpen: boolean;
-}
+  editPermissionsIsOpen: boolean;
+}> = {
+  view: (vnode) => {
+    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
 
-const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
-  oninit: (vnode) => {
-    const { proposal } = vnode.attrs;
-    vnode.state.isAdmin = (app.user.isRoleOfCommunity({
+    const isAdmin = (app.user.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
       community: app.activeCommunityId()
@@ -79,26 +77,19 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
       chain: app.activeChainId(),
       community: app.activeCommunityId()
     }));
-    vnode.state.canEdit = (app.user.activeAccount?.address === proposal.author
-          && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain)
-      || vnode.state.isAdmin;
-  },
-  view: (vnode) => {
-    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
-    const { canEdit, isAdmin } = vnode.state;
+
+    // Original posters have full editorial control, while added collaborators
+    // merely have access to the body and title
+    const isAuthor = (app.user.activeAccount?.address === proposal.author
+          && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain);
+    const isEditor = (proposal as OffchainThread).collaborators?.filter((c) => {
+      return (c.address === app.user.activeAccount?.address && c.chain === app.user.activeAccount?.chain.id);
+    }).length > 0;
+
     const isThread = proposal instanceof OffchainThread;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;
-    const versionHistory = (proposal as OffchainThread).versionHistory;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
-    const description = isThread ? false : (proposal as AnyProposal).description;
-    const body = isThread ? (proposal as OffchainThread).body : false;
-    const lastEdit = versionHistory?.length > 1 ? JSON.parse(versionHistory[0]) : null;
-    const author : Account<any> = proposal instanceof OffchainThread
-      ? (!app.community
-        ? app.chain.accounts.get(proposal.author)
-        : app.community.accounts.get(proposal.author, proposal.authorChain))
-      : proposal.author;
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
@@ -121,28 +112,51 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
               closeOnContentClick: true,
               menuAttrs: { size: 'default' },
               content: [
-                canEdit && m(ProposalBodyEditMenuItem, {
-                  item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
-                }),
-                canEdit && m(ProposalBodyDeleteMenuItem, { item: proposal }),
+                (isEditor || isAuthor)
+                  && m(ProposalBodyEditMenuItem, {
+                    item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+                  }),
+                (isAuthor || isAdmin)
+                  && m(ProposalBodyDeleteMenuItem, { item: proposal }),
+                (isAuthor)
+                  && m(EditPermissionsButton, {
+                    openEditPermissions: () => {
+                      vnode.state.editPermissionsIsOpen = true;
+                    }
+                  }),
                 isAdmin && proposal instanceof OffchainThread && m(TopicEditorButton, {
                   openTopicEditor: () => {
                     vnode.state.topicEditorIsOpen = true;
                   }
                 }),
-                canEdit && m(ProposalHeaderPrivacyButtons, { proposal }),
-                canEdit && m(MenuDivider),
+                (isAuthor || isAdmin)
+                  && m(ProposalHeaderPrivacyButtons, { proposal }),
+                (isAuthor || isAdmin)
+                  && m(MenuDivider),
                 m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
               ],
               inline: true,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
             }),
-            vnode.state.topicEditorIsOpen && proposal instanceof OffchainThread && m(TopicEditor, {
-              thread: vnode.attrs.proposal as OffchainThread,
-              popoverMenu: true,
-              onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
-              openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
-            })
+            vnode.state.editPermissionsIsOpen
+              && proposal instanceof OffchainThread
+              && m(ProposalEditorPermissions, {
+                thread: vnode.attrs.proposal as OffchainThread,
+                popoverMenu: true,
+                openStateHandler: (v) => {
+                  vnode.state.editPermissionsIsOpen = v;
+                },
+                // TODO: Onchange logic
+                onChangeHandler: () => {},
+              }),
+            vnode.state.topicEditorIsOpen
+              && proposal instanceof OffchainThread
+              && m(TopicEditor, {
+                thread: vnode.attrs.proposal as OffchainThread,
+                popoverMenu: true,
+                onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
+                openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
+              })
           ] : [
             m(ProposalHeaderOnchainId, { proposal }),
             m(ProposalHeaderOnchainStatus, { proposal }),
@@ -192,14 +206,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
   }
 };
 
-interface IProposalCommentState {
-  editing: boolean;
-  saving: boolean;
-  replying: boolean;
-  quillEditorState: any;
-}
-
-interface IProposalCommentAttrs {
+const ProposalComment: m.Component<{
   comment: OffchainComment<any>;
   getSetGlobalEditingStatus: CallableFunction;
   getSetGlobalReplyStatus: CallableFunction;
@@ -207,9 +214,12 @@ interface IProposalCommentAttrs {
   proposal: AnyProposal | OffchainThread;
   callback?: Function;
   isLast: boolean,
-}
-
-const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState> = {
+}, {
+  editing: boolean;
+  saving: boolean;
+  replying: boolean;
+  quillEditorState: any;
+}> = {
   view: (vnode) => {
     const {
       comment,
@@ -322,13 +332,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
   }
 };
 
-interface IProposalCommentsState {
-  commentError: any;
-  dom;
-  highlightedComment: boolean;
-}
-
-interface IProposalCommentsAttrs {
+const ProposalComments: m.Component<{
   proposal: OffchainThread | AnyProposal;
   comments: Array<OffchainComment<any>>;
   createdCommentCallback: CallableFunction;
@@ -336,10 +340,11 @@ interface IProposalCommentsAttrs {
   getSetGlobalReplyStatus: CallableFunction;
   replyParent: number | boolean;
   user?: any;
-}
-
-// TODO: clarify that 'user' = user who is commenting
-const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsState> = {
+}, {
+  commentError: any;
+  dom;
+  highlightedComment: boolean;
+}> = {
   view: (vnode) => {
     const {
       proposal, comments, createdCommentCallback, getSetGlobalEditingStatus,
@@ -432,17 +437,6 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
       // errors
       vnode.state.commentError
         && m('.comments-error', vnode.state.commentError),
-    ]);
-  }
-};
-
-const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (proposal instanceof OffchainThread) return;
-
-    return m('.ProposalSidebar.forum-container.proposal-sidebar', [
-      m(ProposalVotingActions, { proposal }),
     ]);
   }
 };
@@ -712,9 +706,6 @@ const ViewProposalPage: m.Component<{
     return m(Sublayout, {
       class: 'ViewProposalPage',
       sidebarTopic: proposal instanceof OffchainThread ? (proposal.topic?.id || null) : null,
-      rightSidebar: proposal instanceof OffchainThread
-        ? null
-        : m(ProposalSidebar, { proposal }),
       showNewProposalButton: true,
     }, [
       m(ProposalHeader, {
@@ -724,11 +715,10 @@ const ViewProposalPage: m.Component<{
         getSetGlobalEditingStatus,
         getSetGlobalReplyStatus
       }),
-      !(proposal instanceof OffchainThread) && m('.proposal-mobile-sidebar', [
-        m(ProposalVotingActions, { proposal }),
-      ]),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingResults, { proposal }),
+      !(proposal instanceof OffchainThread)
+        && m(ProposalVotingActions, { proposal }),
       m(ProposalComments, {
         proposal,
         comments,
