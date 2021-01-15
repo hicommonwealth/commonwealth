@@ -38,8 +38,9 @@ const getFilteredContent = (content, address) => {
     const actor = `${address?.name || content.user}`;
     const action = ((content.notificationCategory === NotificationCategories.NewComment) ? 'commented on'
       : (content.notificationCategory === NotificationCategories.NewMention) ? 'mentioned you in the thread'
-        : (content.notificationCategory === NotificationCategories.NewThread) ? 'created a new thread'
-          : '');
+        : (content.notificationCategory === NotificationCategories.NewCollaboration) ? 'invited you to collaborate on'
+          : (content.notificationCategory === NotificationCategories.NewThread) ? 'created a new thread'
+            : '');
     const actedOn = decodeURIComponent(content.title);
     const actedOnLink = content.url;
 
@@ -49,10 +50,11 @@ const getFilteredContent = (content, address) => {
         : content.notificationCategory === NotificationCategories.NewReaction ? 'Reaction on: '
           : 'Activity on: ';
     const notificationExcerpt = (() => {
-      let bodytext = decodeURIComponent(content.body);
+      const bodytext = decodeURIComponent(content.body);
       try {
         // parse and use quill document
         const doc = JSON.parse(bodytext);
+        if (!doc.ops) throw new Error();
         const text = renderQuillDeltaToText(doc);
         return smartTrim(text);
       } catch (err) {

@@ -1,6 +1,6 @@
 import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
-import * as darwiniaDefinitions from '@darwinia/types/interfaces/definitions';
+import spec from './spec';
 
 import Substrate from '../substrate/main';
 
@@ -15,10 +15,8 @@ class Darwinia extends Substrate {
   }
 
   public async initApi() {
-    const t = Object.values(darwiniaDefinitions)
-      .reduce((res, { types }): object => ({ ...res, ...types }), {});
     await super.initApi({
-      'types': { ...t }
+      'types': spec,
     });
   }
 }

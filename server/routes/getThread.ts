@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import { factory, formatFilename } from '../../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const getThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
@@ -13,7 +10,21 @@ const getThread = async (models, req: Request, res: Response, next: NextFunction
       where: {
         id: req.query.id,
       },
-      include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ]
+      include: [
+        {
+          model: models.Address,
+          as: 'Address'
+        },
+        {
+          model: models.Address,
+          through: models.Collaboration,
+          as: 'collaborators'
+        },
+        {
+          model: models.OffchainTopic,
+          as: 'topic'
+        },
+      ],
     });
   } catch (e) {
     console.log(e);

@@ -12,14 +12,14 @@ import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import QuillMention from 'quill-mention';
 
 import app from 'state';
+import { loadScript } from 'helpers';
+import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import PreviewModal from 'views/modals/preview_modal';
-import { detectURL } from 'views/pages/threads/index';
 import SettingsController from 'controllers/app/settings';
 import { Profile, RolePermission } from 'models';
-import { loadScript } from '../../helpers';
-import User from './widgets/user';
+import User from 'views/components/widgets/user';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import PreviewModal from 'views/modals/preview_modal';
 
 // Rich text and Markdown editor.
 //
@@ -843,6 +843,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
       && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
       try {
         contentsDoc = JSON.parse(localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`));
+        if (!contentsDoc.ops) throw new Error();
         vnode.state.markdownMode = false;
       } catch (e) {
         contentsDoc = localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`);

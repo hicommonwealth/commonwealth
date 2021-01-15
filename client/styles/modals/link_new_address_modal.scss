@@ -214,39 +214,43 @@
         color: $text-color-light;
         margin: 100px 20px;
     }
+    .accounts-caption {
+    }
     .accounts-caption p.small-text {
-        font-size: 13px;
+        font-size: 15px;
         color: $text-color-light;
     }
     .account-adder, .account-adder-placeholder {
         margin-top: 150px;
         .cui-spinner {
             position: relative;
-            top: -1px;
+            top: -2px;
             margin-right: 4px;
         }
     }
     .account-item {
         cursor: pointer;
-        padding: 10px 18px 11px;
+        padding: 16px 18px 9px;
         border: 1px solid $border-color-lightest;
         border-bottom: none;
         text-align: left;
         display: flex;
+        .account-item-avatar {
+            width: 56px;
+        }
         .account-item-address {
             color: $text-color-light;
         }
         .account-item-left {
+            flex: 1;
         }
         .account-item-right {
             text-align: right;
-            flex: 1;
-            margin: 11px 0;
         }
         .account-waiting {
             .cui-spinner {
                 position: relative;
-                top: -2px;
+                top: 10px;
             }
         }
 
@@ -327,17 +331,11 @@
         width: 300px;
         margin: 5px 0;
     }
-    .new-account-userblock {
-        display: inline-block;
-        margin-bottom: 30px;
-        border: 1px solid #eee;
-        border-radius: 3px;
-        padding: 9px 13px 12px;
-    }
     .avatar-wrap {
         display: flex;
         justify-content: center;
         align-items: center;
+        margin-bottom: 20px;
         .AvatarUpload {
             width: 92px;
             height: 92px;

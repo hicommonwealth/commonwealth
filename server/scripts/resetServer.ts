@@ -398,7 +398,7 @@ const resetServer = (models): Promise<number> => {
         }),
       ]);
 
-      // Admins need to be subscribed to mentions
+      // Admins need to be subscribed to mentions and collaborations
       await Promise.all([
         models.Subscription.create({
           subscriber_id: dillon.id,
@@ -417,6 +417,27 @@ const resetServer = (models): Promise<number> => {
         models.Subscription.create({
           subscriber_id: drew.id,
           category_id: NotificationCategories.NewMention,
+          object_id: `user-${drew.id}`,
+          is_active: true,
+          immediate_email: true,
+        }),
+        models.Subscription.create({
+          subscriber_id: dillon.id,
+          category_id: NotificationCategories.NewCollaboration,
+          object_id: `user-${dillon.id}`,
+          is_active: true,
+          immediate_email: true,
+        }),
+        models.Subscription.create({
+          subscriber_id: raymond.id,
+          category_id: NotificationCategories.NewCollaboration,
+          object_id: `user-${raymond.id}`,
+          is_active: true,
+          immediate_email: true,
+        }),
+        models.Subscription.create({
+          subscriber_id: drew.id,
+          category_id: NotificationCategories.NewCollaboration,
           object_id: `user-${drew.id}`,
           is_active: true,
           immediate_email: true,

@@ -4,7 +4,7 @@
 
 import _ from 'underscore';
 import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
-import { Mainnet } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 import { AccountId, Balance } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
@@ -37,10 +37,7 @@ export default async function (models, chain?: string): Promise<void> {
     const flagsHandler = new UserFlagsHandler(models, node.chain);
 
     const nodeUrl = constructSubstrateUrl(node.url);
-    const api = await SubstrateEvents.createApi(
-      nodeUrl,
-      node.chain.includes('edgeware') ? Mainnet as any : {}, // workaround for chain-events type mismatch
-    );
+    const api = await SubstrateEvents.createApi(nodeUrl, spec);
 
     log.info('Fetching councillor and validator lists...');
     try {

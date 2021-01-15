@@ -29,6 +29,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public abstract accounts: IAccountsModule<C, A>;
   public readonly chainEntities?: ChainEntityController;
   public readonly usingServerChainEntities = false;
+  public readonly webWallet;
 
   public deferred: boolean;
 

@@ -76,11 +76,12 @@ class CosmosGovernance extends ProposalModule<
             if (props.length === 0) {
               return of(props);
             } else {
-              return forkJoin(props.map((p) => p.initialized$)).pipe(map(() => props));
+              return of(props);
+              // return forkJoin(props.map((p) => p.initialized$)).pipe(map(() => props));
             }
           })
         ).subscribe((props: CosmosProposal[]) => {
-          this._initialized = true;
+          this._initialized = true; // module is initialized once we get something back
           resolve();
         }, (err) => {
           console.error(`${this.constructor.name}: proposal error: ${JSON.stringify(err)}`);

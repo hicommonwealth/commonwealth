@@ -18,6 +18,7 @@ export const sortNotifications = (n: Notification[]) => {
       // unbatch chain-events, comments, and mentions
       || a[0].subscription.category === NotificationCategories.NewComment
       || a[0].subscription.category === NotificationCategories.NewMention
+      || a[0].subscription.category === NotificationCategories.NewCollaboration
     ) {
       a.forEach((n2) => unbatchChainEvents.push([n2]));
     } else if (!a[0].isRead) {

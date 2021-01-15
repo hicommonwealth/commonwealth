@@ -153,17 +153,17 @@ const NewProposalForm = {
           notifyError('Missing arguments');
           return;
         } else if (vnode.state.toggleValue === 'proposal') {
-          const proposalHash = blake2AsHex(EdgewareFunctionPicker.getMethod().method.toHex());
+          const proposalHash = blake2AsHex(EdgewareFunctionPicker.getMethod().toHex());
           args = [author, EdgewareFunctionPicker.getMethod(), proposalHash, deposit];
           createFunc = ([au, mt, pr, dep]) => (app.chain as Substrate).democracyProposals.createTx(au, mt, pr, dep);
         } else if (vnode.state.toggleValue === 'preimage') {
           vnode.attrs.onChangeSlugEnum('democracypreimage');
-          const encodedProposal = EdgewareFunctionPicker.getMethod().method.toHex();
+          const encodedProposal = EdgewareFunctionPicker.getMethod().toHex();
           args = [author, EdgewareFunctionPicker.getMethod(), encodedProposal];
           createFunc = ([au, mt, pr]) => (app.chain as Substrate).democracyProposals.notePreimage(au, mt, pr);
         } else if (vnode.state.toggleValue === 'imminent') {
           vnode.attrs.onChangeSlugEnum('democracyimminent');
-          const encodedProposal = EdgewareFunctionPicker.getMethod().method.toHex();
+          const encodedProposal = EdgewareFunctionPicker.getMethod().toHex();
           args = [author, EdgewareFunctionPicker.getMethod(), encodedProposal];
           createFunc = ([au, mt, pr]) => (app.chain as Substrate).democracyProposals.noteImminentPreimage(au, mt, pr);
         } else {
