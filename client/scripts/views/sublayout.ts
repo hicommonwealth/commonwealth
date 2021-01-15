@@ -1,6 +1,6 @@
 import 'sublayout.scss';
 
-import m from 'mithril';
+import m, { Vnode } from 'mithril';
 import app from 'state';
 import { EmptyState, Button, Icons, Grid, Col, Spinner } from 'construct-ui';
 
@@ -9,9 +9,10 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
-import RightSidebar from 'views/components/right_sidebar';
-import { getCouncilCandidates } from './pages/council/index';
-import { SubstrateAccount } from '../controllers/chain/substrate/account';
+import { getCouncilCandidates } from 'views/pages/council/index';
+
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import Substrate from 'controllers/chain/substrate/main';
 
 const Sublayout: m.Component<{
   // overrides
@@ -20,13 +21,12 @@ const Sublayout: m.Component<{
 
   // content
   class?: string,
-  title?,                          // displayed at the top of the layout
-  description?: string,            // displayed at the top of the layout
-  sidebarTopic?: number,           // used to override the sidebar
+  title?: any,                        // displayed at the top of the layout
+  description?: string,               // displayed at the top of the layout
+  sidebarTopic?: number,              // used to override the sidebar
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
   hideSidebar?: boolean,
-  rightSidebar?,
 }> = {
   view: (vnode) => {
     const {
@@ -36,7 +36,6 @@ const Sublayout: m.Component<{
       showNewProposalButton,
       showCouncilMenu,
       hideSidebar,
-      rightSidebar,
     } = vnode.attrs;
 
     let councilCandidates: Array<[SubstrateAccount, number]>;
@@ -62,7 +61,6 @@ const Sublayout: m.Component<{
           m(Spinner, { active: true, fill: true, size: 'xl' }),
         ]),
       ]),
-      m(RightSidebar, { rightSidebar }),
     ];
 
     if (vnode.attrs.errorLayout) return [
@@ -75,7 +73,6 @@ const Sublayout: m.Component<{
           style: 'color: #546e7b;'
         }),
       ]),
-      m(RightSidebar, { rightSidebar }),
     ];
 
     return [
@@ -102,7 +99,6 @@ const Sublayout: m.Component<{
           ]),
         ]),
       ]),
-      m(RightSidebar, { rightSidebar }),
     ];
   }
 };

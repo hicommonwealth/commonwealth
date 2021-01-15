@@ -327,6 +327,22 @@
 
 .MobileSidebarHeader,
 .Sidebar {
+    .SubscriptionButton {
+        position: absolute;
+        bottom: 66px;
+        left: 25px;
+        z-index: 5;
+        width: calc(100% - 50px);
+        .cui-button-label {
+            font-weight: 400;
+            font-size: 0.94rem;
+        }
+        @include sm-max {
+            position: relative;
+            bottom: initial;
+            margin-bottom: 10px !important;
+        }
+    }
     .ChainStatusModule {
         position: absolute;
         bottom: 16px;
