@@ -297,6 +297,12 @@ export default (
           object_id: `user-${user.id}`,
           is_active: true,
         });
+        await models.Subscription.create({
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewCollaboration,
+          object_id: `user-${user.id}`,
+          is_active: true,
+        });
         addressModel.user_id = user.id;
       }
     } else if (isValid) {
@@ -314,6 +320,11 @@ export default (
     models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
+    models.Address.belongsToMany(models.OffchainThread, {
+      through: models.Collaboration,
+      as: 'collaboration'
+    });
+    models.Address.hasMany(models.Collaboration);
   };
 
   return Address;

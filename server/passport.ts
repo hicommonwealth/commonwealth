@@ -77,7 +77,6 @@ function setupPassport(models) {
         // TODO: We should probably just block the login, rather than moving the Github account
         log.error('Github already linked to ');
         return cb(null, null);
-
       } else {
         // Github account has a user attached, and we either aren't
         // logged in, or we're already logged in to that account.
@@ -114,6 +113,12 @@ function setupPassport(models) {
       await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
+        object_id: `user-${newUser.id}`,
+        is_active: true,
+      });
+      await models.Subscription.create({
+        subscriber_id: newUser.id,
+        category_id: NotificationCategories.NewCollaboration,
         object_id: `user-${newUser.id}`,
         is_active: true,
       });

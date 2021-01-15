@@ -33,7 +33,7 @@ const bulkAddresses = async (models, req, res, next) => {
       }
     ]
   };
-  if (req.query.searchTerm.length) {
+  if (req.query.searchTerm?.length) {
     options['where'] = options['where']
       ? Object.assign(options['where'], subStr)
       : subStr;
