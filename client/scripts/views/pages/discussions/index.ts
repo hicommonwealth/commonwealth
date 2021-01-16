@@ -7,7 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
 import app from 'state';
 
-import { Spinner, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
+import { Spinner, Button, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
 import { pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo } from 'models';
 
@@ -18,6 +18,7 @@ import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import Listing from 'views/pages/listing';
+import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 
@@ -89,14 +90,14 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
-      title: topic || 'Discussions',
+      title: topic || 'All Discussions',
       showNewProposalButton: true,
     });
     const subpage = topic || ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading, {
-      title: topic || 'Discussions',
+      title: topic || 'All Discussions',
       showNewProposalButton: true,
     });
 
@@ -206,7 +207,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         if (!topicId) {
           return m(Sublayout, {
             class: 'DiscussionsPage',
-            title: topic || 'Discussions',
+            title: topic || 'All Discussions',
             showNewProposalButton: true,
           }, [
             m(EmptyTopicPlaceholder, {
@@ -290,35 +291,36 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const otherTopics = {};
     const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
 
-    const getTopicRow = (topicId, name, description) => m('.discussions-topic', {
-      key: topicId,
-      class: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-              || (topic && topic === id)) ? 'active' : '',
+    const getTopicRow = (key, name, description) => m(Button, {
+      rounded: true,
+      class: 'discussions-topic',
+      key,
+      active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+               || (topic && topic === id)),
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${app.activeId()}/discussions/${name}`);
       },
-    }, [
-      m('.proposal-topic-icon'),
-      m('.proposal-topic-name', name),
-    ]);
-    const allTopicsListItem = m('.discussions-topic', {
-      class: (m.route.get() === `/${app.activeId()}` || !topic) ? 'active' : '',
+      label: name,
+      size: 'sm',
+    });
+    const allTopicsListItem = m(Button, {
+      rounded: true,
+      class: 'discussions-topic',
+      active: (m.route.get() === `/${app.activeId()}` || !topic),
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${app.activeId()}`);
       },
-    }, [
-      m('.proposal-topic-icon'),
-      m('.proposal-topic-name', 'All Discussions'),
-    ]);
+      label: 'All Discussions',
+      size: 'sm',
+    });
 
-    app.topics.getByCommunity(app.activeId()).forEach((topic) => {
-      const { id, name, description } = topic;
-      if (featuredTopicIds.includes(`${topic.id}`)) {
-        featuredTopics[topic.name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
+    app.topics.getByCommunity(app.activeId()).forEach(({ id, name, description }) => {
+      if (featuredTopicIds.includes(`${id}`)) {
+        featuredTopics[name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
       } else {
-        otherTopics[topic.name] = { id, name, description };
+        otherTopics[name] = { id, name, description };
       }
     });
     const otherTopicListItems = Object.keys(otherTopics)
@@ -345,19 +347,28 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               name: Icons.CHEVRON_DOWN,
               style: 'margin-left: 6px;',
             }),
-            content: m(MenuItem, {
-              label: 'Edit topic',
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: EditTopicModal,
-                  data: { description: topicDescription, id: topicId, name: topicName }
-                });
-              }
-            })
+            content: [
+              m(MenuItem, {
+                label: 'New topic',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({ modal: NewTopicModal });
+                }
+              }),
+              m(MenuItem, {
+                label: 'Edit topic',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: EditTopicModal,
+                    data: { description: topicDescription, id: topicId, name: topicName }
+                  });
+                }
+              }),
+            ],
           }),
       ] : [
-        'Discussions',
+        'All Discussions',
         app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
           && m(PopoverMenu, {
             class: 'sidebar-edit-topic',
@@ -369,13 +380,22 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               name: Icons.CHEVRON_DOWN,
               style: 'margin-left: 6px;',
             }),
-            content: m(MenuItem, {
-              label: 'Manage community',
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({ modal: ManageCommunityModal });
-              }
-            })
+            content: [
+              m(MenuItem, {
+                label: 'New topic',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({ modal: NewTopicModal });
+                }
+              }),
+              m(MenuItem, {
+                label: 'Manage community',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({ modal: ManageCommunityModal });
+                }
+              })
+            ],
           }),
       ],
       description: topicDescription,

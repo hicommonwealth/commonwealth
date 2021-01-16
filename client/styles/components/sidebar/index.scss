@@ -236,91 +236,13 @@
     }
     .SidebarModule {
         margin: 0 15px 20px;
-        > .cui-list {
-            // reset list styles
-            overflow-x: hidden;
-            max-height: 100%;
-            user-select: none;
-            background: transparent;
-            .cui-list-item {
-                font-size: 17px;
-                font-weight: 500;
-                padding: 6px 12px 0 !important;
-                border-radius: 4px;
-                border: none;
-                white-space: nowrap;
-                &.section-header, &.section-callout {
-                    background: initial !important;
-                    cursor: initial;
-                }
-                &.section-header {
-                    font-size: 15px;
-                    color: $text-color-lighter;
-                    margin-bottom: 4px;
-                    .cui-icon svg {
-                        stroke: $text-color-lightest;
-                    }
-                    .cui-icon:hover svg {
-                        stroke: $text-color-medium;
-                    }
-                }
-                &.section-callout {
-                    margin-top: 8px;
-                    white-space: initial;
-                }
-                .cui-list-item-content-left {
-                    padding-right: 10px;
-                }
-                .cui-list-item-content-right {
-                    position: relative;
-                    right: -6px;
-                }
-                .cui-list-item-content-left .cui-icon svg {
-                    stroke: $text-color-lighter;
-                    position: relative;
-                    top: -1px;
-                }
-                &:hover {
-                    background: $background-color-light-hover;
-                }
-                &.cui-active, &.cui-active:hover {
-                    background: $primary-bg-color !important;
-                    color: $text-color-white;
-                    .cui-icon svg {
-                        stroke: $text-color-white;
-                    }
-                    .proposal-topic-icon {
-                        border-color: $text-color-white;
-                    }
-                }
-                .cui-icon-action {
-                    position: absolute;
-                    right: 0;
-                    top: 0;
-                    bottom: 0;
-                    width: 36px;
-                    // center the icon
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    .cui-icon svg {
-                        opacity: 0.6;
-                    }
-                }
-                .cui-callout {
-                    font-weight: initial;
-                }
-            }
+        .section-header {
+            font-size: 19px;
+            color: $text-color-light;
+            margin-bottom: 4px;
         }
-        > .cui-list.cui-interactive {
-            .cui-list-item:hover {
-                background: $background-color-light-hover;
-            }
-            .cui-icon-action:hover {
-                .cui-icon svg {
-                    opacity: 1;
-                }
-            }
+        .cui-button {
+            margin-bottom: 4px;
         }
     }
 }

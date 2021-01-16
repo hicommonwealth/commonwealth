@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, List, ListItem, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
+  Button, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
 } from 'construct-ui';
 
 import { selectNode, initChain } from 'app';
@@ -101,67 +101,54 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     return m('.OffchainNavigationModule.SidebarModule', [
-      m(List, [
-        m(ListItem, {
-          class: 'section-header',
-          label: 'Off-chain Discussions',
-          contentRight: app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-            && m(PopoverMenu, {
-              class: 'sidebar-add-topic',
-              position: 'bottom',
-              transitionDuration: 0,
-              hoverCloseDelay: 0,
-              closeOnContentClick: true,
-              trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
-              content: m(MenuItem, {
-                label: 'New topic',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({ modal: NewTopicModal });
-                }
-              }),
-            }),
-        }),
-        m(ListItem, {
-          active: onDiscussionsPage(m.route.get())
-            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-          label: 'Discussions',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeId()}`);
-          },
-          contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
-        }),
-        m(ListItem, {
-          active: onSearchPage(m.route.get())
-            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-          label: 'Search',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeId()}/search`);
-          },
-          contentLeft: m(Icon, { name: Icons.SEARCH }),
-        }),
-        m(ListItem, {
-          active: onMembersPage(m.route.get())
-            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-          label: 'Members',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeId()}/members`);
-          },
-          contentLeft: m(Icon, { name: Icons.USERS }),
-        }),
-        // m(ListItem, {
-        //   active: onChatPage(m.route.get()),
-        //   label: 'Chat',
-        //   onclick: (e) => {
-        //     e.preventDefault();
-        //     m.route.set(`/${app.activeId()}/chat`);
-        //   },
-        //   contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
-        // }),
-      ]),
+      m('.section-header', 'Discuss'),
+      m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onDiscussionsPage(m.route.get())
+          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        label: 'Discussions',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeId()}`);
+        },
+        contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+      }),
+      m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onSearchPage(m.route.get())
+          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        label: 'Search',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeId()}/search`);
+        },
+        contentLeft: m(Icon, { name: Icons.SEARCH }),
+      }),
+      m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onMembersPage(m.route.get())
+          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        label: 'Members',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeId()}/members`);
+        },
+        contentLeft: m(Icon, { name: Icons.USERS }),
+      }),
+      // m(Button, {
+      //   rounded: true,
+      //   fluid: true,
+      //   active: onChatPage(m.route.get()),
+      //   label: 'Chat',
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeId()}/chat`);
+      //   },
+      //   contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+      // }),
     ]);
   }
 };
@@ -209,134 +196,153 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     if (onNotificationsPage(m.route.get())) return;
 
     return m('.OnchainNavigationModule.SidebarModule', [
-      m(List, [
-        m(ListItem, {
-          label: 'On-chain Governance',
-          class: 'section-header',
-        }),
-        // referenda (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia
-          && m(ListItem, {
-            active: onReferendaPage(m.route.get()),
-            label: 'Referenda',
-            contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/referenda`);
-            },
-            contentRight: [], // TODO
-          }),
-        // proposals (substrate, cosmos, moloch only)
-        !app.community && (app.chain?.base === ChainBase.Substrate
-                           || app.chain?.base === ChainBase.CosmosSDK
-                           || app.chain?.class === ChainClass.Moloch)
-          && m(ListItem, {
-            active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
-            label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
-            contentLeft: m(Icon, { name: Icons.SEND }),
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/proposals`);
-            },
-          }),
-        // treasury (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
-          && m(ListItem, {
-            active: onTreasuryPage(m.route.get()),
-            label: 'Treasury',
-            contentLeft: m(Icon, { name: Icons.TRUCK }),
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/treasury`);
-            },
-          }),
-        // council (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate
-          && m(ListItem, {
-            active: onCouncilPage(m.route.get()),
-            label: 'Council',
-            contentLeft: m(Icon, { name: Icons.AWARD }),
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/council`);
-            },
-          }),
-        // validators (substrate and cosmos only)
-        // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-        //   m(ListItem, {
-        //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
-        //     active: onValidatorsPage(m.route.get()),
-        //     label: 'Validators',
-        //     onclick: (e) => {
-        //       e.preventDefault();
-        //       m.route.set(`/${app.activeChainId()}/validators`),
-        //     },
-        //   }),
-        showMolochMemberOptions && m(ListItem, {
+      m('.section-header', 'Vote'),
+      // referenda (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onReferendaPage(m.route.get()),
+          label: 'Referenda',
+          contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
+            m.route.set(`/${app.activeChainId()}/referenda`);
           },
-          label: 'New proposal',
-          contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
+          contentRight: [], // TODO
         }),
-        showMolochMemberOptions && m(ListItem, {
+      // proposals (substrate, cosmos, moloch only)
+      !app.community && (app.chain?.base === ChainBase.Substrate
+                         || app.chain?.base === ChainBase.CosmosSDK
+                         || app.chain?.class === ChainClass.Moloch)
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
+          label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
+          contentLeft: m(Icon, { name: Icons.SEND }),
           onclick: (e) => {
             e.preventDefault();
-            app.modals.lazyCreate('update_delegate_modal', {
-              account: app.user.activeAccount,
-              delegateKey: (app.user.activeAccount as any).delegateKey,
-            });
+            m.route.set(`/${app.activeChainId()}/proposals`);
           },
-          label: 'Update delegate key',
-          contentLeft: m(Icon, { name: Icons.KEY }),
         }),
-        showMolochMemberOptions && m(ListItem, {
+      // treasury (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onTreasuryPage(m.route.get()),
+          label: 'Treasury',
+          contentLeft: m(Icon, { name: Icons.TRUCK }),
           onclick: (e) => {
             e.preventDefault();
-            app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
+            m.route.set(`/${app.activeChainId()}/treasury`);
           },
-          label: 'Rage quit',
-          contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
         }),
-        showMolochMenuOptions && m(ListItem, {
+      // council (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onCouncilPage(m.route.get()),
+          label: 'Council',
+          contentLeft: m(Icon, { name: Icons.AWARD }),
           onclick: (e) => {
             e.preventDefault();
-            app.modals.lazyCreate('token_management_modal', {
-              account: app.user.activeAccount,
-              accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
-              contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
-              tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
-            });
-          },
-          label: 'Approve tokens',
-          contentLeft: m(Icon, { name: Icons.POWER }),
-        }),
-        showCommonwealthMenuOptions && m(ListItem, {
-          label: 'Projects',
-          active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/projects`);
+            m.route.set(`/${app.activeChainId()}/council`);
           },
         }),
-        // showCommonwealthMenuOptions && m(ListItem, {
-        //   label: 'Backers',
-        //   active: m.route.get().startsWith(`/${app.activeChainId()}/backers`),
-        //   onclick: (e) => {
-        //     e.preventDefault();
-        //     m.route.set(`/${app.activeChainId()}/backers`);
-        //   },
-        // }),
-        showCommonwealthMenuOptions && m(ListItem, {
-          label: 'Collectives',
-          active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/collectives`);
-          },
-        }),
-      ]),
+      // validators (substrate and cosmos only)
+      // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
+      //   m(Button, {
+      //     fluid: true,
+      //     rounded: true,
+      //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
+      //     active: onValidatorsPage(m.route.get()),
+      //     label: 'Validators',
+      //     onclick: (e) => {
+      //       e.preventDefault();
+      //       m.route.set(`/${app.activeChainId()}/validators`),
+      //     },
+      //   }),
+      showMolochMemberOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
+        },
+        label: 'New proposal',
+        contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
+      }),
+      showMolochMemberOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.lazyCreate('update_delegate_modal', {
+            account: app.user.activeAccount,
+            delegateKey: (app.user.activeAccount as any).delegateKey,
+          });
+        },
+        label: 'Update delegate key',
+        contentLeft: m(Icon, { name: Icons.KEY }),
+      }),
+      showMolochMemberOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
+        },
+        label: 'Rage quit',
+        contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
+      }),
+      showMolochMenuOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.lazyCreate('token_management_modal', {
+            account: app.user.activeAccount,
+            accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
+            contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
+            tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
+          });
+        },
+        label: 'Approve tokens',
+        contentLeft: m(Icon, { name: Icons.POWER }),
+      }),
+      showCommonwealthMenuOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        label: 'Projects',
+        active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/projects`);
+        },
+      }),
+      // showCommonwealthMenuOptions && m(Button, {
+      //   fluid: true,
+      //   rounded: true,
+      //   label: 'Backers',
+      //   active: m.route.get().startsWith(`/${app.activeChainId()}/backers`),
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeChainId()}/backers`);
+      //   },
+      // }),
+      showCommonwealthMenuOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        label: 'Collectives',
+        active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/collectives`);
+        },
+      }),
     ]);
   }
 };
@@ -401,6 +407,7 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
           });
         }),
         trigger: m(Button, {
+          rounded: true,
           class: 'chain-status-main',
           fluid: true,
           disabled: vnode.state.initializing,
