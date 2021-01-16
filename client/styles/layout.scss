@@ -106,31 +106,11 @@ pre {
 .MobileSidebarHeader {
     display: none;
 }
-.Sidebar {
-    position: fixed;
-    top: 0;
-    left: $quick-switcher-width;
-    @include sm-max {
-        left: 0;
-    }
-    width: $sidebar-width;
-    height: 100%;
-}
 
 .layout-container {
-    padding-left: $sidebar-width + $quick-switcher-width;
-    padding-right: 0;
+    padding-left: $quick-switcher-width;
     @include sm-max {
-        padding-left: $sidebar-width;
-    }
-}
-.hidden-sidebar {
-    .layout-container {
         padding-left: 0;
-        padding-right: 0;
-    }
-    .Sidebar {
-        display: none;
     }
 }
 @include md-max {

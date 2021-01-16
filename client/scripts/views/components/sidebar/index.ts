@@ -95,9 +95,10 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
 
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/discussions/`)
-      || p.startsWith(`/${app.activeId()}/proposal/discussions/`);
+      || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
     const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
-    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
+    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
+      || p.startsWith(`/${app.activeId()}/account/`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     return m('.OffchainNavigationModule.SidebarModule', [
@@ -464,11 +465,8 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           vnode.state.open = false;
         },
       }, [
-        (app.chain || app.community) && m('.SidebarHeader', m(CommunitySelector)),
-        m('.sidebar-content', [ // container for overflow scrolling
-          (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
-          (app.chain || app.community) && m(OnchainNavigationModule),
-        ]),
+        (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
+        (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
         m('.sidebar-fadeout'),

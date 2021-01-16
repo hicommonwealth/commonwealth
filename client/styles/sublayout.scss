@@ -26,6 +26,10 @@
         }
         .sublayout-header-left {
             flex: 3;
+            .CommunitySelector,
+            .sublayout-header-heading {
+                display: inline-block;
+            }
             h4.sublayout-header-heading {
                 font-size: 1.25rem;
                 margin: 7px 17px 0 0;

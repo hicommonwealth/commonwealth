@@ -122,9 +122,6 @@
     }
 }
 
-.hidden-sidebar .SidebarQuickSwitcher {
-    display: none;
-}
 .SidebarQuickSwitcher {
     position: fixed;
     top: 0;
@@ -180,6 +177,7 @@
         }
     }
     .sidebar-fadeout {
+        display: none; // TODO
         position: absolute;
         bottom: 0;
         width: 100%;
@@ -234,52 +232,23 @@
             }
         }
     }
-    .SidebarModule {
-        margin: 0 15px 20px;
-        .section-header {
-            font-size: 19px;
-            color: $text-color-light;
-            margin-bottom: 4px;
-        }
-        .cui-button {
-            margin-bottom: 4px;
-        }
+    .section-header {
+        font-size: 19px;
+        color: $text-color-light;
+        margin-top: 20px;
+        margin-bottom: 4px;
+    }
+    .cui-button {
+        margin-bottom: 4px;
     }
 }
 
 .MobileSidebarHeader,
 .Sidebar {
     .SubscriptionButton {
-        position: absolute;
-        bottom: 20px;
-        left: 25px;
-        z-index: 5;
-        width: calc(100% - 50px);
-        .cui-button-label {
-            font-weight: 400;
-            font-size: 0.94rem;
-        }
-        @include sm-max {
-            position: relative;
-            bottom: initial;
-            margin-bottom: 10px !important;
-        }
+        margin-bottom: 10px;
     }
     .ChainStatusModule {
-        position: absolute;
-        bottom: 66px;
-        left: 25px;
-        margin-bottom: 0 !important;
-        width: calc(100% - 50px);
-        max-width: calc(100% - 50px);
-        z-index: 5;
-        @include sm-max {
-            position: relative;
-            bottom: initial;
-        }
-
-        // background
-        font-size: 0.94rem;
         .chain-deferred {
             color: $text-color-medium;
         }
@@ -297,12 +266,7 @@
                 width: calc(100% - 28px);
             }
         }
-        .cui-button-group {
-            position: relative;
-            width: 100%;
-        }
         .cui-button-label {
-            font-weight: 400;
             text-align: center;
             width: 100%;
         }

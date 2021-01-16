@@ -10,15 +10,10 @@
 }
 
 .CommunitySelector {
-    button.cui-button {
-        border: none !important;
-        border-radius: 0 !important;
-    }
     .title-selector > .cui-button > .cui-button-label {
-        top: 1px;
-        .community-name {
+        .ChainIcon, .CommunityIcon {
             position: relative;
-            top: 2px;
+            top: -2px;
         }
     }
 }

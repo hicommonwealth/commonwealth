@@ -10,6 +10,7 @@ import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import { getCouncilCandidates } from 'views/pages/council/index';
+import CommunitySelector, { CommunityLabel } from 'views/components/sidebar/community_selector';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
@@ -55,7 +56,6 @@ const Sublayout: m.Component<{
     ]);
 
     if (vnode.attrs.loadingLayout) return [
-      !hideSidebar && m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m('.LoadingLayout', [
           m(Spinner, { active: true, fill: true, size: 'xl' }),
@@ -64,7 +64,6 @@ const Sublayout: m.Component<{
     ];
 
     if (vnode.attrs.errorLayout) return [
-      !hideSidebar && m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m(EmptyState, {
           fill: true,
@@ -76,24 +75,22 @@ const Sublayout: m.Component<{
     ];
 
     return [
-      !hideSidebar && m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
-          m(Grid, { class: 'sublayout-grid' }, [
-            m(Col, {
-              span: 12,
-              class: 'sublayout-grid-col sublayout-grid-col-wide'
-            }, [
-              m('.sublayout-header', {
-                class: (!title) ? 'no-title' : '',
-              }, [
-                m('.sublayout-header-left', [
-                  title && m('h4.sublayout-header-heading', title),
-                ]),
-                sublayoutHeaderRight,
+          m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
+            m('.sublayout-header-left', [
+              (app.chain || app.community) && m(CommunitySelector),
+              title && m('h4.sublayout-header-heading', title),
+            ]),
+            sublayoutHeaderRight,
+          ]),
+          m('.sublayout-body', [
+            m(Grid, { class: 'sublayout-grid' }, [
+              m(Col, { span: 3, style: 'padding-right: 30px' }, [
+                !hideSidebar && m(Sidebar, { sidebarTopic }),
               ]),
-              m('.sublayout-body', [
-                vnode.children,
+              m(Col, { span: 9 }, [
+                vnode.children
               ]),
             ]),
           ]),

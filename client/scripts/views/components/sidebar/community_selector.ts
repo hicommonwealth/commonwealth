@@ -207,6 +207,7 @@ const CommunitySelector: m.Component<{}> = {
           hasArrow: false,
           inline: true,
           trigger: m(Button, {
+            rounded: true,
             label: [
               currentCommunity instanceof CommunityInfo
                 ? m(CommunityLabel, { community: currentCommunity })
