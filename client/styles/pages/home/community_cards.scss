@@ -17,8 +17,8 @@
     }
     .communities-list,
     .other-list {
-        width: calc(100% + 40px);
-        margin-right: -40px;
+        width: calc(100% + 30px);
+        margin-right: -30px;
         @include sm-max {
             width: initial;
             margin-right: 0;
@@ -32,7 +32,7 @@
     .home-card {
         box-sizing: border-box;
         float: left;
-        width: calc(50% - 40px);
+        width: calc(50% - 30px);
         max-width: none;
         margin-right: 30px;
         margin-bottom: 30px;

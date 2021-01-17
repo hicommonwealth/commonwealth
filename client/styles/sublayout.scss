@@ -2,9 +2,12 @@
 
 .Sublayout {
     display: block;
-    padding: 0 48px;
+    padding: 0 48px 0 36px;
     @include sm-max {
-        padding: 0 26px;
+        padding: 0 30px;
+    }
+    @include xs-max {
+        padding: 0 22px;
     }
 
     .sublayout-grid {
@@ -12,6 +15,39 @@
         display: flex;
         margin: 0 auto;
         max-width: $layout-max-width;
+        min-height: calc(100vh - 150px);
+    }
+    .sublayout-sidebar-col {
+        flex: 1;
+        padding-right: 30px;
+        max-width: 240px;
+        .Sidebar {
+            max-width: 180px;
+        }
+    }
+    @include sm-max {
+        .sublayout-sidebar-col {
+            display: none;
+        }
+    }
+    .hide-sidebar & {
+        .sublayout-sidebar-col {
+            display: none;
+        }
+    }
+    .sublayout-main-col {
+        flex: 3;
+        max-width: calc(100% - 200px);
+    }
+    .hide-sidebar & {
+        .sublayout-main-col {
+            max-width: 100%;
+        }
+    }
+    @include sm-max {
+        .sublayout-main-col {
+            max-width: 100%;
+        }
     }
 
     .sublayout-header {
@@ -19,13 +55,23 @@
         @include sm-max {
             display: none;
         }
-        margin-top: 28px;
-        margin-bottom: 8px;
-        &.no-title {
-            // margin-bottom: -60px;
-        }
+        max-width: $layout-max-width;
+        margin: 28px auto 8px;
+
         .sublayout-header-left {
             flex: 3;
+            white-space: nowrap;
+            > .ChainIcon,
+            > .CommunityIcon {
+                display: inline-block;
+                margin-right: 14px;
+                position: relative;
+                top: 4px;
+                .no-image {
+                    position: relative;
+                    top: -9px;
+                }
+            }
             .CommunitySelector,
             .sublayout-header-heading {
                 display: inline-block;

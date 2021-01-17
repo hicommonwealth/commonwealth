@@ -25,31 +25,6 @@ body {
     height: 100%;
     width: 100%;
 }
-$gradient-base-color: saturate(lighten($primary-bg-color, 20%), 14%);
-.home-gradient {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 80px;
-    background-image: linear-gradient(
-        180deg, mix($gradient-base-color, #fff, 100%) 0%,
-        mix($gradient-base-color, #fff, 91%) 4%,
-        mix($gradient-base-color, #fff, 83%) 9%,
-        mix($gradient-base-color, #fff, 75%) 13%,
-        mix($gradient-base-color, #fff, 67%) 18%,
-        mix($gradient-base-color, #fff, 60%) 23%,
-        mix($gradient-base-color, #fff, 53%) 29%,
-        mix($gradient-base-color, #fff, 45%) 35%,
-        mix($gradient-base-color, #fff, 39%) 42%,
-        mix($gradient-base-color, #fff, 32%) 49%,
-        mix($gradient-base-color, #fff, 25%) 57%,
-        mix($gradient-base-color, #fff, 19%) 66%,
-        mix($gradient-base-color, #fff, 13%) 77%,
-        mix($gradient-base-color, #fff, 6%) 88%,
-        mix($gradient-base-color, #fff, 0%) 100%
-    );
-}
 
 // global css
 h1, h2, h3, h4, h5, h6 {
@@ -109,13 +84,11 @@ pre {
 
 .layout-container {
     padding-left: $quick-switcher-width;
-    @include sm-max {
+    .hide-sidebar & {
         padding-left: 0;
     }
-}
-@include md-max {
-    .layout-container {
-        padding-right: 0;
+    @include xs-max {
+        padding-left: 0;
     }
 }
 @include sm-max {

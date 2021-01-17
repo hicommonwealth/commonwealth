@@ -205,14 +205,9 @@ const CommunitySelector: m.Component<{}> = {
         m(PopoverMenu, {
           transitionDuration: 0,
           hasArrow: false,
-          inline: true,
           trigger: m(Button, {
             rounded: true,
-            label: [
-              currentCommunity instanceof CommunityInfo
-                ? m(CommunityLabel, { community: currentCommunity })
-                : m(CommunityLabel, { chain: currentCommunity }),
-            ],
+            label: m(Icon, { name: Icons.MENU }),
           }),
           class: 'CommunitySelectList',
           content: [

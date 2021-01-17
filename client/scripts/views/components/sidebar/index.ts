@@ -12,7 +12,7 @@ import { selectNode, initChain } from 'app';
 
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
-import { link } from 'helpers';
+import { link, removeUrlPrefix } from 'helpers';
 import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo, NodeInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 
@@ -22,8 +22,7 @@ import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
-
-import CommunitySelector, { CommunityLabel } from './community_selector';
+import CommunitySelector from 'views/components/sidebar/community_selector';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -77,22 +76,16 @@ const SidebarQuickSwitcher: m.Component<{}> = {
       return true;
     });
 
-    const quickSwitcherCommunities = starredCommunities.length > 0 ? starredCommunities : allCommunities.filter((item) => {
-      if (item instanceof CommunityInfo && item.collapsedOnHomepage) return false;
-      return true;
-    });
-
     const size = 36;
     return m('.SidebarQuickSwitcher', [
-      quickSwitcherCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
+      m(CommunitySelector),
+      starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
     ]);
   }
 };
 
-const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaInitialized: true }> = {
+const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
   view: (vnode) => {
-    const { sidebarTopic } = vnode.attrs;
-
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/discussions/`)
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
@@ -102,7 +95,7 @@ const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaI
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
     return m('.OffchainNavigationModule.SidebarModule', [
-      m('.section-header', 'Discuss'),
+      // m('.section-header', 'Discuss'),
       m(Button, {
         rounded: true,
         fluid: true,
@@ -213,14 +206,14 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
           contentRight: [], // TODO
         }),
       // proposals (substrate, cosmos, moloch only)
-      !app.community && (app.chain?.base === ChainBase.Substrate
+      !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
                          || app.chain?.class === ChainClass.Moloch)
         && m(Button, {
           fluid: true,
           rounded: true,
-          active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
-          label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
+          active: onProposalPage(m.route.get()),
+          label: 'Proposals',
           contentLeft: m(Icon, { name: Icons.SEND }),
           onclick: (e) => {
             e.preventDefault();
@@ -413,17 +406,64 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
           fluid: true,
           disabled: vnode.state.initializing,
           label: vnode.state.initializing ? 'Connecting...' : app.chain.deferred
-            ? 'Ready to connect' : m(ChainStatusIndicator),
+            ? 'Connect to chain' : m(ChainStatusIndicator),
         }),
       }),
     ]);
   }
 };
 
-const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
+const ExternalLinksModule: m.Component<{}, {}> = {
   view: (vnode) => {
-    const { sidebarTopic } = vnode.attrs;
+    if (!app.chain && !app.community) return;
+    const meta = app.chain ? app.chain.meta.chain : app.community.meta;
+    const { name, description, website, chat, telegram, github } = meta;
 
+    return m('.ExternalLinksModule.SidebarModule', [
+      m('.section-header', 'External Links'),
+      chat && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: () => window.open(chat),
+        label: [
+          'Chat on ',
+          chat.startsWith('https://discord.com/') ? 'Discord' : removeUrlPrefix(chat)
+        ],
+        class: chat.startsWith('https://discord.com/') ? 'discord-button' : '',
+      }),
+      telegram && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: () => window.open(telegram),
+        label: 'Chat on Telegram',
+        class: 'telegram-button',
+      }),
+      (github || website) && m(PopoverMenu, {
+        closeOnContentClick: true,
+        transitionDuration: 0,
+        inline: true,
+        content: [
+          github && m(MenuItem, {
+            label: 'Github',
+            onclick: () => window.open(github),
+          }),
+          website && m(MenuItem, {
+            onclick: () => window.open(website),
+            label: 'Project homepage',
+          }),
+        ],
+        trigger: m(Button, {
+          fluid: true,
+          rounded: true,
+          label: 'More...',
+        }),
+      }),
+    ]);
+  }
+};
+
+const Sidebar: m.Component<{}, { open: boolean }> = {
+  view: (vnode) => {
     return [
       m('.MobileSidebarHeader', {
         onclick: (e) => {
@@ -447,7 +487,8 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           app.isLoggedIn() && m(MobileNewProposalButton),
         ]),
         m('.mobile-sidebar-center', {
-          class: `${app.isLoggedIn() ? 'logged-in' : ''} ${((app.chain || app.community) && !app.chainPreloading) ? '' : 'no-community'}`,
+          class: `${app.isLoggedIn() ? 'logged-in' : ''} `
+            + `${((app.chain || app.community) && !app.chainPreloading) ? '' : 'no-community'}`,
         }, [
           m('.community-label', m(CommunitySelector)),
         ]),
@@ -465,11 +506,12 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
           vnode.state.open = false;
         },
       }, [
-        (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
+        (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
-        (app.chain || app.community) && m(SubscriptionButton),
+        (app.chain || app.community) && m(ExternalLinksModule),
+        m('br'),
+        app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
-        m('.sidebar-fadeout'),
       ])
     ];
   },

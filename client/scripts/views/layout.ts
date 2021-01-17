@@ -17,7 +17,6 @@ export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
     const { hideSidebar } = vnode.attrs;
     return m('.Layout.LoadingLayout.mithril-app', {
     }, [
-      hideSidebar && m('.home-gradient'),
       m(Sublayout, { loadingLayout: true, hideSidebar }),
       m(AppModals),
       m(AppToasts),
@@ -40,7 +39,6 @@ export const Layout: m.Component<{
 
     if (app.loadingError) {
       return m('.Layout.mithril-app', [
-        hideSidebar && m('.home-gradient'),
         m(Sublayout, { errorLayout: [
           m('p', `Application error: ${app.loadingError}`),
           m('p', 'Please try again at another time'),
@@ -55,7 +53,6 @@ export const Layout: m.Component<{
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return m('.Layout.mithril-app', [
-        hideSidebar && m('.home-gradient'),
         m(PageNotFound),
         m(AppModals),
         m(AppToasts),
@@ -90,8 +87,7 @@ export const Layout: m.Component<{
       return m(LoadingLayout, { hideSidebar });
     }
 
-    return m('.Layout.mithril-app', [
-      hideSidebar && m('.home-gradient'),
+    return m('.Layout.mithril-app', { class: hideSidebar ? 'hide-sidebar' : '' }, [
       vnode.children,
       m(AppModals),
       m(AppToasts),

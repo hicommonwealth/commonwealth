@@ -135,10 +135,13 @@
     @include sm-max {
         display: none;
     }
+    .CommunitySelector {
+        margin: 15px 0 14px;
+    }
     .ChainIcon, .CommunityIcon {
+        margin-bottom: 15px;
         cursor: pointer;
         opacity: 0.3;
-        margin: 15px 0;
         &:hover {
             opacity: 0.33;
         }
@@ -163,6 +166,7 @@
 .Sidebar {
     position: relative;
     z-index: 2;
+    padding-top: 26px;
     .sidebar-content {
         max-height: calc(100vh - 60px);
         padding-top: 16px;
@@ -245,6 +249,19 @@
 
 .MobileSidebarHeader,
 .Sidebar {
+    .cui-button.cui-align-center {
+        justify-content: left;
+    }
+    .cui-button.telegram-button {
+        border-color: #2480cc;
+        background: #2480cc;
+        color: $text-color-white;
+    }
+    .cui-button.discord-button {
+        border-color: #677bc4;
+        background: #677bc4;
+        color: $text-color-white;
+    }
     .SubscriptionButton {
         margin-bottom: 10px;
     }
@@ -267,7 +284,7 @@
             }
         }
         .cui-button-label {
-            text-align: center;
+            text-align: left;
             width: 100%;
         }
         .cui-icon svg {

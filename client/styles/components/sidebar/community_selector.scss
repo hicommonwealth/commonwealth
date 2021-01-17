@@ -1,19 +1,22 @@
 @import 'client/styles/shared';
 
+.CommunitySelector {
+    .cui-button {
+        height: 36px;
+        width: 36px;
+        padding: 0;
+        .cui-icon {
+            position: relative;
+            top: -2px;
+        }
+    }
+}
+
 .CommunityLabel {
     .visible-sm {
         display: none;
         @include sm-max {
             display: block;
-        }
-    }
-}
-
-.CommunitySelector {
-    .title-selector > .cui-button > .cui-button-label {
-        .ChainIcon, .CommunityIcon {
-            position: relative;
-            top: -2px;
         }
     }
 }

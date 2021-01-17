@@ -10,7 +10,7 @@ import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import { getCouncilCandidates } from 'views/pages/council/index';
-import CommunitySelector, { CommunityLabel } from 'views/components/sidebar/community_selector';
+import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
@@ -24,7 +24,6 @@ const Sublayout: m.Component<{
   class?: string,
   title?: any,                        // displayed at the top of the layout
   description?: string,               // displayed at the top of the layout
-  sidebarTopic?: number,              // used to override the sidebar
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
   hideSidebar?: boolean,
@@ -33,16 +32,37 @@ const Sublayout: m.Component<{
     const {
       title,
       description,
-      sidebarTopic,
       showNewProposalButton,
       showCouncilMenu,
       hideSidebar,
     } = vnode.attrs;
+    const chain = app.chain ? app.chain.meta.chain : null;
+    const community = app.community ? app.community.meta : null;
 
     let councilCandidates: Array<[SubstrateAccount, number]>;
     if (app.chain && showCouncilMenu) {
       councilCandidates = getCouncilCandidates();
     }
+
+    const ICON_SIZE = 22;
+    const sublayoutHeaderLeft = m('.sublayout-header-left', [
+      chain ? [
+        m(ChainIcon, { size: ICON_SIZE, chain }),
+        m('h4.sublayout-header-heading', [
+          chain.name,
+          title && ' / ',
+          title
+        ]),
+      ] : community ? [
+        m(CommunityIcon, { size: ICON_SIZE, community }),
+        m('h4.sublayout-header-heading', [
+          community.name,
+          community.privacyEnabled && m('span.icon-lock'),
+          title && ' / ',
+          title
+        ]),
+      ] : '',
+    ]);
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [
       m(LoginSelector),                                                 // login selector
@@ -78,18 +98,15 @@ const Sublayout: m.Component<{
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
           m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
-            m('.sublayout-header-left', [
-              (app.chain || app.community) && m(CommunitySelector),
-              title && m('h4.sublayout-header-heading', title),
-            ]),
+            sublayoutHeaderLeft,
             sublayoutHeaderRight,
           ]),
           m('.sublayout-body', [
-            m(Grid, { class: 'sublayout-grid' }, [
-              m(Col, { span: 3, style: 'padding-right: 30px' }, [
-                !hideSidebar && m(Sidebar, { sidebarTopic }),
+            m('.sublayout-grid', [
+              !hideSidebar && m('.sublayout-sidebar-col', [
+                m(Sidebar),
               ]),
-              m(Col, { span: 9 }, [
+              m('.sublayout-main-col', [
                 vnode.children
               ]),
             ]),
