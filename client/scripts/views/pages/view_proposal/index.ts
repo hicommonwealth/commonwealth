@@ -706,6 +706,7 @@ const ViewProposalPage: m.Component<{
     return m(Sublayout, {
       class: 'ViewProposalPage',
       showNewProposalButton: true,
+      title: (proposal instanceof OffchainThread) ? 'Discussions' : 'Proposals',
     }, [
       m(ProposalHeader, {
         proposal,

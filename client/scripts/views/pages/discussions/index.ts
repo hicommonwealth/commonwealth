@@ -90,14 +90,14 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
-      title: topic || 'All Discussions',
+      title: topic || 'Discussions',
       showNewProposalButton: true,
     });
     const subpage = topic || ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading, {
-      title: topic || 'All Discussions',
+      title: topic || 'Discussions',
       showNewProposalButton: true,
     });
 
@@ -207,7 +207,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
         if (!topicId) {
           return m(Sublayout, {
             class: 'DiscussionsPage',
-            title: topic || 'All Discussions',
+            title: topic || 'Discussions',
             showNewProposalButton: true,
           }, [
             m(EmptyTopicPlaceholder, {
@@ -368,7 +368,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             ],
           }),
       ] : [
-        'All Discussions',
+        'Discussions',
         app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
           && m(PopoverMenu, {
             class: 'sidebar-edit-topic',

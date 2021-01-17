@@ -50,7 +50,7 @@ const Sublayout: m.Component<{
         m(ChainIcon, { size: ICON_SIZE, chain }),
         m('h4.sublayout-header-heading', [
           chain.name,
-          title && ' / ',
+          title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
       ] : community ? [
@@ -58,7 +58,7 @@ const Sublayout: m.Component<{
         m('h4.sublayout-header-heading', [
           community.name,
           community.privacyEnabled && m('span.icon-lock'),
-          title && ' / ',
+          title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
       ] : '',

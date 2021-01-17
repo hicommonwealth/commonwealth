@@ -86,9 +86,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean }> = {
             profile.headline
               ? m('.members-item-headline', profile.headline)
               : m('.members-item-address', formatAddressShort(profile.address, profile.chain)),
-          ]),
-          m('.members-item-right', [
-            info.count && m('.activity-count', [
+            info.count && m('.members-item-posts', [
               pluralize(info.count, 'post'),
               ' this month'
             ]),

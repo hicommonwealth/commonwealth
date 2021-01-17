@@ -37,16 +37,16 @@
     }
     .sublayout-main-col {
         flex: 3;
-        max-width: calc(100% - 200px);
+        width: calc(100% - 220px);
     }
     .hide-sidebar & {
         .sublayout-main-col {
-            max-width: 100%;
+            width: 100%;
         }
     }
     @include sm-max {
         .sublayout-main-col {
-            max-width: 100%;
+            width: 100%;
         }
     }
 
@@ -77,9 +77,18 @@
                 display: inline-block;
             }
             h4.sublayout-header-heading {
-                font-size: 1.25rem;
+                font-size: 1.15rem;
+                font-weight: 600;
                 margin: 7px 17px 0 0;
                 white-space: nowrap;
+                .breadcrumb {
+                    margin: 0 8px;
+                    color: $text-color-lightest;
+                }
+                .cui-tag {
+                    line-height: 1.1;
+                    margin: -1px 0;
+                }
             }
         }
         .sublayout-header-right {

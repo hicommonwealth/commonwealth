@@ -31,31 +31,21 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
     return m('.SidebarQuickSwitcherItem', {
       key: `${item instanceof ChainInfo ? 'chain' : 'community'}-${item.id}`
     }, [
-      m(Popover, {
-        interactionType: 'hover',
-        hoverOpenDelay: 500,
-        hoverCloseDelay: 0,
-        transitionDuration: 0,
-        position: 'right',
-        restoreFocus: false,
-        content: m('.quick-switcher-option-text', item.name),
-        class: 'SidebarQuickSwitcherItemTooltip',
-        trigger: m('.quick-switcher-option', {
-          class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
-            || (item instanceof CommunityInfo && item.id === app?.community?.id)
-            ? ' active' : '',
-        }, item instanceof ChainInfo
-          ? m(ChainIcon, {
+      m('.quick-switcher-option', {
+        class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
+          || (item instanceof CommunityInfo && item.id === app?.community?.id)
+          ? ' active' : '',
+      }, item instanceof ChainInfo
+        ? m(ChainIcon, {
+          size,
+          chain: item,
+          onclick: link ? (() => m.route.set(`/${item.id}`)) : null
+        }) : item instanceof CommunityInfo
+          ? m(CommunityIcon, {
             size,
-            chain: item,
+            community: item,
             onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-          }) : item instanceof CommunityInfo
-            ? m(CommunityIcon, {
-              size,
-              community: item,
-              onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-            }) : null),
-      }),
+          }) : null),
     ]);
   }
 };
@@ -418,6 +408,7 @@ const ExternalLinksModule: m.Component<{}, {}> = {
     if (!app.chain && !app.community) return;
     const meta = app.chain ? app.chain.meta.chain : app.community.meta;
     const { name, description, website, chat, telegram, github } = meta;
+    if (!website && !chat && !telegram && !github) return;
 
     return m('.ExternalLinksModule.SidebarModule', [
       m('.section-header', 'External Links'),
@@ -425,11 +416,8 @@ const ExternalLinksModule: m.Component<{}, {}> = {
         fluid: true,
         rounded: true,
         onclick: () => window.open(chat),
-        label: [
-          'Chat on ',
-          chat.startsWith('https://discord.com/') ? 'Discord' : removeUrlPrefix(chat)
-        ],
-        class: chat.startsWith('https://discord.com/') ? 'discord-button' : '',
+        label: 'Chat on Discord',
+        class: 'discord-button',
       }),
       telegram && m(Button, {
         fluid: true,
