@@ -9,6 +9,7 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
+import MobileSidebarHeader from 'views/components/sidebar/mobile';
 import { getCouncilCandidates } from 'views/pages/council/index';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
@@ -97,6 +98,7 @@ const Sublayout: m.Component<{
     return [
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
+          m(MobileSidebarHeader),
           m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
             sublayoutHeaderLeft,
             sublayoutHeaderRight,

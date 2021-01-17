@@ -18,9 +18,6 @@ import NewTopicModal from 'views/modals/new_topic_modal';
 
 import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
-import { MobileNewProposalButton } from 'views/components/new_proposal_button';
-import NotificationsMenu from 'views/components/header/notifications_menu';
-import LoginSelector from 'views/components/header/login_selector';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 
@@ -453,38 +450,6 @@ const ExternalLinksModule: m.Component<{}, {}> = {
 const Sidebar: m.Component<{}, { open: boolean }> = {
   view: (vnode) => {
     return [
-      m('.MobileSidebarHeader', {
-        onclick: (e) => {
-          e.preventDefault();
-          // clicking anywhere outside the trigger should close the sidebar
-          const onTrigger = $(e.target).hasClass('mobile-sidebar-trigger')
-            || $(e.target).closest('.mobile-sidebar-trigger').length > 0;
-          if (!onTrigger && vnode.state.open) vnode.state.open = false;
-        },
-      }, [
-        m('.mobile-sidebar-left', [
-          m(Button, {
-            class: 'mobile-sidebar-trigger',
-            compact: true,
-            onclick: (e) => {
-              e.preventDefault();
-              vnode.state.open = !vnode.state.open;
-            },
-            label: m(Icon, { name: Icons.MENU }),
-          }),
-          app.isLoggedIn() && m(MobileNewProposalButton),
-        ]),
-        m('.mobile-sidebar-center', {
-          class: `${app.isLoggedIn() ? 'logged-in' : ''} `
-            + `${((app.chain || app.community) && !app.chainPreloading) ? '' : 'no-community'}`,
-        }, [
-          m('.community-label', m(CommunitySelector)),
-        ]),
-        m('.mobile-sidebar-right', [
-          app.isLoggedIn() && m(NotificationsMenu, { small: false }),
-          m(LoginSelector, { small: false }),
-        ]),
-      ]),
       m(SidebarQuickSwitcher),
       m('.Sidebar', {
         class: vnode.state.open ? 'open' : '',
