@@ -71,7 +71,7 @@ const SidebarQuickSwitcher: m.Component<{}> = {
   }
 };
 
-const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
+export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
   view: (vnode) => {
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/discussions/`)
@@ -134,7 +134,7 @@ const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = 
   }
 };
 
-const OnchainNavigationModule: m.Component<{}, {}> = {
+export const OnchainNavigationModule: m.Component<{}, {}> = {
   view: (vnode) => {
     // // proposal counts
     // const substrateGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.Substrate)
@@ -328,7 +328,7 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
   }
 };
 
-const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
+export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
   view: (vnode) => {
     const url = app.chain?.meta?.url;
     if (!url) return;
@@ -400,7 +400,7 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
   }
 };
 
-const ExternalLinksModule: m.Component<{}, {}> = {
+export const ExternalLinksModule: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain && !app.community) return;
     const meta = app.chain ? app.chain.meta.chain : app.community.meta;
@@ -447,18 +447,11 @@ const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
-const Sidebar: m.Component<{}, { open: boolean }> = {
+const Sidebar: m.Component<{}, {}> = {
   view: (vnode) => {
     return [
       m(SidebarQuickSwitcher),
-      m('.Sidebar', {
-        class: vnode.state.open ? 'open' : '',
-        onclick: (e) => {
-          e.preventDefault();
-          // clicking inside the sidebar should close the sidebar
-          vnode.state.open = false;
-        },
-      }, [
+      m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(ExternalLinksModule),

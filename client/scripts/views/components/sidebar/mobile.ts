@@ -8,14 +8,16 @@ import {
 
 import app from 'state';
 import { link, removeUrlPrefix } from 'helpers';
-// import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo, NodeInfo } from 'models';
 
 import { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import CommunitySelector from 'views/components/sidebar/community_selector';
+import SubscriptionButton from 'views/components/subscription_button';
 
-const MobileSidebar = {
+import { OffchainNavigationModule, OnchainNavigationModule, ExternalLinksModule, ChainStatusModule } from './index';
+
+const MobileSidebar: m.Component<{}, { open: boolean }> = {
   view: (vnode) => {
     return m('.MobileSidebarHeader', {
       onclick: (e) => {
@@ -27,14 +29,24 @@ const MobileSidebar = {
       },
     }, [
       m('.mobile-sidebar-left', [
-        m(Button, {
-          class: 'mobile-sidebar-trigger',
-          compact: true,
-          onclick: (e) => {
-            e.preventDefault();
-            vnode.state.open = !vnode.state.open;
-          },
-          label: m(Icon, { name: Icons.MENU }),
+        m(PopoverMenu, {
+          class: 'MobileSidebarPopoverMenu',
+          transitionDuration: 0,
+          closeOnContentClick: true,
+          inline: true,
+          trigger: m(Button, {
+            class: 'mobile-sidebar-trigger',
+            compact: true,
+            label: m(Icon, { name: Icons.MENU }),
+          }),
+          content: [
+            (app.chain || app.community) && m(OffchainNavigationModule),
+            (app.chain || app.community) && m(OnchainNavigationModule),
+            (app.chain || app.community) && m(ExternalLinksModule),
+            m('br'),
+            app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
+            app.chain && m(ChainStatusModule),
+          ],
         }),
         app.isLoggedIn() && m(MobileNewProposalButton),
       ]),

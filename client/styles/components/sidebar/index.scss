@@ -237,17 +237,17 @@
         }
     }
     .section-header {
-        font-size: 19px;
+        font-size: 18px;
         color: $text-color-light;
         margin-top: 20px;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
     }
     .cui-button {
         margin-bottom: 4px;
     }
 }
 
-.MobileSidebarHeader,
+.MobileSidebarPopoverMenu,
 .Sidebar {
     .cui-button.cui-align-center {
         justify-content: left;
@@ -299,4 +299,21 @@
 .cui-popover.sidebar-edit-topic .cui-menu,
 .cui-popover.sidebar-add-topic .cui-menu {
     padding: 4px 0;
+}
+
+.MobileSidebarPopoverMenu {
+    margin: 0 10px;
+    .section-header {
+        font-size: 18px;
+        color: $text-color-light;
+        margin-top: 20px;
+        margin-bottom: 6px;
+    }
+    .cui-menu {
+        padding: 20px 16px;
+        border-color: $border-color-lightest;
+    }
+    .cui-button {
+        margin-bottom: 6px;
+    }
 }
