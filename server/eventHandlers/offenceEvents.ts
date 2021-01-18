@@ -35,7 +35,7 @@ export default class extends IEventHandler {
       SELECT * FROM (
         SELECT *, ROW_NUMBER() OVER(PARTITION BY stash ORDER BY created_at DESC) 
         FROM public."HistoricalValidatorStatistic" 
-        WHERE stash IN ('${newOffenceEventData.offenders.join("','")}')
+        WHERE stash IN ('${newOffenceEventData.offenders.join("','")}') AND chain_name = '${this._chain}'
       ) as q
       WHERE row_number = 1
     `;

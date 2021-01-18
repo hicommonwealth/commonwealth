@@ -24,6 +24,7 @@ export const computeEventStats = async (chain: String, event: String, stash: Str
     SELECT event_data 
     FROM "ChainEvents" 
     WHERE chain_event_type_id  = '${chain}-${event}' AND 
+    active = true AND
     created_at >= '${startDate}' AND created_at <= '${endDate}'
   `;
   switch (event) {
@@ -61,6 +62,7 @@ export const getAPR = async (chain: String, event: String, stash: string, noOfDa
   SELECT  event_data, created_at 
   FROM "ChainEvents" 
   WHERE chain_event_type_id  = '${chain}-new-session' 
+  AND active = true
   AND created_at >= '${startDate}' AND created_at <= '${endDate}'
   AND event_data ->> 'active' LIKE '%${stash}%'
   `;
@@ -72,6 +74,7 @@ export const getAPR = async (chain: String, event: String, stash: string, noOfDa
     SELECT  event_data, created_at
     FROM "ChainEvents"
     WHERE chain_event_type_id  = '${chain}-${event}'
+    AND active = true
     AND created_at >= '${startDate}' AND created_at <= '${endDate}'
     AND event_data ->>  'validator' LIKE '%${stash}%'
     ORDER BY created_at ASC

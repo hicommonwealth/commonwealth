@@ -24,6 +24,8 @@ import { sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
+import { updateChainEventStatus, deleteOldHistoricalValidatorsStats }  from './../util/archivalNodeHelpers';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 
@@ -89,11 +91,11 @@ const setupChainEventListeners = async (
     const storageHandler = new EventStorageHandler(models, node.chain, excludedEvents);
     const notificationHandler = new EventNotificationHandler(models, wss);
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
-    const newSessionHandler = new NewSessionHandler(models);
+    const newSessionHandler = new NewSessionHandler(models, node.chain);
     const rewardHandler = new RewardHandler(models, node.chain);
     const slashHandler = new SlashHandler(models, node.chain);
-    const bondHandler = new BondHandler(models);
-    const imOnlineHandler = new ImOnlineHandler(models);
+    const bondHandler = new BondHandler(models, node.chain);
+    const imOnlineHandler = new ImOnlineHandler(models, node.chain);
     const offenceHandler = new OffenceHandler(models, node.chain);
     const heartbeatHandler = new HeartbeatHandler(models, node.chain);
     const identityHandler = new IdentityHandler(models, node.chain);
@@ -118,6 +120,14 @@ const setupChainEventListeners = async (
       // and syncup with the head of the chain and then use the URL for the chain provided in db 
       // and use it to subscribe to head of the chain to continue normal execution. 
       if ( archival && node.chain == ARCHIVAL_CHAIN ) {
+        // Sample Events list for update record in ChainEvents and HistoricalValidatorsStats tables 
+        const eventList = ["all-good","bonded","new-session","offences-offence","reward","slash","some-offline","unbonded"]
+        const chainEventRecordsUpdated = await updateChainEventStatus(models, startBlock, node.chain, eventList, "inactive");
+        const historicalValidatorsStatsDeleted = await deleteOldHistoricalValidatorsStats(models, startBlock, node.chain);
+
+        if (chainEventRecordsUpdated) console.info("Records has beed updated in ChainEvents table");
+        if (historicalValidatorsStatsDeleted) console.info("Records has beed deleted in HistoricalValidatorsStats table")
+
         // handlers needed for staking ui
           const _handlers: IEventHandler[] = [
             storageHandler,
@@ -134,23 +144,23 @@ const setupChainEventListeners = async (
         // mark all the events in ChaineEvents db for the archival_chain >= provided blockNumber as INACTIVE
       // await changeChainEventStatus('INACTIVE', chain, eventsList, blockNumber,)
 
-       const nodeUrl = constructSubstrateUrl(ARCHIVAL_NODE_URL);
-       const api = await SubstrateEvents.createApi(
-         nodeUrl,
-         node.chain.includes('edgeware') ? Mainnet : {},
-       );
- 
-       await SubstrateEvents.subscribeEvents({
-         chain: node.chain,
-         handlers,
-         skipCatchup,
-         archival,
-         startBlock,
-         discoverReconnectRange: () => discoverReconnectRange(models, ARCHIVAL_CHAIN),
-         api,
-       });
-       log.info(`Finished archival syncing for chain ${ARCHIVAL_CHAIN}...`);
-      }
+      const nodeUrl = constructSubstrateUrl(ARCHIVAL_NODE_URL);
+      const api = await SubstrateEvents.createApi(
+        nodeUrl,
+        node.chain.includes('edgeware') ? Mainnet : {},
+      );
+
+      await SubstrateEvents.subscribeEvents({
+        chain: node.chain,
+        handlers,
+        skipCatchup,
+        archival,
+        startBlock,
+        discoverReconnectRange: () => discoverReconnectRange(models, ARCHIVAL_CHAIN),
+        api,
+      });
+      log.info(`Finished archival syncing for chain ${ARCHIVAL_CHAIN}...`);
+    }
 
       // only handle identities on substrate chains
       handlers.push(identityHandler);

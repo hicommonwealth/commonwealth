@@ -30,3 +30,57 @@ export const archivalNodeDbEntry = async (models: any, startBlock: number, chain
   }
   return false;
 };
+
+export const updateChainEventStatus = async (models: any, startBlock: number, chain: string, eventsList: any, status: string) => {
+  let chainEventStatusUpdated = false;
+  if (status != "inactive" || eventsList.length === 0 || !startBlock) {
+    console.error('Invalid status provided || eventsList is empty || startBlock is missing for ChainEvents');
+    return chainEventStatusUpdated;
+  }
+  const chainEventsList = eventsList.map(event => `${chain}-${event}`)
+
+  try {
+    const updateChainEventStatus = await models.ChainEvent.update(
+      { active: false }, 
+      { 
+        where: {
+          [Op.and]: [ { chain_event_type_id: { [Op.in]: chainEventsList } },
+                      { block_number: { [Op.gte]: startBlock } }
+                    ],
+        }
+      }
+    );
+    chainEventStatusUpdated = true;
+    console.log(`All ChainEvents records marked as inactive for ${chain} after the starting block number ${startBlock}`);
+  } catch (err) {
+    console.error(`Unable to update ChainEvents records as inactive after starting block number ${startBlock}:\n ${err.message}`);
+  }
+
+  return chainEventStatusUpdated;
+};
+
+export const deleteOldHistoricalValidatorsStats = async (models: any, startBlock: number, chain: string) => {
+  let historicalValidatorsStatsDeleted = false;
+  if (!startBlock || !chain) {
+    console.error('startBlock or chain is missing for HistoricalValidatorsStats');
+    return historicalValidatorsStatsDeleted;
+  }
+
+  try {
+    const deleteHistoricalValidatorsStatsStatus = await models.HistoricalValidatorStatistic.destroy( 
+      { 
+        where: {
+          [Op.and]: [ { chain_name: chain },
+                      { block: { [Op.gt]: startBlock.toString() } }
+                    ],
+        }
+      }
+    );
+    historicalValidatorsStatsDeleted = true;
+    console.log(`All HistoricalValidatorsStats records deleted for ${chain} after the starting block number ${startBlock}`);
+  } catch (err) {
+    console.error(`Unable to delete HistoricalValidatorsStats records after starting block number ${startBlock}:\n ${err.message}`);
+  }
+
+  return historicalValidatorsStatsDeleted;
+};

@@ -6,7 +6,8 @@ const Op = Sequelize.Op;
 
 export default class extends IEventHandler {
   constructor(
-    private readonly _models
+    private readonly _models,
+    private readonly _chain: string
   ) {
     super();
   }
@@ -96,13 +97,14 @@ export default class extends IEventHandler {
     SELECT * FROM (
       SELECT *, ROW_NUMBER() OVER(PARTITION BY stash ORDER BY created_at DESC) 
       FROM public."HistoricalValidatorStatistic" 
-      WHERE stash IN ('${Object.keys(newSessionEventData.activeExposures).join("','")}')
-    ) as q
-    WHERE row_number = 1
-  `;
+      WHERE stash IN ('${Object.keys(newSessionEventData.activeExposures).join("','")}') AND
+      chain_name = '${this._chain}'
+      ) as q
+      WHERE row_number = 1
+      `;
     const [existingHistoricalValidators, metadata] = await sequelize.query(rawQuery);
-
     const existingHistoricalValidatorsData = JSON.parse(JSON.stringify(existingHistoricalValidators));
+
     const allExistingHistoricalValidators = [];
     existingHistoricalValidatorsData.forEach((validator: any) => {
       allExistingHistoricalValidators[validator.stash] = validator;
@@ -129,6 +131,7 @@ export default class extends IEventHandler {
         rewardsStats: {},
         slashesStats: {},
         offencesStats: {},
+        chain_name: this._chain,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

@@ -1,9 +1,12 @@
 import { IEventHandler, CWEvent, IChainEventData, SubstrateTypes } from '@commonwealth/chain-events';
+import Sequelize from 'sequelize';
+const Op = Sequelize.Op;
 
 
 export default class extends IEventHandler {
   constructor(
-    private readonly _models
+    private readonly _models,
+    private readonly _chain: string
   ) {
     super();
   }
@@ -22,7 +25,7 @@ export default class extends IEventHandler {
     // 2) Get relevant data from DB for processing.
     const latestValidators = await this._models.HistoricalValidatorStatistic.findOne({
       where: {
-        stash: bondEventData.stash
+        [Op.and]: [{ stash: bondEventData.stash }, { chain_name: this._chain}]
       },
       order: [
         ['created_at', 'DESC']

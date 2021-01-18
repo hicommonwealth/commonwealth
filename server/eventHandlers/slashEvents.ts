@@ -22,15 +22,9 @@ export default class extends IEventHandler {
     }
 
     const chainEventNewSession = await this._models.ChainEvent.findOne({
-      include: [
-        {
-          model: this._models.ChainEventType,
-          where: {
-            chain: this._chain,
-            event_name: event.data.kind,
-          }
-        }
-      ],
+      where: {
+        [Op.and]: [{ chain_event_type_id: `${this._chain}-${event.data.kind}` }, { active: true }]
+      },
       order: [
         ['created_at', 'DESC']
       ],
@@ -91,7 +85,7 @@ export default class extends IEventHandler {
     // Get last created validator's record from 'HistoricalValidatorStatistic' table. as slash event contains validator's AccountID.
     const latestValidatorStats = await this._models.HistoricalValidatorStatistic.findOne({
       where: {
-        stash: validatorStash
+        [Op.and]: [{ stash: validatorStash }, { chain_name: this._chain }]
       },
       order: [
         ['created_at', 'DESC']

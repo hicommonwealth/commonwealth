@@ -20,7 +20,7 @@ export default class extends IEventHandler {
     const heartbeatEventData = event.data;
 
     // logging Heartbeat on the terminal only as per discussion with Drew.
-    console.log(`Heartbeat Received from AccountId: ${heartbeatEventData.authorityId}`);
+    console.log(`Heartbeat Received from AccountId: ${heartbeatEventData.authorityId} for chain: ${this._chain}`);
 
     return dbEvent;
   }

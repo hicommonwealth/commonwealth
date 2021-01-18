@@ -19,6 +19,7 @@ export interface HistoricalValidatorStatisticsAttributes {
   rewardsStats: object;
   slashesStats: object;
   offencesStats: object;
+  chain_name: string;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -53,6 +54,7 @@ export default (
     rewardsStats: { type: dataTypes.JSONB, allowNull: false },
     slashesStats: { type: dataTypes.JSONB, allowNull: false },
     offencesStats: { type: dataTypes.JSONB, allowNull: false },
+    chain_name: { type: dataTypes.STRING, allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {

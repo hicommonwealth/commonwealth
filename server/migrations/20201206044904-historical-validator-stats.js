@@ -20,6 +20,7 @@ module.exports = {
       rewardsStats: { type: Sequelize.JSONB, allowNull: false },
       slashesStats: { type: Sequelize.JSONB, allowNull: false },
       offencesStats: { type: Sequelize.JSONB, allowNull: false },
+      chain_name: { type: Sequelize.STRING, allowNull: false },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     }, {

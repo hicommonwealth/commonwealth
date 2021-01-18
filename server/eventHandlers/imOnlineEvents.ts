@@ -18,7 +18,8 @@ const uptimePercent = (noOfTrues: number, noOfFalse: number, currentEventType: n
 
 export default class extends IEventHandler {
   constructor(
-    private readonly _models
+    private readonly _models,
+    private readonly _chain: string
   ) {
     super();
   }
@@ -69,7 +70,7 @@ export default class extends IEventHandler {
           GROUP by groupTable.stash
           ) joinTable
         ON joinTable.stash = partitionTable.stash
-        WHERE partitionTable.stash IN ('${eventValidatorsList.join("','")}')
+        WHERE partitionTable.stash IN ('${eventValidatorsList.join("','")}') AND chain_name = '${this._chain}'
         )  as validatorQuery
       WHERE  validatorQuery.row_number = 1
     `;
