@@ -1,11 +1,10 @@
 import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
-  ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
-  ReferendumInfo, SessionIndex, ValidatorId, Exposure, EraIndex, AuthorityId, IdentificationTuple,
+  ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Extrinsic,
+  ReferendumInfo, ValidatorId, Exposure, EraIndex, AuthorityId, IdentificationTuple,
   EraRewardPoints, AccountVote
 } from '@polkadot/types/interfaces';
-import { DeriveStakingElected } from '@polkadot/api-derive/types';
 import BN from 'bn.js';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { Option, bool, Vec, u32, u64, Compact } from '@polkadot/types';
@@ -116,15 +115,18 @@ export async function Enrich(
         const validators = await api.query.session.validators.at(hash);
         // get the era of block
         const rawCurrentEra = await api.query.staking.currentEra.at(hash);
-        const currentEra = rawCurrentEra.toRawType() === 'u32' ? rawCurrentEra.toString() as unknown as EraIndex: rawCurrentEra.unwrap();
-
+        const currentEra = rawCurrentEra.toRawType
+        ? rawCurrentEra.toRawType() === 'u32'
+          ? rawCurrentEra.toString() as unknown as EraIndex
+          : rawCurrentEra.unwrap()
+        : rawCurrentEra.unwrap();
         
         // get the nextElected Validators
         const keys = api.query.staking.erasStakers ? 
-          await api.query.staking.erasStakers.keysAt(hash,currentEra) :
-          await api.query.staking.stakers.keysAt(hash, currentEra) ; 
-      
-        const nextElected = keys.length ? keys.map((key) => key.args[1] as AccountId): validators;
+        await api.query.staking.erasStakers.keysAt(hash,currentEra) :
+        await api.query.staking.stakers.keysAt(hash, currentEra) ; 
+
+        const nextElected = keys.length ? keys.map((key) => key.args[1] as AccountId): validators['nextElected'];
         
         // get current stashes
         const stashes = await api.query.staking.validators.keysAt(hash);
@@ -137,7 +139,7 @@ export async function Enrich(
 
         // get validators current era reward points
         const validatorEraPoints: EraRewardPoints = await currentPoints(api, currentEra, hash, validators) as EraRewardPoints;
-        const eraPointsIndividual = validatorEraPoints.get('individual').toJSON();
+        const eraPointsIndividual = validatorEraPoints.individual;
 
         const validatorInfo = {};
 
@@ -145,10 +147,9 @@ export async function Enrich(
           const key = validator.toString();
 
           // eraValidatorPrefs does not return comission prior to 3139800
-          const preference = api.query.staking.erasValidatorPrefs ? 
-            await api.query.staking.erasValidatorPrefs.at(hash, currentEra,key) :
-            // staking.validators cant pull data prior to 3139200
-            await api.query.staking.validators.at(hash, key);
+          const preference = api.query.staking.erasValidatorPrefs
+          ? await api.query.staking.erasValidatorPrefs.at(hash, currentEra,key)
+          : await api.query.staking.validators.at(hash, key);
 
           const commissionPer =  (Number)(preference.commission || new BN(0)) / 10_000_000;
 
@@ -166,7 +167,9 @@ export async function Enrich(
             // for new blocks after 3139200
             nextSessionKeysOpt = await api.query.session.nextKeys.at(hash,key);
           }
-          const nextSessionKeys = nextSessionKeysOpt.isSome? nextSessionKeysOpt.unwrap(): []
+          const nextSessionKeys = nextSessionKeysOpt.isSome
+          ? nextSessionKeysOpt.unwrap()
+          : []
 
           validatorInfo[key] = {
             commissionPer,
@@ -250,7 +253,6 @@ export async function Enrich(
       case EventKind.Bonded:
       case EventKind.Unbonded: {
         const [ stash, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
-        const hash = await api.rpc.chain.getBlockHash(blockNumber);
         const controllerOpt = await api.query.staking.bonded.at<Option<AccountId>>(hash,stash);
         if (!controllerOpt.isSome) {
           throw new Error(`could not fetch staking controller for ${stash.toString()}`);

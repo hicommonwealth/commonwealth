@@ -21,7 +21,7 @@ async function retrievePoints (api: ApiPromise, era:EraIndex, hash: BlockHash, v
 export async function currentPoints (api: ApiPromise, era:EraIndex, hash: BlockHash, validators: AccountId[]): Promise<EraRewardPoints> {    
     // when running against an archival node prior to a certain block number staking.erasRewardPoints does not exist!
     if (api.query.staking.erasRewardPoints)
-        return await api.query.staking.erasRewardPoints.at<EraRewardPoints>(hash,era)
+      return await api.query.staking.erasRewardPoints.at<EraRewardPoints>(hash,era)
     else
         return await retrievePoints(api, era, hash, validators);
 }
