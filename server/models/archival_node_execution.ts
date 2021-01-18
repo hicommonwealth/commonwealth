@@ -3,6 +3,7 @@ import * as Sequelize from 'sequelize';
 export interface ArchivalNodeAttributes {
     id?: number;
     chain_event_version: string;
+    chain_name: string;
     start_block: number;
     created_at?: Date;
     updated_at?: Date;
@@ -22,6 +23,7 @@ export default (
 ): ArchivalNodeModel => {
   const ArchivalNode = sequelize.define<ArchivalNodeInstance, ArchivalNodeAttributes>('ArchivalNodeExecutionEntries', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    chain_name: { type: dataTypes.STRING, allowNull: false },  // chain name for which archival node is executed
     chain_event_version: { type: dataTypes.STRING, allowNull: false }, //@commonwealth/chain-events version from package.json
     start_block: { type: dataTypes.INTEGER, allowNull: false, unique: true }, // starting block number when archival node executed
     created_at: { type: dataTypes.DATE, allowNull: false },

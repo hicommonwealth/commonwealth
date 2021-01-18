@@ -6,6 +6,7 @@ module.exports = {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
       start_block: { type: Sequelize.INTEGER, unique: true},
       chain_event_version: { type: Sequelize.STRING },
+      chain_name: { type: Sequelize.STRING },
       created_at: { type: Sequelize.DATE },
       updated_at: { type: Sequelize.DATE }
     });

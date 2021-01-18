@@ -66,7 +66,7 @@ async function main() {
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
   let ARCHIVAL = process.env.ARCHIVAL === 'true';
-  const START_BLOCLK = process.env.START_BLOCK ? +process.env.START_BLOCK : 0;
+  const START_BLOCK = process.env.START_BLOCK ? +process.env.START_BLOCK : 0;
   const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
@@ -76,7 +76,7 @@ async function main() {
 
   // check if db record exists for archival node execution with chain-events version and starting block number.
   if (ARCHIVAL) {
-    const archivalNodeDBEntryExist = await archivalNodeDbEntry(models);
+    const archivalNodeDBEntryExist = await archivalNodeDbEntry(models, START_BLOCK, ARCHIVAL_CHAIN);
     ARCHIVAL = !archivalNodeDBEntryExist;
     log.info(`Executing process with ARCHIVAL flag set to ${ARCHIVAL}`);
     if (ARCHIVAL && !ARCHIVAL_NODE_URL && !ARCHIVAL_CHAIN) {
@@ -99,7 +99,7 @@ async function main() {
         chains = CHAIN_EVENTS.split(',');
       }
 
-      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP, ARCHIVAL, START_BLOCLK);
+      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP, ARCHIVAL, START_BLOCK);
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
       for (const [ chain, subscriber ] of Object.entries(subscribers)) {
