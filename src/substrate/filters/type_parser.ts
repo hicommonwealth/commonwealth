@@ -40,6 +40,7 @@ export function ParseType (
     case 'democracy':
       switch (method) {
         case 'Proposed': return EventKind.DemocracyProposed;
+        case 'second': return EventKind.DemocracySeconded;
         case 'Tabled': return EventKind.DemocracyTabled;
         case 'Started': return EventKind.DemocracyStarted;
         case 'Passed': return EventKind.DemocracyPassed;
@@ -52,6 +53,7 @@ export function ParseType (
         case 'PreimageInvalid': return EventKind.PreimageInvalid;
         case 'PreimageMissing': return EventKind.PreimageMissing;
         case 'PreimageReaped': return EventKind.PreimageReaped;
+        case 'vote': return EventKind.DemocracyVoted;
         default: return null;
       }
     case 'treasury':

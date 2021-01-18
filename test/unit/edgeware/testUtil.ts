@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { ApiPromise } from '@polkadot/api';
 import { Option } from '@polkadot/types';
-import { IdentityJudgement } from '@polkadot/types/interfaces';
+import { IdentityJudgement, AccountVote } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { IdentityJudgement as JudgementEnum } from '../../../src/substrate/types';
 
@@ -61,12 +61,41 @@ export function constructIdentityJudgement(j: JudgementEnum): IdentityJudgement 
   return obj as unknown as IdentityJudgement;
 }
 
+export function constructAccountVote(
+  isAye: boolean,
+  conviction: number,
+  balance: string,
+  isSplit = false,
+): AccountVote {
+  if (isSplit) {
+    return { isSplit: true, asSplit: {}, isStandard: false } as AccountVote;
+  } else {
+    return {
+      isSplit: false,
+      isStandard: true,
+      asStandard: {
+        balance,
+        vote: {
+          isAye,
+          isNay: !isAye,
+          conviction: {
+            index: conviction,
+          }
+        }
+      }
+    } as unknown as AccountVote;
+  }
+}
+
 export function constructFakeApi(
   callOverrides: { [name: string]: (...args: any[]) => Promise<any> }
 ): ApiPromise {
   // TODO: auto-multi everything here
   const identityOf = function (...args) { return callOverrides['identityOf'](...args); };
   identityOf.multi = callOverrides['identityOfMulti'];
+
+  const proposals = function (...args) { return callOverrides['treasuryProposals'](...args); };
+  proposals.multi = callOverrides['treasuryProposalsMulti'];
 
   return {
     createType: (name, value) => value,
@@ -118,10 +147,15 @@ export function constructFakeApi(
         electionRounds: callOverrides['electionRounds'],
       },
       treasury: {
-        proposals: callOverrides['treasuryProposals'],
+        proposals,
+        approvals: callOverrides['treasuryApprovals'],
+        proposalCount: callOverrides['treasuryProposalCount'],
       },
       council: {
-        voting: callOverrides['voting'],
+        voting: {
+          multi: callOverrides['votingMulti'],
+        },
+        proposals: callOverrides['collectiveProposals'],
         proposalOf: callOverrides['collectiveProposalOf'],
       },
       signaling: {

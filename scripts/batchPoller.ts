@@ -1,4 +1,4 @@
-import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 import { ApiPromise } from '@polkadot/api';
 import { LogGroupControlSettings } from 'typescript-logging';
 import {
@@ -109,10 +109,6 @@ function main() {
 
   if (!url) throw new Error(`no url for chain ${chain}`);
   if (chainSupportedBy(chain, SubstrateEvents.Types.EventChains)) {
-    // TODO: update this for Beresheet
-    const spec = chain === 'edgeware-local' ? dev
-      : chain === 'edgeware-testnet' ? Beresheet
-        : chain === 'edgeware' ? Mainnet : {};
     SubstrateEvents.createApi(url, spec).then(async (api) => {
       await batchQuery(api, [ new StandaloneEventHandler() ]);
       process.exit(0);

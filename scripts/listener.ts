@@ -1,30 +1,37 @@
 import * as yargs from 'yargs';
 
-import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
+import { spec as EdgewareSpec } from '@edgeware/node-types';
 import {
-  chainSupportedBy, IEventHandler, CWEvent, SubstrateEvents, MolochEvents, EventSupportingChains
+  chainSupportedBy, IEventHandler, CWEvent, SubstrateEvents, MarlinEvents, MolochEvents, EventSupportingChains
 } from '../dist/index';
 
-const networks = {
+const networkUrls = {
   'edgeware': 'ws://mainnet1.edgewa.re:9944',
   'edgeware-local': 'ws://localhost:9944',
   'edgeware-testnet': 'wss://beresheet1.edgewa.re',
   'kusama': 'wss://kusama-rpc.polkadot.io',
   'polkadot': 'wss://rpc.polkadot.io',
   'kulupu': 'ws://rpc.kulupu.corepaper.org/ws',
+  'stafi': 'wss://scan-rpc.stafi.io/ws',
 
   'moloch': 'wss://mainnet.infura.io/ws',
   'moloch-local': 'ws://127.0.0.1:9545',
+
+  'marlin': 'wss://mainnet.infura.io/ws',
+  'marlin-local': 'ws://127.0.0.1:9545',
 } as const;
 
-const specs = {
-  'dev': dev,
-  'edgeware-local': dev,
-  'beresheet': Beresheet,
-  'edgeware-testnet': Beresheet,
-  'mainnet': Mainnet,
-  'edgeware': Mainnet,
-  'none': {},
+const networkSpecs = {
+  'edgeware': EdgewareSpec,
+  'edgeware-local': EdgewareSpec,
+  'edgeware-testnet': EdgewareSpec,
+  'stafi': {
+    types: {
+      ChainId: 'u8',
+      DepositNonce: 'u64',
+      ResourceId: '[u8; 32]',
+    }
+  }
 }
 
 const contracts = {
@@ -38,11 +45,6 @@ const argv = yargs.options({
     choices: EventSupportingChains,
     demandOption: true,
     description: 'chain to listen on',
-  },
-  spec: {
-    alias: 's',
-    choices: ['dev', 'beresheet', 'mainnet', 'none'] as const,
-    description: 'edgeware spec to use'
   },
   url: {
     alias: 'u',
@@ -78,9 +80,8 @@ const archival: boolean = argv.archival;
 // if running in archival mode then which block shall we star from
 const startBlock: number = argv.startBlock? argv.startBlock: 0;
 const network = argv.network;
-// if running archival mode, the archival node requires mainnet specs
-const spec = specs[argv.spec] || archival == true? specs['mainnet']:specs[network] || {};
-const url: string = argv.url || networks[network];
+const url: string = argv.url || networkUrls[network];
+const spec = networkSpecs[network] || {};
 const contract: string | undefined = argv.contractAddress || contracts[network];
 
 class StandaloneEventHandler extends IEventHandler {
@@ -110,7 +111,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       verbose: true,
     });
   });
-} else if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
+} else if (chainSupportedBy(network, MolochEvents.Types.EventChains)) {
   const contractVersion = 1;
   if (!contract) throw new Error(`no contract address for ${network}`);
   MolochEvents.createApi(url, contractVersion, contract).then((api) => {
@@ -122,5 +123,20 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       skipCatchup,
       verbose: true,
     });
+  })
+} else if (chainSupportedBy(network, MarlinEvents.Types.EventChains)) {
+  const contracts = {
+    comp: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // TESTNET
+    governorAlpha: '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff', // TESTNET
+    timelock: '0x7d89D52c464051FcCbe35918cf966e2135a17c43'  // TESTNET
+  };
+  MarlinEvents.createApi(url, contracts).then((api) => {
+    MarlinEvents.subscribeEvents({
+      chain: network,
+      api,
+      handlers: [ new StandaloneEventHandler() ],
+      skipCatchup,
+      verbose: true,
+    })
   })
 }

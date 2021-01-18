@@ -28,13 +28,10 @@ export async function createApi(
   if (unsubscribe) unsubscribe();
 
   // construct API using provider
-  const registry = new TypeRegistry();
-  const api = new ApiPromise({
+  return ApiPromise.create({
     provider,
-    registry,
     ...typeOverrides
   });
-  return api.isReady;
 }
 
 /**

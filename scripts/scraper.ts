@@ -1,4 +1,4 @@
-import { Mainnet, Beresheet, dev } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 import { chainSupportedBy, SubstrateEvents, EventSupportingChains, SubstrateTypes } from '../dist/index';
 import { Registration } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
@@ -22,10 +22,6 @@ const url = networks[chain];
 
 if (!url) throw new Error(`no url for chain ${chain}`);
 if (chainSupportedBy(chain, SubstrateEvents.Types.EventChains)) {
-  // TODO: update this for Beresheet
-  const spec = chain === 'edgeware-local' ? dev
-    : chain === 'edgeware-testnet' ? Beresheet
-      : chain === 'edgeware' ? Mainnet : {};
   SubstrateEvents.createApi(url, spec).then(async (api) => {
     const subscriber = new SubstrateEvents.Subscriber(api);
     const identities = {};
