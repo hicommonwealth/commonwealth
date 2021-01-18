@@ -22,9 +22,11 @@
 }
 
 .CommunitySelectList {
-    left: $quick-switcher-width - 4px !important;
+    transform: none !important; // override any scrolling effects
+    left: $quick-switcher-width !important;
     @include sm-max {
         left: 0 !important;
+        top: 60px !important;
     }
     .cui-popover-content {
         max-height: 100vh;

@@ -1,4 +1,4 @@
-import 'components/sidebar/index.scss';
+import 'components/sidebar/mobile.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -33,6 +33,7 @@ const MobileSidebar: m.Component<{}, { open: boolean }> = {
           class: 'MobileSidebarPopoverMenu',
           transitionDuration: 0,
           closeOnContentClick: true,
+          closeOnOutsideClick: true,
           inline: true,
           trigger: m(Button, {
             class: 'mobile-sidebar-trigger',
@@ -54,7 +55,7 @@ const MobileSidebar: m.Component<{}, { open: boolean }> = {
         class: `${app.isLoggedIn() ? 'logged-in' : ''} `
           + `${((app.chain || app.community) && !app.chainPreloading) ? '' : 'no-community'}`,
       }, [
-        m('.community-label', m(CommunitySelector)),
+        m('.community-label', m(CommunitySelector, { showTextLabel: true })),
       ]),
       m('.mobile-sidebar-right', [
         app.isLoggedIn() && m(NotificationsMenu, { small: false }),
