@@ -194,9 +194,17 @@ function generateBuckets(v, bucketCount, jumpIdx, recentBlockNum) {
   const bucket = new Array(bucketCount).fill(0);
   const bk = [];
   buildBucketKeys(bk, bucket, recentBlockNum, jumpIdx);
-  Object.keys(v).forEach((vk) => {
-    addInDesiredBucket(bucketCount, recentBlockNum, bucket, jumpIdx, v, vk);
-  });
+  try {
+    if (v) {
+      Object.keys(v).forEach((vk) => {
+        addInDesiredBucket(bucketCount, recentBlockNum, bucket, jumpIdx, v, vk);
+      });
+    } else {
+      console.log('Empty bucket value found');
+    }
+  } catch (e) {
+    console.warn('unable to create bucket: ', e);
+  }
   return {
     'key': bk,
     'value': bucket
@@ -213,7 +221,6 @@ async function assignApiValues(route, obj: IGraphData, addr, latestBlock) {
       startDate: _startDate,
       endDate: _endDate
     });
-    console.log('assignApiValues', { route, apiRes });
     const bucket = generateBuckets(apiRes.result[addr],
       numBuckets,
       bucketSize,

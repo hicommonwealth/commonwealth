@@ -159,7 +159,8 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
         && !vnode.state.dynamic.validators) {
       vnode.state.dynamic.validators = {};
       (app.chain as Substrate).staking.validators.pipe(first()).subscribe((val) => {
-        vnode.state.dynamic.validators = val;
+        const q = val;
+        vnode.state.dynamic.validators = (Object.keys(q).map((d) => { return { address:d, ...q[d], state: 'Active', dataFetched: true }; })) as any;
       });
     }
     let vComponents = [];

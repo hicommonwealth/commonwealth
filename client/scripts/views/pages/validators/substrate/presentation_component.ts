@@ -70,6 +70,18 @@ const initFirstLaunch = async (vnode, stkcon: StakingController) => {
   fetchMissingDataForVisibleRecord(model.selectedState === 0 ? 'Active' : 'Waiting', vnode.attrs.validators, stkcon);
 };
 
+const sortValidators = (a, b) => {
+  const sortkey = model.sortKey;
+  const key = sortkey === 'exposure.total' ? (q) => +q?.exposure?.total
+    : (sortkey === 'otherTotal' ? (q) => (Number(q?.exposure?.total) - q?.exposure?.own)
+      : (sortkey === 'commissionPer' ? (q) => q?.commissionPer
+        : (sortkey === 'eraPoints' ? (q) => q?.eraPoints
+          : (q) => 0)));
+  const a1 = key(a);
+  const b1 = key(b);
+  return model.sortAsc ? a1 - b1 : b1 - a1;
+};
+
 export const PresentationComponent_: m.Component<{ validators, valCount }, { firstLoad: boolean }> = {
   view: (vnode) => {
     const refreshTableVals = () => {
@@ -165,6 +177,7 @@ export const PresentationComponent_: m.Component<{ validators, valCount }, { fir
             vnode.attrs.validators
               .filter((q) => q.visible && (model.selectedState === 0 && q.state === 'Active'))
               // total.sort((a, b) => (((+a.exposure?.total) - (b.exposure?.total))))
+              .sort(sortValidators)
               .map((validator) => {
                 // console.log("validator.exposure ===== ", validator.exposure, validator.stash)
                 // total stake
@@ -184,7 +197,7 @@ export const PresentationComponent_: m.Component<{ validators, valCount }, { fir
                 const otherTotal = chain.chain.coins(Number(validator.exposure?.total) - validator.exposure?.own);
                 const commission = validator?.commissionPer;
                 const apr = validator?.apr;
-                const name = validator?.name;
+                // const name = validator?.name;
                 const rewardStats = validator?.rewardStats;
                 const slashesStats = validator?.slashesStats;
                 const offencesStats = validator?.offencesStats;

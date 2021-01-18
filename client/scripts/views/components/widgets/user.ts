@@ -89,17 +89,17 @@ const User: m.Component<{
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
+        /* (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
           // substrate name
-          ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
-            // non-substrate name
-            linkify
-              ? link(`a.user-display-name${(profile && profile.displayName !== 'Anonymous')
-                ? '.username' : '.anonymous'}`,
-              profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-              profile ? formatToSize(profile.displayName.toString(), 13) : '--')
-              : m('a.user-display-name.username', profile ? formatToSize(profile.displayName.toString(), 13) : '--')
-          ],
+          ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon }) : */ [
+          // non-substrate name
+          linkify
+            ? link(`a.user-display-name${(profile && profile.displayName !== 'Anonymous')
+              ? '.username' : '.anonymous'}`,
+            profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+            profile ? formatToSize(profile.displayName.toString(), 13) : '--')
+            : m('a.user-display-name.username', profile ? formatToSize(profile.displayName.toString(), 13) : '--')
+        ],
         showRole && roleTag,
       ]);
 
