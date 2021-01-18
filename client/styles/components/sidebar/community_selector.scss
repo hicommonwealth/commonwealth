@@ -27,6 +27,7 @@
     @include sm-max {
         left: 0 !important;
         top: 60px !important;
+        overflow-y: scroll;
     }
     .cui-popover-content {
         max-height: 100vh;
@@ -35,6 +36,7 @@
         @include xs-max {
             margin: 0 10px;
             width: calc(100vw - 20px);
+            max-height: calc(100vh - 70px);
         }
     }
     .cui-menu {
