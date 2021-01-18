@@ -100,8 +100,10 @@ const Sublayout: m.Component<{
         m('.Sublayout', { class: vnode.attrs.class }, [
           m(MobileSidebarHeader),
           m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
-            sublayoutHeaderLeft,
-            sublayoutHeaderRight,
+            m('.sublayout-header-inner', [
+              sublayoutHeaderLeft,
+              sublayoutHeaderRight,
+            ]),
           ]),
           m('.sublayout-body', [
             m('.sublayout-grid', [

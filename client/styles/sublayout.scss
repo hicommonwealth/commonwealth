@@ -2,27 +2,21 @@
 
 .Sublayout {
     display: block;
-    padding: 0 48px 0 36px;
-    @include sm-max {
-        padding: 0 30px;
-    }
-    @include xs-max {
-        padding: 0 22px;
-    }
 
     .sublayout-grid {
         position: relative;
         display: flex;
         margin: 0 auto;
-        max-width: $layout-max-width;
         min-height: calc(100vh - 150px);
+        max-width: $layout-max-width;
+        padding: 0 $layout-padding;
     }
     .sublayout-sidebar-col {
         flex: 1;
         padding-right: 30px;
-        max-width: 240px;
+        max-width: $sidebar-width;
         .Sidebar {
-            max-width: 180px;
+            max-width: 180px; // sidebar button width
         }
     }
     @include sm-max {
@@ -37,7 +31,14 @@
     }
     .sublayout-main-col {
         flex: 3;
-        width: calc(100% - 220px);
+        padding: 0;
+        max-width: $layout-max-width - $sidebar-width;
+        @include sm-max {
+            padding: 0 30px;
+        }
+        @include xs-max {
+            padding: 0 22px;
+        }
     }
     .hide-sidebar & {
         .sublayout-main-col {
@@ -51,12 +52,18 @@
     }
 
     .sublayout-header {
-        display: flex;
         @include sm-max {
             display: none;
         }
-        max-width: $layout-max-width;
-        margin: 28px auto 8px;
+        margin: 0 auto 12px;
+        border-bottom: 1px solid #eee;
+        padding: 24px 0 22px;
+        .sublayout-header-inner {
+            display: flex;
+            max-width: $layout-max-width;
+            padding: 0 $layout-padding;
+            margin: 0 auto;
+        }
 
         .sublayout-header-left {
             flex: 3;
@@ -105,6 +112,6 @@
     .sublayout-body {
         position: relative;
         min-height: calc(100vh - 140px);
-        padding: 1px;
+        padding: 1px 0; // prevent margins from flowing outside the container
     }
 }
