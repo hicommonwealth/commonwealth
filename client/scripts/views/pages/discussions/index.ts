@@ -21,6 +21,7 @@ import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
+import CreateInviteModal from 'views/modals/create_invite_modal';
 
 import { DEFAULT_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
@@ -330,6 +331,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
       .map((name, idx) => getTopicRow(featuredTopics[name].id, name, featuredTopics[name].description));
 
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
+    });
 
     return m(Sublayout, {
       class: 'DiscussionsPage',
@@ -369,7 +374,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
           }),
       ] : [
         'Discussions',
-        app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+        (isAdmin || isMod || app.community?.meta.invitesEnabled)
           && m(PopoverMenu, {
             class: 'sidebar-edit-topic',
             position: 'bottom',
@@ -381,20 +386,36 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               style: 'margin-left: 6px;',
             }),
             content: [
-              m(MenuItem, {
+              isAdmin && m(MenuItem, {
                 label: 'New topic',
                 onclick: (e) => {
                   e.preventDefault();
                   app.modals.create({ modal: NewTopicModal });
                 }
               }),
-              m(MenuItem, {
+              (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
+                label: 'Invite members',
+                onclick: (e) => {
+                  e.preventDefault();
+                  const data = app.activeCommunityId()
+                    ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain };
+                  app.modals.create({
+                    modal: CreateInviteModal,
+                    data,
+                  });
+                },
+              }),
+              isAdmin && m(MenuItem, {
                 label: 'Manage community',
                 onclick: (e) => {
                   e.preventDefault();
                   app.modals.create({ modal: ManageCommunityModal });
                 }
-              })
+              }),
+              (isAdmin || isMod) && m(MenuItem, {
+                label: 'Community analytics',
+                onclick: (e) => m.route.set(`/${app.activeId() || 'edgeware'}/communityStats`),
+              }),
             ],
           }),
       ],
