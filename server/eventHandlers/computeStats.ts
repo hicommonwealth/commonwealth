@@ -93,10 +93,6 @@ export const getAPR = async (chain: String, event: String, stash: string, noOfDa
     (total, totalStake) => Number(total) + Number(totalStake.event_data.activeExposures[stash].total), 0
   ) / sessionEvents.length;
 
-  const ownAmountAvg = sessionEvents.reduce(
-    (total, ownAmount) => Number(total) + Number(ownAmount.event_data.activeExposures[stash].own), 0
-  ) / sessionEvents.length;
-
   const computedAPR = (1 - commissionsAvg / 100)
     * (rewardAmountAvg / (+stakeAmountAvg))
     * (365 * (24 / 6)) * 100; // number of periods in year

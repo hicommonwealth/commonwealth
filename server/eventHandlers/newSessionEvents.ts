@@ -36,8 +36,9 @@ export default class extends IEventHandler {
     });
 
 
-    // Directly mark all validators as "Inactive" in the database those are not in new-session's active and waiting list.
-    const updateOlderValidators = await this._models.Validator.update(
+    // Directly mark all validators as "Inactive" in the database those are not 
+    // in new-session's active and waiting list.
+    await this._models.Validator.update(
       { state: 'Inactive' },
       {
         where: {
