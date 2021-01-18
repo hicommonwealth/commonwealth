@@ -25,7 +25,7 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
       onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
         type: ProposalType.CosmosProposal
       }),
-      label: 'New proposal'
+      label: 'New text proposal'
     }),
     app.chain?.base === ChainBase.Substrate && app.chain?.class === ChainClass.Edgeware && m(MenuItem, {
       onclick: () => { m.route.set(`/${app.chain.id}/new/signaling`); },
@@ -107,7 +107,6 @@ const NewProposalButton: m.Component<{
       return m(Button, {
         class: 'NewProposalButton',
         label: 'New thread',
-        intent: 'primary',
         fluid,
         disabled: !app.user.activeAccount,
         onclick: () => app.modals.create({ modal: NewThreadModal }),
@@ -125,7 +124,6 @@ const NewProposalButton: m.Component<{
         trigger: m(Button, {
           disabled: !app.user.activeAccount,
           label: 'New thread',
-          intent: 'primary',
         }),
         position: 'bottom-end',
         closeOnContentClick: true,
@@ -136,7 +134,6 @@ const NewProposalButton: m.Component<{
       }),
       m(Button, {
         disabled: !app.user.activeAccount,
-        intent: 'primary',
         iconLeft: Icons.EDIT,
         fluid,
         onclick: () => app.modals.create({ modal: NewThreadModal }),

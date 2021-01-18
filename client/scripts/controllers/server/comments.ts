@@ -9,6 +9,8 @@ import { CommentsStore } from 'stores';
 import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from '../app/login';
+import { Moment } from 'moment';
+import { VersionHistory } from './threads';
 // tslint:disable: object-literal-key-quotes
 
 export enum CommentParent {
@@ -37,6 +39,7 @@ export const modelFromServer = (comment) => {
     comment.chain,
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
+    comment.plaintext,
     comment.version_history,
     attachments,
     proposal,
@@ -49,7 +52,6 @@ export const modelFromServer = (comment) => {
     comment?.Address?.chain || comment.authorChain,
   );
 };
-
 
 class CommentsController {
   private _store: CommentsStore = new CommentsStore();
@@ -102,7 +104,10 @@ class CommentsController {
     attachments?: string[], mentions?: string[]
   ) {
     const timestamp = moment();
-    const firstVersion : any = { timestamp, body: unescapedText };
+    const firstVersion : VersionHistory = {
+      timestamp,
+      body: unescapedText
+    };
     const versionHistory : string = JSON.stringify(firstVersion);
     try {
       // TODO: Change to POST /comment
@@ -121,7 +126,6 @@ class CommentsController {
       });
       const { result } = res;
       this._store.add(modelFromServer(result));
-      app.recentActivity.addAddressesFromActivity([result]);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
@@ -141,7 +145,7 @@ class CommentsController {
 
   public async edit(comment: OffchainComment<any>, body?: string, attachments?: string[]) {
     const newBody = body || comment.text;
-    const recentEdit : any = { timestamp: moment(), body };
+    const recentEdit : VersionHistory = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
     try {
       // TODO: Change to PUT /comment
@@ -180,8 +184,6 @@ class CommentsController {
       }).then((result) => {
         const existing = this._store.getById(comment.id);
         this._store.remove(existing);
-        // Properly removing from recent activity will require comments/threads to have an address_id
-        // app.recentActivity.removeAddressActivity([comment]);
         resolve(result);
       }).catch((e) => {
         console.error(e);

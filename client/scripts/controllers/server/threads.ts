@@ -6,16 +6,29 @@ import $ from 'jquery';
 
 import app from 'state';
 import { ProposalStore, TopicScopedThreadStore } from 'stores';
-import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo, OffchainTopic } from 'models';
+import {
+  OffchainThread,
+  OffchainAttachment,
+  CommunityInfo,
+  NodeInfo,
+  OffchainTopic,
+  Profile
+} from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
+import { Moment } from 'moment';
+import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+
+export const DEFAULT_PAGE_SIZE = 20;
+export const MAX_PAGE_SIZE = 50;
 
 export const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
+
   return new OffchainThread(
     thread.Address.address,
     decodeURIComponent(thread.title),
@@ -29,9 +42,11 @@ export const modelFromServer = (thread) => {
     thread.chain,
     thread.read_only,
     decodeURIComponent(thread.body),
+    thread.plaintext,
     thread.url,
     thread.Address.chain,
     thread.pinned,
+    thread.collaborators
   );
 };
 
@@ -61,6 +76,12 @@ to the listingStore, since they do not belong in the listing component, and thei
 would break the listingStore's careful chronology.
 
 */
+
+export interface VersionHistory {
+  author?: Profile;
+  timestamp: Moment;
+  body: string;
+}
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
@@ -96,12 +117,16 @@ class ThreadsController {
     url?: string,
     attachments?: string[],
     mentions?: string[],
-    readOnly?: boolean
+    readOnly?: boolean,
   ) {
     const timestamp = moment();
-    const firstVersion : any = { timestamp, body };
+    const author = app.user.activeAccount.profile;
+    const firstVersion : VersionHistory = {
+      author,
+      timestamp,
+      body,
+    };
     const versionHistory : string = JSON.stringify(firstVersion);
-
     try {
       // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {
@@ -123,21 +148,10 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
       this._listingStore.add(result, storeOptions);
-      app.recentActivity.addThreads([{
-        id: response.result.id,
-        Address: response.result.Address,
-        title: response.result.title,
-        created_at: response.result.created_at,
-        community: response.result.community,
-        chain: response.result.chain,
-        topic: response.result.topic,
-        pinned: response.result.pinned,
-        url: response.result.pinned
-      }]);
-      app.recentActivity.addAddressesFromActivity([response.result]);
       const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited(app.activeCommunityId()
         ? (activeEntity.meta as CommunityInfo)
@@ -158,7 +172,11 @@ class ThreadsController {
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
-    const recentEdit : any = { timestamp: moment(), body };
+    const recentEdit : VersionHistory = {
+      author: app.user.activeAccount.profile,
+      timestamp: moment(),
+      body
+    };
     const versionHistory = JSON.stringify(recentEdit);
     await $.ajax({
       url: `${app.serverUrl()}/editThread`,
@@ -198,9 +216,6 @@ class ThreadsController {
         // Deleted posts are removed from all stores containing them
         this.store.remove(proposal);
         this._listingStore.remove(proposal);
-        app.recentActivity.removeThread(proposal.id, proposal.community || proposal.chain);
-        // Properly removing from recent activity will require comments/threads to have an address_id
-        // app.recentActivity.removeAddressActivity([proposal]);
         m.redraw();
         resolve(result);
       }).catch((e) => {
@@ -284,8 +299,8 @@ class ThreadsController {
     const { chainId, communityId, cutoffDate, topicId } = options;
     // pageSize can not exceed 50
     const pageSize = options.pageSize
-      ? Math.min(options.pageSize, 50)
-      : 20;
+      ? Math.min(options.pageSize, MAX_PAGE_SIZE)
+      : DEFAULT_PAGE_SIZE;
     const params = {
       chain: chainId,
       community: communityId,
@@ -297,7 +312,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const { threads, comments } = response.result;
+    const { threads, comments, reactions } = response.result;
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -321,6 +336,17 @@ class ThreadsController {
       }
       try {
         app.comments.store.add(modelCommentFromServer(comment));
+      } catch (e) {
+        console.error(e.message);
+      }
+    }
+    for (const reaction of reactions) {
+      const existing = app.reactions.store.getById(reaction.id);
+      if (existing) {
+        app.reactions.store.remove(existing);
+      }
+      try {
+        app.reactions.store.add(modelReactionFromServer(reaction));
       } catch (e) {
         console.error(e.message);
       }
@@ -351,7 +377,6 @@ class ThreadsController {
         // Threads that are posted in an offchain community are still linked to a chain / author address,
         // so when we want just chain threads, then we have to filter away those that have a community
         const { threads } = response.result;
-
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
           if (!thread.Address) {

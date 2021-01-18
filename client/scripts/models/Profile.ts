@@ -1,7 +1,7 @@
 import m from 'mithril';
 import jdenticon from 'jdenticon';
 
-import { formatAddressShort } from 'helpers';
+import { formatAddressShort } from '../../../shared/utils';
 
 class Profile {
   private _name: string;
@@ -11,6 +11,9 @@ class Profile {
   private _initialized: boolean;
   private _judgements: { [registrar: string]: string } = {};
   private _isOnchain: boolean = false;
+  private _lastActive: Date;
+  private _isCouncillor: boolean = false;
+  private _isValidator: boolean = false;
   get name() { return this._name; }
   get headline() { return this._headline; }
   get bio() { return this._bio; }
@@ -18,6 +21,9 @@ class Profile {
   get initialized() { return this._initialized; }
   get judgements() { return this._judgements; }
   get isOnchain() { return this._isOnchain; }
+  get lastActive() { return this._lastActive; }
+  get isCouncillor() { return this._isCouncillor; }
+  get isValidator() { return this._isValidator; }
 
   public readonly chain: string;
   public readonly address: string;
@@ -31,7 +37,7 @@ class Profile {
     this._initialized = true;
   }
 
-  public initializeWithChain(name, headline, bio, avatarUrl, judgements) {
+  public initializeWithChain(name, headline, bio, avatarUrl, judgements, lastActive, isCouncillor = false, isValidator = false) {
     this._initialized = true;
     this._isOnchain = true;
     this._name = name;
@@ -39,19 +45,39 @@ class Profile {
     this._bio = bio;
     this._avatarUrl = avatarUrl;
     this._judgements = judgements;
+    this._lastActive = lastActive;
+    this._isCouncillor = isCouncillor;
+    this._isValidator = isValidator;
   }
 
-  public initialize(name, headline, bio, avatarUrl) {
+  public initialize(name, headline, bio, avatarUrl, lastActive, isCouncillor = false, isValidator = false) {
     this._initialized = true;
     this._name = name;
     this._headline = headline;
     this._bio = bio;
     this._avatarUrl = avatarUrl;
+    this._lastActive = lastActive;
+    this._isCouncillor = isCouncillor;
+    this._isValidator = isValidator;
   }
 
+  // this.name() is only the user-set name, and will be blank if the
+  // user has not set an name (from within Commonwealth or by
+  // registering an on-chain identity)
+  //
+  // this.displayName() is the user-set name or the address, and
+  // this.displayNameWithAddress() is the user-set name with the address,
+  // or just the address if the user has not set a name.
   get displayName() : string {
     if (!this._initialized) return 'Loading...';
     return this.name || formatAddressShort(this.address, this.chain);
+  }
+
+  get displayNameWithAddress() : string {
+    if (!this._initialized) return 'Loading...';
+    return this.name
+      ? `${this.name} · ${formatAddressShort(this.address, this.chain)}`
+      : formatAddressShort(this.address, this.chain);
   }
 
   public getAvatar(size: number) {

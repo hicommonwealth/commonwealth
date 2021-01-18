@@ -145,7 +145,7 @@ const EdgewareChainEvents: m.Component = {
       m(EventSubscriptionTypeRow, { title: 'Signaling events', notificationTypeArray: EdgewareChainNotificationTypes.Signaling, }),
       m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: EdgewareChainNotificationTypes.Treasury, }),
       m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: EdgewareChainNotificationTypes.Validator, }),
-      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: EdgewareChainNotificationTypes.Vote, }),
+      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: EdgewareChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -158,7 +158,7 @@ const KusamaChainEvents: m.Component = {
       m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: KusamaChainNotificationTypes.Preimage, }),
       // m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: KusamaChainNotificationTypes.Treasury, }),
       m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: KusamaChainNotificationTypes.Validator, }),
-      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: KusamaChainNotificationTypes.Vote, }),
+      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: KusamaChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -171,7 +171,7 @@ const PolkadotChainEvents: m.Component = {
       m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
       // m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: PolkdotChainNotificationTypes.Treasury, }),
       m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: PolkadotChainNotificationTypes.Validator, }),
-      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: PolkadotChainNotificationTypes.Vote, }),
+      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: PolkadotChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };

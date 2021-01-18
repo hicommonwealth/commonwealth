@@ -74,18 +74,16 @@ const model: IModel = {
     const controllerId = model.bonded.controller.address;
     const destination = model.bonded.payment.value;
 
-    const bondOwnTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond')(stashId, amount, destination);
-    const bondTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond')(controllerId, amount, destination);
-    const controllerTx = (app.chain as Substrate).chain.getTxMethod('staking', 'setController')(controllerId);
-    const sessionTx = (app.chain as Substrate).chain.getTxMethod('session', 'setKeys')(
-      model.key.value as any, new Uint8Array()
-    );
-    const validateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'validate')({
-      commission: commission.isZero()
-        // small non-zero set to avoid isEmpty
-        ? 1
-        : commission
-    });
+    const bondOwnTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond', [stashId, amount, destination]);
+    const bondTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond', [controllerId, amount, destination]);
+    const controllerTx = (app.chain as Substrate).chain.getTxMethod('staking', 'setController', [controllerId]);
+    const sessionTx = (app.chain as Substrate).chain.getTxMethod('session', 'setKeys', [
+      model.key.value as any, new Uint8Array()]);
+    const validateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'validate', [commission.isZero()
+    // small non-zero set to avoid isEmpty
+      ? 1
+      : commission
+    ]);
     const params = stashId === controllerId
       ? [bondTx, sessionTx, validateTx]
       : [bondOwnTx, sessionTx, validateTx, controllerTx];

@@ -34,7 +34,7 @@ const model: IModel = {
     model.nominates = selected;
   },
   bond: () => {
-    const nominateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'nominate')(model.nominates);
+    const nominateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'nominate', [model.nominates]);
     const txFunc = (model.stash as any as SubstrateAccount).batchTx([nominateTx]);
     txFunc.cb = model.txCallback;
     openTXModal(txFunc);

@@ -87,6 +87,8 @@ export interface IApp {
   _lastNavigatedFrom: string;
   lastNavigatedBack(): boolean;
   lastNavigatedFrom(): string;
+
+  cachedIdentityWidget: any; // lazy loaded substrate identity widget
 }
 
 const app: IApp = {
@@ -142,6 +144,8 @@ const app: IApp = {
   _lastNavigatedBack: false,
   lastNavigatedBack: () => app._lastNavigatedBack,
   lastNavigatedFrom: () => app._lastNavigatedFrom,
+
+  cachedIdentityWidget: null,
 };
 
 export default app;

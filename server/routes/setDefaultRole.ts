@@ -32,6 +32,9 @@ const setDefaultRole = async (models, req, res: Response, next: NextFunction) =>
   } });
   if (!existingRole) return next(new Error(Errors.RoleDNE));
 
+  validAddress.last_active = new Date();
+  await validAddress.save();
+
   const otherAddresses = await models.Address.findAll({
     where: {
       id: { [Sequelize.Op.ne]: validAddress.id },

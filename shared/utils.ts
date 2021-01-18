@@ -55,7 +55,8 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
   const lines = [];
   for (const node of nodes) {
     if (typeof node.insert === 'string') {
-      node.insert.match(/[^\n]+\n?|\n/g).forEach((line) => {
+      const matches = node.insert.match(/[^\n]+\n?|\n/g);
+      (matches || []).forEach((line) => {
         lines.push({ attributes: node.attributes, insert: line });
       });
     } else {
@@ -111,3 +112,16 @@ export const renderQuillDeltaToText = (delta, paragraphSeparator = '\n\n') => {
     }).filter((child) => !!child).join(' ').replace(/  +/g, ' '); // remove multiple spaces
   }).filter((parent) => !!parent).join(paragraphSeparator);
 };
+
+export function formatAddressShort(address: string, chain: string) {
+  if (!address) return;
+  if (chain === 'near') {
+    return `@${address}`;
+  } else if (chain === 'straightedge') {
+    return `${address.slice(0, 9)}…`;
+  } else if (chain === 'cosmos') {
+    return `${address.slice(0, 9)}…`;
+  } else {
+    return `${address.slice(0, 5)}…`;
+  }
+}

@@ -76,13 +76,16 @@ To run the application in archival mode to poll past blocks and execute enricher
 - RUN_AS_LISTENER: run the application as event listener
 - ARCHIVAL: to instruct application to run in archival mode
 - ARCHIVAL_NODE_URL: the url of the node running in archival mode
+- ARCHIVAL_CHAIN: Name of the chain, for which is to be executed in archival mode.
 - START_BLOCK: block from which you want to start archival node from. By default its set to 0
+
 
 ## Production Database
 
 To download and restore the production database, and run migrations:
 
 ```
+nvm use
 heroku pg:backups:capture -a commonwealthapp
 heroku pg:backups:download -a commonwealthapp
 brew services restart postgres     # For Mac OS X restart the database to close any open connections
@@ -139,6 +142,7 @@ We also use certain environment variables to configure the application itself:
 - CHAIN_EVENTS: select chains for event listening. Must be "all", "none", or a comma-separated list of chains (e.g. "edgeware,edgeware-local")
 - NO_EVENTS: disable chain-event functionality entirely
 - NO_CLIENT: set to true to disable the front-end build
+=======
 
 ## Migrations
 

@@ -65,7 +65,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
   public async initData() {
     await this.chain.initEventLoop();
     await this.governance.init(this.chain, this.accounts);
-    await super.initData(this.usingServerChainEntities);
+    await super.initData();
   }
 
   public async deinit() {

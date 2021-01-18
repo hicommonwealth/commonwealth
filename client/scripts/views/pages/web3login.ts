@@ -14,7 +14,7 @@ const Web3LoginPage: m.Component<{}> = {
     const joiningChain = m.route.param('joiningChain');
     // oops! = address linking interrupted
     const loginCopy = loggingInWithAddress ? 'Login interrupted' : (joiningCommunity || joiningChain)
-      ? 'Oops! Login error' : app.isLoggedIn() ? 'Oops! Login error' : 'Login interrupted';
+      ? 'Oops! An error occurred' : app.isLoggedIn() ? 'Oops! An error occurred' : 'Login interrupted';
 
     return m(Sublayout, {
       class: 'Web3LoginPage',

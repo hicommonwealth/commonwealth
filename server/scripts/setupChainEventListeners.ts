@@ -2,12 +2,9 @@ import WebSocket from 'ws';
 import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, chainSupportedBy
+  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
-
-import { createApi, subscribeEvents } from '/home/myym/Desktop/Github/chain-events/src/substrate/subscribeFunc';
-
-import { Mainnet } from '@edgeware/node-types';
+import { spec as EdgewareSpec } from '@edgeware/node-types';
 
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
@@ -20,11 +17,14 @@ import BondHandler from '../eventHandlers/bondEvents';
 import ImOnlineHandler from '../eventHandlers/imOnlineEvents';
 import OffenceHandler from '../eventHandlers/offenceEvents';
 import HeartbeatHandler from '../eventHandlers/heartbeatEvents';
+
+import UserFlagsHandler from '../eventHandlers/userFlags';
+import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
-import { updateChainEventStatus, deleteOldHistoricalValidatorsStats }  from './../util/archivalNodeHelpers';
+import { updateChainEventStatus, deleteOldHistoricalValidatorsStats }  from '../util/archivalNodeHelpers';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -58,11 +58,14 @@ const setupChainEventListeners = async (
   await sequelize.authenticate();
   const nodes: ChainNodeInstance[] = [];
   if (chains === 'all') {
-    const n = (await Promise.all(EventSupportingChains.map((c) => {return models.ChainNode.findOne({ where: { chain: c } });
+    const n = (await Promise.all(EventSupportingChains.map((c) => {
+      return models.ChainNode.findOne({ where: { chain: c } });
     }))).filter((c) => !!c);
     nodes.push(...n);
   } else if (chains !== 'none') {
-    const n = (await Promise.all(EventSupportingChains.filter((c) => chains.includes(c)).map((c) => {
+    const n = (await Promise.all(EventSupportingChains
+      .filter((c) => chains.includes(c))
+      .map((c) => {
         return models.ChainNode.findOne({ where: { chain: c } });
       })))
       .filter((c) => !!c);
@@ -71,7 +74,6 @@ const setupChainEventListeners = async (
     log.info('No event listeners configured.');
     return {};
   }
-
   if (nodes.length === 0) {
     log.info('No event listeners found.');
     return {};
@@ -80,17 +82,15 @@ const setupChainEventListeners = async (
   // Read the archival node url and archival chain name from env
   const ARCHIVAL_NODE_URL = process.env.ARCHIVAL_NODE_URL;
   const ARCHIVAL_CHAIN = process.env.ARCHIVAL_CHAIN;
- 
+
 
   log.info('Setting up event listeners...');
   const subscribers = await Promise.all(nodes.map(async (node) => {
     const excludedEvents = [
+
       SubstrateTypes.EventKind.TreasuryRewardMinting,
       SubstrateTypes.EventKind.TreasuryRewardMintingV2,
     ];
-    const storageHandler = new EventStorageHandler(models, node.chain, excludedEvents);
-    const notificationHandler = new EventNotificationHandler(models, wss);
-    const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
     const newSessionHandler = new NewSessionHandler(models, node.chain);
     const rewardHandler = new RewardHandler(models, node.chain);
     const slashHandler = new SlashHandler(models, node.chain);
@@ -98,11 +98,39 @@ const setupChainEventListeners = async (
     const imOnlineHandler = new ImOnlineHandler(models, node.chain);
     const offenceHandler = new OffenceHandler(models, node.chain);
     const heartbeatHandler = new HeartbeatHandler(models, node.chain);
+
+
+    // writes events into the db as ChainEvents rows
+    const storageHandler = new EventStorageHandler(models, node.chain, excludedEvents);
+
+    // emits notifications by writing into the db's Notifications table, and also optionally
+    // sending a notification to the client via websocket
+    const excludedNotificationEvents = [
+      SubstrateTypes.EventKind.DemocracyTabled,
+    ];
+    const notificationHandler = new EventNotificationHandler(models, wss, excludedNotificationEvents);
+
+    // creates and updates ChainEntity rows corresponding with entity-related events
+    const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, wss);
+
+    // creates empty Address and OffchainProfile models for users who perform certain
+    // actions, like voting on proposals or registering an identity
+    const profileCreationHandler = new ProfileCreationHandler(models, node.chain);
+
+    // populates identity information in OffchainProfiles when received (Substrate only)
     const identityHandler = new IdentityHandler(models, node.chain);
+
+    // populates is_validator and is_councillor flags on Addresses when validator and
+    // councillor sets are updated (Substrate only)
+    const userFlagsHandler = new UserFlagsHandler(models, node.chain);
+
+    // the set of handlers, run sequentially on all incoming chain events
+
     const handlers: IEventHandler[] = [
       storageHandler,
       notificationHandler,
       entityArchivalHandler,
+      profileCreationHandler,
       newSessionHandler,
       heartbeatHandler,
       rewardHandler,
@@ -114,60 +142,59 @@ const setupChainEventListeners = async (
 
     let subscriber: IEventSubscriber<any, any>;
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
-      
       // if running in archival mode and we are supposed to execute archival mode for the chain
-      // then first execute the archival mode using the ARCHIVAL_NODE_URL provided in env  
-      // and syncup with the head of the chain and then use the URL for the chain provided in db 
-      // and use it to subscribe to head of the chain to continue normal execution. 
-      if ( archival && node.chain == ARCHIVAL_CHAIN ) {
-        // Sample Events list for update record in ChainEvents and HistoricalValidatorsStats tables 
-        const eventList = ["all-good","bonded","new-session","offences-offence","reward","slash","some-offline","unbonded"]
-        const chainEventRecordsUpdated = await updateChainEventStatus(models, startBlock, node.chain, eventList, "inactive");
+      // then first execute the archival mode using the ARCHIVAL_NODE_URL provided in env
+      // and syncup with the head of the chain and then use the URL for the chain provided in db
+      // and use it to subscribe to head of the chain to continue normal execution.
+      if (archival && node.chain == ARCHIVAL_CHAIN) {
+        // Sample Events list for update record in ChainEvents and HistoricalValidatorsStats tables
+        const eventList = ['all-good', 'bonded', 'new-session', 'offences-offence', 'reward', 'slash', 'some-offline', 'unbonded'];
+        const chainEventRecordsUpdated = await updateChainEventStatus(models, startBlock, node.chain, eventList, 'inactive');
         const historicalValidatorsStatsDeleted = await deleteOldHistoricalValidatorsStats(models, startBlock, node.chain);
 
-        if (chainEventRecordsUpdated) console.info("Records has beed updated in ChainEvents table");
-        if (historicalValidatorsStatsDeleted) console.info("Records has beed deleted in HistoricalValidatorsStats table")
+        if (chainEventRecordsUpdated) console.info('Records has beed updated in ChainEvents table');
+        if (historicalValidatorsStatsDeleted) console.info('Records has beed deleted in HistoricalValidatorsStats table');
 
         // handlers needed for staking ui
-          const _handlers: IEventHandler[] = [
-            storageHandler,
-            newSessionHandler,
-            heartbeatHandler,
-            rewardHandler,
-            slashHandler,
-            offenceHandler,
-            bondHandler,
-            imOnlineHandler
-          ];
-        
+        const _handlers: IEventHandler[] = [
+          storageHandler,
+          newSessionHandler,
+          heartbeatHandler,
+          rewardHandler,
+          slashHandler,
+          offenceHandler,
+          bondHandler,
+          imOnlineHandler
+        ];
+
 
         // mark all the events in ChaineEvents db for the archival_chain >= provided blockNumber as INACTIVE
-      // await changeChainEventStatus('INACTIVE', chain, eventsList, blockNumber,)
+        // await changeChainEventStatus('INACTIVE', chain, eventsList, blockNumber,)
 
-      const nodeUrl = constructSubstrateUrl(ARCHIVAL_NODE_URL);
-      const api = await SubstrateEvents.createApi(
-        nodeUrl,
-        node.chain.includes('edgeware') ? Mainnet : {},
-      );
+        const nodeUrl = constructSubstrateUrl(ARCHIVAL_NODE_URL);
+        const api = await SubstrateEvents.createApi(
+          nodeUrl,
+          node.chain.includes('edgeware') ? EdgewareSpec : {},
+        );
 
-      await SubstrateEvents.subscribeEvents({
-        chain: node.chain,
-        handlers,
-        skipCatchup,
-        archival,
-        startBlock,
-        discoverReconnectRange: () => discoverReconnectRange(models, ARCHIVAL_CHAIN),
-        api,
-      });
-      log.info(`Finished archival syncing for chain ${ARCHIVAL_CHAIN}...`);
-    }
+        await SubstrateEvents.subscribeEvents({
+          chain: node.chain,
+          handlers,
+          skipCatchup,
+          archival,
+          startBlock,
+          discoverReconnectRange: () => discoverReconnectRange(models, ARCHIVAL_CHAIN),
+          api,
+        });
+        log.info(`Finished archival syncing for chain ${ARCHIVAL_CHAIN}...`);
+      }
 
       // only handle identities on substrate chains
       handlers.push(identityHandler);
       const nodeUrl = constructSubstrateUrl(node.url);
       const api = await SubstrateEvents.createApi(
         nodeUrl,
-        node.chain.includes('edgeware') ? Mainnet : {},
+        node.chain.includes('edgeware') ? EdgewareSpec : {},
       );
 
       subscriber =  await SubstrateEvents.subscribeEvents({
@@ -179,8 +206,6 @@ const setupChainEventListeners = async (
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
       });
-
-
     } else if (chainSupportedBy(node.chain, MolochTypes.EventChains)) {
       const contractVersion = 1;
       const api = await MolochEvents.createApi(node.url, contractVersion, node.address);

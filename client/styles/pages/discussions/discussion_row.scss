@@ -5,12 +5,15 @@ $discussion-meta-padding: 18px;
 .DiscussionRow {
     .row-left {
         .row-header {
+            .spacer {
+                display: inline-block;
+                width: 5px;
+            }
             a.external-discussion-link {
-                .cui-icon {
-                    position: relative;
-                    top: -2px;
-                    color: #111;
-                    margin-left: 2px;
+                font-size: 17px;
+                color: $primary-bg-color;
+                &:hover {
+                    text-decoration: underline;
                 }
             }
         }
@@ -18,6 +21,9 @@ $discussion-meta-padding: 18px;
             // Styling specific to DiscussionRow subheader content
             .discussion-locked {
                 margin-right: 12px;
+                .cui-tag.cui-xs .cui-icon svg {
+                    margin-right: 0;
+                }
             }
             a.proposal-topic {
                 @include proposal-topic-inline;
@@ -56,16 +62,39 @@ $discussion-meta-padding: 18px;
                 color: $text-color-light;
                 margin-right: 12px;
             }
-            .User a {
-                display: inline-block;
+            .proposal-collaborators {
+                margin-left: 8px;
+                color: $text-color-light;
+                position: relative;
+                font-size: 17px;
+            }
+            > .User {
+                display: flex;
+                > .role-icon {
+                    position: relative;
+                    top: -1px;
+                }
+            }
+            > .User > a {
+                display: block;
                 text-decoration: none;
                 color: $text-color-light;
                 &:hover {
                     color: darken($text-color-light, 8%);
                     text-decoration: underline;
                 }
-                a.user-display-name {
-                    color: $theme-base-color;
+                > a.user-display-name {
+                    color: $primary-bg-color;
+                }
+            }
+            .row-excerpt {
+                color: $text-color-light;
+                max-width: calc(44vw - 220px);
+                @include sm-max {
+                    max-width: calc(44vw);
+                }
+                @include xs-max {
+                    max-width: calc(100vw - 120px);
                 }
             }
             .row-excerpt {

@@ -24,7 +24,6 @@ import PageLoading from 'views/pages/loading';
 import ViewVotersModal from 'views/modals/view_voters_modal';
 import { Grid, Col, Button, MenuItem } from 'construct-ui';
 import CouncilRow from './council_row';
-import ListingHeader from '../../components/listing_header';
 import Listing from '../listing';
 import ErrorPage from '../error';
 
@@ -220,12 +219,12 @@ const CouncilPage: m.Component<{}> = {
     if (!app.chain || !app.chain.loaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
-          message: 'Chain connection timed out.',
+          message: 'Could not connect to chain',
           title: 'Proposals',
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 10s)...',
+        message: 'Connecting to chain',
         title: 'Council',
         showNewProposalButton: true
       });
@@ -234,7 +233,7 @@ const CouncilPage: m.Component<{}> = {
     if (!initialized) {
       if (!(app.chain as Substrate).phragmenElections.initializing) loadCmd();
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 10s)...',
+        message: 'Connecting to chain',
         title: 'Council',
         showNewProposalButton: true
       });
@@ -298,10 +297,7 @@ const CouncilPage: m.Component<{}> = {
             ),
             m('.clear'),
           ])],
-        rightColSpacing: [0],
-        columnHeaders: [
-          'Councillors',
-        ],
+        columnHeader: 'Councillors',
       }),
       // candidates
       m(Listing, {
@@ -312,10 +308,7 @@ const CouncilPage: m.Component<{}> = {
               .map(([account, slot]) => m(CouncilRow, { account })),
             m('.clear'),
           ],
-        rightColSpacing: [4, 6],
-        columnHeaders: [
-          'Runners-up',
-        ]
+        columnHeader: 'Runners-up',
       })
     ]);
   },

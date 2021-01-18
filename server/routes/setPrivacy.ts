@@ -44,7 +44,22 @@ const setPrivacy = async (models, req: Request, res: Response, next: NextFunctio
 
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread_id, },
-      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTopic, as: 'topic' } ],
+      include: [
+        {
+          model: models.Address,
+          as: 'Address'
+        },
+        {
+          model: models.Address,
+          through: models.Collaboration,
+          as: 'collaborators'
+        },
+        models.OffchainAttachment,
+        {
+          model: models.OffchainTopic,
+          as: 'topic'
+        }
+      ],
     });
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });

@@ -38,9 +38,9 @@ const model: IModel = {
     model.key = { value: key, valid };
   },
   bond: () => {
-    const sessionTx = (app.chain as Substrate).chain.getTxMethod('session', 'setKeys')(
+    const sessionTx = (app.chain as Substrate).chain.getTxMethod('session', 'setKeys', [
       model.key.value as any, new Uint8Array()
-    );
+    ]);
     const txFunc = (model.controller as any as SubstrateAccount).batchTx([sessionTx]);
     txFunc.cb = model.txCallback;
     openTXModal(txFunc);

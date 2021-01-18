@@ -208,4 +208,33 @@ describe('Event Handler Tests', () => {
     assert.isUndefined(handledEvent);
     assert.equal(notificationCount, postEventNotificationCount);
   });
+
+  it('should not emit notification for excluded events', async () => {
+    // setup
+    const event: CWEvent = {
+      blockNumber: 10,
+      data: {
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
+        referendumIndex: 0,
+        endBlock: 100,
+        proposalHash: 'hash',
+        voteThreshold: 'Supermajorityapproval',
+      }
+    };
+
+    const dbEvent = await setupDbEvent(event);
+    const eventHandler = new NotificationHandler(models, null, [ SubstrateTypes.EventKind.DemocracyStarted ]);
+
+    // process event
+    const handledDbEvent = await eventHandler.handle(event, dbEvent);
+    assert.deepEqual(dbEvent, handledDbEvent);
+
+    // expect no notifications generated
+    const notifications = await models['Notification'].findAll({
+      where: {
+        chain_event_id: dbEvent.id,
+      },
+    });
+    assert.isEmpty(notifications);
+  });
 });

@@ -4,7 +4,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 
-import { Button, ButtonGroup, Icon, Icons, List, Menu, MenuItem, MenuDivider,
+import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider,
   Popover } from 'construct-ui';
 
 import app from 'state';
@@ -17,6 +17,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from 'views/components/widgets/user';
 import CreateInviteModal from 'views/modals/create_invite_modal';
+import EditProfileModal from 'views/modals/edit_profile_modal';
 import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
@@ -93,7 +94,9 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const LoginSelector: m.Component<{ small?: boolean }, {
+const LoginSelector: m.Component<{
+  small?: boolean
+}, {
   profileLoadComplete: boolean
 }> = {
   view: (vnode) => {
@@ -155,7 +158,7 @@ const LoginSelector: m.Component<{ small?: boolean }, {
               hideIdentityIcon: true,
             }) : [
               m('span.hidden-sm', [
-                app.user.activeAccounts.length === 0 ? 'Connect an address' : 'Select an address'
+                app.user.activeAccounts.length === 0 ? 'No address' : 'Select address'
               ]),
             ],
           ],
@@ -180,6 +183,31 @@ const LoginSelector: m.Component<{ small?: boolean }, {
               }),
             })),
             activeAddressesWithRole.length > 0 && m(MenuDivider),
+            activeAddressesWithRole.length > 0 && app.user.activeAccount && app.activeId() && m(MenuItem, {
+              onclick: () => {
+                const pf = app.user.activeAccount.profile;
+                if (pf) {
+                  m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain}`);
+                } else {
+                  const a = app.user.activeAccount;
+                  m.route.set(`/${app.activeId()}/account/${a.address}?base=${a.chain}`);
+                }
+              },
+              label: 'View profile',
+            }),
+            activeAddressesWithRole.length > 0 && app.user.activeAccount && app.activeId() && m(MenuItem, {
+              onclick: (e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: EditProfileModal,
+                  data: {
+                    account: app.user.activeAccount,
+                    refreshCallback: () => m.redraw(),
+                  },
+                });
+              },
+              label: 'Edit profile',
+            }),
             !isPrivateCommunity && m(MenuItem, {
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
@@ -187,6 +215,7 @@ const LoginSelector: m.Component<{ small?: boolean }, {
               label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
                 : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
             }),
+            (app.community?.meta.invitesEnabled || isAdminOrMod) && m(MenuDivider),
             (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
               class: 'invite-user',
               align: 'left',

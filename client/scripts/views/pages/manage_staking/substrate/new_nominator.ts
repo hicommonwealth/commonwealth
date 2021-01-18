@@ -11,6 +11,7 @@ import { SiDef } from '@polkadot/util/types';
 import { getValuesFromBn } from 'views/pages/manage_staking/substrate/validate_amount';
 import Substrate from 'controllers/chain/substrate/main';
 import { createTXModal } from 'views/modals/tx_signing_modal';
+import Edgeware from 'client/scripts/controllers/chain/edgeware/main';
 
 const MAX_STEP = 2;
 const MIN_STEP = 1;
@@ -81,10 +82,10 @@ const model: IModel = {
     const controllerId = model.bonded.controller.address;
     const destination = model.bonded.payment.value;
 
-    const bondOwnTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond')(stashId, amount, destination);
-    const bondTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond')(controllerId, amount, destination);
-    const controllerTx = (app.chain as Substrate).chain.getTxMethod('staking', 'setController')(controllerId);
-    const nominateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'nominate')(model.nominates);
+    const bondOwnTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond', [stashId, amount, destination]);
+    const bondTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond', [controllerId, amount, destination]);
+    const controllerTx = (app.chain as Substrate).chain.getTxMethod('staking', 'setController', [controllerId]);
+    const nominateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'nominate', [model.nominates]);
 
     const params = stashId === controllerId
       ? [bondTx, nominateTx]

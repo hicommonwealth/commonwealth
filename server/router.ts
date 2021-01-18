@@ -15,6 +15,7 @@ import createHedgehogUser from './routes/createHedgehogUser';
 import createAddress from './routes/createAddress';
 import verifyAddress from './routes/verifyAddress';
 import deleteAddress from './routes/deleteAddress';
+import getAddressStatus from './routes/getAddressStatus';
 import selectNode from './routes/selectNode';
 import startEmailLogin from './routes/startEmailLogin';
 import finishEmailLogin from './routes/finishEmailLogin';
@@ -77,8 +78,11 @@ import getUploadSignature from './routes/getUploadSignature';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
+import addEditors from './routes/addEditors';
+import deleteEditors from './routes/deleteEditors';
 import bulkThreads from './routes/bulkThreads';
 import getThread from './routes/getThread';
+import search from './routes/search';
 import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
@@ -127,6 +131,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   // TODO: Change to DELETE /address
   router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), deleteAddress.bind(this, models));
+  router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   // TODO: Change to PUT /node
   router.post('/selectNode', passport.authenticate('jwt', { session: false }), selectNode.bind(this, models));
 
@@ -157,11 +162,14 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/createThread', passport.authenticate('jwt', { session: false }), createThread.bind(this, models));
   // TODO: Change to PUT /thread
   router.put('/editThread', passport.authenticate('jwt', { session: false }), editThread.bind(this, models));
+  router.post('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this, models));
+  router.post('/deleteEditors', passport.authenticate('jwt', { session: false }), deleteEditors.bind(this, models));
   // TODO: Change to DELETE /thread
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
   router.get('/getThread', getThread.bind(this, models));
+  router.get('/search', search.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
 

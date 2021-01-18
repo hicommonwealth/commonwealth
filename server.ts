@@ -1,6 +1,4 @@
 import { SubstrateEvents, SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
-
-
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -41,6 +39,7 @@ import setupChainEventListeners from './server/scripts/setupChainEventListeners'
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 import migrateChainEntities from './server/scripts/migrateChainEntities';
 import migrateIdentities from './server/scripts/migrateIdentities';
+import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -65,41 +64,24 @@ async function main() {
 
   // CLI parameters used to configure specific tasks
   const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
-  let ARCHIVAL = process.env.ARCHIVAL === 'true';
-  const START_BLOCK = process.env.START_BLOCK ? +process.env.START_BLOCK : 0;
   const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
+  const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
-  const ARCHIVAL_NODE_URL = process.env.ARCHIVAL_NODE_URL;
-  const ARCHIVAL_CHAIN = process.env.ARCHIVAL_CHAIN;
-
-  // check if db record exists for archival node execution with chain-events version and starting block number.
-  if (ARCHIVAL) {
-    const archivalNodeDBEntryExist = await archivalNodeDbEntry(models, START_BLOCK, ARCHIVAL_CHAIN);
-    ARCHIVAL = !archivalNodeDBEntryExist;
-    log.info(`Executing process with ARCHIVAL flag set to ${ARCHIVAL}`);
-    if (ARCHIVAL && !ARCHIVAL_NODE_URL && !ARCHIVAL_CHAIN) {
-      log.error('ARCHIVAL NODE URL and ARCHIVAL_CHAIN name is necessary to execute in archival mode');
-      process.exit(1);
-    }
-  }
 
   const identityFetchCache = new IdentityFetchCache(10 * 60);
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
-      let chains: string | string[] | 'all' | 'none' = 'all';
-      // if (ARCHIVAL) {
-      //  chains = [ARCHIVAL_NODE_URL, ARCHIVAL_CHAIN];
-      // }
+      let chains: string[] | 'all' | 'none' = 'all';
       if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
         chains = CHAIN_EVENTS;
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
+      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
 
-      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP, ARCHIVAL, START_BLOCK);
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
       for (const [ chain, subscriber ] of Object.entries(subscribers)) {
@@ -170,6 +152,16 @@ async function main() {
       rc = 0;
     } catch (e) {
       log.error('Failed migrating chain identities into the DB: ', e.message);
+      rc = 1;
+    }
+  } else if (FLAG_MIGRATION) {
+    log.info('Started migrating councillor and validator flags into the DB');
+    try {
+      await migrateCouncillorValidatorFlags(models);
+      log.info('Finished migrating councillor and validator flags into the DB');
+      rc = 0;
+    } catch (e) {
+      log.error('Failed migrating councillor and validator flags into the DB: ', e.message);
       rc = 1;
     }
   }

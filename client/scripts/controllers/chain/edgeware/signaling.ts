@@ -57,18 +57,17 @@ class EdgewareSignaling extends ProposalModule<
         this._votingPeriod = +votinglength;
         this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
 
-        // fetch proposals from chain
-        await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          this,
-          () => this._Chain.fetcher.fetchSignalingProposals(this.app.chain.block.height)
-        );
-
         // register new chain-event handlers
         this.app.chain.chainEntities.registerEntityHandler(
           SubstrateTypes.EntityKind.SignalingProposal, (entity, event) => {
-            if (this.initialized) this.updateProposal(entity, event);
+            this.updateProposal(entity, event);
           }
+        );
+
+        // fetch proposals from chain
+        await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          () => this._Chain.fetcher.fetchSignalingProposals(this.app.chain.block.height)
         );
 
         this._initialized = true;
@@ -86,13 +85,15 @@ class EdgewareSignaling extends ProposalModule<
     voteOutcomes: any[] = [0, 1],
     voteType: 'binary' | 'multioption' | 'rankedchoice' = 'binary',
     tallyType: 'onecoin' | 'oneperson' = 'onecoin',
+    votingScheme: 'simple' | 'commitreveal' = 'simple',
   ) {
     const vOutcomes = voteOutcomes.map((o) => this._Chain.createType('VoteOutcome', o));
     const vType = this._Chain.createType('VoteType', voteType);
     const tType = this._Chain.createType('TallyType', tallyType);
+    const scheme = this._Chain.createType('VotingScheme', votingScheme);
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => api.tx.signaling.createProposal(title, description, vOutcomes, vType, tType),
+      (api: ApiRx) => api.tx.signaling.createProposal(title, description, vOutcomes, vType, tType, scheme),
       'createSignalingProposal',
       title
     );

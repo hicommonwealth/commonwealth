@@ -1,8 +1,12 @@
 import 'components/sidebar/notification_row.scss';
 
+import { Icon, Icons } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
-import moment from 'moment';
+import moment from 'moment-twitter';
+import {
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy
+} from '@commonwealth/chain-events';
 
 import app from 'state';
 import { NotificationCategories } from 'types';
@@ -15,17 +19,15 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy
-} from '@commonwealth/chain-events';
-import { Icon, Icons } from 'construct-ui';
+import UserGallery from 'views/components/widgets/user_gallery';
+
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
-import UserGallery from './widgets/user_gallery';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
+    if (!doc.ops) throw new Error();
     decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
   } catch (e) {
     let doc = decodeURIComponent(comment_text);
@@ -72,6 +74,8 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationHeader = m('span', [ actorName, ' created a new thread ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
+  } else if (category === `${NotificationCategories.NewCollaboration}`) {
+    notificationHeader = m('span', [actorName, ' added you as a collaborator on ', m('span.commented-obj', decoded_title)]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
       ? m('span', [ actorName, ' liked the post ', m('span.commented-obj', decoded_title) ])
@@ -251,7 +255,8 @@ const NotificationRow: m.Component<{
 
       if (vnode.state.scrollOrStop) {
         setTimeout(() => {
-          document.getElementById(m.route.param('id')).scrollIntoView();
+          const el = document.getElementById(m.route.param('id'));
+          if (el) el.scrollIntoView();
         }, 1);
         vnode.state.scrollOrStop = false;
       }
@@ -285,8 +290,13 @@ const NotificationRow: m.Component<{
             `${label.heading} on ${chainName}`,
             !vnode.attrs.onListPage && m(Icon, {
               name: Icons.X,
+              onmousedown: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              },
               onclick: (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 vnode.state.scrollOrStop = true;
                 app.user.notifications.clear([notification]);
                 m.redraw();
@@ -314,10 +324,8 @@ const NotificationRow: m.Component<{
         key: notification.id,
         id: notification.id,
         onclick: async () => {
-          const notificationArray: Notification[] = [];
-          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
-          await m.route.set(path);
-          m.redraw.sync();
+          app.user.notifications.markAsRead(notifications);
+          await m.route.set(path.replace(/ /g, '%20')); // fix for improperly generated notification paths
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
@@ -331,19 +339,17 @@ const NotificationRow: m.Component<{
             ),
             avatarOnly: true,
             avatarSize: 26,
-            popover: true,
           })
           : m(UserGallery, {
             users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
             avatarSize: 26,
-            popover: true,
           }),
         m('.comment-body', [
           m('.comment-body-title', notificationHeader),
           notificationBody
             && category !== `${NotificationCategories.NewReaction}`
             && m('.comment-body-excerpt', notificationBody),
-          m('.comment-body-created', createdAt.fromNow()),
+          m('.comment-body-created', createdAt.twitterShort()),
         ]),
       ]);
     }

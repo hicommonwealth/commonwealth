@@ -95,7 +95,7 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
       if (!vnode.attrs.setDemocracyVoteAmount) return 'Misconfigured';
       if (!app.user.activeAccount) return 'Misconfigured';
       return m('.ProposalExtensions', [
-        m('div', { style: 'font-size: 90%; line-height: 1.3;' }, [
+        m('div', { style: 'font-size: 90%; line-height: 1.2;' }, [
           'The winning side\'s coins will be timelocked according to the weight of their vote:'
         ]),
         m('div', { style: 'margin: 16px 0 12px;' }, [
@@ -103,7 +103,6 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
         ]),
         m(Input, {
           fluid: true,
-          size: 'sm',
           class: 'democracy-referendum-vote-amount',
           placeholder: `Amount to vote (${app.chain?.chain?.denom})`,
           oncreate: (vvnode) => {
@@ -118,7 +117,7 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
       ]);
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyProposal) {
       return m('.ProposalExtensions', [
-        m('p', 'Cost to second: ', proposal.deposit.format())
+        m('.proposal-second', 'Cost to second: ', proposal.deposit.format())
       ]);
     } else if (vnode.attrs.proposal instanceof SubstratePhragmenElection) {
       const votingBond = (app.chain as Substrate).phragmenElections.votingBond;
@@ -127,8 +126,8 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
         m('strong', votingBond ? votingBond.format() : '--'),
         ', which is returned when the election is completed.',
         // TODO XXX: check whether user has deposited a voting bond
-        // m('p', 'You have not deposited a voting bond for the current election.'),
-        // m('p', 'You have already deposited a voting bond for the current election.'),
+        // m('.proposal-bond', 'You have not deposited a voting bond for the current election.'),
+        // m('.proposal-bond', 'You have already deposited a voting bond for the current election.'),
       ]);
     }
   }
@@ -186,10 +185,17 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         'Last Vote Created': new Date().toISOString()
       });
       if (proposal instanceof SubstrateDemocracyProposal) {
-        createTXModal(proposal.submitVoteTx(new DepositVote(user, proposal.deposit), onModalClose)); // TODO: new code, test
+        createTXModal(proposal.submitVoteTx(new DepositVote(user, proposal.deposit), onModalClose));
+        // TODO: new code, test
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
-        if (vnode.state.conviction === undefined) throw new Error('Must select a conviction');
-        if (vnode.state.amount === 0) throw new Error('Must select a valid amount');
+        if (vnode.state.conviction === undefined) {
+          vnode.state.votingModalOpen = false;
+          return notifyError('Must select a conviction');
+        }
+        if (vnode.state.amount === 0) {
+          vnode.state.votingModalOpen = false;
+          return notifyError('Must select a valid amount');
+        }
         createTXModal(proposal.submitVoteTx(
           new BinaryVote(user, true, vnode.state.amount, convictionToWeight(vnode.state.conviction)), onModalClose
         ));
@@ -202,9 +208,11 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
-        throw new Error('Unimplemented proposal type - use election voting modal');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Unimplemented proposal type - use election voting modal');
       } else {
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
     const voteNo = (e) => {
@@ -225,7 +233,14 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           (app.chain.chain as SubstrateChain).createType('VoteOutcome', [0])
         ], app.chain.chain.coins(0)), onModalClose)); // fake balance, not needed for voting
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
-        if (vnode.state.conviction === undefined) throw new Error('Must select a conviction'); // TODO: new code, test
+        if (vnode.state.conviction === undefined) {
+          vnode.state.votingModalOpen = false;
+          return notifyError('Must select a conviction'); // TODO: new code, test
+        }
+        if (vnode.state.amount === 0) {
+          vnode.state.votingModalOpen = false;
+          return notifyError('Must select a valid amount');
+        }
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, false, vnode.state.amount,
           convictionToWeight(vnode.state.conviction)), onModalClose));
       } else if (proposal instanceof SubstrateCollectiveProposal) {
@@ -235,7 +250,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
       } else {
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
     const cancelProposal = (e) => {
@@ -256,7 +272,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => { onModalClose(); m.redraw(); })
           .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else {
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
     // V2 only
@@ -276,7 +293,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
     //   if (proposal instanceof MolochProposal) {
     //     proposal.sponsorTx(proposal, user);
     //   } else {
-    //     throw new Error('Invalid proposal type');
+    //     vnode.state.votingModalOpen = false;
+    //     return notifyError('Invalid proposal type');
     //   }
     // };
     const processProposal = (e) => {
@@ -297,8 +315,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => { onModalClose(); m.redraw(); })
           .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else {
-        onModalClose();
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
     const voteAbstain = (e) => {
@@ -317,7 +335,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       if (proposal instanceof CosmosProposal) {
         createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.ABSTAIN), null, onModalClose));
       } else {
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
     const voteVeto = (e) => {
@@ -336,7 +355,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       if (proposal instanceof CosmosProposal) {
         createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.VETO), null, onModalClose));
       } else {
-        throw new Error('Invalid proposal type');
+        vnode.state.votingModalOpen = false;
+        return notifyError('Invalid proposal type');
       }
     };
 
@@ -480,17 +500,17 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
     // cosmos: abstain
     const abstainButton = m('.abstain-button', [
       m(Button, {
-        intent: 'none',
+        intent: 'warning',
         disabled: !canVote || hasVotedAbstain || votingModalOpen,
         onclick: voteAbstain,
-        label: hasVotedAbstain ? 'Voted abstain' : 'Vote abstain',
+        label: hasVotedAbstain ? 'Abstained' : 'Abstain',
         compact: true,
       }),
     ]);
-    // cosmos: abstain
+    // cosmos: veto
     const noWithVetoButton = m('.veto-button', [
       m(Button, {
-        intent: 'negative',
+        intent: 'warning',
         disabled: !canVote || hasVotedVeto || votingModalOpen,
         onclick: voteVeto,
         label: hasVotedVeto ? 'Vetoed' : 'Veto',
@@ -553,7 +573,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
       ];
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       votingActionObj = [
-        m('.button-row', [yesButton, abstainButton, noButton, noWithVetoButton]),
+        m('.button-row', [yesButton, noButton, abstainButton, noWithVetoButton]),
         m(ProposalExtensions, { proposal }),
       ];
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting

@@ -16,6 +16,12 @@
         font-weight: 500;
         margin: 1.5em 0 0.47em;
     }
+    > h1:first-child,
+    > h2:first-child,
+    > h3:first-child,
+    > h4:first-child,
+    > h5:first-child,
+    > h6:first-child,
     > :first-child > h1,
     > :first-child > h2,
     > :first-child > h3,
@@ -24,6 +30,12 @@
     > :first-child > h6 {
         margin-top: 0.35em;
     }
+    > h1:last-child,
+    > h2:last-child,
+    > h3:last-child,
+    > h4:last-child,
+    > h5:last-child,
+    > h6:last-child,
     > :last-child > h1,
     > :last-child > h2,
     > :last-child > h3,
@@ -71,6 +83,54 @@
         li {
             margin: 2px 0;
         }
+        ol {
+            list-style-type: lower-latin;
+        }
+        ul, ol {
+            ol {
+                list-style-type: lower-roman;
+            }
+        }
+        ul, ol {
+            ul, ol {
+                ol {
+                    list-style-type: decimal;
+                }
+            }
+        }
+        ul, ol {
+            ul, ol {
+                ul, ol {
+                    ol {
+                        list-style-type: lower-latin;
+                    }
+                }
+            }
+        }
+        ul, ol {
+            ul, ol {
+                ul, ol {
+                    ul, ol {
+                        ol {
+                            list-style-type: lower-roman;
+                        }
+                    }
+                }
+            }
+        }
+        ul, ol {
+            ul, ol {
+                ul, ol {
+                    ul, ol {
+                        ul, ol {
+                            ol {
+                                list-style-type: decimal;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     ul + ol,
     ul + ul,
@@ -98,11 +158,11 @@
         }
         li.checked:before {
             content: '\f14a';
-            color: #777;
+            color: $text-color-medium;
         }
         li.unchecked:before {
             content: '\f096';
-            color: #b0bec5;
+            color: $text-color-lightest;
         }
     }
     ul.checklist + ul.checklist {
@@ -148,6 +208,7 @@
         padding: 2px 5px;
         margin: 0 1px;
         background: $background-color-light;
+        color: $text-color-primary;
         border-radius: 3px;
     }
     small {

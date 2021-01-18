@@ -10,14 +10,14 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import UserGallery from 'views/components/widgets/user_gallery';
 
 const getNewTag = (labelCount = null) => {
-  const label = labelCount === null ? 'New' : labelCount;
-  return m('.chain-new', [
+  const label = labelCount === null ? 'New' : `${labelCount} new`;
+  return m('span.chain-new', [
     m(Tag, {
       label,
-      size: 'sm',
-      compact: true,
+      size: 'xs',
       rounded: true,
       intent: 'primary',
+      style: 'margin-top: -3px; margin-left: 10px;',
     })
   ]);
 };
@@ -29,7 +29,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
     const chainInfo = app.config.chains.getById(chain);
     const visitedChain = !!unseenPosts[chain];
     const updatedThreads = unseenPosts[chain]?.activePosts || 0;
-    const monthlyThreads = app.recentActivity.getThreadsByCommunity(chain);
+    const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(chain);
 
     return m(Card, {
       elevation: 1,
@@ -46,6 +46,14 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
       m('.card-right', [
         m('.card-right-top', [
           m('h3', chainInfo.name),
+        ]),
+        m('p.card-description', chainInfo.description),
+        // if no recently active threads, hide this module altogether
+        m('.recent-activity', !!monthlyThreadCount && [
+          m('span.recent-threads', [
+            pluralize(monthlyThreadCount, 'thread'),
+            ' / month',
+          ]),
           app.user.isMember({
             account: app.user.activeAccount,
             chain,
@@ -53,14 +61,6 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
             app.isLoggedIn() && !visitedChain && getNewTag(),
             updatedThreads > 0 && getNewTag(updatedThreads),
           ],
-        ]),
-        m('p.card-description', chainInfo.description),
-        // if no recently active threads, hide this module altogether
-        m('.recent-activity', !!monthlyThreads.length && [
-          m('.recent-threads', [
-            pluralize(monthlyThreads.length, 'thread'),
-            ' this month',
-          ]),
         ])
       ]),
     ]);
@@ -73,7 +73,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
     const { unseenPosts } = app.user;
     const visitedCommunity = !!unseenPosts[community.id];
     const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
-    const monthlyThreads = app.recentActivity.getThreadsByCommunity(community.id);
+    const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(community.id);
 
     return m(Card, {
       elevation: 1,
@@ -93,19 +93,19 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
             community.name,
             community.privacyEnabled && m('span.icon-lock'),
           ]),
+        ]),
+        m('p.card-description', community.description),
+        // if no recently active threads, hide this module altogether
+        m('.recent-activity', !!monthlyThreadCount && [
+          m('span.recent-threads', [
+            pluralize(monthlyThreadCount, 'thread'),
+            ' / month',
+          ]),
           app.user.isMember({ account: app.user.activeAccount, community: community.id })
             && [
               app.isLoggedIn() && !visitedCommunity && getNewTag(),
               updatedThreads > 0 && getNewTag(updatedThreads),
             ],
-        ]),
-        m('p.card-description', community.description),
-        // if no recently active threads, hide this module altogether
-        m('.recent-activity', !!monthlyThreads.length && [
-          m('.recent-threads', [
-            pluralize(monthlyThreads.length, 'thread'),
-            ' this month',
-          ]),
         ])
       ]),
     ]);
@@ -119,13 +119,12 @@ const LockdropToolsCard: m.Component<{}> = {
       class: 'home-card LockdropToolsCard',
     }, [
       m('.card-right', [
-        m('h3', 'Edgeware Lockdrop Tools'),
+        m('h3', { style: 'margin-top: 4px;' }, 'Edgeware Lockdrop Tools'),
         m(Button, {
           interactive: true,
           compact: true,
           fluid: true,
           intent: 'primary',
-          size: 'sm',
           onclick: (e) => {
             e.preventDefault();
             m.route.set('/edgeware/stats');
@@ -137,7 +136,6 @@ const LockdropToolsCard: m.Component<{}> = {
           compact: true,
           fluid: true,
           intent: 'primary',
-          size: 'sm',
           onclick: (e) => {
             e.preventDefault();
             m.route.set('/edgeware/unlock');
@@ -183,9 +181,9 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
     const myChains: any = Object.entries(chains);
     const myCommunities: any = app.config.communities.getAll();
 
-    const sortedChainsAndCommunities = myChains.concat(myCommunities).sort((a, b) => {
-      const threadCountA = app.recentActivity.getThreadsByCommunity(Array.isArray(a) ? a[0] : a.id).length;
-      const threadCountB = app.recentActivity.getThreadsByCommunity(Array.isArray(b) ? b[0] : b.id).length;
+    const sortChainsAndCommunities = (list) => list.sort((a, b) => {
+      const threadCountA = app.recentActivity.getCommunityThreadCount(Array.isArray(a) ? a[0] : a.id);
+      const threadCountB = app.recentActivity.getCommunityThreadCount(Array.isArray(b) ? b[0] : b.id);
       return (threadCountB - threadCountA);
     }).map((entity) => {
       if (Array.isArray(entity)) {
@@ -197,9 +195,21 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
       return null;
     });
 
+    const sortedChainsAndCommunities = sortChainsAndCommunities(
+      myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
+        .concat(myCommunities.filter((c) => !c.collapsedOnHomepage))
+    );
+    const betaChainsAndCommunities = sortChainsAndCommunities(
+      myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
+        .concat(myCommunities.filter((c) => c.collapsedOnHomepage))
+    );
+
     return m('.HomepageCommunityCards', [
       m('.communities-list', [
         sortedChainsAndCommunities,
+        m('.clear'),
+        betaChainsAndCommunities.length > 0 && m('h4', 'Testnets & New Communities'),
+        betaChainsAndCommunities,
         m('.clear'),
       ]),
       m('.other-list', [

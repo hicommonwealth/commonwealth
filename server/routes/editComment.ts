@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
-import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils';
+import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -52,6 +52,13 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
     arr.unshift(req.body.version_history);
     comment.version_history = arr;
     comment.text = req.body.body;
+    comment.plaintext = (() => {
+      try {
+        return renderQuillDeltaToText(JSON.parse(decodeURIComponent(req.body.body)));
+      } catch (e) {
+        return decodeURIComponent(req.body.body);
+      }
+    })();
     await comment.save();
     await attachFiles();
     const finalComment = await models.OffchainComment.findOne({
@@ -108,13 +115,16 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       req.wss,
       [ finalComment.Address.address ],
     );
+    // TODO: dispatch notifications for new mention(s)
+
+    // update author.last_active (no await)
+    author.last_active = new Date();
+    author.save();
 
     return res.json({ status: 'Success', result: finalComment.toJSON() });
   } catch (e) {
     return next(e);
   }
-
-  // Todo: dispatch notifications conditional on a new mention
 };
 
 export default editComment;

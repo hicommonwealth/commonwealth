@@ -3,10 +3,10 @@ import 'modals/tx_signing_modal.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import { mnemonicValidate } from '@polkadot/util-crypto';
-import { Button, TextArea, Grid, Col } from 'construct-ui';
+import { Button, TextArea, Grid, Col, Spinner } from 'construct-ui';
 
 import app from 'state';
-import { formatAsTitleCase } from 'helpers';
+import { formatAsTitleCase, link } from 'helpers';
 import { ITXModalData, ITransactionResult, TransactionStatus, ChainBase } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
@@ -228,7 +228,11 @@ const TXSigningWebWalletOption = {
         }) === vnode.attrs.author.address;
       });
     return m('.TXSigningSeedOrMnemonicOption', [
-      m('div', 'Use the polkadot-js extension to sign the transaction:'),
+      m('div', [
+        'Use a ',
+        link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', { target: '_blank' }),
+        ' compatible wallet to sign the transaction:',
+      ]),
       m(Button, {
         type: 'submit',
         intent: 'primary',
@@ -367,6 +371,19 @@ const TXSigningModalStates = {
         vnode.state.timer++;
         m.redraw();
       }, 1000);
+      // for edgeware mainnet, timeout after 10 sec
+      // TODO: remove this after the runtime upgrade to Substrate 2.0 rc3+
+      if (app.chain?.meta?.chain?.id === 'edgeware') {
+        vnode.state.timeoutHandle = setTimeout(() => {
+          clearInterval(vnode.state.timeoutHandle);
+          vnode.attrs.next('SentTransactionSuccess', {
+            hash: 'Not available (this chain is using an out of date API)',
+            blocknum: '--',
+            timestamp: '--',
+          });
+          $parent.trigger('modalcomplete');
+        }, 10000);
+      }
 
       // for edgeware mainnet, timeout after 10 sec
       // TODO: remove this after the runtime upgrade to Substrate 2.0 rc3+
@@ -420,7 +437,7 @@ const TXSigningModalStates = {
         m('.compact-modal-title', [ m('h3', 'Confirm transaction') ]),
         m('.compact-modal-body', [
           m('.TXSigningBodyText', 'Waiting for your transaction to be confirmed by the network...'),
-          m('span.icon-spinner2.animate-spin'),
+          m(Spinner, { active: true }),
           m('br'),
           m(Button, {
             intent: 'primary',

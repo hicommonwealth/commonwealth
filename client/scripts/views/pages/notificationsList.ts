@@ -2,9 +2,10 @@ import 'pages/notificationsList.scss';
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
-import { Button, ButtonGroup, Popover } from 'construct-ui';
+import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
 import app from 'state';
+import { pluralize } from 'helpers';
 import { sortNotifications } from 'helpers/notifications';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
@@ -20,7 +21,10 @@ const NotificationsPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'NotificationsListPage',
-      title: 'Notifications',
+      title: [
+        'Notifications ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
     }, [
       m('.forum-container', [
         m(ButtonGroup, {
@@ -43,7 +47,7 @@ const NotificationsPage: m.Component<{}> = {
           }),
           m(Popover, {
             content: [
-              m('div', { style: 'margin-bottom: 10px' }, 'Are you sure?'),
+              m('div', { style: 'margin-bottom: 10px' }, 'Clear all chain notifications?'),
               m(Button, {
                 label: 'Confirm',
                 fluid: true,

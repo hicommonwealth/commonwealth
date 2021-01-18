@@ -4,17 +4,20 @@ import * as Sequelize from 'sequelize';
 import crypto from 'crypto';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
-import { stringToU8a, hexToU8a, u8aToString } from '@polkadot/util';
-import ExtrinsicPayload from '@polkadot/types/extrinsic/v4/ExtrinsicPayload';
-import { TypeRegistry } from '@polkadot/types';
+import { stringToU8a, hexToU8a } from '@polkadot/util';
 
 import * as secp256k1 from 'secp256k1';
 import * as CryptoJS from 'crypto-js';
+import { ecdsaVerify } from 'secp256k1/lib/elliptic';
 
-import { getCosmosAddress } from '@lunie/cosmos-keys';
+import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
+import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
+import { toUtf8, fromBase64 } from '@cosmjs/encoding';
+import { Uint53 } from '@cosmjs/math';
+import { getCosmosAddress } from '@lunie/cosmos-keys'; // used to check address validity. TODO: remove
+
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
-import { keyToSignMsg } from '../../shared/adapters/chain/cosmos/keys';
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
@@ -22,6 +25,7 @@ import { UserAttributes } from './user';
 import { OffchainProfileAttributes } from './offchain_profile';
 import { RoleAttributes } from './role';
 import { factory, formatFilename } from '../../shared/logging';
+import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
 
 // tslint:disable-next-line
@@ -36,9 +40,12 @@ export interface AddressAttributes {
   verified?: Date;
   keytype?: string;
   name?: string;
+  last_active?: Date;
   created_at?: Date;
   updated_at?: Date;
   user_id?: number;
+  is_councillor?: boolean;
+  is_validator?: boolean;
 
   // associations
   Chain?: ChainAttributes;
@@ -53,6 +60,11 @@ export interface AddressInstance extends Sequelize.Instance<AddressAttributes>, 
 
 export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAttributes> {
   // static methods
+  createEmpty?: (
+    chain: string,
+    address: string,
+  ) => Promise<AddressInstance>;
+
   createWithToken?: (
     user_id: number,
     chain: string,
@@ -72,7 +84,6 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
     addressModel: AddressInstance,
     user_id: number,
     signatureString: string,
-    signatureParams: string,
   ) => Promise<boolean>;
 }
 
@@ -89,9 +100,12 @@ export default (
     verified:                   { type: dataTypes.DATE, allowNull: true },
     keytype:                    { type: dataTypes.STRING, allowNull: true },
     name:                       { type: dataTypes.STRING, allowNull: true },
+    last_active:                { type: dataTypes.DATE, allowNull: true },
     created_at:                 { type: dataTypes.DATE, allowNull: false },
     updated_at:                 { type: dataTypes.DATE, allowNull: false },
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
+    is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
     underscored: true,
     indexes: [
@@ -101,6 +115,15 @@ export default (
     ]
   });
 
+  Address.createEmpty = (
+    chain: string,
+    address: string,
+  ): Promise<AddressInstance> => {
+    const verification_token = 'NO_USER';
+    const verification_token_expires = new Date(); // expired immediately
+    return Address.create({ chain, address, verification_token, verification_token_expires });
+  };
+
   Address.createWithToken = (
     user_id: number,
     chain: string,
@@ -109,7 +132,8 @@ export default (
   ): Promise<AddressInstance> => {
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
-    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype });
+    const last_active = new Date();
+    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype, last_active });
   };
 
   // Update an existing address' verification token
@@ -126,6 +150,8 @@ export default (
     address.keytype = keytype;
     address.verification_token = verification_token;
     address.verification_token_expires = verification_token_expires;
+    address.last_active = new Date();
+
     return address.save();
   };
 
@@ -138,7 +164,6 @@ export default (
     addressModel: AddressInstance,
     user_id: number,
     signatureString: string,
-    signatureParams: string,
   ): Promise<boolean> => {
     if (!chain) {
       log.error('no chain provided to verifySignature');
@@ -147,7 +172,11 @@ export default (
 
     let isValid;
     if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot'
-        || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi') {
+        || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi'
+        || chain.network === 'darwinia' || chain.network === 'phala' || chain.network === 'centrifuge') {
+      //
+      // substrate address handling
+      //
       const address = decodeAddress(addressModel.address);
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
       if (addressModel.keytype) {
@@ -169,53 +198,63 @@ export default (
         keyringOptions.ss58Format = 5;
       } else if (chain.network === 'stafi') {
         keyringOptions.ss58Format = 20;
+      } else if (chain.network === 'darwinia') {
+        keyringOptions.ss58Format = 18;
+      } else if (chain.network === 'phala') {
+        keyringOptions.ss58Format = 30;
+      } else if (chain.network === 'centrifuge') {
+        keyringOptions.ss58Format = 36;
       } else {
         keyringOptions.ss58Format = 42; // default chain id
       }
       const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
-      if (signatureParams) {
-        let params;
-        try {
-          params = JSON.parse(signatureParams);
-          const verificationToken = u8aToString(hexToU8a(params.method));
-          const verificationTokenValid = verificationToken.indexOf(addressModel.verification_token) !== -1;
-          if (!verificationTokenValid) return false;
-        } catch (e) {
-          log.error('Invalid signatureParams');
-          return false;
-        }
-        const signedPayload = new ExtrinsicPayload(new TypeRegistry(), params).toU8a(true);
-        isValid = signerKeyring.verify(signedPayload, hexToU8a(signatureString));
-      } else {
-        const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
-        const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
-        const signatureU8a = signatureString.slice(0, 2) === '0x'
-          ? hexToU8a(signatureString)
-          : hexToU8a(`0x${signatureString}`);
-        isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
-          || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
-      }
-    } else if (chain.network === 'cosmos') {
+      const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
+      const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
+      const signatureU8a = signatureString.slice(0, 2) === '0x'
+        ? hexToU8a(signatureString)
+        : hexToU8a(`0x${signatureString}`);
+      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
+        || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
+    } else if (chain.network === 'cosmos' || chain.network === 'straightedge') {
+      //
+      // cosmos-sdk address handling
+      //
       const signatureData = JSON.parse(signatureString);
-      // this saved "address" is actually just the address
-      const msg = keyToSignMsg(addressModel.address, addressModel.verification_token);
-      const signature = Buffer.from(signatureData.signature, 'base64');
-      const pk = Buffer.from(signatureData.pub_key.value, 'base64');
+      const pk = Buffer.from(signatureData.signature.pub_key.value, 'base64');
 
       // we generate an address from the actual public key and verify that it matches,
       // this prevents people from using a different key to sign the message than
-      // the account they registered with
-      const generatedAddress = getCosmosAddress(pk);
-      if (generatedAddress === addressModel.address) {
-        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), 'hex');
-        isValid = secp256k1.ecdsaVerify(signHash, signature, pk);
+      // the account they registered with.
+      const bech32Prefix = chain.network === 'cosmos'
+        ? 'cosmos'
+        : chain.network === 'straightedge' ? 'str' : chain.network;
+      const generatedAddress = getCosmosAddress(pk, bech32Prefix);
+      const generatedAddressWithCosmosPrefix = getCosmosAddress(pk, 'cosmos');
+
+      if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
+        // get tx doc that was signed
+        const signDoc = await validationTokenToSignDoc(addressModel.address, addressModel.verification_token.trim());
+
+        // check for signature validity
+        // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
+        const { pubkey, signature } = decodeSignature(signatureData.signature);
+        const secpSignature = Secp256k1Signature.fromFixedLength(fromBase64(signatureData.signature.signature));
+        if (serializeSignDoc(signatureData.signed).toString() !== serializeSignDoc(signDoc).toString()) {
+          isValid = false;
+        } else {
+          const messageHash = new Sha256(serializeSignDoc(signDoc)).digest();
+          isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
+        }
       } else {
         isValid = false;
       }
     } else if (chain.network === 'ethereum'
       || chain.network === 'moloch'
-      || chain.network === 'metacart'
+      || chain.network === 'metacartel'
     ) {
+      //
+      // ethereum address handling
+      //
       const msgBuffer = Buffer.from(addressModel.verification_token.trim());
       // toBuffer() doesn't work if there is a newline
       const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
@@ -244,6 +283,8 @@ export default (
       isValid = false;
     }
 
+    addressModel.last_active = new Date();
+
     if (isValid && user_id === null) {
       // mark the address as verified, and if it doesn't have an associated user, create a new user
       addressModel.verification_token_expires = null;
@@ -256,16 +297,21 @@ export default (
           object_id: `user-${user.id}`,
           is_active: true,
         });
+        await models.Subscription.create({
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewCollaboration,
+          object_id: `user-${user.id}`,
+          is_active: true,
+        });
         addressModel.user_id = user.id;
       }
-      await addressModel.save();
     } else if (isValid) {
       // mark the address as verified
       addressModel.verification_token_expires = null;
       addressModel.verified = new Date();
       addressModel.user_id = user_id;
-      await addressModel.save();
     }
+    await addressModel.save();
     return isValid;
   };
 
@@ -274,6 +320,11 @@ export default (
     models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
+    models.Address.belongsToMany(models.OffchainThread, {
+      through: models.Collaboration,
+      as: 'collaboration'
+    });
+    models.Address.hasMany(models.Collaboration);
   };
 
   return Address;

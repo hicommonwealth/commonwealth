@@ -42,12 +42,12 @@ const model: IModel = {
   bond: () => {
     const COMM_MUL = new BN(1e7);
     const commission: BN = (new BN(model.commission.value) || BN_ZERO).mul(COMM_MUL);
-    const validateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'validate')({
-      commission: commission.isZero()
+    const validateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'validate', [
+      commission.isZero()
         // small non-zero set to avoid isEmpty
         ? 1
         : commission
-    });
+    ]);
     const txFunc = (model.stash as any as SubstrateAccount).batchTx([validateTx]);
     txFunc.cb = model.txCallback;
     openTXModal(txFunc);

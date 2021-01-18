@@ -97,7 +97,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
                 position: 'relative',
                 top: '2px',
               }
-            }, emailVerified ? 'Verified' : app.user.email ? 'Not verified' : 'No email provided'),
+            }, emailVerified ? 'Verified' : app.user.email ? 'Not verified' : 'No email'),
           ],
         errorMessage && m('p.error', errorMessage),
       ]),

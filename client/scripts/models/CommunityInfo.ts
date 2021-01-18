@@ -6,6 +6,7 @@ import OffchainTopic from './OffchainTopic';
 
 interface CommunityData {
   name: string,
+  iconUrl: string,
   description: string,
   website: string,
   chat: string,
@@ -18,6 +19,7 @@ interface CommunityData {
 
 class CommunityInfo {
   public readonly id: string;
+  public iconUrl: string;
   public name: string;
   public description: string;
   public chat: string;
@@ -28,17 +30,19 @@ class CommunityInfo {
   public readonly visible: boolean;
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
+  public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public adminsAndMods: RoleInfo[];
 
   constructor(
-    id, name, description, website, chat, telegram, github, defaultChain,
-    visible, invitesEnabled, privacyEnabled, featuredTopics, topics, adminsAndMods?
+    id, name, description, iconUrl, website, chat, telegram, github, defaultChain,
+    visible, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
     this.name = name;
     this.description = description;
+    this.iconUrl = iconUrl;
     this.website = website;
     this.chat = chat;
     this.telegram = telegram;
@@ -47,6 +51,7 @@ class CommunityInfo {
     this.visible = visible;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
+    this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
@@ -57,6 +62,7 @@ class CommunityInfo {
       json.id,
       json.name,
       json.description,
+      json.iconUrl,
       json.website,
       json.chat,
       json.telegram,
@@ -65,6 +71,7 @@ class CommunityInfo {
       json.visible,
       json.invitesEnabled,
       json.privacyEnabled,
+      json.collapsed_on_homepage,
       json.featuredTopics,
       json.topics,
       json.adminsAndMods,
@@ -104,6 +111,7 @@ class CommunityInfo {
     description,
     invitesEnabled,
     name,
+    iconUrl,
     privacyEnabled,
     website,
     chat,
@@ -115,6 +123,7 @@ class CommunityInfo {
       'id': app.activeCommunityId(),
       'name': name,
       'description': description,
+      'iconUrl': iconUrl,
       'website': website,
       'chat': chat,
       'telegram': telegram,
@@ -126,6 +135,7 @@ class CommunityInfo {
     const updatedCommunity: CommunityInfo = r.result;
     this.name = updatedCommunity.name;
     this.description = updatedCommunity.description;
+    this.iconUrl = updatedCommunity.iconUrl;
     this.website = updatedCommunity.website;
     this.chat = updatedCommunity.chat;
     this.telegram = updatedCommunity.telegram;

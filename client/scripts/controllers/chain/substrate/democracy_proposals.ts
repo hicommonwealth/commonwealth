@@ -79,32 +79,30 @@ class SubstrateDemocracyProposals extends ProposalModule<
         this._launchPeriod = +(api.consts.democracy.launchPeriod as BlockNumber);
         this._cooloffPeriod = +(api.consts.democracy.cooloffPeriod as BlockNumber);
 
-        // fetch proposals from chain
-        const events = await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          this,
-          () => this._Chain.fetcher.fetchDemocracyProposals(this.app.chain.block.height)
-        );
-        const hashes = events.map((e) => e.data.proposalHash);
-        await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          this,
-          () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
-        );
         // register new chain-event handlers
         this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.DemocracyProposal, (entity, event) => {
+            this.updateProposal(entity, event);
+          }
+        );
+        this.app.chain.chainEntities.registerEntityHandler(
           SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
-            if (!this.initialized) return;
             if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
               const proposal = this.getByHash(entity.typeId);
               if (proposal) proposal.update(event);
             }
           }
         );
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.DemocracyProposal, (entity, event) => {
-            if (this.initialized) this.updateProposal(entity, event);
-          }
+
+        // fetch proposals from chain
+        const events = await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          () => this._Chain.fetcher.fetchDemocracyProposals(this.app.chain.block.height)
+        );
+        const hashes = events.map((e) => e.data.proposalHash);
+        await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
         );
 
         // TODO: add preimage to get name of nextExternal

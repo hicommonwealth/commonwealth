@@ -423,7 +423,7 @@ class SubstrateStaking implements StorageModule {
     );
   }
   public query(address: string): Observable<DeriveStakingQuery> {
-    return this._Chain.query((api: ApiRx) => api.derive.staking.query(address));
+    return this._Chain.query((api: ApiRx) => api.derive.staking.query(address, {}));
   }
   public get annualPercentRate(): Observable<ICommissionInfo> {
     return this._Chain.api.pipe(

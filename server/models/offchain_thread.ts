@@ -3,7 +3,6 @@ import * as Sequelize from 'sequelize';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
-import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 
 export interface OffchainThreadAttributes {
@@ -11,6 +10,7 @@ export interface OffchainThreadAttributes {
   address_id: number;
   title: string;
   body?: string;
+  plaintext?: string;
   kind: string;
   url?: string;
   topic_id?: number;
@@ -48,6 +48,7 @@ export default (
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     title: { type: dataTypes.TEXT, allowNull: false },
     body: { type: dataTypes.TEXT, allowNull: true },
+    plaintext: { type: dataTypes.TEXT, allowNull: true },
     kind: { type: dataTypes.TEXT, allowNull: false },
     url: { type: dataTypes.TEXT, allowNull: true },
     topic_id: { type: dataTypes.INTEGER, allowNull: true },
@@ -68,9 +69,16 @@ export default (
   });
 
   OffchainThread.associate = (models) => {
-    models.OffchainThread.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.OffchainThread.belongsTo(models.Chain, {
+      foreignKey: 'chain',
+      targetKey: 'id',
+    });
     models.OffchainThread.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
-    models.OffchainThread.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
+    models.OffchainThread.belongsTo(models.Address, {
+      as: 'Address',
+      foreignKey: 'address_id',
+      targetKey: 'id'
+    });
     models.OffchainThread.hasMany(models.OffchainAttachment, {
       foreignKey: 'attachment_id',
       constraints: false,
@@ -86,6 +94,11 @@ export default (
       foreignKey: 'thread_id',
       otherKey: 'id',
     });
+    models.OffchainThread.belongsToMany(models.Address, {
+      through: models.Collaboration,
+      as: 'collaborators'
+    });
+    models.OffchainThread.hasMany(models.Collaboration);
   };
 
   return OffchainThread;

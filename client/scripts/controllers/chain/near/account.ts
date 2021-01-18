@@ -141,22 +141,6 @@ export class NearAccount extends Account<NearToken> {
     });
   }
 
-  // signature must be a JSON object of type "Signature" (cf. CosmosAccount)
-  public async isValidSignature(message: string, signature: string): Promise<boolean> {
-    try {
-      const { signature: sigObj, publicKey } = JSON.parse(signature);
-      const isValid = nacl.sign.detached.verify(
-        Buffer.from(message),
-        Buffer.from(sigObj, 'base64'),
-        Buffer.from(publicKey, 'base64')
-      );
-      return isValid;
-    } catch (e) {
-      console.error('Signature validation error: ', e);
-      return false;
-    }
-  }
-
   protected addressFromMnemonic(mnemonic: string): string {
     throw new Error('not valid on Near protocol');
   }

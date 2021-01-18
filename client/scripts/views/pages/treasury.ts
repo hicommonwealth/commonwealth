@@ -106,12 +106,12 @@ const TreasuryPage: m.Component<{}> = {
     if (!app.chain || !app.chain.loaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
-          message: 'Chain connection timed out.',
+          message: 'Could not connect to chain',
           title: 'Proposals',
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 10s)...',
+        message: 'Connecting to chain',
         title: 'Treasury',
         showNewProposalButton: true,
       });
@@ -120,7 +120,7 @@ const TreasuryPage: m.Component<{}> = {
     if (onSubstrate && !(app.chain as Substrate).treasury.initialized) {
       if (!(app.chain as Substrate).treasury.initializing) loadCmd();
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 10s)...',
+        message: 'Connecting to chain',
         title: 'Treasury',
         showNewProposalButton: true,
       });
@@ -146,13 +146,11 @@ const TreasuryPage: m.Component<{}> = {
       onSubstrate && m(SubstrateProposalStats),
       m(Listing, {
         content: activeTreasuryContent,
-        columnHeaders: ['Active Treasury Proposals'],
-        rightColSpacing: [0]
+        columnHeader: 'Active Treasury Proposals',
       }),
       m(Listing, {
         content: inactiveTreasuryContent,
-        columnHeaders: ['Inactive Treasury Proposals'],
-        rightColSpacing: [0]
+        columnHeader: 'Inactive Treasury Proposals',
       })
     ]);
   }

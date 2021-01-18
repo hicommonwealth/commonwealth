@@ -30,6 +30,9 @@ const nodes = [
   [ 'wss://rpc.kulupu.corepaper.org/ws', 'kulupu'],
   [ 'wss://rpc.plasmnet.io/ws', 'plasm'],
   [ 'wss://scan-rpc.stafi.io/ws', 'stafi'],
+  [ 'wss://cc1.darwinia.network/ws', 'darwinia'],
+  [ 'wss://poc3.phala.com/ws', 'phala'],
+  [ 'wss://fullnode.centrifuge.io', 'centrifuge'],
   // [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
@@ -164,6 +167,33 @@ const resetServer = (models): Promise<number> => {
           symbol: 'FIS',
           name: 'stafi',
           icon_url: '/static/img/protocols/fis.png',
+          active: true,
+          type: 'chain',
+        }),
+        models.Chain.create({
+          id: 'darwinia',
+          network: 'darwinia',
+          symbol: 'RING',
+          name: 'Darwinia',
+          icon_url: '/static/img/protocols/ring.png',
+          active: true,
+          type: 'chain',
+        }),
+        models.Chain.create({
+          id: 'phala',
+          network: 'phala',
+          symbol: 'RING',
+          name: 'Phala',
+          icon_url: '/static/img/protocols/pha.png',
+          active: true,
+          type: 'chain',
+        }),
+        models.Chain.create({
+          id: 'centrifuge',
+          network: 'centrifuge',
+          symbol: 'CENNZ',
+          name: 'Centrifuge',
+          icon_url: '/static/img/protocols/cennz.png',
           active: true,
           type: 'chain',
         }),
@@ -347,7 +377,7 @@ const resetServer = (models): Promise<number> => {
         }),
       ]);
 
-      // Admins need to be subscribed to mentions
+      // Admins need to be subscribed to mentions and collaborations
       await Promise.all([
         models.Subscription.create({
           subscriber_id: dillon.id,
@@ -370,6 +400,27 @@ const resetServer = (models): Promise<number> => {
           is_active: true,
           immediate_email: true,
         }),
+        models.Subscription.create({
+          subscriber_id: dillon.id,
+          category_id: NotificationCategories.NewCollaboration,
+          object_id: `user-${dillon.id}`,
+          is_active: true,
+          immediate_email: true,
+        }),
+        models.Subscription.create({
+          subscriber_id: raymond.id,
+          category_id: NotificationCategories.NewCollaboration,
+          object_id: `user-${raymond.id}`,
+          is_active: true,
+          immediate_email: true,
+        }),
+        models.Subscription.create({
+          subscriber_id: drew.id,
+          category_id: NotificationCategories.NewCollaboration,
+          object_id: `user-${drew.id}`,
+          is_active: true,
+          immediate_email: true,
+        }),
       ]);
 
       // Communities
@@ -380,7 +431,6 @@ const resetServer = (models): Promise<number> => {
           creator_id: 1,
           description: 'All things staking',
           default_chain: 'ethereum',
-          visible: true,
         }),
         models.OffchainCommunity.create({
           id: 'governance',
@@ -388,7 +438,6 @@ const resetServer = (models): Promise<number> => {
           creator_id: 1,
           description: 'All things governance',
           default_chain: 'ethereum',
-          visible: false,
         }),
         models.OffchainCommunity.create({
           id: 'meta',
@@ -396,7 +445,6 @@ const resetServer = (models): Promise<number> => {
           creator_id: 1,
           description: 'All things Commonwealth',
           default_chain: 'edgeware',
-          visible: true,
         })
       ]);
 
