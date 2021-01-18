@@ -7,7 +7,7 @@
 
 import _ from 'underscore';
 import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
-import { Mainnet } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 import { OffchainProfileInstance } from '../models/offchain_profile';
 import IdentityEventHandler from '../eventHandlers/identity';
 import { constructSubstrateUrl } from '../../shared/substrate';
@@ -50,7 +50,9 @@ export default async function (models, chain?: string): Promise<void> {
     const nodeUrl = constructSubstrateUrl(node.url);
     const api = await SubstrateEvents.createApi(
       nodeUrl,
-      node.chain.includes('edgeware') ? Mainnet : {},
+      /* tslint:disable */
+      // @ts-ignore-start
+      spec
     );
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     const identityEvents = await fetcher.fetchIdentities(addresses);
