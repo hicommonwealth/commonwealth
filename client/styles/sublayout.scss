@@ -34,10 +34,7 @@
         padding: 0;
         max-width: calc(100% - #{$sidebar-width});
         @include sm-max {
-            padding: 0 30px;
-        }
-        @include xs-max {
-            padding: 0 22px;
+            padding: 0;
         }
     }
     .hide-sidebar & {
@@ -46,9 +43,10 @@
             margin: 0 auto;
         }
     }
-    @include sm-max {
+    @include md-max {
         .sublayout-main-col {
             width: 100%;
+            max-width: none;
         }
     }
 
@@ -98,6 +96,9 @@
                 font-weight: 600;
                 margin: 7px 17px 0 0;
                 white-space: nowrap;
+                a {
+                    color: $text-color-black;
+                }
                 .breadcrumb {
                     margin: 0 8px;
                     color: $text-color-lightest;

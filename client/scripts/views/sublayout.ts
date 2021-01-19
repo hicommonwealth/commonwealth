@@ -3,6 +3,7 @@ import 'sublayout.scss';
 import m, { Vnode } from 'mithril';
 import app from 'state';
 import { EmptyState, Button, Icons, Grid, Col, Spinner } from 'construct-ui';
+import { link } from 'helpers';
 
 import NewProposalButton from 'views/components/new_proposal_button';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
@@ -52,14 +53,14 @@ const Sublayout: m.Component<{
       ] : chain ? [
         m(ChainIcon, { size: ICON_SIZE, chain }),
         m('h4.sublayout-header-heading', [
-          chain.name,
+          link('a', `/${app.activeId()}`, chain.name),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
       ] : community ? [
         m(CommunityIcon, { size: ICON_SIZE, community }),
         m('h4.sublayout-header-heading', [
-          community.name,
+          link('a', `/${app.activeId()}`, community.name),
           community.privacyEnabled && m('span.icon-lock'),
           title && m('span.breadcrumb', m.trust('/')),
           title
