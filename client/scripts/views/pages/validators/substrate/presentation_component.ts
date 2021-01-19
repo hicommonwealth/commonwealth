@@ -252,6 +252,7 @@ export const PresentationComponent_: m.Component<{ validators, valCount }, { fir
         ]), m('table.validators-table', [
           vnode.attrs.validators
             .filter((q) => q.visible && (model.selectedState === 1 && q.state === 'Waiting'))
+            .sort(sortValidators)
             .map((validator) => {
               const stash = validator.address;
               const controller = validator.controller;

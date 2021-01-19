@@ -74,7 +74,12 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
     // calculate est. apr
     apr += stats?.apr ? stats.apr : 0;
   });
-
+  let lastBlockNumber = 0;
+  try {
+    lastBlockNumber = result[0][0].block;
+  } catch (e) {
+    lastBlockNumber = 0;
+  }
   return res.json({
     status: 'Success',
     result: {
@@ -85,7 +90,7 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
       totalStaked,
       offences,
       aprPercentage: apr / elected,
-      lastBlockNumber: result[0][0].block
+      lastBlockNumber
     }
   });
 };

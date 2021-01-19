@@ -63,6 +63,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await this.chain.resetApi(this.meta, additionalOptions);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
+    await this.staking.init(this.chain);
     if (this.class !== ChainClass.Plasm) {
       await this.identities.init(this.chain, this.accounts);
     }

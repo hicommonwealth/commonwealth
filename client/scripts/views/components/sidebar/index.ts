@@ -295,6 +295,54 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
   }
 };
 
+const StakingNavigationModule: m.Component<{}, {}> = {
+  view: (vnode) => {
+    const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    const onManageStakingPage = (p) => p.startsWith(`/${app.activeChainId()}/manageStaking`);
+    const onStakingCalculatorPage = (p) => p.startsWith(`/${app.activeChainId()}/stakingCalculator`);
+
+    const hasProposals = app.chain && !app.community && (
+      app.chain.base === ChainBase.CosmosSDK
+      || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
+      || app.chain.class === ChainClass.Moloch);
+    if (!hasProposals) return;
+
+    return m('.StakingNavigationModule.SidebarModule', [
+      m(List, [
+        (app.community || app.chain)
+        && m(ListItem, {
+          label: 'Staking',
+          class: 'section-header',
+        }),
+        // validators (substrate and cosmos only)
+        !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+        && [
+          // validators (substrate and cosmos only)
+          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+          && m(ListItem, {
+            contentLeft: m(Icon, { name: Icons.SHARE_2 }),
+            active: onValidatorsPage(m.route.get()),
+            label: 'Validators',
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
+          }),
+          m(ListItem, {
+            contentLeft: m(Icon, { name: Icons.BOX }),
+            active: onManageStakingPage(m.route.get()),
+            label: 'Manage Staking',
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/manageStaking`),
+          }),
+          m(ListItem, {
+            contentLeft: m(Icon, { name: Icons.ZAP }),
+            active: onStakingCalculatorPage(m.route.get()),
+            label: 'Staking Calculator',
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/stakingCalculator`),
+          })
+        ]
+      ]),
+    ]);
+  }
+};
+
 const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
   view: (vnode) => {
     const url = app.chain?.meta?.url;
@@ -415,6 +463,7 @@ const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
         m('.sidebar-content', [ // container for overflow scrolling
           (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
           (app.chain || app.community) && m(OnchainNavigationModule),
+          (app.chain || app.community) && m(StakingNavigationModule),
         ]),
         (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
