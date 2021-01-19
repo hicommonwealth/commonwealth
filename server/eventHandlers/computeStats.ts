@@ -23,9 +23,10 @@ export const computeEventStats = async (chain: String, event: String, stash: Str
   let rawQuery = `
     SELECT event_data 
     FROM "ChainEvents" 
-    WHERE chain_event_type_id  = '${chain}-${event}' AND 
-    active = true AND
-    created_at >= '${startDate}' AND created_at <= '${endDate}'
+    WHERE chain_event_type_id  = '${chain}-${event}'
+    AND active = true 
+    AND created_at >= '${startDate}' 
+    AND created_at <= '${endDate}'
   `;
   switch (event) {
     case SubstrateTypes.EventKind.Reward:
@@ -91,10 +92,6 @@ export const getAPR = async (chain: String, event: String, stash: string, noOfDa
 
   const stakeAmountAvg = sessionEvents.reduce(
     (total, totalStake) => Number(total) + Number(totalStake.event_data.activeExposures[stash].total), 0
-  ) / sessionEvents.length;
-
-  const ownAmountAvg = sessionEvents.reduce(
-    (total, ownAmount) => Number(total) + Number(ownAmount.event_data.activeExposures[stash].own), 0
   ) / sessionEvents.length;
 
   const computedAPR = (1 - commissionsAvg / 100)

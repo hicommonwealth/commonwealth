@@ -4,6 +4,9 @@ import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
+
+// import { createApi, subscribeEvents } from '/home/myym/Desktop/Github/chain-events/src/substrate/subscribeFunc';
+
 import { spec as EdgewareSpec } from '@edgeware/node-types';
 
 import EventStorageHandler from '../eventHandlers/storage';
@@ -142,20 +145,15 @@ const setupChainEventListeners = async (
 
     let subscriber: IEventSubscriber<any, any>;
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
-      // if running in archival mode and we are supposed to execute archival mode for the chain
-      // then first execute the archival mode using the ARCHIVAL_NODE_URL provided in env
-      // and syncup with the head of the chain and then use the URL for the chain provided in db
-      // and use it to subscribe to head of the chain to continue normal execution.
-      if (archival && node.chain == ARCHIVAL_CHAIN) {
-        // Sample Events list for update record in ChainEvents and HistoricalValidatorsStats tables
-        const eventList = ['all-good', 'bonded', 'new-session', 'offences-offence', 'reward', 'slash', 'some-offline', 'unbonded'];
-        const chainEventRecordsUpdated = await updateChainEventStatus(models, startBlock, node.chain, eventList, 'inactive');
-        const historicalValidatorsStatsDeleted = await deleteOldHistoricalValidatorsStats(models, startBlock, node.chain);
+      
+      // if running in archival mode then check if the chain is the same as provided in ARCHIVAL_CHAIN
+      // parameter in env. If yes, then execute the archival mode using the ARCHIVAL_NODE_URL  
+      // and syncup with the head of the chain and then use the URL for the chain provided in db 
+      // and use it to subscribe to head of the chain to continue normal execution. 
+      if ( archival && node.chain == ARCHIVAL_CHAIN ) {
 
-        if (chainEventRecordsUpdated) console.info('Records has beed updated in ChainEvents table');
-        if (historicalValidatorsStatsDeleted) console.info('Records has beed deleted in HistoricalValidatorsStats table');
-
-        // handlers needed for staking ui
+        // handlers needed for staking ui. Need to execute these event handlers for
+        // blocks starting from 3139200 till head to popular HistoricalValidatorStats
         const _handlers: IEventHandler[] = [
           storageHandler,
           newSessionHandler,
@@ -166,11 +164,31 @@ const setupChainEventListeners = async (
           bondHandler,
           imOnlineHandler
         ];
+        // events processed by the staking-ui event handlers
+        const eventList = [ 
+          SubstrateTypes.EventKind.AllGood,
+          SubstrateTypes.EventKind.Bonded,
+          SubstrateTypes.EventKind.NewSession,
+          SubstrateTypes.EventKind.Offence,
+          SubstrateTypes.EventKind.Reward,
+          SubstrateTypes.EventKind.Slash,
+          SubstrateTypes.EventKind.SomeOffline,
+          SubstrateTypes.EventKind.Unbonded
+        ]
+        // mark the events in ChainEvents as Inactive as when running archival we will be creating new entries
+        // for the same events in db and marking them as Active
+        // to do: once the archvial node has finished execution remove the old events marked as Inactive
+        const chainEventRecordsUpdated = await updateChainEventStatus(models, startBlock, node.chain, eventList, "inactive");
 
+        // when running archival mode remove the already existing entried 
+        // in historicalValidatorStats as we will be re-creating the stats
+        const historicalValidatorsStatsDeleted = await deleteOldHistoricalValidatorsStats(models, startBlock, node.chain);
 
-        // mark all the events in ChaineEvents db for the archival_chain >= provided blockNumber as INACTIVE
-        // await changeChainEventStatus('INACTIVE', chain, eventsList, blockNumber,)
-
+        if (chainEventRecordsUpdated) console.info("Records marked as inactive in Chainevents table");
+        if (historicalValidatorsStatsDeleted) console.info("Records removed from HistoricalValidatorsStats table")        
+        
+        // run subscribeEvents with archival flag true, this will enforce it to 
+        // poll past blocks and process events starting from provided blockNumber
         const nodeUrl = constructSubstrateUrl(ARCHIVAL_NODE_URL);
         const api = await SubstrateEvents.createApi(
           nodeUrl,
@@ -201,7 +219,7 @@ const setupChainEventListeners = async (
         chain: node.chain,
         handlers,
         skipCatchup,
-        archival,
+        archival: false,
         startBlock,
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
