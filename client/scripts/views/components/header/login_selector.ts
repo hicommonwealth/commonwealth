@@ -247,7 +247,7 @@ const LoginSelector: m.Component<{
             onclick: () => app.activeChainId()
               ? m.route.set(`/${app.activeChainId()}/settings`)
               : m.route.set('/settings'),
-            label: 'Login & address settings'
+            label: 'Account settings'
           }),
           m(MenuDivider),
           m(MenuItem, {

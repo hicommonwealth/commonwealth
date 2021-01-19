@@ -480,6 +480,7 @@ const LinkNewAddressModal: m.Component<{
             && m(Button, {
               class: 'account-adder',
               intent: 'primary',
+              rounded: true,
               disabled: !app.chain.webWallet?.available // disable if unavailable
                 || vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
               oninit: async (vvnode) => {
@@ -538,6 +539,7 @@ const LinkNewAddressModal: m.Component<{
             app.chain.base === ChainBase.NEAR ? [
               m(Button, {
                 intent: 'primary',
+                rounded: true,
                 onclick: async (e) => {
                   // redirect to NEAR page for login
                   const WalletAccount = (await import('nearlib')).WalletAccount;
@@ -699,6 +701,7 @@ const LinkNewAddressModal: m.Component<{
             }),
             m(Button, {
               intent: 'primary',
+              rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
                 const unverifiedAcct: Account<any> = vnode.state.newAddress;
@@ -803,6 +806,7 @@ const LinkNewAddressModal: m.Component<{
           ]),
           m(Button, {
             intent: 'primary',
+            rounded: true,
             disabled: (vnode.state.uploadsInProgress || !vnode.state.hasName),
             onclick: async (e) => {
               e.preventDefault();
