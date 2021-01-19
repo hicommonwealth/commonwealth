@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
@@ -71,8 +72,12 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
-  const version_history = [];
-  version_history.push(req.body.versionHistory);
+  const firstVersion : any = {
+    timestamp: moment(),
+    author: req.body.author,
+    body: decodeURIComponent(req.body.body)
+  };
+  const version_history : string[] = [ JSON.stringify(firstVersion) ];
 
   const threadContent = community ? {
     community: community.id,

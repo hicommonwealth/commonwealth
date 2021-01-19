@@ -5,6 +5,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
+import moment from 'moment';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -48,9 +49,15 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    const arr = comment.version_history;
-    arr.unshift(req.body.version_history);
-    comment.version_history = arr;
+    if (req.body.new_version_history) {
+      const recentEdit = {
+        timestamp: moment(),
+        body: decodeURIComponent(req.body.body)
+      };
+      const arr = comment.version_history;
+      arr.unshift(JSON.stringify(recentEdit));
+      comment.version_history = arr;
+    }
     comment.text = req.body.body;
     comment.plaintext = (() => {
       try {

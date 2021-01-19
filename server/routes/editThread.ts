@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import moment from 'moment';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
@@ -15,7 +16,9 @@ export const Errors = {
 };
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, title, kind, thread_id, version_history, } = req.body;
+  const { body, title, kind, thread_id, new_version_history } = req.body;
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const author = await lookupAddressIsOwnedByUser(models, req, next);
 
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
@@ -68,11 +71,19 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     });
   }
   if (!thread) return next(new Error('No thread with that id found'));
-
   try {
-    const arr = thread.version_history;
-    arr.unshift(version_history);
-    thread.version_history = arr;
+    // Only add a new version to the history if the body has been updated
+    if (new_version_history) {
+      const recentEdit : any = {
+        timestamp: moment(),
+        author: req.body.author,
+        body: decodeURIComponent(req.body.body)
+      };
+      const versionHistory : string = JSON.stringify(recentEdit);
+      const arr = thread.version_history;
+      arr.unshift(versionHistory);
+      thread.version_history = arr;
+    }
     thread.body = body;
     thread.plaintext = (() => {
       try {
