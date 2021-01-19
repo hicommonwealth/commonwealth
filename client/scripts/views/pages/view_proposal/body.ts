@@ -582,7 +582,7 @@ export const ProposalBodySaveEdit: m.Component<{
               : quillEditorState.markdownMode
                 ? parseMentionsForServer(quillEditorState.editor.getText(), true)
                 : parseMentionsForServer(quillEditorState.editor.getContents(), false);
-            const previousDraft = JSON.parse((item as OffchainThread).versionHistory[0]);
+            const previousDraft = (item as OffchainThread).versionHistory[0];
             let previousDraftMentions;
             try {
               const previousDraftQuill = new Delta(JSON.parse(previousDraft.body));
