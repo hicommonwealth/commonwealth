@@ -25,7 +25,7 @@ export default class extends IEventHandler {
     // 2) Get relevant data from DB for processing.
     const latestValidators = await this._models.HistoricalValidatorStatistic.findOne({
       where: {
-        [Op.and]: [{ stash: bondEventData.stash }, { chain_name: this._chain}]
+        [Op.and]: [{ stash: bondEventData.stash }, { chain_name: this._chain }]
       },
       order: [
         ['created_at', 'DESC']

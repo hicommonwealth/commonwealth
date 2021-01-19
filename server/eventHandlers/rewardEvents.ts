@@ -46,8 +46,9 @@ export default class extends IEventHandler {
 
     // Get last created validator's record from 'HistoricalValidatorStatistic' table. as new reward event will contain validator's AccountID.
     const validatorRawQuery = ` SELECT  * FROM "HistoricalValidatorStatistic" 
-    WHERE stash LIKE '%${newRewardEventData.validator}%' AND chain_name = '${this._chain}'
-    order by created_at desc limit 1`;
+    WHERE stash LIKE '%${newRewardEventData.validator}%' 
+    AND chain_name = '${this._chain}'
+    ORDER BY created_at desc limit 1`;
     const [latestValidatorStat, validatorStatMetadata] = await sequelize.query(validatorRawQuery);
 
     if (!latestValidatorStat.length) {

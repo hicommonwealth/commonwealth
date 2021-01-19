@@ -66,7 +66,7 @@ export default class extends IEventHandler {
           (case when "isOnline"  then 1 else 0 end) else null end),0) as "onlineCount", 
           COALESCE (SUM ( case when "eventType" in ('all-good', 'some-offline') then
           (case when "isOnline"  then 0 else 1 end) else null end),0) as "offlineCount" 
-          FROM public."HistoricalValidatorStatistic" as groupTable 
+          FROM public."HistoricalValidatorStatistic" as groupTable WHERE chain_name = '${this._chain}'
           GROUP by groupTable.stash
           ) joinTable
         ON joinTable.stash = partitionTable.stash

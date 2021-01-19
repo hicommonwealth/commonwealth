@@ -23,9 +23,10 @@ export const computeEventStats = async (chain: String, event: String, stash: Str
   let rawQuery = `
     SELECT event_data 
     FROM "ChainEvents" 
-    WHERE chain_event_type_id  = '${chain}-${event}' AND 
-    active = true AND
-    created_at >= '${startDate}' AND created_at <= '${endDate}'
+    WHERE chain_event_type_id  = '${chain}-${event}'
+    AND active = true 
+    AND created_at >= '${startDate}' 
+    AND created_at <= '${endDate}'
   `;
   switch (event) {
     case SubstrateTypes.EventKind.Reward:
