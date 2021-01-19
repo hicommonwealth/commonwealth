@@ -32,6 +32,7 @@
     .sublayout-main-col {
         flex: 3;
         padding: 0;
+        padding-right: 20px;
         max-width: calc(100% - #{$sidebar-width});
         @include sm-max {
             padding: 0;
@@ -41,12 +42,14 @@
         .sublayout-main-col {
             width: 100%;
             margin: 0 auto;
+            padding: 0;
         }
     }
     @include md-max {
         .sublayout-main-col {
             width: 100%;
             max-width: none;
+            padding: 0;
         }
     }
 
@@ -57,6 +60,13 @@
         margin: 0 auto 12px;
         border-bottom: 1px solid #eee;
         padding: 24px 0 22px;
+        padding-right: 20px;
+        @include md-max {
+            padding-right: 0;
+        }
+        .hide-sidebar & {
+            padding-right: 0;
+        }
         .sublayout-header-inner {
             display: flex;
             max-width: $layout-max-width;
