@@ -63,7 +63,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean }> = {
     const activeAddresses = app.recentActivity.getMostActiveUsers();
 
     const otherMembers = activeInfo.members.map((role) => {
-      return { address: role.address, chain: role.chain_id };
+      return { address: role.address, chain: role.address_chain };
     }) as any;
 
     return m(Sublayout, {
