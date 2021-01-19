@@ -602,7 +602,6 @@ export const ProposalBodySaveEdit: m.Component<{
               return !alreadyExists;
             });
           }
-          console.log(mentions);
           parentState.saving = true;
           if (item instanceof OffchainThread) {
             app.threads.edit(item, itemText, parentState.updatedTitle, mentions).then(() => {
