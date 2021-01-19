@@ -690,6 +690,10 @@ const NotificationsPage: m.Component<{}, {
     const chains = _.uniq(app.config.chains.getAll());
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
+      title: [
+        'Notification Settings ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       message: 'This page requires you to be logged in.'
     });
     if (subscriptions.length < 1) return m(PageLoading);

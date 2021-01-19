@@ -43,7 +43,10 @@ const MembersPage : m.Component<{}, { membersRequested: boolean }> = {
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
-      title: 'Members',
+      title: [
+        'Members',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       showNewProposalButton: true,
     });
 
@@ -56,7 +59,10 @@ const MembersPage : m.Component<{}, { membersRequested: boolean }> = {
       });
     }
     if (!activeInfo.members) return m(PageLoading, {
-      title: 'Members',
+      title: [
+        'Members',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       showNewProposalButton: true,
     });
 
@@ -68,7 +74,10 @@ const MembersPage : m.Component<{}, { membersRequested: boolean }> = {
 
     return m(Sublayout, {
       class: 'MembersPage',
-      title: 'Members',
+      title: [
+        'Members',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       showNewProposalButton: true,
     }, [
       // m('.members-caption', `Showing ${pluralize(activeAddresses.length, 'active member')}`),
