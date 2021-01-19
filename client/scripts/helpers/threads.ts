@@ -1,6 +1,6 @@
 import { re_weburl } from 'lib/url-validation';
 
-export const parseMentionsForServer = (text, isMarkdown) => {
+export const parseMentionsForServer = (text, isMarkdown: boolean): any[] => {
   // Extract links to Commonwealth profiles, so they can be processed by the server as mentions
   if (!text) return [];
   const regexp = RegExp('\\[\\@.+?\\]\\(.+?\\)', 'g');
@@ -13,6 +13,7 @@ export const parseMentionsForServer = (text, isMarkdown) => {
         return [chunks[refIdx - 1], chunks[refIdx + 1]];
       });
     }
+    return [];
   } else {
     return text.ops
       .filter((op) => {

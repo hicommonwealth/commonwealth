@@ -136,6 +136,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       : typeof req.body['mentions[]'] === 'undefined'
         ? []
         : req.body['mentions[]'];
+
     // grab mentions to notify tagged users
     let mentionedAddresses;
     if (mentions?.length > 0) {
@@ -173,6 +174,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
           if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
         }
       }
+
       if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
         models,
         NotificationCategories.NewMention,

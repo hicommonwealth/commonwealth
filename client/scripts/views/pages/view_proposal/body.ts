@@ -30,7 +30,6 @@ import { parseMentionsForServer } from 'helpers/threads';
 const Delta = Quill.import('delta');
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, ControlGroup, Icon, Icons } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
-import { VersionHistory } from 'client/scripts/controllers/server/threads';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -136,7 +135,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainT
     if (item instanceof OffchainThread || item instanceof OffchainComment) {
       if (!item.versionHistory || item.versionHistory.length === 0) return;
       const isThread = item instanceof OffchainThread;
-      const lastEdit : VersionHistory = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
+      const lastEdit = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
       if (!lastEdit) return;
 
       return m('.ProposalBodyLastEdited', [
@@ -583,6 +582,7 @@ export const ProposalBodySaveEdit: m.Component<{
               : quillEditorState.markdownMode
                 ? parseMentionsForServer(quillEditorState.editor.getText(), true)
                 : parseMentionsForServer(quillEditorState.editor.getContents(), false);
+
             const previousDraft = (item as OffchainThread).versionHistory[0];
             let previousDraftMentions;
             try {
