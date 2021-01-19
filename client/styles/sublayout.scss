@@ -43,6 +43,7 @@
     .hide-sidebar & {
         .sublayout-main-col {
             width: 100%;
+            margin: 0 auto;
         }
     }
     @include sm-max {
@@ -63,6 +64,10 @@
             max-width: $layout-max-width;
             padding: 0 $layout-padding;
             margin: 0 auto;
+            .hide-sidebar & {
+                max-width: 840px;
+                margin: 0 auto;
+            }
         }
 
         .sublayout-header-left {
@@ -82,6 +87,11 @@
             .CommunitySelector,
             .sublayout-header-heading {
                 display: inline-block;
+            }
+            h3 {
+                font-size: 1.15rem;
+                font-weight: 600;
+                margin: 8px 0 0;
             }
             h4.sublayout-header-heading {
                 font-size: 1.15rem;

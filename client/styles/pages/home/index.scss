@@ -1,24 +1,11 @@
 @import 'client/styles/shared';
 
 .Homepage {
-    max-width: 900px;
-    margin: 0 auto 80px;
-    @include sm-max {
-        padding-top: 30px;
-    }
-    h1 {
-        font-size: 33px;
-        margin: 12px 0 0;
-    }
+    border-top: 1px solid #eee;
+    padding-bottom: 40px;
     p.lead-copy {
         font-size: 19px;
         margin: 0 0 34px;
         line-height: 1.1;
-    }
-    @include xs-max {
-        text-align: center;
-        .sublayout-body .container {
-            padding: 0;
-        }
     }
 }

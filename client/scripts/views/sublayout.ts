@@ -47,7 +47,9 @@ const Sublayout: m.Component<{
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
-      chain ? [
+      (!m.route.param('scope') && m.route.get() === '/') ? [
+        m('h3', 'Commonwealth')
+      ] : chain ? [
         m(ChainIcon, { size: ICON_SIZE, chain }),
         m('h4.sublayout-header-heading', [
           chain.name,
@@ -62,7 +64,9 @@ const Sublayout: m.Component<{
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
-      ] : '',
+      ] : [
+        // empty since a chain or community is loading
+      ],
     ]);
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [
