@@ -70,6 +70,7 @@ const NewTopicModal: m.Component<{
           m(Button, {
             intent: 'primary',
             disabled: vnode.state.saving,
+            rounded: true,
             onclick: async (e) => {
               e.preventDefault();
               if (!vnode.state.form.name.trim()) return;

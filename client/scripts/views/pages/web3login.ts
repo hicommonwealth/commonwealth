@@ -25,6 +25,7 @@ const Web3LoginPage: m.Component<{}> = {
           intent: 'primary',
           label: 'Try again',
           fluid: true,
+          rounded: true,
           onclick: (e) => {
             app.modals.lazyCreate('link_new_address_modal', {
               loggingInWithAddress,

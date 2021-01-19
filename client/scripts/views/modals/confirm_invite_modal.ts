@@ -105,6 +105,7 @@ const ConfirmInviteModal: m.Component<{}, {
                 && m(Button, {
                   class: 'submit',
                   intent: 'primary',
+                  rounded: true,
                   disabled: vnode.state.accepted.includes(vnode.state.location) || !vnode.state.selectedAddress,
                   onclick: (e) => {
                     e.preventDefault();
@@ -133,6 +134,7 @@ const ConfirmInviteModal: m.Component<{}, {
                 && m(Button, {
                   class: 'reject',
                   intent: 'negative',
+                  rounded: true,
                   disabled: vnode.state.accepted.includes(vnode.state.location),
                   onclick: async (e) => {
                     e.preventDefault();

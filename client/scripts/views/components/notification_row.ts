@@ -74,6 +74,8 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationHeader = m('span', [ actorName, ' created a new thread ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
+  } else if (category === `${NotificationCategories.NewCollaboration}`) {
+    notificationHeader = m('span', [actorName, ' added you as a collaborator on ', m('span.commented-obj', decoded_title)]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
       ? m('span', [ actorName, ' liked the post ', m('span.commented-obj', decoded_title) ])
@@ -323,7 +325,7 @@ const NotificationRow: m.Component<{
         id: notification.id,
         onclick: async () => {
           app.user.notifications.markAsRead(notifications);
-          await m.route.set(path);
+          await m.route.set(path.replace(/ /g, '%20')); // fix for improperly generated notification paths
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [

@@ -95,6 +95,7 @@ const EditTopicModal : m.Component<{
               intent: 'primary',
               disabled: vnode.state.saving,
               style: 'margin-right: 8px',
+              rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
                 updateTopic(vnode.state.form).then(() => {
@@ -109,6 +110,7 @@ const EditTopicModal : m.Component<{
             m(Button, {
               intent: 'negative',
               disabled: vnode.state.saving,
+              rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
                 const confirmed = await confirmationModalWithText('Delete this topic?')();

@@ -55,6 +55,10 @@ export function extractDomain(url) {
   return re.exec(url)[1];
 }
 
+export function removeUrlPrefix(url) {
+  return url.replace(/^https?:\/\//, '');
+}
+
 /*
  * icons
  */

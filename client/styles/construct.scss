@@ -132,6 +132,8 @@ $cui-negative-border-color:        $cui-negative-bg-color;
 $cui-negative-border-color-hover:  $cui-negative-bg-color-hover;
 $cui-negative-border-color-active: $cui-negative-bg-color-active;
 
+$cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
+
 @import 'construct-ui/src/utils/focus-manager/index.scss';
 @import 'construct-ui/src/components/index.scss';
 
@@ -152,6 +154,13 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
     top: 4px;
 }
 
+
+.cui-popover-content {
+    border-color: $cui-popover-arrow-border-color;
+}
+.cui-menu .cui-menu-divider {
+    border-color: lighten($cui-popover-arrow-border-color, 2%);
+}
 
 .cui-button {
     font-weight: $cui-font-weight-bold !important; // fix weight
@@ -241,6 +250,23 @@ button, .cui-button {
 
 // button color fixes
 .cui-button {
+    background: $background-color-white;
+    transition: none;
+    &:active, &.cui-active {
+        background: $background-color-white;
+        box-shadow: none;
+    }
+    // adjust rounded button styles
+    &.cui-rounded {
+        border-color: $grey200;
+        &:hover {
+            border-color: $grey700;
+        }
+        &:active, &.cui-active {
+            border-color: $grey700;
+        }
+    }
+
     // adjust sublabel colors to grey from blue grey
     .cui-button-sublabel {
         color: $grey400;
@@ -453,6 +479,12 @@ button, .cui-button {
     z-index: initial;
 }
 
+.cui-spinner .cui-spinner-icon {
+    border-color: transparent;
+    border-top-color: $text-color-primary !important;
+    border-right-color: $text-color-primary !important;
+}
+
 // make large spinners bigger
 .cui-spinner.cui-lg .cui-spinner-icon,
 .cui-lg .cui-spinner .cui-spinner-icon {
@@ -487,7 +519,46 @@ button, .cui-button {
 .cui-dialog-header {
     padding: 15px 15px 15px 25px;
     h3 {
-        margin: 4px 0 0;
+        margin: 6px 0 0;
         font-weight: 600;
+    }
+}
+
+// dialog entry animation
+.cui-overlay-backdrop {
+    .fade-enter & {
+        opacity: 0.01;
+        transition: opacity 0.05s ease;
+    }
+    .fade-enter-active & {
+        opacity: 1;
+    }
+    .fade-exit & {
+        opacity: 0.01;
+        transition: opacity 0.05s ease;
+    }
+    .fade-exit-active & {
+        opacity: 0;
+    }
+}
+
+.cui-dialog-content {
+    .fade-enter & {
+        opacity: 0.01;
+        transform: scale(0.95);
+        transition: opacity 0.05s ease, popout 0.05s ease,
+                    transform 0.05s cubic-bezier(0.54, 1.12, 0.38, 1.11);
+    }
+    .fade-enter-active & {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .fade-exit & {
+        transition: opacity 0.05s ease, popout 0.05s ease,
+                    transform 0.05s cubic-bezier(0.54, 1.12, 0.38, 1.11);
+    }
+    .fade-exit-active & {
+        opacity: 0;
+        transform: scale(0.95);
     }
 }

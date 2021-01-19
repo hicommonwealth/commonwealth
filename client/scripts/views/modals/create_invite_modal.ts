@@ -32,6 +32,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { disabled: boolean, }> = {
       intent: 'primary',
       name: selection,
       loading: vnode.state.disabled,
+      rounded: true,
       type: 'submit',
       label: selection === 'address'
         ? 'Invite Commonwealth user' : selection === 'email' ? 'Invite email' : 'Add',
@@ -165,6 +166,7 @@ const CreateInviteLink: m.Component<{
         m(Button, {
           type: 'submit',
           intent: 'primary',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             // TODO: Change to POST /inviteLink

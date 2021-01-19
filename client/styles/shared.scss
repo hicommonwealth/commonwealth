@@ -7,9 +7,10 @@
 //
 // layout parameters
 
-$sidebar-width: 230px;
+$sidebar-width: 240px;
 $quick-switcher-width: 64px;
-$layout-max-width: 970px;
+$layout-max-width: 1280px;
+$layout-padding: 36px;
 
 //
 // base fonts
@@ -83,7 +84,7 @@ $listing-right-flex: 3;
 
 @mixin listing-row-base {
     display: flex;
-    padding: 12px 20px;
+    padding: 15px 20px 10px;
     margin: 0 -20px;
     cursor: pointer;
     &:hover {
@@ -155,5 +156,7 @@ $listing-right-flex: 3;
         width: 7px;
         height: 7px;
         margin-right: 6px;
+        position: relative;
+        top: -1px;
     }
 }
