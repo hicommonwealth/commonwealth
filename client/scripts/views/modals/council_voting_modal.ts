@@ -113,6 +113,7 @@ const CouncilVotingModal: m.Component<{ candidates }, { votes, error, phragmenSt
           type: 'submit',
           onclick: submitVote,
           fluid: true,
+          rounded: true,
           label: hasApprovals ? 'Update vote' : 'Submit vote',
           intent: 'primary',
         }),
@@ -120,6 +121,7 @@ const CouncilVotingModal: m.Component<{ candidates }, { votes, error, phragmenSt
           class: 'retract-vote',
           intent: 'negative',
           fluid: true,
+          rounded: true,
           style: 'margin-top: 10px;',
           onclick: (e) => {
             e.preventDefault();

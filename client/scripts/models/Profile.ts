@@ -61,9 +61,23 @@ class Profile {
     this._isValidator = isValidator;
   }
 
+  // this.name() is only the user-set name, and will be blank if the
+  // user has not set an name (from within Commonwealth or by
+  // registering an on-chain identity)
+  //
+  // this.displayName() is the user-set name or the address, and
+  // this.displayNameWithAddress() is the user-set name with the address,
+  // or just the address if the user has not set a name.
   get displayName() : string {
     if (!this._initialized) return 'Loading...';
     return this.name || 'Anonymous';
+  }
+
+  get displayNameWithAddress() : string {
+    if (!this._initialized) return 'Loading...';
+    return this.name
+      ? `${this.name} · ${formatAddressShort(this.address, this.chain)}`
+      : formatAddressShort(this.address, this.chain);
   }
 
   public getAvatar(size: number) {

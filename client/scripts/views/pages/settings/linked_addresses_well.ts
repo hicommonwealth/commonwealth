@@ -69,6 +69,7 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
               });
             }
           },
+          rounded: true,
           disabled: vnode.state.removing,
           loading: vnode.state.removing,
           label: 'Remove',

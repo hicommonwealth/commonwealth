@@ -305,6 +305,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
+  } else if (n.chain.network === ChainNetwork.Commonwealth) {
+    const Commonwealth = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/commonwealth/adapter'
+    )).default;
+    newChain = new Commonwealth(n, app);
   } else {
     throw new Error('Invalid chain');
   }
@@ -507,6 +514,11 @@ $(() => {
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
     '/edgeware/stats':           importRoute('views/stats/edgeware', { scoped: false }),
+
+    // Commonwealth protocol
+    '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
+    // '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
+    '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),

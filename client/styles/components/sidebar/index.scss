@@ -1,130 +1,53 @@
 @import 'client/styles/shared';
 
-.MobileSidebarHeader {
-    // only content styles here. layout styles are in layout.scss
-    background: $background-color-light;
-    border-bottom: 1px solid $border-color-lightest;
-
-    .mobile-sidebar-center {
-        flex: 1;
-        max-width: calc(100% - 100px);
-        &.logged-in {
-            max-width: calc(100% - 242px);
+@mixin sidebar {
+    .cui-button.cui-align-center {
+        justify-content: left;
+    }
+    .cui-button.telegram-button {
+        border-color: #2480cc;
+        background: #2480cc;
+        color: $text-color-white;
+    }
+    .cui-button.discord-button {
+        border-color: #677bc4;
+        background: #677bc4;
+        color: $text-color-white;
+    }
+    .SubscriptionButton {
+        margin-bottom: 10px;
+    }
+    .ChainStatusModule {
+        .chain-deferred {
+            color: $text-color-medium;
         }
-        &.logged-in.no-community {
-            max-width: calc(100% - 142px);
-        }
-    }
-    .mobile-sidebar-left {
-        padding-left: 6px !important;
-    }
-    .mobile-sidebar-right {
-        padding-right: 13px !important;
-    }
 
-    // TODO: split this up so CSS classes aren't duplicated
-    .mobile-sidebar-left,
-    .mobile-sidebar-center,
-    .mobile-sidebar-right {
-        padding: 13px 0;
-        .CommunitySelector .cui-button {
+        // form stuff
+        .form-group {
+            margin-bottom: 0;
+            select {
+                width: 100%;
+                border-color: $border-color-lightest;
+                border-radius: 2px;
+                padding: 5px 6px;
+            }
+            .chain-status-main {
+                width: calc(100% - 28px);
+            }
+        }
+        .cui-button-label {
+            text-align: left;
             width: 100%;
-            padding: 0 14px;
-            background: $background-color-white;
-            overflow: hidden;
-            border: 1px solid #c5cdd1 !important;
-            border-radius: 4px !important;
-            .cui-icon-menu {
-                display: none;
-            }
         }
-        > .MobileNewProposalButton,
-        > .cui-button,
-        > .cui-overlay {
-            display: inline-block;
-        }
-        > .LoginSelector > .cui-button > .cui-button-label > * {
-            display: inline-block;
-        }
-        > .cui-button,
-        > .MobileNewProposalButton,
-        > .community-label,
-        > .LoginSelector {
-            margin-left: 9px;
-        }
-        > .cui-button .cui-button-label {
-            display: inline-block;
-            position: relative;
-            top: 1px;
-        }
-        @include xs-max {
-            .MobileNewProposalButton .cui-button {
-                .cui-button-label {
-                    top: 0 !important;
-                }
-            }
-        }
-        @include sm-max {
-            .MobileNewProposalButton .cui-button {
-                padding: 0 12px;
-                .cui-button-label {
-                    top: 2px;
-                }
-            }
-            .cui-button.mobile-sidebar-trigger {
-                padding-left: 12px;
-                padding-right: 12px;
-                .cui-icon {
-                    margin-left: -2px;
-                    margin-right: -2px;
-                }
-            }
-            .community-label .CommunityLabel .community-label-left {
-                padding-right: 8px;
-            }
-            .LoginSelector {
-                // responsive logged-in state
-                .User {
-                    position: relative;
-                    top: -1px;
-                }
-                .user-avatar {
-                    margin-right: 0;
-                }
-                .user-display-name {
-                    display: none;
-                }
-                .role-icon {
-                    display: none;
-                }
-                .LoginSelectorMenu .user-display-name {
-                    display: inline;
-                }
-                .cui-button-label .cui-icon-user {
-                    margin-right: 0;
-                }
-                .hidden-sm {
-                    display: none !important;
-                }
-                // responsive logged-out state
-                .login-selector-user .cui-button {
-                    padding-left: 12px;
-                    padding-right: 12px;
-                }
-                .login-selector-user .cui-icon-user {
-                    margin-right: 0;
-                }
-                .login-selector-user .cui-button-label {
-                    display: none;
-                }
-            }
+        .cui-icon svg {
+            min-width: 12px;
+            min-height: 12px;
+            width: 12px;
+            height: 12px;
         }
     }
 }
 
-.hidden-sidebar .SidebarQuickSwitcher {
-    display: none;
-}
 .SidebarQuickSwitcher {
     position: fixed;
     top: 0;
@@ -134,14 +57,18 @@
     width: $quick-switcher-width;
     background: $background-color-medium-light;
     z-index: 3;
-    overflow-y: auto;
+    // overflow-y: auto;
     @include sm-max {
         display: none;
     }
-    .ChainIcon, .CommunityIcon {
+    .CommunitySelector {
+        margin: 15px 0 14px;
+    }
+    > .SidebarQuickSwitcherItem .ChainIcon,
+    > .SidebarQuickSwitcherItem .CommunityIcon {
+        margin-bottom: 15px;
         cursor: pointer;
         opacity: 0.3;
-        margin: 15px 0;
         &:hover {
             opacity: 0.33;
         }
@@ -166,6 +93,7 @@
 .Sidebar {
     position: relative;
     z-index: 2;
+    padding-top: 24px;
     .sidebar-content {
         max-height: calc(100vh - 60px);
         padding-top: 16px;
@@ -180,6 +108,7 @@
         }
     }
     .sidebar-fadeout {
+        display: none; // TODO
         position: absolute;
         bottom: 0;
         width: 100%;
@@ -234,163 +163,19 @@
             }
         }
     }
-    .SidebarModule {
-        margin: 0 15px 20px;
-        > .cui-list {
-            // reset list styles
-            overflow-x: hidden;
-            max-height: 100%;
-            user-select: none;
-            background: transparent;
-            .cui-list-item {
-                font-size: 17px;
-                font-weight: 500;
-                padding: 6px 12px 0 !important;
-                border-radius: 4px;
-                border: none;
-                white-space: nowrap;
-                &.section-header, &.section-callout {
-                    background: initial !important;
-                    cursor: initial;
-                }
-                &.section-header {
-                    font-size: 15px;
-                    color: $text-color-lighter;
-                    margin-bottom: 4px;
-                    .cui-icon svg {
-                        stroke: $text-color-lightest;
-                    }
-                    .cui-icon:hover svg {
-                        stroke: $text-color-medium;
-                    }
-                }
-                &.section-callout {
-                    margin-top: 8px;
-                    white-space: initial;
-                }
-                .cui-list-item-content-left {
-                    padding-right: 10px;
-                }
-                .cui-list-item-content-right {
-                    position: relative;
-                    right: -6px;
-                }
-                .cui-list-item-content-left .cui-icon svg {
-                    stroke: $text-color-lighter;
-                    position: relative;
-                    top: -1px;
-                }
-                &:hover {
-                    background: $background-color-light-hover;
-                }
-                &.cui-active, &.cui-active:hover {
-                    background: $primary-bg-color !important;
-                    color: $text-color-white;
-                    .cui-icon svg {
-                        stroke: $text-color-white;
-                    }
-                    .proposal-topic-icon {
-                        border-color: $text-color-white;
-                    }
-                }
-                .cui-icon-action {
-                    position: absolute;
-                    right: 0;
-                    top: 0;
-                    bottom: 0;
-                    width: 36px;
-                    // center the icon
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    .cui-icon svg {
-                        opacity: 0.6;
-                    }
-                }
-                .cui-callout {
-                    font-weight: initial;
-                }
-            }
-        }
-        > .cui-list.cui-interactive {
-            .cui-list-item:hover {
-                background: $background-color-light-hover;
-            }
-            .cui-icon-action:hover {
-                .cui-icon svg {
-                    opacity: 1;
-                }
-            }
-        }
+    .section-header {
+        font-size: 18px;
+        color: $text-color-light;
+        margin-top: 20px;
+        margin-bottom: 6px;
+    }
+    .cui-button {
+        margin-bottom: 4px;
     }
 }
 
-.MobileSidebarHeader,
 .Sidebar {
-    .SubscriptionButton {
-        position: absolute;
-        bottom: 20px;
-        left: 25px;
-        z-index: 5;
-        width: calc(100% - 50px);
-        .cui-button-label {
-            font-weight: 400;
-            font-size: 0.94rem;
-        }
-        @include sm-max {
-            position: relative;
-            bottom: initial;
-            margin-bottom: 10px !important;
-        }
-    }
-    .ChainStatusModule {
-        position: absolute;
-        bottom: 66px;
-        left: 25px;
-        margin-bottom: 0 !important;
-        width: calc(100% - 50px);
-        max-width: calc(100% - 50px);
-        z-index: 5;
-        @include sm-max {
-            position: relative;
-            bottom: initial;
-        }
-
-        // background
-        font-size: 0.94rem;
-        .chain-deferred {
-            color: $text-color-medium;
-        }
-
-        // form stuff
-        .form-group {
-            margin-bottom: 0;
-            select {
-                width: 100%;
-                border-color: $border-color-lightest;
-                border-radius: 2px;
-                padding: 5px 6px;
-            }
-            .chain-status-main {
-                width: calc(100% - 28px);
-            }
-        }
-        .cui-button-group {
-            position: relative;
-            width: 100%;
-        }
-        .cui-button-label {
-            font-weight: 400;
-            text-align: center;
-            width: 100%;
-        }
-        .cui-icon svg {
-            min-width: 12px;
-            min-height: 12px;
-            width: 12px;
-            height: 12px;
-        }
-    }
+    @include sidebar();
 }
 
 .cui-popover.sidebar-edit-topic .cui-menu,

@@ -253,6 +253,7 @@ export default (
       || chain.network === 'metacartel'
       || chain.network === 'marlin'
       || chain.network === 'marlin-testnet'
+      || chain.network === 'commonwealth'
     ) {
       //
       // ethereum address handling

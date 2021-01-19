@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
 .MembersPage {
-    padding-bottom: 10px;
+    padding-bottom: 40px;
 
     .members-list {
         margin: 20px -16px;
@@ -11,6 +11,7 @@
         color: #111;
         text-decoration: none;
         padding: 10px 16px 4px;
+        margin-bottom: 6px;
         border-radius: 4px;
         &:hover {
             background: $background-color-white-hover;
@@ -20,24 +21,18 @@
         width: 52px;
         padding-top: 3px;
     }
+
+    // content
     .members-item-left {
-        flex: 1;
         .User {
-            font-weight: 500;
-        }
-        .members-item-headline {
+            font-weight: 600;
+            font-size: 19px;
         }
         .members-item-address {
             color: $text-color-light;
         }
-    }
-    .members-item-right {
-        padding-right: 4px;
-        margin-top: 13px;
-        font-size: 95%;
-        color: $text-color-light;
-        @include sm-max {
-            display: none;
+        .members-item-posts {
+            color: $text-color-light;
         }
     }
 }

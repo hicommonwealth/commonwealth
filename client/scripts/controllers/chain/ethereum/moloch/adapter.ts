@@ -48,12 +48,14 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
       await this.webWallet.enable();
       await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
         const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
+        if (!updatedAddress) return;
         await setActiveAccount(updatedAddress);
       });
     }
 
     await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
       const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
+      if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);
       api.updateSigner(accounts[0]);
     });

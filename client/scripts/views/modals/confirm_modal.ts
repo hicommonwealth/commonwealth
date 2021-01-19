@@ -27,6 +27,7 @@ const ConfirmModal = {
       m('.compact-modal-actions', [
         m(Button, {
           intent: 'primary',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             $(e.target).trigger('modalcomplete');
@@ -41,6 +42,7 @@ const ConfirmModal = {
         }),
         m(Button, {
           intent: 'none',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             $(e.target).trigger('modalexit');

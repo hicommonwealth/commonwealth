@@ -76,6 +76,7 @@ We also use certain environment variables to configure the application itself:
 To download and restore the production database, and run migrations:
 
 ```
+nvm use
 heroku pg:backups:capture -a commonwealthapp
 heroku pg:backups:download -a commonwealthapp
 brew services restart postgres     # For Mac OS X restart the database to close any open connections

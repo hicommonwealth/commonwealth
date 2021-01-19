@@ -96,6 +96,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
           model: models.Chain,
         }, {
           model: models.Address,
+          as: 'Address',
           include: [ models.OffchainProfile ]
         }],
       });
@@ -106,6 +107,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
           where: { privacyEnabled: false },
         }, {
           model: models.Address,
+          as: 'Address',
           include: [ models.OffchainProfile ]
         }],
       });

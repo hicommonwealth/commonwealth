@@ -37,7 +37,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
-              const adminsAndMods = await communityMeta.getAdminsAndMods(app.activeId());
+              const adminsAndMods = await communityMeta.getMembers(app.activeId());
               const userAdminsAndMods = adminsAndMods.filter((role_) => {
                 const belongsToUser = !!app.user.addresses
                   .filter((addr_) => addr_.id === role_.address_id)

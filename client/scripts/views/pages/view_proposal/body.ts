@@ -87,6 +87,7 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
         popover: true,
         linkify: true,
         hideAvatar: true,
+        showAddressWithDisplayName: true,
       }),
       item instanceof OffchainThread && item.collaborators && item.collaborators.length > 0
         && m('span.proposal-collaborators', ` and ${pluralize(item.collaborators?.length, 'other')}`),

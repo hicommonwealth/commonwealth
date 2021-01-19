@@ -34,6 +34,7 @@ export enum ChainNetwork {
   Marlin = 'marlin',
   MarlinTestnet = 'marlin-testnet',
   Metacartel = 'metacartel',
+  Commonwealth = 'commonwealth',
 }
 
 // TODO: this should be deprecated, and replaced with ChainNetwork in most instances
@@ -55,6 +56,7 @@ export enum ChainClass {
   Moloch = 'moloch',
   Marlin = 'marlin',
   MarlinTestnet = 'marlin-testnet',
+  Commonwealth = 'commonwealth',
 }
 
 // TODO: this is inconsistently used

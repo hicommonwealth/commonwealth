@@ -43,6 +43,7 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
     try {
       return this._store.getByAddress(address.toLowerCase());
     } catch (e) {
+      if (!this._Accounts) return null;
       return new MolochMember(this.app, this._Chain, this._Accounts, this, address);
     }
   }
@@ -52,6 +53,7 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
     try {
       return this._store.getByAddress(member.id);
     } catch (e) {
+      if (!this._Accounts) return null;
       return new MolochMember(this.app, this._Chain, this._Accounts, this, member.id, member);
     }
   }
