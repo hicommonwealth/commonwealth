@@ -224,6 +224,7 @@ const BatchedSubscriptionRow: m.Component<{
           trigger: m(Button, {
             align: 'left',
             compact: true,
+            rounded: true,
             disabled: !app.user.emailVerified || vnode.state.loading,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
@@ -423,6 +424,7 @@ const ChainEventSubscriptionRow: m.Component<{
           trigger: m(Button, {
             align: 'left',
             compact: true,
+            rounded: true,
             disabled: !app.user.emailVerified || vnode.state.loading,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
@@ -720,6 +722,7 @@ const NotificationsPage: m.Component<{}, {
               trigger: m(Button, {
                 align: 'left',
                 compact: true,
+                rounded: true,
                 disabled: !app.user.emailVerified,
                 iconRight: Icons.CHEVRON_DOWN,
                 label: vnode.state.selectedCommunity

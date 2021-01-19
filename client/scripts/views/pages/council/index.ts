@@ -94,6 +94,7 @@ export const CollectiveVotingButton: m.Component<{
           disabled: !app.user.activeAccount,
           intent: 'primary',
           label: 'Set council vote',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             app.modals.create({
@@ -146,6 +147,7 @@ export const CandidacyButton: m.Component<{
           disabled: (!app.user.activeAccount || activeAccountIsCandidate
                     || app.chain.networkStatus !== ApiStatus.Connected),
           intent: 'primary',
+          rounded: true,
           label: activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council',
           onclick: (e) => {
             e.preventDefault();
