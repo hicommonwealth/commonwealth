@@ -65,6 +65,15 @@ const SidebarQuickSwitcher: m.Component<{}> = {
 
     const size = 36;
     return m('.SidebarQuickSwitcher', [
+      m(Button, {
+        class: 'sidebar-home-link',
+        rounded: true,
+        label: m(Icon, { name: Icons.HOME }),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set('/');
+        },
+      }),
       m(CommunitySelector),
       starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
     ]);
