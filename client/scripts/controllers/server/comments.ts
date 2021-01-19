@@ -145,7 +145,12 @@ class CommentsController {
     }
   }
 
-  public async edit(comment: OffchainComment<any>, body?: string, attachments?: string[]) {
+  public async edit(
+    comment: OffchainComment<any>,
+    body?: string,
+    mentions?: any[],
+    attachments?: string[]
+  ) {
     const newBody = body || comment.text;
     try {
       // TODO: Change to PUT /comment
@@ -158,6 +163,7 @@ class CommentsController {
         'body': encodeURIComponent(newBody),
         'new_version_history': !!body,
         'attachments[]': attachments,
+        'mentions[]': mentions,
         'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);

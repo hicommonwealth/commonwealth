@@ -324,10 +324,10 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id: Number(id),
+          root_id: +id,
           root_title,
           root_type: prefix,
-          comment_id: Number(finalComment.id),
+          comment_id: +finalComment.id,
           comment_text: finalComment.text,
           chain_id: finalComment.chain,
           community_id: finalComment.community,

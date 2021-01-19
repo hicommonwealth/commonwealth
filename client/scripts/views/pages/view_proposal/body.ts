@@ -559,6 +559,7 @@ export const ProposalBodySaveEdit: m.Component<{
     const { item, getSetGlobalEditingStatus, parentState, callback } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
+    const isComment = item instanceof OffchainComment;
 
     return m('.ProposalBodySaveEdit', [
       m(Button, {
@@ -576,7 +577,7 @@ export const ProposalBodySaveEdit: m.Component<{
             ? quillEditorState.editor.getText()
             : JSON.stringify(quillEditorState.editor.getContents());
           let mentions;
-          if (isThread) {
+          if (isThread || isComment) {
             const currentDraftMentions = !quillEditorState
               ? []
               : quillEditorState.markdownMode
@@ -601,6 +602,7 @@ export const ProposalBodySaveEdit: m.Component<{
               return !alreadyExists;
             });
           }
+          console.log(mentions);
           parentState.saving = true;
           if (item instanceof OffchainThread) {
             app.threads.edit(item, itemText, parentState.updatedTitle, mentions).then(() => {
@@ -613,7 +615,7 @@ export const ProposalBodySaveEdit: m.Component<{
               notifySuccess('Thread successfully edited');
             });
           } else if (item instanceof OffchainComment) {
-            app.comments.edit(item, itemText).then((c) => {
+            app.comments.edit(item, itemText, mentions).then((c) => {
               parentState.editing = false;
               parentState.saving = false;
               clearEditingLocalStorage(item, false);

@@ -181,7 +181,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id: Number(finalThread.id),
+          root_id: +finalThread.id,
           root_type: ProposalType.OffchainThread,
           root_title: finalThread.title,
           comment_text: finalThread.body,

@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import moment from 'moment';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
-import moment from 'moment';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -122,7 +122,82 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       req.wss,
       [ finalComment.Address.address ],
     );
-    // TODO: dispatch notifications for new mention(s)
+
+    const mentions = typeof req.body['mentions[]'] === 'string'
+      ? [req.body['mentions[]']]
+      : typeof req.body['mentions[]'] === 'undefined'
+        ? []
+        : req.body['mentions[]'];
+    console.log(mentions);
+    // grab mentions to notify tagged users
+    let mentionedAddresses;
+    if (mentions?.length > 0) {
+      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+        mention = mention.split(',');
+        try {
+          const user = await models.Address.findOne({
+            where: {
+              chain: mention[0],
+              address: mention[1],
+            },
+            include: [ models.User, models.Role ]
+          });
+          return user;
+        } catch (err) {
+          return next(new Error(err));
+        }
+      }));
+      // filter null results
+      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+    }
+
+    // notify mentioned users, given permissions are in place
+    if (mentionedAddresses?.length > 0) {
+      await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
+        if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
+
+        let shouldNotifyMentionedUser = true;
+        if (finalComment.community) {
+          const originCommunity = await models.OffchainCommunity.findOne({
+            where: { id: finalComment.community }
+          });
+          if (originCommunity.privacyEnabled) {
+            const destinationCommunity = mentionedAddress.Roles
+              .find((role) => role.offchain_community_id === originCommunity.id);
+            if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
+          }
+        }
+
+        if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
+          models,
+          NotificationCategories.NewMention,
+          `user-${mentionedAddress.User.id}`,
+          {
+            created_at: new Date(),
+            root_id: +id,
+            root_title,
+            root_type: prefix,
+            comment_id: +finalComment.id,
+            comment_text: finalComment.text,
+            chain_id: finalComment.chain,
+            community_id: finalComment.community,
+            author_address: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+          },
+          {
+            user: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+            url: cwUrl,
+            title: proposal.title || '',
+            chain: finalComment.chain,
+            community: finalComment.community,
+            body: finalComment.text,
+          },
+          req.wss,
+          // [ finalComment.Address.address ],
+        );
+      }));
+    }
 
     // update author.last_active (no await)
     author.last_active = new Date();
