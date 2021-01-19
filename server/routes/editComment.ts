@@ -128,7 +128,7 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       : typeof req.body['mentions[]'] === 'undefined'
         ? []
         : req.body['mentions[]'];
-    console.log(mentions);
+
     // grab mentions to notify tagged users
     let mentionedAddresses;
     if (mentions?.length > 0) {
