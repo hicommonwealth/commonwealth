@@ -133,7 +133,9 @@ export async function Enrich(
 
         // find the waiting validator
         const nextElectedStr = nextElected.map((v) => v.toString())
-        const stashesStr =stashes.map((v) => v.args[0].toString())
+        // const stashesStr =stashes.map((v) => v.args[0].toString())
+        const stashesStr =stashes.filter((v) => v.args.length).map((v) => v.args[0].toString())
+        
         const waiting = stashesStr.filter((v) => !nextElectedStr.includes(v));
 
 
