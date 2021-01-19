@@ -23,6 +23,7 @@ const MessageSigningSeedOrMnemonicOption = {
         }),
         m(Button, {
           type: 'submit',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             vnode.state.error = null;

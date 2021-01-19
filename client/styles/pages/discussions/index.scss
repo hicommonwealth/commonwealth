@@ -17,35 +17,22 @@
     }
 
     .discussions-topics {
+        @include xs-max {
+            margin-top: 16px;
+        }
         margin-bottom: 20px;
         font-size: 17px;
         line-height: 1.25;
     }
-    .discussions-topic {
-        color: $text-color-medium;
+    .cui-button.discussions-topic {
+        padding: 0 15px;
         display: inline-block;
-        margin-right: 24px;
+        margin-right: 6px;
+        margin-bottom: 6px;
         cursor: pointer;
-        @include proposal-topic-inline;
-        .proposal-topic-name:hover {
-            text-decoration: underline;
-        }
-        .sidebar-edit-topic {
-            display: inline-block;
-        }
-        .proposal-topic-icon {
-            border-color: $text-color-medium;
-            margin-right: 8px;
-        }
-        .proposal-topic-name,
-        .proposal-topic-icon {
-            display: inline-block;
-        }
+        line-height: 1 !important;
         &.active {
-            color: $text-color-black;
-            .proposal-topic-icon {
-                border-color: $text-color-black;
-            }
+            border-color: $text-color-black;
         }
     }
 

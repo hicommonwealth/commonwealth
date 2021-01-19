@@ -190,6 +190,7 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
                 || !canTransfer
                 || vnode.state.sending),
         type: 'submit',
+        rounded: true,
         onclick: async (e) => {
           e.preventDefault();
           const address = vnode.state.recipientAddress;

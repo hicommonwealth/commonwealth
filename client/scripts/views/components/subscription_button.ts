@@ -15,6 +15,8 @@ const SubscriptionButton: m.Component<{}> = {
 
     return m(Button, {
       class: 'SubscriptionButton',
+      rounded: true,
+      fluid: true,
       onclick: (e) => {
         e.preventDefault();
         if (communitySubscription) {

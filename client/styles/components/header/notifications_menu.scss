@@ -79,6 +79,7 @@
         @include xs-max {
             max-width: calc(100vw - 24px);
         }
+        border-color: #dce1e3; // match cui-popover border color
     }
     .cui-popover-arrow {
         background: white;

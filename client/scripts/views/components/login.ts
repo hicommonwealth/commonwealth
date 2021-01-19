@@ -40,6 +40,7 @@ const Login: m.Component<{}, {
             intent: 'primary',
             fluid: true,
             disabled: vnode.state.disabled,
+            rounded: true,
             type: 'submit',
             onclick: (e) => {
               e.preventDefault();
@@ -85,6 +86,7 @@ const Login: m.Component<{}, {
           m(Button, {
             intent: 'primary',
             fluid: true,
+            rounded: true,
             href: `${app.serverUrl()}/auth/github`,
             onclick: (e) => {
               localStorage.setItem('githubPostAuthRedirect', JSON.stringify({

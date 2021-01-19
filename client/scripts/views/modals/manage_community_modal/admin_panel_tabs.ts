@@ -1,11 +1,13 @@
 import m from 'mithril';
 import $ from 'jquery';
 
-import { Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, RadioGroup, Form, Tag } from 'construct-ui';
+import {
+  Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, RadioGroup, Form, Tag
+} from 'construct-ui';
 import app from 'state';
 import { RolePermission, Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import WebhookSettingsModal from '../webhook_settings_modal';
+import WebhookSettingsModal from 'views/modals/webhook_settings_modal';
 import { pluralize } from 'helpers';
 
 interface IWebhooksFormAttrs {
@@ -91,6 +93,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                   m(Button, {
                     class: 'settings-button',
                     label: m(Icon, { name: Icons.SETTINGS, size: 'xs' }),
+                    rounded: true,
                     onclick: (e) => {
                       e.preventDefault();
                       app.modals.create({
@@ -162,6 +165,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
           label: 'Add webhook',
           style: 'margin: 10px 0',
           onclick: createWebhook,
+          rounded: true,
         }),
       ]),
     ]);
