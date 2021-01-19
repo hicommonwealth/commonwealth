@@ -34,20 +34,19 @@
         padding: 0;
         max-width: calc(100% - #{$sidebar-width});
         @include sm-max {
-            padding: 0 30px;
-        }
-        @include xs-max {
-            padding: 0 22px;
+            padding: 0;
         }
     }
     .hide-sidebar & {
         .sublayout-main-col {
             width: 100%;
+            margin: 0 auto;
         }
     }
-    @include sm-max {
+    @include md-max {
         .sublayout-main-col {
             width: 100%;
+            max-width: none;
         }
     }
 
@@ -63,6 +62,10 @@
             max-width: $layout-max-width;
             padding: 0 $layout-padding;
             margin: 0 auto;
+            .hide-sidebar & {
+                max-width: 840px;
+                margin: 0 auto;
+            }
         }
 
         .sublayout-header-left {
@@ -83,11 +86,19 @@
             .sublayout-header-heading {
                 display: inline-block;
             }
+            h3 {
+                font-size: 1.15rem;
+                font-weight: 600;
+                margin: 8px 0 0;
+            }
             h4.sublayout-header-heading {
                 font-size: 1.15rem;
                 font-weight: 600;
                 margin: 7px 17px 0 0;
                 white-space: nowrap;
+                a {
+                    color: $text-color-black;
+                }
                 .breadcrumb {
                     margin: 0 8px;
                     color: $text-color-lightest;

@@ -2,7 +2,7 @@ import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
 
-import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
+import { Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
 
 import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
 import { proposalSlugToFriendlyName } from 'identifiers';

@@ -10,8 +10,7 @@ const Homepage: m.Component<{}, {}> = {
     return m(Sublayout, {
       class: 'Homepage',
     }, [
-      m('h1', 'Commonwealth'),
-      m('p.lead-copy', 'On-chain communities'),
+      m('br'),
       m(CommunityCards),
     ]);
   }

@@ -55,23 +55,39 @@
     left: 0;
     padding: 0 14px;
     width: $quick-switcher-width;
-    background: $background-color-medium-light;
+    border-right: 1px solid #eee;
     z-index: 3;
     // overflow-y: auto;
     @include sm-max {
         display: none;
     }
-    .CommunitySelector {
+    .sidebar-home-link.cui-button {
         margin: 15px 0 14px;
+        height: 38px;
+        width: 38px;
+        padding: 0;
+        .cui-icon {
+            position: relative;
+            top: -2px;
+        }
+    }
+    .CommunitySelector {
+        margin: 0 0 14px;
+    }
+    .SidebarQuickSwitcherItem {
+        height: 38px;
+        width: 38px;
+        margin-bottom: 14px;
+        border: 1px solid transparent;
+        border-radius: 9999px;
+        &:hover {
+            border-color: #111;
+        }
     }
     > .SidebarQuickSwitcherItem .ChainIcon,
     > .SidebarQuickSwitcherItem .CommunityIcon {
-        margin-bottom: 15px;
         cursor: pointer;
-        opacity: 0.3;
-        &:hover {
-            opacity: 0.33;
-        }
+        opacity: 0.33;
     }
     .cui-overlay-inline {
         display: block;
