@@ -1,5 +1,17 @@
 @import 'client/styles/shared';
 
+.CommunitySelector {
+    .cui-button {
+        height: 36px;
+        width: 36px;
+        padding: 0;
+        .cui-icon {
+            position: relative;
+            top: -2px;
+        }
+    }
+}
+
 .CommunityLabel {
     .visible-sm {
         display: none;
@@ -9,24 +21,13 @@
     }
 }
 
-.CommunitySelector {
-    button.cui-button {
-        border: none !important;
-        border-radius: 0 !important;
-    }
-    .title-selector > .cui-button > .cui-button-label {
-        top: 1px;
-        .community-name {
-            position: relative;
-            top: 2px;
-        }
-    }
-}
-
 .CommunitySelectList {
-    left: $quick-switcher-width - 4px !important;
+    transform: none !important; // override any scrolling effects
+    left: $quick-switcher-width !important;
     @include sm-max {
         left: 0 !important;
+        top: 60px !important;
+        overflow-y: scroll;
     }
     .cui-popover-content {
         max-height: 100vh;
@@ -35,6 +36,7 @@
         @include xs-max {
             margin: 0 10px;
             width: calc(100vw - 20px);
+            max-height: calc(100vh - 70px);
         }
     }
     .cui-menu {

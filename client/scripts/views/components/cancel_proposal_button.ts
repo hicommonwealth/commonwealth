@@ -13,6 +13,7 @@ const CancelProposalButton: m.Component<IAttrs> = {
   view: (vnode: m.VnodeDOM<IAttrs>) => {
     return m(Button, {
       class: 'CancelProposalButton',
+      rounded: true,
       disabled: app.chain.networkStatus !== ApiStatus.Connected,
       onclick: (e) => {
         e.preventDefault();

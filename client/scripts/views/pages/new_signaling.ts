@@ -198,6 +198,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                   m(Button, {
                     iconLeft: Icons.PLUS,
                     label: 'Add option',
+                    rounded: true,
                     disabled: vnode.state.voteType === 'binary' || vnode.state.voteOutcomes.length === 6,
                     onclick: () => {
                       if (vnode.state.voteOutcomes.length >= 6) return;
@@ -207,6 +208,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                   m(Button, {
                     iconLeft: Icons.MINUS,
                     label: 'Remove option',
+                    rounded: true,
                     disabled: vnode.state.voteType === 'binary' || vnode.state.voteOutcomes.length === 3,
                     onclick: () => {
                       if (vnode.state.voteOutcomes.length <= 3) return;
@@ -219,6 +221,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                 m(Button, {
                   intent: 'primary',
                   disabled: !author,
+                  rounded: true,
                   onclick: (e) => newThread(),
                   label: 'Create proposal',
                 }),
