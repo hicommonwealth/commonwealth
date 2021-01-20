@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import moment from 'moment';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
-import moment from 'moment';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -49,7 +49,9 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    if (req.body.new_version_history) {
+    // If new comment body text has been submitted, create another version history entry
+    if (decodeURIComponent(req.body.body) !== JSON.parse(comment.version_history[0])) {
+      console.log('new history entry');
       const recentEdit = {
         timestamp: moment(),
         body: decodeURIComponent(req.body.body)

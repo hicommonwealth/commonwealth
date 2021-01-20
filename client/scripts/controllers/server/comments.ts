@@ -156,7 +156,6 @@ class CommentsController {
         'chain': comment.chain,
         'community': comment.community,
         'body': encodeURIComponent(newBody),
-        'new_version_history': !!body,
         'attachments[]': attachments,
         'jwt': app.user.jwt,
       });
