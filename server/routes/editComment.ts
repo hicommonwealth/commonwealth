@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import moment from 'moment';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
@@ -48,9 +49,22 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    const arr = comment.version_history;
-    arr.unshift(req.body.version_history);
-    comment.version_history = arr;
+    let latestVersion; 
+    try {
+      latestVersion = JSON.parse(comment.version_history[0]).body;
+    } catch (e) {
+      console.log(e);
+    }
+    // If new comment body text has been submitted, create another version history entry
+    if (decodeURIComponent(req.body.body) !== latestVersion) {
+      const recentEdit = {
+        timestamp: moment(),
+        body: decodeURIComponent(req.body.body)
+      };
+      const arr = comment.version_history;
+      arr.unshift(JSON.stringify(recentEdit));
+      comment.version_history = arr;
+    }
     comment.text = req.body.body;
     comment.plaintext = (() => {
       try {
