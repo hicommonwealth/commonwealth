@@ -174,6 +174,7 @@ class ThreadsController {
     proposal: OffchainThread,
     body?: string,
     title?: string,
+    mentions?: string[],
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
@@ -182,10 +183,15 @@ class ThreadsController {
       url: `${app.serverUrl()}/editThread`,
       type: 'PUT',
       data: {
+        'author_chain': app.user.activeAccount.chain.id,
         'author': JSON.stringify(app.user.activeAccount.profile),
+        'address': app.user.activeAccount.address,
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
         'thread_id': proposal.id,
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
+        'mentions[]': mentions,
         'title': newTitle,
         'attachments[]': attachments,
         'jwt': app.user.jwt
