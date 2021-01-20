@@ -21,7 +21,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
-import { Grid, Col, List } from 'construct-ui';
+import { Grid, Col, List, Tag } from 'construct-ui';
 import moment from 'moment';
 import Listing from './listing';
 import ErrorPage from './error';
@@ -94,12 +94,18 @@ const ReferendaPage: m.Component<{}> = {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
           message: 'Could not connect to chain',
-          title: 'Proposals',
+          title: [
+            'Referenda',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
         });
       }
       return m(PageLoading, {
         message: 'Connecting to chain',
-        title: 'Referenda',
+        title: [
+          'Referenda',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
         showNewProposalButton: true,
       });
     }
@@ -109,7 +115,10 @@ const ReferendaPage: m.Component<{}> = {
         if (!(app.chain as Substrate).democracy.initializing) loadCmd();
         return m(PageLoading, {
           message: 'Connecting to chain',
-          title: 'Referenda',
+          title: [
+            'Referenda',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
           showNewProposalButton: true,
         });
       }
@@ -131,7 +140,10 @@ const ReferendaPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'ReferendaPage',
-      title: 'Referenda',
+      title: [
+        'Referenda',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),

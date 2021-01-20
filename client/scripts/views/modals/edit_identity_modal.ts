@@ -139,6 +139,7 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
             m(Button, {
               intent: 'primary',
               disabled: vnode.state.saving || !app.chain?.loaded,
+              rounded: true,
               onclick: (e) => {
                 e.preventDefault();
                 updateIdentity();
@@ -146,6 +147,7 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
               label: 'Set identity'
             }),
             m(Button, {
+              rounded: true,
               onclick: (e) => {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');

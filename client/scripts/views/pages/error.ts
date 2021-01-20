@@ -5,7 +5,7 @@ import mixpanel from 'mixpanel-browser';
 import { EmptyState, Icon, Icons } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 
-const ErrorPage: m.Component<{ title?: string, message?: string }> = {
+const ErrorPage: m.Component<{ title, message?: string }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ErrorPage' });
   },

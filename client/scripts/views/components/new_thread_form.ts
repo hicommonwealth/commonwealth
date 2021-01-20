@@ -568,6 +568,7 @@ export const NewThreadForm: m.Component<{
               label: 'Create thread',
               name: 'submit',
               disabled: !author || vnode.state.saving,
+              rounded: true,
               onclick: async (e) => {
                 if (!detectURL(vnode.state.form.url)) {
                   notifyError('Must provide a valid URL.');
@@ -657,6 +658,7 @@ export const NewThreadForm: m.Component<{
             m(Button, {
               disabled: !author || saving || vnode.state.uploadsInProgress > 0,
               intent: 'primary',
+              rounded: true,
               onclick: async (e) => {
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
@@ -694,6 +696,7 @@ export const NewThreadForm: m.Component<{
               disabled: !author || saving || vnode.state.uploadsInProgress > 0
                 || (fromDraft && !vnode.state.quillEditorState?.alteredText),
               intent: 'none',
+              rounded: true,
               onclick: async (e) => {
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
@@ -804,6 +807,7 @@ export const NewThreadForm: m.Component<{
         // m(Button, {
         //   disabled: !author || vnode.state.uploadsInProgress > 0,
         //   intent: 'none',
+        //   rounded: true,
         //   onclick: () => cancelDraft(vnode.state),
         //   label: 'Cancel editing draft',
         // }),
