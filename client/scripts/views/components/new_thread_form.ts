@@ -160,7 +160,6 @@ const newThread = async (
       bodyText,
       url,
       attachments,
-      quillEditorState.markdownMode,
       readOnly,
     );
   } catch (e) {

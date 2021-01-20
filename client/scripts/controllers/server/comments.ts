@@ -114,10 +114,8 @@ class CommentsController {
     community: string,
     unescapedText: string,
     parentCommentId: any = null,
-    markdown: boolean,
     attachments?: string[],
   ) {
-    console.log({ markdown });
     try {
       // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
@@ -128,7 +126,6 @@ class CommentsController {
         'parent_id': parentCommentId,
         'root_id': proposalIdentifier,
         'attachments[]': attachments,
-        'markdown': markdown,
         'text': encodeURIComponent(unescapedText),
         'jwt': app.user.jwt,
       });
@@ -154,7 +151,6 @@ class CommentsController {
   public async edit(
     comment: OffchainComment<any>,
     body: string,
-    markdown: boolean,
     attachments?: string[]
   ) {
     const newBody = body || comment.text;
@@ -168,7 +164,6 @@ class CommentsController {
         'community': comment.community,
         'body': encodeURIComponent(newBody),
         'attachments[]': attachments,
-        'markdown': markdown,
         'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);

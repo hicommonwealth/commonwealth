@@ -78,7 +78,7 @@ const CreateComment: m.Component<{
       const communityId = app.activeCommunityId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, communityId, commentText, parentComment?.id, quillEditorState.markdownMode, attachments);
+          chainId, communityId, commentText, parentComment?.id, attachments);
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();

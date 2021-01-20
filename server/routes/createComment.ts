@@ -27,7 +27,7 @@ export const Errors = {
 const createComment = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { parent_id, root_id, text, markdown } = req.body;
+  const { parent_id, root_id, text } = req.body;
 
   const plaintext = (() => {
     try {

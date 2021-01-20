@@ -130,7 +130,6 @@ class ThreadsController {
     body?: string,
     url?: string,
     attachments?: string[],
-    markdown?: boolean,
     readOnly?: boolean,
   ) {
     try {
@@ -145,7 +144,6 @@ class ThreadsController {
         'body': encodeURIComponent(body),
         'kind': kind,
         'attachments[]': attachments,
-        'markdown': markdown,
         'topic_name': topicName,
         'topic_id': topicId,
         'url': url,
@@ -174,7 +172,6 @@ class ThreadsController {
     proposal: OffchainThread,
     body: string,
     title: string,
-    markdown?: boolean,
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
@@ -192,7 +189,6 @@ class ThreadsController {
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
-        'markdown': markdown,
         'attachments[]': attachments,
         'jwt': app.user.jwt
       },

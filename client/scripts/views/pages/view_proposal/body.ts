@@ -574,10 +574,9 @@ export const ProposalBodySaveEdit: m.Component<{
           const itemText = quillEditorState.markdownMode
             ? quillEditorState.editor.getText()
             : JSON.stringify(quillEditorState.editor.getContents());
-          let mentions;
           parentState.saving = true;
           if (item instanceof OffchainThread) {
-            app.threads.edit(item, itemText, parentState.updatedTitle, quillEditorState.markdownMode).then(() => {
+            app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {
               m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;
@@ -587,7 +586,7 @@ export const ProposalBodySaveEdit: m.Component<{
               notifySuccess('Thread successfully edited');
             });
           } else if (item instanceof OffchainComment) {
-            app.comments.edit(item, itemText, mentions).then((c) => {
+            app.comments.edit(item, itemText).then((c) => {
               parentState.editing = false;
               parentState.saving = false;
               clearEditingLocalStorage(item, false);
