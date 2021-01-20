@@ -130,7 +130,7 @@ class ThreadsController {
     body?: string,
     url?: string,
     attachments?: string[],
-    mentions?: string[],
+    markdown?: boolean,
     readOnly?: boolean,
   ) {
     try {
@@ -145,7 +145,7 @@ class ThreadsController {
         'body': encodeURIComponent(body),
         'kind': kind,
         'attachments[]': attachments,
-        'mentions[]': mentions,
+        'markdown': markdown,
         'topic_name': topicName,
         'topic_id': topicId,
         'url': url,
@@ -172,9 +172,9 @@ class ThreadsController {
 
   public async edit(
     proposal: OffchainThread,
-    body?: string,
-    title?: string,
-    mentions?: string[],
+    body: string,
+    title: string,
+    markdown?: boolean,
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
@@ -192,7 +192,7 @@ class ThreadsController {
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
-        'mentions[]': mentions,
+        'markdown': markdown,
         'attachments[]': attachments,
         'jwt': app.user.jwt
       },

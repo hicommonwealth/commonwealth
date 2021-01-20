@@ -26,7 +26,6 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import { parseMentionsForServer } from 'helpers/threads';
 const Delta = Quill.import('delta');
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, ControlGroup, Icon, Icons } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
@@ -578,33 +577,27 @@ export const ProposalBodySaveEdit: m.Component<{
             : JSON.stringify(quillEditorState.editor.getContents());
           let mentions;
           if (isThread || isComment) {
-            const currentDraftMentions = !quillEditorState
-              ? []
-              : quillEditorState.markdownMode
-                ? parseMentionsForServer(quillEditorState.editor.getText(), true)
-                : parseMentionsForServer(quillEditorState.editor.getContents(), false);
-
-            const previousDraft = (item as OffchainThread).versionHistory[0];
-            let previousDraftMentions;
-            try {
-              const previousDraftQuill = new Delta(JSON.parse(previousDraft.body));
-              previousDraftMentions = parseMentionsForServer(previousDraftQuill, false);
-            } catch {
-              previousDraftMentions = parseMentionsForServer(previousDraft.body, true);
-            }
-            mentions = currentDraftMentions.filter((addrArray) => {
-              let alreadyExists = false;
-              previousDraftMentions.forEach((addrArray_) => {
-                if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
-                  alreadyExists = true;
-                }
-              });
-              return !alreadyExists;
-            });
+            // const previousDraft = (item as OffchainThread).versionHistory[0];
+            // let previousDraftMentions;
+            // try {
+            //   const previousDraftQuill = new Delta(JSON.parse(previousDraft.body));
+            //   previousDraftMentions = parseMentionsForServer(previousDraftQuill, false);
+            // } catch {
+            //   previousDraftMentions = parseMentionsForServer(previousDraft.body, true);
+            // }
+            // mentions = currentDraftMentions.filter((addrArray) => {
+            //   let alreadyExists = false;
+            //   previousDraftMentions.forEach((addrArray_) => {
+            //     if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+            //       alreadyExists = true;
+            //     }
+            //   });
+            //   return !alreadyExists;
+            // });
           }
           parentState.saving = true;
           if (item instanceof OffchainThread) {
-            app.threads.edit(item, itemText, parentState.updatedTitle, mentions).then(() => {
+            app.threads.edit(item, itemText, parentState.updatedTitle, quillEditorState.markdownMode).then(() => {
               m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;

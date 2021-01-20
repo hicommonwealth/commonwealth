@@ -49,7 +49,7 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    let latestVersion; 
+    let latestVersion;
     try {
       latestVersion = JSON.parse(comment.version_history[0]).body;
     } catch (e) {

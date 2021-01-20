@@ -108,9 +108,14 @@ class CommentsController {
   }
 
   public async create<T extends IUniqueId>(
-    address: string, proposalIdentifier: string, chain: string,
-    community: string, unescapedText: string, parentCommentId: any = null,
-    attachments?: string[], mentions?: string[]
+    address: string,
+    proposalIdentifier: string,
+    chain: string,
+    community: string,
+    unescapedText: string,
+    parentCommentId: any = null,
+    markdown: boolean,
+    attachments?: string[],
   ) {
     try {
       // TODO: Change to POST /comment
@@ -122,7 +127,7 @@ class CommentsController {
         'parent_id': parentCommentId,
         'root_id': proposalIdentifier,
         'attachments[]': attachments,
-        'mentions[]': mentions,
+        'markdown': markdown,
         'text': encodeURIComponent(unescapedText),
         'jwt': app.user.jwt,
       });
@@ -147,8 +152,8 @@ class CommentsController {
 
   public async edit(
     comment: OffchainComment<any>,
-    body?: string,
-    mentions?: any[],
+    body: string,
+    markdown: boolean,
     attachments?: string[]
   ) {
     const newBody = body || comment.text;
@@ -162,7 +167,7 @@ class CommentsController {
         'community': comment.community,
         'body': encodeURIComponent(newBody),
         'attachments[]': attachments,
-        'mentions[]': mentions,
+        'markdown': markdown,
         'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
