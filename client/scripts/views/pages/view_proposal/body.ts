@@ -575,25 +575,6 @@ export const ProposalBodySaveEdit: m.Component<{
             ? quillEditorState.editor.getText()
             : JSON.stringify(quillEditorState.editor.getContents());
           let mentions;
-          if (isThread || isComment) {
-            // const previousDraft = (item as OffchainThread).versionHistory[0];
-            // let previousDraftMentions;
-            // try {
-            //   const previousDraftQuill = new Delta(JSON.parse(previousDraft.body));
-            //   previousDraftMentions = parseMentionsForServer(previousDraftQuill, false);
-            // } catch {
-            //   previousDraftMentions = parseMentionsForServer(previousDraft.body, true);
-            // }
-            // mentions = currentDraftMentions.filter((addrArray) => {
-            //   let alreadyExists = false;
-            //   previousDraftMentions.forEach((addrArray_) => {
-            //     if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
-            //       alreadyExists = true;
-            //     }
-            //   });
-            //   return !alreadyExists;
-            // });
-          }
           parentState.saving = true;
           if (item instanceof OffchainThread) {
             app.threads.edit(item, itemText, parentState.updatedTitle, quillEditorState.markdownMode).then(() => {

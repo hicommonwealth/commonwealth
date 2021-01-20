@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
+import { parseUserMentions } from '../util/parseUserMentions';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
@@ -137,11 +138,17 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       [ userOwnedAddresses[0].address ],
     );
 
-    const mentions = typeof req.body['mentions[]'] === 'string'
-      ? [req.body['mentions[]']]
-      : typeof req.body['mentions[]'] === 'undefined'
-        ? []
-        : req.body['mentions[]'];
+    const previousDraftMentions = parseUserMentions(latestVersion);
+    const currentDraftMentions = parseUserMentions(body);
+    const mentions = currentDraftMentions.filter((addrArray) => {
+      let alreadyExists = false;
+      previousDraftMentions.forEach((addrArray_) => {
+        if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+          alreadyExists = true;
+        }
+      });
+      return !alreadyExists;
+    });
 
     // grab mentions to notify tagged users
     let mentionedAddresses;
@@ -206,7 +213,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
           body: finalThread.body,
         },
         req.wss,
-        [ finalThread.Address.address ],
+        // [ finalThread.Address.address ],
       );
     }));
 

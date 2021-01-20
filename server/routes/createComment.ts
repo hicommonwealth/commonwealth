@@ -10,7 +10,6 @@ import proposalIdToEntity from '../util/proposalIdToEntity';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
-import moment from 'moment';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -215,12 +214,11 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(text);
-  const mentions = parseUserMentions(bodyText, markdown);
+  const mentions = parseUserMentions(bodyText);
   console.log(mentions);
   let mentionedAddresses;
   if (mentions && mentions.length > 0) {
     mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-      mention = mention.split(',');
       const user = await models.Address.findOne({
         where: {
           chain: mention[0],
@@ -343,7 +341,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
           body: finalComment.text,
         }, // TODO: add webhook data for mentions
         req.wss,
-        [ finalComment.Address.address ],
+        // [ finalComment.Address.address ],
       );
     }));
   }
