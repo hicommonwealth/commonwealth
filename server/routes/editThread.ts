@@ -147,6 +147,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     let mentionedAddresses;
     if (mentions?.length > 0) {
       mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+
         mention = mention.split(',');
         try {
           const user = await models.Address.findOne({
@@ -164,7 +165,6 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
-
     // notify mentioned users, given permissions are in place
     if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address

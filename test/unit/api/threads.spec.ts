@@ -562,7 +562,6 @@ describe('Thread Tests', () => {
           'thread_id': thread_id,
           'kind': thread_kind,
           'body': thread.body,
-          'new_version_history': false,
           'title': newTitle,
           'attachments[]': null,
           'read_only': readOnly,
