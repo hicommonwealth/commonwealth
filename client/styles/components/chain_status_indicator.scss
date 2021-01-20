@@ -13,6 +13,8 @@
             border-radius: 4px;
             // position
             margin-right: 7px;
+            position: relative;
+            top: -1px;
         }
         &.connecting:before {
             background: $intermediate-icon-color;
