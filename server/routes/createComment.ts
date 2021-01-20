@@ -10,6 +10,7 @@ import proposalIdToEntity from '../util/proposalIdToEntity';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
+import moment from 'moment';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
