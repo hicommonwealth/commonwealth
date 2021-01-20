@@ -103,7 +103,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // New Topic table entries created
   if (topic_id) {
-    threadContent['topic_id'] = Number(topic_id);
+    threadContent['topic_id'] = +topic_id;
   } else if (topic_name) {
     let offchainTopic;
     try {
@@ -243,7 +243,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     location,
     {
       created_at: new Date(),
-      root_id: Number(finalThread.id),
+      root_id: +finalThread.id,
       root_type: ProposalType.OffchainThread,
       root_title: finalThread.title,
       comment_text: finalThread.body,
@@ -287,7 +287,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       `user-${mentionedAddress.User.id}`,
       {
         created_at: new Date(),
-        root_id: Number(finalThread.id),
+        root_id: finalThread.id,
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
         comment_text: finalThread.body,

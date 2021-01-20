@@ -116,7 +116,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       }
     });
     const arr = parentComment.child_comments;
-    arr.push(Number(comment.id));
+    arr.push(+comment.id);
     parentComment.child_comments = arr;
     await parentComment.save();
   }
@@ -248,7 +248,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       root_id: id,
       root_title,
       root_type: prefix,
-      comment_id: Number(finalComment.id),
+      comment_id: +finalComment.id,
       comment_text: finalComment.text,
       chain_id: finalComment.chain,
       community_id: finalComment.community,
@@ -276,12 +276,12 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       `comment-${parent_id}`,
       {
         created_at: new Date(),
-        root_id: Number(id),
+        root_id: +id,
         root_title,
         root_type: prefix,
-        comment_id: Number(finalComment.id),
+        comment_id: +finalComment.id,
         comment_text: finalComment.text,
-        parent_comment_id: Number(parent_id),
+        parent_comment_id: +parent_id,
         parent_comment_text: parentComment.text,
         chain_id: finalComment.chain,
         community_id: finalComment.community,

@@ -111,7 +111,7 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
         root_id: comment.root_id,
         root_title,
         root_type: prefix,
-        comment_id: Number(finalComment.id),
+        comment_id: +finalComment.id,
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
         community_id: finalComment.community,
