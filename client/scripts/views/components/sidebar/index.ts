@@ -365,20 +365,23 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
     })));
 
     return m('.ChainStatusModule', [
-      m(PopoverMenu, {
+      app.chain.deferred ? m(Button, {
+        label: 'Connect to chain',
+        rounded: true,
+        fluid: true,
+        disabled: vnode.state.initializing,
+        onclick: async (e) => {
+          e.preventDefault();
+          vnode.state.initializing = true;
+          await initChain();
+          vnode.state.initializing = false;
+          m.redraw();
+        }
+      }) : m(PopoverMenu, {
         transitionDuration: 0,
         closeOnContentClick: true,
         closeOnOutsideClick: true,
-        content: app.chain.deferred ? m(MenuItem, {
-          label: 'Connect to chain',
-          onclick: async (e) => {
-            e.preventDefault();
-            vnode.state.initializing = true;
-            await initChain();
-            vnode.state.initializing = false;
-            m.redraw();
-          }
-        }) : nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
+        content: nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
           return m(MenuItem, {
             label: [
               node.label,
