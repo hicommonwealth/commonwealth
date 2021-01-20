@@ -110,6 +110,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     m(Button, {
       label: 'Save changes',
       intent: 'primary',
+      rounded: true,
       onclick: async (e) => {
         const {
           name,

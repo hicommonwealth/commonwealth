@@ -93,6 +93,7 @@ const LoginWithWalletDropdown: m.Component<{
         intent: 'primary',
         fluid: true,
         class: 'login-with-web3',
+        rounded: true,
         label: [
           label,
           m(Icon, { name: Icons.CHEVRON_DOWN }),

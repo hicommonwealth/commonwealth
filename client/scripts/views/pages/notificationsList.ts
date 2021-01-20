@@ -51,6 +51,7 @@ const NotificationsPage: m.Component<{}> = {
               m(Button, {
                 label: 'Confirm',
                 fluid: true,
+                rounded: true,
                 onclick: async (e) => {
                   e.preventDefault();
                   const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);

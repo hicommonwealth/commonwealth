@@ -2,33 +2,121 @@
 
 .Sublayout {
     display: block;
-    padding: 0 48px;
-    @include sm-max {
-        padding: 0 26px;
-    }
 
     .sublayout-grid {
         position: relative;
         display: flex;
         margin: 0 auto;
+        min-height: calc(100vh - 150px);
         max-width: $layout-max-width;
+        padding: 0 $layout-padding;
+    }
+    .sublayout-sidebar-col {
+        flex: 1;
+        padding-right: 30px;
+        max-width: $sidebar-width;
+        .Sidebar {
+            max-width: 180px; // sidebar button width
+        }
+    }
+    @include sm-max {
+        .sublayout-sidebar-col {
+            display: none;
+        }
+    }
+    .hide-sidebar & {
+        .sublayout-sidebar-col {
+            display: none;
+        }
+    }
+    .sublayout-main-col {
+        flex: 3;
+        padding: 0;
+        padding-right: 20px;
+        max-width: calc(100% - #{$sidebar-width});
+        @include sm-max {
+            padding: 0;
+        }
+    }
+    .hide-sidebar & {
+        .sublayout-main-col {
+            width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+    }
+    @include md-max {
+        .sublayout-main-col {
+            width: 100%;
+            max-width: none;
+            padding: 0;
+        }
     }
 
     .sublayout-header {
-        display: flex;
         @include sm-max {
             display: none;
         }
-        margin-top: 28px;
-        margin-bottom: 8px;
-        &.no-title {
-            // margin-bottom: -60px;
+        margin: 0 auto 12px;
+        border-bottom: 1px solid #eee;
+        padding: 24px 0 22px;
+        padding-right: 20px;
+        @include md-max {
+            padding-right: 0;
         }
+        .hide-sidebar & {
+            padding-right: 0;
+        }
+        .sublayout-header-inner {
+            display: flex;
+            max-width: $layout-max-width;
+            padding: 0 $layout-padding;
+            margin: 0 auto;
+            .hide-sidebar & {
+                max-width: 840px;
+                margin: 0 auto;
+            }
+        }
+
         .sublayout-header-left {
             flex: 3;
+            white-space: nowrap;
+            > .ChainIcon,
+            > .CommunityIcon {
+                display: inline-block;
+                margin-right: 14px;
+                position: relative;
+                top: 4px;
+                .no-image {
+                    position: relative;
+                    top: -9px;
+                }
+            }
+            .CommunitySelector,
+            .sublayout-header-heading {
+                display: inline-block;
+            }
+            h3 {
+                font-size: 1.15rem;
+                font-weight: 600;
+                margin: 8px 0 0;
+            }
             h4.sublayout-header-heading {
-                font-size: 1.25rem;
+                font-size: 1.15rem;
+                font-weight: 600;
                 margin: 7px 17px 0 0;
+                white-space: nowrap;
+                a {
+                    color: $text-color-black;
+                }
+                .breadcrumb {
+                    margin: 0 8px;
+                    color: $text-color-lightest;
+                }
+                .cui-tag {
+                    line-height: 1.1;
+                    margin: -1px 0;
+                }
             }
         }
         .sublayout-header-right {
@@ -45,6 +133,6 @@
     .sublayout-body {
         position: relative;
         min-height: calc(100vh - 140px);
-        padding: 1px;
+        padding: 1px 0; // prevent margins from flowing outside the container
     }
 }

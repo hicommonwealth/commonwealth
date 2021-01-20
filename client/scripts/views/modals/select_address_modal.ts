@@ -120,6 +120,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           intent: 'primary',
           compact: true,
           fluid: true,
+          rounded: true,
           disabled: vnode.state.selectedIndex === undefined || vnode.state.loading,
           onclick: createRole.bind(this),
         }),

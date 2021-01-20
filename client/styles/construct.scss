@@ -250,6 +250,23 @@ button, .cui-button {
 
 // button color fixes
 .cui-button {
+    background: $background-color-white;
+    transition: none;
+    &:active, &.cui-active {
+        background: $background-color-white;
+        box-shadow: none;
+    }
+    // adjust rounded button styles
+    &.cui-rounded {
+        border-color: $grey200;
+        &:hover {
+            border-color: $grey700;
+        }
+        &:active, &.cui-active {
+            border-color: $grey700;
+        }
+    }
+
     // adjust sublabel colors to grey from blue grey
     .cui-button-sublabel {
         color: $grey400;
@@ -460,6 +477,12 @@ button, .cui-button {
 }
 .cui-spinner.cui-spinner-fill {
     z-index: initial;
+}
+
+.cui-spinner .cui-spinner-icon {
+    border-color: transparent;
+    border-top-color: $text-color-primary !important;
+    border-right-color: $text-color-primary !important;
 }
 
 // make large spinners bigger
