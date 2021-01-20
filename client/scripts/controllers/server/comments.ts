@@ -117,6 +117,7 @@ class CommentsController {
     markdown: boolean,
     attachments?: string[],
   ) {
+    console.log({ markdown });
     try {
       // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {

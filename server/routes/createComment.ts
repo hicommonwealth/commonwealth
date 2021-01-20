@@ -213,7 +213,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   });
 
   // grab mentions to notify tagged users
-  const bodyText = decodeURIComponent(finalComment.text);
+  const bodyText = decodeURIComponent(text);
   const mentions = parseUserMentions(bodyText, markdown);
   console.log(mentions);
   let mentionedAddresses;
