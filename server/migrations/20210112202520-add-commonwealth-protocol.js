@@ -30,7 +30,6 @@ module.exports = {
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'commonwealth',
         url: 'wss://mainnet.infura.io/ws',
-        address: '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1',
       }], { transaction: t });
 
       const buildObject = (event_name, chain) => ({
