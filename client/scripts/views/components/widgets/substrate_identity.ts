@@ -4,15 +4,14 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import { link } from 'helpers';
-import { formatAddressShort } from '../../../../../shared/utils';
 
 import app from 'state';
 import { Account, Profile } from 'models';
-
 import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity, { IdentityQuality, getIdentityQuality } from 'controllers/chain/substrate/identity';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 export interface ISubstrateIdentityAttrs {
   account: Account<any>;
@@ -92,8 +91,9 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
 
     if (profile?.isOnchain && profile?.name && quality && !hideIdentityIcon) {
       const name = [
-        profile.name,
-        ` · ${formatAddressShort(profile.address, profile.chain)}`,
+        showAddressWithDisplayName
+          ? [ profile.name, ` · ${formatAddressShort(profile.address, profile.chain)}` ]
+          : profile.name,
         m(`span.identity-icon${quality === IdentityQuality.Good
           ? '.green' : quality === IdentityQuality.Bad
             ? '.red' : '.gray'}`, [
