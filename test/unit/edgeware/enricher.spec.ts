@@ -11,7 +11,7 @@ import { Codec } from '@polkadot/types/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
-import { ValidatorId } from '@polkadot/types/interfaces';
+import { ValidatorId, RewardPoint } from '@polkadot/types/interfaces';
 import { OffenceDetails, ReportIdOf } from '@polkadot/types/interfaces/offences';
 import { Enrich } from '../../../src/substrate/filters/enricher';
 import { constructFakeApi, constructOption, constructIdentityJudgement, constructAccountVote } from './testUtil';
@@ -382,18 +382,23 @@ const api = constructFakeApi({
       total:10,
       individual: [5,5]
     }
-
     return eraPoints
   }, 
   'erasRewardPoints.at': async (hash,era) => {
-    let eraPoints = {
-      total:10,
-      individual: [
-        { 'EXkCSUQ6Z1hKvGWMNkUDKrTMVHRduQHWc8G6vgo4NccUmhU': 5 }, 
-        { 'FnWdLnFhRuphztWJJLoNV4zc18dBsjpaAMboPLhLdL7zZp3': 5 }
-      ]
-    }
-    return eraPoints;
+    const total = 10;
+    const registry = new TypeRegistry();
+    const validators = ["GweeXog8vdnDhjiBCLVvbE4NA4CPTFS3pdFFAFwgZzpUzKu", "mmhaivFqq2gPP6nMpbVoMtxz1H85FVTfn879X5kforz32CL"];
+    const individual = [5, 5];
+
+    const eraPoints =  registry.createType('EraRewardPoints', {
+        individual: new Map<AccountId, RewardPoint>(
+          individual
+            .map((points) => registry.createType('RewardPoint', points))
+            .map((points, index): [AccountId, RewardPoint] => [validators[index] as unknown as AccountId, points])
+          ),
+          total
+      });
+      return eraPoints;
   },
   'payee.at': async ( hash, key ) => 'staked',
   currentEra: async () => constructOption( new BN(12) as unknown as BN & Codec),

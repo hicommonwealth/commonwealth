@@ -73,8 +73,7 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
 
   /**
    * Connects to chain, fetches blocks specified in given range in provided batch size,
-   * prcoesses the blocks if a handler is provided else returns the blocks for 
-   * further processing
+   * prcoesses the blocks if a handler is provided 
    * @param range IDisconnectedRange having startBlock and optional endBlock
    * @param batchSize size of the batch in which blocks are to be fetched from chain
    * @param processBlockFn an optional function to process the blocks

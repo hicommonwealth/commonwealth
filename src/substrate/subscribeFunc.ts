@@ -1,5 +1,4 @@
 import { WsProvider, ApiPromise } from '@polkadot/api';
-import { TypeRegistry } from '@polkadot/types';
 import { RegisteredTypes } from '@polkadot/types/types';
 
 import { IDisconnectedRange, CWEvent, SubscribeFunc, ISubscribeOptions } from '../interfaces';

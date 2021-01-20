@@ -141,7 +141,7 @@ export async function Enrich(
 
         // get validators current era reward points
         const validatorEraPoints: EraRewardPoints = await currentPoints(api, currentEra, hash, validators) as EraRewardPoints;
-        const eraPointsIndividual = validatorEraPoints.individual;
+        const eraPointsIndividual = validatorEraPoints.individual.toJSON();
 
         const validatorInfo = {};
 
