@@ -3,13 +3,11 @@ import 'modals/version_history_modal.scss';
 import m from 'mithril';
 import app from 'state';
 import Quill from 'quill';
-import moment from 'moment';
 import { OffchainThread, OffchainComment } from 'models';
-import { formatAddressShort } from 'utils';
 import { CompactModalExitButton } from 'views/modal';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-import User, { UserBlock } from 'views/components/widgets/user';
+import User from 'views/components/widgets/user';
 import { VersionHistory } from 'client/scripts/controllers/server/threads';
 const Delta = Quill.import('delta');
 
@@ -47,13 +45,13 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
     const getVersion = (edit: VersionHistory, prevEdit: VersionHistory) => {
       const author = edit.author
         ? app.profiles.getProfile(edit.author.chain, edit.author.address)
-        : app.profiles.getProfile(proposal.author, proposal.authorChain);
-      const timestamp = moment(edit.timestamp).format('dddd, MMMM Do YYYY, h:mm a');
+        : app.profiles.getProfile(post.authorChain, post.author);
+      const timestamp = edit.timestamp.format('dddd, MMMM Do YYYY, h:mm a');
       const userOptions = {
         user: author,
         showRole: false,
         linkify: true,
-        popover: true,
+        popover: false,
         hideAvatar: true
       };
       // TODO: Add diffing algorithm for Markdown posts
@@ -93,7 +91,6 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         ]);
       }
     };
-
     return m('.VersionHistoryModal', [
       m('.compact-modal-title', [
         m('h3', 'Version History'),
@@ -103,6 +100,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         m('.versions', [
           post.versionHistory.map((edit, idx) => {
             const prevEdit = post.versionHistory[idx + 1];
+            if (!edit) return null;
             return getVersion(edit, prevEdit);
           })
         ]),
