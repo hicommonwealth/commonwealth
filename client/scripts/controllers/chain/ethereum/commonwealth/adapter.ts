@@ -28,7 +28,7 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     super(meta, app);
     this.chain = new CommonwealthChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
-    this.accounts = new CommonwealthMembers(this.app);
+    this.accounts = new CommonwealthMembers(this.app, this.chain, this.ethAccounts);
     this.governance = new CommonwealthGovernance(this.app, !this.usingServerChainEntities);
   }
 
@@ -59,7 +59,7 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
       api.updateSigner(accounts[0]);
     });
 
-    await this.accounts.init(api, this.chain, this.ethAccounts);
+    await this.accounts.init(api);
     await super.initApi();
   }
 

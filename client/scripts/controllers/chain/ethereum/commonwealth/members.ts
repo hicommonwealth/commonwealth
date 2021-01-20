@@ -20,12 +20,8 @@ export default class CommonwealthMembers implements IAccountsModule<EthereumCoin
   public get store() { return this._store; }
   public get api() { return this._api; }
 
-  public async init(api: CommonwealthAPI, ChainInfo: EthereumChain, Accounts: EthereumAccounts) {
+  public async init(api: CommonwealthAPI) {
     this._api = api;
-
-    // only used to initialize member for super call
-    this._Chain = ChainInfo;
-    this._Accounts = Accounts;
   }
 
   public deinit() {
@@ -35,8 +31,12 @@ export default class CommonwealthMembers implements IAccountsModule<EthereumCoin
   private _app: IApp;
   public get app() { return this._app; }
 
-  constructor(app: IApp) {
+  constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts) {
     this._app = app;
+
+    // only used to initialize member for super call
+    this._Chain = ChainInfo;
+    this._Accounts = Accounts;
   }
 
   public get(address: string) {
