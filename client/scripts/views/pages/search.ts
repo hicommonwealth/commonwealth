@@ -56,7 +56,7 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
     return m(Sublayout, {
       class: 'SearchPage',
       title: [
-        'Search ',
+        'Search Discussions ',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,

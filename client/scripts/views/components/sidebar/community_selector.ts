@@ -80,8 +80,10 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const CommunitySelector: m.Component<{}> = {
+const CommunitySelector: m.Component<{ showTextLabel?: boolean }> = {
   view: (vnode) => {
+    const activeEntityName = app.chain
+      ? app.chain.meta.chain.name : app.community ? app.community.meta.name : 'Commonwealth';
     const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
       .concat(app.config.chains.getAll())
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -205,18 +207,15 @@ const CommunitySelector: m.Component<{}> = {
         m(PopoverMenu, {
           transitionDuration: 0,
           hasArrow: false,
-          inline: true,
           trigger: m(Button, {
-            label: [
-              currentCommunity instanceof CommunityInfo
-                ? m(CommunityLabel, { community: currentCommunity })
-                : m(CommunityLabel, { chain: currentCommunity }),
-            ],
+            rounded: true,
+            label: vnode.attrs.showTextLabel ? activeEntityName : m(Icon, { name: Icons.MENU }),
           }),
+          inline: true,
           class: 'CommunitySelectList',
           content: [
             app.isLoggedIn() && [
-              m('h4', 'You\'re a member of'),
+              m('h4', 'Your communities'),
               joinedCommunities.map(renderCommunity),
               joinedCommunities.length === 0 && m('.community-placeholder', 'None'),
               m('h4', 'Other communities'),

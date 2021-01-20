@@ -87,6 +87,7 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
         popover: true,
         linkify: true,
         hideAvatar: true,
+        showAddressWithDisplayName: true,
       }),
       item instanceof OffchainThread && item.collaborators && item.collaborators.length > 0
         && m('span.proposal-collaborators', ` and ${pluralize(item.collaborators?.length, 'other')}`),
@@ -439,6 +440,7 @@ export const ProposalEditorPermissions: m.Component<{
       footer: m(`.${Classes.ALIGN_RIGHT}`, [
         m(Button, {
           label: 'Cancel',
+          rounded: true,
           onclick: async () => {
             if (vnode.attrs.popoverMenu) {
               vnode.attrs.openStateHandler(false);
@@ -452,6 +454,7 @@ export const ProposalEditorPermissions: m.Component<{
           disabled: $.isEmptyObject(vnode.state.addedEditors) && $.isEmptyObject(vnode.state.removedEditors),
           label: 'Save changes',
           intent: 'primary',
+          rounded: true,
           onclick: async () => {
             if (!$.isEmptyObject(vnode.state.addedEditors)) {
               try {
@@ -522,6 +525,7 @@ export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStat
         label: 'Cancel',
         disabled: parentState.saving,
         intent: 'none',
+        rounded: true,
         onclick: async (e) => {
           e.preventDefault();
           let confirmed = true;
@@ -559,6 +563,7 @@ export const ProposalBodySaveEdit: m.Component<{
         label: 'Save',
         disabled: parentState.saving,
         intent: 'primary',
+        rounded: true,
         onclick: (e) => {
           e.preventDefault();
           parentState.saving = true;

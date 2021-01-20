@@ -76,6 +76,7 @@ const EditProfileModal = {
             m(Button, {
               intent: 'primary',
               disabled: vnode.state.saving || vnode.state.uploadsInProgress > 0,
+              rounded: true,
               onclick: (e) => {
                 e.preventDefault();
                 const data = {
@@ -99,6 +100,7 @@ const EditProfileModal = {
               label: 'Save Changes'
             }),
             m(Button, {
+              rounded: true,
               onclick: (e) => {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');
