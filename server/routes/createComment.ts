@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
-import { parseUserMentions } from 'server/util/parseUserMentions';
+import { parseUserMentions } from '../util/parseUserMentions';
 import { NotificationCategories } from '../../shared/types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
@@ -213,7 +213,9 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   });
 
   // grab mentions to notify tagged users
-  const mentions = parseUserMentions(finalComment.body, markdown);
+  const bodyText = decodeURIComponent(finalComment.text);
+  const mentions = parseUserMentions(bodyText, markdown);
+  console.log(mentions);
   let mentionedAddresses;
   if (mentions && mentions.length > 0) {
     mentionedAddresses = await Promise.all(mentions.map(async (mention) => {

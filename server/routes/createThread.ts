@@ -208,7 +208,9 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   }));
 
   // grab mentions to notify tagged users
-  const mentions = parseUserMentions(finalThread.body, markdown);
+  const bodyText = decodeURIComponent(finalThread.body);
+  const mentions = parseUserMentions(bodyText, markdown);
+  console.log(mentions);
   let mentionedAddresses;
   if (mentions?.length > 0) {
     mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
