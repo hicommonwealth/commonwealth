@@ -139,7 +139,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     );
 
     const previousDraftMentions = parseUserMentions(latestVersion);
-    const currentDraftMentions = parseUserMentions(body);
+    const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
     const mentions = currentDraftMentions.filter((addrArray) => {
       let alreadyExists = false;
       previousDraftMentions.forEach((addrArray_) => {
@@ -154,7 +154,6 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     let mentionedAddresses;
     if (mentions?.length > 0) {
       mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-        mention = mention.split(',');
         try {
           const user = await models.Address.findOne({
             where: {
