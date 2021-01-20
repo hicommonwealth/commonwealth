@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
@@ -71,8 +72,12 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
-  const version_history = [];
-  version_history.push(req.body.versionHistory);
+  const firstVersion : any = {
+    timestamp: moment(),
+    author: req.body.author,
+    body: decodeURIComponent(req.body.body)
+  };
+  const version_history : string[] = [ JSON.stringify(firstVersion) ];
 
   const threadContent = community ? {
     community: community.id,
@@ -98,7 +103,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // New Topic table entries created
   if (topic_id) {
-    threadContent['topic_id'] = Number(topic_id);
+    threadContent['topic_id'] = +topic_id;
   } else if (topic_name) {
     let offchainTopic;
     try {
@@ -238,7 +243,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     location,
     {
       created_at: new Date(),
-      root_id: Number(finalThread.id),
+      root_id: +finalThread.id,
       root_type: ProposalType.OffchainThread,
       root_title: finalThread.title,
       comment_text: finalThread.body,
@@ -282,7 +287,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       `user-${mentionedAddress.User.id}`,
       {
         created_at: new Date(),
-        root_id: Number(finalThread.id),
+        root_id: finalThread.id,
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
         comment_text: finalThread.body,

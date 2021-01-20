@@ -475,8 +475,6 @@ describe('Thread Tests', () => {
     it('should fail to edit an admin\'s post as a user', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
-      const recentEdit : any = { timestamp: moment(), body: thread.body };
-      const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const res = await chai.request(app)
         .put('/api/editThread')
@@ -485,7 +483,6 @@ describe('Thread Tests', () => {
           'thread_id': thread_id,
           'kind': thread_kind,
           'body': thread.body,
-          'version_history': versionHistory,
           'attachments[]': null,
           'read_only': readOnly,
           'jwt': userJWT,
@@ -496,8 +493,6 @@ describe('Thread Tests', () => {
 
     it('should fail to edit a thread without passing a thread id', async () => {
       const thread_kind = thread.kind;
-      const recentEdit : any = { timestamp: moment(), body: thread.body };
-      const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const res = await chai.request(app)
         .put('/api/editThread')
@@ -506,7 +501,6 @@ describe('Thread Tests', () => {
           'thread_id': null,
           'kind': thread_kind,
           'body': thread.body,
-          'version_history': versionHistory,
           'attachments[]': null,
           'read_only': readOnly,
           'jwt': adminJWT,
@@ -519,8 +513,6 @@ describe('Thread Tests', () => {
     it('should fail to edit a thread without passing a body', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
-      const recentEdit : any = { timestamp: moment(), body: thread.body };
-      const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const res = await chai.request(app)
         .put('/api/editThread')
@@ -529,7 +521,6 @@ describe('Thread Tests', () => {
           'thread_id': thread_id,
           'kind': thread_kind,
           'body': null,
-          'version_history': versionHistory,
           'attachments[]': null,
           'read_only': readOnly,
           'jwt': adminJWT,
@@ -543,8 +534,6 @@ describe('Thread Tests', () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
       const newBody = 'new Body';
-      const recentEdit : any = { timestamp: moment(), body: newBody };
-      const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const res = await chai.request(app)
         .put('/api/editThread')
@@ -553,7 +542,6 @@ describe('Thread Tests', () => {
           'thread_id': thread_id,
           'kind': thread_kind,
           'body': newBody,
-          'version_history': versionHistory,
           'attachments[]': null,
           'read_only': readOnly,
           'jwt': adminJWT,
@@ -566,8 +554,6 @@ describe('Thread Tests', () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
       const newTitle = 'new Title';
-      const recentEdit : any = { timestamp: moment(), body: thread.body };
-      const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const res = await chai.request(app)
         .put('/api/editThread')
@@ -577,7 +563,6 @@ describe('Thread Tests', () => {
           'kind': thread_kind,
           'body': thread.body,
           'title': newTitle,
-          'version_history': versionHistory,
           'attachments[]': null,
           'read_only': readOnly,
           'jwt': adminJWT,

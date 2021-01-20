@@ -29,7 +29,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     super(meta, app);
     this.chain = new MolochChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
-    this.accounts = new MolochMembers(this.app);
+    this.accounts = new MolochMembers(this.app, this.chain, this.ethAccounts);
     this.governance = new MolochGovernance(this.app, !this.usingServerChainEntities);
   }
 
@@ -60,7 +60,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
       api.updateSigner(accounts[0]);
     });
 
-    await this.accounts.init(api, this.chain, this.ethAccounts);
+    await this.accounts.init(api);
     await super.initApi();
   }
 

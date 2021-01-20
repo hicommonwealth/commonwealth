@@ -28,54 +28,66 @@ const ComponentKit: m.Component<{}, { radioGroupSelected, activeTab }> = {
         m(Button, {
           label: 'Default',
           intent: 'none',
+          rounded: true,
         }),
         m(Button, {
           label: 'Primary',
           intent: 'primary',
+          rounded: true,
         }),
         m(Button, {
           label: 'Positive',
           intent: 'positive',
+          rounded: true,
         }),
         m(Button, {
           label: 'Negative',
           intent: 'negative',
+          rounded: true,
         }),
       ]),
       m('.gallery', [
         m(Button, {
           label: 'Save changes',
           intent: 'primary',
+          rounded: true,
         }),
         m(Button, {
           label: 'Cancel',
           intent: 'none',
+          rounded: true,
         }),
       ]),
       m('.gallery', [
         m(Button, {
           label: 'Basic',
           basic: true,
+          rounded: true,
         }),
         m(Button, {
           label: 'Outlined',
           outlined: true,
+          rounded: true,
         }),
         m(Button, {
           label: 'Compact',
           compact: true,
+          rounded: true,
         }),
         m(Button, {
           label: 'Disabled',
           disabled: true,
+          rounded: true,
         }),
         m(Button, {
           label: 'Label',
           sublabel: 'Sublabel',
+          rounded: true,
         }),
         m(Button, {
           label: 'Loading',
           loading: true,
+          rounded: true,
         }),
       ]),
       m('.gallery', [

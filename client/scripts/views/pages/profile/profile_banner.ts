@@ -53,6 +53,7 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
       m(Button, {
         label: 'Join community',
         intent: 'primary',
+        rounded: true,
         disabled: vnode.state.loading,
         onclick: createRole.bind(this),
       })

@@ -124,6 +124,7 @@ const LockdropToolsCard: m.Component<{}> = {
           interactive: true,
           compact: true,
           fluid: true,
+          rounded: true,
           intent: 'primary',
           onclick: (e) => {
             e.preventDefault();
@@ -135,6 +136,7 @@ const LockdropToolsCard: m.Component<{}> = {
           interactive: true,
           compact: true,
           fluid: true,
+          rounded: true,
           intent: 'primary',
           onclick: (e) => {
             e.preventDefault();

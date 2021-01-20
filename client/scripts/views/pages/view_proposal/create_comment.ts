@@ -173,6 +173,7 @@ const CreateComment: m.Component<{
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
+                rounded: true,
                 disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
@@ -184,6 +185,7 @@ const CreateComment: m.Component<{
                   intent: 'none',
                   type: 'cancel',
                   compact: true,
+                  rounded: true,
                   onclick: (e) => {
                     e.preventDefault();
                     getSetGlobalReplyStatus(GlobalStatus.Set, false, true);

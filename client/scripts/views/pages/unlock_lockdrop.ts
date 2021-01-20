@@ -153,6 +153,7 @@ const LockContractComponent = {
       ]),
       m(Button, {
         intent: 'primary',
+        rounded: true,
         onclick: async (e) => {
           e.preventDefault();
           vnode.state.error = null;
@@ -247,6 +248,7 @@ const UnlockPage = {
                 ? state.locks.map((data) => m(LockContractComponent, { data }))
                 : m(Button, {
                   intent: 'primary',
+                  rounded: true,
                   onclick: async () => {
                     vnode.state.error = null;
                     if (!state.user) {
