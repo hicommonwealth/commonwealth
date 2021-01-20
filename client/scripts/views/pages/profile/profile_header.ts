@@ -27,6 +27,7 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
     intent: 'primary',
     // wait for info to load before making it clickable
     disabled: vnode.state.chainLoading,
+    rounded: true,
     onclick: async () => {
       if (app.activeId() !== chainObj.id) {
         let confirmed = false;
@@ -140,6 +141,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             editIdentityAction(account, vnode.state.identity, vnode),
             m(Button, {
               intent: 'primary',
+              rounded: true,
               onclick: () => {
                 app.modals.create({
                   modal: EditProfileModal,
@@ -151,6 +153,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ] : (showJoinCommunityButton && app.activeChainId())
             ? m(Button, {
               intent: 'primary',
+              rounded: true,
               onclick: async () => {
                 if (onLinkedProfile) {
                   vnode.state.loading = true;

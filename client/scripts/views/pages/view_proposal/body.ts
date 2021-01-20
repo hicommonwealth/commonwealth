@@ -3,6 +3,7 @@ import 'pages/view_proposal/editor_permissions.scss';
 import m from 'mithril';
 import moment from 'moment';
 import lity from 'lity';
+import Quill from 'quill';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -25,8 +26,11 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
+import { parseMentionsForServer } from 'helpers/threads';
+const Delta = Quill.import('delta');
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, ControlGroup, Icon, Icons } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
+import { VersionHistory } from 'client/scripts/controllers/server/threads';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -132,7 +136,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainT
     if (item instanceof OffchainThread || item instanceof OffchainComment) {
       if (!item.versionHistory || item.versionHistory.length === 0) return;
       const isThread = item instanceof OffchainThread;
-      const lastEdit = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
+      const lastEdit : VersionHistory = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
       if (!lastEdit) return;
 
       return m('.ProposalBodyLastEdited', [
@@ -147,7 +151,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainT
           }
         }, [
           'Edited ',
-          moment(lastEdit.timestamp).fromNow()
+          lastEdit.timestamp.fromNow()
         ])
       ]);
     } else {
@@ -440,6 +444,7 @@ export const ProposalEditorPermissions: m.Component<{
       footer: m(`.${Classes.ALIGN_RIGHT}`, [
         m(Button, {
           label: 'Cancel',
+          rounded: true,
           onclick: async () => {
             if (vnode.attrs.popoverMenu) {
               vnode.attrs.openStateHandler(false);
@@ -453,6 +458,7 @@ export const ProposalEditorPermissions: m.Component<{
           disabled: $.isEmptyObject(vnode.state.addedEditors) && $.isEmptyObject(vnode.state.removedEditors),
           label: 'Save changes',
           intent: 'primary',
+          rounded: true,
           onclick: async () => {
             if (!$.isEmptyObject(vnode.state.addedEditors)) {
               try {
@@ -523,6 +529,7 @@ export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStat
         label: 'Cancel',
         disabled: parentState.saving,
         intent: 'none',
+        rounded: true,
         onclick: async (e) => {
           e.preventDefault();
           let confirmed = true;
@@ -553,6 +560,7 @@ export const ProposalBodySaveEdit: m.Component<{
     const { item, getSetGlobalEditingStatus, parentState, callback } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
+    const isComment = item instanceof OffchainComment;
 
     return m('.ProposalBodySaveEdit', [
       m(Button, {
@@ -560,16 +568,44 @@ export const ProposalBodySaveEdit: m.Component<{
         label: 'Save',
         disabled: parentState.saving,
         intent: 'primary',
+        rounded: true,
         onclick: (e) => {
           e.preventDefault();
           parentState.saving = true;
           parentState.quillEditorState.editor.enable(false);
-          const itemText = parentState.quillEditorState.markdownMode
-            ? parentState.quillEditorState.editor.getText()
-            : JSON.stringify(parentState.quillEditorState.editor.getContents());
+          const { quillEditorState } = parentState;
+          const itemText = quillEditorState.markdownMode
+            ? quillEditorState.editor.getText()
+            : JSON.stringify(quillEditorState.editor.getContents());
+          let mentions;
+          if (isThread || isComment) {
+            const currentDraftMentions = !quillEditorState
+              ? []
+              : quillEditorState.markdownMode
+                ? parseMentionsForServer(quillEditorState.editor.getText(), true)
+                : parseMentionsForServer(quillEditorState.editor.getContents(), false);
+
+            const previousDraft = (item as OffchainThread).versionHistory[0];
+            let previousDraftMentions;
+            try {
+              const previousDraftQuill = new Delta(JSON.parse(previousDraft.body));
+              previousDraftMentions = parseMentionsForServer(previousDraftQuill, false);
+            } catch {
+              previousDraftMentions = parseMentionsForServer(previousDraft.body, true);
+            }
+            mentions = currentDraftMentions.filter((addrArray) => {
+              let alreadyExists = false;
+              previousDraftMentions.forEach((addrArray_) => {
+                if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+                  alreadyExists = true;
+                }
+              });
+              return !alreadyExists;
+            });
+          }
           parentState.saving = true;
           if (item instanceof OffchainThread) {
-            app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {
+            app.threads.edit(item, itemText, parentState.updatedTitle, mentions).then(() => {
               m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;
@@ -579,7 +615,7 @@ export const ProposalBodySaveEdit: m.Component<{
               notifySuccess('Thread successfully edited');
             });
           } else if (item instanceof OffchainComment) {
-            app.comments.edit(item, itemText).then((c) => {
+            app.comments.edit(item, itemText, mentions).then((c) => {
               parentState.editing = false;
               parentState.saving = false;
               clearEditingLocalStorage(item, false);

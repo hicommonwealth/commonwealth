@@ -3,6 +3,7 @@ import 'sublayout.scss';
 import m, { Vnode } from 'mithril';
 import app from 'state';
 import { EmptyState, Button, Icons, Grid, Col, Spinner } from 'construct-ui';
+import { link } from 'helpers';
 
 import NewProposalButton from 'views/components/new_proposal_button';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
@@ -47,22 +48,26 @@ const Sublayout: m.Component<{
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
-      chain ? [
+      (!m.route.param('scope') && m.route.get() === '/') ? [
+        m('h3', 'Commonwealth')
+      ] : chain ? [
         m(ChainIcon, { size: ICON_SIZE, chain }),
         m('h4.sublayout-header-heading', [
-          chain.name,
+          link('a', `/${app.activeId()}`, chain.name),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
       ] : community ? [
         m(CommunityIcon, { size: ICON_SIZE, community }),
         m('h4.sublayout-header-heading', [
-          community.name,
+          link('a', `/${app.activeId()}`, community.name),
           community.privacyEnabled && m('span.icon-lock'),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
-      ] : '',
+      ] : [
+        // empty since a chain or community is loading
+      ],
     ]);
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [

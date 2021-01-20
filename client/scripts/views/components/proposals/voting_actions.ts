@@ -48,6 +48,7 @@ const CannotVote: m.Component<{ action }> = {
           disabled: true,
           fluid: true,
           label: vnode.attrs.action,
+          rounded: true,
           compact: true,
         }),
       ]),
@@ -93,6 +94,7 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
             onclick: advanceSignalingProposal,
             label: proposalStageMsg,
             compact: true,
+            rounded: true,
           }),
       ]);
     } else if (vnode.attrs.proposal instanceof SubstrateDemocracyReferendum) {
@@ -491,6 +493,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
               ? `Voted ${hexToUtf8(c.toHex())}`
               : `Vote ${hexToUtf8(c.toHex())}`,
             compact: true,
+            rounded: true,
           }),
         ]);
       });
@@ -502,6 +505,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         onclick: voteYes,
         label: hasVotedYes ? 'Voted yes' : 'Vote yes',
         compact: true,
+        rounded: true,
       }),
     ]);
     const noButton = m('.no-button', [
@@ -511,6 +515,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         onclick: voteNo,
         label: hasVotedNo ? 'Voted no' : 'Vote no',
         compact: true,
+        rounded: true,
       })
     ]);
     // substrate: multi-deposit approve
@@ -521,6 +526,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         onclick: voteYes,
         label: (hasVotedYes && !canVote) ? 'Already approved' : 'Second',
         compact: true,
+        rounded: true,
       }),
     ]);
     // cosmos: abstain
@@ -531,6 +537,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         onclick: voteAbstain,
         label: hasVotedAbstain ? 'Abstained' : 'Abstain',
         compact: true,
+        rounded: true,
       }),
     ]);
     // cosmos: veto
@@ -541,6 +548,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         onclick: voteVeto,
         label: hasVotedVeto ? 'Vetoed' : 'Veto',
         compact: true,
+        rounded: true,
       }),
     ]);
     // moloch: cancel
@@ -552,6 +560,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         onclick: cancelProposal,
         label: (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel',
         compact: true,
+        rounded: true,
       }),
     ]) : (proposal.votingType === VotingType.MarlinYesNo) ? m('.veto-button', [
       m(Button, {
@@ -573,6 +582,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
     //    onclick: sponsorProposal,
     //    label: (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor',
     //    compact: true,
+    //    rounded: true,
     //  }),
     // ]);
     // moloch: process
@@ -583,6 +593,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
         onclick: processProposal,
         label: (proposal as MolochProposal).data.processed ? 'Processed' : 'Process',
         compact: true,
+        rounded: true,
       })
     ]);
 

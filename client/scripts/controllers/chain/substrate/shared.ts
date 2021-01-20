@@ -354,6 +354,10 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         this._creationfee = this.coins(creationfee);
         this._sudoKey = sudokey ? sudokey.toString() : undefined;
         this._reservationFee = reservationFee ? this.coins(reservationFee) : null;
+
+        // redraw
+        m.redraw();
+
         // grab last timestamps from storage and use to compute blocktime
         const TIMESTAMP_LOOKBACK = 5;
         this.api.pipe(

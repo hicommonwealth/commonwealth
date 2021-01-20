@@ -88,6 +88,7 @@ const TopicEditor: m.Component<ITopicEditorAttrs, ITopicEditorState> = {
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
             label: 'Close',
+            rounded: true,
             onclick: () => {
               if (vnode.attrs.popoverMenu) {
                 vnode.attrs.openStateHandler(false);
@@ -99,6 +100,7 @@ const TopicEditor: m.Component<ITopicEditorAttrs, ITopicEditorState> = {
           m(Button, {
             label: 'Save changes',
             intent: 'primary',
+            rounded: true,
             onclick: async () => {
               const { topicName, topicId } = vnode.state;
               const { thread } = vnode.attrs;

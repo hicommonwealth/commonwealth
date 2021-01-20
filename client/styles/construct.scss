@@ -479,10 +479,21 @@ button, .cui-button {
     z-index: initial;
 }
 
+// make spinner visually minimal
 .cui-spinner .cui-spinner-icon {
     border-color: transparent;
-    border-top-color: $text-color-primary !important;
-    border-right-color: $text-color-primary !important;
+    border-top-color: $text-color-darker !important;
+    border-right-color: $text-color-darker !important;
+}
+.cui-spinner-message {
+    margin-top: 0.8em;
+    color: $text-color-darker;
+}
+
+// make spinner slower
+$spinner-animation-duration: 1000ms;
+.cui-spinner-icon {
+    animation: loading $spinner-animation-duration infinite linear;
 }
 
 // make large spinners bigger
@@ -493,8 +504,8 @@ button, .cui-button {
 }
 .cui-spinner.cui-xl .cui-spinner-icon,
 .cui-xl .cui-spinner .cui-spinner-icon {
-    height: 36px;
-    width: 36px;
+    height: 40px;
+    width: 40px;
     border-width: 3px;
 }
 
