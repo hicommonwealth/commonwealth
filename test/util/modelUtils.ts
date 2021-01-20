@@ -162,7 +162,6 @@ export const editComment = async (args: EditCommentArgs) => {
       'author_chain': chain,
       'address': address,
       'body': encodeURIComponent(text),
-      'new_version_history': !!text,
       'attachments[]': undefined,
       'jwt': jwt,
       'chain': community ? undefined : chain,

@@ -16,7 +16,7 @@ export const Errors = {
 };
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, title, kind, thread_id, new_version_history } = req.body;
+  const { body, title, kind, thread_id } = req.body;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
@@ -72,8 +72,14 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   }
   if (!thread) return next(new Error('No thread with that id found'));
   try {
-    // Only add a new version to the history if the body has been updated
-    if (new_version_history) {
+    let latestVersion;
+    try {
+      latestVersion = JSON.parse(thread.version_history[0]).body;
+    } catch (e) {
+      console.log(e);
+    }
+    // If new comment body text has been submitted, create another version history entry
+    if (decodeURIComponent(req.body.body) !== latestVersion) {
       const recentEdit : any = {
         timestamp: moment(),
         author: req.body.author,

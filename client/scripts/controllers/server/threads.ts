@@ -192,8 +192,6 @@ class ThreadsController {
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
-        'new_version_history': !!body,
-        'mentions[]': mentions,
         'attachments[]': attachments,
         'jwt': app.user.jwt
       },

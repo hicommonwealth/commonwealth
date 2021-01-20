@@ -49,7 +49,14 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    if (req.body.new_version_history) {
+    let latestVersion;
+    try {
+      latestVersion = JSON.parse(comment.version_history[0]).body;
+    } catch (e) {
+      console.log(e);
+    }
+    // If new comment body text has been submitted, create another version history entry
+    if (decodeURIComponent(req.body.body) !== latestVersion) {
       const recentEdit = {
         timestamp: moment(),
         body: decodeURIComponent(req.body.body)
