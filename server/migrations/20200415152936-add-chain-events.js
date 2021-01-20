@@ -105,6 +105,7 @@ module.exports = {
         },
         block_number: { type: Sequelize.INTEGER, allowNull: false },
         event_data: { type: Sequelize.JSONB, allowNull: false },
+        active: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: true },
         created_at: { type: Sequelize.DATE, allowNull: false },
         updated_at: { type: Sequelize.DATE, allowNull: false },
       }, {

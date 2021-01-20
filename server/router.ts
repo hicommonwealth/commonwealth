@@ -30,6 +30,9 @@ import viewReactions from './routes/viewReactions';
 import bulkReactions from './routes/bulkReactions';
 import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
+import createValidatorGroup from './routes/createValidatorGroup';
+import getValidatorGroup from './routes/getValidatorGroup';
+import getChainStake from './routes/getChainStake';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
@@ -51,6 +54,12 @@ import bulkMembers from './routes/bulkMembers';
 import bulkAddresses from './routes/bulkAddresses';
 import createInvite from './routes/createInvite';
 import getInvites from './routes/getInvites';
+import getOffences from './routes/getOffences';
+import getRewards from './routes/getRewards';
+import getSlashes from './routes/getSlashes';
+import { getTotalStakeOverTime, getOwnStakeOverTime, getOtherStakeOverTime, getNominatorsOverTime }
+  from './routes/getExposureOverTime';
+import getImOnline from './routes/getImOnline';
 import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
@@ -59,7 +68,7 @@ import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
 import getProfile from './routes/getProfile';
-
+import getValidatorHeaderDetails from './routes/getValidatorHeaderDetails';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -107,6 +116,9 @@ import IdentityFetchCache from './util/identityFetchCache';
 
 import bulkEntities from './routes/bulkEntities';
 
+import getGlobalStatistics from './routes/getGlobalStatistics';
+import getValidatorDetail from './routes/getValidatorDetail';
+import getValidatorNamesAndAddresses from './routes/getValidatorNamesAndAddresses';
 function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
@@ -220,6 +232,16 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/createInvite', passport.authenticate('jwt', { session: false }), createInvite.bind(this, models));
   // TODO: Change to GET /invites
   router.get('/getInvites', passport.authenticate('jwt', { session: false }), getInvites.bind(this, models));
+  router.get('/getOffences', getOffences.bind(this, models));
+  router.get('/getRewards', getRewards.bind(this, models));
+  router.get('/getSlashes', getSlashes.bind(this, models));
+  router.get('/getOwnStakeOverTime', getOwnStakeOverTime.bind(this, models));
+  router.get('/getOtherStakeOverTime', getOtherStakeOverTime.bind(this, models));
+  router.get('/getTotalStakeOverTime', getTotalStakeOverTime.bind(this, models));
+  router.get('/getNominatorsOverTime', getNominatorsOverTime.bind(this, models));
+  router.get('/getImOnline', getImOnline.bind(this, models));
+  router.get('/getValidatorHeaderDetails', getValidatorHeaderDetails.bind(this, models));
+
   // TODO: Change to PUT /invite
   router.post('/acceptInvite', passport.authenticate('jwt', { session: false }), acceptInvite.bind(this, models));
   // TODO: Change to POST /member
@@ -306,7 +328,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // settings
   // TODO: Change to POST /userSetting
   router.post('/writeUserSetting', passport.authenticate('jwt', { session: false }),
-              writeUserSetting.bind(this, models));
+    writeUserSetting.bind(this, models));
 
   // send feedback button
   // TODO: Change to POST /feedback
@@ -329,6 +351,19 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
+
+  // validator_group
+  router.post('/createValidatorGroup', passport.authenticate('jwt', { session: false }),
+    createValidatorGroup.bind(this, models));
+  router.get('/getValidatorGroup', passport.authenticate('jwt', { session: false }),
+    getValidatorGroup.bind(this, models));
+  router.get('/getChainStake', getChainStake.bind(this, models));
+
+  router.get('/getValidatorNamesAndAddresses', getValidatorNamesAndAddresses.bind(this, models));
+  router.get('/getValidatorDetail/', getValidatorDetail.bind(this, models));
+  router.get('/getValidatorDetail/:state', getValidatorDetail.bind(this, models));
+  router.get('/getGlobalStatistics', getGlobalStatistics.bind(this, models));
+
 
   app.use('/api', router);
 }

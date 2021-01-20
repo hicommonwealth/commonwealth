@@ -87,7 +87,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         }
       } catch (e) {
         if (this.app.chain.networkStatus !== ApiStatus.Disconnected) {
-          console.error('failed to query NEAR status: ' + JSON.stringify(e));
+          console.error(`failed to query NEAR status: ${JSON.stringify(e)}`);
           this.app.chain.networkStatus = ApiStatus.Disconnected;
           m.redraw();
         }
@@ -102,11 +102,12 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   public createTXModalData(
-      author: NearAccount,
-      txFunc,
-      txName: string,
-      objName: string,
-      cb?: (success: boolean) => void): ITXModalData {
+    author: NearAccount,
+    txFunc,
+    txName: string,
+    objName: string,
+    cb?: (success: boolean) => void
+  ): ITXModalData {
     // TODO
     throw new Error('Txs not yet implemented');
   }

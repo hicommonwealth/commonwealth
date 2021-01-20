@@ -108,6 +108,11 @@
             flex-direction: column;
         }
     }
+    @include sm-max {
+        .info-row {
+            flex-direction: column;
+        }
+    }
     @include xxs-max {
         .ProfileHeader, .Tabs {
             padding: 0 17px 12px 17px !important;

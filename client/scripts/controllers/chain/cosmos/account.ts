@@ -341,13 +341,13 @@ export class CosmosAccount extends Account<CosmosToken> {
   }
 
   public updateBalance = _.throttle(async () => {
-    const queryUrl = this._Chain.api.restUrl + '/auth/accounts/' + this.address;
+    const queryUrl = `${this._Chain.api.restUrl}/auth/accounts/${this.address}`;
     let resp;
     try {
       resp = await this._Chain.api.query.account(this.address);
     } catch (e) {
       // if coins is null, they have a zero balance
-      console.log('no balance found: ' + JSON.stringify(e));
+      console.log(`no balance found: ${JSON.stringify(e)}`);
       this._balance.next(this._Chain.coins(0));
     }
     // JSON incompatibilities...
@@ -364,7 +364,7 @@ export class CosmosAccount extends Account<CosmosToken> {
           // TODO: add validator tokens to accounts
           this._validatorStake.next(+bal);
         } else {
-          throw new Error('invalid denomination: ' + coins.denom);
+          throw new Error(`invalid denomination: ${coins.denom}`);
         }
       }
       if (resp && resp.public_key && resp.public_key.type === 'tendermint/PubKeySecp256k1') {
@@ -391,12 +391,12 @@ export class CosmosAccount extends Account<CosmosToken> {
       txFn,
       'MsgSend',
       `${this.address} sent ${amount.format()} to ${recipient.address}`,
-      //(success: boolean) => {
+      // (success: boolean) => {
       //  if (success) {
       //    this.updateBalance();
       //    recipient.updateBalance();
       //  }
-      //},
+      // },
     );
   }
 

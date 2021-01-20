@@ -27,7 +27,7 @@ const fetchEvents = async (web3, originContract, eventName, fromBlock, blocksPer
   let toBlock = fromBlock + blocksPerQuery;
   console.log(`Getting ${eventName} events...`);
   while (toBlock < latestBlock + blocksPerQuery) {
-    const newEvents = await originContract.getPastEvents(eventName, { fromBlock: fromBlock, toBlock: toBlock, });
+    const newEvents = await originContract.getPastEvents(eventName, { fromBlock, toBlock, });
     events = events.concat(newEvents);
     fromBlock += blocksPerQuery;
     toBlock += blocksPerQuery;

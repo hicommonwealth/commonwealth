@@ -120,7 +120,7 @@ export class NearAccount extends Account<NearToken> {
     return new Promise(async (resolve) => {
       this._keyPair = await this._Accounts.keyStore.getKey(this._Chain.api.connection.networkId, this.address);
       // if a keypair is found, return
-      if (!!this._keyPair) {
+      if (this._keyPair) {
         return resolve(!!this._keyPair);
       }
       // otherwise, call updateKeypair again with a delay

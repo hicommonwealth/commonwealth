@@ -145,19 +145,6 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
 
 export const OnchainNavigationModule: m.Component<{}, {}> = {
   view: (vnode) => {
-    // // proposal counts
-    // const substrateGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.Substrate)
-    //   ? ((app.chain as any).democracy.store.getAll().filter((p) => !p.completed && !p.passed).length
-    //     + (app.chain as any).democracyProposals.store.getAll().filter((p) => !p.completed).length
-    //     + (app.chain as any).council.store.getAll().filter((p) => !p.completed).length
-    //     + (app.chain as any).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
-    // const edgewareSignalingProposals = (app.chain?.loaded && app.chain?.class === ChainClass.Edgeware)
-    //   ? (app.chain as any).signaling.store.getAll().filter((p) => !p.completed).length : 0;
-    // const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
-    // const cosmosGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.CosmosSDK)
-    //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
-    // const molochProposals = (app.chain?.loaded && app.chain?.class === ChainClass.Moloch)
-    //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
@@ -181,9 +168,12 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
 
-    const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
-    const onNotificationsPage = (p) => p.startsWith('/notifications');
-    if (onNotificationsPage(m.route.get())) return;
+    // const starredCommunities = allCommunities.filter((item) => {
+    //   // filter out non-starred communities
+    //   if (item instanceof ChainInfo && !app.communities.isStarred(item.id, null)) return false;
+    //   if (item instanceof CommunityInfo && !app.communities.isStarred(null, item.id)) return false;
+    //   return true;
+    // });
 
     return m('.OnchainNavigationModule.SidebarModule', [
       m('.section-header', 'Vote'),
@@ -459,6 +449,71 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
+export const StakingNavigationModule: m.Component<{}, {}> = {
+  view: (vnode) => {
+    const hasProposals = app.chain && !app.community && (
+      app.chain.base === ChainBase.CosmosSDK
+        || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
+        || app.chain.class === ChainClass.Moloch || app.chain.class === ChainClass.Commonwealth);
+    if (!hasProposals) return;
+
+    const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
+    const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
+    const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
+
+    const onManageStakingPage = (p) => (
+      p.startsWith(`/${app.activeChainId()}/manageStaking`));
+    const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    const onStakingCalculatorPage = (p) => p.startsWith(`/${app.activeChainId()}/stakingCalculator`);
+
+    return m('.StakingNavigationModule.SidebarModule', [
+      m('.section-header', 'Staking'),
+      // referenda (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onValidatorsPage(m.route.get()),
+          label: 'Validators',
+          contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/validators`);
+          },
+          contentRight: [], // TODO
+        }),
+      // proposals (substrate, cosmos, moloch only)
+      !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
+                         || app.chain?.base === ChainBase.CosmosSDK
+                         || app.chain?.class === ChainClass.Moloch)
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onManageStakingPage(m.route.get()),
+          label: 'Manage Staking',
+          contentLeft: m(Icon, { name: Icons.SEND }),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/manageStaking`);
+          },
+        }),
+      // treasury (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onStakingCalculatorPage(m.route.get()),
+          label: 'Staking Calculator',
+          contentLeft: m(Icon, { name: Icons.TRUCK }),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/stakingCalculator`);
+          },
+        })
+    ]);
+  }
+};
+
 const Sidebar: m.Component<{}, {}> = {
   view: (vnode) => {
     return [
@@ -467,6 +522,7 @@ const Sidebar: m.Component<{}, {}> = {
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(ExternalLinksModule),
+        (app.chain || app.community) && m(StakingNavigationModule),
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),

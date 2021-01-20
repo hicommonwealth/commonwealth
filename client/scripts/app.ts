@@ -535,15 +535,19 @@ $(() => {
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
     '/:scope/communityStats':    importRoute('views/pages/stats', { scoped: true, deferChain: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
+    '/:scope/stakingCalculator': importRoute('views/pages/staking_calculator/staking_calculator', { scoped: true }),
 
-    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
+    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true }),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.user.activeAccount)
         ? `/${attrs.scope}/account/${app.user.activeAccount.address}`
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
+    // '/:scope/questions':         importRoute(import('views/pages/questions'), { scoped: true }),
+    // '/:scope/requests':          importRoute(import('views/pages/requests'), { scoped: true }),
+    '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
+    '/:scope/manageStaking':        importRoute('views/pages/manage_staking', { scoped: true }),
 
     // NEAR login
     '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),

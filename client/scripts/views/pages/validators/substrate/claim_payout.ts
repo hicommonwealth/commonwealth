@@ -22,7 +22,7 @@ interface IClaimPayoutState {
   validators?: any[];
   sending: boolean;
   error: any;
-};
+}
 
 const NominatorForm: m.Component<{}, IClaimPayoutState> = {
   view: (vnode) => {

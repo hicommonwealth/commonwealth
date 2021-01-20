@@ -16,8 +16,10 @@ import ReactionsController from './controllers/server/reactions';
 import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
+import ChainEventsController from './controllers/server/chain_events';
+// import ChainEntityController from './controllers/server/chain_entities';
 import UserController from './controllers/server/user/index';
-
+import StakingController from './controllers/server/staking';
 export enum ApiStatus {
   Disconnected = 'disconnected',
   Connecting = 'connecting',
@@ -48,9 +50,11 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   reactions: ReactionsController;
+  chainEvents: ChainEventsController;
   topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
+  staking: StakingController;
 
   recentActivity: RecentActivityController;
 
@@ -100,9 +104,11 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
+  chainEvents: new ChainEventsController(),
   topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
+  staking: new StakingController(),
 
   recentActivity: new RecentActivityController(),
 

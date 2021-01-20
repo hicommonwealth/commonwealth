@@ -32,6 +32,7 @@ import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
+import { archivalNodeDbEntry }  from './server/util/archivalNodeHelpers';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
@@ -260,7 +261,6 @@ async function main() {
   })();
 
   const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
-
 
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.

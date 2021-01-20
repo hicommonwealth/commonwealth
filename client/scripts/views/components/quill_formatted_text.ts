@@ -19,7 +19,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
   // first, concatenate parent nodes for <ul> and <ol> into groups
   const groups = [];
   preprocessQuillDeltaForRendering(delta.ops).forEach((parent) => {
-    // if the last parent was a <ul> or <ol> with the same attributes.list,
+    // if the last parent was a <ul> or <ol> with the same attributes.list and indentation,
     // concatenate the current parent's children onto the last instead
     if (groups.length !== 0
         && groups[groups.length - 1].parents[0].attributes

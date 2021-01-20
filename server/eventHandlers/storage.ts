@@ -48,12 +48,11 @@ export default class extends IEventHandler {
     if (!dbEventType) {
       log.error(`unknown event type: ${event.data.kind}`);
       return;
-    } else {
-      log.trace(`found chain event type: ${dbEventType.id}`);
     }
+    log.trace(`Received event: ${JSON.stringify(event, null, 2)}`);
 
     // create event in db
-    const dbEvent = await this._models.ChainEvent.create({
+    const dbEvent = await this._models.ChainEvent.upsert({
       chain_event_type_id: dbEventType.id,
       block_number: event.blockNumber,
       event_data: event.data,

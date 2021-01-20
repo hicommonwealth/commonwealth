@@ -215,7 +215,7 @@ const CommunitySelector: m.Component<{ showTextLabel?: boolean }> = {
           class: 'CommunitySelectList',
           content: [
             app.isLoggedIn() && [
-              m('h4', 'Your communities'),
+              m('h4', 'You\'re a member of'),
               joinedCommunities.map(renderCommunity),
               joinedCommunities.length === 0 && m('.community-placeholder', 'None'),
               m('h4', 'Other communities'),

@@ -421,6 +421,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       ],
       description: topicDescription,
       showNewProposalButton: true,
+      // rightSidebar: m(ListingSidebar, { entity: app.activeId() })
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [

@@ -6,7 +6,7 @@ import { of, combineLatest, Observable, Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
 
 import { ApiRx, WsProvider, SubmittableResult, Keyring, ApiPromise } from '@polkadot/api';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHex, formatBalance } from '@polkadot/util';
 import {
   Moment,
   Balance,
@@ -92,7 +92,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   public get denom() { return this.app.chain.currency; }
 
-  private readonly _silencedEvents = { };
+  private readonly _silencedEvents = {};
 
   private _blockSubscription: Unsubscribable;
   private _timestampSubscription: Unsubscribable;
@@ -241,7 +241,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return this._api.isReady;
   }
 
-  public get apiInitialized() : boolean {
+  public get apiInitialized(): boolean {
     return !!this._api;
   }
 
@@ -249,12 +249,16 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   public initChainEntities(): Promise<void> {
     this._fetcher = new SubstrateEvents.StorageFetcher(this._apiPromise);
     const subscriber = new SubstrateEvents.Subscriber(this._apiPromise);
+    /* tslint:disable */
+    // @ts-ignore-start
     const processor = new SubstrateEvents.Processor(this._apiPromise);
     return this._app.chain.chainEntities.subscribeEntities(
       this._app.chain.id,
       subscriber,
       processor,
     );
+    // @ts-ignore-end
+    /* tslint:enable */
   }
 
   public query<T>(fn: (api: ApiRx) => Observable<T>): Observable<T> {
@@ -268,7 +272,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return Object.keys(this._api.tx).filter((mod) => !!(mod.trim()));
   }
 
-  public listModuleFunctions(mod : string) {
+  public listModuleFunctions(mod: string) {
     if (!mod || !this._api.tx) {
       return [];
     }
@@ -331,7 +335,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       ]: [
           string, string, string, Moment, BlockNumber,
           Balance, Balance, Balance, AccountId, ChainProperties, Balance
-      ]) => {
+        ]) => {
         this.app.chain.name = chainname;
         this.app.chain.version = chainversion;
         this.app.chain.runtimeName = chainruntimename;
@@ -347,6 +351,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           this._ss58Format = +ss58Format.unwrapOr(42);
           this._tokenDecimals = +tokenDecimals.unwrapOr(12);
           this._tokenSymbol = tokenSymbol.unwrapOr(this.app.chain.currency).toString();
+
+          const DEFAULT_DECIMALS = this.registry.createType('u32', 15);
+
+          formatBalance.setDefaults({
+            decimals: tokenDecimals.unwrapOr(DEFAULT_DECIMALS).toNumber(),
+            unit: tokenSymbol.unwrapOr(undefined)?.toString()
+          });
         }
 
         this._totalbalance = this.coins(totalbalance);
@@ -385,7 +396,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   public silenceEvent(moduleName: string, eventName: string) {
     if (!this._silencedEvents[moduleName]) {
-      this._silencedEvents[moduleName] = { };
+      this._silencedEvents[moduleName] = {};
     }
     if (!this._silencedEvents[moduleName][eventName]) {
       this._silencedEvents[moduleName][eventName] = true;

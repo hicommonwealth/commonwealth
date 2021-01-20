@@ -16,7 +16,10 @@ import { sequelize } from '../database';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
+import { updateChainEventStatus, deleteOldHistoricalValidatorsStats }  from './../util/archivalNodeHelpers';
+
 const log = factory.getLogger(formatFilename(__filename));
+
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
@@ -118,6 +121,8 @@ const setupChainEventListeners = async (
         chain: node.chain,
         handlers,
         skipCatchup,
+        archival: false,
+        // startBlock,
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
       });

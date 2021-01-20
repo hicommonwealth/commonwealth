@@ -1,4 +1,5 @@
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
+import SubstrateStaking from 'controllers/chain/substrate/staking';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
@@ -7,6 +8,7 @@ import ChainEntityController from 'controllers/server/chain_entities';
 import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
+import StakingController from 'controllers/server/staking';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateIdentities from './identities';
@@ -16,6 +18,7 @@ import EdgewareSignaling from '../edgeware/signaling';
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;
   public accounts: SubstrateAccounts;
+  public staking: SubstrateStaking;
   public phragmenElections: SubstratePhragmenElections;
   public council: SubstrateCouncil;
   public technicalCommittee: SubstrateTechnicalCommittee;
@@ -26,7 +29,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public signaling: EdgewareSignaling;
   public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly chainEntities = new ChainEntityController();
-
+  public stakingAdapter = new StakingController();
   public readonly base = ChainBase.Substrate;
   public readonly class: ChainClass;
 
@@ -44,6 +47,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.class = _class;
     this.chain = new SubstrateChain(this.app);
     this.accounts = new SubstrateAccounts(this.app);
+    this.staking = new SubstrateStaking(this.app);
     this.phragmenElections = new SubstratePhragmenElections(this.app);
     this.council = new SubstrateCouncil(this.app);
     this.technicalCommittee = new SubstrateTechnicalCommittee(this.app);
@@ -59,6 +63,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await this.chain.resetApi(this.meta, additionalOptions);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
+    await this.staking.init(this.chain);
     if (this.class !== ChainClass.Plasm) {
       await this.identities.init(this.chain, this.accounts);
     }

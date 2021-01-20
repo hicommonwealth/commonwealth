@@ -211,7 +211,6 @@ export default (
     //   const userNotificationMap = _.object(subscriberIds, notifications);
     //   wss.emit(WebsocketMessageType.Notification, payload, userNotificationMap);
     // }
-
     return notifications;
   };
 

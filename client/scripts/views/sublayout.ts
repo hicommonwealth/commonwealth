@@ -70,6 +70,7 @@ const Sublayout: m.Component<{
       ],
     ]);
 
+
     const sublayoutHeaderRight = m('.sublayout-header-right', [
       m(LoginSelector),                                                 // login selector
       app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, { // invites menu
