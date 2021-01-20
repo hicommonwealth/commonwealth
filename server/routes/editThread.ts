@@ -69,7 +69,9 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   if (!thread) return next(new Error('No thread with that id found'));
   try {
     // If new comment body text has been submitted, create another version history entry
-    if (decodeURIComponent(req.body.body) !== JSON.parse(thread.version_history[0])) {
+    console.log(decodeURIComponent(req.body.body));
+    console.log(JSON.parse(thread.version_history[0]).body);
+    if (decodeURIComponent(req.body.body) !== JSON.parse(thread.version_history[0]).body) {
       console.log('new history entry');
       const recentEdit : any = {
         timestamp: moment(),
