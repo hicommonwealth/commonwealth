@@ -1,4 +1,4 @@
-export const parseMentionsForServer = (text, isMarkdown: boolean): any[] => {
+export const parseUserMentions = (text, isMarkdown: boolean): any[] => {
   // Extract links to Commonwealth profiles, so they can be processed by the server as mentions
   if (!text) return [];
   const regexp = RegExp('\\[\\@.+?\\]\\(.+?\\)', 'g');

@@ -1,7 +1,6 @@
 import 'pages/view_proposal/editor_permissions.scss';
 
 import m from 'mithril';
-import moment from 'moment';
 import lity from 'lity';
 import Quill from 'quill';
 import $ from 'jquery';
@@ -26,8 +25,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-const Delta = Quill.import('delta');
-import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, ControlGroup, Icon, Icons } from 'construct-ui';
+import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
 
 export enum GlobalStatus {

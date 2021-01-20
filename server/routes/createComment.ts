@@ -1,4 +1,6 @@
+import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
+import { parseUserMentions } from 'server/util/parseUserMentions';
 import { NotificationCategories } from '../../shared/types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
@@ -8,7 +10,6 @@ import proposalIdToEntity from '../util/proposalIdToEntity';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
-import moment from 'moment';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -26,13 +27,7 @@ export const Errors = {
 const createComment = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { parent_id, root_id, text } = req.body;
-
-  const mentions = typeof req.body['mentions[]'] === 'string'
-    ? [req.body['mentions[]']]
-    : typeof req.body['mentions[]'] === 'undefined'
-      ? []
-      : req.body['mentions[]'];
+  const { parent_id, root_id, text, markdown } = req.body;
 
   const plaintext = (() => {
     try {
@@ -218,6 +213,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   });
 
   // grab mentions to notify tagged users
+  const mentions = parseUserMentions(finalComment.body, markdown);
   let mentionedAddresses;
   if (mentions && mentions.length > 0) {
     mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
