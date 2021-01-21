@@ -198,7 +198,7 @@ export const PresentationComponent_: m.Component<{ validators, valCount }, { fir
                 const commission = validator?.commissionPer;
                 const apr = validator?.apr;
                 // const name = validator?.name;
-                const rewardStats = validator?.rewardStats;
+                const rewardStats = validator?.rewardsStats;
                 const slashesStats = validator?.slashesStats;
                 const offencesStats = validator?.offencesStats;
                 // let apr = annualPercentRate[validator];
@@ -252,6 +252,7 @@ export const PresentationComponent_: m.Component<{ validators, valCount }, { fir
         ]), m('table.validators-table', [
           vnode.attrs.validators
             .filter((q) => q.visible && (model.selectedState === 1 && q.state === 'Waiting'))
+            .sort(sortValidators)
             .map((validator) => {
               const stash = validator.address;
               const controller = validator.controller;

@@ -463,7 +463,7 @@ export const StakingNavigationModule: m.Component<{}, {}> = {
 
     const onManageStakingPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/manageStaking`));
-    const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`) || p.startsWith(`/${app.activeChainId()}/validatorProfile`);
     const onStakingCalculatorPage = (p) => p.startsWith(`/${app.activeChainId()}/stakingCalculator`);
 
     return m('.StakingNavigationModule.SidebarModule', [
