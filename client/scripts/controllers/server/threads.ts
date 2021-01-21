@@ -33,9 +33,9 @@ export const modelFromServer = (thread) => {
     let history;
     try {
       history = JSON.parse(v || '{}');
-      history.author = history.author
+      history.author = typeof history.author === 'string'
         ? JSON.parse(history.author)
-        : null;
+        : typeof history.author === 'object' ? history.author : null;
       history.timestamp = moment(history.timestamp);
     } catch (e) {
       console.log(e);
