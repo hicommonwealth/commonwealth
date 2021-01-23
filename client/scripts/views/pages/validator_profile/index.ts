@@ -7,13 +7,20 @@ import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 import app from 'state';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile, ChainBase } from 'models';
-import { Card, Icons, Icon, Select, TextArea, Spinner } from 'construct-ui';
+import { Spinner } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';
-import { makeDynamicComponent } from 'models/mithril';
-import Substrate from 'controllers/chain/substrate/main';
+import PageLoading from 'views/pages/loading';
+import Tabs from 'views/components/widgets/tabs';
+import { decodeAddress } from '@polkadot/keyring';
+import { setActiveAccount } from 'controllers/app/login';
 import { ApiRx } from '@polkadot/api';
+import Substrate from 'client/scripts/controllers/chain/substrate/main';
+import { makeDynamicComponent } from 'models/mithril';
 import { ValidatorStats } from './validator_profile_stats';
+import ProfileContent from './profile_content';
+import ProfileBio from './profile_bio';
+import ProfileBanner from './profile_banner';
 import chartComponent from '../../components/chart';
 import lineModel from './graph_models/linemodel';
 
@@ -53,6 +60,7 @@ const commentModelFromServer = (comment) => {
         comment.community,
         comment.chain,
         null,
+        null,
         null
       );
     } else {
@@ -70,6 +78,7 @@ const commentModelFromServer = (comment) => {
     comment.chain,
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
+    comment.plaintext,
     comment.version_history,
     attachments,
     proposal,
@@ -100,17 +109,65 @@ const threadModelFromServer = (thread) => {
     thread.chain,
     thread.read_only,
     decodeURIComponent(thread.body),
+    thread.plaintext,
     thread.url,
     thread.Address.chain,
     thread.pinned,
   );
 };
 
+const getProfileStatus = (account) => {
+  const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
+    ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
+    : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
+  const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
+    && app.user.activeAccounts.filter((account_) => {
+      return app.user.getRoleInCommunity({
+        account: account_,
+        chain: app.activeChainId(),
+      });
+    }).filter((account_) => {
+      return account_.address === account.address;
+    }).length > 0;
+
+  // if the profile that we are visiting is in app.activeAddresses() but not the current active address,
+  // then display the ProfileBanner
+  // TODO: display the banner if the current address is in app.activeAddresses() and *is* a member of the
+  // community (this will require alternate copy on the banner)
+  let isUnjoinedJoinableAddress;
+  let currentAddressInfo;
+  if (!onOwnProfile && !onLinkedProfile) {
+    const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
+    const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
+    const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
+    const unjoinedJoinableAddresses = (joinableAddresses.length > communityRoles.length)
+      ? joinableAddresses.filter((addr) => {
+        return communityRoles.filter((role) => {
+          return role.address_id === addr.id;
+        }).length === 0;
+      })
+      : [];
+    const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
+      return addr.id === account.id;
+    });
+    isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
+    if (isUnjoinedJoinableAddress) {
+      currentAddressInfo = currentAddressInfoArray[0];
+    }
+  }
+
+  return ({
+    onOwnProfile,
+    onLinkedProfile,
+    displayBanner: isUnjoinedJoinableAddress,
+    currentAddressInfo
+  });
+};
+
 export enum UserContent {
-  All = 'all',
+  All = 'posts',
   Threads = 'threads',
-  Comments = 'comments',
-  Graphs = 'graphs'
+  Comments = 'comments'
 }
 
 interface IGraphData {
@@ -120,15 +177,15 @@ interface IGraphData {
   maxValue: number,
   yStepSize: number
 }
-
-function getEmptyGraphData() {
-  return { blocks: [-9], values: [], minValue: undefined, maxValue: undefined, yStepSize: undefined };
+interface IGraphApi {
+  route: string,
+  data: any
 }
-
 export interface IProfileAttrs {
   address: string;
   setIdentity?: boolean;
 }
+
 
 interface IProfilePageState {
   dynamic: {
@@ -158,9 +215,8 @@ interface IProfilePageState {
   refreshProfile: boolean;
 }
 
-interface IGraphApi {
-  route: string,
-  data: any
+function getEmptyGraphData() {
+  return { blocks: [-9], values: [], minValue: undefined, maxValue: undefined, yStepSize: undefined };
 }
 
 function buildBucketKeys(bk, bucket, recentBlockNum, jumpIdx) {
@@ -240,7 +296,6 @@ async function assignApiValues(route, obj: IGraphData, addr, latestBlock) {
   }
 }
 
-
 const dataGetter = async (vnode) => {
   const address = vnode.state.account.address;
   const latestBlock = vnode.state.latestBlock;
@@ -258,6 +313,7 @@ const dataGetter = async (vnode) => {
   apiCalls.forEach((api) => assignApiValues(api.route, api.data, address, latestBlock));
 };
 
+// ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProfilePageState> = {
 const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
   getObservables: (attrs) => ({
     groupKey: app.chain.class.toString(),
@@ -268,8 +324,11 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
   }),
   oninit: (vnode) => {
     vnode.state.account = null;
+    vnode.state.loaded = false;
+    vnode.state.loading = false;
     vnode.state.threads = [];
     vnode.state.comments = [];
+    vnode.state.refreshProfile = false;
     vnode.state.totalStakeGraph = getEmptyGraphData();
     vnode.state.slashesGraph = getEmptyGraphData();
     vnode.state.rewardsGraph = getEmptyGraphData();
@@ -282,7 +341,9 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
     vnode.state.apiResponse = undefined;
   },
   oncreate: async (vnode) => {
-    vnode.state.apiCalled = false;
+    mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
+  },
+  view: (vnode) => {
     const loadProfile = async () => {
       const chain = (m.route.param('base'))
         ? m.route.param('base')
@@ -304,7 +365,29 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           const profile = new Profile(a.chain, a.address);
           if (a.OffchainProfile) {
             const profileData = JSON.parse(a.OffchainProfile.data);
-            // profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
+            // ignore off-chain name if substrate id exists
+            if (a.OffchainProfile.identity) {
+              profile.initializeWithChain(
+                a.OffchainProfile.identity,
+                profileData?.headline,
+                profileData?.bio,
+                profileData?.avatarUrl,
+                a.OffchainProfile.judgements,
+                a.last_active,
+                a.is_councillor,
+                a.is_validator,
+              );
+            } else {
+              profile.initialize(
+                profileData?.name,
+                profileData?.headline,
+                profileData?.bio,
+                profileData?.avatarUrl,
+                a.last_active,
+                a.is_councillor,
+                a.is_validator
+              );
+            }
           } else {
             profile.initializeEmpty();
           }
@@ -322,20 +405,48 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
           m.redraw();
         },
         error: (err) => {
-          console.log('Failed to find profile');
           console.error(err);
+          // decode address properly
+          if (['kulupu', 'edgeware', 'polkadot', 'kusama'].includes(chain)) {
+            try {
+              decodeAddress(address);
+              vnode.state.account = {
+                profile: null,
+                chain,
+                address,
+                id: null,
+                name: null,
+                user_id: null,
+              };
+            } catch (e) {
+              // do nothing if can't decode
+            }
+          }
           vnode.state.loaded = true;
           vnode.state.loading = false;
           m.redraw();
-          throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          if (!vnode.state.account) throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
             : 'Failed to find profile');
         }
       });
     };
-    mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
-    loadProfile();
-  },
-  view: (vnode) => {
+
+    const { setIdentity } = vnode.attrs;
+    const { account, loaded, loading, refreshProfile, totalStakeGraph, offenceGraph, ownStakeGraph, otherStakeGraph, nominatorGraph, slashesGraph, imOnlineGraph, rewardsGraph } = vnode.state;
+    if (!loading && !loaded) {
+      vnode.state.loading = true;
+      loadProfile();
+    }
+    if (account && account.address !== vnode.attrs.address) {
+      vnode.state.loading = true;
+      vnode.state.loaded = false;
+      loadProfile();
+    }
+    if (loading || !loaded) return m(PageLoading, { showNewProposalButton: true });
+    if (!account) {
+      return m(PageNotFound, { message: 'Invalid address provided' });
+    }
+
     if (!vnode.state.fetchedBlock && vnode.state.dynamic.validators && app.chain) {
       const a: Substrate = app.chain as Substrate;
       const apiCheck = a.chain.api;
@@ -349,7 +460,8 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
               next: (ww) => {
                 const w1: any = ww.toJSON();
                 vnode.state.latestBlock = w1.block.header['number'];
-
+                // debug block
+                vnode.state.latestBlock = 4785944;
                 dataGetter(vnode);
               },
               complete: () => {
@@ -373,182 +485,205 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
       }
     }
 
-    const { account, totalStakeGraph, offenceGraph, ownStakeGraph, otherStakeGraph, nominatorGraph, slashesGraph, imOnlineGraph, rewardsGraph } = vnode.state;
-    const { setIdentity } = vnode.attrs;
-    if (!account) {
-      return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
+    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
+
+    if (refreshProfile) {
+      loadProfile();
+      vnode.state.refreshProfile = false;
+      if (onOwnProfile) {
+        setActiveAccount(account).then(() => {
+          m.redraw();
+        });
+      } else {
+        m.redraw();
+      }
     }
 
-    
+    const comments = vnode.state.comments
+      .sort((a, b) => +b.createdAt - +a.createdAt);
+    const proposals = vnode.state.threads
+      .sort((a, b) => +b.createdAt - +a.createdAt);
+    const allContent = [].concat(proposals || []).concat(comments || [])
+      .sort((a, b) => +b.createdAt - +a.createdAt);
+
+    const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
+    const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
+    const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
 
     return m(Sublayout, {
       class: 'ProfilePage',
-    }, [(!vnode.state.latestBlock || !vnode.state.apiResponse) ? m(Spinner, { active: true, fill: true, size: 'default', message: 'Loading...' }) : m('.forum-container-alt', [
-      m(ProfileHeader, {
-        account,
-        setIdentity,
-        onOwnProfile: true,
-        onLinkedProfile: true,
-        refreshCallback: () => { vnode.state.refreshProfile = true; },
-      }),
-      // Quick stats for a validator section
-      m(ValidatorStats, { address: account.address, account, apiResponse: vnode.state.apiResponse }),
-      m('.row.graph-row', [
-        // TOTAL STAKE OVER TIME
-        totalStakeGraph && totalStakeGraph.blocks[0] !== -9 ? (totalStakeGraph.blocks.length ? m(chartComponent, {
-          title: 'TOTAL STAKE (000,000\'s)', // Title
-          model: lineModel(totalStakeGraph.maxValue, totalStakeGraph.minValue, totalStakeGraph.yStepSize),
-          xvalues: totalStakeGraph.blocks,
-          yvalues: totalStakeGraph.values,
-          addColorStop0: 'rgba(99, 113, 209, 0.23)',
-          addColorStop1: 'rgba(99, 113, 209, 0)',
-          color: 'rgb(99, 113, 209)'
-        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'TOTAL STAKE (000,000\'s)')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'TOTAL STAKE (000,000\'s)')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-            fill: false,
-            message: ' Loading...',
-            size: 'xl',
-            style: 'visibility: visible; opacity: 1;'
-          })))]),
-        // OWN STAKE OVER TIME
-        ownStakeGraph && ownStakeGraph.blocks[0] !== -9 ? (ownStakeGraph.blocks.length ? m(chartComponent, {
-          title: 'OWN STAKE (000,000\'s)', // Title
-          model: lineModel(ownStakeGraph.maxValue, ownStakeGraph.minValue, ownStakeGraph.yStepSize),
-          xvalues: ownStakeGraph.blocks,
-          yvalues: ownStakeGraph.values,
-          addColorStop0: 'rgba(53, 212, 19, 0.23)',
-          addColorStop1: 'rgba(53, 212, 19, 0)',
-          color: 'rgb(53, 212, 19)',
-        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'OWN STAKE (000,000\'s)')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'OWN STAKE (000,000\'s)')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-            fill: false,
-            message: ' Loading...',
-            size: 'xl',
-            style: 'visibility: visible; opacity: 1;'
-          })))]),
-        // OTHER STAKE OVER TIME
-        otherStakeGraph && otherStakeGraph.blocks[0] !== -9 ? (otherStakeGraph.blocks.length ? m(chartComponent, {
-          title: 'OTHER STAKE (000,000\'s)', // Title
-          model: lineModel(otherStakeGraph.maxValue, otherStakeGraph.minValue, otherStakeGraph.yStepSize),
-          xvalues: otherStakeGraph.blocks,
-          yvalues: otherStakeGraph.values,
-          addColorStop0: 'rgba(83, 110, 124, 0.23)',
-          addColorStop1: 'rgba(83, 110, 124, 0)',
-          color: 'rgb(83, 110, 124)'
-        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'OTHER STAKE (000,000\'s)')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'OTHER STAKE (000,000\'s)')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-            fill: false,
-            message: ' Loading...',
-            size: 'xl',
-            style: 'visibility: visible; opacity: 1;'
-          })))]),
-        // NOMINATORS OVER TIME
-        nominatorGraph && nominatorGraph.blocks[0] !== -9 ? (nominatorGraph.blocks.length ? m(chartComponent, {
-          title: 'NOMINATORS', // Title
-          model: lineModel(nominatorGraph.maxValue, nominatorGraph.minValue, nominatorGraph.yStepSize),
-          xvalues: nominatorGraph.blocks,
-          yvalues: nominatorGraph.values,
-          addColorStop0: 'rgba(237, 146, 61, 0.23)',
-          addColorStop1: 'rgba(237, 146, 61, 0)',
-          color: 'rgb(237, 146, 61)'
-        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'NOMINATORS')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'NOMINATORS')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-            fill: false,
-            message: ' Loading...',
-            size: 'xl',
-            style: 'visibility: visible; opacity: 1;'
-          })))]),
-        // SLASHES OVER TIME
-        slashesGraph && slashesGraph.blocks[0] !== -9 ? (slashesGraph.blocks.length ? m(chartComponent, {
-          title: 'SLASHES (000,000\'s)', // Title
-          model: lineModel(slashesGraph.maxValue, slashesGraph.minValue, slashesGraph.yStepSize),
-          xvalues: slashesGraph.blocks,
-          yvalues: slashesGraph.values,
-          addColorStop0: 'rgba(53, 212, 19, 0.23)',
-          addColorStop1: 'rgba(53, 212, 19, 0)',
-          color: 'rgb(53, 212, 19)'
-        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'SLASHES (000,000\'s)')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'SLASHES (000,000\'s)')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-            fill: false,
-            message: ' Loading...',
-            size: 'xl',
-            style: 'visibility: visible; opacity: 1;'
-          })))]),
-        // IMONLINE OVER TIME
-        imOnlineGraph && imOnlineGraph.blocks[0] !== -9 ? (imOnlineGraph.blocks.length ? m(chartComponent, {
-          title: 'IMONLINE Percentage', // Title
-          model: lineModel(imOnlineGraph.maxValue, imOnlineGraph.minValue, imOnlineGraph.yStepSize),
-          xvalues: imOnlineGraph.blocks,
-          yvalues: imOnlineGraph.values,
-          addColorStop0: 'rgba(99, 113, 209, 0.23)',
-          addColorStop1: 'rgba(99, 113, 209, 0)',
-          color: 'rgb(99, 113, 209)'
-        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'IMONLINE Percentage')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'IMONLINE Percentage')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-            fill: false,
-            message: ' Loading...',
-            size: 'xl',
-            style: 'visibility: visible; opacity: 1;'
-          })))]),
-        // REWARDS OVER TIME
-        rewardsGraph && rewardsGraph.blocks[0] !== -9 ? (rewardsGraph.blocks.length ? m(chartComponent, {
-          title: 'REWARDS (000,000\'s)', // Title
-          model: lineModel(rewardsGraph.maxValue, rewardsGraph.minValue, rewardsGraph.yStepSize),
-          xvalues: rewardsGraph.blocks,
-          yvalues: rewardsGraph.values,
-          addColorStop0: 'rgba(237, 146, 61, 0.23)',
-          addColorStop1: 'rgba(237, 146, 61, 0)',
-          color: 'rgb(237, 146, 61)'
-        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'REWARDS (000,000\'s)')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'REWARDS (000,000\'s)')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-            fill: false,
-            message: ' Loading...',
-            size: 'xl',
-            style: 'visibility: visible; opacity: 1;'
-          })))]),
-
-        offenceGraph && offenceGraph.blocks[0] !== -9 ? (offenceGraph.blocks.length ? m(chartComponent, {
-          title: 'OFFENCES', // Title
-          model: lineModel(offenceGraph.maxValue, offenceGraph.minValue, offenceGraph.yStepSize),
-          xvalues: offenceGraph.blocks,
-          yvalues: offenceGraph.values,
-          addColorStop0: 'rgba(83, 110, 124, 0.23)',
-          addColorStop1: 'rgba(83, 110, 124, 0)',
-          color: 'rgb(83, 110, 124)'
-        }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'OFFENCES')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
-          m('div.row.graph-title', m('p', 'OFFENCES')), // Give same Title here
-          m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
-            fill: false,
-            message: ' Loading...',
-            size: 'xl',
-            style: 'visibility: visible; opacity: 1;'
-          })))]),
-
-      ])
-    ]),
+      showNewProposalButton: true,
+    }, [
+      m('.forum-container-alt', [
+        displayBanner
+        && m(ProfileBanner, {
+          account,
+          addressInfo: currentAddressInfo
+        }),
+        m(ProfileHeader, {
+          account,
+          setIdentity,
+          onOwnProfile,
+          onLinkedProfile,
+          refreshCallback: () => { vnode.state.refreshProfile = true; },
+        }),
+        m(ValidatorStats, { address: account.address, account, apiResponse: vnode.state.apiResponse }),
+        m('.row.graph-row', [
+          // TOTAL STAKE OVER TIME
+          totalStakeGraph && totalStakeGraph.blocks[0] !== -9 ? (totalStakeGraph.blocks.length ? m(chartComponent, {
+            title: 'TOTAL STAKE (000,000\'s)', // Title
+            model: lineModel(totalStakeGraph.maxValue, totalStakeGraph.minValue, totalStakeGraph.yStepSize),
+            xvalues: totalStakeGraph.blocks,
+            yvalues: totalStakeGraph.values,
+            addColorStop0: 'rgba(99, 113, 209, 0.23)',
+            addColorStop1: 'rgba(99, 113, 209, 0)',
+            color: 'rgb(99, 113, 209)'
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'TOTAL STAKE (000,000\'s)')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'TOTAL STAKE (000,000\'s)')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+              fill: false,
+              message: ' Loading...',
+              size: 'xl',
+              style: 'visibility: visible; opacity: 1;'
+            })))]),
+          // OWN STAKE OVER TIME
+          ownStakeGraph && ownStakeGraph.blocks[0] !== -9 ? (ownStakeGraph.blocks.length ? m(chartComponent, {
+            title: 'OWN STAKE (000,000\'s)', // Title
+            model: lineModel(ownStakeGraph.maxValue, ownStakeGraph.minValue, ownStakeGraph.yStepSize),
+            xvalues: ownStakeGraph.blocks,
+            yvalues: ownStakeGraph.values,
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color: 'rgb(53, 212, 19)',
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'OWN STAKE (000,000\'s)')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'OWN STAKE (000,000\'s)')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+              fill: false,
+              message: ' Loading...',
+              size: 'xl',
+              style: 'visibility: visible; opacity: 1;'
+            })))]),
+          // OTHER STAKE OVER TIME
+          otherStakeGraph && otherStakeGraph.blocks[0] !== -9 ? (otherStakeGraph.blocks.length ? m(chartComponent, {
+            title: 'OTHER STAKE (000,000\'s)', // Title
+            model: lineModel(otherStakeGraph.maxValue, otherStakeGraph.minValue, otherStakeGraph.yStepSize),
+            xvalues: otherStakeGraph.blocks,
+            yvalues: otherStakeGraph.values,
+            addColorStop0: 'rgba(83, 110, 124, 0.23)',
+            addColorStop1: 'rgba(83, 110, 124, 0)',
+            color: 'rgb(83, 110, 124)'
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'OTHER STAKE (000,000\'s)')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'OTHER STAKE (000,000\'s)')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+              fill: false,
+              message: ' Loading...',
+              size: 'xl',
+              style: 'visibility: visible; opacity: 1;'
+            })))]),
+          // NOMINATORS OVER TIME
+          nominatorGraph && nominatorGraph.blocks[0] !== -9 ? (nominatorGraph.blocks.length ? m(chartComponent, {
+            title: 'NOMINATORS', // Title
+            model: lineModel(nominatorGraph.maxValue, nominatorGraph.minValue, nominatorGraph.yStepSize),
+            xvalues: nominatorGraph.blocks,
+            yvalues: nominatorGraph.values,
+            addColorStop0: 'rgba(237, 146, 61, 0.23)',
+            addColorStop1: 'rgba(237, 146, 61, 0)',
+            color: 'rgb(237, 146, 61)'
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'NOMINATORS')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'NOMINATORS')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+              fill: false,
+              message: ' Loading...',
+              size: 'xl',
+              style: 'visibility: visible; opacity: 1;'
+            })))]),
+          // SLASHES OVER TIME
+          slashesGraph && slashesGraph.blocks[0] !== -9 ? (slashesGraph.blocks.length ? m(chartComponent, {
+            title: 'SLASHES (000,000\'s)', // Title
+            model: lineModel(slashesGraph.maxValue, slashesGraph.minValue, slashesGraph.yStepSize),
+            xvalues: slashesGraph.blocks,
+            yvalues: slashesGraph.values,
+            addColorStop0: 'rgba(53, 212, 19, 0.23)',
+            addColorStop1: 'rgba(53, 212, 19, 0)',
+            color: 'rgb(53, 212, 19)'
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'SLASHES (000,000\'s)')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'SLASHES (000,000\'s)')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+              fill: false,
+              message: ' Loading...',
+              size: 'xl',
+              style: 'visibility: visible; opacity: 1;'
+            })))]),
+          // IMONLINE OVER TIME
+          imOnlineGraph && imOnlineGraph.blocks[0] !== -9 ? (imOnlineGraph.blocks.length ? m(chartComponent, {
+            title: 'IMONLINE Percentage', // Title
+            model: lineModel(imOnlineGraph.maxValue, imOnlineGraph.minValue, imOnlineGraph.yStepSize),
+            xvalues: imOnlineGraph.blocks,
+            yvalues: imOnlineGraph.values,
+            addColorStop0: 'rgba(99, 113, 209, 0.23)',
+            addColorStop1: 'rgba(99, 113, 209, 0)',
+            color: 'rgb(99, 113, 209)'
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'IMONLINE Percentage')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'IMONLINE Percentage')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+              fill: false,
+              message: ' Loading...',
+              size: 'xl',
+              style: 'visibility: visible; opacity: 1;'
+            })))]),
+          // REWARDS OVER TIME
+          rewardsGraph && rewardsGraph.blocks[0] !== -9 ? (rewardsGraph.blocks.length ? m(chartComponent, {
+            title: 'REWARDS (000,000\'s)', // Title
+            model: lineModel(rewardsGraph.maxValue, rewardsGraph.minValue, rewardsGraph.yStepSize),
+            xvalues: rewardsGraph.blocks,
+            yvalues: rewardsGraph.values,
+            addColorStop0: 'rgba(237, 146, 61, 0.23)',
+            addColorStop1: 'rgba(237, 146, 61, 0)',
+            color: 'rgb(237, 146, 61)'
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'REWARDS (000,000\'s)')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'REWARDS (000,000\'s)')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+              fill: false,
+              message: ' Loading...',
+              size: 'xl',
+              style: 'visibility: visible; opacity: 1;'
+            })))]),
+  
+          offenceGraph && offenceGraph.blocks[0] !== -9 ? (offenceGraph.blocks.length ? m(chartComponent, {
+            title: 'OFFENCES', // Title
+            model: lineModel(offenceGraph.maxValue, offenceGraph.minValue, offenceGraph.yStepSize),
+            xvalues: offenceGraph.blocks,
+            yvalues: offenceGraph.values,
+            addColorStop0: 'rgba(83, 110, 124, 0.23)',
+            addColorStop1: 'rgba(83, 110, 124, 0)',
+            color: 'rgb(83, 110, 124)'
+          }) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'OFFENCES')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', 'NO DATA AVAILABLE'))])) : m('.col-xs-5 .col-xs-offset-1 .graph-container', [
+            m('div.row.graph-title', m('p', 'OFFENCES')), // Give same Title here
+            m('#canvas-holder', m('div.row.graph-spinner', m(Spinner, {
+              fill: false,
+              message: ' Loading...',
+              size: 'xl',
+              style: 'visibility: visible; opacity: 1;'
+            })))]),
+  
+        ])
+      ]),
     ]);
   },
 });
