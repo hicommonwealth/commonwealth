@@ -27,6 +27,7 @@ const FeedbackModal: m.Component<{}, { sending, error, success }> = {
               intent: 'primary',
               loading: vnode.state.sending,
               label: 'Send feedback',
+              rounded: true,
               onclick: (e) => {
                 e.preventDefault();
                 const $text = $(e.target).closest('.FeedbackModal').find('textarea');

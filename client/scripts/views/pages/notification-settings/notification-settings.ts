@@ -3,7 +3,7 @@ import 'pages/subscriptions.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
-import { Button, Icons, ListItem, Checkbox, Table, SelectList, } from 'construct-ui';
+import { Button, Icons, ListItem, Checkbox, Table, SelectList, Tag, } from 'construct-ui';
 
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
@@ -427,6 +427,10 @@ const NotificationSettingsPage: m.Component<{}, {
     const { chains, communities, subscriptions } = vnode.state;
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
+      title: [
+        'Notification Settings ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       message: 'This page requires you to be logged in.'
     });
     if (subscriptions.length < 1) return m(PageLoading);

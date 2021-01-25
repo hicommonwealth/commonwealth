@@ -14,7 +14,16 @@ export function externalLink(selector, target, children) {
   return m(selector, {
     href: target,
     target: '_blank',
-    rel: 'noopener noreferrer'
+    rel: 'noopener noreferrer',
+    onclick: (e) => {
+      if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+      if (target.startsWith(document.location.origin + '/')) {
+        // don't open a new window if the link is on Commonwealth
+        e.preventDefault();
+        e.stopPropagation();
+        m.route.set(target);
+      }
+    },
   }, children);
 }
 
@@ -44,6 +53,10 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
 export function extractDomain(url) {
   const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');
   return re.exec(url)[1];
+}
+
+export function removeUrlPrefix(url) {
+  return url.replace(/^https?:\/\//, '');
 }
 
 /*
@@ -115,11 +128,11 @@ export function byAscendingCreationDate(a, b) {
 }
 
 export function byDescendingUpdatedDate(a, b) {
-  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt);
+  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt)
 }
 
 export function byAscendingUpdatedDate(a, b) {
-  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt);
+  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt)
 }
 
 export function orderAccountsByAddress(a, b) {
@@ -206,18 +219,9 @@ export function formatDuration(duration: moment.Duration, includeSeconds = true)
   ].join('');
 }
 
-export function formatAddressShort(address: string, chain: string) {
-  if (!address) return;
-  if (chain === 'near') {
-    return `@${address}`;
-  } else {
-    return `${address.slice(0, 5)}…`;
-  }
-}
-
 export function formatProposalHashShort(hash: string) {
   if (!hash) return;
-  return hash.slice(0, 8);
+  return `${hash.slice(0, 8)}…`;
 }
 
 export function renderMultilineText(text: string) {

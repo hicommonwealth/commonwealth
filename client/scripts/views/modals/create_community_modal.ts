@@ -4,6 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
+import { Button } from 'construct-ui';
 
 import app from 'state';
 
@@ -90,7 +91,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
             ]);
           }),
         ]),
-        m('button', {
+        m(Button, {
           class: (vnode.state.disabled || !vnode.state.selectedAddress || !vnode.state.selectedChain)
             ? 'disabled' : '',
           type: 'submit',
@@ -127,10 +128,12 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 null,
                 null,
                 null,
+                null,
                 result.result.default_chain,
                 false,
                 result.result.invitesEnabled,
                 result.result.privacyEnabled,
+                true,
                 result.featured_topics,
                 result.topics,
               );
@@ -156,8 +159,9 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
               if (err.responseJSON) vnode.state.error = err.responseJSON.error;
               m.redraw();
             });
-          }
-        }, 'Create community'),
+          },
+          label: 'Create community'
+        }),
         vnode.state.error && m('.create-community-message.error', [
           vnode.state.error || 'An error occurred'
         ]),

@@ -29,7 +29,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     super(meta, app);
     this.chain = new MolochChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
-    this.accounts = new MolochMembers(this.app);
+    this.accounts = new MolochMembers(this.app, this.chain, this.ethAccounts);
     this.governance = new MolochGovernance(this.app, !this.usingServerChainEntities);
   }
 
@@ -48,24 +48,26 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
       await this.webWallet.enable();
       await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
         const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
+        if (!updatedAddress) return;
         await setActiveAccount(updatedAddress);
       });
     }
 
     await this.webWallet.web3.givenProvider.on('accountsChanged', async (accounts) => {
       const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
+      if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);
       api.updateSigner(accounts[0]);
     });
 
-    await this.accounts.init(api, this.chain, this.ethAccounts);
+    await this.accounts.init(api);
     await super.initApi();
   }
 
   public async initData() {
     await this.chain.initEventLoop();
     await this.governance.init(this.chain, this.accounts);
-    await super.initData(this.usingServerChainEntities);
+    await super.initData();
   }
 
   public async deinit() {

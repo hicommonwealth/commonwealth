@@ -52,6 +52,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
           label: (app.user.email && !emailInputUpdated && !emailVerified) ? 'Retry verification' : 'Update email',
           class: 'update-email-button',
           disabled: (!emailInputUpdated && emailVerified) || verificationSent,
+          rounded: true,
           onclick: async () => {
             vnode.state.errorMessage = null;
             const confirmed = await confirmationModalWithText(
@@ -97,7 +98,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
                 position: 'relative',
                 top: '2px',
               }
-            }, emailVerified ? 'Verified' : app.user.email ? 'Not verified' : 'No email provided'),
+            }, emailVerified ? 'Verified' : app.user.email ? 'Not verified' : 'No email'),
           ],
         errorMessage && m('p.error', errorMessage),
       ]),
@@ -111,6 +112,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
           m(Button, {
             label: githubAccount ? 'Unlink Github' : 'Link Github',
             intent: githubAccount ? 'negative' : 'primary',
+            rounded: true,
             onclick: () => {
               if (githubAccount) {
                 $.ajax({

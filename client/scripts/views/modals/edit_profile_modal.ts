@@ -3,7 +3,7 @@ import 'modals/edit_profile_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
-import { Button, Input, TextArea } from 'construct-ui';
+import { Button, Input, TextArea, FormLabel } from 'construct-ui';
 
 import AvatarUpload from 'views/components/avatar_upload';
 
@@ -40,10 +40,11 @@ const EditProfileModal = {
           oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.avatarUrl)
         }),
         m('.text-input-wrapper', [
+          m(FormLabel, 'Name'),
           m(Input, {
             name: 'name',
-            defaultValue: account.name,
-            placeholder: 'Display name',
+            defaultValue: account.name || account.profile.name,
+            placeholder: 'Add your name',
             disabled: account.profile.isOnchain,
             fluid: true,
             autocomplete: 'off',
@@ -52,18 +53,20 @@ const EditProfileModal = {
               $(vvnode.dom).focus();
             },
           }),
+          m(FormLabel, 'Headline'),
           m(Input, {
             name: 'headline',
             defaultValue: account.profile.headline,
-            placeholder: 'Headline',
+            placeholder: 'Add a headline',
             fluid: true,
             autocomplete: 'off',
             oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.headline),
           }),
+          m(FormLabel, 'Bio'),
           m(TextArea, {
             name: 'bio',
             defaultValue: account.profile.bio,
-            placeholder: 'Enter bio...',
+            placeholder: 'Add a bio',
             fluid: true,
             oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.bio)
           }),
@@ -73,6 +76,7 @@ const EditProfileModal = {
             m(Button, {
               intent: 'primary',
               disabled: vnode.state.saving || vnode.state.uploadsInProgress > 0,
+              rounded: true,
               onclick: (e) => {
                 e.preventDefault();
                 const data = {
@@ -96,6 +100,7 @@ const EditProfileModal = {
               label: 'Save Changes'
             }),
             m(Button, {
+              rounded: true,
               onclick: (e) => {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');

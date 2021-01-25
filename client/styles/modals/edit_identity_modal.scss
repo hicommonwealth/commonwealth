@@ -6,7 +6,7 @@
         width: initial;
     }
     .form {
-        padding: 20px 32px 32px;
+        padding: 30px 32px 32px;
         .text-input-wrapper {
             margin: 6px 0 4px 0;
             label {
@@ -25,7 +25,7 @@
         }
     }
     .error-message {
-        color: $negative-text-color;
+        color: $negative-bg-color;
         font-weight: 500;
         margin-top: 16px;
     }

@@ -11,13 +11,23 @@ const ConfirmModal = {
     const confirmText = vnode.attrs.prompt || 'Are you sure?';
     const primaryButton = vnode.attrs.primaryButton || 'Yes';
     const secondaryButton = vnode.attrs.secondaryButton || 'Cancel';
-    return m('.ConfirmModal', [
+    return m('.ConfirmModal', {
+      onclick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      },
+      onmousedown: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, [
       m('.compact-modal-body', [
         m('h3', confirmText),
       ]),
       m('.compact-modal-actions', [
         m(Button, {
           intent: 'primary',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             $(e.target).trigger('modalcomplete');
@@ -32,6 +42,7 @@ const ConfirmModal = {
         }),
         m(Button, {
           intent: 'none',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             $(e.target).trigger('modalexit');

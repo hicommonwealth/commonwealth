@@ -2,6 +2,7 @@ import 'pages/discussions/discussion_row.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
+import $ from 'jquery';
 import moment from 'moment-twitter';
 import { Icon, Icons, Tag } from 'construct-ui';
 
@@ -25,17 +26,19 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
     const lastUpdated = app.comments.lastCommented(proposal) || proposal.createdAt;
-
+    const pinned = proposal.pinned;
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
-    const rowHeader = (propType === OffchainThreadKind.Link && proposal.url)
-      ? externalLink('a.external-discussion-link', proposal.url, [
-        proposal.title, m.trust('&nbsp;'), m(Icon, { name: Icons.EXTERNAL_LINK })
-      ])
-      : link('a', discussionLink, proposal.title);
-
-    const pinned = proposal.pinned;
+    const rowHeader = [
+      (propType === OffchainThreadKind.Link && proposal.url)
+        && externalLink('a.external-discussion-link', proposal.url, [
+          extractDomain(proposal.url),
+        ]),
+      (propType === OffchainThreadKind.Link && proposal.url)
+        && m('span.spacer', ' '),
+      link('a', discussionLink, proposal.title),
+    ];
     const rowSubheader = [
       proposal.readOnly && m('.discussion-locked', [
         m(Tag, {
@@ -49,15 +52,15 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         m('span.proposal-topic-icon'),
         m('span.proposal-topic-name', `${proposal.topic.name}`),
       ]),
-      (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
-        `Link: ${extractDomain(proposal.url)}`
-      ]),
       m(User, {
         user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
         linkify: true,
         popover: true,
         hideAvatar: true,
+        showAddressWithDisplayName: true,
       }),
+      proposal instanceof OffchainThread && proposal.collaborators && proposal.collaborators.length > 0
+        && m('span.proposal-collaborators', [ ' +', proposal.collaborators.length ]),
       m('.mobile-comment-count', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         app.comments.nComments(proposal),
@@ -83,6 +86,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       m(UserGallery, {
         avatarSize: 24,
         popover: true,
+        maxUsers: 4,
         users: app.comments.uniqueCommenters(
           proposal,
           proposal.author,
@@ -116,6 +120,8 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       contentRight: rowMetadata,
       rightColSpacing: app.isLoggedIn() ?  [4, 4, 3, 1] : [4, 4, 4],
       onclick: (e) => {
+        if ($(e.target).hasClass('cui-tag')) return;
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
         e.preventDefault();
         localStorage[`${app.activeId()}-discussions-scrollY`] = window.scrollY;
         updateRoute(discussionLink);

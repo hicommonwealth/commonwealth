@@ -38,8 +38,9 @@ const getFilteredContent = (content, address) => {
     const actor = `${address?.name || content.user}`;
     const action = ((content.notificationCategory === NotificationCategories.NewComment) ? 'commented on'
       : (content.notificationCategory === NotificationCategories.NewMention) ? 'mentioned you in the thread'
-        : (content.notificationCategory === NotificationCategories.NewThread) ? 'created a new thread'
-          : '');
+        : (content.notificationCategory === NotificationCategories.NewCollaboration) ? 'invited you to collaborate on'
+          : (content.notificationCategory === NotificationCategories.NewThread) ? 'created a new thread'
+            : '');
     const actedOn = decodeURIComponent(content.title);
     const actedOnLink = content.url;
 
@@ -53,6 +54,7 @@ const getFilteredContent = (content, address) => {
       try {
         // parse and use quill document
         const doc = JSON.parse(bodytext);
+        if (!doc.ops) throw new Error();
         const text = renderQuillDeltaToText(doc);
         return smartTrim(text);
       } catch (err) {
@@ -113,8 +115,8 @@ const send = async (models, content: WebhookContent) => {
           format: 'mrkdwn',
         } : {
           type: 'section',
-          text: `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-          }${notificationTitlePrefix}<${actedOnLink}|${actedOn}>`
+          text: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
+            + `${notificationTitlePrefix}<${actedOnLink}|${actedOn}>`
             + `\n> ${notificationExcerpt.split('\n').join('\n> ')}`,
           format: 'mrkdwn',
         });
@@ -170,7 +172,6 @@ const send = async (models, content: WebhookContent) => {
           await request.post(url).send(webhookData);
         } else {
           console.log('Suppressed webhook notification to', url);
-          console.log(webhookData);
         }
       } catch (err) {
         console.error(err);

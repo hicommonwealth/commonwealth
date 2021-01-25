@@ -25,6 +25,7 @@ const getStakeOverTime = async (models, req: Request, res: Response, next: NextF
   if (!chainInfo) return next(new Error(Errors.InvalidChain));
 
   const where: any = {};
+  where['$HistoricalValidatorStatistic.chain_name$'] = chain;
   // if stash is given
   if (stash) where['$HistoricalValidatorStatistic.stash$'] = stash;
 

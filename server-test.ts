@@ -121,15 +121,42 @@ const resetServer = (debug=false): Promise<void> => {
         type: 'chain',
       });
 
-      await models['Address'].create({
-        user_id: 1,
-        address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
-        chain: 'ethereum',
-        selected: true,
-        verification_token: 'PLACEHOLDER',
-        verification_token_expires: null,
-        verified: new Date(),
-      });
+      // Admin roles for specific communities
+      await Promise.all([
+        models['Address'].create({
+          user_id: 1,
+          address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
+          chain: 'ethereum',
+          selected: true,
+          verification_token: 'PLACEHOLDER',
+          verification_token_expires: null,
+          verified: new Date(),
+        }),
+        models['Address'].create({
+          address: '5DJA5ZCobDS3GVn8D2E5YRiotDqGkR2FN1bg6LtfNUmuadwX',
+          chain: 'edgeware',
+          verification_token: 'PLACEHOLDER',
+          verification_token_expires: null,
+          verified: true,
+          keytype: 'sr25519',
+        }),
+        models['Address'].create({
+          address: 'ik52qFh92pboSctWPSFKtQwGEpypzz2m6D5ZRP8AYxqjHpM',
+          chain: 'edgeware',
+          verification_token: 'PLACEHOLDER',
+          verification_token_expires: null,
+          verified: true,
+          keytype: 'sr25519',
+        }),
+        models['Address'].create({
+          address: 'js4NB7G3bqEsSYq4ruj9Lq24QHcoKaqauw6YDPD7hMr1Roj',
+          chain: 'edgeware',
+          verification_token: 'PLACEHOLDER',
+          verification_token_expires: null,
+          verified: true,
+          keytype: 'sr25519',
+        }),
+      ]);
 
       // Notification Categories
       await models['NotificationCategory'].create({
@@ -149,6 +176,10 @@ const resetServer = (debug=false): Promise<void> => {
         description: 'someone @ mentions a user',
       });
       await models['NotificationCategory'].create({
+        name: NotificationCategories.NewCollaboration,
+        description: 'someone collaborates with a user',
+      });
+      await models['NotificationCategory'].create({
         name: NotificationCategories.ChainEvent,
         description: 'a chain event occurs',
       });
@@ -157,10 +188,16 @@ const resetServer = (debug=false): Promise<void> => {
         description: 'someone reacts to a post',
       });
 
-      // Admins need to be subscribed to mentions
+      // Admins need to be subscribed to mentions and collaborations
       await models['Subscription'].create({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewMention,
+        object_id: `user-${drew.id}`,
+        is_active: true,
+      });
+      await models['Subscription'].create({
+        subscriber_id: drew.id,
+        category_id: NotificationCategories.NewCollaboration,
         object_id: `user-${drew.id}`,
         is_active: true,
       });

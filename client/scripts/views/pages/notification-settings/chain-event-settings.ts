@@ -2,7 +2,7 @@ import 'pages/subscriptions.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { Checkbox, Table, SelectList, Icons, Button, ListItem } from 'construct-ui';
+import { Checkbox, Table, SelectList, Icons, Button, ListItem, Tag } from 'construct-ui';
 import {
   SubstrateEvents, SubstrateTypes, IChainEventKind, EventSupportingChains, TitlerFilter
 } from '@commonwealth/chain-events';
@@ -145,7 +145,7 @@ const EdgewareChainEvents: m.Component = {
       m(EventSubscriptionTypeRow, { title: 'Signaling events', notificationTypeArray: EdgewareChainNotificationTypes.Signaling, }),
       m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: EdgewareChainNotificationTypes.Treasury, }),
       m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: EdgewareChainNotificationTypes.Validator, }),
-      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: EdgewareChainNotificationTypes.Vote, }),
+      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: EdgewareChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -158,7 +158,7 @@ const KusamaChainEvents: m.Component = {
       m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: KusamaChainNotificationTypes.Preimage, }),
       // m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: KusamaChainNotificationTypes.Treasury, }),
       m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: KusamaChainNotificationTypes.Validator, }),
-      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: KusamaChainNotificationTypes.Vote, }),
+      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: KusamaChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -171,7 +171,7 @@ const PolkadotChainEvents: m.Component = {
       m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
       // m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: PolkdotChainNotificationTypes.Treasury, }),
       m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: PolkadotChainNotificationTypes.Validator, }),
-      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: PolkadotChainNotificationTypes.Vote, }),
+      m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: PolkadotChainNotificationTypes.VotingDelegation, }),
     ];
   }
 };
@@ -290,6 +290,10 @@ const ChainEventSettingsPage: m.Component<{}, {
     const { chains } = vnode.state;
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
+      title: [
+        'Notification Settings ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       message: 'This page requires you to be logged in.'
     });
 

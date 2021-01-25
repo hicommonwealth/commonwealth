@@ -3,29 +3,30 @@
 .ChainStatusIndicator {
     .status {
         display: inline-block;
-        color: #777;
         &:before {
             display: inline-block;
             content: " ";
             // sizing
-            background: #bbb;
+            background: $background-color-medium-accent;
             height: 8px;
             width: 8px;
             border-radius: 4px;
             // position
             margin-right: 7px;
+            position: relative;
+            top: -1px;
         }
         &.connecting:before {
-            background: #ffa200;
+            background: $intermediate-icon-color;
         }
         &.connected:before {
-            background: #7ed320;
+            background: $positive-icon-color;
         }
         &.disconnected:before {
-            background: #db322d;
+            background: $failure-icon-color;
         }
         &.error:before {
-            background: #db322d;
+            background: $failure-icon-color;
         }
     }
 }

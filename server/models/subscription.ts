@@ -177,6 +177,7 @@ export default (
         msg.dynamic_template_data.notification.path = `${SERVER_URL}/${notification_data.chainEventType.chain}/notificationsList?id=${notification.id}`;
       }
       if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
+      return notification;
     }));
 
     // send data to relevant webhooks
@@ -216,7 +217,7 @@ export default (
   Subscription.associate = (models) => {
     models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
-    models.Subscription.hasMany(models.Notification);
+    models.Subscription.hasMany(models.Notification, { onDelete: 'cascade' });
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainCommunity, { foreignKey: 'community_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });

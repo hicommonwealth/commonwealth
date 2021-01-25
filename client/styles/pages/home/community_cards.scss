@@ -1,23 +1,26 @@
 @import 'client/styles/shared';
 
 .HomepageCommunityCards {
+    text-align: left;
+    margin: 0 auto;
+    max-width: 760px;
     position: relative;
     .ChainIcon {
         margin-bottom: 10px;
     }
     .CommunityIcon {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
     h4 {
         margin-top: 32px;
-        font-weight: 500;
-        font-size: 16px;
-        color: #999;
+        font-weight: 600;
+        font-size: 17px;
+        color: $text-color-light;
     }
     .communities-list,
     .other-list {
-        width: calc(100% + 40px);
-        margin-right: -40px;
+        width: calc(100% + 30px);
+        margin-right: -30px;
         @include sm-max {
             width: initial;
             margin-right: 0;
@@ -31,7 +34,7 @@
     .home-card {
         box-sizing: border-box;
         float: left;
-        width: calc(50% - 40px);
+        width: calc(50% - 30px);
         max-width: none;
         margin-right: 30px;
         margin-bottom: 30px;
@@ -54,9 +57,9 @@
             }
             h3 {
                 flex: 1;
-                font-size: 19px;
-                font-weight: 500;
-                margin: 0 0 6px;
+                font-size: 20px;
+                font-weight: 600;
+                margin: 8px 0 5px;
                 line-height: 1.1;
                 white-space: nowrap;
                 text-overflow: ellipse;
@@ -69,10 +72,10 @@
             .card-description {
                 margin: 0;
                 line-height: 1.25;
-                height: 64px;
+                height: 45px;
                 overflow: hidden;
                 display: -webkit-box;
-                -webkit-line-clamp: 3;
+                -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
             }
             .recent-activity {

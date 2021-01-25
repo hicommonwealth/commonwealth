@@ -20,7 +20,6 @@ abstract class Account<C extends Coin> {
   public abstract balance: Observable<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
   public async abstract signMessage(message: string): Promise<string>;
-  public abstract async isValidSignature(message: string, signature: string): Promise<boolean>;
   protected abstract addressFromMnemonic(mnemonic: string): string;
   protected abstract addressFromSeed(seed: string): string;
 
@@ -87,7 +86,7 @@ abstract class Account<C extends Coin> {
   public setValidationToken(token: string) {
     this._validationToken = token;
   }
-  public async validate(signature?: string, txParams?: string) {
+  public async validate(signature?: string) {
     if (!this._validationToken) {
       throw new Error('no validation token found');
     }
@@ -97,12 +96,8 @@ abstract class Account<C extends Coin> {
     if (!signature && (this.seed || this.mnemonic || this.chainBase === ChainBase.NEAR)) {
       // construct signature from private key
       signature = await this.signMessage(`${this._validationToken}\n`);
-    } else if (signature && !txParams) {
-      const withoutNewline = !(await this.isValidSignature(this._validationToken, signature));
-      const withNewline = !(await this.isValidSignature(`${this._validationToken}\n`, signature));
-      if (withNewline && withoutNewline) {
-        throw new Error('invalid signature');
-      }
+    } else if (!signature) {
+      throw new Error('no signature or seed provided');
     }
 
     if (signature) {
@@ -110,18 +105,16 @@ abstract class Account<C extends Coin> {
         address: this.address,
         chain: this.chain.id,
         jwt: this.app.user.jwt,
+        signature,
       };
-      // If txParams is provided, the signature is actually for a
-      // transaction, not a message. The transaction should be a
-      // system.remark() call containing the validation token, and
-      // txParams should be a JSON string of the ExtrinsicPayload.
-      if (txParams) {
-        params.txSignature = signature;
-        params.txParams = txParams;
-      } else {
-        params.signature = signature;
-      }
-      return Promise.resolve($.post(`${this.app.serverUrl()}/verifyAddress`, params));
+      return new Promise((resolve, reject) => {
+        $.post(`${this.app.serverUrl()}/verifyAddress`, params).then((result) => {
+          if (result.status === 'Success') return resolve();
+          else reject();
+        }).catch((error) => {
+          reject();
+        });
+      });
     } else {
       throw new Error('signature or key required for validation');
     }

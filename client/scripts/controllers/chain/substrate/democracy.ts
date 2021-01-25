@@ -56,32 +56,30 @@ class SubstrateDemocracy extends ProposalModule<
         this._emergencyVotingPeriod = +(api.consts.democracy.emergencyVotingPeriod as BlockNumber);
         this._preimageByteDeposit = this._Chain.coins(api.consts.democracy.preimageByteDeposit);
 
-        // fetch referenda from chain
-        const events = await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          this,
-          () => this._Chain.fetcher.fetchDemocracyReferenda(this.app.chain.block.height)
+        // register chain-event handlers
+        this.app.chain.chainEntities.registerEntityHandler(
+          SubstrateTypes.EntityKind.DemocracyReferendum, (entity, event) => {
+            this.updateProposal(entity, event);
+          }
         );
-        const hashes = events.filter((e) => (e.data as any).proposalHash).map((e) => (e.data as any).proposalHash);
-        await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          this,
-          () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
-        );
-        // register new chain-event handlers
         this.app.chain.chainEntities.registerEntityHandler(
           SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
-            if (!this.initialized) return;
             if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
               const referendum = this.getByHash(entity.typeId);
               if (referendum) referendum.update(event);
             }
           }
         );
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.DemocracyReferendum, (entity, event) => {
-            if (this.initialized) this.updateProposal(entity, event);
-          }
+
+        // fetch referenda from chain
+        const events = await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          () => this._Chain.fetcher.fetchDemocracyReferenda(this.app.chain.block.height)
+        );
+        const hashes = events.filter((e) => (e.data as any).proposalHash).map((e) => (e.data as any).proposalHash);
+        await this.app.chain.chainEntities.fetchEntities(
+          this.app.chain.id,
+          () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
         );
 
         this._initialized = true;

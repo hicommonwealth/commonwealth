@@ -3,10 +3,10 @@ import 'modals/tx_signing_modal.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import { mnemonicValidate } from '@polkadot/util-crypto';
-import { Button, TextArea, Grid, Col } from 'construct-ui';
+import { Button, TextArea, Grid, Col, Spinner } from 'construct-ui';
 
 import app from 'state';
-import { formatAsTitleCase } from 'helpers';
+import { formatAsTitleCase, link } from 'helpers';
 import { ITXModalData, ITransactionResult, TransactionStatus, ChainBase } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
@@ -135,6 +135,7 @@ const TXSigningCLIOption = {
       submitAction = m(Button, {
         intent: 'primary',
         type: 'submit',
+        rounded: true,
         onclick: (e) => {
           e.preventDefault();
           // try {
@@ -166,6 +167,7 @@ const TXSigningCLIOption = {
       submitAction = m(Button, {
         intent: 'primary',
         type: 'submit',
+        rounded: true,
         onclick: (e) => {
           e.preventDefault();
           try {
@@ -228,10 +230,15 @@ const TXSigningWebWalletOption = {
         }) === vnode.attrs.author.address;
       });
     return m('.TXSigningSeedOrMnemonicOption', [
-      m('div', 'Use the polkadot-js extension to sign the transaction:'),
+      m('div', [
+        'Use a ',
+        link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', { target: '_blank' }),
+        ' compatible wallet to sign the transaction:',
+      ]),
       m(Button, {
         type: 'submit',
         intent: 'primary',
+        rounded: true,
         disabled: !isWebWalletEnabled || !isAuthorInWebWallet,
         onclick: async (e) => { await transact(); },
         oncreate: (vvnode) => $(vvnode.dom).focus(),
@@ -272,6 +279,7 @@ const TXSigningSeedOrMnemonicOption = {
         m(Button, {
           intent: 'primary',
           type: 'submit',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             const newKey = `${$(vnode.dom).find('textarea.mnemonic').val().toString()
@@ -294,6 +302,7 @@ const TXSigningSeedOrMnemonicOption = {
         m(Button, {
           intent: 'primary',
           type: 'submit',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             transact();
@@ -367,6 +376,19 @@ const TXSigningModalStates = {
         vnode.state.timer++;
         m.redraw();
       }, 1000);
+      // for edgeware mainnet, timeout after 10 sec
+      // TODO: remove this after the runtime upgrade to Substrate 2.0 rc3+
+      if (app.chain?.meta?.chain?.id === 'edgeware') {
+        vnode.state.timeoutHandle = setTimeout(() => {
+          clearInterval(vnode.state.timeoutHandle);
+          vnode.attrs.next('SentTransactionSuccess', {
+            hash: 'Not available (this chain is using an out of date API)',
+            blocknum: '--',
+            timestamp: '--',
+          });
+          $parent.trigger('modalcomplete');
+        }, 10000);
+      }
 
       // for edgeware mainnet, timeout after 10 sec
       // TODO: remove this after the runtime upgrade to Substrate 2.0 rc3+
@@ -420,13 +442,14 @@ const TXSigningModalStates = {
         m('.compact-modal-title', [ m('h3', 'Confirm transaction') ]),
         m('.compact-modal-body', [
           m('.TXSigningBodyText', 'Waiting for your transaction to be confirmed by the network...'),
-          m('span.icon-spinner2.animate-spin'),
+          m(Spinner, { active: true }),
           m('br'),
           m(Button, {
             intent: 'primary',
             type: 'submit',
             disabled: true,
             fluid: true,
+            rounded: true,
             onclick: (e) => (undefined),
             label: `Waiting ${vnode.state.timer || 0}s...`
           }),
@@ -452,6 +475,7 @@ const TXSigningModalStates = {
             intent: 'primary',
             type: 'submit',
             fluid: true,
+            rounded: true,
             oncreate: (vvnode) => $(vvnode.dom).focus(),
             onclick: (e) => {
               e.preventDefault();
@@ -482,6 +506,7 @@ const TXSigningModalStates = {
                 type: 'submit',
                 style: 'margin-right: 10px',
                 fluid: true,
+                rounded: true,
                 onclick: (e) => {
                   e.preventDefault();
                   $(vnode.dom).trigger('modalexit');
@@ -493,6 +518,7 @@ const TXSigningModalStates = {
               m(Button, {
                 intent: 'none',
                 fluid: true,
+                rounded: true,
                 style: 'margin-left: 10px',
                 oncreate: (vvnode) => $(vvnode.dom).focus(),
                 onclick: (e) => { vnode.attrs.next('Intro'); },

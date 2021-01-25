@@ -3,7 +3,7 @@ import { NotificationCategories, ProposalType } from '../../shared/types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl } from '../../shared/utils';
+import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -60,17 +60,27 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     return next(new Error(Errors.UnsupportedKind));
   }
 
+  // Render a copy of the thread to plaintext for the search indexer
+  const plaintext = (() => {
+    try {
+      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
+    } catch (e) {
+      return decodeURIComponent(body);
+    }
+  })();
+
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
-  const versionHistory = [];
-  versionHistory.push(req.body.versionHistory);
+  const version_history = [];
+  version_history.push(req.body.versionHistory);
 
   const threadContent = community ? {
     community: community.id,
     address_id: author.id,
     title,
     body,
-    version_history: versionHistory,
+    plaintext,
+    version_history,
     kind,
     url,
     read_only: readOnly,
@@ -79,7 +89,8 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     address_id: author.id,
     title,
     body,
-    version_history: versionHistory,
+    plaintext,
+    version_history,
     kind,
     url,
     read_only: readOnly || false,
@@ -141,7 +152,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
       include: [
-        models.Address,
+        { model: models.Address, as: 'Address' },
         models.OffchainAttachment,
         { model: models.OffchainTopic, as: 'topic' }
       ],
@@ -195,6 +206,31 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       },
     });
   }));
+
+  // grab mentions to notify tagged users
+  let mentionedAddresses;
+  if (mentions?.length > 0) {
+    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+      mention = mention.split(',');
+      try {
+        return models.Address.findOne({
+          where: {
+            chain: mention[0],
+            address: mention[1],
+          },
+          include: [ models.User, models.Role ]
+        });
+      } catch (err) {
+        return next(new Error(err));
+      }
+    }));
+    // filter null results
+    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+  }
+
+  const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
+  excludedAddrs.push(finalThread.Address.address);
+
   // dispatch notifications to subscribers of the given chain/community
   await models.Subscription.emitNotifications(
     models,
@@ -222,30 +258,8 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       body: finalThread.body,
     },
     req.wss,
-    [ finalThread.Address.address ],
+    excludedAddrs,
   );
-
-  // grab mentions to notify tagged users
-  let mentionedAddresses;
-  if (mentions?.length > 0) {
-    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-      mention = mention.split(',');
-      try {
-        const user = await models.Address.findOne({
-          where: {
-            chain: mention[0],
-            address: mention[1],
-          },
-          include: [ models.User, models.Role ]
-        });
-        return user;
-      } catch (err) {
-        return next(new Error(err));
-      }
-    }));
-    // filter null results
-    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-  }
 
   // notify mentioned users, given permissions are in place
   if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
@@ -290,6 +304,10 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       [ finalThread.Address.address ],
     );
   }));
+
+  // update author.last_active (no await)
+  author.last_active = new Date();
+  author.save();
 
   return res.json({ status: 'Success', result: finalThread.toJSON() });
 };

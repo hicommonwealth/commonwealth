@@ -1,5 +1,5 @@
 import { ICommunityAdapter } from 'models';
-
+import m from 'mithril';
 import { Coin } from 'adapters/currency';
 import { CommentRefreshOption } from 'controllers/server/comments';
 import $ from 'jquery';
@@ -22,14 +22,24 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
       community: this.id,
       jwt: this.app.user.jwt,
     });
-    const { threads, comments, reactions, topics, admins } = response.result;
+
+    // If user is no longer on the initializing community, abort initialization
+    // and return false, so that the invoking selectCommunity fn can similarly
+    // break, rather than complete.
+    if (this.meta.id !== m.route.param('scope')) {
+      return false;
+    }
+
+    const { threads, comments, reactions, topics, admins, activeUsers } = response.result;
     this.app.threads.initialize(threads, true);
     this.app.comments.initialize(comments, true);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
     this.meta.setAdmins(admins);
+    this.app.recentActivity.setMostActiveUsers(activeUsers);
     this._serverLoaded = true;
     this._loaded = true;
+    return true;
   }
 
   public deinit = async (): Promise<void> => {
@@ -38,7 +48,7 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     this.app.threads.deinit();
     this.app.comments.deinit();
     this.app.reactions.deinit();
-    console.log('Community stopped.');
+    console.log(`${this.meta.name} stopped.`);
   }
 }
 

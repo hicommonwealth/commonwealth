@@ -39,6 +39,7 @@ const RagequitModal: m.Component<IAttrs, IState> = {
         m(Button, {
           type: 'submit',
           intent: 'primary',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             const toBurn = new BN(vnode.state.sharesToBurn);

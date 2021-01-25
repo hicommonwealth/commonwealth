@@ -85,6 +85,7 @@ To run the application in archival mode to poll past blocks and execute enricher
 To download and restore the production database, and run migrations:
 
 ```
+nvm use
 heroku pg:backups:capture -a commonwealthapp
 heroku pg:backups:download -a commonwealthapp
 brew services restart postgres     # For Mac OS X restart the database to close any open connections
@@ -135,12 +136,6 @@ Components should be namespaced by class name, e.g. a component called MembersBo
 - placed in client/scripts/views/components/members_box.ts, as a default export
 - styled in client/styles/components/members_box.scss
 - exported as a Mithril component with parent class .MembersBox
-
-We also use certain environment variables to configure the application itself:
-
-- CHAIN_EVENTS: select chains for event listening. Must be "all", "none", or a comma-separated list of chains (e.g. "edgeware,edgeware-local")
-- NO_EVENTS: disable chain-event functionality entirely
-- NO_CLIENT: set to true to disable the front-end build
 
 ## Migrations
 

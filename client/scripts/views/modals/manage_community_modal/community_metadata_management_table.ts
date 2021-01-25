@@ -9,6 +9,7 @@ import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_
 interface ICommunityMetadataManagementState {
   name: string;
   description: string;
+  iconUrl: string;
   invitesEnabled: boolean;
   privacyEnabled: boolean;
   website: string;
@@ -30,6 +31,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.community.name;
     vnode.state.description = vnode.attrs.community.description;
+    vnode.state.iconUrl = vnode.attrs.community.iconUrl;
     vnode.state.website = vnode.attrs.community.website;
     vnode.state.chat = vnode.attrs.community.chat;
     vnode.state.telegram = vnode.attrs.community.telegram;
@@ -108,10 +110,12 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     m(Button, {
       label: 'Save changes',
       intent: 'primary',
+      rounded: true,
       onclick: async (e) => {
         const {
           name,
           description,
+          iconUrl,
           website,
           chat,
           telegram,
@@ -123,6 +127,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           await vnode.attrs.community.updateCommunityData({
             name,
             description,
+            iconUrl,
             website,
             chat,
             telegram,

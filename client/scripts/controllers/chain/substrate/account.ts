@@ -8,7 +8,7 @@ import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringPair, KeyringOptions } from '@polkadot/keyring/types';
 import {
   AccountData, Balance, BalanceLock, BalanceLockTo212, EraIndex,
-  AccountId, Exposure, Conviction, StakingLedger, Registration
+  AccountId, Exposure, Conviction, StakingLedger, Registration, Call
 } from '@polkadot/types/interfaces';
 import { Vec, u32 } from '@polkadot/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
@@ -391,14 +391,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     return u8aToHex(signature).slice(2); // remove hex prefix, will be re-added on server
   }
 
-  public async isValidSignature(message: string, signature: string): Promise<boolean> {
-    const signatureU8a = signature.slice(0, 2) === '0x'
-      ? hexToU8a(signature)
-      : hexToU8a(`0x${signature}`);
-    const keyring = this._Chain.keyring(this.isEd25519).addFromAddress(this.address);
-    return keyring.verify(stringToU8a(message), signatureU8a);
-  }
-
   // keys
   protected addressFromMnemonic(mnemonic: string) {
     return addressFromMnemonic(mnemonic, this._Chain);
@@ -479,7 +471,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     );
   }
 
-  public batchTx(params: SubmittableExtrinsic<'rxjs'>[]) {
+  public batchTx(params: Call[]) {
     const payload = isFunction(params)
       ? params()
       : (params || []);

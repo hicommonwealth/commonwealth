@@ -1,5 +1,5 @@
 import { IPostNotificationData, IChainEventNotificationData, NotificationCategories } from './types';
-import { getProposalUrl, renderQuillDeltaToText, smartTrim } from './utils';
+import { getProposalUrl, renderQuillDeltaToText, smartTrim, formatAddressShort } from './utils';
 
 import { SERVER_URL } from '../server/config';
 
@@ -19,8 +19,9 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   // email subject line
   const emailSubjectLine = ((category_id === NotificationCategories.NewComment) ? `Comment on: ${decodedTitle}`
     : (category_id === NotificationCategories.NewMention) ? `You were mentioned in: ${decodedTitle}`
-      : (category_id === NotificationCategories.NewThread) ? `New thread: ${decodedTitle}`
-        : 'New activity on Commonwealth');
+      : (category_id === NotificationCategories.NewCollaboration) ? `You were added as a collaborator on: ${decodedTitle}`
+        : (category_id === NotificationCategories.NewThread) ? `New thread: ${decodedTitle}`
+          : 'New activity on Commonwealth');
 
   // author
   const authorProfile = await models.OffchainProfile.findOne({
@@ -31,20 +32,22 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
     }]
   });
   let authorName;
+  const author_addr_short = formatAddressShort(author_address, author_chain);
   try {
-    authorName = authorProfile.Address.name || JSON.parse(authorProfile.data).name || 'Someone';
+    authorName = authorProfile.Address.name || JSON.parse(authorProfile.data).name || author_addr_short;
   } catch (e) {
-    authorName = 'Someone';
+    authorName = author_addr_short;
   }
 
   // author profile link
   const authorPath = `https://commonwealth.im/${author_chain}/account/${author_address}?base=${author_chain}`;
 
   // action and community
-  const actionCopy = ((category_id === NotificationCategories.NewComment) ? 'commented on'
+  const actionCopy = (([NotificationCategories.NewComment, NotificationCategories.CommentEdit].includes(category_id)) ? 'commented on'
     : (category_id === NotificationCategories.NewMention) ? 'mentioned you in the thread'
-      : (category_id === NotificationCategories.NewThread) ? 'created a new thread'
-        : '');
+      : (category_id === NotificationCategories.NewCollaboration) ? 'invited you to collaborate on'
+        : [NotificationCategories.ThreadEdit, NotificationCategories.NewThread].includes(category_id) ? 'created a new thread'
+          : null);
   const objectCopy = decodeURIComponent(root_title).trim();
   const communityObject = chain_id
     ? await models.Chain.findOne({ where: { id: chain_id } })
@@ -55,6 +58,7 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
     try {
       // return rendered quill doc
       const doc = JSON.parse(text);
+      if (!doc.ops) throw new Error();
       const finalText = renderQuillDeltaToText(doc);
       return smartTrim(finalText);
     } catch (e) {
@@ -72,7 +76,6 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   };
   const proposalUrlArgs = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
   const proposalPath = (getProposalUrl as any)(...proposalUrlArgs);
-
   return [emailSubjectLine, authorName, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath];
 };
 

@@ -1,19 +1,21 @@
 import 'sublayout.scss';
 
-import m from 'mithril';
+import m, { Vnode } from 'mithril';
 import app from 'state';
-import { EmptyState, Button, Icons, Grid, Col } from 'construct-ui';
+import { EmptyState, Button, Icons, Grid, Col, Spinner } from 'construct-ui';
+import { link } from 'helpers';
 
 import NewProposalButton from 'views/components/new_proposal_button';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
-import RightSidebar from 'views/components/right_sidebar';
-import { CollectiveVotingButton, CandidacyButton, getCouncilCandidates } from './pages/council/index';
-import { SubstrateAccount } from '../controllers/chain/substrate/account';
-import Substrate from '../controllers/chain/substrate/main';
+import MobileSidebarHeader from 'views/components/sidebar/mobile';
+import { getCouncilCandidates } from 'views/pages/council/index';
+import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import Substrate from 'controllers/chain/substrate/main';
 
 const Sublayout: m.Component<{
   // overrides
@@ -22,27 +24,52 @@ const Sublayout: m.Component<{
 
   // content
   class?: string,
-  title?: string,                  // displayed at the top of the layout
-  description?: string,            // displayed at the top of the layout
-  sidebarTopic?: number,           // used to override the sidebar
+  title?: any,                        // displayed at the top of the layout
+  description?: string,               // displayed at the top of the layout
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
-  rightSidebar?,
+  hideSidebar?: boolean,
 }> = {
   view: (vnode) => {
     const {
       title,
       description,
-      rightSidebar,
       showNewProposalButton,
       showCouncilMenu,
-      sidebarTopic,
+      hideSidebar,
     } = vnode.attrs;
+    const chain = app.chain ? app.chain.meta.chain : null;
+    const community = app.community ? app.community.meta : null;
 
     let councilCandidates: Array<[SubstrateAccount, number]>;
     if (app.chain && showCouncilMenu) {
       councilCandidates = getCouncilCandidates();
     }
+
+    const ICON_SIZE = 22;
+    const sublayoutHeaderLeft = m('.sublayout-header-left', [
+      (!m.route.param('scope') && m.route.get() === '/') ? [
+        m('h3', 'Commonwealth')
+      ] : chain ? [
+        m(ChainIcon, { size: ICON_SIZE, chain }),
+        m('h4.sublayout-header-heading', [
+          link('a', `/${app.activeId()}`, chain.name),
+          title && m('span.breadcrumb', m.trust('/')),
+          title
+        ]),
+      ] : community ? [
+        m(CommunityIcon, { size: ICON_SIZE, community }),
+        m('h4.sublayout-header-heading', [
+          link('a', `/${app.activeId()}`, community.name),
+          community.privacyEnabled && m('span.icon-lock'),
+          title && m('span.breadcrumb', m.trust('/')),
+          title
+        ]),
+      ] : [
+        // empty since a chain or community is loading
+      ],
+    ]);
+
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [
       m(LoginSelector),                                                 // login selector
@@ -56,15 +83,14 @@ const Sublayout: m.Component<{
     ]);
 
     if (vnode.attrs.loadingLayout) return [
-      m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
-        m('.LoadingLayout'),
+        m('.LoadingLayout', [
+          m(Spinner, { active: true, fill: true, size: 'xl' }),
+        ]),
       ]),
-      m(RightSidebar, { rightSidebar }),
     ];
 
     if (vnode.attrs.errorLayout) return [
-      m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m(EmptyState, {
           fill: true,
@@ -73,35 +99,30 @@ const Sublayout: m.Component<{
           style: 'color: #546e7b;'
         }),
       ]),
-      m(RightSidebar, { rightSidebar }),
     ];
 
     return [
-      m(Sidebar, { sidebarTopic }),
       m('.layout-container', [
         m('.Sublayout', { class: vnode.attrs.class }, [
-          m(Grid, { class: 'sublayout-grid' }, [
-            m(Col, {
-              span: 12,
-              class: 'sublayout-grid-col sublayout-grid-col-wide'
-            }, [
-              m('.sublayout-header', {
-                class: (!title && !description) ? 'no-title' : '',
-              }, [
-                m('.sublayout-header-left', [
-                  title && m('h4.sublayout-header-heading', title),
-                  description && m('.sublayout-header-description', description),
-                ]),
-                sublayoutHeaderRight,
+          m(MobileSidebarHeader),
+          m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
+            m('.sublayout-header-inner', [
+              sublayoutHeaderLeft,
+              sublayoutHeaderRight,
+            ]),
+          ]),
+          m('.sublayout-body', [
+            m('.sublayout-grid', [
+              !hideSidebar && m('.sublayout-sidebar-col', [
+                m(Sidebar),
               ]),
-              m('.sublayout-body', [
-                vnode.children,
+              m('.sublayout-main-col', [
+                vnode.children
               ]),
             ]),
           ]),
         ]),
       ]),
-      m(RightSidebar, { rightSidebar }),
     ];
   }
 };

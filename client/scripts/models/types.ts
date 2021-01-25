@@ -23,11 +23,16 @@ export enum ChainNetwork {
   Polkadot = 'polkadot',
   Plasm = 'plasm',
   Stafi = 'stafi',
+  Darwinia = 'darwinia',
+  Phala = 'phala',
+  Centrifuge = 'centrifuge',
   Cosmos = 'cosmos',
+  Straightedge = 'straightedge',
   Ethereum = 'ethereum',
   NEAR = 'near',
   Moloch = 'moloch',
   Metacartel = 'metacartel',
+  Commonwealth = 'commonwealth',
 }
 
 // TODO: this should be deprecated, and replaced with ChainNetwork in most instances
@@ -38,11 +43,16 @@ export enum ChainClass {
   Polkadot = 'polkadot',
   Plasm = 'plasm',
   Stafi = 'stafi',
+  Darwinia = 'darwinia',
+  Phala = 'phala',
+  Centrifuge = 'centrifuge',
   CosmosHub = 'cosmos-hub',
   Gaia13k = 'gaia-13k',
+  Straightedge = 'straightedge',
   Ethereum = 'ethereum',
   Near = 'near',
   Moloch = 'moloch',
+  Commonwealth = 'commonwealth',
 }
 
 // TODO: this is inconsistently used

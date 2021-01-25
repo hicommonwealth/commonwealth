@@ -21,7 +21,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
-import { Grid, Col, List } from 'construct-ui';
+import { Grid, Col, List, Tag } from 'construct-ui';
 import moment from 'moment';
 import Listing from './listing';
 import ErrorPage from './error';
@@ -93,13 +93,19 @@ const ReferendaPage: m.Component<{}> = {
     if (!app.chain || !app.chain.loaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
-          message: 'Chain connection timed out.',
-          title: 'Proposals',
+          message: 'Could not connect to chain',
+          title: [
+            'Referenda',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 10s)...',
-        title: 'Referenda',
+        message: 'Connecting to chain',
+        title: [
+          'Referenda',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
         showNewProposalButton: true,
       });
     }
@@ -108,8 +114,11 @@ const ReferendaPage: m.Component<{}> = {
       if (!(app.chain as Substrate).democracy.initialized || !(app.chain as Substrate).democracyProposals.initialized) {
         if (!(app.chain as Substrate).democracy.initializing) loadCmd();
         return m(PageLoading, {
-          message: 'Connecting to chain (may take up to 10s)...',
-          title: 'Referenda',
+          message: 'Connecting to chain',
+          title: [
+            'Referenda',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
           showNewProposalButton: true,
         });
       }
@@ -131,19 +140,20 @@ const ReferendaPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'ReferendaPage',
-      title: 'Referenda',
+      title: [
+        'Referenda',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
       m(Listing, {
         content: activeProposalContent,
-        columnHeaders: ['Active Referenda', 'Comments', 'Likes', 'Updated'],
-        rightColSpacing: [4, 4, 4]
+        columnHeader: 'Active Referenda',
       }),
       m(Listing, {
         content: inactiveProposalContent,
-        columnHeaders: ['Inactive Referenda', 'Comments', 'Likes', 'Updated'],
-        rightColSpacing: [4, 4, 4]
+        columnHeader: 'Inactive Referenda',
       }),
     ]);
   }

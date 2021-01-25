@@ -48,12 +48,7 @@ export default async function (models, chain?: string): Promise<void> {
     // 2b. connect to chain and query all identities of found addresses
     log.info(`Fetching identities on chain ${node.chain} at url ${node.url}...`);
     const nodeUrl = constructSubstrateUrl(node.url);
-    const api = await SubstrateEvents.createApi(
-      nodeUrl,
-      /* tslint:disable */
-      // @ts-ignore-start
-      spec
-    );
+    const api = await SubstrateEvents.createApi(nodeUrl, spec);
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     const identityEvents = await fetcher.fetchIdentities(addresses);
 

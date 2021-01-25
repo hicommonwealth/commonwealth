@@ -2,7 +2,7 @@ import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
 
-import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
+import { Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
 
 import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
 import { proposalSlugToFriendlyName } from 'identifiers';
@@ -34,6 +34,32 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
     return m('.ProposalHeaderExternalLink', [
       externalLink('a.external-link', proposal.url, [
         extractDomain(proposal.url),
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
+    ]);
+  }
+};
+
+export const ProposalHeaderBlockExplorerLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (!proposal || !proposal['blockExplorerLink']) return;
+    return m('.ProposalHeaderBlockExplorerLink', [
+      externalLink('a.voting-link', proposal['blockExplorerLink'], [
+        proposal['blockExplorerLinkLabel'] || extractDomain(proposal['blockExplorerLink']),
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
+    ]);
+  }
+};
+
+export const ProposalHeaderVotingInterfaceLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (!proposal || !proposal['votingInterfaceLink']) return;
+    return m('.ProposalHeaderVotingInterfaceLink', [
+      externalLink('a.voting-link', proposal['votingInterfaceLink'], [
+        proposal['votingInterfaceLinkLabel'] || extractDomain(proposal['votingInterfaceLink']),
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
     ]);

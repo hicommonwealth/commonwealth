@@ -116,6 +116,12 @@ function setupPassport(models) {
         object_id: `user-${newUser.id}`,
         is_active: true,
       });
+      await models.Subscription.create({
+        subscriber_id: newUser.id,
+        category_id: NotificationCategories.NewCollaboration,
+        object_id: `user-${newUser.id}`,
+        is_active: true,
+      });
       await newGithubAccount.setUser(newUser);
       return cb(null, newUser);
     }

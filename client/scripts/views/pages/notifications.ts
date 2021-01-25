@@ -30,6 +30,7 @@ const ALL_COMMUNITIES = 'All communities';
 
 // left column - for identifying the notification type
 const NEW_MENTIONS_LABEL = 'When someone mentions me';
+const NEW_COLLABORATIONS_LABEL = 'When someone adds me as an editor to a thread';
 const NEW_THREADS_LABEL = 'When a thread is created';
 const NEW_ACTIVITY_LABEL = 'When there is new activity on...';
 const NEW_COMMENTS_LABEL_SUFFIX = '(new comments only)';
@@ -38,7 +39,7 @@ const NEW_REACTIONS_LABEL_SUFFIX = '(new reactions only)';
 // right column - for selecting the notification frequency
 const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (immediate)';
 const NOTIFICATION_ON_OPTION = 'On';
-const NOTIFICATION_ON_SOMETIMES_OPTION = 'Multiple selections';
+const NOTIFICATION_ON_SOMETIMES_OPTION = 'Multiple';
 const NOTIFICATION_OFF_OPTION = 'Off';
 
 const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: boolean }> = {
@@ -48,9 +49,19 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
 
     return m(Grid, { class: 'EmailIntervalConfiguration' }, [
       m(Col, { class: 'email-interval-configuration-left', span: { xs: 12, md: 6 } }, [
-        m('h4', 'Notification digest'),
-        m('p', 'Receive a digest of your unread notifications'),
+        m('h4', 'Get notifications immediately'),
+        m('p', {
+          style: 'margin-top: 8px',
+        }, [
+          'Select ',
+          m('strong', 'On (immediate)'),
+          ' to receive an email immediately when the selected event occurs'
+        ]),
+      ]),
+      m(Col, { class: 'email-interval-configuration-right', span: { xs: 12, md: 6 } }, [
+        m('h4', 'Get notifications in a daily digest'),
         m(RadioGroup, {
+          style: 'margin-top: 10px',
           options: ['daily', 'never'],
           name: 'interval',
           onchange: (e) => {
@@ -84,14 +95,6 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
             ' to continue receiving notification emails.'
           ]) : '',
         vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
-      ]),
-      m(Col, { class: 'email-interval-configuration-right', span: { xs: 12, md: 6 } }, [
-        m('h4', 'Immediate email notifications'),
-        m('p', [
-          'Select ',
-          m('strong', 'On (immediate)'),
-          ' to receive an email immediately when the selected event occurs'
-        ]),
       ]),
     ]);
   }
@@ -221,10 +224,10 @@ const BatchedSubscriptionRow: m.Component<{
           trigger: m(Button, {
             align: 'left',
             compact: true,
+            rounded: true,
             disabled: !app.user.emailVerified || vnode.state.loading,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
-            size: 'sm',
             class: vnode.state.option === NOTIFICATION_ON_SOMETIMES_OPTION ? 'sometimes' : '',
           }),
           onSelect: async (option: string) => {
@@ -365,10 +368,9 @@ const ChainEventSubscriptionRow: m.Component<{
   title: string;
   notificationTypeArray: string[];
   recommended?: boolean;
-  noisy?: boolean;
 }, { option: string; loading: boolean, }> = {
   view: (vnode) => {
-    const { title, notificationTypeArray, recommended, noisy } = vnode.attrs;
+    const { title, notificationTypeArray, recommended } = vnode.attrs;
     const subscriptions = app.user.notifications.subscriptions.filter((s) => {
       return (
         s.category === NotificationCategories.ChainEvent
@@ -393,7 +395,6 @@ const ChainEventSubscriptionRow: m.Component<{
       m('td.subscription-label', [
         title,
         recommended && m(Tag, { size: 'xs', label: 'Recommended' }),
-        noisy && m(Tag, { size: 'xs', label: 'Noisy', intent: 'negative' }),
         m('.ChainEventDetails', [
           notificationTypeArray
             .filter((s) => s.indexOf('reward') === -1) // filter out treasury-reward and reward events (they are silent)
@@ -423,10 +424,10 @@ const ChainEventSubscriptionRow: m.Component<{
           trigger: m(Button, {
             align: 'left',
             compact: true,
+            rounded: true,
             disabled: !app.user.emailVerified || vnode.state.loading,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.option,
-            size: 'sm',
           }),
           onSelect: async (option: string) => {
             vnode.state.option = option;
@@ -482,7 +483,6 @@ const EdgewareChainEventNotifications: m.Component = {
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Signaling events', notificationTypeArray: EdgewareChainNotificationTypes.Signaling, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: EdgewareChainNotificationTypes.Treasury, recommended: true }),
-      m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: EdgewareChainNotificationTypes.Validator, noisy: true }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: EdgewareChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: EdgewareChainNotificationTypes.VotingDelegation, }),
     ];
@@ -495,7 +495,6 @@ const KusamaChainEventNotifications: m.Component = {
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KusamaChainNotificationTypes.Council, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KusamaChainNotificationTypes.Democracy, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KusamaChainNotificationTypes.Treasury, recommended: true }),
-      m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KusamaChainNotificationTypes.Validator, noisy: true }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KusamaChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: KusamaChainNotificationTypes.VotingDelegation, }),
     ];
@@ -508,7 +507,6 @@ const PolkadotChainEventNotifications: m.Component = {
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: PolkadotChainNotificationTypes.Council, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: PolkadotChainNotificationTypes.Democracy, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: PolkadotChainNotificationTypes.Treasury, recommended: true }),
-      m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: PolkadotChainNotificationTypes.Validator, noisy: true }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: PolkadotChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: PolkadotChainNotificationTypes.VotingDelegation, }),
     ];
@@ -521,7 +519,6 @@ const KulupuChainEventNotifications: m.Component = {
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: KulupuChainNotificationTypes.Council, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: KulupuChainNotificationTypes.Democracy, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: KulupuChainNotificationTypes.Treasury, recommended: true }),
-      m(ChainEventSubscriptionRow, { title: 'Validator events', notificationTypeArray: KulupuChainNotificationTypes.Validator, noisy: true }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: KulupuChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: KulupuChainNotificationTypes.VotingDelegation, }),
     ];
@@ -540,6 +537,7 @@ const IndividualCommunityNotifications: m.Component<{
       (s) => (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id)
         && s.category !== NotificationCategories.NewThread
         && s.category !== NotificationCategories.NewMention
+        && s.category !== NotificationCategories.NewCollaboration
         && s.category !== NotificationCategories.ChainEvent
         && !s.OffchainComment
     );
@@ -583,6 +581,7 @@ const AllCommunitiesNotifications: m.Component<{
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
+    const collaborationsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewCollaboration);
     const chainIds = app.config.chains.getAll().map((c) => c.id);
     // const communityIds = communities.map((c) => c.id);
     const communityIds = communities;
@@ -601,6 +600,10 @@ const AllCommunitiesNotifications: m.Component<{
       mentionsSubscription && m(BatchedSubscriptionRow, {
         subscriptions: [mentionsSubscription],
         label: NEW_MENTIONS_LABEL,
+      }),
+      collaborationsSubscription && m(BatchedSubscriptionRow, {
+        subscriptions: [collaborationsSubscription],
+        label: NEW_COLLABORATIONS_LABEL,
       }),
       batchedSubscriptions.length > 0 && m('tr.NewActivityRow', [
         m('td', NEW_ACTIVITY_LABEL),
@@ -687,12 +690,19 @@ const NotificationsPage: m.Component<{}, {
     const chains = _.uniq(app.config.chains.getAll());
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
+      title: [
+        'Notification Settings ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       message: 'This page requires you to be logged in.'
     });
     if (subscriptions.length < 1) return m(PageLoading);
     return m(Sublayout, {
       class: 'NotificationsPage',
-      title: 'Notification Settings',
+      title: [
+        'Notification Settings ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
     }, [
       m('.forum-container', [
         m(EmailIntervalConfiguration),
@@ -716,6 +726,7 @@ const NotificationsPage: m.Component<{}, {
               trigger: m(Button, {
                 align: 'left',
                 compact: true,
+                rounded: true,
                 disabled: !app.user.emailVerified,
                 iconRight: Icons.CHEVRON_DOWN,
                 label: vnode.state.selectedCommunity

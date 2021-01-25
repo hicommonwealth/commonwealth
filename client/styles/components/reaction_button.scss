@@ -7,10 +7,10 @@
     user-select: none;
     // border
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 9999px;
     &:hover, &.active {
-        color: $theme-accent-dark;
-        border-color: $theme-base-color;
+        color: $primary-bg-color;
+        border-color: $primary-bg-color;
         span {
             color: inherit;
         }
@@ -18,21 +18,27 @@
     &.disabled {
         background: initial !important;
         color: $text-color-light !important;
-        border-color: $background-color-border !important;
+        border-color: $border-color-lightest !important;
     }
     .reactions-icon {
-        padding: 2px 0;
+        position: relative;
+        top: 1px;
+        padding: 5px 0 0;
         padding-left: 8px;
         margin-right: -3px;
     }
     .reactions-count {
-        padding: 2px 4px 2px 0px;
+        position: relative;
+        top: 1px;
+        padding: 5px 4px 0 0;
         min-width: 26px;
         font-weight: 500;
         text-align: center;
     }
 }
 
-.cui-popover.cui-tooltip.ReactionButtonTooltip .cui-popover-content .reaction-button-tooltip {
-    // TODO
+.cui-popover.cui-tooltip.ReactionButtonTooltip {
+    .cui-popover-content .reaction-button-tooltip {
+        padding: 7px 8px 2px;
+    }
 }

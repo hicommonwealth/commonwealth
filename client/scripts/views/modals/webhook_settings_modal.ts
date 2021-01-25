@@ -6,7 +6,10 @@ import app from 'state';
 import { Button, List, ListItem, Checkbox } from 'construct-ui';
 import { Webhook } from 'models';
 import { NotificationCategories } from 'types';
-import { EdgewareChainNotificationTypes, KusamaChainNotificationTypes, KulupuChainNotificationTypes, PolkadotChainNotificationTypes } from 'helpers/chain_notification_types';
+import {
+  EdgewareChainNotificationTypes, KusamaChainNotificationTypes,
+  KulupuChainNotificationTypes, PolkadotChainNotificationTypes
+} from 'helpers/chain_notification_types';
 import { symbols } from 'helpers';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -31,7 +34,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
   },
   view: (vnode) => {
     const { webhook } = vnode.attrs;
-    const isChain = !!webhook.chain_id;
+    const isChain = webhook.chain_id ? true : false;
     const chainNotifications = webhook.chain_id === 'edgeware' ? EdgewareChainNotificationTypes
       : webhook.chain_id === 'kusama' ? KusamaChainNotificationTypes
         : webhook.chain_id === 'kulupu' ? KulupuChainNotificationTypes
@@ -98,6 +101,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
         label: 'Save webhook settings',
         class: 'settings-save-button',
         intent: 'primary',
+        rounded: true,
         onclick: (e) => {
           e.preventDefault();
           const chainOrCommObj = webhook.chain_id

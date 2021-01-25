@@ -5,8 +5,7 @@ import mixpanel from 'mixpanel-browser';
 import { from } from 'rxjs';
 import { first } from 'rxjs/operators';
 import app, { ApiStatus } from 'state';
-import { formatAddressShort } from 'helpers/index';
-import { Coin, formatCoin, formatNumberShort } from 'adapters/currency';
+import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
 import { u32 } from '@polkadot/types';
 import { HeaderExtended } from '@polkadot/api-derive';
@@ -22,7 +21,8 @@ import { ICommissionInfo } from 'controllers/chain/substrate/staking';
 import { Button } from 'construct-ui';
 
 import * as CosmosValidationViews from './cosmos';
-import { SubstratePresentationComponent, SubstratePreHeader } from './substrate';
+import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 export interface IValidatorAttrs {
   stash: string;
@@ -146,9 +146,9 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     lastHeader: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.lastHeader
       : null,
-    nominatedBy: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.nominatedBy
-      : null,
+    // nominatedBy: (app.chain.base === ChainBase.Substrate)
+    //   ? (app.chain as Substrate).staking.nominatedBy
+    //   : null,
     annualPercentRate: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.annualPercentRate
       : null
@@ -212,7 +212,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   }
 });
 
-const ValidatorPage: m.Component<{}> = {
+const ValidatorPage : m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ValidatorPage' });
   },

@@ -74,7 +74,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
     previousUser.emailVerified = true;
     await previousUser.save();
     req.login(previousUser, (err) => {
-      if (err) return redirectWithLoginError(res, `Could not log in with user at ${email}`);
+      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
       return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation);
     });
   } else {
@@ -92,8 +92,16 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
       is_active: true,
     });
 
+    // Automatically create a subscription to collaborations
+    await models.Subscription.create({
+      subscriber_id: newUser.id,
+      category_id: NotificationCategories.NewCollaboration,
+      object_id: `user-${newUser.id}`,
+      is_active: true,
+    });
+
     req.login(newUser, (err) => {
-      if (err) return redirectWithLoginError(res, `Could not log in with user at ${email}`);
+      if (err) return redirectWithLoginError(res, 'Could not log in with user at ' + email);
       return redirectWithLoginSuccess(res, email, tokenObj.redirect_path, confirmation, true);
     });
   }

@@ -11,15 +11,16 @@ export interface OffchainCommunityAttributes {
   name: string;
   creator_id: number;
   default_chain: string;
+  iconUrl: string;
   description?: string;
   website?: string;
   chat?: string;
   telegram?: string;
   github?: string;
   featured_topics?: string[];
-  visible: boolean;
   privacyEnabled?: boolean;
   invitesEnabled?: boolean;
+  collapsed_on_homepage: boolean;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -51,7 +52,7 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       creator_id: { type: dataTypes.INTEGER, allowNull: false },
       default_chain: { type: dataTypes.STRING, allowNull: false },
-      visible: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      iconUrl: { type: dataTypes.STRING, allowNull: true },
       description: { type: dataTypes.TEXT, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       chat: { type: dataTypes.STRING, allowNull: true },
@@ -65,6 +66,7 @@ export default (
       // XXX: mixing camelCase and underscore_case is bad practice
       privacyEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       invitesEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     }, {
       underscored: true,
       paranoid: true,

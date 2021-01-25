@@ -15,14 +15,17 @@ class ChainInfo {
   public chat: string;
   public telegram: string;
   public github: string;
+  public readonly blockExplorerIds: object;
+  public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
+  public members: RoleInfo[];
 
   constructor(
     id, network, symbol, name, iconUrl, description, website, chat, telegram,
-    github, featuredTopics, topics, adminsAndMods?
+    github, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
     this.network = network;
@@ -34,12 +37,20 @@ class ChainInfo {
     this.chat = chat;
     this.telegram = telegram;
     this.github = github;
+    this.blockExplorerIds = blockExplorerIds;
+    this.collapsedOnHomepage = collapsedOnHomepage;
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
   }
 
   public static fromJSON(json) {
+    let blockExplorerIds;
+    try {
+      blockExplorerIds = JSON.parse(json.blockExplorerIds);
+    } catch (e) {
+      // ignore invalid JSON blobs
+    }
     return new ChainInfo(
       json.id,
       json.network,
@@ -51,15 +62,19 @@ class ChainInfo {
       json.chat,
       json.telegram,
       json.github,
+      blockExplorerIds,
+      json.collapsed_on_homepage,
       json.featured_topics,
       json.topics,
       json.adminsAndMods,
     );
   }
 
-  public async getAdminsAndMods(id: string) {
+  // TODO: get operation should not have side effects, and either way this shouldn't be here
+  public async getMembers(id: string) {
     try {
       const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id, });
+      this.setMembers(res.result);
       const roles = res.result.filter((r) => {
         return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
       });
@@ -68,6 +83,22 @@ class ChainInfo {
     } catch {
       console.log('Failed to fetch admins/mods');
     }
+  }
+
+  public setMembers(roles) {
+    this.members = [];
+    roles.forEach((r) => {
+      this.members.push(new RoleInfo(
+        r.id,
+        r.address_id,
+        r.Address.address,
+        r.Address.chain,
+        r.chain_id,
+        r.offchain_community_id,
+        r.permission,
+        r.is_user_default
+      ));
+    });
   }
 
   public setAdmins(roles) {
