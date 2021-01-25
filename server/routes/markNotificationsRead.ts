@@ -30,14 +30,8 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     where: { id: idOptions },
     include: [ models.Subscription ]
   });
-  console.log(notifications);
-  if (notifications.find((n) => {
-    console.log({
-      userId: req.user.id,
-      subscriberId: n.Subscription.subscriber_id,
-    });
-    return n.Subscription.subscriber_id !== req.user.id;
-  })) {
+
+  if (notifications.find((n) => n.Subscription.subscriber_id !== req.user.id)) {
     return next(new Error(Errors.WrongOwner));
   }
 
