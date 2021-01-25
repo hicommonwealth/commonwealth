@@ -51,7 +51,7 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
       }
     });
     if (collaboration) {
-      await collaboration.destroy({}, { transaction: t });
+      await collaboration.destroy();
     }
   }));
 

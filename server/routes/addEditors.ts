@@ -48,13 +48,23 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
   }
 
   // Ensure collaborators have community permissions
-  const subscribedUsers = [];
   if (collaborators?.length > 0) {
-    await Promise.all(collaborators.map(async (collaborator) => {
-      if (!collaborator.Roles || collaborator.User) {
+    const uniqueCollaborators = [];
+    const collaboratorIds = [];
+    collaborators.forEach((c) => {
+      if (!collaboratorIds.includes(c.User.id)) {
+        uniqueCollaborators.push(c);
+        collaboratorIds.push(c.User.id);
+      }
+    });
+    console.log({
+      total: collaborators.length,
+      unique: uniqueCollaborators.length
+    });
+    await Promise.all(uniqueCollaborators.map(async (collaborator) => {
+      if (!collaborator.Roles || !collaborator.User) {
         return null;
       }
-      subscribedUsers.push(collaborator.User.id);
       if (community) {
         const isMember = collaborator.Roles
           .find((role) => role.offchain_community_id === community.id);
@@ -81,34 +91,32 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
         is_active: true,
       });
 
-      if (!subscribedUsers.includes(collaborator.User.id)) {
-        // auto-subscribe collaborator to comments & reactions
-        // findOrCreate to avoid duplicate subscriptions being created e.g. for
-        // same-account collaborators
-        const [sub, created] = await models.Subscription.findOrCreate({
-          where: {
-            subscriber_id: collaborator.User.id,
-            category_id: NotificationCategories.NewComment,
-            object_id: `discussion_${thread.id}`,
-            offchain_thread_id: thread.id,
-            community_id: thread.community || null,
-            chain_id: thread.chain || null,
-            is_active: true,
-          }
-        });
-        const [sub2, created2] = await models.Subscription.findOrCreate({
-          where: {
-            subscriber_id: req.user.id,
-            category_id: NotificationCategories.NewReaction,
-            object_id: `discussion_${thread.id}`,
-            offchain_thread_id: thread.id,
-            community_id: thread.community || null,
-            chain_id: thread.chain || null,
-            is_active: true,
-          }
-        });
-        console.log({ created, created2 });
-      }
+      // auto-subscribe collaborator to comments & reactions
+      // findOrCreate to avoid duplicate subscriptions being created e.g. for
+      // same-account collaborators
+      const [sub, created] = await models.Subscription.findOrCreate({
+        where: {
+          subscriber_id: collaborator.User.id,
+          category_id: NotificationCategories.NewComment,
+          object_id: `discussion_${thread.id}`,
+          offchain_thread_id: thread.id,
+          community_id: thread.community || null,
+          chain_id: thread.chain || null,
+          is_active: true,
+        }
+      });
+      const [sub2, created2] = await models.Subscription.findOrCreate({
+        where: {
+          subscriber_id: req.user.id,
+          category_id: NotificationCategories.NewReaction,
+          object_id: `discussion_${thread.id}`,
+          offchain_thread_id: thread.id,
+          community_id: thread.community || null,
+          chain_id: thread.chain || null,
+          is_active: true,
+        }
+      });
+      console.log({ created, created2 });
     })).catch((e) => {
       return next(new Error(e));
     });
