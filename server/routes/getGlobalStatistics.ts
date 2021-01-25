@@ -39,7 +39,8 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
     FROM public."HistoricalValidatorStatistic" as partitionTable
   ) p
   on p.row_number = 1
-  and p.stash = v.stash 
+  and p.stash = v.stash
+  and p.chain_name = '${chain}'
   `;
 
   result = await sequelize.query(rawQuery);

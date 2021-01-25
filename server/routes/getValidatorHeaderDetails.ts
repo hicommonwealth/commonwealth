@@ -23,7 +23,7 @@ const getValidatorHeaderDetails = async (models, req: Request, res: Response, ne
 
   const historicalData = await models.HistoricalValidatorStatistic.findAll({
     limit: 1,
-    where: { '$HistoricalValidatorStatistic.stash$': stash },
+    where: { '$HistoricalValidatorStatistic.stash$': stash, '$HistoricalValidatorStatistic.chain_name$': chain },
     order: [['created_at', 'DESC']],
     attributes: ['stash', 'uptime', 'apr', 'rewardsStats', 'slashesStats', 'offencesStats']
   });

@@ -29,6 +29,7 @@ const getImOnline = async (models, req: Request, res: Response, next: NextFuncti
     startDate = startDate.toISOString(); // 2020-08-08T12:46:32.276Z FORMAT // 30 days ago date
   }
   const where: any = {};
+  where['$HistoricalValidatorStatistic.chain_name$'] = chain;
   // if stash is given
   if (stash) where['$HistoricalValidatorStatistic.stash$'] = stash;
   if (startDate && endDate) {
