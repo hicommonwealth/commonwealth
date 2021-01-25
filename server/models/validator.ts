@@ -7,6 +7,7 @@ export interface ValidatorAttributes {
     state: string;
     name: string;
     lastUpdate: string;
+    chain_name: string;
     created_at?: Date;
     updated_at?: Date;
 }
@@ -30,6 +31,7 @@ export default (
     sessionKeys: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false }, // AccountID[]
     state: { type: dataTypes.STRING, allowNull: false }, // Active/waiting/inactive
     lastUpdate: { type: dataTypes.BIGINT, allowNull: false }, // blocknumber,
+    chain_name: { type: dataTypes.STRING, allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false }
   }, {

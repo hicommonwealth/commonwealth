@@ -39,7 +39,7 @@ export default class extends IEventHandler {
     // Directly mark all validators as "Inactive" in the database those are not 
     // in new-session's active and waiting list.
     await this._models.Validator.update(
-      { state: 'Inactive' },
+      { state: 'Inactive' , chain_name: this._chain },
       {
         where: {
           stash: {
@@ -83,6 +83,7 @@ export default class extends IEventHandler {
         controller: validatorsInfo ? validatorsInfo.controllerId : '',
         sessionKeys: validatorsInfo ? validatorsInfo.nextSessionIds : [],
         lastUpdate: event.blockNumber.toString(),
+        chain_name: this._chain,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
