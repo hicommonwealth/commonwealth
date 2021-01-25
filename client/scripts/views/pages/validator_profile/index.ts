@@ -460,8 +460,6 @@ const ProfilePage = makeDynamicComponent<IProfileAttrs, IProfilePageState>({
               next: (ww) => {
                 const w1: any = ww.toJSON();
                 vnode.state.latestBlock = w1.block.header['number'];
-                // debug block
-                vnode.state.latestBlock = 4785944;
                 dataGetter(vnode);
               },
               complete: () => {
