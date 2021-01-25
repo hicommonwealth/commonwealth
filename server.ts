@@ -70,6 +70,23 @@ async function main() {
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
+  // CLI parameters used to configure archival mode
+  let ARCHIVAL = process.env.ARCHIVAL === 'true';
+  const START_BLOCK = process.env.START_BLOCK ? +process.env.START_BLOCK : 0;
+  const ARCHIVAL_NODE_URL = process.env.ARCHIVAL_NODE_URL;
+  const ARCHIVAL_CHAIN = process.env.ARCHIVAL_CHAIN;
+
+  // check if db record exists for archival node execution with chain-events version and starting block number.
+  if (ARCHIVAL) {
+    const archivalNodeDBEntryExist = await archivalNodeDbEntry(models, START_BLOCK, ARCHIVAL_CHAIN);
+    ARCHIVAL = !archivalNodeDBEntryExist;
+    log.info(`Executing process with ARCHIVAL flag set to ${ARCHIVAL}`);
+    if (ARCHIVAL && !ARCHIVAL_NODE_URL && !ARCHIVAL_CHAIN) {
+      log.error('ARCHIVAL NODE URL and ARCHIVAL_CHAIN name is necessary to execute in archival mode');
+      process.exit(1);
+    }
+  }
+
   const identityFetchCache = new IdentityFetchCache(10 * 60);
   const listenChainEvents = async () => {
     try {
@@ -80,7 +97,7 @@ async function main() {
       } else if (CHAIN_EVENTS) {
         chains = CHAIN_EVENTS.split(',');
       }
-      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP);
+      const subscribers = await setupChainEventListeners(models, null, chains, SKIP_EVENT_CATCHUP, ARCHIVAL, START_BLOCK);
 
       // construct storageFetchers needed for the identity cache
       const fetchers = {};

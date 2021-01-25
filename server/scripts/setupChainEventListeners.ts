@@ -104,6 +104,13 @@ const setupChainEventListeners = async (
       storageHandler,
       notificationHandler,
       entityArchivalHandler,
+    ];
+
+    // handlers needed for staking ui. Need to execute these event handlers for
+    // edgeware chain for blocks starting from 3139200 till head to popular
+    // HistoricalValidatorStats using archival mode
+    const handlersEdgeware: IEventHandler[] = [
+      storageHandler,
       newSessionHandler,
       heartbeatHandler,
       rewardHandler,
@@ -119,19 +126,7 @@ const setupChainEventListeners = async (
       // parameter in env. If yes, then execute the archival mode using the ARCHIVAL_NODE_URL
       // and syncup with the head of the chain and then use the URL for the chain provided in db
       // and use it to subscribe to head of the chain to continue normal execution.
-      if (archival && node.chain === ARCHIVAL_CHAIN) {
-        // handlers needed for staking ui. Need to execute these event handlers for
-        // blocks starting from 3139200 till head to popular HistoricalValidatorStats
-        const _handlers: IEventHandler[] = [
-          storageHandler,
-          newSessionHandler,
-          heartbeatHandler,
-          rewardHandler,
-          slashHandler,
-          offenceHandler,
-          bondHandler,
-          imOnlineHandler
-        ];
+      if (archival && node.chain === ARCHIVAL_CHAIN && node.chain.includes('edgeware')) {
         // events processed by the staking-ui event handlers
         const eventList = [
           SubstrateTypes.EventKind.AllGood,
@@ -146,11 +141,13 @@ const setupChainEventListeners = async (
         // mark the events in ChainEvents as Inactive as when running archival we will be creating new entries
         // for the same events in db and marking them as Active
         // to do: once the archvial node has finished execution remove the old events marked as Inactive
-        const chainEventRecordsUpdated = await updateChainEventStatus(models, startBlock, node.chain, eventList, 'inactive');
+        const chainEventRecordsUpdated = await updateChainEventStatus(models,
+          startBlock, node.chain, eventList, 'inactive');
 
         // when running archival mode remove the already existing entried
         // in historicalValidatorStats as we will be re-creating the stats
-        const historicalValidatorsStatsDeleted = await deleteOldHistoricalValidatorsStats(models, startBlock, node.chain);
+        const historicalValidatorsStatsDeleted = await deleteOldHistoricalValidatorsStats(models,
+          startBlock, node.chain);
 
         if (chainEventRecordsUpdated) console.info('Records marked as inactive in Chainevents table');
         if (historicalValidatorsStatsDeleted) console.info('Records removed from HistoricalValidatorsStats table');
@@ -164,7 +161,7 @@ const setupChainEventListeners = async (
 
         await SubstrateEvents.subscribeEvents({
           chain: node.chain,
-          handlers,
+          handlers:handlersEdgeware,
           skipCatchup,
           archival,
           startBlock,
@@ -176,6 +173,13 @@ const setupChainEventListeners = async (
 
       // only handle identities on substrate chains
       handlers.push(identityHandler);
+
+      // only handle new-session, allgood, heartbeat, reward, slash, bond/unbond
+      // on edgeware chain
+      if (node.chain.includes('edgeware')) {
+        handlers.push(...handlersEdgeware);
+      }
+
       const nodeUrl = constructSubstrateUrl(node.url);
       const api = await SubstrateEvents.createApi(
         nodeUrl,
