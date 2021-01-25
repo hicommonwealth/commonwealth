@@ -125,7 +125,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       '',
       {
         created_at: new Date(),
-        root_id: Number(finalThread.id),
+        root_id: +finalThread.id,
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
         chain_id: finalThread.chain,
@@ -170,7 +170,6 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
-
     // notify mentioned users, given permissions are in place
     if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
