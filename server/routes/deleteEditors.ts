@@ -44,7 +44,6 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
         address: editor.address,
       },
     });
-    console.log({ addr: address.user_id, auth: author.user_id });
     const collaboration = await models.Collaboration.findOne({
       where: {
         offchain_thread_id: thread.id,
@@ -81,7 +80,8 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
       }
       // Only remove user subscriptions if user is not the thread author, who should
       // remain subscribed to new reactions and comments
-      if (address.user_id !== author.user_id) {
+      const isAuthor = (address.user_id === author.user_id);
+      if (!isAuthor) {
         if (commentSubscription) {
           await commentSubscription.destroy({}, { transaction: t });
         }
