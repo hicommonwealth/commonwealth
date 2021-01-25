@@ -416,17 +416,24 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain && !app.community) return;
     const meta = app.chain ? app.chain.meta.chain : app.community.meta;
-    const { name, description, website, chat, telegram, github } = meta;
-    if (!website && !chat && !telegram && !github) return;
+    const { name, description, website, discord, element, telegram, github } = meta;
+    if (!website && !discord && !telegram && !github) return;
 
     return m('.ExternalLinksModule.SidebarModule', [
       m('.section-header', 'External Links'),
-      chat && m(Button, {
+      discord && m(Button, {
         fluid: true,
         rounded: true,
-        onclick: () => window.open(chat),
+        onclick: () => window.open(discord),
         label: 'Chat on Discord',
         class: 'discord-button',
+      }),
+      element && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: () => window.open(element),
+        label: 'Chat on Element',
+        class: 'element-button',
       }),
       telegram && m(Button, {
         fluid: true,
