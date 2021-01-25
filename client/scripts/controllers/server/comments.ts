@@ -164,7 +164,6 @@ class CommentsController {
         'community': comment.community,
         'body': encodeURIComponent(newBody),
         'attachments[]': attachments,
-        'mentions[]': mentions,
         'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
