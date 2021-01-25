@@ -13,7 +13,8 @@ interface ICommunityMetadataManagementState {
   invitesEnabled: boolean;
   privacyEnabled: boolean;
   website: string;
-  chat: string;
+  discord: string;
+  element: string;
   telegram: string;
   github: string;
 }
@@ -33,7 +34,8 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.description = vnode.attrs.community.description;
     vnode.state.iconUrl = vnode.attrs.community.iconUrl;
     vnode.state.website = vnode.attrs.community.website;
-    vnode.state.chat = vnode.attrs.community.chat;
+    vnode.state.discord = vnode.attrs.community.discord;
+    vnode.state.element = vnode.attrs.community.element;
     vnode.state.telegram = vnode.attrs.community.telegram;
     vnode.state.github = vnode.attrs.community.github;
   },
@@ -62,10 +64,16 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         onChangeHandler: (v) => { vnode.state.website = v; },
       }),
       m(InputPropertyRow, {
-        title: 'Chat',
-        defaultValue: vnode.state.chat,
+        title: 'Discord',
+        defaultValue: vnode.state.discord,
         placeholder: 'https://discord.com/invite',
-        onChangeHandler: (v) => { vnode.state.chat = v; },
+        onChangeHandler: (v) => { vnode.state.discord = v; },
+      }),
+      m(InputPropertyRow, {
+        title: 'Element',
+        defaultValue: vnode.state.element,
+        placeholder: 'https://matrix.to/#',
+        onChangeHandler: (v) => { vnode.state.element = v; },
       }),
       m(InputPropertyRow, {
         title: 'Telegram',
@@ -117,7 +125,8 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           description,
           iconUrl,
           website,
-          chat,
+          discord,
+          element,
           telegram,
           github,
           invitesEnabled,
@@ -129,7 +138,8 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             description,
             iconUrl,
             website,
-            chat,
+            discord,
+            element,
             telegram,
             github,
             privacyEnabled,
