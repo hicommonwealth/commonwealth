@@ -67,23 +67,29 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       });
 
       // auto-subscribe collaborator to comments & reactions
-      await models.Subscription.create({
-        subscriber_id: collaborator.User.id,
-        category_id: NotificationCategories.NewComment,
-        object_id: `discussion_${thread.id}`,
-        offchain_thread_id: thread.id,
-        community_id: thread.community || null,
-        chain_id: thread.chain || null,
-        is_active: true,
+      // findOrCreate to avoid duplicate subscriptions being created e.g. for
+      // same-account collaborators
+      await models.Subscription.findOrCreate({
+        where: {
+          subscriber_id: collaborator.User.id,
+          category_id: NotificationCategories.NewComment,
+          object_id: `discussion_${thread.id}`,
+          offchain_thread_id: thread.id,
+          community_id: thread.community || null,
+          chain_id: thread.chain || null,
+          is_active: true,
+        }
       });
-      await models.Subscription.create({
-        subscriber_id: req.user.id,
-        category_id: NotificationCategories.NewReaction,
-        object_id: `discussion_${thread.id}`,
-        offchain_thread_id: thread.id,
-        community_id: thread.community || null,
-        chain_id: thread.chain || null,
-        is_active: true,
+      await models.Subscription.findOrCreate({
+        where: {
+          subscriber_id: req.user.id,
+          category_id: NotificationCategories.NewReaction,
+          object_id: `discussion_${thread.id}`,
+          offchain_thread_id: thread.id,
+          community_id: thread.community || null,
+          chain_id: thread.chain || null,
+          is_active: true,
+        }
       });
     })).catch((e) => {
       return next(new Error(e));

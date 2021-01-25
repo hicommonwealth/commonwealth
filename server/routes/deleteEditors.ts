@@ -42,8 +42,12 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
       where: {
         chain: editor.chain,
         address: editor.address,
-      }
+      },
     });
+    console.log({ addr: address.user_id, auth: author.user_id });
+    if (address.user_id === author.user_id) {
+      return null;
+    }
     const collaboration = await models.Collaboration.findOne({
       where: {
         offchain_thread_id: thread.id,
