@@ -80,7 +80,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       // auto-subscribe collaborator to comments & reactions
       // findOrCreate to avoid duplicate subscriptions being created e.g. for
       // same-account collaborators
-      const [sub, created] = await models.Subscription.findOrCreate({
+      await models.Subscription.findOrCreate({
         where: {
           subscriber_id: collaborator.User.id,
           category_id: NotificationCategories.NewComment,
@@ -91,7 +91,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
           is_active: true,
         }
       });
-      const [sub2, created2] = await models.Subscription.findOrCreate({
+      await models.Subscription.findOrCreate({
         where: {
           subscriber_id: collaborator.User.id,
           category_id: NotificationCategories.NewReaction,
