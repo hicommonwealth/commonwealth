@@ -61,6 +61,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       total: collaborators.length,
       unique: uniqueCollaborators.length
     });
+    console.log(collaboratorIds);
     await Promise.all(uniqueCollaborators.map(async (collaborator) => {
       if (!collaborator.Roles || !collaborator.User) {
         return null;
@@ -107,7 +108,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
       });
       const [sub2, created2] = await models.Subscription.findOrCreate({
         where: {
-          subscriber_id: req.user.id,
+          subscriber_id: collaborator.User.id,
           category_id: NotificationCategories.NewReaction,
           object_id: `discussion_${thread.id}`,
           offchain_thread_id: thread.id,
