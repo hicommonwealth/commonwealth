@@ -344,7 +344,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
           body: finalComment.text,
         }, // TODO: add webhook data for mentions
         req.wss,
-        [ finalComment.Address.address ],
+        // [ finalComment.Address.address ],
       );
     }));
   }

@@ -130,7 +130,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
       body: (comment_id) ? comment.text : '',
     },
     req.wss,
-    [ finalReaction.Address.address ],
+    // [ finalReaction.Address.address ],
   );
 
   // update author.last_active (no await)

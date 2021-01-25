@@ -66,10 +66,20 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
         }
       });
 
+      console.log({
+        subscriber_id: req.user.id,
+        category_id: NotificationCategories.NewReaction,
+        object_id: `discussion_${thread.id}`,
+        offchain_thread_id: thread.id,
+        community_id: thread.community || null,
+        chain_id: thread.chain || null,
+        is_active: true,
+      });
+
       // auto-subscribe collaborator to comments & reactions
       // findOrCreate to avoid duplicate subscriptions being created e.g. for
       // same-account collaborators
-      await models.Subscription.findOrCreate({
+      const [sub, created] = await models.Subscription.findOrCreate({
         where: {
           subscriber_id: collaborator.User.id,
           category_id: NotificationCategories.NewComment,
@@ -80,7 +90,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
           is_active: true,
         }
       });
-      await models.Subscription.findOrCreate({
+      const [sub2, created2] = await models.Subscription.findOrCreate({
         where: {
           subscriber_id: req.user.id,
           category_id: NotificationCategories.NewReaction,
@@ -91,6 +101,7 @@ const addEditors = async (models, req: Request, res: Response, next: NextFunctio
           is_active: true,
         }
       });
+      console.log({ created, created2 });
     })).catch((e) => {
       return next(new Error(e));
     });
