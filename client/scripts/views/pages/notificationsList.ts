@@ -5,7 +5,6 @@ import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
 import app from 'state';
-import { pluralize } from 'helpers';
 import { sortNotifications } from 'helpers/notifications';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
@@ -16,7 +15,7 @@ const NotificationsPage: m.Component<{}> = {
       return m('div', 'Must be logged in to view notifications.');
     }
 
-    const notifications = app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
+    const notifications = app.user.notifications?.notifications || [];
     const sortedNotifications = sortNotifications(notifications).reverse();
 
     return m(Sublayout, {
