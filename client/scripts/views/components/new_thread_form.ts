@@ -13,7 +13,6 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
-import { link } from 'helpers';
 import { detectURL, parseMentionsForServer } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { updateLastVisited } from 'controllers/app/login';
@@ -255,7 +254,6 @@ const checkForModifications = async (state, modalMsg) => {
 };
 
 export const loadDraft = async (dom, state, draft) => {
-  debugger
   const titleInput = $(dom).find('div.new-thread-form-body input[name=\'new-thread-title\']');
 
   // First we check if the form has been updated, to avoid losing any unsaved form data
@@ -296,7 +294,6 @@ export const loadDraft = async (dom, state, draft) => {
   if (state.quillEditorState?.alteredText) {
     state.quillEditorState.alteredText = false;
   }
-  m.redraw();
 };
 
 // export const cancelDraft = async (state) => {
@@ -438,7 +435,6 @@ export const NewThreadForm: m.Component<{
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { fromDraft, postType, saving } = vnode.state;
 
-    console.log({ alteredText: vnode.state.quillEditorState?.alteredText, saving });
     return m('.NewThreadForm', {
       class: `${postType === PostType.Link ? 'link-post' : ''} `
         + `${postType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `
@@ -695,8 +691,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
             m(Button, {
-              disabled: !author || saving || vnode.state.uploadsInProgress > 0
-                || (fromDraft && !vnode.state.quillEditorState?.alteredText),
+              disabled: !author || saving || vnode.state.uploadsInProgress > 0,
               intent: 'none',
               rounded: true,
               onclick: async (e) => {
@@ -769,6 +764,7 @@ export const NewThreadForm: m.Component<{
             onclick: (e) => {
               const parent = $(e.target).closest('.NewThreadForm');
               loadDraft(parent, vnode.state, draft);
+              m.redraw();
             },
             contentRight: [
               fromDraft === draft.id

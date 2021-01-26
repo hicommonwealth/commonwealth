@@ -1,10 +1,7 @@
 import 'components/topic_selector.scss';
 
 import m from 'mithril';
-import { SelectList, ListItem, Callout, Colors, Button, Icons, List } from 'construct-ui';
-
-import app from 'state';
-import NewTopicModal from 'views/modals/new_topic_modal';
+import { SelectList, ListItem, Callout, Button, Icons } from 'construct-ui';
 import { OffchainTopic } from 'models';
 
 const TopicSelector: m.Component<{
@@ -17,8 +14,8 @@ const TopicSelector: m.Component<{
   error: string;
   selectedTopic?: OffchainTopic;
 }> = {
-  oninit: (vnode) => {
-    const { defaultTopic, topics } = vnode.attrs;
+  view: (vnode) => {
+    const { defaultTopic, featuredTopics, tabindex, topics, updateFormData } = vnode.attrs;
     if (defaultTopic === false) {
       vnode.state.selectedTopic = undefined;
     } else if (defaultTopic && typeof defaultTopic === 'string') {
@@ -26,10 +23,6 @@ const TopicSelector: m.Component<{
     } else if (defaultTopic && defaultTopic instanceof OffchainTopic) {
       vnode.state.selectedTopic = defaultTopic;
     }
-  },
-  view: (vnode) => {
-    const { defaultTopic, featuredTopics, tabindex, topics, updateFormData } = vnode.attrs;
-
     const itemRender = (topic) => {
       return m(ListItem, {
         class: featuredTopics.includes(topic) ? 'featured-topic' : 'other-topic',
