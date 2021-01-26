@@ -211,7 +211,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
           body: finalThread.body,
         },
         req.wss,
-        // [ finalThread.Address.address ],
+        [ finalThread.Address.address ],
       );
     }));
 

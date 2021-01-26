@@ -206,7 +206,7 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
             body: finalComment.text,
           },
           req.wss,
-          // [ finalComment.Address.address ],
+          [ finalComment.Address.address ],
         );
       }));
     }
