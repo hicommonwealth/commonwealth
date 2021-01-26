@@ -209,24 +209,28 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(body);
-  const mentions = parseUserMentions(bodyText);
   let mentionedAddresses;
-  if (mentions?.length > 0) {
-    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-      try {
-        return models.Address.findOne({
-          where: {
-            chain: mention[0],
-            address: mention[1],
-          },
-          include: [ models.User, models.Role ]
-        });
-      } catch (err) {
-        return next(new Error(err));
-      }
-    }));
-    // filter null results
-    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+  try {
+    const mentions = parseUserMentions(bodyText);
+    if (mentions?.length > 0) {
+      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+        try {
+          return models.Address.findOne({
+            where: {
+              chain: mention[0],
+              address: mention[1],
+            },
+            include: [ models.User, models.Role ]
+          });
+        } catch (err) {
+          return next(new Error(err));
+        }
+      }));
+      // filter null results
+      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+    }
+  } catch (e) {
+    return next(new Error('Failed to parse mentions'));
   }
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);

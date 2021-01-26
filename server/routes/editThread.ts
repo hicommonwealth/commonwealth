@@ -138,17 +138,22 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       [ userOwnedAddresses[0].address ],
     );
 
-    const previousDraftMentions = parseUserMentions(latestVersion);
-    const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
-    const mentions = currentDraftMentions.filter((addrArray) => {
-      let alreadyExists = false;
-      previousDraftMentions.forEach((addrArray_) => {
-        if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
-          alreadyExists = true;
-        }
+    let mentions;
+    try {
+      const previousDraftMentions = parseUserMentions(latestVersion);
+      const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
+      mentions = currentDraftMentions.filter((addrArray) => {
+        let alreadyExists = false;
+        previousDraftMentions.forEach((addrArray_) => {
+          if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+            alreadyExists = true;
+          }
+        });
+        return !alreadyExists;
       });
-      return !alreadyExists;
-    });
+    } catch (e) {
+      return next(new Error('Failed to parse mentions'));
+    }
 
     // grab mentions to notify tagged users
     let mentionedAddresses;

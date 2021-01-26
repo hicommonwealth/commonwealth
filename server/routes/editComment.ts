@@ -131,17 +131,22 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       [ finalComment.Address.address ],
     );
 
-    const previousDraftMentions = parseUserMentions(latestVersion);
-    const currentDraftMentions = parseUserMentions(decodeURIComponent(req.body.body));
-    const mentions = currentDraftMentions.filter((addrArray) => {
-      let alreadyExists = false;
-      previousDraftMentions.forEach((addrArray_) => {
-        if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
-          alreadyExists = true;
-        }
+    let mentions;
+    try {
+      const previousDraftMentions = parseUserMentions(latestVersion);
+      const currentDraftMentions = parseUserMentions(decodeURIComponent(req.body.body));
+      mentions = currentDraftMentions.filter((addrArray) => {
+        let alreadyExists = false;
+        previousDraftMentions.forEach((addrArray_) => {
+          if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+            alreadyExists = true;
+          }
+        });
+        return !alreadyExists;
       });
-      return !alreadyExists;
-    });
+    } catch (e) {
+      return next(new Error('Failed to parse mentions'));
+    }
 
     // grab mentions to notify tagged users
     let mentionedAddresses;
