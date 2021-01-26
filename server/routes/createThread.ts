@@ -213,7 +213,6 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   let mentionedAddresses;
   if (mentions?.length > 0) {
     mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-      console.log(mention);
       try {
         return models.Address.findOne({
           where: {
