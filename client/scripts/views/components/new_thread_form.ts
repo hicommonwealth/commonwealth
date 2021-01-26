@@ -255,6 +255,7 @@ const checkForModifications = async (state, modalMsg) => {
 };
 
 export const loadDraft = async (dom, state, draft) => {
+  debugger
   const titleInput = $(dom).find('div.new-thread-form-body input[name=\'new-thread-title\']');
 
   // First we check if the form has been updated, to avoid losing any unsaved form data
@@ -289,8 +290,8 @@ export const loadDraft = async (dom, state, draft) => {
   state.form.threadTitle = draft.title;
 
   localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, state.form.threadTitle);
-  state.activeTopic = draft.tag;
-  state.form.topicName = draft.tag;
+  state.activeTopic = draft.topic;
+  state.form.topicName = draft.topic;
   state.fromDraft = draft.id;
   if (state.quillEditorState?.alteredText) {
     state.quillEditorState.alteredText = false;
@@ -377,7 +378,7 @@ export const NewThreadForm: m.Component<{
       }
       localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
       localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
-      localStorage.removeItem(`${app.activeId()}-active-tag`);
+      localStorage.removeItem(`${app.activeId()}-active-topic`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
     }
   },
@@ -391,7 +392,7 @@ export const NewThreadForm: m.Component<{
     }
 
     const updateTopicState = (topicName: string, topicId?: number) => {
-      localStorage.setItem(`${app.activeId()}-active-tag`, topicName);
+      localStorage.setItem(`${app.activeId()}-active-topic`, topicName);
       vnode.state.activeTopic = topicName;
       vnode.state.form.topicName = topicName;
       vnode.state.form.topicId = topicId;
@@ -430,13 +431,14 @@ export const NewThreadForm: m.Component<{
         localStorage.removeItem(`${app.activeId()}-new-link-storedTitle`);
         localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
       }
-      localStorage.removeItem(`${app.activeId()}-active-tag`);
+      localStorage.removeItem(`${app.activeId()}-active-topic`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
     };
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { fromDraft, postType, saving } = vnode.state;
 
+    console.log({ alteredText: vnode.state.quillEditorState?.alteredText, saving });
     return m('.NewThreadForm', {
       class: `${postType === PostType.Link ? 'link-post' : ''} `
         + `${postType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `
@@ -512,7 +514,7 @@ export const NewThreadForm: m.Component<{
           hasTopics
             ? m(FormGroup, { span: { xs: 12, sm: 5 }, order: 1 }, [
               m(TopicSelector, {
-                defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
+                defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-topic`),
                 topics: app.topics.getByCommunity(app.activeId()),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
@@ -617,7 +619,7 @@ export const NewThreadForm: m.Component<{
               m(TopicSelector, {
                 defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
                   ? vnode.state.activeTopic
-                  : localStorage.getItem(`${app.activeId()}-active-tag`),
+                  : localStorage.getItem(`${app.activeId()}-active-topic`),
                 topics: app.topics.getByCommunity(app.activeId()),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
