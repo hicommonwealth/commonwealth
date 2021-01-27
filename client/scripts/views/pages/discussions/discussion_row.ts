@@ -106,7 +106,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
         e.preventDefault();
         localStorage[`${app.activeId()}-discussions-scrollY`] = window.scrollY;
-        updateRoute(discussionLink);
+        m.route.set(discussionLink);
       },
     });
   }
