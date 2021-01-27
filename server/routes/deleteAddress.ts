@@ -8,6 +8,7 @@ export const Errors = {
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
   AddressNotFound: 'Address not found',
+  CannotDeleteMagic: 'Cannot delete Magic Link address',
 };
 
 const deleteAddress = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -26,6 +27,9 @@ const deleteAddress = async (models, req: Request, res: Response, next: NextFunc
   });
   if (!addressObj || addressObj.user_id !== req.user.id) {
     return next(new Error(Errors.AddressNotFound));
+  }
+  if (addressObj.is_magic) {
+    return next(new Error(Errors.CannotDeleteMagic));
   }
 
   try {

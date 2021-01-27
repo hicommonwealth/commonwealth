@@ -6,14 +6,9 @@ import crypto from 'crypto';
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 
-import * as secp256k1 from 'secp256k1';
-import * as CryptoJS from 'crypto-js';
-import { ecdsaVerify } from 'secp256k1/lib/elliptic';
-
 import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import { toUtf8, fromBase64 } from '@cosmjs/encoding';
-import { Uint53 } from '@cosmjs/math';
+import { fromBase64 } from '@cosmjs/encoding';
 import { getCosmosAddress } from '@lunie/cosmos-keys'; // used to check address validity. TODO: remove
 
 import nacl from 'tweetnacl';
@@ -46,6 +41,7 @@ export interface AddressAttributes {
   user_id?: number;
   is_councillor?: boolean;
   is_validator?: boolean;
+  is_magic?: boolean;
 
   // associations
   Chain?: ChainAttributes;
@@ -106,6 +102,7 @@ export default (
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
     is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
     underscored: true,
     indexes: [
