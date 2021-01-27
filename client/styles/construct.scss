@@ -537,6 +537,7 @@ $spinner-animation-duration: 1000ms;
 
 // dialog entry animation
 .cui-overlay-backdrop {
+    background: rgba(0,0,0,0.2);
     .fade-enter & {
         opacity: 0.01;
         transition: opacity 0.05s ease;
