@@ -79,12 +79,12 @@ $border-color-focus: mix($border-color, $primary-bg-color, 50%);
 
 $text-size-item-header: 19px;
 $text-size-item-meta: 17px;
-$listing-left-flex: 4;
-$listing-right-flex: 3;
+$listing-left-flex: 6;
+$listing-right-flex: 1;
 
 @mixin listing-row-base {
     display: flex;
-    padding: 15px 20px 10px;
+    padding: 16px 20px 9px;
     margin: 0 -20px;
     cursor: pointer;
     &:hover {

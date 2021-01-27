@@ -15,17 +15,16 @@ import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import UserGallery from 'views/components/widgets/user_gallery';
+import ListingRow from 'views/components/listing_row';
 
 import DiscussionRowMenu from './discussion_row_menu';
-import UserGallery from '../../components/widgets/user_gallery';
-import ListingRow from '../../components/listing_row';
 
 const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boolean }, { expanded: boolean }> = {
   view: (vnode) => {
     const { proposal, showExcerpt } = vnode.attrs;
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
-    const lastUpdated = app.comments.lastCommented(proposal) || proposal.createdAt;
     const pinned = proposal.pinned;
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
@@ -52,6 +51,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         m('span.proposal-topic-icon'),
         m('span.proposal-topic-name', `${proposal.topic.name}`),
       ]),
+      m('.created-at', link('a', discussionLink, formatLastUpdated(proposal.createdAt))),
       m(User, {
         user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
         linkify: true,
@@ -67,24 +67,9 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       ]),
     ];
 
-    const rowExcerpt = showExcerpt
-      && proposal instanceof OffchainThread
-      && proposal.body
-      && m('.row-excerpt', [
-        (() => {
-          try {
-            const doc = JSON.parse(proposal.body);
-            if (!doc.ops) throw new Error();
-            return m(QuillFormattedText, { doc, collapse: true, hideFormatting: true });
-          } catch (e) {
-            return m(MarkdownFormattedText, { doc: proposal.body, collapse: true, hideFormatting: true });
-          }
-        })(),
-      ]);
-
     const rowMetadata = [
       m(UserGallery, {
-        avatarSize: 24,
+        avatarSize: 20,
         popover: true,
         maxUsers: 4,
         users: app.comments.uniqueCommenters(
@@ -93,32 +78,29 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
           proposal.authorChain
         )
       }),
-      m(ReactionButton, {
-        post: proposal,
-        type: ReactionType.Like,
-        tooltip: true
-      }),
-      m('.last-updated', {
-        class: lastUpdated.isBefore(moment().subtract(365, 'days'))
-          ? 'older'
-          : ''
-      }, link('a', discussionLink, formatLastUpdated(lastUpdated))),
       app.isLoggedIn() && m('.discussion-row-menu', [
         m(DiscussionRowMenu, { proposal }),
       ]),
     ];
 
+    const reaction = m(ReactionButton, {
+      post: proposal,
+      type: ReactionType.Like,
+      tooltip: true,
+      large: true,
+    });
+
     return m(ListingRow, {
       class: 'DiscussionRow',
       contentLeft: {
+        reaction,
         header: rowHeader,
         subheader: rowSubheader,
-        subheader2: rowExcerpt,
         pinned,
       },
-      key: proposal.id,
       contentRight: rowMetadata,
-      rightColSpacing: app.isLoggedIn() ?  [4, 4, 3, 1] : [4, 4, 4],
+      rightColSpacing: app.isLoggedIn() ? [10, 2] : [12],
+      key: proposal.id,
       onclick: (e) => {
         if ($(e.target).hasClass('cui-tag')) return;
         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
