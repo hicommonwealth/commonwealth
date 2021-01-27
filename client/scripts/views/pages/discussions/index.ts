@@ -58,26 +58,30 @@ const getLastSeenDivider = (hasText = true) => {
 const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
   view: (vnode) => {
     const { topic, stage } = vnode.attrs;
-    return m('.DiscussionStagesBar', [
-      m('a.discussions-stage', {
-        // class: stage ? '' : 'active',
-        href: topic ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}` : `/${app.activeId()}`,
+    return m('.DiscussionStagesBar.discussions-stages', [
+      m(Button, {
+        rounded: true,
+        compact: true,
+        size: 'sm',
+        class: 'discussions-stage',
         onclick: (e) => {
           e.preventDefault();
           m.route.set(topic ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}` : `/${app.activeId()}`);
-        }
-      }, 'Stages:'),
+        },
+        active: !stage,
+        label: 'All Stages'
+      }),
       [
         OffchainThreadStage.Discussion,
         OffchainThreadStage.DraftProposal,
         OffchainThreadStage.Voting,
         OffchainThreadStage.Passed,
         OffchainThreadStage.Failed,
-      ].map((targetStage) => m('a.discussions-stage', {
-        class: stage === targetStage ? 'active' : '',
-        href: topic
-          ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}?stage=${targetStage}`
-          : `/${app.activeId()}?stage=${targetStage}`,
+      ].map((targetStage) => m(Button, {
+        class: 'discussions-stage',
+        active: stage === targetStage,
+        rounded: true,
+        size: 'sm',
         onclick: (e) => {
           e.preventDefault();
           m.route.set(
@@ -85,10 +89,9 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
               ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}?stage=${targetStage}`
               : `/${app.activeId()}?stage=${targetStage}`
           );
-        }
-      }, [
-        offchainThreadStageToLabel(targetStage)
-      ])),
+        },
+        label: offchainThreadStageToLabel(targetStage),
+      })),
     ]);
   }
 };
@@ -335,10 +338,11 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     const getTopicRow = (key, name, description) => m(Button, {
       rounded: true,
+      compact: true,
       class: 'discussions-topic',
       key,
       active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-               || (topic && topic === id)),
+               || (topic && topic === key)),
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${app.activeId()}/discussions/${name}`);
@@ -349,6 +353,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     const allTopicsListItem = m(Button, {
       rounded: true,
+      compact: true,
       class: 'discussions-topic',
       active: (m.route.get() === `/${app.activeId()}` || !topic),
       onclick: (e) => {

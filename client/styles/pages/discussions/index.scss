@@ -16,7 +16,8 @@
         }
     }
 
-    .discussions-topics {
+    .discussions-topics,
+    .discussions-stages {
         margin-bottom: 20px;
         font-size: 17px;
         line-height: 1.25;
@@ -25,7 +26,9 @@
             margin-bottom: 10px;
         }
     }
-    .cui-button.discussions-topic {
+    .cui-button.discussions-topic,
+    .cui-button.discussions-stage {
+        color: $text-color-black;
         padding: 0 15px;
         display: inline-block;
         margin-right: 6px;

@@ -147,7 +147,6 @@ class ThreadsController {
         'body': encodeURIComponent(body),
         'kind': kind,
         'stage': stage,
-        'versionHistory': versionHistory,
         'attachments[]': attachments,
         'mentions[]': mentions,
         'topic_name': topicName,
