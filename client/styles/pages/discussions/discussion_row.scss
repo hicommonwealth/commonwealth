@@ -40,9 +40,9 @@
             .mobile-comment-count {
                 display: none;
                 color: $text-color-light;
-                margin-right: 14px;
+                margin-left: 14px;
                 @include xs-max {
-                    display: flex;
+                    display: inline;
                 }
                 .cui-icon svg {
                     position: relative;
@@ -67,7 +67,7 @@
                 font-size: 17px;
             }
             > .User {
-                display: flex;
+                display: inline-flex;
                 > .role-icon {
                     position: relative;
                     top: -1px;
@@ -86,7 +86,6 @@
                 }
             }
             > .created-at {
-                display: flex;
                 margin-right: 14px;
             }
         }
