@@ -102,9 +102,9 @@ const ProposalHeader: m.Component<{
             && m(ProposalTitleEditor, { item: proposal, parentState: vnode.state }),
           m('.proposal-body-meta', proposal instanceof OffchainThread ? [
             m(ProposalHeaderTopics, { proposal }),
-            m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
             m(ProposalBodyLastEdited, { item: proposal }),
+            m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalHeaderViewCount, { viewCount }),
             app.isLoggedIn() && !getSetGlobalEditingStatus(GlobalStatus.Get) && m(PopoverMenu, {
               transitionDuration: 0,
