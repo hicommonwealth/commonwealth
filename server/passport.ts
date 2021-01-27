@@ -4,8 +4,7 @@ import passportJWT from 'passport-jwt';
 import { Request } from 'express';
 
 import { Magic } from '@magic-sdk/admin';
-import { Strategy as MagicStrategy } from 'passport-magic';
-import Web3 from 'web3';
+import { Strategy as MagicStrategy, StrategyOptionsWithReq } from 'passport-magic';
 
 import { factory, formatFilename } from '../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -48,7 +47,6 @@ function setupPassport(models) {
     // TODO: verify we are in a community that supports magic login
     const magic = new Magic(MAGIC_API_KEY);
     passport.use(new MagicStrategy(async (user, cb) => {
-      console.log(user);
       // TODO: verify the metadata fetch is successful?
       const userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
       const existingUser = await models.User.findOne({
@@ -60,7 +58,6 @@ function setupPassport(models) {
           where: { is_magic: true },
         }],
       });
-      console.log(existingUser);
       if (!existingUser) {
         // create new user and unverified address if doesn't exist
         const newUser = await models.User.create({
@@ -68,7 +65,6 @@ function setupPassport(models) {
           magicIssuer: userMetadata.issuer,
           lastLoginAt: user.claim.iat,
         });
-        console.log(newUser);
 
         // TODO: use non-default chain in certain cases?
         const newAddress = await models.Address.createWithToken(
@@ -76,15 +72,13 @@ function setupPassport(models) {
         );
         newAddress.is_magic = true;
         await newAddress.save();
-        console.log(newAddress);
 
         const newRole = await models.Role.create({
           address_id: newAddress.id,
           chain_id: DEFAULT_MAGIC_CHAIN,
           permission: 'member',
         });
-        console.log(newRole);
-        cb(null, newUser);
+        return cb(null, newUser);
       } else if (existingUser.Addresses) {
         // login user if they registered via magic
         if (user.claim.iat <= existingUser.lastMagicLoginAt) {
@@ -94,10 +88,10 @@ function setupPassport(models) {
         }
         existingUser.lastLoginAt = user.claim.iat;
         await existingUser.save();
-        cb(null, existingUser);
+        return cb(null, existingUser);
       } else {
         // error if email exists but not registered with magic
-        cb(null, null, {
+        return cb(null, null, {
           message: `Email for user ${user.issuer} already registered`
         });
       }
@@ -193,7 +187,7 @@ function setupPassport(models) {
     }
   }));
 
-  passport.serializeUser<any, any>((req, user, done) => {
+  passport.serializeUser<any>((user, done) => {
     done(null, user.id);
   });
 
