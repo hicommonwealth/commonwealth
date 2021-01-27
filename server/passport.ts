@@ -1,14 +1,19 @@
 import passport from 'passport';
-import passportLocal from 'passport-local';
 import passportGithub from 'passport-github';
 import passportJWT from 'passport-jwt';
 import { Request } from 'express';
+
+import { Magic } from '@magic-sdk/admin';
+import { Strategy as MagicStrategy } from 'passport-magic';
+import Web3 from 'web3';
 
 import { factory, formatFilename } from '../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 
-import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK } from './config';
+import {
+  JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, DEFAULT_MAGIC_CHAIN,
+} from './config';
 import { NotificationCategories } from '../shared/types';
 
 const GithubStrategy = passportGithub.Strategy;
@@ -37,6 +42,55 @@ function setupPassport(models) {
       done(err);
     }
   }));
+
+  // allow magic login if configured with key
+  if (MAGIC_API_KEY) {
+    // TODO: verify we are in a community that supports magic login
+    const magic = new Magic(MAGIC_API_KEY);
+    passport.use(new MagicStrategy(async (user, cb) => {
+      console.log(user);
+      // TODO: verify the metadata fetch is successful?
+      const userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+      const existingUser = await models.Users.findOne({
+        email: userMetadata.email,
+        include: [{
+          model: models.Address,
+          where: { is_magic: true },
+          as: 'MagicAddresses',
+        }],
+      });
+      if (!existingUser) {
+        // create new user and unverified address if doesn't exist
+        const newUser = await models.User.create({
+          email: userMetadata.email,
+          magicIssuer: userMetadata.issuer,
+          lastLoginAt: user.claim.iat,
+        });
+        // TODO: use non-default chain in certain cases?
+        const newAddress = await models.Address.createWithToken(
+          newUser.id, DEFAULT_MAGIC_CHAIN, userMetadata.publicAddress,
+        );
+        newAddress.is_magic = true;
+        await newAddress.save();
+        cb(null, newUser);
+      } else if (existingUser.MagicAddresses) {
+        // login user if they registered via magic
+        if (user.claim.iat <= existingUser.lastMagicLoginAt) {
+          return cb(null, null, {
+            message: `Replay attack detected for user ${user.issuer}}.`,
+          });
+        }
+        existingUser.lastLoginAt = user.claim.iat;
+        await existingUser.save();
+        cb(null, existingUser);
+      } else {
+        // error if email exists but not registered with magic
+        cb(null, null, {
+          message: `Email for user ${user.issuer} already registered`
+        });
+      }
+    }));
+  }
 
   // allow user to authenticate with Github
   // create stub user without email
@@ -127,7 +181,7 @@ function setupPassport(models) {
     }
   }));
 
-  passport.serializeUser<any, any>((user, done) => {
+  passport.serializeUser<any>((user, done) => {
     done(null, user.id);
   });
 

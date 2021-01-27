@@ -15,6 +15,8 @@ export interface UserAttributes {
   lastVisited?: string;
   disableRichText?: boolean;
   emailNotificationInterval: EmailNotificationInterval;
+  magicIssuer?: string;
+  lastMagicLoginAt?: number;
   created_at?: Date;
   updated_at?: Date;
 
@@ -58,6 +60,8 @@ export default (
     isAdmin: { type: dataTypes.BOOLEAN, defaultValue: false },
     lastVisited: { type: dataTypes.TEXT, allowNull: false, defaultValue: '{}' },
     disableRichText: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+    magicIssuer: { type: dataTypes.STRING, allowNull: true },
+    lastMagicLoginAt: { type: dataTypes.INTEGER, allowNull: true },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
