@@ -319,7 +319,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
-  router.get('/auth/magic', passport.authenticate('magic'));
+  router.post('/auth/magic', passport.authenticate('magic'));
   router.get('/auth/github', passport.authenticate('github'));
   router.get('/auth/github/callback', passport.authenticate('github', { successRedirect: '/', failureRedirect: '/#!/login' }));
   // logout

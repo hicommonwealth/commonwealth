@@ -127,6 +127,7 @@ export default (
     address: string,
     keytype?: string
   ): Promise<AddressInstance> => {
+    console.log(user_id, chain, address);
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
     const last_active = new Date();

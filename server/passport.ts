@@ -51,14 +51,16 @@ function setupPassport(models) {
       console.log(user);
       // TODO: verify the metadata fetch is successful?
       const userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
-      const existingUser = await models.Users.findOne({
-        email: userMetadata.email,
+      const existingUser = await models.User.findOne({
+        where: {
+          email: userMetadata.email,
+        },
         include: [{
           model: models.Address,
           where: { is_magic: true },
-          as: 'MagicAddresses',
         }],
       });
+      console.log(existingUser);
       if (!existingUser) {
         // create new user and unverified address if doesn't exist
         const newUser = await models.User.create({
@@ -66,14 +68,24 @@ function setupPassport(models) {
           magicIssuer: userMetadata.issuer,
           lastLoginAt: user.claim.iat,
         });
+        console.log(newUser);
+
         // TODO: use non-default chain in certain cases?
         const newAddress = await models.Address.createWithToken(
           newUser.id, DEFAULT_MAGIC_CHAIN, userMetadata.publicAddress,
         );
         newAddress.is_magic = true;
         await newAddress.save();
+        console.log(newAddress);
+
+        const newRole = await models.Role.create({
+          address_id: newAddress.id,
+          chain_id: DEFAULT_MAGIC_CHAIN,
+          permission: 'member',
+        });
+        console.log(newRole);
         cb(null, newUser);
-      } else if (existingUser.MagicAddresses) {
+      } else if (existingUser.Addresses) {
         // login user if they registered via magic
         if (user.claim.iat <= existingUser.lastMagicLoginAt) {
           return cb(null, null, {
@@ -181,7 +193,7 @@ function setupPassport(models) {
     }
   }));
 
-  passport.serializeUser<any>((user, done) => {
+  passport.serializeUser<any, any>((req, user, done) => {
     done(null, user.id);
   });
 

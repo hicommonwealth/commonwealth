@@ -2,8 +2,8 @@ import 'components/login.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, Input, Form, FormGroup, PopoverMenu, MenuItem, Icon, Icons } from 'construct-ui';
-
+import { Button, Input, Form, FormGroup, Checkbox } from 'construct-ui';
+import { Magic } from 'magic-sdk';
 import app from 'state';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 
@@ -13,13 +13,24 @@ const Login: m.Component<{}, {
   failure: boolean;
   error: Error | string;
   forceRegularLogin: boolean; // show regular login form from NEAR page
+  usingMagic: boolean;
 }> = {
   view: (vnode) => {
+    const usingMagic = vnode.state.usingMagic;
     return m('.Login', {
       onclick: (e) => {
         e.stopPropagation();
       }
     }, [
+      m(Checkbox, {
+        checked: !!usingMagic,
+        size: 'lg',
+        onchange: async (e) => {
+          e.preventDefault();
+          vnode.state.usingMagic = !usingMagic;
+          m.redraw();
+        }
+      }, 'Use Magic Link'),
       m(Form, { gutter: 10 }, [
         m(FormGroup, { span: 9 }, [
           m(Input, {
@@ -42,7 +53,7 @@ const Login: m.Component<{}, {
             disabled: vnode.state.disabled,
             rounded: true,
             type: 'submit',
-            onclick: (e) => {
+            onclick: async (e) => {
               e.preventDefault();
               e.stopPropagation();
               const email = $(e.target).closest('.Login').find('[name="email"]').val()
@@ -52,7 +63,26 @@ const Login: m.Component<{}, {
               vnode.state.disabled = true;
               vnode.state.success = false;
               vnode.state.failure = false;
-              $.post(`${app.serverUrl()}/login`, { email, path }).then((response) => {
+              // TODO: pass in ETH config
+              let query: JQuery.jqXHR;
+              if (usingMagic) {
+                const magic = new Magic('pk_test_436D33AFC319E080');
+                const didToken = await magic.auth.loginWithMagicLink({ email });
+                query = $.post({
+                  url: `${app.serverUrl()}/auth/magic`,
+                  headers: {
+                    Authorization: `Bearer ${didToken}`,
+                  },
+                  crossDomain: true,
+                  xhrFields: {
+                    withCredentials: true
+                  },
+                });
+              } else {
+                query = $.post(`${app.serverUrl()}/login`, { email, path });
+              }
+              try {
+                const response = await query;
                 vnode.state.disabled = false;
                 if (response.status === 'Success') {
                   vnode.state.success = true;
@@ -61,12 +91,12 @@ const Login: m.Component<{}, {
                   vnode.state.error = response.message;
                 }
                 m.redraw();
-              }).catch((err: any) => {
+              } catch (err) {
                 vnode.state.disabled = false;
                 vnode.state.failure = true;
                 vnode.state.error = (err && err.responseJSON && err.responseJSON.error) || err.statusText;
                 m.redraw();
-              });
+              }
             },
             label: 'Go',
             loading: vnode.state.disabled,

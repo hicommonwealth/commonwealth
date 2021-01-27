@@ -44,11 +44,10 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
     include: [{
       model: models.Address,
       where: { is_magic: true },
-      as: 'MagicAddresses',
     }],
   });
   if (!user) return next(new Error(Errors.NoUser));
-  if (user.MagicAddresses && user.MagicAddresses > 0) return next(new Error(Errors.NoUpdateForMagic));
+  if (user.Addresses && user.Addresses > 0) return next(new Error(Errors.NoUpdateForMagic));
 
   // ensure no more than 3 tokens have been created in the last 5 minutes
   const recentTokens = await models.LoginToken.findAndCountAll({
