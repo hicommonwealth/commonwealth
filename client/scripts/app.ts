@@ -22,6 +22,11 @@ import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 
+// Prefetch commonly used pages
+import(/* webpackPrefetch: true */ 'views/pages/home');
+import(/* webpackPrefetch: true */ 'views/pages/discussions');
+import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
+
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true): Promise<void> {
