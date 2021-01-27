@@ -75,7 +75,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       : {};
 
     const nominatorsList = vnode.attrs.nominators;
-    const commission = vnode.attrs.commission / 10.0  || 0;
+    const commission = vnode.attrs.commission || 0;
     const apr = vnode.attrs?.apr || 0;
     const profile = app.chain.accounts.get(vnode.attrs.stash);
     return m('tr.ValidatorRow', [
@@ -98,7 +98,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
 
       m('td.val-total', [
         // formatCoin(app.chain.chain.coins(vnode.attrs.total), true), ' '
-        vnode.attrs.total.format(true)
+        vnode.attrs.total ? vnode.attrs.total.format(true) : 0
       ]),
       // m('td.val-own', formatCoin(app.chain.chain.coins(vnode.attrs.bonded), true)),
       m('td.val-other', [
@@ -113,7 +113,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
                 data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash }
               });
             }
-          }, `${formatCoin(app.chain.chain.coins(+vnode.attrs.otherTotal), true)}   (${nominatorsList.length})`)],
+          }, `${formatCoin(app.chain.chain.coins(vnode.attrs.otherTotal), true)}   (${nominatorsList.length})`)],
       ]),
       m('td.val-commission', `${commission.toFixed(2)}%`),
       m('td.val-points', vnode.attrs.eraPoints || '0'),

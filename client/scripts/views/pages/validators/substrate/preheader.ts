@@ -12,6 +12,8 @@ import { Icon, Icons, Spinner, TextArea, Select, Button } from 'construct-ui';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
 import CardSummary from './card_summary';
+import { getBN } from './presentation_component';
+import BN from 'bn.js';
 interface IPreHeaderState {
   dynamic: {
     sessionInfo: DeriveSessionProgress;
@@ -46,7 +48,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     const nominators: string[] = [];
     const stDynamic = vnode.state.dynamic;
     let sessionInfo,
-      globalStatistics: { waiting?: any; totalStaked?: any; elected?: any; count?: any; nominators?: any; offences?: any; aprPercentage?: any; lastBlockNumber?:any; },
+      globalStatistics: { waiting?: any; totalStaked?: any; elected?: any; count?: any; nominators?: any; offences?: any; aprPercentage?: any; lastBlockNumber?: any; },
       sender,
       validators: IValidators,
       currentEra: number,
@@ -80,8 +82,12 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       eraLength = sessionInfo.eraLength;
       eraProgress = sessionInfo.eraProgress;
       isEpoch = sessionInfo.isEpoch;
-
-      totalStaked = (app.chain as Substrate).chain.coins(globalStatistics.totalStaked);
+      if (typeof (globalStatistics.totalStaked) === 'number') {
+        console.log('globalStatistics.totalStaked ', globalStatistics.totalStaked);
+        totalStaked = (app.chain as Substrate).chain.coins(new BN('0x' + globalStatistics.totalStaked.toString(16), 'hex'));
+      } else {
+        totalStaked = (app.chain as Substrate).chain.coins(globalStatistics.totalStaked);
+      }
     }
 
     if (app.chain.base === ChainBase.Substrate) {
@@ -94,7 +100,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     }
 
     const totalbalance = (app.chain as Substrate).chain.totalbalance;
-    const stakedPercentage = totalStaked ? `${(totalStaked.muln(10000).div(totalbalance).toNumber() / 100).toFixed(2)}%` : undefined;
+    const stakedPercentage = totalStaked ? `${(totalStaked.muln(1000000).div(totalbalance) / 10000).toFixed(2)}%` : undefined;
 
     if (app.chain.base === ChainBase.Substrate) {
       (app.chain as Substrate).chain.api.toPromise()
@@ -128,11 +134,11 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         m('.validators-preheader-item', [
           m('h3', 'Nominators'),
           globalStatistics.nominators
-            ? m('.preheader-item-text', `${globalStatistics?.nominators}`) : m('spinner', itemLoadingSpinner()),
+            ? m('.preheader-item-text', `${globalStatistics?.nominators < 0 ? '--' : globalStatistics?.nominators}`) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Offences'),
-          m('.preheader-item-text', `${globalStatistics?.offences}`),
+          m('.preheader-item-text', `${globalStatistics?.offences < 0 ? '--' : globalStatistics?.offences}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Last Block'),
@@ -154,7 +160,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         m('.validators-preheader-item', [
           m('h3', 'Est. APR'),
           globalStatistics.aprPercentage
-            ? m('.preheader-item-text', `${globalStatistics?.aprPercentage?.toFixed(2)}%`) : m('spinner', itemLoadingSpinner()),
+            ? m('.preheader-item-text', `${globalStatistics?.aprPercentage < 0 ? '-- ' : globalStatistics?.aprPercentage?.toFixed(2)}%`) : m('spinner', itemLoadingSpinner()),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Supply'),

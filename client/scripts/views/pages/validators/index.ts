@@ -158,9 +158,18 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
         && !shouldFetchFromDB(app.chain as Substrate, vnode.state.dynamic.globalStatistics.lastBlockNumber)
         && !vnode.state.dynamic.validators) {
       vnode.state.dynamic.validators = {};
+      const gsUpdates = vnode.state.dynamic.globalStatistics;
+      gsUpdates.aprPercentage = -1;
+      gsUpdates.totalStaked = 0;
+      gsUpdates.offences = -1;
+      gsUpdates.nominators = -1;
+
       (app.chain as Substrate).staking.validators.pipe(first()).subscribe((val) => {
         const q = val;
-        vnode.state.dynamic.validators = (Object.keys(q).map((d) => { return { address:d, ...q[d], state: 'Active', dataFetched: true }; })) as any;
+        vnode.state.dynamic.validators = (Object.keys(q).map((d) => { return { address:d, ...q[d], state: q[d].isElected ? 'Active' : 'Waiting', dataFetched: true }; })) as any;
+        gsUpdates.totalStaked =  Object.values(q).filter((v) => v.exposure?.total).map((v) => app.chain.chain.coins(v.exposure?.total.toBn())).reduce((acc, v) => acc.add(v));
+        gsUpdates.waiting = Object.values(q).filter((v) => !v.isElected).length;
+        gsUpdates.nominators = new Set(Object.values(q).filter((v) => v.exposure?.others).map((v) => v.exposure?.others.map((b) => b.who.toString())).reduce((a, b) => [...a, ...b])).size;
       });
     }
     let vComponents = [];

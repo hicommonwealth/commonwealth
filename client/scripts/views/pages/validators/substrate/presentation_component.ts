@@ -7,6 +7,7 @@ import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
 import { Icon, Icons, Spinner, ListItem, Select, InputSelect } from 'construct-ui';
 import StakingController from 'client/scripts/controllers/server/staking';
+import BN from 'bn.js';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
 import ValidatorRowWaiting from './validator_row_waiting';
@@ -47,6 +48,12 @@ const fetchMissingDataForVisibleRecord = async (state: string, validators: any[]
       res.validators.forEach((q) => {
         const _v = validators.findIndex((v) => v.address === q.stash);
         if (_v > -1) {
+          if (q.HistoricalValidatorStatistics[0].exposure?.total) {
+            q.HistoricalValidatorStatistics[0].exposure.total = (Number(q.HistoricalValidatorStatistics[0].exposure?.total));
+          }
+          if (q.HistoricalValidatorStatistics[0].exposure?.own) {
+            q.HistoricalValidatorStatistics[0].exposure.own = Number(q.HistoricalValidatorStatistics[0].exposure?.own);
+          }
           validators[_v] = { ...validators[_v], ...q, ...q.HistoricalValidatorStatistics[0], dataFetched: true };
         }
       });
@@ -81,6 +88,8 @@ const sortValidators = (a, b) => {
   const b1 = key(b);
   return model.sortAsc ? a1 - b1 : b1 - a1;
 };
+
+export const getBN = (bn) => bn ? (bn?.toBn ? bn.toBn() : new BN(Number(bn).toLocaleString().replace(/,/g, ''))) : new BN(0);
 
 export const PresentationComponent_: m.Component<{ validators, valCount }, { firstLoad: boolean }> = {
   view: (vnode) => {
@@ -181,7 +190,7 @@ export const PresentationComponent_: m.Component<{ validators, valCount }, { fir
               .map((validator) => {
                 // console.log("validator.exposure ===== ", validator.exposure, validator.stash)
                 // total stake
-                const total = chain.chain.coins(+validator.exposure?.total);
+                const total = chain.chain.coins(getBN(validator.exposure?.total));
                 // own stake
                 const bonded = chain.chain.coins(+validator.exposure?.own);
                 const nominators = validator.exposure?.others.map(({ who, value }) => ({
@@ -194,7 +203,7 @@ export const PresentationComponent_: m.Component<{ validators, valCount }, { fir
                 const blockCount = validator.blockCount;
                 const hasMessage = validator?.hasMessage;
                 const isOnline = validator?.isOnline;
-                const otherTotal = chain.chain.coins(Number(validator.exposure?.total) - validator.exposure?.own);
+                const otherTotal = chain.chain.coins(getBN(validator.exposure?.total).sub(getBN(validator.exposure?.own)));
                 const commission = validator?.commissionPer;
                 const apr = validator?.apr;
                 // const name = validator?.name;
