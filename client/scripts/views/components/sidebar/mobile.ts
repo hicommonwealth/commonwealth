@@ -39,6 +39,7 @@ const MobileSidebar: m.Component<{}, { open: boolean }> = {
             class: 'mobile-sidebar-trigger',
             compact: true,
             label: m(Icon, { name: Icons.MENU }),
+            disabled: !app.chain && !app.community,
           }),
           content: [
             (app.chain || app.community) && m(OffchainNavigationModule),

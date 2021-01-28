@@ -124,16 +124,17 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 result.result.id,
                 result.result.name,
                 result.result.description,
-                null,
-                null,
-                null,
-                null,
-                null,
+                null, // iconUrl
+                null, // website
+                null, // discord
+                null, // element
+                null, // telegram
+                null, // github
                 result.result.default_chain,
-                false,
+                false, // visible
                 result.result.invitesEnabled,
                 result.result.privacyEnabled,
-                true,
+                true, // collapsedOnHomepage
                 result.featured_topics,
                 result.topics,
               );

@@ -12,7 +12,8 @@ export interface ChainAttributes {
   id?: string;
   name: string;
   description?: string;
-  chat?: string;
+  discord?: string;
+  element?: string;
   website?: string;
   telegram?: string;
   github?: string;
@@ -54,7 +55,8 @@ export default (
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.STRING, allowNull: true },
     website: { type: dataTypes.STRING, allowNull: true },
-    chat: { type: dataTypes.STRING, allowNull: true },
+    discord: { type: dataTypes.STRING, allowNull: true },
+    element: { type: dataTypes.STRING, allowNull: true },
     telegram: { type: dataTypes.STRING, allowNull: true },
     github: { type: dataTypes.STRING, allowNull: true },
     featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },

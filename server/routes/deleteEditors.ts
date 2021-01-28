@@ -42,7 +42,7 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
       where: {
         chain: editor.chain,
         address: editor.address,
-      }
+      },
     });
     const collaboration = await models.Collaboration.findOne({
       where: {
@@ -50,41 +50,9 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
         address_id: address.id
       }
     });
-    let commentSubscription;
-    let reactionSubscription;
-    await models.sequelize.transaction(async (t) => {
-      commentSubscription = await models.Subscription.findOne({
-        where: {
-          subscriber_id: address.user_id,
-          category_id: NotificationCategories.NewComment,
-          object_id: `discussion_${thread.id}`,
-          offchain_thread_id: thread.id,
-          community_id: thread.community || null,
-          chain_id: thread.chain || null,
-          is_active: true,
-        }
-      });
-      reactionSubscription = await models.Subscription.findOne({
-        where: {
-          subscriber_id: address.user_id,
-          category_id: NotificationCategories.NewReaction,
-          object_id: `discussion_${thread.id}`,
-          offchain_thread_id: thread.id,
-          community_id: thread.community || null,
-          chain_id: thread.chain || null,
-          is_active: true,
-        }
-      });
-      if (collaboration) {
-        await collaboration.destroy({}, { transaction: t });
-      }
-      if (commentSubscription) {
-        await commentSubscription.destroy({}, { transaction: t });
-      }
-      if (reactionSubscription) {
-        await reactionSubscription.destroy({}, { transaction: t });
-      }
-    });
+    if (collaboration) {
+      await collaboration.destroy();
+    }
   }));
 
   const finalEditors = await models.Collaboration.findAll({

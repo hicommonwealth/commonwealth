@@ -14,7 +14,8 @@ export interface OffchainCommunityAttributes {
   iconUrl: string;
   description?: string;
   website?: string;
-  chat?: string;
+  discord?: string;
+  element?: string;
   telegram?: string;
   github?: string;
   featured_topics?: string[];
@@ -55,7 +56,8 @@ export default (
       iconUrl: { type: dataTypes.STRING, allowNull: true },
       description: { type: dataTypes.TEXT, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
-      chat: { type: dataTypes.STRING, allowNull: true },
+      discord: { type: dataTypes.STRING, allowNull: true },
+      element: { type: dataTypes.STRING, allowNull: true },
       telegram: { type: dataTypes.STRING, allowNull: true },
       github: { type: dataTypes.STRING, allowNull: true },
       featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
