@@ -60,7 +60,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: OffchainThreadSta
           compact: true,
           size: 'sm',
           class: 'discussions-stage',
-          active: !stage,
+          active: !!stage,
           label: stage
             ? `${offchainThreadStageToIndex(stage)}. ${offchainThreadStageToLabel(stage)}`
             : 'Filter by stage',
