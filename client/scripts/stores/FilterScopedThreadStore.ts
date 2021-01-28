@@ -38,7 +38,6 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
     if (thread.topic && thread.stage) addThread(`${thread.topic?.name}#${thread.stage}`);
     if (thread.topic) addThread(`${thread.topic?.name}#`);
     if (thread.stage) addThread(`#${thread.stage}`);
-    addThread('#');
     return this;
   }
 
@@ -64,7 +63,6 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
     if (thread.topic && thread.stage) updateThread(`${thread.topic?.name}#${thread.stage}`);
     if (thread.topic) updateThread(`${thread.topic?.name}#`);
     if (thread.stage) updateThread(`#${thread.stage}`);
-    updateThread('#');
     updateThread(ALL_PROPOSALS_KEY);
 
     return this;
@@ -87,7 +85,6 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
     if (thread.topic && thread.stage) removeThread(`${thread.topic?.name}#${thread.stage}`);
     if (thread.topic) removeThread(`${thread.topic?.name}#`);
     if (thread.stage) removeThread(`#${thread.stage}`);
-    removeThread('#');
     removeThread(ALL_PROPOSALS_KEY);
 
     return this;
@@ -99,7 +96,7 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
   }
 
   public getByCommunityAndTopic(community: string, topic: string = '', stage: string = ''): Array<OffchainThread> {
-    const subpage = `${topic || ''}#${stage || ''}`;
+    const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     return this._threadsByCommunity[community]
       ? this._threadsByCommunity[community][subpage] || []
       : [];

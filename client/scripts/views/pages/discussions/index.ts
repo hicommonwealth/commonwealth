@@ -15,7 +15,7 @@ import { updateLastVisited } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
+import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
@@ -330,7 +330,8 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
 
     localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, vnode.state.lookback[subpage]);
     const stillFetching = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === false);
-    const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true);
+    const emptyTopic = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !stage);
+    const emptyStage = (allThreads.length === 0 && vnode.state.postsDepleted[subpage] === true && !!stage);
 
     const featuredTopics = {};
     const otherTopics = {};
@@ -496,11 +497,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
               m(ProposalsLoadingRow),
             ])
             : emptyTopic
-              // TODO: Ensure that this doesn't get shown on first render
               ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
-              : listing.length === 0
-                ? m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
-                : m(Listing, { content: listing }),
+              : emptyStage
+                ? m(EmptyStagePlaceholder)
+                : listing.length === 0
+                  ? m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
+                  : m(Listing, { content: listing }),
           // TODO: Incorporate infinite scroll into generic Listing component
           (allThreads.length && vnode.state.postsDepleted[subpage])
             ? m('.infinite-scroll-reached-end', [
