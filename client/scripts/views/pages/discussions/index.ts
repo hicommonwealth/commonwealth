@@ -29,15 +29,6 @@ import DiscussionRow from './discussion_row';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
-interface IDiscussionPageState {
-  lookback?: { [community: string]: moment.Moment} ;
-  postsDepleted: { [community: string]: boolean };
-  topicInitialized: { [community: string]: boolean };
-  lastSubpage: string;
-  lastVisitedUpdated?: boolean;
-  onscroll: any;
-}
-
 const getLastUpdate = (proposal) => {
   const lastComment = Number(app.comments.lastCommented(proposal));
   const createdAt = Number(proposal.createdAt.utc());
@@ -96,7 +87,14 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
   }
 };
 
-const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
+const DiscussionsPage: m.Component<{ topic?: string }, {
+  lookback?: { [community: string]: moment.Moment} ;
+  postsDepleted: { [community: string]: boolean };
+  topicInitialized: { [community: string]: boolean };
+  lastSubpage: string;
+  lastVisitedUpdated?: boolean;
+  onscroll: any;
+}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
@@ -120,7 +118,9 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     vnode.state.postsDepleted = {};
     vnode.state.topicInitialized = {};
     vnode.state.topicInitialized[ALL_PROPOSALS_KEY] = true;
-    const subpage = vnode.attrs.topic || ALL_PROPOSALS_KEY;
+    const topic = vnode.attrs.topic;
+    const stage = m.route.param('stage');
+    const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread = (app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/discussion/'));
     vnode.state.lookback[subpage] = (returningFromThread && localStorage[`${app.activeId()}-lookback-${subpage}`])
       ? localStorage[`${app.activeId()}-lookback-${subpage}`]
@@ -130,14 +130,14 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
+    const stage = m.route.param('stage');
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
       title: topic || 'Discussions',
       showNewProposalButton: true,
     });
-    const subpage = topic || ALL_PROPOSALS_KEY;
 
-    const stage = m.route.param('stage');
+    const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading, {
@@ -188,7 +188,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
 
     let listing = [];
     const allThreads = app.threads.listingStore
-      .getByCommunityAndTopic(app.activeId(), subpage)
+      .getByCommunityAndTopic(app.activeId(), topic, stage)
       .sort(orderDiscussionsbyLastComment);
 
     if (allThreads.length > 0) {

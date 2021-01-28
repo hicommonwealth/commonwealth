@@ -35,7 +35,10 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
       }
     }
 
-    addThread(`${thread.topic?.name}#${thread.stage}`);
+    if (thread.topic && thread.stage) addThread(`${thread.topic?.name}#${thread.stage}`);
+    if (thread.topic) addThread(`${thread.topic?.name}#`);
+    if (thread.stage) addThread(`#${thread.stage}`);
+    addThread('#');
     return this;
   }
 
@@ -58,7 +61,10 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
       communityStore[subpage].push(thread);
     };
 
-    updateThread(`${thread.topic?.name}#${thread.stage}`);
+    if (thread.topic && thread.stage) updateThread(`${thread.topic?.name}#${thread.stage}`);
+    if (thread.topic) updateThread(`${thread.topic?.name}#`);
+    if (thread.stage) updateThread(`#${thread.stage}`);
+    updateThread('#');
     updateThread(ALL_PROPOSALS_KEY);
 
     return this;
@@ -78,7 +84,10 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
       topicStore.splice(proposalIndex, 1);
     };
 
-    removeThread(`${thread.topic?.name}#${thread.stage}`);
+    if (thread.topic && thread.stage) removeThread(`${thread.topic?.name}#${thread.stage}`);
+    if (thread.topic) removeThread(`${thread.topic?.name}#`);
+    if (thread.stage) removeThread(`#${thread.stage}`);
+    removeThread('#');
     removeThread(ALL_PROPOSALS_KEY);
 
     return this;
@@ -90,7 +99,7 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
   }
 
   public getByCommunityAndTopic(community: string, topic: string = '', stage: string = ''): Array<OffchainThread> {
-    const subpage = `${topic}#${stage}`;
+    const subpage = `${topic || ''}#${stage || ''}`;
     return this._threadsByCommunity[community]
       ? this._threadsByCommunity[community][subpage] || []
       : [];
@@ -99,7 +108,8 @@ class FilterScopedThreadStore extends IdStore<OffchainThread> {
   public removeTopic(community: string, topicName: string) {
     const communityStore = this._threadsByCommunity[community];
     if (communityStore) {
-      delete this._threadsByCommunity[community][`${topicName}#`];
+      delete this._threadsByCommunity[community][`${topicName || ''}#`];
+      // TODO: also delete topic#stage for all stages
       if (communityStore[ALL_PROPOSALS_KEY]) {
         communityStore[ALL_PROPOSALS_KEY].forEach((thread) => {
           if (thread.topic?.name === topicName) {
