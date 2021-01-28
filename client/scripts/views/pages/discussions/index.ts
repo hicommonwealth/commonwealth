@@ -76,7 +76,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
         OffchainThreadStage.DraftProposal,
         OffchainThreadStage.Voting,
         OffchainThreadStage.Passed,
-        OffchainThreadStage.Failed,
+        OffchainThreadStage.Abandoned,
       ].map((targetStage) => m(Button, {
         class: 'discussions-stage',
         active: stage === targetStage,

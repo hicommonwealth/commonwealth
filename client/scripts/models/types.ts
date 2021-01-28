@@ -68,7 +68,7 @@ export enum OffchainThreadStage {
   DraftProposal = 'draft',
   Voting = 'voting',
   Passed = 'passed',
-  Failed = 'failed',
+  Abandoned = 'abandoned',
 }
 
 export enum TransactionStatus {
