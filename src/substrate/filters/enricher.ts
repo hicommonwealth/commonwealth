@@ -7,7 +7,6 @@ import {
 } from '@polkadot/types/interfaces';
 import { DeriveStakingElected } from '@polkadot/api-derive/types';
 import BN from 'bn.js';
-import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { Option, bool, Vec, u32, u64, Compact } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { filter } from 'lodash';
@@ -572,11 +571,11 @@ export async function Enrich(
        */
       case EventKind.SignalingNewProposal: {
         const [ proposer, hash ] = event.data as unknown as [ AccountId, Hash ] & Codec;
-        const proposalInfoOpt = await api.query.signaling.proposalOf<Option<ProposalRecord>>(hash);
+        const proposalInfoOpt = await api.query.signaling.proposalOf<Option<any>>(hash);
         if (!proposalInfoOpt.isSome) {
           throw new Error('unable to fetch signaling proposal info');
         }
-        const voteInfoOpt = await api.query.voting.voteRecords<Option<VoteRecord>>(proposalInfoOpt.unwrap().vote_id);
+        const voteInfoOpt = await api.query.voting.voteRecords<Option<any>>(proposalInfoOpt.unwrap().vote_id);
         if (!voteInfoOpt.isSome) {
           throw new Error('unable to fetch signaling proposal voting info');
         }

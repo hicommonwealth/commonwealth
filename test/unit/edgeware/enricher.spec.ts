@@ -9,7 +9,6 @@ import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types'
 import { Vec, bool, Data, TypeRegistry, Option } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
-import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { ValidatorId } from '@polkadot/types/interfaces';
 import { OffenceDetails, ReportIdOf } from '@polkadot/types/interfaces/offences';
 import { Enrich } from '../../../src/substrate/filters/enricher';
@@ -371,7 +370,7 @@ const api = constructFakeApi({
       title: 'title',
       contents: 'contents',
       vote_id: 101,
-    } as unknown as ProposalRecord),
+    } as any),
   voteRecords: async (vote_id) => +vote_id !== 101
     ? constructOption()
     : constructOption({
@@ -380,7 +379,7 @@ const api = constructFakeApi({
         vote_type: 'binary',
       },
       outcomes: [1, 2],
-    } as unknown as VoteRecord),
+    } as any),
   preimage: async (hash) => hash.toString() !== 'hash'
     ? undefined
     : {
