@@ -17,12 +17,13 @@
     }
 
     .discussions-topics {
-        @include xs-max {
-            margin-top: 16px;
-        }
         margin-bottom: 20px;
         font-size: 17px;
         line-height: 1.25;
+        @include xs-max {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
     }
     .cui-button.discussions-topic {
         padding: 0 15px;

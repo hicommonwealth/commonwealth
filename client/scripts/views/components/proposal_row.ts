@@ -286,16 +286,18 @@ const ProposalRow: m.Component<IRowAttrs> = {
       })(),
     ]);
 
+    const reaction = m(ReactionButton, {
+      post: proposal,
+      type: ReactionType.Like,
+      tooltip: true,
+      large: true,
+    });
+
     const rowMetadata = [
       m(UserGallery, {
         popover: true,
         avatarSize: 24,
         users: app.comments.uniqueCommenters(proposal)
-      }),
-      m(ReactionButton, {
-        post: proposal,
-        type: ReactionType.Like,
-        tooltip: true
       }),
       !proposal.completed
         ? m('.last-updated', 'Active')
@@ -310,9 +312,10 @@ const ProposalRow: m.Component<IRowAttrs> = {
         contentLeft: {
           header: rowHeader,
           subheader: m('.proposal-row-sub', [rowSubheader, rowComments]),
+          reaction,
         },
         contentRight: rowMetadata,
-        rightColSpacing: [4, 4, 4],
+        rightColSpacing: [6, 6],
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
