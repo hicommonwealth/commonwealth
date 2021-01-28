@@ -53,5 +53,5 @@ export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 export const INFURA_API_KEY = process.env.INFURA_API_KEY;
 
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
-export const MAGIC_SUPPORTED_CHAINS = process.env.MAGIC_SUPPORTED_CHAINS.split(',') || ['ethereum'];
+export const MAGIC_SUPPORTED_CHAINS = process.env.MAGIC_SUPPORTED_CHAINS?.split(',') || ['ethereum'];
 export const DEFAULT_MAGIC_CHAIN = process.env.DEFAULT_MAGIC_CHAIN || 'ethereum';
