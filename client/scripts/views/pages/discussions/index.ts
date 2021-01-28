@@ -77,7 +77,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
         OffchainThreadStage.Voting,
         OffchainThreadStage.Passed,
         OffchainThreadStage.Abandoned,
-      ].map((targetStage) => m(Button, {
+      ].map((targetStage, index) => m(Button, {
         class: 'discussions-stage',
         active: stage === targetStage,
         rounded: true,
@@ -90,7 +90,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
               : `/${app.activeId()}?stage=${targetStage}`
           );
         },
-        label: offchainThreadStageToLabel(targetStage),
+        label: `${index + 1}. ${offchainThreadStageToLabel(targetStage)}`,
       })),
     ]);
   }
