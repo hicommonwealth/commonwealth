@@ -2,9 +2,12 @@ import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
 
-import { Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
+import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
 
-import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
+import {
+  pluralize, link, externalLink, isSameAccount, extractDomain,
+  offchainThreadStageToLabel, offchainThreadStageToIndex,
+} from 'helpers';
 import { proposalSlugToFriendlyName } from 'identifiers';
 
 import {
@@ -102,6 +105,26 @@ export const ProposalHeaderTitle: m.Component<{ proposal: AnyProposal | Offchain
           m(Icon, { name: Icons.LOCK, size: 'xs' }),
           ' Locked'
         ],
+      }),
+    ]);
+  }
+};
+
+export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (!proposal) return;
+    return m('.ProposalHeaderStage', [
+      m(Button, {
+        rounded: true,
+        compact: true,
+        size: 'xs',
+        href: `/${proposal.chain || proposal.community}?stage=${proposal.stage}`,
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${proposal.chain || proposal.community}?stage=${proposal.stage}`);
+        },
+        label: offchainThreadStageToLabel(proposal.stage),
       }),
     ]);
   }

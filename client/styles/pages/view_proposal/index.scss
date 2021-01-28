@@ -191,6 +191,7 @@ $discussion-title-font-size: 1.45rem;
 
     // proposal-meta
     .ProposalHeaderTopics,
+    .ProposalHeaderStage,
     .ProposalHeaderOnchainId,
     .ProposalHeaderOnchainStatus,
     .ProposalBodyAuthor,
@@ -217,6 +218,20 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
+
+    .ProposalHeaderStage {
+        position: relative;
+        top: -4px;
+        margin-left: 12px;
+        a.cui-button {
+            padding: 0 10px;
+        }
+        a.cui-button:hover {
+            color: $text-color-black;
+            text-decoration: none;
+        }
+    }
+
     .QuillEditor {
         margin-top: 8px;
     }

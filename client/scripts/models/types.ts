@@ -65,7 +65,7 @@ export enum OffchainThreadKind {
 
 export enum OffchainThreadStage {
   Discussion = 'discussion',
-  DraftProposal = 'draft',
+  ProposalInReview = 'proposal_in_review',
   Voting = 'voting',
   Passed = 'passed',
   Abandoned = 'abandoned',

@@ -33,7 +33,7 @@ import PageNotFound from 'views/pages/404';
 
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
-  ProposalHeaderTopics, ProposalHeaderTitle,
+  ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyButtons,
   ProposalTitleEditor,
@@ -96,7 +96,10 @@ const ProposalHeader: m.Component<{
       m('.proposal-top', [
         m('.proposal-top-left', [
           !vnode.state.editing
-            && m('.proposal-title', m(ProposalHeaderTitle, { proposal })),
+            && m('.proposal-title', [
+              m(ProposalHeaderTitle, { proposal }),
+              proposal instanceof OffchainThread && m(ProposalHeaderStage, { proposal }),
+            ]),
           vnode.state.editing
             && m(ProposalTitleEditor, { item: proposal, parentState: vnode.state }),
           m('.proposal-body-meta', proposal instanceof OffchainThread ? [
@@ -155,7 +158,7 @@ const ProposalHeader: m.Component<{
                 popoverMenu: true,
                 onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
                 openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
-              })
+              }),
           ] : [
             m(ProposalHeaderOnchainId, { proposal }),
             m(ProposalHeaderOnchainStatus, { proposal }),

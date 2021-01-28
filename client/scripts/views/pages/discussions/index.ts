@@ -64,7 +64,7 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
       }),
       [
         OffchainThreadStage.Discussion,
-        OffchainThreadStage.DraftProposal,
+        OffchainThreadStage.ProposalInReview,
         OffchainThreadStage.Voting,
         OffchainThreadStage.Passed,
         OffchainThreadStage.Abandoned,

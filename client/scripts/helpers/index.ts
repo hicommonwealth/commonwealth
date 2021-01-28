@@ -11,8 +11,8 @@ export async function sleep(msec) {
 export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   if (stage === OffchainThreadStage.Discussion) {
     return 'Discussion';
-  } else if (stage === OffchainThreadStage.DraftProposal) {
-    return 'Draft Proposal';
+  } else if (stage === OffchainThreadStage.ProposalInReview) {
+    return 'Final Review';
   } else if (stage === OffchainThreadStage.Voting) {
     return 'Voting';
   } else if (stage === OffchainThreadStage.Passed) {
@@ -21,6 +21,22 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
     return 'Abandoned';
   } else {
     return 'Other';
+  }
+}
+
+export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
+  if (stage === OffchainThreadStage.Discussion) {
+    return 1;
+  } else if (stage === OffchainThreadStage.ProposalInReview) {
+    return 2;
+  } else if (stage === OffchainThreadStage.Voting) {
+    return 3;
+  } else if (stage === OffchainThreadStage.Passed) {
+    return 4;
+  } else if (stage === OffchainThreadStage.Abandoned) {
+    return 5;
+  } else {
+    return 6;
   }
 }
 
