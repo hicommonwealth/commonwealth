@@ -35,8 +35,21 @@
         margin-bottom: 6px;
         cursor: pointer;
         line-height: 1 !important;
+    }
+    .cui-button.discussions-topic {
         &.active {
             border-color: $text-color-black;
+        }
+    }
+    .cui-button.discussions-stage {
+        .cui-button-label {
+            margin-right: 4px;
+        }
+        svg {
+            position: relative;
+            margin: 0;
+            top: 2px;
+            margin-right: -4px;
         }
     }
 

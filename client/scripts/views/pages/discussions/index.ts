@@ -8,7 +8,7 @@ import moment from 'moment-twitter';
 import app from 'state';
 
 import { Spinner, Button, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
-import { pluralize, offchainThreadStageToLabel } from 'helpers';
+import { pluralize, offchainThreadStageToLabel, offchainThreadStageToIndex } from 'helpers';
 import { NodeInfo, CommunityInfo, OffchainThreadStage } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -46,43 +46,56 @@ const getLastSeenDivider = (hasText = true) => {
   ]);
 };
 
-const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
+const DiscussionStagesBar: m.Component<{ topic: string, stage: OffchainThreadStage }, {}> = {
   view: (vnode) => {
     const { topic, stage } = vnode.attrs;
     return m('.DiscussionStagesBar.discussions-stages', [
-      m(Button, {
-        rounded: true,
-        compact: true,
-        size: 'sm',
-        class: 'discussions-stage',
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(topic ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}` : `/${app.activeId()}`);
-        },
-        active: !stage,
-        label: 'All Stages'
+      m(PopoverMenu, {
+        transitionDuration: 0,
+        hoverCloseDelay: 0,
+        closeOnContentClick: true,
+        position: 'bottom',
+        trigger: m(Button, {
+          rounded: true,
+          compact: true,
+          size: 'sm',
+          class: 'discussions-stage',
+          active: !stage,
+          label: stage
+            ? `${offchainThreadStageToIndex(stage)}. ${offchainThreadStageToLabel(stage)}`
+            : 'Filter by stage',
+          iconRight: Icons.CHEVRON_DOWN
+        }),
+        content: [
+          OffchainThreadStage.Discussion,
+          OffchainThreadStage.ProposalInReview,
+          OffchainThreadStage.Voting,
+          OffchainThreadStage.Passed,
+          OffchainThreadStage.Abandoned,
+          null,
+        ].map((targetStage, index) => m(Button, {
+          class: 'discussions-stage',
+          active: stage === targetStage,
+          rounded: true,
+          size: 'sm',
+          style: 'margin: 3px 10px;',
+          onclick: (e) => {
+            e.preventDefault();
+            if (targetStage === null) {
+              m.route.set(topic ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}` : `/${app.activeId()}`);
+            } else {
+              m.route.set(
+                topic
+                  ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}?stage=${targetStage}`
+                  : `/${app.activeId()}?stage=${targetStage}`
+              );
+            }
+          },
+          label: targetStage
+            ? `${offchainThreadStageToIndex(targetStage)}. ${offchainThreadStageToLabel(targetStage)}`
+            : 'Clear filter',
+        })),
       }),
-      [
-        OffchainThreadStage.Discussion,
-        OffchainThreadStage.ProposalInReview,
-        OffchainThreadStage.Voting,
-        OffchainThreadStage.Passed,
-        OffchainThreadStage.Abandoned,
-      ].map((targetStage, index) => m(Button, {
-        class: 'discussions-stage',
-        active: stage === targetStage,
-        rounded: true,
-        size: 'sm',
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(
-            topic
-              ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}?stage=${targetStage}`
-              : `/${app.activeId()}?stage=${targetStage}`
-          );
-        },
-        label: `${index + 1}. ${offchainThreadStageToLabel(targetStage)}`,
-      })),
     ]);
   }
 };
@@ -130,7 +143,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
-    const stage = m.route.param('stage');
+    const stage = m.route.param('stage') as OffchainThreadStage;
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
       title: topic || 'Discussions',
