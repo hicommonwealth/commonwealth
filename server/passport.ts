@@ -47,7 +47,8 @@ function setupPassport(models) {
   if (MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
     const magic = new Magic(MAGIC_API_KEY);
-    passport.use(new MagicStrategy(async (user, cb) => {
+    passport.use(new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
+      const currentUser = req.user;
       // TODO: verify the metadata fetch is successful?
       const userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
       const existingUser = await models.User.findOne({
@@ -65,41 +66,73 @@ function setupPassport(models) {
           // create new user and unverified address if doesn't exist
           const newUser = await models.User.create({
             email: userMetadata.email,
+            emailVerified: true,
             magicIssuer: userMetadata.issuer,
             lastLoginAt: user.claim.iat,
           }, { transaction: t });
 
           // TODO: use non-default chain in certain cases?
-          const newAddress = await models.Address.createWithToken(
-            newUser.id,
-            DEFAULT_MAGIC_CHAIN,
-            userMetadata.publicAddress,
-            undefined,
-            t,
-          );
-          newAddress.is_magic = true;
-          await newAddress.save({ transaction: t });
+          const newAddress = await models.Address.create({
+            address: userMetadata.publicAddress,
+            chain: DEFAULT_MAGIC_CHAIN,
+            verification_token: 'MAGIC',
+            verification_token_expires: null,
+            verified: new Date(), // trust addresses from magic
+            last_active: new Date(),
+            user_id: newUser.id,
+            is_magic: true,
+          }, { transaction: t });
 
           const newRole = await models.Role.create({
             address_id: newAddress.id,
             chain_id: DEFAULT_MAGIC_CHAIN,
             permission: 'member',
           }, { transaction: t });
+
+          // Automatically create subscription to their own mentions
+          await models.Subscription.create({
+            subscriber_id: newUser.id,
+            category_id: NotificationCategories.NewMention,
+            object_id: `user-${newUser.id}`,
+            is_active: true,
+          }, { transaction: t });
+
+          // Automatically create a subscription to collaborations
+          await models.Subscription.create({
+            subscriber_id: newUser.id,
+            category_id: NotificationCategories.NewCollaboration,
+            object_id: `user-${newUser.id}`,
+            is_active: true,
+          }, { transaction: t });
+
           return newUser;
         });
-        return cb(null, result);
+        console.log(`Created user: ${JSON.stringify(result)}`);
+
+        // re-fetch user to include address object
+        // TODO: simplify this without doing a refetch
+        const newUser = await models.User.findOne({
+          where: {
+            id: result.id,
+          },
+          include: [ models.Address ],
+        });
+        return cb(null, newUser);
       } else if (existingUser.Addresses) {
         // login user if they registered via magic
         if (user.claim.iat <= existingUser.lastMagicLoginAt) {
+          console.log('Replay attack detected.');
           return cb(null, null, {
             message: `Replay attack detected for user ${user.issuer}}.`,
           });
         }
         existingUser.lastLoginAt = user.claim.iat;
         await existingUser.save();
+        console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
         return cb(null, existingUser);
       } else {
         // error if email exists but not registered with magic
+        console.log('User already registered with old method.');
         return cb(null, null, {
           message: `Email for user ${user.issuer} already registered`
         });

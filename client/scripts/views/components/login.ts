@@ -5,6 +5,8 @@ import $ from 'jquery';
 import { Button, Input, Form, FormGroup, Checkbox } from 'construct-ui';
 import { Magic } from 'magic-sdk';
 import app from 'state';
+import { initAppState } from 'app';
+import { updateActiveAddresses } from 'controllers/app/login';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 
 const Login: m.Component<{}, {
@@ -66,37 +68,57 @@ const Login: m.Component<{}, {
               // TODO: pass in ETH config
               let query: JQuery.jqXHR;
               if (usingMagic) {
-                const magic = new Magic('pk_test_436D33AFC319E080');
-                const didToken = await magic.auth.loginWithMagicLink({ email });
-                query = $.post({
-                  url: `${app.serverUrl()}/auth/magic`,
-                  headers: {
-                    Authorization: `Bearer ${didToken}`,
-                  },
-                  crossDomain: true,
-                  xhrFields: {
-                    withCredentials: true
-                  },
-                });
-              } else {
-                query = $.post(`${app.serverUrl()}/login`, { email, path });
-              }
-              try {
-                const response = await query;
-                console.log(response);
-                vnode.state.disabled = false;
-                if (response.status === 'Success') {
-                  vnode.state.success = true;
-                } else {
+                try {
+                  const magic = new Magic('pk_test_436D33AFC319E080');
+                  const didToken = await magic.auth.loginWithMagicLink({ email });
+                  const response = await $.post({
+                    url: `${app.serverUrl()}/auth/magic`,
+                    headers: {
+                      Authorization: `Bearer ${didToken}`,
+                    },
+                    xhrFields: {
+                      withCredentials: true
+                    },
+                  });
+                  console.log(response);
+                  if (response.status === 'Success') {
+                    // if success, move immediately to next login step -- do not wait for user
+                    // TODO: verify the address
+
+                    // log in as the new user
+                    // TODO: make this not just redirect to ethereum
+                    const chain = response.result.Addresses[0].chain;
+                    $('.LoginModal').trigger('modalforceexit');
+                    await initAppState(false);
+                    await updateActiveAddresses(chain);
+                    m.route.set(`/${chain}`);
+                  } else {
+                    vnode.state.failure = true;
+                    vnode.state.error = response.message;
+                  }
+                } catch (err) {
+                  vnode.state.disabled = false;
                   vnode.state.failure = true;
-                  vnode.state.error = response.message;
+                  vnode.state.error = (err && err.responseJSON && err.responseJSON.error) || err.statusText;
+                  m.redraw();
                 }
-                m.redraw();
-              } catch (err) {
-                vnode.state.disabled = false;
-                vnode.state.failure = true;
-                vnode.state.error = (err && err.responseJSON && err.responseJSON.error) || err.statusText;
-                m.redraw();
+              } else {
+                try {
+                  const response = await $.post(`${app.serverUrl()}/login`, { email, path });
+                  vnode.state.disabled = false;
+                  if (response.status === 'Success') {
+                    vnode.state.success = true;
+                  } else {
+                    vnode.state.failure = true;
+                    vnode.state.error = response.message;
+                  }
+                  m.redraw();
+                } catch (err) {
+                  vnode.state.disabled = false;
+                  vnode.state.failure = true;
+                  vnode.state.error = (err && err.responseJSON && err.responseJSON.error) || err.statusText;
+                  m.redraw();
+                }
               }
             },
             label: 'Go',
