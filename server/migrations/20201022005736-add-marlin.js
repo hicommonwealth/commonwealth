@@ -30,7 +30,7 @@ module.exports = {
       await queryInterface.bulkInsert('Chains', [{
         id: 'marlin',
         symbol: 'LIN',
-        name: 'Marlin (Mainnet)',
+        name: 'Marlin',
         icon_url: '/static/img/protocols/lin.png',
         type: 'dao',
         network: 'marlin',
@@ -43,6 +43,7 @@ module.exports = {
         type: 'dao',
         network: 'marlin-testnet',
         active: true,
+        collapsed_on_homepage: true,
       }
       ], { transaction: t });
 
