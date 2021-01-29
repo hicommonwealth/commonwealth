@@ -12,7 +12,7 @@ const StageEditor: m.Component<{
   onChangeHandler: Function;
   openStateHandler: Function;
 }, {
-  stage: string;
+  stage: OffchainThreadStage;
   isOpen: boolean;
 }> = {
   oninit: (vnode) => {
@@ -80,8 +80,8 @@ const StageEditor: m.Component<{
               const { stage } = vnode.state;
               const { thread } = vnode.attrs;
               try {
-                await app.threads.updateStage(thread);
-                vnode.attrs.onChangeHandler(stage);
+                await app.threads.setStage({ threadId: thread.id, stage: vnode.state.stage });
+                vnode.attrs.onChangeHandler(vnode.state.stage);
               } catch (err) {
                 console.log('Failed to update stage');
                 throw new Error((err.responseJSON && err.responseJSON.error)

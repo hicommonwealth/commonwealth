@@ -9,6 +9,7 @@ import { ProposalStore, FilterScopedThreadStore } from 'stores';
 import {
   OffchainThread,
   OffchainAttachment,
+  OffchainThreadStage,
   CommunityInfo,
   NodeInfo,
   OffchainTopic,
@@ -236,15 +237,15 @@ class ThreadsController {
     });
   }
 
-  public async setStage(proposal: OffchainThread) {
+  public async setStage(args: { threadId: number, stage: OffchainThreadStage }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadStage`,
-      type: 'PUT',
+      type: 'POST',
       data: {
         'chain': app.activeChainId(),
         'community': app.activeCommunityId(),
-        'thread_id': proposal.id,
-        'stage': proposal.stage,
+        'thread_id': args.threadId,
+        'stage': args.stage,
         'jwt': app.user.jwt
       },
       success: (response) => {

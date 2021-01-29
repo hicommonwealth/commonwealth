@@ -914,7 +914,7 @@ describe('Thread Tests', () => {
         .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
         .send({ jwt: adminJWT, });
-      expect(res2.body.error).to.be.equal(updateThreadPinnedErrors.NeedThread);
+      expect(res2.body.error).to.be.equal(updateThreadPinnedErrors.NoThread);
     });
 
     it('user fails to toggle pin', async () => {
@@ -922,7 +922,7 @@ describe('Thread Tests', () => {
         .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
         .send({ thread_id: pinThread, jwt: userJWT, });
-      expect(res2.body.error).to.be.equal(updateThreadPinnedErrors.MustBeAdmin);
+      expect(res2.body.error).to.be.equal(updateThreadPinnedErrors.NotAdmin);
     });
   });
 
