@@ -44,6 +44,7 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
     include: [{
       model: models.Address,
       where: { is_magic: true },
+      required: false,
     }],
   });
   if (!user) return next(new Error(Errors.NoUser));

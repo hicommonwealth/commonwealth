@@ -83,6 +83,7 @@ const Login: m.Component<{}, {
               }
               try {
                 const response = await query;
+                console.log(response);
                 vnode.state.disabled = false;
                 if (response.status === 'Success') {
                   vnode.state.success = true;

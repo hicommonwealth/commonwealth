@@ -125,13 +125,13 @@ export default (
     user_id: number,
     chain: string,
     address: string,
-    keytype?: string
+    keytype?: string,
+    transaction?,
   ): Promise<AddressInstance> => {
-    console.log(user_id, chain, address);
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
     const last_active = new Date();
-    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype, last_active });
+    return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype, last_active }, { transaction });
   };
 
   // Update an existing address' verification token

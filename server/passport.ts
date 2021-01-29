@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { Magic } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy, StrategyOptionsWithReq } from 'passport-magic';
 
+import { sequelize } from './database';
 import { factory, formatFilename } from '../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -56,29 +57,37 @@ function setupPassport(models) {
         include: [{
           model: models.Address,
           where: { is_magic: true },
+          required: false,
         }],
       });
       if (!existingUser) {
-        // create new user and unverified address if doesn't exist
-        const newUser = await models.User.create({
-          email: userMetadata.email,
-          magicIssuer: userMetadata.issuer,
-          lastLoginAt: user.claim.iat,
-        });
+        const result = await sequelize.transaction(async (t) => {
+          // create new user and unverified address if doesn't exist
+          const newUser = await models.User.create({
+            email: userMetadata.email,
+            magicIssuer: userMetadata.issuer,
+            lastLoginAt: user.claim.iat,
+          }, { transaction: t });
 
-        // TODO: use non-default chain in certain cases?
-        const newAddress = await models.Address.createWithToken(
-          newUser.id, DEFAULT_MAGIC_CHAIN, userMetadata.publicAddress,
-        );
-        newAddress.is_magic = true;
-        await newAddress.save();
+          // TODO: use non-default chain in certain cases?
+          const newAddress = await models.Address.createWithToken(
+            newUser.id,
+            DEFAULT_MAGIC_CHAIN,
+            userMetadata.publicAddress,
+            undefined,
+            t,
+          );
+          newAddress.is_magic = true;
+          await newAddress.save({ transaction: t });
 
-        const newRole = await models.Role.create({
-          address_id: newAddress.id,
-          chain_id: DEFAULT_MAGIC_CHAIN,
-          permission: 'member',
+          const newRole = await models.Role.create({
+            address_id: newAddress.id,
+            chain_id: DEFAULT_MAGIC_CHAIN,
+            permission: 'member',
+          }, { transaction: t });
+          return newUser;
         });
-        return cb(null, newUser);
+        return cb(null, result);
       } else if (existingUser.Addresses) {
         // login user if they registered via magic
         if (user.claim.iat <= existingUser.lastMagicLoginAt) {
