@@ -206,10 +206,12 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
           contentRight: [], // TODO
         }),
-      // proposals (substrate, cosmos, moloch only)
+      // proposals (substrate, cosmos, moloch & marlin only)
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
-                         || app.chain?.class === ChainClass.Moloch)
+                         || app.chain?.class === ChainClass.Moloch
+                         || app.chain?.network === ChainNetwork.Marlin
+                         || app.chain?.network === ChainNetwork.MarlinTestnet)
         && m(Button, {
           fluid: true,
           rounded: true,
