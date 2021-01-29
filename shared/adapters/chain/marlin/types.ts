@@ -16,7 +16,6 @@ export interface IMarlinHolder {
 }
 
 export interface IMarlinVote {
-  // TODO: FILL THIS OUT!!!!
   // who voted
   delegateAddress: string;
 
@@ -47,7 +46,7 @@ export interface IMarlinProposalResponse {
   signatures: string[];
   calldatas: string[];
 
-  startBlock: number; // TODO: BN?
+  startBlock: number;
   endBlock: number;
   eta: number; // The timestamp that the proposal will be available for execution, set once the vote succeeds
 
