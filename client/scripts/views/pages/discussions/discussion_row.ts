@@ -37,14 +37,13 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       (propType === OffchainThreadKind.Link && proposal.url)
         && m('span.spacer', ' '),
       link('a', discussionLink, proposal.title),
-      m(Button, {
+      proposal.stage !== OffchainThreadStage.Discussion && m(Button, {
         class: 'discussion-row-stage',
         label: offchainThreadStageToLabel(proposal.stage),
-        intent: proposal.stage === OffchainThreadStage.Discussion ? 'none'
-          : proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
-            : proposal.stage === OffchainThreadStage.Voting ? 'positive'
-              : proposal.stage === OffchainThreadStage.Passed ? 'positive'
-                : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
+        intent: proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+          : proposal.stage === OffchainThreadStage.Voting ? 'positive'
+            : proposal.stage === OffchainThreadStage.Passed ? 'positive'
+              : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
         size: 'xs',
         rounded: true,
         compact: true,

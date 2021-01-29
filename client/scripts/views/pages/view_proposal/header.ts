@@ -13,6 +13,7 @@ import { proposalSlugToFriendlyName } from 'identifiers';
 import {
   OffchainThread,
   OffchainThreadKind,
+  OffchainThreadStage,
   OffchainComment,
   Proposal,
   AnyProposal,
@@ -114,6 +115,7 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
+    if (proposal.stage === OffchainThreadStage.Discussion) return;
     return m('.ProposalHeaderStage', [
       m(Button, {
         rounded: true,
