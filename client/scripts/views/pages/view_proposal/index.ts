@@ -491,6 +491,7 @@ const ViewProposalPage: m.Component<{
     const { identifier, type } = vnode.attrs;
     const headerTitle = m.route.param('type') === 'discussion' ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string') return m(PageNotFound, { title: headerTitle });
+    // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
     if (!vnode.state.prefetch || !vnode.state.prefetch[identifier]) {
       vnode.state.prefetch = {};
       vnode.state.prefetch[identifier] = {
@@ -514,7 +515,7 @@ const ViewProposalPage: m.Component<{
 
     const proposalRecentlyEdited = vnode.state.recentlyEdited;
     const proposalDoesNotMatch = vnode.state.proposal && Number(vnode.state.proposal.identifier) !== Number(proposalId);
-    // load proposal
+    // load proposal, and return m(PageLoading)
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
