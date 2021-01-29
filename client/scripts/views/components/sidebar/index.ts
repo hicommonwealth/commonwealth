@@ -269,7 +269,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           e.preventDefault();
           m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MarlinProposal });
         },
-        label: 'Propose',
+        label: 'Submit Proposal',
         active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.MarlinProposal}`,
       }),
       showMarlinOptions && m(Button, {
