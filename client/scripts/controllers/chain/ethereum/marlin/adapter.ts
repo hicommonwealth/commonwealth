@@ -61,7 +61,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     const mpondContractAddress = this.meta.address;
-    const governorAlphaContractAddress = '0xeDAA76873524f6A203De2Fa792AD97E459Fca6Ff';
+    const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
     const api = new MarlinAPI(this.meta.address, governorAlphaContractAddress, this.chain.api.currentProvider as any, activeAddress);
     await api.init().catch((e) => {
       this._failed = true;
