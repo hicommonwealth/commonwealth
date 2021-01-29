@@ -67,7 +67,7 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['phragmenelection', 'Phragmen Council Candidacy'],
   ['treasuryproposal', 'Treasury Proposal'],
   ['discussion', 'Discussion Thread'],
-  ['marlinproposal', 'Proposal']
+  ['marlinproposal', 'Proposal'],
   ['cosmosproposal', 'Proposal'],
   ['molochproposal', 'Proposal']
 ]);

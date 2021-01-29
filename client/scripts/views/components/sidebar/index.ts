@@ -358,7 +358,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           m.route.set(`/${app.activeChainId()}/collectives`);
         },
       }),
->>>>>>> master
     ]);
   }
 };

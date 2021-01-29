@@ -115,7 +115,7 @@ const VoteListing: m.Component<{
               case (vote instanceof MarlinProposalVote):
                 return m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-                  m('.vote-choice', vote.choice.toString()),
+                  m('.vote-choice', (vote as MarlinProposalVote).choice.toString()),
                   balance && m('.vote-balance', balance),
                 ]);
               default:
