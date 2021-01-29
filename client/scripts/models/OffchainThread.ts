@@ -14,7 +14,7 @@ class OffchainThread implements IUniqueId {
   public readonly plaintext: string;
   public readonly pinned: boolean;
   public readonly kind: OffchainThreadKind;
-  public readonly stage: OffchainThreadStage;
+  public stage: OffchainThreadStage;
   public readonly attachments: OffchainAttachment[];
   public readonly readOnly: boolean;
 

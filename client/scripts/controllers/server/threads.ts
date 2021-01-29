@@ -236,9 +236,35 @@ class ThreadsController {
     });
   }
 
+  public async setStage(proposal: OffchainThread) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadStage`,
+      type: 'PUT',
+      data: {
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
+        'thread_id': proposal.id,
+        'stage': proposal.stage,
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const result = modelFromServer(response.result);
+        // Post edits propagate to all thread stores
+        this._store.update(result);
+        this._listingStore.update(result);
+        return result;
+      },
+      error: (err) => {
+        console.log('Failed to update stage');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to update stage');
+      }
+    });
+  }
+
   public async setPrivacy(args: { threadId: number, readOnly: boolean }) {
     return $.ajax({
-      url: `${app.serverUrl()}/setPrivacy`,
+      url: `${app.serverUrl()}/updateThreadPrivacy`,
       type: 'POST',
       data: {
         'jwt': app.user.jwt,
@@ -261,7 +287,7 @@ class ThreadsController {
 
   public async pin(args: { proposal: OffchainThread }) {
     return $.ajax({
-      url: `${app.serverUrl()}/pinThread`,
+      url: `${app.serverUrl()}/updateThreadPinned`,
       type: 'POST',
       data: {
         'jwt': app.user.jwt,

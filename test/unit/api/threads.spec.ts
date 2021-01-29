@@ -10,8 +10,8 @@ import { Errors as ThreadErrors } from 'server/routes/createThread';
 import { Errors as EditThreadErrors } from 'server/routes/editThread';
 import { Errors as CreateCommentErrors } from 'server/routes/createComment';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
-import { Errors as setPrivacyErrors } from 'server/routes/setPrivacy';
-import { Errors as pinThreadErrors } from 'server/routes/pinThread';
+import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadPrivacy';
+import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPinned';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -602,7 +602,7 @@ describe('Thread Tests', () => {
     });
   });
 
-  describe('/setPrivacy', () => {
+  describe('/updateThreadPrivacy', () => {
     let tempThread;
 
     it('should turn on readonly', async () => {
@@ -621,7 +621,7 @@ describe('Thread Tests', () => {
       expect(res1.result).to.not.be.null;
       tempThread = res1.result;
       const res = await chai.request(app)
-        .post('/api/setPrivacy')
+        .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
           thread_id: tempThread.id,
@@ -650,7 +650,7 @@ describe('Thread Tests', () => {
 
     it('should turn off readonly as an admin of community', async () => {
       const res = await chai.request(app)
-        .post('/api/setPrivacy')
+        .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
           thread_id: tempThread.id,
@@ -663,32 +663,32 @@ describe('Thread Tests', () => {
 
     it('should fail without read_only', async () => {
       const res = await chai.request(app)
-        .post('/api/setPrivacy')
+        .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
           thread_id: tempThread.id,
           jwt: adminJWT,
         });
       expect(res.status).to.be.equal(500);
-      expect(res.body.error).to.be.equal(setPrivacyErrors.NoReadOnly);
+      expect(res.body.error).to.be.equal(updateThreadPrivacyErrors.NoReadOnly);
     });
 
 
     it('should fail without thread_id', async () => {
       const res = await chai.request(app)
-        .post('/api/setPrivacy')
+        .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
           read_only: 'true',
           jwt: adminJWT,
         });
       expect(res.status).to.be.equal(500);
-      expect(res.body.error).to.be.equal(setPrivacyErrors.NoThreadId);
+      expect(res.body.error).to.be.equal(updateThreadPrivacyErrors.NoThreadId);
     });
 
     it('should fail with an invalid thread_id', async () => {
       const res = await chai.request(app)
-        .post('/api/setPrivacy')
+        .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
           thread_id: 123458,
@@ -696,7 +696,7 @@ describe('Thread Tests', () => {
           jwt: adminJWT,
         });
       expect(res.status).to.be.equal(500);
-      expect(res.body.error).to.be.equal(setPrivacyErrors.NoThread);
+      expect(res.body.error).to.be.equal(updateThreadPrivacyErrors.NoThread);
     });
 
     it('should fail if not an admin or author', async () => {
@@ -704,7 +704,7 @@ describe('Thread Tests', () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
       const newUserJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
       const res2 = await chai.request(app)
-        .post('/api/setPrivacy')
+        .post('/api/updateThreadPrivacy')
         .set('Accept', 'application/json')
         .send({
           thread_id: tempThread.id,
@@ -712,7 +712,7 @@ describe('Thread Tests', () => {
           jwt: newUserJWT,
         });
       expect(res2.status).to.be.equal(500);
-      expect(res2.body.error).to.be.equal(setPrivacyErrors.NotAdmin);
+      expect(res2.body.error).to.be.equal(updateThreadPrivacyErrors.NotAdmin);
     });
   });
 
@@ -873,7 +873,7 @@ describe('Thread Tests', () => {
     });
   });
 
-  describe('/pinThread route tests', () => {
+  describe('/updateThreadPinned route tests', () => {
     let pinThread;
     before(async () => {
       const res = await modelUtils.createThread({
@@ -893,7 +893,7 @@ describe('Thread Tests', () => {
 
     it('admin can toggle thread to pinned', async () => {
       const res2 = await chai.request(app)
-        .post('/api/pinThread')
+        .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
         .send({ thread_id: pinThread, jwt: adminJWT, });
       expect(res2.body.status).to.be.equal('Success');
@@ -902,7 +902,7 @@ describe('Thread Tests', () => {
 
     it('admin can toggle thread to unpinned', async () => {
       const res2 = await chai.request(app)
-        .post('/api/pinThread')
+        .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
         .send({ thread_id: pinThread, jwt: adminJWT, });
       expect(res2.body.status).to.be.equal('Success');
@@ -911,18 +911,18 @@ describe('Thread Tests', () => {
 
     it('admin fails to toggle without thread', async () => {
       const res2 = await chai.request(app)
-        .post('/api/pinThread')
+        .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
         .send({ jwt: adminJWT, });
-      expect(res2.body.error).to.be.equal(pinThreadErrors.NeedThread);
+      expect(res2.body.error).to.be.equal(updateThreadPinnedErrors.NeedThread);
     });
 
     it('user fails to toggle pin', async () => {
       const res2 = await chai.request(app)
-        .post('/api/pinThread')
+        .post('/api/updateThreadPinned')
         .set('Accept', 'application/json')
         .send({ thread_id: pinThread, jwt: userJWT, });
-      expect(res2.body.error).to.be.equal(pinThreadErrors.MustBeAdmin);
+      expect(res2.body.error).to.be.equal(updateThreadPinnedErrors.MustBeAdmin);
     });
   });
 

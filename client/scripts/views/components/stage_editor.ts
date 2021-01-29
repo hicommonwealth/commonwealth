@@ -3,72 +3,51 @@ import $ from 'jquery';
 import { Button, Classes, Dialog, Icon, Icons, MenuItem } from 'construct-ui';
 
 import app from 'state';
-import { OffchainThread, OffchainTopic } from 'models';
-import TopicSelector from './topic_selector';
+import { offchainThreadStageToLabel } from 'helpers';
+import { OffchainThread, OffchainThreadStage } from 'models';
 
-const TopicWindow: m.Component<{
-  thread: OffchainThread,
-  onChangeHandler: Function
-}, {
-  activeTopic: OffchainTopic | string
-}> = {
-  oninit: (vnode) => {
-    if (!vnode.state.activeTopic) {
-      vnode.state.activeTopic = vnode.attrs.thread.topic;
-    }
-  },
-  view: (vnode) => {
-    const activeMeta = app.chain ? app.chain.meta.chain : app.community.meta;
-    const featuredTopics = activeMeta.featuredTopics.map((t) => {
-      return app.topics.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
-    });
-    return m(TopicSelector, {
-      featuredTopics,
-      defaultTopic: vnode.state.activeTopic,
-      topics: app.topics.getByCommunity(app.activeId()),
-      updateFormData: (topicName, topicId?) => {
-        vnode.attrs.onChangeHandler(topicName, topicId);
-        vnode.state.activeTopic = topicName;
-      },
-    });
-  }
-};
-
-const TopicEditor: m.Component<{
+const StageEditor: m.Component<{
   thread: OffchainThread;
   popoverMenu?: boolean;
   onChangeHandler: Function;
   openStateHandler: Function;
 }, {
-  topicName: string;
-  topicId: number;
+  stage: string;
   isOpen: boolean;
 }> = {
-  oncreate: (vnode) => {
-    if (!vnode.attrs.thread.topic) return;
-    vnode.state.topicName = vnode.attrs.thread.topic.name;
-    vnode.state.topicId = vnode.attrs.thread.topic.id;
-  },
   oninit: (vnode) => {
     vnode.state.isOpen = !!vnode.attrs.popoverMenu;
+    vnode.state.stage = vnode.attrs.thread.stage;
   },
   view: (vnode) => {
-    return m('.TopicEditor', [
+    return m('.StageEditor', [
       !vnode.attrs.popoverMenu && m('a', {
         href: '#',
         onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
-      }, 'Move to another topic'),
+      }, 'Edit stage'),
       m(Dialog, {
         basic: false,
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
-        content: m(TopicWindow, {
-          thread: vnode.attrs.thread,
-          onChangeHandler: (topicName, topicId?) => {
-            vnode.state.topicName = topicName;
-            vnode.state.topicId = topicId;
-          }
-        }),
+        content: [
+          [
+            OffchainThreadStage.Discussion,
+            OffchainThreadStage.ProposalInReview,
+            OffchainThreadStage.Voting,
+            OffchainThreadStage.Passed,
+            OffchainThreadStage.Abandoned,
+          ].map((targetStage) => m(Button, {
+            class: 'discussions-stage',
+            active: vnode.state.stage === targetStage,
+            rounded: true,
+            size: 'sm',
+            style: 'margin: 3px 6px;',
+            label: offchainThreadStageToLabel(targetStage),
+            onclick: (e) => {
+              vnode.state.stage = targetStage;
+            }
+          })),
+        ],
         hasBackdrop: true,
         isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
         inline: false,
@@ -79,7 +58,7 @@ const TopicEditor: m.Component<{
             vnode.state.isOpen = false;
           }
         },
-        title: 'Edit topic',
+        title: 'Edit stage',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
@@ -98,16 +77,16 @@ const TopicEditor: m.Component<{
             intent: 'primary',
             rounded: true,
             onclick: async () => {
-              const { topicName, topicId } = vnode.state;
+              const { stage } = vnode.state;
               const { thread } = vnode.attrs;
               try {
-                const topic: OffchainTopic = await app.topics.update(thread.id, topicName, topicId);
-                vnode.attrs.onChangeHandler(topic);
+                await app.threads.updateStage(thread);
+                vnode.attrs.onChangeHandler(stage);
               } catch (err) {
-                console.log('Failed to update topic');
+                console.log('Failed to update stage');
                 throw new Error((err.responseJSON && err.responseJSON.error)
                   ? err.responseJSON.error
-                  : 'Failed to update topic');
+                  : 'Failed to update stage');
               }
               if (vnode.attrs.popoverMenu) {
                 vnode.attrs.openStateHandler(false);
@@ -122,4 +101,4 @@ const TopicEditor: m.Component<{
   }
 };
 
-export default TopicEditor;
+export default StageEditor;
