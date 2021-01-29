@@ -208,9 +208,10 @@ $discussion-title-font-size: 1.45rem;
         display: inline-block;
         color: $discussion-meta-color;
         margin-right: 17px;
-        a:link,
-        a:visited,
-        .User a.user-display-name {
+        > a:link,
+        > a:visited,
+        a.proposal-collaborators,
+        > .User a.user-display-name {
             color: $discussion-meta-color;
             text-decoration: none;
             &:hover {
@@ -218,7 +219,6 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
-
     .ProposalHeaderStage {
         position: relative;
         top: -4px;
@@ -229,6 +229,15 @@ $discussion-title-font-size: 1.45rem;
         }
         a.cui-button:hover {
             text-decoration: none;
+        }
+    }
+    .proposal-collaborators-popover {
+        color: $text-color-black;
+        .cui-popover-content {
+            padding-top: 22px;
+            .User {
+                display: block;
+            }
         }
     }
 

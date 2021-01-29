@@ -478,6 +478,7 @@ const ViewProposalPage: m.Component<{
   viewCount: number,
   proposal: AnyProposal | OffchainThread,
   threadFetched,
+  threadFetchFailed,
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -493,6 +494,7 @@ const ViewProposalPage: m.Component<{
     const { identifier, type } = vnode.attrs;
     const headerTitle = m.route.param('type') === 'discussion' ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string') return m(PageNotFound, { title: headerTitle });
+    // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
     if (!vnode.state.prefetch || !vnode.state.prefetch[identifier]) {
       vnode.state.prefetch = {};
       vnode.state.prefetch[identifier] = {
@@ -505,6 +507,10 @@ const ViewProposalPage: m.Component<{
     const proposalId = identifier.split('-')[0];
     const proposalType = type;
 
+    if (vnode.state.threadFetchFailed) {
+      return m(PageNotFound, { title: headerTitle });
+    }
+
     // load app controller
     if (!app.threads.initialized) {
       return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
@@ -512,7 +518,7 @@ const ViewProposalPage: m.Component<{
 
     const proposalRecentlyEdited = vnode.state.recentlyEdited;
     const proposalDoesNotMatch = vnode.state.proposal && Number(vnode.state.proposal.identifier) !== Number(proposalId);
-    // load proposal
+    // load proposal, and return m(PageLoading)
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
@@ -525,13 +531,15 @@ const ViewProposalPage: m.Component<{
               m.redraw();
             }).catch((err) => {
               notifyError('Thread not found');
-              return m(PageNotFound);
+              vnode.state.threadFetchFailed = true;
             });
             vnode.state.threadFetched = true;
           }
           return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
         } else {
-          if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
+          if (!app.chain.loaded) {
+            return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
+          }
           // check if module is still initializing
           const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
           if (!c.disabled && !c.initialized) {
