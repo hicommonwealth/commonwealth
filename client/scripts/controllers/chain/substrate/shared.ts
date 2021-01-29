@@ -345,8 +345,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           const { ss58Format, tokenDecimals, tokenSymbol } = chainProps;
           this.registry.setChainProperties(this.createType('ChainProperties', { ...chainProps, ss58Format }));
           this._ss58Format = +ss58Format.unwrapOr(42);
-          this._tokenDecimals = +tokenDecimals.unwrapOr(12);
-          this._tokenSymbol = tokenSymbol.unwrapOr(this.app.chain.currency).toString();
+          this._tokenDecimals = +tokenDecimals.unwrapOr(12)[0];
+          this._tokenSymbol = '' + tokenSymbol.unwrapOr(this.app.chain.currency)[0];
         }
 
         this._totalbalance = this.coins(totalbalance);
