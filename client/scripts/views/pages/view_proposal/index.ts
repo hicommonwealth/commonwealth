@@ -475,6 +475,7 @@ const ViewProposalPage: m.Component<{
   viewCount: number,
   proposal: AnyProposal | OffchainThread,
   threadFetched,
+  threadFetchFailed,
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -502,6 +503,10 @@ const ViewProposalPage: m.Component<{
     const proposalId = identifier.split('-')[0];
     const proposalType = type;
 
+    if (vnode.state.threadFetchFailed) {
+      return m(PageNotFound, { title: headerTitle });
+    }
+
     // load app controller
     if (!app.threads.initialized) {
       return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
@@ -522,13 +527,15 @@ const ViewProposalPage: m.Component<{
               m.redraw();
             }).catch((err) => {
               notifyError('Thread not found');
-              return m(PageNotFound);
+              vnode.state.threadFetchFailed = true;
             });
             vnode.state.threadFetched = true;
           }
           return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
         } else {
-          if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
+          if (!app.chain.loaded) {
+            return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
+          }
           // check if module is still initializing
           const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
           if (!c.disabled && !c.initialized) {
