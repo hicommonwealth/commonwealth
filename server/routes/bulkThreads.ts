@@ -1,14 +1,14 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
-import { QueryTypes, Sequelize } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 
-const Op = Sequelize.Op;
 const log = factory.getLogger(formatFilename(__filename));
 
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
 const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
+  const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
   const { cutoff_date, topic_id } = req.query;
   // Threads

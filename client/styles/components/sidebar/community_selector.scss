@@ -1,14 +1,5 @@
 @import 'client/styles/shared';
 
-.CommunityLabel {
-    .visible-sm {
-        display: none;
-        @include sm-max {
-            display: block;
-        }
-    }
-}
-
 .CommunitySelector {
     .cui-button {
         height: 38px;
@@ -27,13 +18,6 @@
         @include sm-max {
             display: block;
         }
-    }
-    .title-selector .ChainIcon {
-        position: relative;
-        top: 2px;
-    }
-    .title-selector .CommunityIcon .community-icon span {
-        font-size: 12px;
     }
 }
 

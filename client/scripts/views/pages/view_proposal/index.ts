@@ -62,7 +62,6 @@ const ProposalHeader: m.Component<{
   saving: boolean;
   quillEditorState: any;
   currentText: any;
-  updatedTitle: string;
   topicEditorIsOpen: boolean;
   editPermissionsIsOpen: boolean;
 }> = {

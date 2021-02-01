@@ -10,6 +10,7 @@ import { formatCoin } from 'adapters/currency';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase, ChainNetwork } from 'models';
+
 import Edgeware from 'controllers/chain/edgeware/main';
 import {
   convictionToWeight, convictionToLocktime, convictions
