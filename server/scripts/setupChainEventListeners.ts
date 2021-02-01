@@ -164,7 +164,7 @@ const setupChainEventListeners = async (
           handlers:handlersEdgeware,
           skipCatchup,
           archival:true,
-          startBlock,
+          // startBlock,
           discoverReconnectRange: () => discoverReconnectRange(models, ARCHIVAL_CHAIN),
           api,
         });
@@ -191,7 +191,7 @@ const setupChainEventListeners = async (
         handlers,
         skipCatchup,
         archival:false,
-        startBlock,
+        // startBlock,
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
       });
