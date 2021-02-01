@@ -306,7 +306,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // settings
   // TODO: Change to POST /userSetting
   router.post('/writeUserSetting', passport.authenticate('jwt', { session: false }),
-              writeUserSetting.bind(this, models));
+    writeUserSetting.bind(this, models));
 
   // send feedback button
   // TODO: Change to POST /feedback
@@ -316,6 +316,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // edgeware
   router.get('/stats/edgeware/lockdrop/events', edgewareLockdropEvents.bind(this, models));
   router.get('/stats/edgeware/lockdrop/balances', edgewareLockdropBalances.bind(this, models));
+
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));

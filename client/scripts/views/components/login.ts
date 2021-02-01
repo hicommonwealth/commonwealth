@@ -2,7 +2,7 @@ import 'components/login.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, Input, Form, FormGroup, Checkbox } from 'construct-ui';
+import { Button, Input, Form, FormGroup } from 'construct-ui';
 import { Magic } from 'magic-sdk';
 import app from 'state';
 import { initAppState } from 'app';
@@ -15,24 +15,14 @@ const Login: m.Component<{}, {
   failure: boolean;
   error: Error | string;
   forceRegularLogin: boolean; // show regular login form from NEAR page
-  usingMagic: boolean;
+
 }> = {
   view: (vnode) => {
-    const usingMagic = vnode.state.usingMagic;
     return m('.Login', {
       onclick: (e) => {
         e.stopPropagation();
       }
     }, [
-      m(Checkbox, {
-        checked: !!usingMagic,
-        size: 'lg',
-        onchange: async (e) => {
-          e.preventDefault();
-          vnode.state.usingMagic = !usingMagic;
-          m.redraw();
-        }
-      }, 'Use Magic Link'),
       m(Form, { gutter: 10 }, [
         m(FormGroup, { span: 9 }, [
           m(Input, {
@@ -52,6 +42,8 @@ const Login: m.Component<{}, {
           m(Button, {
             intent: 'primary',
             fluid: true,
+            // must be inside a chain/community in order to use magic login
+            // TODO: tell the user this somehow
             disabled: vnode.state.disabled,
             rounded: true,
             type: 'submit',
@@ -65,10 +57,19 @@ const Login: m.Component<{}, {
               vnode.state.disabled = true;
               vnode.state.success = false;
               vnode.state.failure = false;
-              // TODO: pass in ETH config
-              let query: JQuery.jqXHR;
-              if (usingMagic) {
-                try {
+
+              // attempt legacy login first -- will bounce if we need to use magic instead
+              try {
+                const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
+                  'chain': app.activeChainId(),
+                  'community': app.activeCommunityId(),
+                  email,
+                  path,
+                });
+                console.log(legacyResponse);
+
+                // use magic if legacy response tells us to do so
+                if (legacyResponse.status === 'Success' && legacyResponse.result.shouldUseMagic) {
                   const magic = new Magic('pk_test_436D33AFC319E080');
                   const didToken = await magic.auth.loginWithMagicLink({ email });
                   const response = await $.post({
@@ -79,46 +80,45 @@ const Login: m.Component<{}, {
                     xhrFields: {
                       withCredentials: true
                     },
+                    data: {
+                      // send chain/community to request
+                      'chain': app.activeChainId(),
+                      'community': app.activeCommunityId(),
+                    },
                   });
                   console.log(response);
                   if (response.status === 'Success') {
-                    // if success, move immediately to next login step -- do not wait for user
-                    // TODO: verify the address
-
-                    // log in as the new user
-                    // TODO: make this not just redirect to ethereum
-                    const chain = response.result.Addresses[0].chain;
+                    // do not redirect -- just close modal
                     $('.LoginModal').trigger('modalforceexit');
+
+                    // log in as the new user (assume all verification done server-side)
                     await initAppState(false);
-                    await updateActiveAddresses(chain);
-                    m.route.set(`/${chain}`);
+                    if (app.community) {
+                      await updateActiveAddresses(undefined);
+                    } else if (app.chain) {
+                      const c = app.user.selectedNode
+                        ? app.user.selectedNode.chain
+                        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+                      await updateActiveAddresses(c);
+                    }
                   } else {
                     vnode.state.failure = true;
                     vnode.state.error = response.message;
                   }
-                } catch (err) {
-                  vnode.state.disabled = false;
+                } else if (legacyResponse.status === 'Success') {
+                  // successfully kicked off a legacy-style login
+                  vnode.state.success = true;
+                } else {
                   vnode.state.failure = true;
-                  vnode.state.error = (err && err.responseJSON && err.responseJSON.error) || err.statusText;
-                  m.redraw();
+                  vnode.state.error = legacyResponse.message;
                 }
-              } else {
-                try {
-                  const response = await $.post(`${app.serverUrl()}/login`, { email, path });
-                  vnode.state.disabled = false;
-                  if (response.status === 'Success') {
-                    vnode.state.success = true;
-                  } else {
-                    vnode.state.failure = true;
-                    vnode.state.error = response.message;
-                  }
-                  m.redraw();
-                } catch (err) {
-                  vnode.state.disabled = false;
-                  vnode.state.failure = true;
-                  vnode.state.error = (err && err.responseJSON && err.responseJSON.error) || err.statusText;
-                  m.redraw();
-                }
+                vnode.state.disabled = false;
+                m.redraw();
+              } catch (err) {
+                vnode.state.disabled = false;
+                vnode.state.failure = true;
+                vnode.state.error = (err && err.responseJSON && err.responseJSON.error) || err.statusText;
+                m.redraw();
               }
             },
             label: 'Go',

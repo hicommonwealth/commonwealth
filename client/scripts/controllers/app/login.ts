@@ -158,7 +158,7 @@ export function updateActiveUser(data) {
     app.user.setEmailVerified(data.emailVerified);
     app.user.setJWT(data.jwt);
 
-    app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype)));
+    app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic)));
     app.user.setSocialAccounts(data.socialAccounts.map((sa) => new SocialAccount(sa.provider, sa.provider_username)));
 
     app.user.setSiteAdmin(data.isAdmin);

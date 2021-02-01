@@ -3,8 +3,8 @@ import passportGithub from 'passport-github';
 import passportJWT from 'passport-jwt';
 import { Request } from 'express';
 
-import { Magic } from '@magic-sdk/admin';
-import { Strategy as MagicStrategy, StrategyOptionsWithReq } from 'passport-magic';
+import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
+import { Strategy as MagicStrategy } from 'passport-magic';
 
 import { sequelize } from './database';
 import { factory, formatFilename } from '../shared/logging';
@@ -12,9 +12,10 @@ const log = factory.getLogger(formatFilename(__filename));
 
 
 import {
-  JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, DEFAULT_MAGIC_CHAIN,
+  JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, MAGIC_SUPPORTED_CHAINS
 } from './config';
 import { NotificationCategories } from '../shared/types';
+import lookupCommunityIsVisibleToUser from './util/lookupCommunityIsVisibleToUser';
 
 const GithubStrategy = passportGithub.Strategy;
 const JWTStrategy = passportJWT.Strategy;
@@ -48,9 +49,27 @@ function setupPassport(models) {
     // TODO: verify we are in a community that supports magic login
     const magic = new Magic(MAGIC_API_KEY);
     passport.use(new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
-      const currentUser = req.user;
-      // TODO: verify the metadata fetch is successful?
-      const userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+      // determine login location
+      if (!req.body.community && !req.body.chain) {
+        return cb(new Error('No Community or Chain found!'));
+      }
+      const [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, cb);
+      const registrationChain: string = chain ? chain.id : community.default_chain;
+
+      // unsupported chain -- client should send through old email flow
+      if (!registrationChain || !MAGIC_SUPPORTED_CHAINS.includes(registrationChain)) {
+        return cb(new Error('Unsupported magic chain.'));
+      }
+
+      // fetch user data from magic backend
+      let userMetadata: MagicUserMetadata;
+      try {
+        userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+      } catch (e) {
+        return cb(new Error('Magic fetch failed.'));
+      }
+
+      // check if this is a new signup or a login
       const existingUser = await models.User.findOne({
         where: {
           email: userMetadata.email,
@@ -74,7 +93,7 @@ function setupPassport(models) {
           // TODO: use non-default chain in certain cases?
           const newAddress = await models.Address.create({
             address: userMetadata.publicAddress,
-            chain: DEFAULT_MAGIC_CHAIN,
+            chain: registrationChain,
             verification_token: 'MAGIC',
             verification_token_expires: null,
             verified: new Date(), // trust addresses from magic
@@ -83,9 +102,13 @@ function setupPassport(models) {
             is_magic: true,
           }, { transaction: t });
 
-          const newRole = await models.Role.create({
+          const newRole = await models.Role.create(req.body.community ? {
             address_id: newAddress.id,
-            chain_id: DEFAULT_MAGIC_CHAIN,
+            offchain_community_id: req.body.community,
+            permission: 'member',
+          } : {
+            address_id: newAddress.id,
+            chain_id: req.body.chain,
             permission: 'member',
           }, { transaction: t });
 

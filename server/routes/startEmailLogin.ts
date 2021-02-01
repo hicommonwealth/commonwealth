@@ -1,8 +1,11 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
-import { SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES } from '../config';
+import {
+  SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES, MAGIC_SUPPORTED_CHAINS
+} from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));
@@ -11,6 +14,7 @@ export const Errors = {
   AlreadyLoggedIn: 'Already logged in',
   NoEmail: 'Missing email',
   InvalidEmail: 'Invalid email',
+  ChainOrCommunityRequired: 'Must be within existing chain or community to register',
 };
 
 const startEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -25,6 +29,27 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.NoEmail));
   } else if (!validEmailRegex.test(email)) {
     return next(new Error(Errors.InvalidEmail));
+  }
+
+  const previousUser = await models.User.findOne({
+    where: {
+      email,
+    },
+  });
+
+  // check whether to enforce magic.link registration instead
+  // 1. user should not already exist
+  // 2. chain or community default chain should be "supported"
+  const [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, (err) => {
+    log.warn(`Could not look up chain/community for login email ${email}: ${err.message}`);
+    return [ null, null ];
+  });
+  const registrationChain: string = chain ? chain.id : community ? community.default_chain : null;
+  if (!previousUser && registrationChain && MAGIC_SUPPORTED_CHAINS.includes(registrationChain)) {
+    return res.json({ status: 'Success', result: { shouldUseMagic: true } });
+  }
+  if (!previousUser && !registrationChain) {
+    return res.status(500).json({ error: Errors.ChainOrCommunityRequired });
   }
 
   // ensure no more than 3 tokens have been created in the last 5 minutes
@@ -43,12 +68,6 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
         + `Check your spam folder, or wait ${LOGIN_RATE_LIMIT_MINS} minutes to try again.`
     });
   }
-
-  const previousUser = await models.User.findOne({
-    where: {
-      email,
-    },
-  });
 
   // create and email the token
   const path = req.body.path;

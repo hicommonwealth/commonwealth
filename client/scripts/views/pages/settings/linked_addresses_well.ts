@@ -70,7 +70,7 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
             }
           },
           rounded: true,
-          disabled: vnode.state.removing,
+          disabled: vnode.state.removing || app.user.addresses.some((a) => a.isMagic),
           loading: vnode.state.removing,
           label: 'Remove',
         }),
