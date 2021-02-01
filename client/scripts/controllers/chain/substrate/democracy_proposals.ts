@@ -112,7 +112,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
             api.query.democracy.nextExternal,
           ]).subscribe(([lastTabledWasExternal, nextExternal]: [ bool, Option<NextExternal> ]) => {
             this._lastTabledWasExternal = lastTabledWasExternal.valueOf();
-            this._nextExternal = nextExternal.unwrapOr(null)[0];
+            this._nextExternal = nextExternal.unwrapOr([ null ])[0];
             externalsResolve();
           });
         });

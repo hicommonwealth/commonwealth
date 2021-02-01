@@ -185,7 +185,7 @@ class SubstrateIdentities implements StorageModule {
         this._registrarSubscription = this._Chain.query(
           (apiRx: ApiRx) => apiRx.query.identity.registrars()
         ).subscribe((rs: Vec<Option<RegistrarInfo>>) => {
-          this._registrars = rs.map((r) => r.unwrapOr(null)[0]);
+          this._registrars = rs.map((r) => r.unwrapOr([ null ])[0]);
           if (!this._initialized) {
             this._initialized = true;
             this._initializing = false;
