@@ -1,7 +1,5 @@
 @import 'client/styles/shared';
 
-$discussion-meta-padding: 18px;
-
 .DiscussionRow {
     .row-left {
         .row-header {
@@ -27,7 +25,7 @@ $discussion-meta-padding: 18px;
             }
             a.proposal-topic {
                 @include proposal-topic-inline;
-                margin-right: $discussion-meta-padding;
+                margin-right: 16px;
                 color: $text-color-light;
                 span.proposal-topic-icon {
                     display: inline-block;
@@ -42,9 +40,9 @@ $discussion-meta-padding: 18px;
             .mobile-comment-count {
                 display: none;
                 color: $text-color-light;
-                margin-left: 12px;
+                margin-left: 14px;
                 @include xs-max {
-                    display: block;
+                    display: inline;
                 }
                 .cui-icon svg {
                     position: relative;
@@ -69,7 +67,7 @@ $discussion-meta-padding: 18px;
                 font-size: 17px;
             }
             > .User {
-                display: flex;
+                display: inline-flex;
                 > .role-icon {
                     position: relative;
                     top: -1px;
@@ -87,15 +85,8 @@ $discussion-meta-padding: 18px;
                     color: $primary-bg-color;
                 }
             }
-            .row-excerpt {
-                color: $text-color-light;
-                max-width: calc(44vw - 220px);
-                @include sm-max {
-                    max-width: calc(44vw);
-                }
-                @include xs-max {
-                    max-width: calc(100vw - 120px);
-                }
+            > .created-at {
+                margin-right: 14px;
             }
             .row-excerpt {
                 color: $text-color-light;
@@ -112,7 +103,12 @@ $discussion-meta-padding: 18px;
     .row-right {
         .discussion-row-menu {
             width: 28px;
-            padding-top: 3px;
+            position: relative;
+            top: -2px;
+            svg {
+                position: relative;
+                top: 1px;
+            }
         }
     }
 }

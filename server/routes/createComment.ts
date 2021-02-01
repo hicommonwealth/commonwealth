@@ -8,6 +8,7 @@ import proposalIdToEntity from '../util/proposalIdToEntity';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
+import moment from 'moment';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -74,15 +75,18 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   }
 
   // New comments get an empty version history initialized, which is passed
-  // the comment's first version, formatted on the frontend with timestamps
-  const versionHistory = [];
-  versionHistory.push(req.body.versionHistory);
+  // the comment's first version, formatted on the backend with timestamps
+  const firstVersion = {
+    timestamp: moment(),
+    body: decodeURIComponent(req.body.text)
+  };
+  const version_history : string[] = [ JSON.stringify(firstVersion) ];
   const commentContent = {
     root_id,
     child_comments: [],
     text,
     plaintext,
-    version_history: versionHistory,
+    version_history,
     address_id: author.id,
     chain: null,
     community: null,
@@ -112,7 +116,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       }
     });
     const arr = parentComment.child_comments;
-    arr.push(Number(comment.id));
+    arr.push(+comment.id);
     parentComment.child_comments = arr;
     await parentComment.save();
   }
@@ -244,7 +248,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       root_id: id,
       root_title,
       root_type: prefix,
-      comment_id: Number(finalComment.id),
+      comment_id: +finalComment.id,
       comment_text: finalComment.text,
       chain_id: finalComment.chain,
       community_id: finalComment.community,
@@ -272,12 +276,12 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       `comment-${parent_id}`,
       {
         created_at: new Date(),
-        root_id: Number(id),
+        root_id: +id,
         root_title,
         root_type: prefix,
-        comment_id: Number(finalComment.id),
+        comment_id: +finalComment.id,
         comment_text: finalComment.text,
-        parent_comment_id: Number(parent_id),
+        parent_comment_id: +parent_id,
         parent_comment_text: parentComment.text,
         chain_id: finalComment.chain,
         community_id: finalComment.community,
@@ -320,10 +324,10 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id: Number(id),
+          root_id: +id,
           root_title,
           root_type: prefix,
-          comment_id: Number(finalComment.id),
+          comment_id: +finalComment.id,
           comment_text: finalComment.text,
           chain_id: finalComment.chain,
           community_id: finalComment.community,

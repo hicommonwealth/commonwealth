@@ -357,7 +357,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           this._tokenSymbol = tokenSymbol.unwrapOr(this.app.chain.currency).toString();
 
           const DEFAULT_DECIMALS = this.registry.createType('u32', 15);
-
           formatBalance.setDefaults({
             decimals: tokenDecimals.unwrapOr(DEFAULT_DECIMALS).toNumber(),
             unit: tokenSymbol.unwrapOr(undefined)?.toString()

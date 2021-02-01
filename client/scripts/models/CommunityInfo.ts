@@ -9,9 +9,10 @@ interface CommunityData {
   iconUrl: string,
   description: string,
   website: string,
-  chat: string,
-  telegram: string,
-  github: string,
+  discord: string,
+  element: string,
+  telegram: string;
+  github: string;
   visible: boolean;
   invitesEnabled: boolean,
   privacyEnabled: boolean,
@@ -22,8 +23,9 @@ class CommunityInfo {
   public iconUrl: string;
   public name: string;
   public description: string;
-  public chat: string;
   public website: string;
+  public discord: string;
+  public element: string;
   public telegram: string;
   public github: string;
   public readonly defaultChain: ChainInfo;
@@ -37,7 +39,7 @@ class CommunityInfo {
   public members: RoleInfo[];
 
   constructor(
-    id, name, description, iconUrl, website, chat, telegram, github, defaultChain,
+    id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain,
     visible, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
@@ -45,7 +47,8 @@ class CommunityInfo {
     this.description = description;
     this.iconUrl = iconUrl;
     this.website = website;
-    this.chat = chat;
+    this.discord = discord;
+    this.element = element;
     this.telegram = telegram;
     this.github = github;
     this.defaultChain = defaultChain;
@@ -65,7 +68,8 @@ class CommunityInfo {
       json.description,
       json.iconUrl,
       json.website,
-      json.chat,
+      json.discord,
+      json.element,
       json.telegram,
       json.github,
       json.default_chain,
@@ -133,7 +137,8 @@ class CommunityInfo {
     iconUrl,
     privacyEnabled,
     website,
-    chat,
+    discord,
+    element,
     telegram,
     github,
   }) {
@@ -144,7 +149,8 @@ class CommunityInfo {
       'description': description,
       'iconUrl': iconUrl,
       'website': website,
-      'chat': chat,
+      'discord': discord,
+      'element': element,
       'telegram': telegram,
       'github': github,
       'privacy': privacyEnabled,
@@ -156,7 +162,8 @@ class CommunityInfo {
     this.description = updatedCommunity.description;
     this.iconUrl = updatedCommunity.iconUrl;
     this.website = updatedCommunity.website;
-    this.chat = updatedCommunity.chat;
+    this.discord = updatedCommunity.discord;
+    this.element = updatedCommunity.element;
     this.telegram = updatedCommunity.telegram;
     this.github = updatedCommunity.github;
     this.privacyEnabled = updatedCommunity.privacyEnabled;

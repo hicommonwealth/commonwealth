@@ -10,6 +10,9 @@
         min-height: calc(100vh - 150px);
         max-width: $layout-max-width;
         padding: 0 $layout-padding;
+        @include xs-max {
+            padding: 0 $layout-padding-xs;
+        }
     }
     .sublayout-sidebar-col {
         flex: 1;
