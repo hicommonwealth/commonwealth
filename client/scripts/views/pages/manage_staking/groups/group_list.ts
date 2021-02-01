@@ -1,14 +1,15 @@
 import m from 'mithril';
+import { from } from 'rxjs';
+import BN from 'bn.js';
+import { Spinner, Tooltip, Grid, Col, CustomSelect, ListItem, Icon, Icons, IOption } from 'construct-ui';
+
 import app from 'state';
 import { makeDynamicComponent } from 'models/mithril';
 import { ChainBase } from 'models';
+
 import Substrate from 'controllers/chain/substrate/main';
 import { IValidators } from 'controllers/chain/substrate/account';
 import { ICommissionInfo, GroupValidator } from 'controllers/chain/substrate/staking';
-import { from } from 'rxjs';
-import Spinner from 'views/pages/spinner';
-import BN from 'bn.js';
-import { Tooltip, Grid, Col, CustomSelect, ListItem, Icon, Icons, IOption } from 'construct-ui';
 import User from 'views/components/widgets/user';
 import NewGroup from 'views/pages/manage_staking/groups/new_group';
 import Identity from '../../validators/substrate/identity';
@@ -53,7 +54,7 @@ const StakeList = makeDynamicComponent<StakeListAttrs, IStakeListState>({
     const { validators, groups, apr } = vnode.state.dynamic;
 
     if (!validators || !groups || !apr)
-      return m(Spinner);
+      return m(Spinner, { active: true });
 
     return [m('div.groups_window',
       groups.map((group) => {

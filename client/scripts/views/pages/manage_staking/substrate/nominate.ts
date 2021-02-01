@@ -1,13 +1,14 @@
 import m from 'mithril';
+import { pull, pullAll, cloneDeep } from 'lodash';
+import { Col, Grid, Icon, Icons, PopoverMenu, MenuItem, Spinner } from 'construct-ui';
+
 import app from 'state';
 import { ChainBase } from 'models';
-import Spinner from 'views/pages/spinner';
-import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
+
+import Substrate from 'controllers/chain/substrate/main';
 import { GroupValidator } from 'controllers/chain/substrate/staking';
-import { Col, Grid, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
 import User from 'views/components/widgets/user';
-import { pull, pullAll, cloneDeep } from 'lodash';
 
 interface NominateState { dynamic: {
   validators: string[]
@@ -80,7 +81,7 @@ const Nominate = makeDynamicComponent<NominateAttrs, NominateState>({
     const { validators } = vnode.state.dynamic;
 
     if (!validators || model.isLoading)
-      return m(Spinner);
+      return m(Spinner, { active: true });
 
     return m('.Nominate', [
       m('div.center-lg',

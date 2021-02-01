@@ -1,13 +1,14 @@
 import $ from 'jquery';
 import m from 'mithril';
+import { Spinner, Tooltip, Input, Checkbox, Intent } from 'construct-ui';
+
 import app from 'state';
-import Spinner from 'views/pages/spinner';
 import { makeDynamicComponent } from 'models/mithril';
-import { Tooltip, Input, Checkbox, Intent } from 'construct-ui';
 import { ChainBase } from 'models';
+
+import { formatCoin } from 'adapters/currency';
 import Substrate from 'controllers/chain/substrate/main';
 import { IValidators } from 'controllers/chain/substrate/account';
-import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
 import Identity from '../../validators/substrate/identity';
 
@@ -88,7 +89,7 @@ const NewGroup = makeDynamicComponent<NewGroupAttrs, NewGroupState>({
         m('.compact-modal-title.center-lg', [
           m('h3', 'New Group')
         ]),
-        m(Spinner)
+        m(Spinner, { active: true })
       ]);
 
     return m('.NewGroup.manage-staking', [
