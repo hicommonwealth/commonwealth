@@ -42,7 +42,7 @@ const PinnedListing: m.Component<IPinnedListingAttrs, IPinnedListingState> = {
     }
     return m('.WeeklyDiscussionListing', [
       m(threadGroup, proposals.map((proposal) => {
-        return m(DiscussionRow, { proposal, showExcerpt: true });
+        return m(DiscussionRow, { proposal });
       }))
     ]);
   },
