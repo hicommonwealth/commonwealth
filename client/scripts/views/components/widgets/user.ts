@@ -33,7 +33,7 @@ const User: m.Component<{
     const showAvatar = !hideAvatar;
     if (!user) return;
 
-    let account: Account<any>;
+    let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
     const addrShort = formatAddressShort(user.address, typeof user.chain === 'string' ? user.chain : user.chain?.id);
@@ -225,7 +225,7 @@ export const UserBlock: m.Component<{
         ]),
       ]),
       m('.user-block-right', [
-        m('.user-block-selected', selected ? m(Icon, { name: Icons.CHECK }) : ''), // __TODO__ ADD CURRENT CHAIN NAME
+        m('.user-block-selected', selected ? m(Icon, { name: Icons.CHECK }) : ''),
       ]),
     ]);
   }
