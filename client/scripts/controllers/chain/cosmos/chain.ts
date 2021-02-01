@@ -159,11 +159,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
               timestamp: moment(txObj.timestamp),
               hash: '--', // TODO: fetch the hash value of the block rather than the tx
             });
-          })
-            .catch((err) => {
-              console.error(err);
-              subject.next({ status: TransactionStatus.Error, err: err.message });
-            });
+          }).catch((err) => {
+            console.error(err);
+            subject.next({ status: TransactionStatus.Error, err: err.message });
+          });
           return subject.asObservable();
         },
       }
