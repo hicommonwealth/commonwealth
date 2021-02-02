@@ -1,4 +1,4 @@
-(global as any).window = {};
+(global as any).window = { location: { href: '/' } };
 
 import * as Sequelize from 'sequelize';
 import crypto from 'crypto';
