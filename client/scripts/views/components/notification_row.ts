@@ -1,6 +1,6 @@
 import 'components/sidebar/notification_row.scss';
 
-import { Icon, Icons } from 'construct-ui';
+import { Icon, Icons, Tooltip } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment-twitter';
@@ -320,7 +320,7 @@ const NotificationRow: m.Component<{
         pageJump
       } = getBatchNotificationFields(category, notificationData);
       return m('li.NotificationRow', {
-        class: notifications[0].isRead ? '' : 'unread',
+        class: notification.isRead ? '' : 'unread',
         key: notification.id,
         id: notification.id,
         onclick: async () => {
@@ -351,7 +351,16 @@ const NotificationRow: m.Component<{
             && m('.comment-body-excerpt', notificationBody),
           m('.comment-body-bottom-wrap', [
             m('.comment-body-created', createdAt.twitterShort()),
-            m('.comment-body-pip')
+            !notification.isRead && m(Tooltip, {
+              content: m('', 'Mark as read'),
+              trigger: m('.comment-body-pip', {
+                onclick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  app.user.notifications.markAsRead(notifications);
+                }
+              })
+            })
           ])
         ]),
       ]);
