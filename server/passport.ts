@@ -87,12 +87,12 @@ function setupPassport(models) {
             email: userMetadata.email,
             emailVerified: true,
             magicIssuer: userMetadata.issuer,
-            lastLoginAt: user.claim.iat,
+            lastMagicLoginAt: user.claim.iat,
           }, { transaction: t });
 
           // TODO: use non-default chain in certain cases?
           const newAddress = await models.Address.create({
-            address: userMetadata.publicAddress,
+            address: userMetadata.publicAddress.toLowerCase(), // ensure all eth addresses are lowercase
             chain: registrationChain,
             verification_token: 'MAGIC',
             verification_token_expires: null,
@@ -149,7 +149,7 @@ function setupPassport(models) {
             message: `Replay attack detected for user ${user.issuer}}.`,
           });
         }
-        existingUser.lastLoginAt = user.claim.iat;
+        existingUser.lastMagicLoginAt = user.claim.iat;
         await existingUser.save();
         console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
         return cb(null, existingUser);

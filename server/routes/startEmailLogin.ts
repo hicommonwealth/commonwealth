@@ -45,10 +45,12 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
     return [ null, null ];
   });
   const registrationChain: string = chain ? chain.id : community ? community.default_chain : null;
-  if (!previousUser && registrationChain && MAGIC_SUPPORTED_CHAINS.includes(registrationChain)) {
+  const isRegistration = !previousUser;
+  const isMagicUser = previousUser && !!previousUser.lastMagicLoginAt;
+  if ((isRegistration || isMagicUser) && registrationChain && MAGIC_SUPPORTED_CHAINS.includes(registrationChain)) {
     return res.json({ status: 'Success', result: { shouldUseMagic: true } });
   }
-  if (!previousUser && !registrationChain) {
+  if ((isRegistration || isMagicUser) && !registrationChain) {
     return res.status(500).json({ error: Errors.ChainOrCommunityRequired });
   }
 
