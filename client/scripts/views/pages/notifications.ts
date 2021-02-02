@@ -688,7 +688,12 @@ const NotificationsPage: m.Component<{}, {
     const { communities, subscriptions } = vnode.state;
     const { selectedCommunity, selectedCommunityId, selectableCommunityIds, allCommunityIds } = vnode.state;
     const chains = _.uniq(app.config.chains.getAll());
-    if (!app.loginStatusLoaded()) return m(PageLoading);
+    if (!app.loginStatusLoaded()) return m(PageLoading, {
+      title: [
+        'Notification Settings ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
+    });
     if (!app.isLoggedIn()) return m(PageError, {
       title: [
         'Notification Settings ',
@@ -696,7 +701,12 @@ const NotificationsPage: m.Component<{}, {
       ],
       message: 'This page requires you to be logged in.'
     });
-    if (subscriptions.length < 1) return m(PageLoading);
+    if (subscriptions.length < 1) return m(PageLoading, {
+      title: [
+        'Notification Settings ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
+    });
     return m(Sublayout, {
       class: 'NotificationsPage',
       title: [

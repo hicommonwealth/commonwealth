@@ -19,10 +19,9 @@ const PageNotFound: m.Component<{ title?: string, message?: string }> = {
       m('.page-not-found-container', [
         m(EmptyState, {
           class: 'PageNotFound',
-          icon: Icons.X_OCTAGON,
-          fill: false,
-          header: 'The page you were looking for could not be found.',
-          content: message || 'If it is not visible to the public, you may need to log in.'
+          icon: Icons.MINUS_CIRCLE,
+          header: 'Page not found',
+          content: message || 'This page may not be visible to the public. If so, you should log in.'
         }),
       ]),
     ]);

@@ -133,6 +133,10 @@ class NotificationsController {
     }
   }
 
+  public clearSubscriptions() {
+    this._subscriptions = [];
+  }
+
   public refresh() {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
