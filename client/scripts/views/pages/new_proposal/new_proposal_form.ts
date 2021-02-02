@@ -642,6 +642,7 @@ const NewProposalForm = {
             ]),
           ],
           hasMarlinFields && [
+            m('h2', 'New Marlin Proposal:'),
             m(FormGroup, [
               m(FormLabel, 'Proposal Targets'),
               m(Input, {
