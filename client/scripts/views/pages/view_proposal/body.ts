@@ -15,6 +15,7 @@ import {
   AnyProposal,
   Account,
   Profile,
+  AddressInfo
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
@@ -91,7 +92,21 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
         showAddressWithDisplayName: true,
       }),
       item instanceof OffchainThread && item.collaborators && item.collaborators.length > 0
-        && m('span.proposal-collaborators', ` and ${pluralize(item.collaborators?.length, 'other')}`),
+        && m('span.proposal-collaborators', [
+          ' and ',
+          m(Popover, {
+            inline: true,
+            interactionType: 'hover',
+            transitionDuration: 0,
+            hoverOpenDelay: 500,
+            closeOnContentClick: true,
+            class: 'proposal-collaborators-popover',
+            content: item.collaborators.map(({ address, chain }) => {
+              return m(User, { user: new AddressInfo(null, address, chain, null), linkify: true });
+            }),
+            trigger: m('a.proposal-collaborators', { href: '#' }, pluralize(item.collaborators?.length, 'other')),
+          }),
+        ]),
     ]);
   }
 };

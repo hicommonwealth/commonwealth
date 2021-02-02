@@ -10,8 +10,8 @@ import { Grid, Col, Icon, Icons } from 'construct-ui';
 interface IContentLeft {
   header: Vnode | Vnode[];
   subheader: Vnode | Vnode[];
-  subheader2?: Vnode | Vnode[];
   pinned?: boolean;
+  reaction?: Vnode | Vnode[];
 }
 
 const ListingRow: m.Component<{
@@ -31,13 +31,11 @@ const ListingRow: m.Component<{
     const initialOffset = 12 - rightColSpacing.reduce((t, n) => t + n);
     return m('.ListingRow', attrs, [
       m('.row-left', [
-        contentLeft.pinned && m('.pinned', [
-          m('span.icon-pin-outline'),
-        ]),
+        contentLeft.pinned ? m('.pinned', m('span.icon-pin-outline'))
+          : contentLeft.reaction ? m('.reaction', contentLeft.reaction) : '',
         m('.title-container', [
           m('.row-header', contentLeft.header),
           m('.row-subheader', contentLeft.subheader),
-          contentLeft.subheader2 && m('.row-subheader', contentLeft.subheader2),
         ]),
       ]),
       m('.row-right', [
