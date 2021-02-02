@@ -33,7 +33,7 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
 
   const rawQuery = `
   select p.*, v.state, v."lastUpdate", v."sessionKeys" , v."name"
-  from "Validator" v  
+  from "Validator" v
   left join (
     SELECT * ,ROW_NUMBER() OVER( PARTITION BY partitionTable.stash ORDER BY created_at DESC )
     FROM public."HistoricalValidatorStatistic" as partitionTable
@@ -86,7 +86,7 @@ const getGlobalStatistics = async (models, req: Request, res: Response, next: Ne
       totalStaked,
       offences,
       aprPercentage: apr / elected,
-      lastBlockNumber: result[0][0].block
+      lastBlockNumber: result[0] && result[0][0] && result[0][0].block
     }
   });
 };
