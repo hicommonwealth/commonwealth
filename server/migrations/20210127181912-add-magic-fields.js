@@ -18,6 +18,14 @@ module.exports = {
         { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
         { transaction: t },
       );
+
+      // change default community chains to ethereum
+      await queryInterface.bulkUpdate(
+        'OffchainCommunities',
+        { default_chain: 'ethereum' },
+        { default_chain: 'edgeware' },
+        { transaction: t },
+      );
     });
   },
 
@@ -26,6 +34,12 @@ module.exports = {
       await queryInterface.removeColumn('Users', 'magicIssuer', { transaction: t });
       await queryInterface.removeColumn('Users', 'lastMagicLoginAt', { transaction: t });
       await queryInterface.removeColumn('Addresses', 'is_magic', { transaction: t });
+      await queryInterface.bulkUpdate(
+        'OffchainCommunities',
+        { default_chain: 'edgeware' },
+        { default_chain: 'ethereum' },
+        { transaction: t },
+      );
     });
   }
 };

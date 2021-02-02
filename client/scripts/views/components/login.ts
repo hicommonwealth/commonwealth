@@ -66,10 +66,9 @@ const Login: m.Component<{}, {
                   email,
                   path,
                 });
-                console.log(legacyResponse);
 
                 // use magic if legacy response tells us to do so
-                if (legacyResponse.status === 'Success' && legacyResponse.result.shouldUseMagic) {
+                if (legacyResponse.status === 'Success' && legacyResponse.result?.shouldUseMagic) {
                   const magic = new Magic('pk_test_436D33AFC319E080');
                   const didToken = await magic.auth.loginWithMagicLink({ email });
                   const response = await $.post({
@@ -86,7 +85,6 @@ const Login: m.Component<{}, {
                       'community': app.activeCommunityId(),
                     },
                   });
-                  console.log(response);
                   if (response.status === 'Success') {
                     // do not redirect -- just close modal
                     $('.LoginModal').trigger('modalforceexit');
