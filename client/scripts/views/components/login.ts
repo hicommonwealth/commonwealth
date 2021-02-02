@@ -3,10 +3,8 @@ import 'components/login.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup } from 'construct-ui';
-import { Magic } from 'magic-sdk';
 import app from 'state';
-import { initAppState } from 'app';
-import { updateActiveAddresses } from 'controllers/app/login';
+import { loginWithMagicLink } from 'controllers/app/login';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 
 const Login: m.Component<{}, {
@@ -69,39 +67,13 @@ const Login: m.Component<{}, {
 
                 // use magic if legacy response tells us to do so
                 if (legacyResponse.status === 'Success' && legacyResponse.result?.shouldUseMagic) {
-                  const magic = new Magic('pk_test_436D33AFC319E080');
-                  const didToken = await magic.auth.loginWithMagicLink({ email });
-                  const response = await $.post({
-                    url: `${app.serverUrl()}/auth/magic`,
-                    headers: {
-                      Authorization: `Bearer ${didToken}`,
-                    },
-                    xhrFields: {
-                      withCredentials: true
-                    },
-                    data: {
-                      // send chain/community to request
-                      'chain': app.activeChainId(),
-                      'community': app.activeCommunityId(),
-                    },
-                  });
-                  if (response.status === 'Success') {
+                  try {
+                    await loginWithMagicLink(email);
                     // do not redirect -- just close modal
                     $('.LoginModal').trigger('modalforceexit');
-
-                    // log in as the new user (assume all verification done server-side)
-                    await initAppState(false);
-                    if (app.community) {
-                      await updateActiveAddresses(undefined);
-                    } else if (app.chain) {
-                      const c = app.user.selectedNode
-                        ? app.user.selectedNode.chain
-                        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
-                      await updateActiveAddresses(c);
-                    }
-                  } else {
+                  } catch (err) {
                     vnode.state.failure = true;
-                    vnode.state.error = response.message;
+                    vnode.state.error = err.message;
                   }
                 } else if (legacyResponse.status === 'Success') {
                   // successfully kicked off a legacy-style login
