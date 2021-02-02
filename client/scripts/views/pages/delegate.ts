@@ -33,7 +33,21 @@ const DelegateStats: m.Component<{ currentDelegate: string, }> = {
             ? m('.stats-tile-figure-minor', vnode.attrs.currentDelegate)
             : '--',
         ]),
+        m('.stats-tile', [
+          m('.stats-heading', 'Your address:'),
+          app.user.activeAccount.address
+            ? m('.stats-tile-figure-minor', app.user.activeAccount.address)
+            : '--',
+        ]),
       ]),
+      // m(Col, { span: { xs: 6, md: 3 } }, [
+      //   m('.stats-tile', [
+      //     m('.stats-heading', 'Your address:'),
+      //     app.user.activeAccount.address
+      //       ? m('.stats-tile-figure-minor', app.user.activeAccount.address)
+      //       : '--',
+      //   ]),
+      // ]),
     ]);
   }
 };
@@ -61,8 +75,9 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
       m(Form, { class: 'DelegateForm' }, [
         m(Grid, [
           m(Col, [
+            m('h2', 'Set up your delegation:'),
             m(FormGroup, [
-              m(FormLabel, `Address to Delegate to (your address is: ${app.user.activeAccount.address}):`),
+              m(FormLabel, 'Your delegate:'),
               m(Input, {
                 name: 'address',
                 placeholder: 'Paste address you want to delegate to',
