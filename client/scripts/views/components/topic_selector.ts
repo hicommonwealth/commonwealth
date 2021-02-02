@@ -12,17 +12,18 @@ const TopicSelector: m.Component<{
   updateFormData: Function;
 }, {
   error: string;
-  selectedTopic?: OffchainTopic;
 }> = {
   view: (vnode) => {
     const { defaultTopic, featuredTopics, tabindex, topics, updateFormData } = vnode.attrs;
+    let selectedTopic;
     if (defaultTopic === false) {
-      vnode.state.selectedTopic = undefined;
+      selectedTopic = undefined;
     } else if (defaultTopic && typeof defaultTopic === 'string') {
-      vnode.state.selectedTopic = topics.find((t) => t.name === defaultTopic);
+      selectedTopic = topics.find((t) => t.name === defaultTopic);
     } else if (defaultTopic && defaultTopic instanceof OffchainTopic) {
-      vnode.state.selectedTopic = defaultTopic;
+      selectedTopic = defaultTopic;
     }
+
     const itemRender = (topic) => {
       return m(ListItem, {
         class: featuredTopics.includes(topic) ? 'featured-topic' : 'other-topic',
@@ -30,7 +31,7 @@ const TopicSelector: m.Component<{
           m('span.proposal-topic-icon'),
           m('span.topic-name', topic.name),
         ],
-        selected: (vnode.state.selectedTopic as OffchainTopic)?.name === topic.name,
+        selected: (selectedTopic as OffchainTopic)?.name === topic.name,
       });
     };
 
@@ -39,13 +40,13 @@ const TopicSelector: m.Component<{
     };
 
     const oncreate = () => {
-      if (vnode.state.selectedTopic) {
-        updateFormData(vnode.state.selectedTopic.name, vnode.state.selectedTopic.id);
+      if (selectedTopic) {
+        updateFormData(selectedTopic.name, selectedTopic.id);
       }
     };
 
     const onSelect = (item: OffchainTopic) => {
-      vnode.state.selectedTopic = item;
+      selectedTopic = item;
       updateFormData(item.name, item.id);
     };
 
@@ -58,7 +59,7 @@ const TopicSelector: m.Component<{
       const newTopic = topic || (document.getElementsByClassName('autocomplete-topic-input')[0]
         .firstChild as HTMLInputElement).value;
       topics.push({ name: newTopic, id: null, description: '' });
-      setTimeout(() => { vnode.state.selectedTopic = newTopic; m.redraw(); }, 1);
+      setTimeout(() => { selectedTopic = newTopic; m.redraw(); }, 1);
       updateFormData(newTopic);
       if (!topic) manuallyClosePopover();
     };
@@ -96,15 +97,15 @@ const TopicSelector: m.Component<{
         class: 'topic-selection-drop-menu',
         compact: true,
         iconRight: Icons.CHEVRON_DOWN,
-        label: vnode.state.selectedTopic
+        label: selectedTopic
           ? [
             m('span.proposal-topic-icon'),
             m('span.topic-name', [
-              vnode.state.selectedTopic.name
+              selectedTopic.name
             ]),
           ]
           : '',
-        sublabel: vnode.state.selectedTopic ? '' : 'Select a topic',
+        sublabel: selectedTopic ? '' : 'Select a topic',
         tabindex
       }),
     });
