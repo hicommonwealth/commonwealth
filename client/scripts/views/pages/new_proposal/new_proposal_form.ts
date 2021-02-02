@@ -309,7 +309,7 @@ const NewProposalForm = {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
 
-        // TODO: Create Proposal via WebTx
+        // @TODO: Create Proposal via WebTx
       } else {
         mixpanel.track('Create Thread', {
           'Step No': 2,

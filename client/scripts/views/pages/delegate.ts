@@ -64,11 +64,8 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
             m(FormGroup, [
               m(FormLabel, `Address to Delegate to (your address is: ${app.user.activeAccount.address}):`),
               m(Input, {
-                options: {
-                  name: 'address',
-                  placeholder: 'Paste address you want to delegate to',
-                  defaultValue: 'hello',
-                },
+                name: 'address',
+                placeholder: 'Paste address you want to delegate to',
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.address = result;
@@ -77,11 +74,9 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
               }),
               m(FormLabel, 'Amount of MPOND to delegate:'),
               m(Input, {
-                options: {
-                  name: 'address',
-                  placeholder: '...',
-                  defaultValue: '',
-                },
+                name: 'amount',
+                placeholder: '10000',
+                defaultValue: '',
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.amount = result;
@@ -89,10 +84,11 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
                 }
               }),
             ]),
-            m(FormLabel, [
+            m(FormGroup, [
               m(Button, {
                 disabled: form.address === '' || loading,
                 intent: 'primary',
+                rounded: true,
                 label: 'Delegate!',
                 onclick: async (e) => {
                   e.preventDefault();
@@ -122,18 +118,23 @@ const DelegateForm: m.Component<{}, { form: IDelegateForm, loading: boolean, cur
 const DelegatePage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
-      if (app.chain?.failed) {
+      // chain load failed
+      if (app.chain && app.chain.failed) {
         return m(PageNotFound, {
           title: 'Wrong Ethereum Provider Network!',
           message: 'Change Metamask to point to Ropsten Testnet',
         });
       }
-      if (app.chain && [ChainNetwork.Marlin, ChainNetwork.MarlinTestnet].includes(app.chain?.network)) {
+      // wrong chain loaded
+      if (app.chain && app.chain.loaded
+          && [ChainNetwork.Marlin, ChainNetwork.MarlinTestnet].includes(app.chain.network)
+      ) {
         return m(PageNotFound, {
           title: 'Delegate Page',
           message: 'Delegate page for Marlin users only!'
         });
       }
+      // chain loading
       return m(PageLoading, {
         message: 'Connecting to chain (may take up to 10s)...',
         title: 'Delegate',
