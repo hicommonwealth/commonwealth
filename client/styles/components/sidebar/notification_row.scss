@@ -57,9 +57,25 @@
             text-overflow: ellipsis;
         }
     }
+    .comment-body-bottom-wrap {
+        display: flex;
+        justify-content: space-between;
+    }
     .comment-body-created {
         color: $text-color-medium;
         font-size: 15px;
         margin-top: 8px; // needed because .comment-body-excerpt may not be present
+    }
+    .comment-body-pip {
+        border-radius: 50%;
+        background: #434d5a;
+        border: none;
+        height: 10px;
+        width: 10px;
+        margin-top: 8px;
+    }
+    .comment-body-pip:hover {
+        border: 1px solid #434d5a;
+        background: white;
     }
 }

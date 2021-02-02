@@ -349,7 +349,10 @@ const NotificationRow: m.Component<{
           notificationBody
             && category !== `${NotificationCategories.NewReaction}`
             && m('.comment-body-excerpt', notificationBody),
-          m('.comment-body-created', createdAt.twitterShort()),
+          m('.comment-body-bottom-wrap', [
+            m('.comment-body-created', createdAt.twitterShort()),
+            m('.comment-body-pip')
+          ])
         ]),
       ]);
     }
