@@ -472,7 +472,7 @@ const api = constructFakeApi({
       title: 'title',
       contents: 'contents',
       vote_id: 101,
-    } as unknown as ProposalRecord),
+    } as any),
   voteRecords: async (vote_id) => +vote_id !== 101
     ? constructOption()
     : constructOption({
@@ -481,7 +481,7 @@ const api = constructFakeApi({
         vote_type: 'binary',
       },
       outcomes: [1, 2],
-    } as unknown as VoteRecord),
+    } as any),
   preimage: async (hash) => hash.toString() !== 'hash'
     ? undefined
     : {
