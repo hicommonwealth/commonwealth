@@ -56,8 +56,13 @@
                 }
             }
         }
-        > .UserBlock {
+        > .select-address-option-left {
             padding: 14px 16px 10px;
+            .magic-label {
+                font-size: 15px;
+                color: $text-color-light;
+                padding: 10px 0 0;
+            }
         }
     }
     .select-address-explanation {
