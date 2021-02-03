@@ -169,6 +169,7 @@ export async function Enrich(
             // for new blocks after 3139200
             nextSessionKeysOpt = await api.query.session.nextKeys.at(hash,key);
           }
+          
           const nextSessionKeys = nextSessionKeysOpt.isSome
           ? nextSessionKeysOpt.unwrap()
           : []
