@@ -121,9 +121,9 @@ export async function Enrich(
           : rawCurrentEra.unwrap();
         
         // get the nextElected Validators
-        const keys = api.query.staking.erasStakers ? 
-        await api.query.staking.erasStakers.keysAt(hash,currentEra) :
-        await api.query.staking.stakers.keysAt(hash, currentEra) ; 
+        const keys = api.query.staking.erasStakers
+          ? await api.query.staking.erasStakers.keysAt(hash,currentEra)
+          : await api.query.staking.stakers.keysAt(hash, currentEra) ; 
 
         const nextElected = keys.length ? keys.map((key) => key.args[1] as AccountId): validators['nextElected'];
         
