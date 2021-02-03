@@ -3,7 +3,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn(
-      'ChainEvents',
+      'ChainEntities',
       'title',
       {
         type: Sequelize.TEXT,
@@ -14,7 +14,7 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn(
-      'ChainEvents',
+      'ChainEntities',
       'title',
       {
         type: Sequelize.TEXT,
