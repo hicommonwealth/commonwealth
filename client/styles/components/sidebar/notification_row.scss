@@ -68,14 +68,14 @@
     }
     .comment-body-pip {
         border-radius: 50%;
-        background: #434d5a;
+        background: $background-color-dark-monochrome;
         border: none;
         height: 10px;
         width: 10px;
         margin-top: 8px;
     }
     .comment-body-pip:hover {
-        border: 1px solid #434d5a;
+        border: 1px solid $background-color-dark-monochrome;
         background: white;
     }
 }
