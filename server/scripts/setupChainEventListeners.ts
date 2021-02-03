@@ -5,9 +5,7 @@ import {
   SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
 
-// import { createApi, subscribeEvents } from '/home/myym/Desktop/Github/chain-events/src/substrate/subscribeFunc';
-
-import { spec as EdgewareSpec } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
@@ -154,17 +152,13 @@ const setupChainEventListeners = async (
         // run subscribeEvents with archival flag true, this will enforce it to
         // poll past blocks and process events starting from provided blockNumber
         const nodeUrl = constructSubstrateUrl(ARCHIVAL_NODE_URL);
-        const api = await SubstrateEvents.createApi(
-          nodeUrl,
-          node.chain.includes('edgeware') ? EdgewareSpec : {},
-        );
+        const api = await SubstrateEvents.createApi(nodeUrl, spec);
 
         await SubstrateEvents.subscribeEvents({
           chain: node.chain,
           handlers:handlersEdgeware,
-          skipCatchup,
           archival:true,
-          // startBlock,
+          startBlock,
           discoverReconnectRange: () => discoverReconnectRange(models, ARCHIVAL_CHAIN),
           api,
         });
@@ -181,17 +175,12 @@ const setupChainEventListeners = async (
       }
 
       const nodeUrl = constructSubstrateUrl(node.url);
-      const api = await SubstrateEvents.createApi(
-        nodeUrl,
-        node.chain.includes('edgeware') ? EdgewareSpec : {},
-      );
+      const api = await SubstrateEvents.createApi(nodeUrl, spec);
 
       subscriber =  await SubstrateEvents.subscribeEvents({
         chain: node.chain,
         handlers,
         skipCatchup,
-        archival:false,
-        // startBlock,
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
       });
