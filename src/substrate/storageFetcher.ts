@@ -15,7 +15,6 @@ import {
 import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { isFunction } from '@polkadot/util';
-import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 
 import { CWEvent, IStorageFetcher } from '../interfaces';
 import {
@@ -321,18 +320,18 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     const proposalHashes = [...inactiveProposals, ...activeProposals, ...completedProposals].map(([ hash ]) => hash);
 
     // fetch records
-    const proposalRecordOpts: Array<Option<ProposalRecord>> = await this._api.queryMulti(
+    const proposalRecordOpts: Array<Option<any>> = await this._api.queryMulti(
       proposalHashes.map((hash) => [ this._api.query.signaling.proposalOf, hash ])
     );
-    const proposalRecords: Array<[ ProposalRecord, Hash ]> = _.zip(proposalRecordOpts, proposalHashes)
-      .filter(([ p ]: [ Option<ProposalRecord> ]) => p.isSome)
-      .map(([ p, hash ]: [ Option<ProposalRecord>, Hash ]) => [ p.unwrap(), hash ]);
-    const voteRecordOpts: Array<Option<VoteRecord>> = await this._api.queryMulti(
+    const proposalRecords: Array<[ any, Hash ]> = _.zip(proposalRecordOpts, proposalHashes)
+      .filter(([ p ]: [ Option<any> ]) => p.isSome)
+      .map(([ p, hash ]: [ Option<any>, Hash ]) => [ p.unwrap(), hash ]);
+    const voteRecordOpts: Array<Option<any>> = await this._api.queryMulti(
       proposalRecords.map(([ p ]) => [ this._api.query.voting.voteRecords, p.vote_id ])
     );
-    const allRecords: Array<[ Hash, ProposalRecord, VoteRecord ]> = _.zip(proposalRecords, voteRecordOpts)
-      .filter(([ [ record, hash ], voteOpt ]: [ [ ProposalRecord, Hash ], Option<VoteRecord> ]) => voteOpt.isSome)
-      .map(([ [ record, hash ], vote ]: [ [ ProposalRecord, Hash ], Option<VoteRecord> ]) => [
+    const allRecords: Array<[ Hash, any, any ]> = _.zip(proposalRecords, voteRecordOpts)
+      .filter(([ [ record, hash ], voteOpt ]: [ [ any, Hash ], Option<any> ]) => voteOpt.isSome)
+      .map(([ [ record, hash ], vote ]: [ [ any, Hash ], Option<any> ]) => [
         hash, record, vote.unwrap()
       ]);
 
