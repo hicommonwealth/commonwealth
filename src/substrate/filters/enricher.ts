@@ -115,10 +115,10 @@ export async function Enrich(
         // get the era of block
         const rawCurrentEra = await api.query.staking.currentEra.at(hash);
         const currentEra = rawCurrentEra.toRawType
-        ? rawCurrentEra.toRawType() === 'u32'
-          ? rawCurrentEra.toString() as unknown as EraIndex
-          : rawCurrentEra.unwrap()
-        : rawCurrentEra.unwrap();
+          ? rawCurrentEra.toRawType() === 'u32'
+            ? rawCurrentEra.toString() as unknown as EraIndex
+            : rawCurrentEra.unwrap()
+          : rawCurrentEra.unwrap();
         
         // get the nextElected Validators
         const keys = api.query.staking.erasStakers ? 
@@ -149,8 +149,8 @@ export async function Enrich(
 
           // eraValidatorPrefs does not return comission prior to 3139800
           const preference = api.query.staking.erasValidatorPrefs
-          ? await api.query.staking.erasValidatorPrefs.at(hash, currentEra,key)
-          : await api.query.staking.validators.at(hash, key);
+            ? await api.query.staking.erasValidatorPrefs.at(hash, currentEra,key)
+            : await api.query.staking.validators.at(hash, key);
 
           const commissionPer =  (Number)(preference.commission || new BN(0)) / 10_000_000;
 
@@ -170,8 +170,8 @@ export async function Enrich(
           }
           
           const nextSessionKeys = nextSessionKeysOpt.isSome
-          ? nextSessionKeysOpt.unwrap()
-          : []
+            ? nextSessionKeysOpt.unwrap()
+            : []
 
           validatorInfo[key] = {
             commissionPer,
