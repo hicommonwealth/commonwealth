@@ -67,14 +67,17 @@ const Login: m.Component<{}, {
                 });
 
                 if (legacyResponse.status === 'Success' && legacyResponse.result?.shouldUseMagic) {
-                  // use magic if legacy response tells us to do so
+                  // immediately log us into magic if legacy response tells us to do so
                   if (legacyResponse.result.shouldUseMagicImmediately) {
-                    await loginWithMagicLink(vnode.state.showMagicLoginPromptEmail);
+                    await loginWithMagicLink(email);
                     // do not redirect -- just close modal
                     $('.LoginModal').trigger('modalforceexit');
                     vnode.state.disabled = false;
                     m.redraw();
+                    return;
                   }
+
+                  // otherwise, prompt to choose between magic and legacy-style login
                   setTimeout(() => {
                     vnode.state.showMagicLoginPrompt = true;
                     vnode.state.showMagicLoginPromptEmail = $(e.target).closest('.Login').find('[name="email"]').val()
