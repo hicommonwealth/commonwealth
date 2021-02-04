@@ -21,7 +21,8 @@ const PageNotFound: m.Component<{ title?: string, message?: string }> = {
           class: 'PageNotFound',
           icon: Icons.MINUS_CIRCLE,
           header: 'Page not found',
-          content: message || 'This page may not be visible to the public. If so, you should log in.'
+          content: message
+            || 'This page may not be visible to the public. If it belongs to a private thread, try logging in.'
         }),
       ]),
     ]);

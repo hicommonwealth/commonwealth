@@ -57,9 +57,35 @@
             text-overflow: ellipsis;
         }
     }
-    .comment-body-created {
-        color: $text-color-medium;
+    .comment-body-bottom-wrap {
         font-size: 15px;
-        margin-top: 8px; // needed because .comment-body-excerpt may not be present
+        margin-top: 12px; // needed because .comment-body-excerpt may not be present
+    }
+    .comment-body-created {
+        display: inline;
+        color: $text-color-medium;
+    }
+    .comment-body-mark-as-read {
+        display: inline;
+        color: $text-color-medium;
+        margin-left: 8px;
+        .cui-spinner {
+            position: relative;
+            top: -1px;
+            .cui-spinner-icon {
+                border-color: transparent;
+                border-top-color: $background-color-dark-accent !important;
+                border-right-color: $background-color-dark-accent !important;
+            }
+        }
+    }
+    .comment-body-mark-as-read:hover {
+        color: $background-color-dark-accent;
+    }
+}
+
+.NotificationRowMarkAsRead {
+    .cui-popover-content {
+        padding: 15px 20px 10px;
     }
 }

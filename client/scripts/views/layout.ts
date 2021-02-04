@@ -40,8 +40,8 @@ export const Layout: m.Component<{
     if (app.loadingError) {
       return m('.Layout.mithril-app', [
         m(Sublayout, { errorLayout: [
-          m('p', `Application error: ${app.loadingError}`),
-          m('p', 'Please try again at another time'),
+          m('p', { style: 'color: #222' }, `Application error: ${app.loadingError}`),
+          m('p', { style: 'color: #222' }, 'Please try again at another time'),
         ] }),
         m(AppModals),
         m(AppToasts),
