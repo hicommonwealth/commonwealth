@@ -14,7 +14,7 @@
         margin-bottom: 10px;
     }
     .select-address-placeholder {
-        padding: 20px;
+        padding: 25px 0 20px;
         text-align: center;
         border: 1px solid $border-color-lightest;
         border-bottom: none;
@@ -56,8 +56,14 @@
                 }
             }
         }
-        > .UserBlock {
+        > .select-address-option-left {
             padding: 14px 16px 10px;
+            .magic-label {
+                font-size: 15px;
+                color: $text-color-light;
+                padding: 10px 0 0;
+                text-align: center;
+            }
         }
     }
     .select-address-explanation {
