@@ -48,8 +48,9 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
   const magicChain: string = chain ? chain.id : community ? community.default_chain : MAGIC_DEFAULT_CHAIN;
   const isNewRegistration = !previousUser;
   const isExistingMagicUser = previousUser && !!previousUser.lastMagicLoginAt;
-  if ((isNewRegistration || isExistingMagicUser) && magicChain && MAGIC_SUPPORTED_CHAINS.includes(magicChain)
-      && !req.body.forceEmailLogin) {
+  if (isExistingMagicUser // existing magic users should always use magic login, even if they're in the wrong community
+      || (isNewRegistration && magicChain && MAGIC_SUPPORTED_CHAINS.includes(magicChain)
+          && !req.body.forceEmailLogin)) {
     return res.json({
       status: 'Success',
       result: { shouldUseMagic: true, shouldUseMagicImmediately: !!isExistingMagicUser }
