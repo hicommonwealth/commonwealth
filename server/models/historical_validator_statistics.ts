@@ -1,5 +1,4 @@
 import * as Sequelize from 'sequelize';
-import { Validators } from '../../client/scripts/views/pages/validators/index';
 
 export interface HistoricalValidatorStatisticsAttributes {
   id: number,

@@ -11,7 +11,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Sublayout from 'views/sublayout';
 import { Spinner } from 'construct-ui';
-import * as CosmosValidationViews from '../validators/cosmos';
+import * as CosmosValidationViews from '../staking_validators/cosmos';
 import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
 
 export interface IValidatorPageState {

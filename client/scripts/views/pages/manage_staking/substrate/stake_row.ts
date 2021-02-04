@@ -6,7 +6,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import User from 'views/components/widgets/user';
 import { makeDynamicComponent } from 'models/mithril';
 import { StakerState } from 'controllers/chain/substrate/staking';
-import Identity from 'views/pages/validators/substrate/identity';
+import Identity from 'views/pages/staking_validators/substrate/identity';
 import { DeriveStakingAccount, DeriveBalancesAll } from '@polkadot/api-derive/types';
 import { formatCoin } from 'adapters/currency';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';

@@ -10,7 +10,7 @@ import { Card, Spinner, Button } from 'construct-ui';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
-import { ViewNominatorsModal } from '../validators/index';
+import { ViewNominatorsModal } from '../staking_validators/index';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity) => {
   const chainObj = app.config.chains.getById(account.chain);

@@ -10,7 +10,7 @@ import { formatCoin } from 'adapters/currency';
 import Substrate from 'controllers/chain/substrate/main';
 import { IValidators } from 'controllers/chain/substrate/account';
 import User from 'views/components/widgets/user';
-import Identity from '../../validators/substrate/identity';
+import Identity from '../../staking_validators/substrate/identity';
 
 const MAX_SELECT = 16;
 

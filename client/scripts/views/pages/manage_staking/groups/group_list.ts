@@ -12,7 +12,7 @@ import { IValidators } from 'controllers/chain/substrate/account';
 import { ICommissionInfo, GroupValidator } from 'controllers/chain/substrate/staking';
 import User from 'views/components/widgets/user';
 import NewGroup from 'views/pages/manage_staking/groups/new_group';
-import Identity from '../../validators/substrate/identity';
+import Identity from '../../staking_validators/substrate/identity';
 
 const options = [
   {

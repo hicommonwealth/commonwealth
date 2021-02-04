@@ -1,4 +1,4 @@
-import 'pages/validators.scss';
+import 'pages/staking_validators.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
