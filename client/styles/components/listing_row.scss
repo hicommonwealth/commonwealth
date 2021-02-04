@@ -14,11 +14,18 @@
             margin-right: 22px;
             position: relative;
             top: -2px;
+            @include xs-max {
+                margin-right: 20px;
+            }
         }
         .pinned {
+            flex-shrink: 0;
             position: relative;
             top: -2px;
             margin-right: 22px;
+            @include xs-max {
+                margin-right: 20px;
+            }
             height: 43px;
             width: 45px;
             border: 1px solid #ddd;
@@ -45,8 +52,10 @@
                 font-weight: 600;
             }
             .row-subheader {
-                display: flex;
                 margin-top: 3px;
+                > * {
+                    display: inline;
+                }
             }
             .row-subheader + .row-subheader {
                 margin-top: 1px;

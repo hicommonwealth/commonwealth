@@ -158,7 +158,9 @@ const LoginSelector: m.Component<{
               hideIdentityIcon: true,
             }) : [
               m('span.hidden-sm', [
-                app.user.activeAccounts.length === 0 ? 'No address' : 'Select address'
+                app.user.activeAccounts.length === 0
+                  ? `No ${app.chain?.meta?.chain.name || ''} address`
+                  : 'Select address'
               ]),
             ],
           ],
