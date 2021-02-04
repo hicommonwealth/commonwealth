@@ -6,6 +6,23 @@ import { Button, Input, Form, FormGroup } from 'construct-ui';
 import app from 'state';
 import { loginWithMagicLink } from 'controllers/app/login';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
+import LinkNewAddressModal from 'views/modals/link_new_address_modal';
+
+const exitWithLoginComplete = () => {
+  $('.LoginModal').trigger('modalforceexit');
+
+  if (app.user?.activeAccount && !app.user.activeAccount.profile?.name) {
+    app.modals.create({
+      modal: LinkNewAddressModal,
+      data: { alreadyInitializedAccount: app.user.activeAccount },
+      exitCallback: () => {
+        // TODO:
+      }
+    });
+  }
+
+  m.redraw();
+};
 
 const Login: m.Component<{}, {
   disabled: boolean;
@@ -71,9 +88,8 @@ const Login: m.Component<{}, {
                   if (legacyResponse.result.shouldUseMagicImmediately) {
                     await loginWithMagicLink(email);
                     // do not redirect -- just close modal
-                    $('.LoginModal').trigger('modalforceexit');
                     vnode.state.disabled = false;
-                    m.redraw();
+                    exitWithLoginComplete();
                     return;
                   }
 
@@ -131,7 +147,7 @@ const Login: m.Component<{}, {
                 await loginWithMagicLink(vnode.state.showMagicLoginPromptEmail);
                 vnode.state.disabled = false;
                 // do not redirect -- just close modal
-                $('.LoginModal').trigger('modalforceexit');
+                exitWithLoginComplete();
               } catch (err) {
                 vnode.state.disabled = false;
                 vnode.state.failure = true;
