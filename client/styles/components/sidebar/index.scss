@@ -5,7 +5,8 @@
         justify-content: left;
     }
     .cui-button.telegram-button {
-        border-color: saturate(tint(#2480cc, 85%), 75%);
+        border-color: tint(#2480cc, 25%);
+        color: #2480cc;
         &:hover {
             border-color: #2480cc;
         }
@@ -16,10 +17,12 @@
         svg {
             position: relative;
             left: 2px;
+            stroke: #2480cc;
         }
     }
     .cui-button.element-button {
-        border-color: saturate(tint(#0cbd8b, 85%), 75%);
+        border-color: tint(#0cbd8b, 25%);
+        color: #0cbd8b;
         &:hover {
             border-color: #0cbd8b;
         }
@@ -30,10 +33,12 @@
         svg {
             position: relative;
             left: 2px;
+            stroke: #0cbd8b;
         }
     }
     .cui-button.discord-button {
-        border-color: saturate(tint(#677bc4, 85%), 75%);
+        border-color: tint(#677bc4, 25%);
+        color: #677bc4;
         &:hover {
             border-color: #677bc4;
         }
@@ -44,6 +49,7 @@
         svg {
             position: relative;
             left: 2px;
+            stroke: #677bc4;
         }
     }
     .SubscriptionButton {
