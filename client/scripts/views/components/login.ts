@@ -170,7 +170,8 @@ const Login: m.Component<{}, {
             },
           }),
         ]),
-      ]) : [
+      ]) : '',
+      !vnode.state.showMagicLoginPrompt && [
         m('.form-divider', 'or'),
         m(Form, { gutter: 10 }, [
           m(FormGroup, { span: 12 }, [
