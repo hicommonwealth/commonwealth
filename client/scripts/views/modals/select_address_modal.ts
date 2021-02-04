@@ -86,7 +86,9 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       m('.compact-modal-body', [
         m('.select-address-options', [
           activeAccountsByRole.length === 0 && m('.select-address-placeholder', [
-            'Connect an address to comment or vote'
+            app.chain?.meta.chain.id
+              ? `No ${app.chain?.meta?.chain.name} addresses found`
+              : 'Connect an address to comment or vote'
           ]),
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
             m('.select-address-option-left', [
