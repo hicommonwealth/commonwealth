@@ -12,7 +12,8 @@ const log = factory.getLogger(formatFilename(__filename));
 
 
 import {
-  JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, MAGIC_SUPPORTED_CHAINS
+  JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, MAGIC_SUPPORTED_CHAINS,
+  MAGIC_DEFAULT_CHAIN
 } from './config';
 import { NotificationCategories } from '../shared/types';
 import lookupCommunityIsVisibleToUser from './util/lookupCommunityIsVisibleToUser';
@@ -50,11 +51,9 @@ function setupPassport(models) {
     const magic = new Magic(MAGIC_API_KEY);
     passport.use(new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
       // determine login location
-      if (!req.body.community && !req.body.chain) {
-        return cb(new Error('No Community or Chain found!'));
-      }
       const [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, cb);
-      const registrationChain: string = chain ? chain.id : community.default_chain;
+      const registrationChain: string = chain ? chain.id : community.default_chain
+        ? community.default_chain : MAGIC_DEFAULT_CHAIN;
 
       // fetch user data from magic backend
       let userMetadata: MagicUserMetadata;
@@ -103,7 +102,7 @@ function setupPassport(models) {
             is_magic: true,
           }, { transaction: t });
 
-          const newRole = await models.Role.create(req.body.community ? {
+          if (req.body.chain || req.body.community) await models.Role.create(req.body.community ? {
             address_id: newAddress.id,
             offchain_community_id: req.body.community,
             permission: 'member',
