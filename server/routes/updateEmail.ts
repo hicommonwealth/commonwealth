@@ -15,6 +15,7 @@ export const Errors = {
   NoUser: 'Could not find a user with this email',
   InvalidEmail: 'Invalid email',
   EmailInUse: 'Email already in use',
+  NoUpdateForMagic: 'Cannot update email if registered with Magic Link',
 };
 
 const updateEmail = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -39,9 +40,15 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
   const user = await models.User.findOne({
     where: {
       id: req.user.id,
-    }
+    },
+    include: [{
+      model: models.Address,
+      where: { is_magic: true },
+      required: false,
+    }],
   });
   if (!user) return next(new Error(Errors.NoUser));
+  if (user.Addresses && user.Addresses > 0) return next(new Error(Errors.NoUpdateForMagic));
 
   // ensure no more than 3 tokens have been created in the last 5 minutes
   const recentTokens = await models.LoginToken.findAndCountAll({
