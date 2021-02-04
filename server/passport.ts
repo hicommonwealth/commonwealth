@@ -56,11 +56,6 @@ function setupPassport(models) {
       const [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, cb);
       const registrationChain: string = chain ? chain.id : community.default_chain;
 
-      // unsupported chain -- client should send through old email flow
-      if (!registrationChain || !MAGIC_SUPPORTED_CHAINS.includes(registrationChain)) {
-        return cb(new Error('Unsupported magic chain.'));
-      }
-
       // fetch user data from magic backend
       let userMetadata: MagicUserMetadata;
       try {
@@ -80,6 +75,12 @@ function setupPassport(models) {
           required: false,
         }],
       });
+
+      // unsupported chain -- client should send through old email flow
+      if (!existingUser && (!registrationChain || !MAGIC_SUPPORTED_CHAINS.includes(registrationChain))) {
+        return cb(new Error('Unsupported magic chain.'));
+      }
+
       if (!existingUser) {
         const result = await sequelize.transaction(async (t) => {
           // create new user and unverified address if doesn't exist
