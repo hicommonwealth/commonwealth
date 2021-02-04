@@ -130,7 +130,7 @@ const Login: m.Component<{}, {
         'Check your email to continue.'
       ]) : vnode.state.showMagicLoginPrompt ? m('.login-magic-prompt', [
         m('p', [
-          'Commonwealth requires a crypto address to post. Generate one attached to ',
+          'Commonwealth requires a crypto address to participate in discussions. Generate one for ',
           m('strong', vnode.state.showMagicLoginPromptEmail),
           '?',
         ]),
@@ -156,7 +156,7 @@ const Login: m.Component<{}, {
             },
           }),
           m(Button, {
-            label: 'No, I’ll use my own wallet',
+            label: 'No, I’ll connect an address later',
             intent: 'none',
             rounded: true,
             compact: true,
