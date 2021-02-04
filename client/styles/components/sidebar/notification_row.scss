@@ -58,24 +58,34 @@
         }
     }
     .comment-body-bottom-wrap {
-        display: flex;
-        justify-content: space-between;
+        font-size: 15px;
+        margin-top: 12px; // needed because .comment-body-excerpt may not be present
     }
     .comment-body-created {
+        display: inline;
         color: $text-color-medium;
-        font-size: 15px;
-        margin-top: 8px; // needed because .comment-body-excerpt may not be present
     }
-    .comment-body-pip {
-        border-radius: 50%;
-        background: $background-color-dark-monochrome;
-        border: none;
-        height: 10px;
-        width: 10px;
-        margin-top: 8px;
+    .comment-body-mark-as-read {
+        display: inline;
+        color: $text-color-medium;
+        margin-left: 8px;
+        .cui-spinner {
+            position: relative;
+            top: -1px;
+            .cui-spinner-icon {
+                border-color: transparent;
+                border-top-color: $background-color-dark-accent !important;
+                border-right-color: $background-color-dark-accent !important;
+            }
+        }
     }
-    .comment-body-pip:hover {
-        border: 1px solid $background-color-dark-monochrome;
-        background: white;
+    .comment-body-mark-as-read:hover {
+        color: $background-color-dark-accent;
+    }
+}
+
+.NotificationRowMarkAsRead {
+    .cui-popover-content {
+        padding: 15px 20px 10px;
     }
 }
