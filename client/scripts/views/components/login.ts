@@ -5,10 +5,11 @@ import $ from 'jquery';
 import { Button, Input, Form, FormGroup } from 'construct-ui';
 import app from 'state';
 import { loginWithMagicLink } from 'controllers/app/login';
+import { notifySuccess } from 'controllers/app/notifications';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
-const exitWithLoginComplete = () => {
+const exitWithMagicLoginComplete = () => {
   $('.LoginModal').trigger('modalforceexit');
 
   if (app.user?.activeAccount && !app.user.activeAccount.profile?.name) {
@@ -21,6 +22,7 @@ const exitWithLoginComplete = () => {
     });
   }
 
+  notifySuccess('Successfully logged in!');
   m.redraw();
 };
 
@@ -88,7 +90,7 @@ const Login: m.Component<{}, {
                     await loginWithMagicLink(email);
                     // do not redirect -- just close modal
                     vnode.state.disabled = false;
-                    exitWithLoginComplete();
+                    exitWithMagicLoginComplete();
                     return;
                   }
 
@@ -148,7 +150,7 @@ const Login: m.Component<{}, {
                 await loginWithMagicLink(vnode.state.showMagicLoginPromptEmail);
                 vnode.state.disabled = false;
                 // do not redirect -- just close modal
-                exitWithLoginComplete();
+                exitWithMagicLoginComplete();
               } catch (err) {
                 vnode.state.disabled = false;
                 vnode.state.failure = true;
