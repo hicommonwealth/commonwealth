@@ -48,7 +48,7 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
           `${account.address} - ${app.config.chains.getById(account.chain)?.name}`,
           account.isMagic && [
             m('br'),
-            `Magic address for ${app.user.email}`,
+            `Magically linked to ${app.user.email}`,
           ]
         ]),
         (account instanceof MolochMember && account.isMember && account.delegateKey) ? m('.moloch-delegatekey', [

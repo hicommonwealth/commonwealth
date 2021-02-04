@@ -94,7 +94,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
             m('.select-address-option-left', [
               m(UserBlock, { user: account }),
               app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id)?.isMagic
-                && m('.magic-label', `Magic address for ${app.user.email}`),
+                && m('.magic-label', `Magically linked to ${app.user.email}`),
             ]),
             m('.role-remove', [
               m('span.already-connected', `${formatAsTitleCase(role.permission)} of '${activeEntityInfo?.name}'`),
@@ -113,7 +113,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
             m('.select-address-option-left', [
               m(UserBlock, { user: account, showRole: true, selected: vnode.state.selectedIndex === index }),
               app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id)?.isMagic
-                && m('.magic-label', `Magic address for ${app.user.email}`),
+                && m('.magic-label', `Magically linked to ${app.user.email}`),
             ]),
             role && m('.role-permission', [
               m(Tag, { label: formatAsTitleCase(role.permission), rounded: true, size: 'sm' }),
