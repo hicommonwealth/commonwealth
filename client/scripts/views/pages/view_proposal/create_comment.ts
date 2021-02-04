@@ -133,7 +133,7 @@ const CreateComment: m.Component<{
               class: 'no-profile-callout',
               intent: 'primary',
               content: [
-                'You haven\'t set a display name yet, so other people can only see your address. ',
+                'You haven\'t set a display name yet. ',
                 m('a', {
                   href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
                     + `?base=${app.user.activeAccount.chain}`,
@@ -147,7 +147,7 @@ const CreateComment: m.Component<{
                       },
                     });
                   }
-                }, 'Add your name'),
+                }, 'Set a display name'),
               ],
             }),
             m(QuillEditor, {

@@ -343,8 +343,20 @@ const LinkNewAddressModal: m.Component<{
       vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
     ]);
 
+    // initialize the step
+    if (vnode.state.step === undefined) {
+      if (vnode.attrs.alreadyInitializedAccount) {
+        vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
+        vnode.state.newAddress = vnode.attrs.alreadyInitializedAccount;
+      } else {
+        vnode.state.step = vnode.attrs.useCommandLineWallet
+          ? LinkNewAddressSteps.Step1VerifyWithCLI
+          : LinkNewAddressSteps.Step1VerifyWithWebWallet;
+      }
+    }
+
     // TODO: refactor this out so we don't have duplicated loading code
-    if (!app.chain) return m('.LinkNewAddressModal', {
+    if (!app.chain && vnode.state.step !== LinkNewAddressSteps.Step2CreateProfile) return m('.LinkNewAddressModal', {
       key: 'placeholder', // prevent vnode from being reused so later oninit / oncreate code runs
     }, [
       m('.link-address-step', [
@@ -360,18 +372,6 @@ const LinkNewAddressModal: m.Component<{
         ])
       ])
     ]);
-
-    // initialize the step
-    if (vnode.state.step === undefined) {
-      if (vnode.attrs.alreadyInitializedAccount) {
-        vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
-        vnode.state.newAddress = vnode.attrs.alreadyInitializedAccount;
-      } else {
-        vnode.state.step = vnode.attrs.useCommandLineWallet
-          ? LinkNewAddressSteps.Step1VerifyWithCLI
-          : LinkNewAddressSteps.Step1VerifyWithWebWallet;
-      }
-    }
 
     // TODO: add a step to help users install wallets
     // gaiacli 'https://cosmos.network/docs/cosmos-hub/installation.html',
@@ -722,11 +722,12 @@ const LinkNewAddressModal: m.Component<{
       ]) : vnode.state.step === LinkNewAddressSteps.Step2CreateProfile ? m('.link-address-step', [
         linkAddressHeader,
         m('.link-address-step-narrow', [
-          m('.create-profile-instructions', vnode.state.isNewLogin
-            ? 'Logged in! Now create a profile:'
-            : 'Address verified! Now create a profile:'),
-          m('.new-account-userblock', { style: 'text-align: center;' }, [
-            m(UserBlock, { user: vnode.state.newAddress }),
+          m('.create-profile-instructions', vnode.state.isNewLogin ? [
+            m('p', 'Logged in!'),
+            m('p', 'Finish setting up your account, by uploading an avatar & telling us a little more about yourself:'),
+          ] : [
+            m('p', 'Address connected!'),
+            m('p', 'Finish setting up your account, by uploading an avatar & telling us a little more about yourself:'),
           ]),
           m('.avatar-wrap', [
             m(AvatarUpload, {
@@ -841,7 +842,7 @@ const LinkNewAddressModal: m.Component<{
 
 // inject confirmExit property
 LinkNewAddressModal['confirmExit'] = confirmationModalWithText(
-  app.isLoggedIn() ? 'Cancel connecting new address?' : 'Cancel log in?',
+  'Exit now?',
   'Yes',
   'No'
 );

@@ -1,15 +1,22 @@
 import passport from 'passport';
-import passportLocal from 'passport-local';
 import passportGithub from 'passport-github';
 import passportJWT from 'passport-jwt';
 import { Request } from 'express';
 
+import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
+import { Strategy as MagicStrategy } from 'passport-magic';
+
+import { sequelize } from './database';
 import { factory, formatFilename } from '../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 
-import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK } from './config';
+import {
+  JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK, MAGIC_API_KEY, MAGIC_SUPPORTED_CHAINS,
+  MAGIC_DEFAULT_CHAIN
+} from './config';
 import { NotificationCategories } from '../shared/types';
+import lookupCommunityIsVisibleToUser from './util/lookupCommunityIsVisibleToUser';
 
 const GithubStrategy = passportGithub.Strategy;
 const JWTStrategy = passportJWT.Strategy;
@@ -37,6 +44,127 @@ function setupPassport(models) {
       done(err);
     }
   }));
+
+  // allow magic login if configured with key
+  if (MAGIC_API_KEY) {
+    // TODO: verify we are in a community that supports magic login
+    const magic = new Magic(MAGIC_API_KEY);
+    passport.use(new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
+      // determine login location
+      let chain, community;
+      if (req.body.chain || req.body.community) {
+        [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, cb);
+      }
+      const registrationChain: string = chain ? chain.id : community?.default_chain
+        ? community?.default_chain : MAGIC_DEFAULT_CHAIN;
+
+      // fetch user data from magic backend
+      let userMetadata: MagicUserMetadata;
+      try {
+        userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+      } catch (e) {
+        return cb(new Error('Magic fetch failed.'));
+      }
+
+      // check if this is a new signup or a login
+      const existingUser = await models.User.findOne({
+        where: {
+          email: userMetadata.email,
+        },
+        include: [{
+          model: models.Address,
+          where: { is_magic: true },
+          required: false,
+        }],
+      });
+
+      // unsupported chain -- client should send through old email flow
+      if (!existingUser && (!registrationChain || !MAGIC_SUPPORTED_CHAINS.includes(registrationChain))) {
+        return cb(new Error('Unsupported magic chain.'));
+      }
+
+      if (!existingUser) {
+        const result = await sequelize.transaction(async (t) => {
+          // create new user and unverified address if doesn't exist
+          const newUser = await models.User.create({
+            email: userMetadata.email,
+            emailVerified: true,
+            magicIssuer: userMetadata.issuer,
+            lastMagicLoginAt: user.claim.iat,
+          }, { transaction: t });
+
+          // TODO: use non-default chain in certain cases?
+          const newAddress = await models.Address.create({
+            address: userMetadata.publicAddress.toLowerCase(), // ensure all eth addresses are lowercase
+            chain: registrationChain,
+            verification_token: 'MAGIC',
+            verification_token_expires: null,
+            verified: new Date(), // trust addresses from magic
+            last_active: new Date(),
+            user_id: newUser.id,
+            is_magic: true,
+          }, { transaction: t });
+
+          if (req.body.chain || req.body.community) await models.Role.create(req.body.community ? {
+            address_id: newAddress.id,
+            offchain_community_id: req.body.community,
+            permission: 'member',
+          } : {
+            address_id: newAddress.id,
+            chain_id: req.body.chain,
+            permission: 'member',
+          }, { transaction: t });
+
+          // Automatically create subscription to their own mentions
+          await models.Subscription.create({
+            subscriber_id: newUser.id,
+            category_id: NotificationCategories.NewMention,
+            object_id: `user-${newUser.id}`,
+            is_active: true,
+          }, { transaction: t });
+
+          // Automatically create a subscription to collaborations
+          await models.Subscription.create({
+            subscriber_id: newUser.id,
+            category_id: NotificationCategories.NewCollaboration,
+            object_id: `user-${newUser.id}`,
+            is_active: true,
+          }, { transaction: t });
+
+          return newUser;
+        });
+        console.log(`Created user: ${JSON.stringify(result)}`);
+
+        // re-fetch user to include address object
+        // TODO: simplify this without doing a refetch
+        const newUser = await models.User.findOne({
+          where: {
+            id: result.id,
+          },
+          include: [ models.Address ],
+        });
+        return cb(null, newUser);
+      } else if (existingUser.Addresses) {
+        // login user if they registered via magic
+        if (user.claim.iat <= existingUser.lastMagicLoginAt) {
+          console.log('Replay attack detected.');
+          return cb(null, null, {
+            message: `Replay attack detected for user ${user.issuer}}.`,
+          });
+        }
+        existingUser.lastMagicLoginAt = user.claim.iat;
+        await existingUser.save();
+        console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
+        return cb(null, existingUser);
+      } else {
+        // error if email exists but not registered with magic
+        console.log('User already registered with old method.');
+        return cb(null, null, {
+          message: `Email for user ${user.issuer} already registered`
+        });
+      }
+    }));
+  }
 
   // allow user to authenticate with Github
   // create stub user without email
@@ -127,7 +255,7 @@ function setupPassport(models) {
     }
   }));
 
-  passport.serializeUser<any, any>((user, done) => {
+  passport.serializeUser<any>((user, done) => {
     done(null, user.id);
   });
 
