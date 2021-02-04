@@ -7,9 +7,11 @@
 //
 // layout parameters
 
-$sidebar-width: 230px;
+$sidebar-width: 240px;
 $quick-switcher-width: 64px;
-$layout-max-width: 970px;
+$layout-max-width: 1280px;
+$layout-padding: 36px;
+$layout-padding-xs: 20px;
 
 //
 // base fonts
@@ -78,12 +80,12 @@ $border-color-focus: mix($border-color, $primary-bg-color, 50%);
 
 $text-size-item-header: 19px;
 $text-size-item-meta: 17px;
-$listing-left-flex: 4;
-$listing-right-flex: 3;
+$listing-left-flex: 6;
+$listing-right-flex: 1;
 
 @mixin listing-row-base {
     display: flex;
-    padding: 12px 20px;
+    padding: 16px 20px 9px;
     margin: 0 -20px;
     cursor: pointer;
     &:hover {
@@ -155,5 +157,7 @@ $listing-right-flex: 3;
         width: 7px;
         height: 7px;
         margin-right: 6px;
+        position: relative;
+        top: -1px;
     }
 }

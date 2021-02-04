@@ -3,13 +3,6 @@
 .ListingRow {
     @include listing-row-base;
 
-    .UserGallery {
-        .User {
-            margin-top: 3px;
-            margin-right: -16px;
-        }
-    }
-
     .row-left {
         line-height: 1.1;
         flex: $listing-left-flex;
@@ -17,12 +10,34 @@
         flex-direction: row;
         align-items: center;
         position: relative;
+        .reaction {
+            margin-right: 22px;
+            position: relative;
+            top: -2px;
+            @include xs-max {
+                margin-right: 20px;
+            }
+        }
         .pinned {
-            width: 34px;
+            flex-shrink: 0;
+            position: relative;
+            top: -2px;
+            margin-right: 22px;
+            @include xs-max {
+                margin-right: 20px;
+            }
+            height: 43px;
+            width: 45px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding-top: 15px;
+            text-align: center;
             .icon-pin-outline {
                 display: block;
                 font-size: 15px;
-                color: $text-color-light;
+                color: $text-color-medium-dark;
+                position: relative;
+                top: -2px;
             }
         }
         .title-container {
@@ -34,20 +49,27 @@
                 color: $text-color-black;
                 font-size: $text-size-item-header;
                 text-decoration: none;
-                font-weight: 500;
+                font-weight: 600;
             }
             .row-subheader {
-                display: flex;
                 margin-top: 3px;
+                > * {
+                    display: inline;
+                }
             }
             .row-subheader + .row-subheader {
                 margin-top: 1px;
             }
             .row-subheader > a,
             .row-subheader > .User > a,
+            .row-subheader > .created-at > a,
+            .row-subheader > .mobile-comment-count,
             > span {
                 color: $text-color-light;
                 font-size: $text-size-item-meta;
+                &:hover {
+                    color: darken($text-color-light, 8%);
+                }
             }
         }
     }
@@ -61,10 +83,13 @@
             > div {
                 display: flex;
                 justify-content: flex-end;
-                .UserGallery {
-                    margin-right: 8px;
+                > .UserGallery {
+                    margin-right: 10px;
                     text-align: right;
                     white-space: nowrap;
+                    > .User, > .overflow-users-wrap {
+                        margin-right: -10px;
+                    }
                     .overflow-users {
                         font-size: 13.5px;
                     }
@@ -72,22 +97,6 @@
                 .ReactionButton {
                     width: min-content;
                     height: min-content;
-                }
-                .last-updated {
-                    text-align: right;
-                    font-size: $text-size-item-meta;
-                    color: $text-color-light;
-                    padding-top: 6px;
-                    &.older {
-                        min-width: 116px;
-                    }
-                    a {
-                        font-size: inherit;
-                        color: inherit;
-                        &:hover {
-                            color: darken($text-color-light, 8%);
-                        }
-                    }
                 }
             }
         }

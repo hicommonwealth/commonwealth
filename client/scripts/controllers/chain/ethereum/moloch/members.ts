@@ -20,12 +20,8 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
   public get store() { return this._store; }
   public get api() { return this._api; }
 
-  public async init(api: MolochAPI, ChainInfo: EthereumChain, Accounts: EthereumAccounts) {
+  public async init(api: MolochAPI) {
     this._api = api;
-
-    // only used to initialize member for super call
-    this._Chain = ChainInfo;
-    this._Accounts = Accounts;
   }
 
   public deinit() {
@@ -35,14 +31,19 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
   private _app: IApp;
   public get app() { return this._app; }
 
-  constructor(app: IApp) {
+  constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts) {
     this._app = app;
+
+    // only used to initialize member for super call
+    this._Chain = ChainInfo;
+    this._Accounts = Accounts;
   }
 
   public get(address: string) {
     try {
       return this._store.getByAddress(address.toLowerCase());
     } catch (e) {
+      if (!this._Accounts) return null;
       return new MolochMember(this.app, this._Chain, this._Accounts, this, address);
     }
   }
@@ -52,6 +53,7 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
     try {
       return this._store.getByAddress(member.id);
     } catch (e) {
+      if (!this._Accounts) return null;
       return new MolochMember(this.app, this._Chain, this._Accounts, this, member.id, member);
     }
   }

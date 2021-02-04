@@ -1,4 +1,4 @@
-(global as any).window = {};
+(global as any).window = { location: { href: '/' } };
 
 import * as Sequelize from 'sequelize';
 import crypto from 'crypto';
@@ -6,14 +6,9 @@ import crypto from 'crypto';
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 
-import * as secp256k1 from 'secp256k1';
-import * as CryptoJS from 'crypto-js';
-import { ecdsaVerify } from 'secp256k1/lib/elliptic';
-
 import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import { toUtf8, fromBase64 } from '@cosmjs/encoding';
-import { Uint53 } from '@cosmjs/math';
+import { fromBase64 } from '@cosmjs/encoding';
 import { getCosmosAddress } from '@lunie/cosmos-keys'; // used to check address validity. TODO: remove
 
 import nacl from 'tweetnacl';
@@ -46,6 +41,7 @@ export interface AddressAttributes {
   user_id?: number;
   is_councillor?: boolean;
   is_validator?: boolean;
+  is_magic?: boolean;
 
   // associations
   Chain?: ChainAttributes;
@@ -106,6 +102,7 @@ export default (
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
     is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
     underscored: true,
     indexes: [
@@ -128,7 +125,7 @@ export default (
     user_id: number,
     chain: string,
     address: string,
-    keytype?: string
+    keytype?: string,
   ): Promise<AddressInstance> => {
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
@@ -251,6 +248,7 @@ export default (
     } else if (chain.network === 'ethereum'
       || chain.network === 'moloch'
       || chain.network === 'metacartel'
+      || chain.network === 'commonwealth'
     ) {
       //
       // ethereum address handling
@@ -297,6 +295,12 @@ export default (
           object_id: `user-${user.id}`,
           is_active: true,
         });
+        await models.Subscription.create({
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewCollaboration,
+          object_id: `user-${user.id}`,
+          is_active: true,
+        });
         addressModel.user_id = user.id;
       }
     } else if (isValid) {
@@ -314,6 +318,11 @@ export default (
     models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
+    models.Address.belongsToMany(models.OffchainThread, {
+      through: models.Collaboration,
+      as: 'collaboration'
+    });
+    models.Address.hasMany(models.Collaboration);
   };
 
   return Address;

@@ -69,6 +69,8 @@ import getUploadSignature from './routes/getUploadSignature';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
+import addEditors from './routes/addEditors';
+import deleteEditors from './routes/deleteEditors';
 import bulkThreads from './routes/bulkThreads';
 import getThread from './routes/getThread';
 import search from './routes/search';
@@ -148,6 +150,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/createThread', passport.authenticate('jwt', { session: false }), createThread.bind(this, models));
   // TODO: Change to PUT /thread
   router.put('/editThread', passport.authenticate('jwt', { session: false }), editThread.bind(this, models));
+  router.post('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this, models));
+  router.post('/deleteEditors', passport.authenticate('jwt', { session: false }), deleteEditors.bind(this, models));
   // TODO: Change to DELETE /thread
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
@@ -302,7 +306,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // settings
   // TODO: Change to POST /userSetting
   router.post('/writeUserSetting', passport.authenticate('jwt', { session: false }),
-              writeUserSetting.bind(this, models));
+    writeUserSetting.bind(this, models));
 
   // send feedback button
   // TODO: Change to POST /feedback
@@ -312,9 +316,13 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // edgeware
   router.get('/stats/edgeware/lockdrop/events', edgewareLockdropEvents.bind(this, models));
   router.get('/stats/edgeware/lockdrop/balances', edgewareLockdropBalances.bind(this, models));
+
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
+  router.post('/auth/magic', passport.authenticate('magic'), (req, res, next) => {
+    return res.json({ status: 'Success', result: req.user.toJSON() });
+  });
   router.get('/auth/github', passport.authenticate('github'));
   router.get('/auth/github/callback', passport.authenticate('github', { successRedirect: '/', failureRedirect: '/#!/login' }));
   // logout

@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
@@ -71,8 +72,12 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
-  const versionHistory = [];
-  versionHistory.push(req.body.versionHistory);
+  const firstVersion : any = {
+    timestamp: moment(),
+    author: req.body.author,
+    body: decodeURIComponent(req.body.body)
+  };
+  const version_history : string[] = [ JSON.stringify(firstVersion) ];
 
   const threadContent = community ? {
     community: community.id,
@@ -80,7 +85,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     title,
     body,
     plaintext,
-    version_history: versionHistory,
+    version_history,
     kind,
     url,
     read_only: readOnly,
@@ -90,7 +95,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     title,
     body,
     plaintext,
-    version_history: versionHistory,
+    version_history,
     kind,
     url,
     read_only: readOnly || false,
@@ -98,7 +103,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // New Topic table entries created
   if (topic_id) {
-    threadContent['topic_id'] = Number(topic_id);
+    threadContent['topic_id'] = +topic_id;
   } else if (topic_name) {
     let offchainTopic;
     try {
@@ -152,7 +157,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
       include: [
-        models.Address,
+        { model: models.Address, as: 'Address' },
         models.OffchainAttachment,
         { model: models.OffchainTopic, as: 'topic' }
       ],
@@ -206,6 +211,31 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       },
     });
   }));
+
+  // grab mentions to notify tagged users
+  let mentionedAddresses;
+  if (mentions?.length > 0) {
+    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+      mention = mention.split(',');
+      try {
+        return models.Address.findOne({
+          where: {
+            chain: mention[0],
+            address: mention[1],
+          },
+          include: [ models.User, models.Role ]
+        });
+      } catch (err) {
+        return next(new Error(err));
+      }
+    }));
+    // filter null results
+    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+  }
+
+  const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
+  excludedAddrs.push(finalThread.Address.address);
+
   // dispatch notifications to subscribers of the given chain/community
   await models.Subscription.emitNotifications(
     models,
@@ -213,7 +243,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     location,
     {
       created_at: new Date(),
-      root_id: Number(finalThread.id),
+      root_id: +finalThread.id,
       root_type: ProposalType.OffchainThread,
       root_title: finalThread.title,
       comment_text: finalThread.body,
@@ -233,30 +263,8 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       body: finalThread.body,
     },
     req.wss,
-    [ finalThread.Address.address ],
+    excludedAddrs,
   );
-
-  // grab mentions to notify tagged users
-  let mentionedAddresses;
-  if (mentions?.length > 0) {
-    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-      mention = mention.split(',');
-      try {
-        const user = await models.Address.findOne({
-          where: {
-            chain: mention[0],
-            address: mention[1],
-          },
-          include: [ models.User, models.Role ]
-        });
-        return user;
-      } catch (err) {
-        return next(new Error(err));
-      }
-    }));
-    // filter null results
-    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-  }
 
   // notify mentioned users, given permissions are in place
   if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
@@ -279,7 +287,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       `user-${mentionedAddress.User.id}`,
       {
         created_at: new Date(),
-        root_id: Number(finalThread.id),
+        root_id: finalThread.id,
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
         comment_text: finalThread.body,

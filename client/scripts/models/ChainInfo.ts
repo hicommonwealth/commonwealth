@@ -12,7 +12,8 @@ class ChainInfo {
   public readonly iconUrl: string;
   public description: string;
   public website: string;
-  public chat: string;
+  public discord: string;
+  public element: string;
   public telegram: string;
   public github: string;
   public readonly blockExplorerIds: object;
@@ -21,10 +22,11 @@ class ChainInfo {
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
+  public members: RoleInfo[];
 
   constructor(
-    id, network, symbol, name, iconUrl, description, website, chat, telegram,
-    github, blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
+    id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
+    blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
     this.network = network;
@@ -33,7 +35,8 @@ class ChainInfo {
     this.iconUrl = iconUrl;
     this.description = description;
     this.website = website;
-    this.chat = chat;
+    this.discord = discord;
+    this.element = element;
     this.telegram = telegram;
     this.github = github;
     this.blockExplorerIds = blockExplorerIds;
@@ -58,7 +61,8 @@ class ChainInfo {
       json.icon_url,
       json.description,
       json.website,
-      json.chat,
+      json.discord,
+      json.element,
       json.telegram,
       json.github,
       blockExplorerIds,
@@ -69,9 +73,11 @@ class ChainInfo {
     );
   }
 
-  public async getAdminsAndMods(id: string) {
+  // TODO: get operation should not have side effects, and either way this shouldn't be here
+  public async getMembers(id: string) {
     try {
       const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id, });
+      this.setMembers(res.result);
       const roles = res.result.filter((r) => {
         return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
       });
@@ -80,6 +86,22 @@ class ChainInfo {
     } catch {
       console.log('Failed to fetch admins/mods');
     }
+  }
+
+  public setMembers(roles) {
+    this.members = [];
+    roles.forEach((r) => {
+      this.members.push(new RoleInfo(
+        r.id,
+        r.address_id,
+        r.Address.address,
+        r.Address.chain,
+        r.chain_id,
+        r.offchain_community_id,
+        r.permission,
+        r.is_user_default
+      ));
+    });
   }
 
   public setAdmins(roles) {
@@ -99,7 +121,7 @@ class ChainInfo {
   }
 
   public async updateChainData(
-    name: string, description: string, website: string, chat: string, telegram: string, github: string
+    name: string, description: string, website: string, discord: string, element: string, telegram: string, github: string
   ) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -107,7 +129,8 @@ class ChainInfo {
       'name': name,
       'description': description,
       'website': website,
-      'chat': chat,
+      'discord': discord,
+      'element': element,
       'telegram': telegram,
       'github': github,
       'jwt': app.user.jwt,
@@ -116,9 +139,10 @@ class ChainInfo {
     this.name = updatedChain.name;
     this.description = updatedChain.description;
     this.website = updatedChain.website;
-    this.chat = updatedChain.chat;
-    this.telegram = telegram;
-    this.github = github;
+    this.discord = updatedChain.discord;
+    this.element = updatedChain.element;
+    this.telegram = updatedChain.telegram;
+    this.github = updatedChain.github;
   }
 
   public addFeaturedTopic(topic: string) {

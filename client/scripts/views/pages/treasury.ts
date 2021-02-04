@@ -2,29 +2,31 @@ import 'pages/proposals.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { Grid, Col, List, Tag } from 'construct-ui';
+import moment from 'moment';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
+
 import Edgeware from 'controllers/chain/edgeware/main';
 import {
   convictionToWeight, convictionToLocktime, convictions
 } from 'controllers/chain/substrate/democracy_referendum';
+import Substrate from 'controllers/chain/substrate/main';
+import Cosmos from 'controllers/chain/cosmos/main';
+import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import Substrate from 'controllers/chain/substrate/main';
-import Cosmos from 'controllers/chain/cosmos/main';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
-import { Grid, Col, List } from 'construct-ui';
-import moment from 'moment';
-import Listing from './listing';
-import ErrorPage from './error';
+import Listing from 'views/pages/listing';
+import ErrorPage from 'views/pages/error';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -107,12 +109,18 @@ const TreasuryPage: m.Component<{}> = {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
           message: 'Could not connect to chain',
-          title: 'Proposals',
+          title: [
+            'Treasury',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ]
         });
       }
       return m(PageLoading, {
         message: 'Connecting to chain',
-        title: 'Treasury',
+        title: [
+          'Treasury',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
         showNewProposalButton: true,
       });
     }
@@ -121,7 +129,10 @@ const TreasuryPage: m.Component<{}> = {
       if (!(app.chain as Substrate).treasury.initializing) loadCmd();
       return m(PageLoading, {
         message: 'Connecting to chain',
-        title: 'Treasury',
+        title: [
+          'Treasury',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
         showNewProposalButton: true,
       });
     }
@@ -140,19 +151,20 @@ const TreasuryPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'TreasuryPage',
-      title: 'Treasury',
+      title: [
+        'Treasury',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
       m(Listing, {
         content: activeTreasuryContent,
-        columnHeaders: ['Active Treasury Proposals'],
-        rightColSpacing: [0]
+        columnHeader: 'Active Treasury Proposals',
       }),
       m(Listing, {
         content: inactiveTreasuryContent,
-        columnHeaders: ['Inactive Treasury Proposals'],
-        rightColSpacing: [0]
+        columnHeader: 'Inactive Treasury Proposals',
       })
     ]);
   }

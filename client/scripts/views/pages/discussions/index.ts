@@ -7,20 +7,23 @@ import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
 import app from 'state';
 
-import { Spinner, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
+import { Spinner, Button, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
 import { pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
+import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import Listing from 'views/pages/listing';
+import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
+import ManageCommunityModal from 'views/modals/manage_community_modal';
+import CreateInviteModal from 'views/modals/create_invite_modal';
 
 import { DEFAULT_PAGE_SIZE } from 'controllers/server/threads';
-import { ListingSidebar } from './sidebar';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
@@ -207,7 +210,6 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             class: 'DiscussionsPage',
             title: topic || 'Discussions',
             showNewProposalButton: true,
-            rightSidebar: m(ListingSidebar, { entity: app.activeId() })
           }, [
             m(EmptyTopicPlaceholder, {
               communityName: app.activeId(),
@@ -290,35 +292,36 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const otherTopics = {};
     const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
 
-    const getTopicRow = (topicId, name, description) => m('.discussions-topic', {
-      key: topicId,
-      class: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-              || (topic && topic === id)) ? 'active' : '',
+    const getTopicRow = (key, name, description) => m(Button, {
+      rounded: true,
+      class: 'discussions-topic',
+      key,
+      active: (m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
+               || (topic && topic === id)),
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${app.activeId()}/discussions/${name}`);
       },
-    }, [
-      m('.proposal-topic-icon'),
-      m('.proposal-topic-name', name),
-    ]);
-    const allTopicsListItem = m('.discussions-topic', {
-      class: (m.route.get() === `/${app.activeId()}` || !topic) ? 'active' : '',
+      label: name,
+      size: 'sm',
+    });
+    const allTopicsListItem = m(Button, {
+      rounded: true,
+      class: 'discussions-topic',
+      active: (m.route.get() === `/${app.activeId()}` || !topic),
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${app.activeId()}`);
       },
-    }, [
-      m('.proposal-topic-icon'),
-      m('.proposal-topic-name', 'All Discussions'),
-    ]);
+      label: 'All Discussions',
+      size: 'sm',
+    });
 
-    app.topics.getByCommunity(app.activeId()).forEach((topic) => {
-      const { id, name, description } = topic;
-      if (featuredTopicIds.includes(`${topic.id}`)) {
-        featuredTopics[topic.name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
+    app.topics.getByCommunity(app.activeId()).forEach(({ id, name, description }) => {
+      if (featuredTopicIds.includes(`${id}`)) {
+        featuredTopics[name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
       } else {
-        otherTopics[topic.name] = { id, name, description };
+        otherTopics[name] = { id, name, description };
       }
     });
     const otherTopicListItems = Object.keys(otherTopics)
@@ -328,6 +331,10 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
       .map((name, idx) => getTopicRow(featuredTopics[name].id, name, featuredTopics[name].description));
 
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
+    });
 
     return m(Sublayout, {
       class: 'DiscussionsPage',
@@ -345,21 +352,75 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               name: Icons.CHEVRON_DOWN,
               style: 'margin-left: 6px;',
             }),
-            content: m(MenuItem, {
-              label: 'Edit topic',
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: EditTopicModal,
-                  data: { description: topicDescription, id: topicId, name: topicName }
-                });
-              }
-            })
+            content: [
+              m(MenuItem, {
+                label: 'New topic',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({ modal: NewTopicModal });
+                }
+              }),
+              m(MenuItem, {
+                label: 'Edit topic',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: EditTopicModal,
+                    data: { description: topicDescription, id: topicId, name: topicName }
+                  });
+                }
+              }),
+            ],
           }),
-      ] : 'Discussions',
+      ] : [
+        'Discussions',
+        (isAdmin || isMod || app.community?.meta.invitesEnabled)
+          && m(PopoverMenu, {
+            class: 'sidebar-edit-topic',
+            position: 'bottom',
+            transitionDuration: 0,
+            hoverCloseDelay: 0,
+            closeOnContentClick: true,
+            trigger: m(Icon, {
+              name: Icons.CHEVRON_DOWN,
+              style: 'margin-left: 6px;',
+            }),
+            content: [
+              isAdmin && m(MenuItem, {
+                label: 'New topic',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({ modal: NewTopicModal });
+                }
+              }),
+              (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
+                label: 'Invite members',
+                onclick: (e) => {
+                  e.preventDefault();
+                  const data = app.activeCommunityId()
+                    ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain };
+                  app.modals.create({
+                    modal: CreateInviteModal,
+                    data,
+                  });
+                },
+              }),
+              isAdmin && m(MenuItem, {
+                label: 'Manage community',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({ modal: ManageCommunityModal });
+                }
+              }),
+              (isAdmin || isMod) && m(MenuItem, {
+                label: 'Community analytics',
+                onclick: (e) => m.route.set(`/${app.activeId() || 'edgeware'}/communityStats`),
+              }),
+            ],
+          }),
+      ],
       description: topicDescription,
       showNewProposalButton: true,
-      rightSidebar: m(ListingSidebar, { entity: app.activeId() })
     }, [
       (app.chain || app.community) && [
         m('.discussions-main', [
@@ -391,17 +452,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
               ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })
               : listing.length === 0
                 ? m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ])
-                : m(Listing, {
-                  content: listing,
-                  rightColSpacing: [4, 4, 4],
-                  columnHeaders: [
-                    'Title',
-                    'Comments',
-                    'Likes',
-                    'Updated'
-                  ],
-                  menuCarat: true,
-                }),
+                : m(Listing, { content: listing }),
           // TODO: Incorporate infinite scroll into generic Listing component
           (allThreads.length && vnode.state.postsDepleted[subpage])
             ? m('.infinite-scroll-reached-end', [

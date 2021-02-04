@@ -3,6 +3,7 @@ import 'pages/council.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { Grid, Col, Button, MenuItem, Tag } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
@@ -14,6 +15,7 @@ import { ChainBase, ChainClass, IVote } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
+
 import Sublayout from 'views/sublayout';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
@@ -22,11 +24,9 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import PageLoading from 'views/pages/loading';
 import ViewVotersModal from 'views/modals/view_voters_modal';
-import { Grid, Col, Button, MenuItem } from 'construct-ui';
-import CouncilRow from './council_row';
-import ListingHeader from '../../components/listing_header';
-import Listing from '../listing';
-import ErrorPage from '../error';
+import CouncilRow from 'views/pages/council/council_row';
+import Listing from 'views/pages/listing';
+import ErrorPage from 'views/pages/error';
 
 interface ICouncilElectionVoterAttrs {
   vote: PhragmenElectionVote;
@@ -95,6 +95,7 @@ export const CollectiveVotingButton: m.Component<{
           disabled: !app.user.activeAccount,
           intent: 'primary',
           label: 'Set council vote',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             app.modals.create({
@@ -147,6 +148,7 @@ export const CandidacyButton: m.Component<{
           disabled: (!app.user.activeAccount || activeAccountIsCandidate
                     || app.chain.networkStatus !== ApiStatus.Connected),
           intent: 'primary',
+          rounded: true,
           label: activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council',
           onclick: (e) => {
             e.preventDefault();
@@ -155,8 +157,8 @@ export const CandidacyButton: m.Component<{
           },
         })
         : m('a.proposals-action.CandidacyButton', {
-          class: (!app.user.activeAccount || activeAccountIsCandidate || app.chain.networkStatus !== ApiStatus.Connected)
-            ? 'disabled' : '',
+          class: (!app.user.activeAccount || activeAccountIsCandidate
+                  || app.chain.networkStatus !== ApiStatus.Connected) ? 'disabled' : '',
           onclick: (e) => {
             e.preventDefault();
             if (app.modals.getList().length > 0) return;
@@ -221,12 +223,18 @@ const CouncilPage: m.Component<{}> = {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
           message: 'Could not connect to chain',
-          title: 'Proposals',
+          title: [
+            'Council',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
         });
       }
       return m(PageLoading, {
         message: 'Connecting to chain',
-        title: 'Council',
+        title: [
+          'Council',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
         showNewProposalButton: true
       });
     }
@@ -235,7 +243,10 @@ const CouncilPage: m.Component<{}> = {
       if (!(app.chain as Substrate).phragmenElections.initializing) loadCmd();
       return m(PageLoading, {
         message: 'Connecting to chain',
-        title: 'Council',
+        title: [
+          'Council',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
         showNewProposalButton: true
       });
     }
@@ -254,7 +265,10 @@ const CouncilPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'CouncilPage',
-      title: 'Council',
+      title: [
+        'Council',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       showNewProposalButton: true,
       showCouncilMenu: true,
     }, [
@@ -271,7 +285,9 @@ const CouncilPage: m.Component<{}> = {
         ]),
         m(Col, { span: { xs: 6, md: 3 } }, [
           m('.stats-heading', 'Runners-up'),
-          m('.stats-tile', `${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)} / ${nRunnersUpSeats}`),
+          m('.stats-tile', [
+            `${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)} / ${nRunnersUpSeats}`
+          ]),
         ]),
         m(Col, { span: { xs: 6, md: 3 } }, [
           m('.stats-heading', 'Next council'),
@@ -298,10 +314,7 @@ const CouncilPage: m.Component<{}> = {
             ),
             m('.clear'),
           ])],
-        rightColSpacing: [0],
-        columnHeaders: [
-          'Councillors',
-        ],
+        columnHeader: 'Councillors',
       }),
       // candidates
       m(Listing, {
@@ -312,10 +325,7 @@ const CouncilPage: m.Component<{}> = {
               .map(([account, slot]) => m(CouncilRow, { account })),
             m('.clear'),
           ],
-        rightColSpacing: [4, 6],
-        columnHeaders: [
-          'Runners-up',
-        ]
+        columnHeader: 'Runners-up',
       })
     ]);
   },

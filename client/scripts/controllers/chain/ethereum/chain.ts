@@ -1,5 +1,6 @@
 import { ApiStatus, IApp } from 'state';
 import Web3 from 'web3';
+import m from 'mithril';
 
 import {
   NodeInfo,
@@ -106,6 +107,18 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       this._api.eth.net.isListening()
         .then((isListening) => {
           this.app.chain.networkStatus = ApiStatus.Connected;
+          this._api.eth.getBlock('latest').then((headers) => {
+            if (this.app.chain) {
+              this.app.chain.block.height = headers.number;
+              m.redraw();
+            }
+          });
+          this._api.eth.subscribe('newBlockHeaders', (err, headers) => {
+            if (this.app.chain) {
+              this.app.chain.block.height = headers.number;
+              m.redraw();
+            }
+          });
           resolve(this._api);
         })
         .catch((err) => reject(this._api));

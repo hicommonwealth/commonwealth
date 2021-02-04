@@ -1,6 +1,6 @@
 import 'components/sidebar/notification_row.scss';
 
-import { Icon, Icons } from 'construct-ui';
+import { Icon, Icons, Tooltip, Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment-twitter';
@@ -74,6 +74,8 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationHeader = m('span', [ actorName, ' created a new thread ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title) ]);
+  } else if (category === `${NotificationCategories.NewCollaboration}`) {
+    notificationHeader = m('span', [actorName, ' added you as a collaborator on ', m('span.commented-obj', decoded_title)]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
       ? m('span', [ actorName, ' liked the post ', m('span.commented-obj', decoded_title) ])
@@ -215,6 +217,7 @@ const NotificationRow: m.Component<{
   MolochTypes: any,
   SubstrateTypes: any,
   scrollOrStop: boolean;
+  markingRead: boolean;
 }> = {
   oncreate: (vnode) => {
     if (m.route.param('id') && vnode.attrs.onListPage
@@ -318,12 +321,12 @@ const NotificationRow: m.Component<{
         pageJump
       } = getBatchNotificationFields(category, notificationData);
       return m('li.NotificationRow', {
-        class: notifications[0].isRead ? '' : 'unread',
+        class: notification.isRead ? '' : 'unread',
         key: notification.id,
         id: notification.id,
         onclick: async () => {
           app.user.notifications.markAsRead(notifications);
-          await m.route.set(path);
+          await m.route.set(path.replace(/ /g, '%20')); // fix for improperly generated notification paths
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
@@ -347,7 +350,19 @@ const NotificationRow: m.Component<{
           notificationBody
             && category !== `${NotificationCategories.NewReaction}`
             && m('.comment-body-excerpt', notificationBody),
-          m('.comment-body-created', createdAt.twitterShort()),
+          m('.comment-body-bottom-wrap', [
+            m('.comment-body-created', createdAt.twitterShort()),
+            !notification.isRead && m('.comment-body-mark-as-read', {
+              onclick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                app.user.notifications.markAsRead(notifications);
+                vnode.state.markingRead = true;
+              }
+            }, [
+              vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
+            ]),
+          ])
         ]),
       ]);
     }

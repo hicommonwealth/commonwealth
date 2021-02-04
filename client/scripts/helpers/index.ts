@@ -17,7 +17,7 @@ export function externalLink(selector, target, children) {
     rel: 'noopener noreferrer',
     onclick: (e) => {
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-      if (target.startsWith(document.location.origin + '/')) {
+      if (target.startsWith(`${document.location.origin}/`)) {
         // don't open a new window if the link is on Commonwealth
         e.preventDefault();
         e.stopPropagation();
@@ -53,6 +53,10 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
 export function extractDomain(url) {
   const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');
   return re.exec(url)[1];
+}
+
+export function removeUrlPrefix(url) {
+  return url.replace(/^https?:\/\//, '');
 }
 
 /*
@@ -124,11 +128,11 @@ export function byAscendingCreationDate(a, b) {
 }
 
 export function byDescendingUpdatedDate(a, b) {
-  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt)
+  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt);
 }
 
 export function byAscendingUpdatedDate(a, b) {
-  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt)
+  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt);
 }
 
 export function orderAccountsByAddress(a, b) {
@@ -180,13 +184,13 @@ export function formatLastUpdated(timestamp) {
   if (formatted.indexOf(' month') !== -1) {
     return timestamp.format('MMM D');
   } else {
-    return formatted
+    return `${formatted
       .replace(' days', 'd')
       .replace(' day', 'd')
       .replace(' hours', 'h')
-      .replace(' hour', 'h');
+      .replace(' hour', 'h')} ago`;
   }
-};
+}
 
 // duplicated in adapters/currency.ts
 export function formatNumberLong(num: number) {

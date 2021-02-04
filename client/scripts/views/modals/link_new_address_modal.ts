@@ -60,23 +60,27 @@ const EthereumLinkAccountItem: m.Component<{
       onclick: async (e) => {
         e.preventDefault();
         vnode.state.linking = true;
-        const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
-          address: address.toLowerCase(),
-          chain: app.activeChainId(),
-          jwt: app.user.jwt,
-        });
 
-        if (result.exists) {
-          if (result.belongsToUser) {
-            notifyInfo('This address is already linked to your current account.');
-            vnode.state.linking = false;
-            return;
-          } else {
-            const modalMsg = 'This address is currently linked to another account. Continue?';
-            const confirmed = await confirmationModalWithText(modalMsg)();
-            if (!confirmed) {
+        // check address status if currently logged in
+        if (app.isLoggedIn()) {
+          const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+            address: address.toLowerCase(),
+            chain: app.activeChainId(),
+            jwt: app.user.jwt,
+          });
+
+          if (result.exists) {
+            if (result.belongsToUser) {
+              notifyInfo('This address is already linked to your current account.');
               vnode.state.linking = false;
               return;
+            } else {
+              const modalMsg = 'This address is currently linked to another account. Continue?';
+              const confirmed = await confirmationModalWithText(modalMsg)();
+              if (!confirmed) {
+                vnode.state.linking = false;
+                return;
+              }
             }
           }
         }
@@ -98,7 +102,9 @@ const EthereumLinkAccountItem: m.Component<{
           .then(() => m.redraw())
           .catch((err) => {
             vnode.state.linking = false;
-            errorCallback(`${err.name || 'Error'}: ${err.message}`);
+            errorCallback(
+              err ? `${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}` : 'Unknown error'
+            );
             m.redraw();
           });
       },
@@ -107,7 +113,7 @@ const EthereumLinkAccountItem: m.Component<{
         m('.account-user', m(User, { user: app.chain.accounts.get(address), avatarOnly: true, avatarSize: 40 })),
       ]),
       m('.account-item-left', [
-        m('.account-item-name', `${app.chain.meta.chain.name} account`),
+        m('.account-item-name', 'Ethereum address'), // always Ethereum, not app.chain.meta.chain.name
         m('.account-item-address', [
           m('.account-user', m(User, { user: app.chain.accounts.get(address), hideAvatar: true })),
         ]),
@@ -165,12 +171,16 @@ const CosmosLinkAccountItem: m.Component<{
             return accountVerifiedCallback(signerAccount).then(() => m.redraw());
           }).catch((err) => {
             vnode.state.linking = false;
-            errorCallback(`${err.name || 'Error'}: ${err.message}`);
+            errorCallback(
+              err ? `${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}` : 'Unknown error'
+            );
             m.redraw();
           });
         }).catch((err) => {
           vnode.state.linking = false;
-          errorCallback(`${err.name || 'Error'}: ${err.message}`);
+          errorCallback(
+            err ? `${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}` : 'Unknown error'
+          );
           m.redraw();
         });
       },
@@ -210,22 +220,25 @@ const SubstrateLinkAccountItem: m.Component<{
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
-        const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
-          address,
-          chain: app.activeChainId(),
-          jwt: app.user.jwt,
-        });
 
-        if (result.exists) {
-          if (result.belongsToUser) {
-            notifyInfo('This address is already linked to your current account.');
-            return;
-          } else {
-            const modalMsg = 'This address is currently linked to another account. Continue?';
-            const confirmed = await confirmationModalWithText(modalMsg)();
-            if (!confirmed) {
-              vnode.state.linking = false;
+        // check address status if currently logged in
+        if (app.isLoggedIn()) {
+          const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+            address,
+            chain: app.activeChainId(),
+            jwt: app.user.jwt,
+          });
+          if (result.exists) {
+            if (result.belongsToUser) {
+              notifyInfo('This address is already linked to your current account.');
               return;
+            } else {
+              const modalMsg = 'This address is currently linked to another account. Continue?';
+              const confirmed = await confirmationModalWithText(modalMsg)();
+              if (!confirmed) {
+                vnode.state.linking = false;
+                return;
+              }
             }
           }
         }
@@ -245,6 +258,7 @@ const SubstrateLinkAccountItem: m.Component<{
           const signature = (await signer.signRaw(payload)).signature;
           signerAccount.validate(signature).then(() => {
             vnode.state.linking = false;
+            m.redraw();
             // return if user signs for two addresses
             if (linkNewAddressModalVnode.state.linkingComplete) return;
             linkNewAddressModalVnode.state.linkingComplete = true;
@@ -257,11 +271,13 @@ const SubstrateLinkAccountItem: m.Component<{
           }).catch((err) => {
             vnode.state.linking = false;
             errorCallback('Verification failed');
+            m.redraw();
           });
         } catch (err) {
           // catch when the user rejects the sign message prompt
           vnode.state.linking = false;
           errorCallback('Verification failed');
+          m.redraw();
         }
       }
     }, [
@@ -327,8 +343,20 @@ const LinkNewAddressModal: m.Component<{
       vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
     ]);
 
+    // initialize the step
+    if (vnode.state.step === undefined) {
+      if (vnode.attrs.alreadyInitializedAccount) {
+        vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
+        vnode.state.newAddress = vnode.attrs.alreadyInitializedAccount;
+      } else {
+        vnode.state.step = vnode.attrs.useCommandLineWallet
+          ? LinkNewAddressSteps.Step1VerifyWithCLI
+          : LinkNewAddressSteps.Step1VerifyWithWebWallet;
+      }
+    }
+
     // TODO: refactor this out so we don't have duplicated loading code
-    if (!app.chain) return m('.LinkNewAddressModal', {
+    if (!app.chain && vnode.state.step !== LinkNewAddressSteps.Step2CreateProfile) return m('.LinkNewAddressModal', {
       key: 'placeholder', // prevent vnode from being reused so later oninit / oncreate code runs
     }, [
       m('.link-address-step', [
@@ -344,18 +372,6 @@ const LinkNewAddressModal: m.Component<{
         ])
       ])
     ]);
-
-    // initialize the step
-    if (vnode.state.step === undefined) {
-      if (vnode.attrs.alreadyInitializedAccount) {
-        vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
-        vnode.state.newAddress = vnode.attrs.alreadyInitializedAccount;
-      } else {
-        vnode.state.step = vnode.attrs.useCommandLineWallet
-          ? LinkNewAddressSteps.Step1VerifyWithCLI
-          : LinkNewAddressSteps.Step1VerifyWithWebWallet;
-      }
-    }
 
     // TODO: add a step to help users install wallets
     // gaiacli 'https://cosmos.network/docs/cosmos-hub/installation.html',
@@ -464,6 +480,7 @@ const LinkNewAddressModal: m.Component<{
             && m(Button, {
               class: 'account-adder',
               intent: 'primary',
+              rounded: true,
               disabled: !app.chain.webWallet?.available // disable if unavailable
                 || vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
               oninit: async (vvnode) => {
@@ -504,7 +521,11 @@ const LinkNewAddressModal: m.Component<{
               && link('a', 'https://wallet.keplr.app/', 'Get Keplr', { target: '_blank' }),
           ]),
           app.chain.webWallet?.enabled && m('.accounts-caption', [
-            app.chain.webWallet?.accounts.length ? [
+            app.chain.webWallet?.accounts.length === 0 ? [
+              m('p', 'Wallet connected, but no accounts were found.'),
+            ] : app.chain.base === ChainBase.Ethereum ? [
+              m('p.small-text', 'To connect with a different account, select it in your wallet, and refresh the page.'),
+            ] : [
               m('p', 'Select an address:'),
               m('p.small-text', 'Look for a popup, or check your wallet/browser extension.'),
               app.chain.base === ChainBase.CosmosSDK
@@ -512,14 +533,13 @@ const LinkNewAddressModal: m.Component<{
                   `Because ${app.chain.meta.chain.name} does not support signed verification messages, `,
                   'you will be asked to sign a no-op transaction. It will not be submitted to the chain.'
                 ]),
-            ] : [
-              m('p', 'Wallet connected, but no accounts were found.'),
             ],
           ]),
           m('.accounts-list', [
             app.chain.base === ChainBase.NEAR ? [
               m(Button, {
                 intent: 'primary',
+                rounded: true,
                 onclick: async (e) => {
                   // redirect to NEAR page for login
                   const WalletAccount = (await import('nearlib')).WalletAccount;
@@ -681,6 +701,7 @@ const LinkNewAddressModal: m.Component<{
             }),
             m(Button, {
               intent: 'primary',
+              rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
                 const unverifiedAcct: Account<any> = vnode.state.newAddress;
@@ -701,11 +722,12 @@ const LinkNewAddressModal: m.Component<{
       ]) : vnode.state.step === LinkNewAddressSteps.Step2CreateProfile ? m('.link-address-step', [
         linkAddressHeader,
         m('.link-address-step-narrow', [
-          m('.create-profile-instructions', vnode.state.isNewLogin
-            ? 'Logged in! Now create a profile:'
-            : 'Address verified! Now create a profile:'),
-          m('.new-account-userblock', { style: 'text-align: center;' }, [
-            m(UserBlock, { user: vnode.state.newAddress }),
+          m('.create-profile-instructions', vnode.state.isNewLogin ? [
+            m('p', 'Logged in!'),
+            m('p', 'Finish setting up your account, by uploading an avatar & telling us a little more about yourself:'),
+          ] : [
+            m('p', 'Address connected!'),
+            m('p', 'Finish setting up your account, by uploading an avatar & telling us a little more about yourself:'),
           ]),
           m('.avatar-wrap', [
             m(AvatarUpload, {
@@ -785,6 +807,7 @@ const LinkNewAddressModal: m.Component<{
           ]),
           m(Button, {
             intent: 'primary',
+            rounded: true,
             disabled: (vnode.state.uploadsInProgress || !vnode.state.hasName),
             onclick: async (e) => {
               e.preventDefault();
@@ -819,7 +842,7 @@ const LinkNewAddressModal: m.Component<{
 
 // inject confirmExit property
 LinkNewAddressModal['confirmExit'] = confirmationModalWithText(
-  app.isLoggedIn() ? 'Cancel connecting new address?' : 'Cancel log in?',
+  'Exit now?',
   'Yes',
   'No'
 );

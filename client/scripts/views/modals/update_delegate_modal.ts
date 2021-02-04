@@ -40,6 +40,7 @@ const UpdateDelegateModal: m.Component<IAttrs, IState> = {
         m(Button, {
           intent: 'primary',
           type: 'submit',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             vnode.attrs.account.updateDelegateKeyTx(vnode.state.newDelegateKey)

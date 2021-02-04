@@ -599,6 +599,7 @@ const NewProposalForm = {
               disabled: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
                 && !(author as SubstrateAccount).isCouncillor),
               intent: 'primary',
+              rounded: true,
               label: proposalTypeEnum === ProposalType.OffchainThread
                 ? 'Create thread'
                 : 'Send transaction',

@@ -22,6 +22,11 @@ import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 
+// Prefetch commonly used pages
+import(/* webpackPrefetch: true */ 'views/pages/home');
+import(/* webpackPrefetch: true */ 'views/pages/discussions');
+import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
+
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true): Promise<void> {
@@ -30,6 +35,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.chains.clear();
       app.config.nodes.clear();
       app.config.communities.clear();
+      app.user.notifications.store.clear();
+      app.user.notifications.clearSubscriptions();
       data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
       data.nodes.map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
@@ -46,7 +53,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           description: community.description,
           iconUrl: community.iconUrl,
           website: community.website,
-          chat: community.chat,
+          discord: community.discord,
+          element: community.element,
           telegram: community.telegram,
           github: community.github,
           default_chain: app.config.chains.getById(community.default_chain),
@@ -298,6 +306,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
+  } else if (n.chain.network === ChainNetwork.Commonwealth) {
+    const Commonwealth = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/commonwealth/adapter'
+    )).default;
+    newChain = new Commonwealth(n, app);
   } else {
     throw new Error('Invalid chain');
   }
@@ -500,6 +515,11 @@ $(() => {
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
     '/edgeware/stats':           importRoute('views/stats/edgeware', { scoped: false }),
+
+    // Commonwealth protocol
+    '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
+    // '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
+    '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),

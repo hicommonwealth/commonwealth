@@ -131,6 +131,7 @@ const TXSigningCLIOption = {
       submitAction = m(Button, {
         intent: 'primary',
         type: 'submit',
+        rounded: true,
         onclick: (e) => {
           e.preventDefault();
           // try {
@@ -162,6 +163,7 @@ const TXSigningCLIOption = {
       submitAction = m(Button, {
         intent: 'primary',
         type: 'submit',
+        rounded: true,
         onclick: (e) => {
           e.preventDefault();
           try {
@@ -232,6 +234,7 @@ const TXSigningWebWalletOption = {
       m(Button, {
         type: 'submit',
         intent: 'primary',
+        rounded: true,
         disabled: !isWebWalletEnabled || !isAuthorInWebWallet,
         onclick: async (e) => { await transact(); },
         oncreate: (vvnode) => $(vvnode.dom).focus(),
@@ -272,6 +275,7 @@ const TXSigningSeedOrMnemonicOption = {
         m(Button, {
           intent: 'primary',
           type: 'submit',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             const newKey = `${$(vnode.dom).find('textarea.mnemonic').val().toString()
@@ -294,6 +298,7 @@ const TXSigningSeedOrMnemonicOption = {
         m(Button, {
           intent: 'primary',
           type: 'submit',
+          rounded: true,
           onclick: (e) => {
             e.preventDefault();
             transact();
@@ -423,6 +428,7 @@ const TXSigningModalStates = {
             type: 'submit',
             disabled: true,
             fluid: true,
+            rounded: true,
             onclick: (e) => (undefined),
             label: `Waiting ${vnode.state.timer || 0}s...`
           }),
@@ -448,6 +454,7 @@ const TXSigningModalStates = {
             intent: 'primary',
             type: 'submit',
             fluid: true,
+            rounded: true,
             oncreate: (vvnode) => $(vvnode.dom).focus(),
             onclick: (e) => {
               e.preventDefault();
@@ -478,6 +485,7 @@ const TXSigningModalStates = {
                 type: 'submit',
                 style: 'margin-right: 10px',
                 fluid: true,
+                rounded: true,
                 onclick: (e) => {
                   e.preventDefault();
                   $(vnode.dom).trigger('modalexit');
@@ -489,6 +497,7 @@ const TXSigningModalStates = {
               m(Button, {
                 intent: 'none',
                 fluid: true,
+                rounded: true,
                 style: 'margin-left: 10px',
                 oncreate: (vvnode) => $(vvnode.dom).focus(),
                 onclick: (e) => { vnode.attrs.next('Intro'); },

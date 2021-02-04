@@ -6,11 +6,19 @@ import $ from 'jquery';
 
 import app from 'state';
 import { ProposalStore, TopicScopedThreadStore } from 'stores';
-import { OffchainThread, OffchainAttachment, CommunityInfo, NodeInfo, OffchainTopic } from 'models';
+import {
+  OffchainThread,
+  OffchainAttachment,
+  CommunityInfo,
+  NodeInfo,
+  OffchainTopic,
+  Profile
+} from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
+import { Moment } from 'moment';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 
 export const DEFAULT_PAGE_SIZE = 20;
@@ -20,6 +28,21 @@ export const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
+
+  const versionHistory = thread.version_history.map((v) => {
+    let history;
+    try {
+      history = JSON.parse(v || '{}');
+      history.author = typeof history.author === 'string'
+        ? JSON.parse(history.author)
+        : typeof history.author === 'object' ? history.author : null;
+      history.timestamp = moment(history.timestamp);
+    } catch (e) {
+      console.log(e);
+    }
+    return history;
+  });
+
   return new OffchainThread(
     thread.Address.address,
     decodeURIComponent(thread.title),
@@ -28,7 +51,7 @@ export const modelFromServer = (thread) => {
     moment(thread.created_at),
     thread.topic,
     thread.kind,
-    thread.version_history,
+    versionHistory,
     thread.community,
     thread.chain,
     thread.read_only,
@@ -37,6 +60,7 @@ export const modelFromServer = (thread) => {
     thread.url,
     thread.Address.chain,
     thread.pinned,
+    thread.collaborators
   );
 };
 
@@ -66,6 +90,12 @@ to the listingStore, since they do not belong in the listing component, and thei
 would break the listingStore's careful chronology.
 
 */
+
+export interface VersionHistory {
+  author?: Profile;
+  timestamp: Moment;
+  body: string;
+}
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
@@ -101,23 +131,19 @@ class ThreadsController {
     url?: string,
     attachments?: string[],
     mentions?: string[],
-    readOnly?: boolean
+    readOnly?: boolean,
   ) {
-    const timestamp = moment();
-    const firstVersion : any = { timestamp, body };
-    const versionHistory : string = JSON.stringify(firstVersion);
-
     try {
       // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {
         'author_chain': app.user.activeAccount.chain.id,
+        'author': JSON.stringify(app.user.activeAccount.profile),
         'chain': chainId,
         'community': communityId,
         'address': address,
         'title': encodeURIComponent(title),
         'body': encodeURIComponent(body),
         'kind': kind,
-        'versionHistory': versionHistory,
         'attachments[]': attachments,
         'mentions[]': mentions,
         'topic_name': topicName,
@@ -148,21 +174,25 @@ class ThreadsController {
     proposal: OffchainThread,
     body?: string,
     title?: string,
+    mentions?: string[],
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
-    const recentEdit : any = { timestamp: moment(), body };
-    const versionHistory = JSON.stringify(recentEdit);
     await $.ajax({
       url: `${app.serverUrl()}/editThread`,
       type: 'PUT',
       data: {
+        'author_chain': app.user.activeAccount.chain.id,
+        'author': JSON.stringify(app.user.activeAccount.profile),
+        'address': app.user.activeAccount.address,
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
         'thread_id': proposal.id,
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
+        'mentions[]': mentions,
         'title': newTitle,
-        'version_history': versionHistory,
         'attachments[]': attachments,
         'jwt': app.user.jwt
       },
@@ -353,7 +383,6 @@ class ThreadsController {
         // Threads that are posted in an offchain community are still linked to a chain / author address,
         // so when we want just chain threads, then we have to filter away those that have a community
         const { threads } = response.result;
-
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
           if (!thread.Address) {

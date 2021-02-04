@@ -36,10 +36,8 @@ export const EdgewareChainNotificationTypes = {
     'edgeware-treasury-reward-minting-v2'
   ],
   Validator: [
-    'edgeware-bonded',
     'edgeware-reward',
     'edgeware-slash',
-    'edgeware-unbonded',
   ],
   VotingDelegation: [
     'edgeware-vote-delegated',
@@ -82,10 +80,8 @@ export const PolkadotChainNotificationTypes = {
     'polkadot-treasury-rejected',
   ],
   Validator: [
-    'polkadot-bonded',
     'polkadot-reward',
     'polkadot-slash',
-    'polkadot-unbonded',
   ],
   VotingDelegation: [
     'polkadot-vote-delegated',
@@ -128,10 +124,8 @@ export const KusamaChainNotificationTypes = {
     'kusama-treasury-rejected',
   ],
   Validator: [
-    'kusama-bonded',
     'kusama-reward',
     'kusama-slash',
-    'kusama-unbonded',
   ],
   VotingDelegation: [
     'kusama-vote-delegated',
@@ -174,10 +168,8 @@ export const KulupuChainNotificationTypes = {
     'kulupu-treasury-rejected',
   ],
   Validator: [
-    'kulupu-bonded',
     'kulupu-reward',
     'kulupu-slash',
-    'kulupu-unbonded',
   ],
   VotingDelegation: [
     'kulupu-vote-delegated',
