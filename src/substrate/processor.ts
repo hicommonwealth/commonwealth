@@ -45,6 +45,7 @@ export class Processor extends IEventProcessor<ApiPromise, Block> {
           return result;
         } catch (e) {
           log.error(`Event enriching failed for ${kind}`);
+          log.error(`Error: ${e}`);
           return null;
         }
       } else {

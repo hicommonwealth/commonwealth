@@ -46,7 +46,7 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
     // fetch blocks from start to end
     const blockNumbers = [ ...Array(range.endBlock - range.startBlock).keys()]
       .map((i) => range.startBlock + i);
-    log.debug(`Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`);
+    log.info(`Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`);
 
     // the hashes are pruned when using api.query.system.blockHash.multi
     // therefore fetching hashes from chain. the downside is that for every
@@ -73,30 +73,37 @@ export class Poller extends IEventPoller<ApiPromise, Block> {
 
   /**
    * Connects to chain, fetches blocks specified in given range in provided batch size,
-   * prcoesses the blocks if a handler is provided else returns the blocks for 
-   * further processing
+   * prcoesses the blocks if a handler is provided 
    * @param range IDisconnectedRange having startBlock and optional endBlock
    * @param batchSize size of the batch in which blocks are to be fetched from chain
    * @param processBlockFn an optional function to process the blocks
    */
-  public async archive(range: IDisconnectedRange, batchSize: number = 500, processBlockFn: (block: Block) => any = null): Promise<Block[]> {
-    if(!range.endBlock){
+  public async archive(range: IDisconnectedRange, batchSize: number = 10, processBlockFn: (block: Block) => any = null) {
+    const syncWithHead = !range.endBlock? true:false;
+
+    // if the endBlock is not provided then we will run archival mode until we reach the head
+    if(syncWithHead){
       const header = await this._api.rpc.chain.getHeader();
       range.endBlock =  +header.number;
     }
-    const blocks = [];
+    
     for (let block = range.startBlock; block < range.endBlock; block = Math.min(block + batchSize, range.endBlock)) {
       try {
         let currentBlocks = await this.poll({startBlock: block, endBlock: Math.min(block + batchSize, range.endBlock)}, batchSize); 
         if(processBlockFn){
-          await Promise.all(currentBlocks.map(processBlockFn));
+          // process all blocks sequentially
+          for(let block of currentBlocks) await processBlockFn(block); 
+
         }
-        blocks.push(...currentBlocks);
       } catch (e) {
         log.error(`Block polling failed after disconnect at block ${range.startBlock}`);
         return;
       }
+      // if sync with head then update the endBlock to current header 
+      if(syncWithHead){
+        const header = await this._api.rpc.chain.getHeader();
+        range.endBlock =  +header.number;
+      }
     }
-    return blocks;
   }
 }

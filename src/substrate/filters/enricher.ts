@@ -1,11 +1,10 @@
 import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
-  ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
-  ReferendumInfo, SessionIndex, ValidatorId, Exposure, EraIndex, AuthorityId, IdentificationTuple,
+  ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Extrinsic,
+  ReferendumInfo, ValidatorId, Exposure, EraIndex, AuthorityId, IdentificationTuple,
   EraRewardPoints, AccountVote
 } from '@polkadot/types/interfaces';
-import { DeriveStakingElected } from '@polkadot/api-derive/types';
 import BN from 'bn.js';
 import { Option, bool, Vec, u32, u64, Compact } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
@@ -13,6 +12,7 @@ import { filter } from 'lodash';
 import { Kind, OpaqueTimeSlot, OffenceDetails } from '@polkadot/types/interfaces/offences';
 import { CWEvent } from '../../interfaces';
 import { EventKind, IEventData, isEvent, parseJudgement, IdentityJudgement } from '../types';
+import { currentPoints } from './currentPoint';
 
 /**
  * This is an "enricher" function, whose goal is to augment the initial event data
@@ -34,6 +34,11 @@ export async function Enrich(
     includeAddresses?: string[],
     excludeAddresses?: string[],
   }> => {
+
+    // get the hash of current block number
+    const hash = await api.rpc.chain.getBlockHash(blockNumber);
+    const sessionIndex = await api.query.session.currentIndex.at(hash);
+
     switch (kind) {
       /**
        * ImOnline Events
@@ -47,9 +52,9 @@ export async function Enrich(
           }
         }
       }
+      
       case EventKind.SomeOffline: {
         const [ validators ] = event.data as unknown as [ Vec<IdentificationTuple> ];
-        const sessionIndex = await api.query.session.currentIndex();
         return {
           data: {
             kind,
@@ -59,13 +64,12 @@ export async function Enrich(
         }
       }
       case EventKind.AllGood: {
-        const validators = await api.derive.staking.validators();
-        const sessionIndex = await api.query.session.currentIndex();
+        const validators = await api.query.session.validators.at(hash);
         return {
           data: {
             kind,
             sessionIndex: +sessionIndex - 1,
-            validators: validators.validators?.map((v) => v.toString()),
+            validators: validators?.map((v) => v.toString()),
           }
         }
       }
@@ -75,7 +79,12 @@ export async function Enrich(
        */
       case EventKind.Offence: {
         const [ offenceKind, opaqueTimeSlot, applied ] = event.data as unknown as [ Kind, OpaqueTimeSlot, bool ];
-        const offenceApplied = applied.isTrue;
+        
+        // for past events we dont get the applied field so offenceApplied can be undefined
+        let offenceApplied:boolean = null;
+        if (applied){
+          offenceApplied = applied.isTrue;
+        }
         const reportIds = await api.query.offences.concurrentReportsIndex(offenceKind, opaqueTimeSlot);
         const offenceDetails: Option<OffenceDetails>[] = await api.query.offences.reports
           .multi(reportIds);
@@ -101,55 +110,103 @@ export async function Enrich(
        * Session Events
        */
       case EventKind.NewSession: {
-        const [sessionIndex] = event.data as unknown as [SessionIndex] & Codec
-        const validators = await api.derive.staking.validators();
-        const electedInfo: DeriveStakingElected = await api.derive.staking.electedInfo() as any; // validator preferences for getting commision
-        const validatorEraPoints: EraRewardPoints = await api.query.staking.currentPoints() as EraRewardPoints;
-        const currentEra = (Number)(await api.query.staking.currentEra<Option<EraIndex>>());
-        const eraPointsIndividual = validatorEraPoints.individual;
-        let active: Array<ValidatorId>
-        let waiting: Array<ValidatorId>
+
+        const validators = await api.query.session.validators.at(hash);
+        // get the era of block
+        const rawCurrentEra = await api.query.staking.currentEra.at(hash);
+        const currentEra = rawCurrentEra.toRawType
+          ? rawCurrentEra.toRawType() === 'u32'
+            ? rawCurrentEra.toString() as unknown as EraIndex
+            : rawCurrentEra.unwrap()
+          : rawCurrentEra.unwrap();
+        
+        // get the nextElected Validators
+        const keys = api.query.staking.erasStakers
+          ? await api.query.staking.erasStakers.keysAt(hash,currentEra)
+          : await api.query.staking.stakers.keysAt(hash, currentEra) ; 
+
+        const nextElected = keys.length ? keys.map((key) => key.args[1] as AccountId): validators['nextElected'];
+        
+        // get current stashes
+        const stashes = await api.query.staking.validators.keysAt(hash);
+
+        // find the waiting validator
+        const nextElectedStr = nextElected.map((v) => v.toString())
+        // const stashesStr =stashes.map((v) => v.args[0].toString())
+        const stashesStr =stashes.filter((v) => v.args.length).map((v) => v.args[0].toString())
+        
+        const waiting = stashesStr.filter((v) => !nextElectedStr.includes(v));
+
+
+        // get validators current era reward points
+        const validatorEraPoints: EraRewardPoints = await currentPoints(api, currentEra, hash, validators) as EraRewardPoints;
+        const eraPointsIndividual = validatorEraPoints.individual.toJSON();
+
         const validatorInfo = {};
-        electedInfo.info.forEach(async ({ accountId, controllerId, validatorPrefs, rewardDestination }) => {
-          const commissionPer = (Number)(validatorPrefs.commission || new BN(0)) / 10_000_000;
-          const key = accountId.toString();
-          validatorInfo[key] = {}
+
+        for(let validator of validators){
+          const key = validator.toString();
+
+          // eraValidatorPrefs does not return comission prior to 3139800
+          const preference = api.query.staking.erasValidatorPrefs
+            ? await api.query.staking.erasValidatorPrefs.at(hash, currentEra,key)
+            : await api.query.staking.validators.at(hash, key);
+
+          const commissionPer =  (Number)(preference.commission || new BN(0)) / 10_000_000;
+
+          const rewardDestination = await api.query.staking.payee.at(hash,key);
+          const controllerId = await api.query.staking.bonded.at(hash, key);
+          let nextSessionKeysOpt;
+
+          try{
+            // to get keys of old blocks
+            nextSessionKeysOpt = await api.query.session.nextKeys(hash,key);
+            // there is queuedKeys function as well not sure which one to use
+            // nextSessionKeysOpt = await api.query.session.queuedKeys(hash,key);
+          }
+          catch(e){
+            // for new blocks after 3139200
+            nextSessionKeysOpt = await api.query.session.nextKeys.at(hash,key);
+          }
+          
+          const nextSessionKeys = nextSessionKeysOpt.isSome
+            ? nextSessionKeysOpt.unwrap()
+            : []
+
           validatorInfo[key] = {
             commissionPer,
-            controllerId,
-            rewardDestination,
-            nextSessionIds: await (await api.query.session.nextKeys(key)).toString(),
-            eraPoints: Number(eraPointsIndividual[key])
+            controllerId: controllerId.toString() == ''? key: controllerId.toString(),
+            rewardDestination: rewardDestination.toString(),
+            nextSessionIds: nextSessionKeys.map(key => key.toString()),
+            eraPoints: eraPointsIndividual[key]? Number(eraPointsIndividual[key]): 0
           };
-        });
-        // erasStakers(EraIndex, AccountId): Exposure -> api.query.staking.erasStakers // KUSAMA
-        // stakers(AccountId): Exposure -> api.query.staking.stakers // EDGEWARE
-        const stakersCall = (api.query.staking.stakers)
-          ? api.query.staking.stakers
-          : api.query.staking.erasStakers;
-        const stakersCallArgs = (account) => (api.query.staking.stakers)
-          ? [account]
-          : [currentEra as unknown as EraIndex, account];
+        };
+
+        const stakersCall = (account) => {
+          return  api.query.staking.stakers ?
+          api.query.staking.stakers.at(hash, account) : 
+          api.query.staking.erasStakers.at(hash,currentEra, account);
+        }
+
         let activeExposures: { [key: string]: any } = {}
         if (validators && currentEra) { // if currentEra isn't empty
-          active = validators.validators;
-          waiting = validators.nextElected;
-          await Promise.all(active.map(async (validator) => {
-            const tmp_exposure = (await stakersCall(...stakersCallArgs(validator))) as Exposure;
+          await Promise.all(validators.map(async (validator) => {
+            const tmpExposure = (await stakersCall(validator)) as Exposure;
             const exposure = {
-              own: tmp_exposure.own,
-              total: tmp_exposure.total,
-              others: tmp_exposure.others
+              own: tmpExposure.own,
+              total: tmpExposure.total,
+              others: tmpExposure.others
             }
             activeExposures[validator.toString()] = exposure;
           }));
         }
+
         return {
           data: {
             kind,
             activeExposures,
-            active: active?.map((v) => v.toString()),
-            waiting: waiting?.map((v) => v.toString()),
+            active: validators?.map((v) => v.toString()),
+            waiting: waiting,
             sessionIndex: +sessionIndex,
             currentEra: +currentEra,
             validatorInfo,
@@ -198,7 +255,7 @@ export async function Enrich(
       case EventKind.Bonded:
       case EventKind.Unbonded: {
         const [ stash, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
-        const controllerOpt = await api.query.staking.bonded<Option<AccountId>>(stash);
+        const controllerOpt = await api.query.staking.bonded.at<Option<AccountId>>(hash,stash);
         if (!controllerOpt.isSome) {
           throw new Error(`could not fetch staking controller for ${stash.toString()}`);
         }
@@ -411,6 +468,7 @@ export async function Enrich(
       case EventKind.TreasuryProposed: {
         const [ proposalIndex ] = event.data as unknown as [ ProposalIndex ] & Codec;
         const proposalOpt = await api.query.treasury.proposals<Option<TreasuryProposal>>(proposalIndex);
+        
         if (!proposalOpt.isSome) {
           throw new Error(`could not fetch treasury proposal index ${+proposalIndex}`);
         }
