@@ -83,13 +83,11 @@ export interface ThreadArgs {
   body?: string,
   url?: string,
   attachments?: string[],
-  mentions?: string[],
   readOnly?: boolean
 }
 export const createThread = async (args: ThreadArgs) => {
   const { chainId, communityId, address, jwt, title, body, topicName, topicId,
-    readOnly, kind, url, mentions, attachments } = args;
-  const timestamp = moment();
+    readOnly, kind, url, attachments } = args;
   const res = await chai.request.agent(app)
     .post('/api/createThread')
     .set('Accept', 'application/json')
@@ -104,7 +102,6 @@ export const createThread = async (args: ThreadArgs) => {
       'attachments[]': undefined,
       'topic_name': topicName,
       'topic_id': topicId,
-      'mentions[]': mentions,
       'url': url,
       'readOnly': readOnly || false,
       'jwt': jwt,
@@ -120,11 +117,9 @@ export interface CommentArgs {
   text: any;
   parentCommentId?: any;
   root_id?: any;
-  mentions?: any;
 }
 export const createComment = async (args: CommentArgs) => {
-  const { chain, community, address, jwt, text, parentCommentId, root_id, mentions } = args;
-  const timestamp = moment();
+  const { chain, community, address, jwt, text, parentCommentId, root_id } = args;
   const res = await chai.request.agent(app)
     .post('/api/createComment')
     .set('Accept', 'application/json')
@@ -138,7 +133,6 @@ export const createComment = async (args: CommentArgs) => {
       'attachments[]': undefined,
       'text': text,
       'jwt': jwt,
-      'mentions[]': mentions,
     });
   return res.body;
 };

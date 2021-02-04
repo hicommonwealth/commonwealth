@@ -1,6 +1,7 @@
 import 'components/quill_editor.scss';
 
 import m, { VnodeDOM } from 'mithril';
+import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment-twitter';
 import Quill from 'quill-2.0-dev/quill';
@@ -248,7 +249,6 @@ const instantiateEditor = (
     return response.result;
   };
 
-  let typingListener;
   const queryMentions = async (searchTerm, renderList, mentionChar) => {
     if (mentionChar !== '@') return;
     // Optional code for tagging roles:
@@ -259,20 +259,17 @@ const instantiateEditor = (
     let members = [];
     let formattedMatches;
     if (searchTerm.length === 0) {
-      typingListener = setTimeout(() => {
-        const node = document.createElement('div');
-        const tip = document.createElement('span');
-        tip.innerText = 'Type to tag a member';
-        node.appendChild(tip);
-        formattedMatches = [{
-          link: '#',
-          name: '',
-          component: node.outerHTML,
-        }];
-        renderList(formattedMatches, searchTerm);
-      }, 300);
+      const node = document.createElement('div');
+      const tip = document.createElement('span');
+      tip.innerText = 'Type to tag a member';
+      node.appendChild(tip);
+      formattedMatches = [{
+        link: '#',
+        name: '',
+        component: node.outerHTML,
+      }];
+      renderList(formattedMatches, searchTerm);
     } else if (searchTerm.length > 0) {
-      if (typingListener) clearTimeout(typingListener);
       members = await searchMentionableAddresses(searchTerm);
       formattedMatches = members.map((addr) => {
         const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
@@ -608,7 +605,7 @@ const instantiateEditor = (
         dataAttributes: ['name', 'link', 'component'],
         renderItem: (item) => item.component,
         onSelect: selectMention,
-        source: queryMentions,
+        source: _.debounce(queryMentions, 300, { leading: true, trailing: true }),
         isolateChar: true,
       }
     },

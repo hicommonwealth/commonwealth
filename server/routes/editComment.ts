@@ -6,6 +6,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
+import { parseUserMentions } from '../util/parseUserMentions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -130,17 +131,27 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       [ finalComment.Address.address ],
     );
 
-    const mentions = typeof req.body['mentions[]'] === 'string'
-      ? [req.body['mentions[]']]
-      : typeof req.body['mentions[]'] === 'undefined'
-        ? []
-        : req.body['mentions[]'];
+    let mentions;
+    try {
+      const previousDraftMentions = parseUserMentions(latestVersion);
+      const currentDraftMentions = parseUserMentions(decodeURIComponent(req.body.body));
+      mentions = currentDraftMentions.filter((addrArray) => {
+        let alreadyExists = false;
+        previousDraftMentions.forEach((addrArray_) => {
+          if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+            alreadyExists = true;
+          }
+        });
+        return !alreadyExists;
+      });
+    } catch (e) {
+      return next(new Error('Failed to parse mentions'));
+    }
 
     // grab mentions to notify tagged users
     let mentionedAddresses;
     if (mentions?.length > 0) {
       mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-        mention = mention.split(',');
         try {
           const user = await models.Address.findOne({
             where: {

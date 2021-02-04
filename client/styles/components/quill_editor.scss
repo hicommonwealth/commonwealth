@@ -267,11 +267,17 @@
             }
         }
         > .selected {
-            background: $background-color-light-hover;
+            background: $background-color-white-hover;
             cursor: pointer;
+        }
+        .ql-mention-list-item > div > span {
+            position: relative;
+            top: 4px;
         }
         .ql-mention-text-wrap {
             width: 100%;
+            position: relative;
+            top: 4px;
             .ql-mention-name {
                 margin-right: 15px;
             }
@@ -286,6 +292,7 @@
                 color: $text-color-light;
                 font-size: 90%;
                 white-space: nowrap;
+                margin-bottom: 2px;
             }
         }
         .ql-mention-avatar {
