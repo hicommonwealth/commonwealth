@@ -1,7 +1,8 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import {
-  SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES, MAGIC_SUPPORTED_CHAINS
+  SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES, MAGIC_SUPPORTED_CHAINS,
+  MAGIC_DEFAULT_CHAIN
 } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
@@ -44,14 +45,12 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
     log.warn(`Could not look up chain/community for login email ${email}: ${err.message}`);
     return [ null, null ];
   });
-  const registrationChain: string = chain ? chain.id : community ? community.default_chain : null;
+  const registrationChain: string = chain ? chain.id : community ? community.default_chain : MAGIC_DEFAULT_CHAIN;
   const isRegistration = !previousUser;
   const isMagicUser = previousUser && !!previousUser.lastMagicLoginAt;
-  if ((isRegistration || isMagicUser) && registrationChain && MAGIC_SUPPORTED_CHAINS.includes(registrationChain)) {
+  if ((isRegistration || isMagicUser) && registrationChain && MAGIC_SUPPORTED_CHAINS.includes(registrationChain)
+      && !req.body.forceEmailLogin) {
     return res.json({ status: 'Success', result: { shouldUseMagic: true } });
-  }
-  if ((isRegistration || isMagicUser) && !registrationChain) {
-    return res.status(500).json({ error: Errors.ChainOrCommunityRequired });
   }
 
   // ensure no more than 3 tokens have been created in the last 5 minutes

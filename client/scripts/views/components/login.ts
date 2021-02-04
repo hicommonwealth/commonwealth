@@ -9,11 +9,11 @@ import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown
 
 const Login: m.Component<{}, {
   disabled: boolean;
-  success: boolean;
+  showMagicLoginPrompt: boolean;
+  showMagicLoginPromptEmail: string;
+  emailLoginSucceeded: boolean;
   failure: boolean;
   error: Error | string;
-  forceRegularLogin: boolean; // show regular login form from NEAR page
-
 }> = {
   view: (vnode) => {
     return m('.Login', {
@@ -31,6 +31,7 @@ const Login: m.Component<{}, {
             onclick: (e) => {
               e.stopPropagation();
             },
+            disabled: vnode.state.showMagicLoginPrompt,
             oncreate: (vvnode) => {
               $(vvnode.dom).focus();
             }
@@ -53,7 +54,7 @@ const Login: m.Component<{}, {
               const path = m.route.get();
               if (!email) return;
               vnode.state.disabled = true;
-              vnode.state.success = false;
+              vnode.state.emailLoginSucceeded = false;
               vnode.state.failure = false;
 
               // attempt legacy login first -- will bounce if we need to use magic instead
@@ -65,25 +66,26 @@ const Login: m.Component<{}, {
                   path,
                 });
 
-                // use magic if legacy response tells us to do so
                 if (legacyResponse.status === 'Success' && legacyResponse.result?.shouldUseMagic) {
-                  try {
-                    await loginWithMagicLink(email);
-                    // do not redirect -- just close modal
-                    $('.LoginModal').trigger('modalforceexit');
-                  } catch (err) {
-                    vnode.state.failure = true;
-                    vnode.state.error = err.message;
-                  }
+                  // use magic if legacy response tells us to do so
+                  setTimeout(() => {
+                    vnode.state.showMagicLoginPrompt = true;
+                    vnode.state.showMagicLoginPromptEmail = $(e.target).closest('.Login').find('[name="email"]').val()
+                      .toString();
+                    vnode.state.disabled = false;
+                    m.redraw();
+                  }, 500);
                 } else if (legacyResponse.status === 'Success') {
-                  // successfully kicked off a legacy-style login
-                  vnode.state.success = true;
+                  // use legacy-style login otherwise
+                  vnode.state.emailLoginSucceeded = true;
+                  vnode.state.disabled = false;
+                  m.redraw();
                 } else {
                   vnode.state.failure = true;
                   vnode.state.error = legacyResponse.message;
+                  vnode.state.disabled = false;
+                  m.redraw();
                 }
-                vnode.state.disabled = false;
-                m.redraw();
               } catch (err) {
                 vnode.state.disabled = false;
                 vnode.state.failure = true;
@@ -96,41 +98,98 @@ const Login: m.Component<{}, {
           }),
         ])
       ]),
-      vnode.state.success && m('.login-message.success', [
-        'Check your email to continue.'
-      ]),
-      vnode.state.failure && m('.login-message.failure', [
+      vnode.state.failure ? m('.login-message.failure', [
         vnode.state.error || 'An error occurred.'
-      ]),
-
-      m('.form-divider', 'or'),
-      m(Form, { gutter: 10 }, [
-        m(FormGroup, { span: 12 }, [
+      ]) : vnode.state.emailLoginSucceeded ? m('.login-message.success', [
+        'Check your email to continue.'
+      ]) : vnode.state.showMagicLoginPrompt ? m('.login-magic-prompt', [
+        m('p', [
+          'Commonwealth requires a crypto address to post. Generate one attached to ',
+          m('strong', vnode.state.showMagicLoginPromptEmail),
+          '?',
+        ]),
+        m('.login-magic-prompt-buttons', [
           m(Button, {
+            label: 'Yes, generate an address for me',
             intent: 'primary',
-            fluid: true,
             rounded: true,
-            href: `${app.serverUrl()}/auth/github`,
-            onclick: (e) => {
-              localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
-                timestamp: (+new Date()).toString(),
-                path: m.route.get()
-              }));
+            compact: true,
+            onclick: async (e) => {
+              e.preventDefault();
+              try {
+                vnode.state.disabled = true;
+                await loginWithMagicLink(vnode.state.showMagicLoginPromptEmail);
+                vnode.state.disabled = false;
+                // do not redirect -- just close modal
+                $('.LoginModal').trigger('modalforceexit');
+              } catch (err) {
+                vnode.state.disabled = false;
+                vnode.state.failure = true;
+                vnode.state.error = err.message;
+              }
             },
-            label: 'Continue with Github'
+          }),
+          m(Button, {
+            label: 'No, I’ll use my own wallet',
+            intent: 'none',
+            rounded: true,
+            compact: true,
+            onclick: async (e) => {
+              e.preventDefault();
+              vnode.state.disabled = true;
+              const path = m.route.get();
+              const email = $(e.target).closest('.Login').find('[name="email"]').val()
+                .toString();
+              const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
+                'chain': app.activeChainId(),
+                'community': app.activeCommunityId(),
+                email,
+                path,
+                forceEmailLogin: true,
+              });
+
+              if (legacyResponse.status === 'Success') {
+                // successfully kicked off a legacy-style login
+                vnode.state.emailLoginSucceeded = true;
+              } else {
+                vnode.state.failure = true;
+                vnode.state.error = legacyResponse.message;
+              }
+              vnode.state.disabled = false;
+              m.redraw();
+            },
           }),
         ]),
-      ]),
-      m(Form, { gutter: 10 }, [
-        m(FormGroup, { span: 12 }, [
-          m(LoginWithWalletDropdown, {
-            label: 'Continue with wallet',
-            joiningChain: null,
-            joiningCommunity: null,
-            loggingInWithAddress: true,
-          }),
+      ]) : [
+        m('.form-divider', 'or'),
+        m(Form, { gutter: 10 }, [
+          m(FormGroup, { span: 12 }, [
+            m(Button, {
+              intent: 'primary',
+              fluid: true,
+              rounded: true,
+              href: `${app.serverUrl()}/auth/github`,
+              onclick: (e) => {
+                localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
+                  timestamp: (+new Date()).toString(),
+                  path: m.route.get()
+                }));
+              },
+              label: 'Continue with Github'
+            }),
+          ]),
         ]),
-      ]),
+        m(Form, { gutter: 10 }, [
+          m(FormGroup, { span: 12 }, [
+            m(LoginWithWalletDropdown, {
+              label: 'Continue with wallet',
+              joiningChain: null,
+              joiningCommunity: null,
+              loggingInWithAddress: true,
+            }),
+          ]),
+        ]),
+      ]
     ]);
   },
 };
