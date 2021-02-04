@@ -60,7 +60,6 @@ const Login: m.Component<{}, {
             fluid: true,
             // must be inside a chain/community in order to use magic login
             // TODO: tell the user this somehow
-            disabled: vnode.state.disabled,
             rounded: true,
             type: 'submit',
             onclick: async (e) => {
@@ -120,7 +119,8 @@ const Login: m.Component<{}, {
               }
             },
             label: 'Go',
-            loading: vnode.state.disabled,
+            loading: vnode.state.disabled && !vnode.state.showMagicLoginPrompt,
+            disabled: vnode.state.disabled && !!vnode.state.showMagicLoginPrompt,
           }),
         ])
       ]),
@@ -140,6 +140,7 @@ const Login: m.Component<{}, {
             intent: 'primary',
             rounded: true,
             compact: true,
+            disabled: vnode.state.disabled,
             onclick: async (e) => {
               e.preventDefault();
               try {
@@ -160,6 +161,7 @@ const Login: m.Component<{}, {
             intent: 'none',
             rounded: true,
             compact: true,
+            disabled: vnode.state.disabled,
             onclick: async (e) => {
               e.preventDefault();
               vnode.state.disabled = true;

@@ -55,8 +55,8 @@ function setupPassport(models) {
       if (req.body.chain || req.body.community) {
         [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, cb);
       }
-      const registrationChain: string = chain ? chain.id : community.default_chain
-        ? community.default_chain : MAGIC_DEFAULT_CHAIN;
+      const registrationChain: string = chain ? chain.id : community?.default_chain
+        ? community?.default_chain : MAGIC_DEFAULT_CHAIN;
 
       // fetch user data from magic backend
       let userMetadata: MagicUserMetadata;
