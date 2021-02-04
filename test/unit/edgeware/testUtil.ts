@@ -121,52 +121,21 @@ export function constructFakeApi(
     query: {
       system: {
         blockHash: {
-        multi: callOverrides['blockHash.multi'],
+          multi: callOverrides['blockHash.multi'],
         },
         events: {
           at: callOverrides['events.at'],
-        },
-        
-      },
-      session: {
-        nextKeys: callOverrides['nextKeys'],
-        currentIndex: {
-          at: callOverrides['currentIndex.at'],
-        },
-        validators: {
-          at: callOverrides['validators.at'],
         }
       },
+      session: {
+        nextKeys: callOverrides['nextKeys']
+      },
       staking: {
-        bonded: {
-          at: callOverrides['bonded.at'],
-        },        
+        bonded: callOverrides['bonded'],
         currentPoints: callOverrides['currentPoints'],
+        currentEra: callOverrides['currentEra'],
+        stakers: callOverrides['stakers'],
         activeEra: callOverrides['activeEra'],
-        stakers: {
-          at: callOverrides['stakers.at'],
-          keysAt: callOverrides['stakers.keysAt'],
-        },
-        currentEra: {
-          at: callOverrides['currentEra.at'],
-        },
-        bonder: {
-          at: callOverrides['bonded.at'],
-        },
-        validators: {
-          keysAt: callOverrides['validators.keysAt'],
-          at: callOverrides['validators.at'],
-
-        },
-        erasRewardPoints: {
-          at: callOverrides['erasRewardPoints.at'],
-        },
-        currentEraPointsEarned: {
-          at: callOverrides['currentEraPointsEarned.at'],
-        },
-        payee: {
-          at: callOverrides['payee.at'],
-        },
       },
       democracy: {
         referendumInfoOf: callOverrides['referendumInfoOf'],
