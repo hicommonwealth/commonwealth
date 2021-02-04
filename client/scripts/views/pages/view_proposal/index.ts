@@ -129,7 +129,7 @@ const ProposalHeader: m.Component<{
                   }
                 }),
                 (isAuthor || isAdmin)
-                  && m(ProposalHeaderPrivacyButtons, { proposal }),
+                  && m(ProposalHeaderPrivacyButtons, { proposal, getSetGlobalEditingStatus }),
                 (isAuthor || isAdmin)
                   && m(MenuDivider),
                 m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
