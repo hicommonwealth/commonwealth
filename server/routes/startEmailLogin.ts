@@ -38,19 +38,22 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
     },
   });
 
-  // check whether to enforce magic.link registration instead
+  // check whether to recommend magic.link registration instead
   // 1. user should not already exist
   // 2. chain or community default chain should be "supported"
   const [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, (err) => {
     log.warn(`Could not look up chain/community for login email ${email}: ${err.message}`);
     return [ null, null ];
   });
-  const registrationChain: string = chain ? chain.id : community ? community.default_chain : MAGIC_DEFAULT_CHAIN;
-  const isRegistration = !previousUser;
-  const isMagicUser = previousUser && !!previousUser.lastMagicLoginAt;
-  if ((isRegistration || isMagicUser) && registrationChain && MAGIC_SUPPORTED_CHAINS.includes(registrationChain)
+  const magicChain: string = chain ? chain.id : community ? community.default_chain : MAGIC_DEFAULT_CHAIN;
+  const isNewRegistration = !previousUser;
+  const isExistingMagicUser = previousUser && !!previousUser.lastMagicLoginAt;
+  if ((isNewRegistration || isExistingMagicUser) && magicChain && MAGIC_SUPPORTED_CHAINS.includes(magicChain)
       && !req.body.forceEmailLogin) {
-    return res.json({ status: 'Success', result: { shouldUseMagic: true } });
+    return res.json({
+      status: 'Success',
+      result: { shouldUseMagic: true, shouldUseMagicImmediately: !!isExistingMagicUser }
+    });
   }
 
   // ensure no more than 3 tokens have been created in the last 5 minutes
