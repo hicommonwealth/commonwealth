@@ -29,6 +29,7 @@ describe('Thread Tests', () => {
   // communityId, unlike in non-test thread creation
   const title = 'test title';
   const body = 'test body';
+  const bodyWithMentions = 'test body [@Tagged Member](/edgeware/npRis4Nb)';
   const topicName = 'test topic';
   const topicId = undefined;
   const kind = 'forum';
@@ -290,8 +291,7 @@ describe('Thread Tests', () => {
         title,
         topicName,
         topicId,
-        body,
-        mentions: ['0x1234'],
+        body: bodyWithMentions,
         jwt: userJWT,
       });
       expect(res.status).to.equal('Success');
@@ -387,9 +387,8 @@ describe('Thread Tests', () => {
         chain,
         address: userAddress,
         jwt: userJWT,
-        text: markdownComment.text,
+        text: bodyWithMentions,
         root_id: `discussion_${thread.id}`,
-        mentions: '0x1234',
       });
 
       expect(cRes.status).to.equal('Success');

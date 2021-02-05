@@ -13,8 +13,9 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
-import { detectURL, parseMentionsForServer } from 'helpers/threads';
+import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
+
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -141,10 +142,6 @@ const newThread = async (
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
-  const mentions = !quillEditorState ? []
-    : quillEditorState.markdownMode
-      ? parseMentionsForServer(quillEditorState.editor.getText(), true)
-      : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
   const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
@@ -166,7 +163,6 @@ const newThread = async (
       bodyText,
       url,
       attachments,
-      mentions,
       readOnly,
     );
   } catch (e) {
