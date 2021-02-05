@@ -126,12 +126,10 @@ const BountyPage: m.Component<{}> = {
       m(Listing, {
         content: activeBountyContent,
         columnHeaders: ['Active Bounties'],
-        rightColSpacing: [0]
       }),
       m(Listing, {
         content: inactiveBountyContent,
         columnHeaders: ['Inactive Bounties'],
-        rightColSpacing: [0]
       })
     ]);
   }

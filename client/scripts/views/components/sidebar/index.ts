@@ -232,13 +232,17 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       // bounties (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
-      && m(ListItem, {
-        active: onBountiesPage(m.route.get()),
-        label: 'Bounties',
-        contentLeft: m(Icon, { name: Icons.PAPERCLIP }),
-        onclick: (e) => m.route.set(`/${app.activeChainId()}/bounties`),
-        contentRight: [], // TODO
-      }),
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onBountiesPage(m.route.get()),
+          label: 'Bounties',
+          contentLeft: m(Icon, { name: Icons.PAPERCLIP }),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/bounties`);
+          },
+        }),
       // council (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
         && m(Button, {
