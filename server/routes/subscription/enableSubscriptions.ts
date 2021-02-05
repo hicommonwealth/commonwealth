@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import Errors from './errors';
+import { sequelize } from '../../database';
 import { factory, formatFilename } from '../../../shared/logging';
 
 const Op = Sequelize.Op;
@@ -32,11 +33,12 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     return next(new Error(Errors.NotUsersSubscription));
   }
 
-  // TODO: transactionalize this
-  await Promise.all(subscriptions.map((s) => {
-    s.is_active = true;
-    return s.save();
-  }));
+  await sequelize.transaction(async (t) => {
+    await Promise.all(subscriptions.map((s) => {
+      s.is_active = true;
+      return s.save({ transaction: t });
+    }));
+  });
 
   return res.json({ status: 'Success', result: 'Enabled subscriptions' });
 };

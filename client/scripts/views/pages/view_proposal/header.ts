@@ -24,6 +24,7 @@ import User from 'views/components/widgets/user';
 import { getStatusClass, getStatusText, getSupportText } from 'views/components/proposal_row';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
+import { GlobalStatus } from './body';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -162,9 +163,12 @@ export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyPropos
   }
 };
 
-export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
+export const ProposalHeaderPrivacyButtons: m.Component<{
+  proposal: AnyProposal | OffchainThread,
+  getSetGlobalEditingStatus: CallableFunction
+}> = {
   view: (vnode) => {
-    const { proposal } = vnode.attrs;
+    const { proposal, getSetGlobalEditingStatus } = vnode.attrs;
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
 
@@ -176,7 +180,10 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
           app.threads.setPrivacy({
             threadId: proposal.id,
             readOnly: !proposal.readOnly,
-          }).then(() => m.redraw());
+          }).then(() => {
+            getSetGlobalEditingStatus(GlobalStatus.Set, false);
+            m.redraw();
+          });
         },
         label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
       }),

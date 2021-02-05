@@ -1,8 +1,8 @@
 import 'pages/view_proposal/editor_permissions.scss';
 
 import m from 'mithril';
-import moment from 'moment';
 import lity from 'lity';
+import Quill from 'quill';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -15,6 +15,7 @@ import {
   AnyProposal,
   Account,
   Profile,
+  AddressInfo
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
@@ -25,8 +26,9 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, ControlGroup, Icon, Icons } from 'construct-ui';
+import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
+import { VersionHistory } from 'client/scripts/controllers/server/threads';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -90,7 +92,21 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
         showAddressWithDisplayName: true,
       }),
       item instanceof OffchainThread && item.collaborators && item.collaborators.length > 0
-        && m('span.proposal-collaborators', ` and ${pluralize(item.collaborators?.length, 'other')}`),
+        && m('span.proposal-collaborators', [
+          ' and ',
+          m(Popover, {
+            inline: true,
+            interactionType: 'hover',
+            transitionDuration: 0,
+            hoverOpenDelay: 500,
+            closeOnContentClick: true,
+            class: 'proposal-collaborators-popover',
+            content: item.collaborators.map(({ address, chain }) => {
+              return m(User, { user: new AddressInfo(null, address, chain, null), linkify: true });
+            }),
+            trigger: m('a.proposal-collaborators', { href: '#' }, pluralize(item.collaborators?.length, 'other')),
+          }),
+        ]),
     ]);
   }
 };
@@ -132,7 +148,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainT
     if (item instanceof OffchainThread || item instanceof OffchainComment) {
       if (!item.versionHistory || item.versionHistory.length === 0) return;
       const isThread = item instanceof OffchainThread;
-      const lastEdit = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
+      const lastEdit : VersionHistory = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
       if (!lastEdit) return;
 
       return m('.ProposalBodyLastEdited', [
@@ -147,7 +163,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainT
           }
         }, [
           'Edited ',
-          moment(lastEdit.timestamp).fromNow()
+          lastEdit.timestamp.fromNow()
         ])
       ]);
     } else {
@@ -556,6 +572,7 @@ export const ProposalBodySaveEdit: m.Component<{
     const { item, getSetGlobalEditingStatus, parentState, callback } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
+    const isComment = item instanceof OffchainComment;
 
     return m('.ProposalBodySaveEdit', [
       m(Button, {
@@ -568,9 +585,10 @@ export const ProposalBodySaveEdit: m.Component<{
           e.preventDefault();
           parentState.saving = true;
           parentState.quillEditorState.editor.enable(false);
-          const itemText = parentState.quillEditorState.markdownMode
-            ? parentState.quillEditorState.editor.getText()
-            : JSON.stringify(parentState.quillEditorState.editor.getContents());
+          const { quillEditorState } = parentState;
+          const itemText = quillEditorState.markdownMode
+            ? quillEditorState.editor.getText()
+            : JSON.stringify(quillEditorState.editor.getContents());
           parentState.saving = true;
           if (item instanceof OffchainThread) {
             app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {

@@ -82,6 +82,17 @@ pre {
 .MobileSidebarHeader {
     display: none;
 }
+.LoadingLayout {
+    @include sm-min {
+        .cui-spinner.cui-spinner-fill {
+            position: absolute;
+            top: 82px;
+            left: $quick-switcher-width / 2;
+            width: calc(100vw - $quick-switcher-width) !important;
+            height: calc(100vh - 120px) !important;
+        }
+    }
+}
 
 .layout-container {
     padding-left: $quick-switcher-width;

@@ -345,8 +345,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           const { ss58Format, tokenDecimals, tokenSymbol } = chainProps;
           this.registry.setChainProperties(this.createType('ChainProperties', { ...chainProps, ss58Format }));
           this._ss58Format = +ss58Format.unwrapOr(42);
-          this._tokenDecimals = +tokenDecimals.unwrapOr(12);
-          this._tokenSymbol = tokenSymbol.unwrapOr(this.app.chain.currency).toString();
+          this._tokenDecimals = +tokenDecimals.unwrapOr([ 12 ])[0];
+          this._tokenSymbol = `${tokenSymbol.unwrapOr([ this.app.chain.currency ])[0]}`;
         }
 
         this._totalbalance = this.coins(totalbalance);
@@ -354,6 +354,10 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         this._creationfee = this.coins(creationfee);
         this._sudoKey = sudokey ? sudokey.toString() : undefined;
         this._reservationFee = reservationFee ? this.coins(reservationFee) : null;
+
+        // redraw
+        m.redraw();
+
         // grab last timestamps from storage and use to compute blocktime
         const TIMESTAMP_LOOKBACK = 5;
         this.api.pipe(

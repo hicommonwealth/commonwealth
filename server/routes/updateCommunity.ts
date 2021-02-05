@@ -11,7 +11,8 @@ export const Errors = {
   CommunityNotFound: 'Community not found',
   NotAdmin: 'Not an admin',
   InvalidWebsite: 'Website must begin with https://',
-  InvalidChat: 'Chat must begin with https://',
+  InvalidDiscord: 'Discord must begin with https://',
+  InvalidElement: 'Element must begin with https://',
   InvalidTelegram: 'Telegram must begin with https://t.me/',
   InvalidGithub: 'Github must begin with https://github.com/',
 };
@@ -38,12 +39,14 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
     }
   }
 
-  const { chat, description, iconUrl, invites, name, privacy, website, telegram, github } = req.body;
+  const { iconUrl, name, description, website, discord, element, telegram, github, invites, privacy } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
-  } else if (chat && !urlHasValidHTTPPrefix(chat)) {
-    return next(new Error(Errors.InvalidChat));
+  } else if (discord && !urlHasValidHTTPPrefix(discord)) {
+    return next(new Error(Errors.InvalidDiscord));
+  } else if (element && !urlHasValidHTTPPrefix(element)) {
+    return next(new Error(Errors.InvalidElement));
   } else if (telegram && !telegram.startsWith('https://t.me/')) {
     return next(new Error(Errors.InvalidTelegram));
   } else if (github && !github.startsWith('https://github.com/')) {
@@ -55,7 +58,8 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   community.description = description;
   community.iconUrl = iconUrl;
   community.website = website;
-  community.chat = chat;
+  community.discord = discord;
+  community.element = element;
   community.telegram = telegram;
   community.github = github;
   community.invitesEnabled = invites || false;

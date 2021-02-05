@@ -3,7 +3,7 @@
 
 .MobileSidebarHeader {
     // only content styles here. layout styles are in layout.scss
-    background: $background-color-light;
+    background: $background-color-white;
     border-bottom: 1px solid $border-color-lightest;
 
     .mobile-sidebar-center {
@@ -27,7 +27,7 @@
     .mobile-sidebar-left,
     .mobile-sidebar-center,
     .mobile-sidebar-right {
-        padding: 13px 0;
+        padding: 10px 0;
         .CommunitySelector .cui-button {
             width: 100%;
             padding: 0 14px;
@@ -67,7 +67,7 @@
         }
         @include sm-max {
             .MobileNewProposalButton .cui-button {
-                padding: 0 12px;
+                padding: 0 10px;
                 .cui-button-label {
                     top: 2px;
                 }

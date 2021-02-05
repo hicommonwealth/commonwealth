@@ -86,8 +86,7 @@ const ProposalHeader: m.Component<{
       return (c.address === app.user.activeAccount?.address && c.chain === app.user.activeAccount?.chain.id);
     }).length > 0;
 
-    const isThread = proposal instanceof OffchainThread;
-    const attachments = isThread ? (proposal as OffchainThread).attachments : false;
+    const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
@@ -102,9 +101,9 @@ const ProposalHeader: m.Component<{
             && m(ProposalTitleEditor, { item: proposal, parentState: vnode.state }),
           m('.proposal-body-meta', proposal instanceof OffchainThread ? [
             m(ProposalHeaderTopics, { proposal }),
-            m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
             m(ProposalBodyLastEdited, { item: proposal }),
+            m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalHeaderViewCount, { viewCount }),
             app.isLoggedIn() && !getSetGlobalEditingStatus(GlobalStatus.Get) && m(PopoverMenu, {
               transitionDuration: 0,
@@ -130,7 +129,7 @@ const ProposalHeader: m.Component<{
                   }
                 }),
                 (isAuthor || isAdmin)
-                  && m(ProposalHeaderPrivacyButtons, { proposal }),
+                  && m(ProposalHeaderPrivacyButtons, { proposal, getSetGlobalEditingStatus }),
                 (isAuthor || isAdmin)
                   && m(MenuDivider),
                 m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
@@ -476,6 +475,7 @@ const ViewProposalPage: m.Component<{
   viewCount: number,
   proposal: AnyProposal | OffchainThread,
   threadFetched,
+  threadFetchFailed,
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -489,7 +489,9 @@ const ViewProposalPage: m.Component<{
   },
   view: (vnode) => {
     const { identifier, type } = vnode.attrs;
-    if (typeof identifier !== 'string') return m(PageNotFound);
+    const headerTitle = m.route.param('type') === 'discussion' ? 'Discussions' : 'Proposals';
+    if (typeof identifier !== 'string') return m(PageNotFound, { title: headerTitle });
+    // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
     if (!vnode.state.prefetch || !vnode.state.prefetch[identifier]) {
       vnode.state.prefetch = {};
       vnode.state.prefetch[identifier] = {
@@ -502,14 +504,18 @@ const ViewProposalPage: m.Component<{
     const proposalId = identifier.split('-')[0];
     const proposalType = type;
 
+    if (vnode.state.threadFetchFailed) {
+      return m(PageNotFound, { title: headerTitle });
+    }
+
     // load app controller
     if (!app.threads.initialized) {
-      return m(PageLoading, { narrow: true, showNewProposalButton: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
     }
 
     const proposalRecentlyEdited = vnode.state.recentlyEdited;
     const proposalDoesNotMatch = vnode.state.proposal && Number(vnode.state.proposal.identifier) !== Number(proposalId);
-    // load proposal
+    // load proposal, and return m(PageLoading)
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
@@ -522,18 +528,20 @@ const ViewProposalPage: m.Component<{
               m.redraw();
             }).catch((err) => {
               notifyError('Thread not found');
-              return m(PageNotFound);
+              vnode.state.threadFetchFailed = true;
             });
             vnode.state.threadFetched = true;
           }
-          return m(PageLoading, { narrow: true, showNewProposalButton: true });
+          return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
         } else {
-          if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
+          if (!app.chain.loaded) {
+            return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
+          }
           // check if module is still initializing
           const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
           if (!c.disabled && !c.initialized) {
             if (!c.initializing) loadCmd(proposalType);
-            return m(PageLoading, { narrow: true, showNewProposalButton: true });
+            return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
           }
         }
         // proposal does not exist, 404
@@ -603,10 +611,10 @@ const ViewProposalPage: m.Component<{
     }
 
     if (vnode.state.comments === undefined) {
-      return m(PageLoading, { narrow: true, showNewProposalButton: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
     }
     if (vnode.state.viewCount === undefined) {
-      return m(PageLoading, { narrow: true, showNewProposalButton: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
     }
 
     // load profiles
@@ -623,7 +631,7 @@ const ViewProposalPage: m.Component<{
       vnode.state.prefetch[identifier]['profilesStarted'] = true;
     }
     if (!app.profiles.allLoaded() && !vnode.state.prefetch[identifier]['profilesFinished']) {
-      return m(PageLoading, { narrow: true, showNewProposalButton: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
     }
     vnode.state.prefetch[identifier]['profilesFinished'] = true;
 
@@ -703,11 +711,7 @@ const ViewProposalPage: m.Component<{
     };
 
     const { replyParent } = vnode.state;
-    return m(Sublayout, {
-      class: 'ViewProposalPage',
-      showNewProposalButton: true,
-      title: (proposal instanceof OffchainThread) ? 'Discussions' : 'Proposals',
-    }, [
+    return m(Sublayout, { class: 'ViewProposalPage', showNewProposalButton: true, title: headerTitle }, [
       m(ProposalHeader, {
         proposal,
         commentCount,

@@ -29,6 +29,20 @@ export const modelFromServer = (thread) => {
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
+  const versionHistory = thread.version_history.map((v) => {
+    let history;
+    try {
+      history = JSON.parse(v || '{}');
+      history.author = typeof history.author === 'string'
+        ? JSON.parse(history.author)
+        : typeof history.author === 'object' ? history.author : null;
+      history.timestamp = moment(history.timestamp);
+    } catch (e) {
+      console.log(e);
+    }
+    return history;
+  });
+
   return new OffchainThread(
     thread.Address.address,
     decodeURIComponent(thread.title),
@@ -37,7 +51,7 @@ export const modelFromServer = (thread) => {
     moment(thread.created_at),
     thread.topic,
     thread.kind,
-    thread.version_history,
+    versionHistory,
     thread.community,
     thread.chain,
     thread.read_only,
@@ -116,30 +130,20 @@ class ThreadsController {
     body?: string,
     url?: string,
     attachments?: string[],
-    mentions?: string[],
     readOnly?: boolean,
   ) {
-    const timestamp = moment();
-    const author = app.user.activeAccount.profile;
-    const firstVersion : VersionHistory = {
-      author,
-      timestamp,
-      body,
-    };
-    const versionHistory : string = JSON.stringify(firstVersion);
     try {
       // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {
         'author_chain': app.user.activeAccount.chain.id,
+        'author': JSON.stringify(app.user.activeAccount.profile),
         'chain': chainId,
         'community': communityId,
         'address': address,
         'title': encodeURIComponent(title),
         'body': encodeURIComponent(body),
         'kind': kind,
-        'versionHistory': versionHistory,
         'attachments[]': attachments,
-        'mentions[]': mentions,
         'topic_name': topicName,
         'topic_id': topicId,
         'url': url,
@@ -166,27 +170,25 @@ class ThreadsController {
 
   public async edit(
     proposal: OffchainThread,
-    body?: string,
-    title?: string,
+    body: string,
+    title: string,
     attachments?: string[],
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
-    const recentEdit : VersionHistory = {
-      author: app.user.activeAccount.profile,
-      timestamp: moment(),
-      body
-    };
-    const versionHistory = JSON.stringify(recentEdit);
     await $.ajax({
       url: `${app.serverUrl()}/editThread`,
       type: 'PUT',
       data: {
+        'author_chain': app.user.activeAccount.chain.id,
+        'author': JSON.stringify(app.user.activeAccount.profile),
+        'address': app.user.activeAccount.address,
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
         'thread_id': proposal.id,
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
-        'version_history': versionHistory,
         'attachments[]': attachments,
         'jwt': app.user.jwt
       },

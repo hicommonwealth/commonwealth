@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
+import { sequelize } from '../database';
 import { factory, formatFilename } from '../../shared/logging';
 
 const Op = Sequelize.Op;
@@ -35,11 +36,12 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     return next(new Error(Errors.WrongOwner));
   }
 
-  // TODO: transactionalize this
-  await Promise.all(notifications.map((n) => {
-    n.is_read = true;
-    return n.save();
-  }));
+  await sequelize.transaction(async (t) => {
+    await Promise.all(notifications.map((n) => {
+      n.is_read = true;
+      return n.save({ transaction: t });
+    }));
+  });
 
   return res.json({ status: 'Success', result: 'Marked notifications read' });
 };

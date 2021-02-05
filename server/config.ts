@@ -1,3 +1,4 @@
+/* eslint-disable indent,prefer-template,operator-linebreak */
 require('dotenv').config();
 
 export const DEFAULT_PORT = '8080';
@@ -34,9 +35,9 @@ export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
 export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 export const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-export const GITHUB_OAUTH_CALLBACK = (process.env.NODE_ENV === 'production' ?
-                                      'https://commonwealth.im' :
-                                      'http://localhost:8080') + '/api/auth/github/callback';
+export const GITHUB_OAUTH_CALLBACK = (process.env.NODE_ENV === 'production'
+                                      ? 'https://commonwealth.im'
+                                      : 'http://localhost:8080') + '/api/auth/github/callback';
 
 export const DATABASE_URI =
       (!process.env.DATABASE_URL || process.env.NODE_ENV === 'development') ?
@@ -51,3 +52,7 @@ export const LOGIN_RATE_LIMIT_MINS = 5;
 export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 
 export const INFURA_API_KEY = process.env.INFURA_API_KEY;
+
+export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
+export const MAGIC_SUPPORTED_CHAINS = process.env.MAGIC_SUPPORTED_CHAINS?.split(',') || ['ethereum'];
+export const MAGIC_DEFAULT_CHAIN = MAGIC_SUPPORTED_CHAINS[0];
