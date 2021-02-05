@@ -123,13 +123,13 @@ const BountyPage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       m(SubstrateBountyStats),
+      m('', 'Active Bounties'),
       m(Listing, {
         content: activeBountyContent,
-        columnHeaders: ['Active Bounties'],
       }),
+      m('', 'Inactive Bounties'),
       m(Listing, {
         content: inactiveBountyContent,
-        columnHeaders: ['Inactive Bounties'],
       })
     ]);
   }
