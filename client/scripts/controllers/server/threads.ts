@@ -110,6 +110,9 @@ class ThreadsController {
 
   public get initialized() { return this._initialized; }
 
+  public numPrevotingThreads: number;
+  public numVotingThreads: number;
+
   public getType(primary: string, secondary?: string, tertiary?: string) {
     const result = this._store.getAll().filter((thread) => {
       return tertiary
@@ -119,10 +122,6 @@ class ThreadsController {
           : thread.kind === primary;
     });
     return result;
-  }
-
-  public getByStage(stage: OffchainThreadStage) {
-    return this._store.getAll().filter((thread) => thread.stage === stage);
   }
 
   public async create(
@@ -415,7 +414,7 @@ class ThreadsController {
         }
         // Threads that are posted in an offchain community are still linked to a chain / author address,
         // so when we want just chain threads, then we have to filter away those that have a community
-        const { threads } = response.result;
+        const { threads, numPrevotingThreads, numVotingThreads } = response.result;
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
           if (!thread.Address) {
@@ -432,6 +431,8 @@ class ThreadsController {
             console.error(e.message);
           }
         }
+        this.numPrevotingThreads = numPrevotingThreads;
+        this.numVotingThreads = numVotingThreads;
         this._initialized = true;
       }, (err) => {
         console.log('failed to load offchain discussions');
@@ -441,7 +442,7 @@ class ThreadsController {
       });
   }
 
-  public initialize(initialThreads: any[], reset = true) {
+  public initialize(initialThreads: any[], numPrevotingThreads, numVotingThreads, reset) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
@@ -460,6 +461,8 @@ class ThreadsController {
         console.error(e.message);
       }
     }
+    this.numPrevotingThreads = numPrevotingThreads;
+    this.numVotingThreads = numVotingThreads;
     this._initialized = true;
   }
 

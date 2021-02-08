@@ -180,6 +180,8 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
   return res.json({
     status: 'Success',
     result: {
+      numPrevotingThreads: 0,
+      numVotingThreads: 0,
       threads: cutoff_date ? threads : threads.map((t) => t.toJSON()),
       comments: comments.map((c) => c.toJSON()),
       reactions: reactions.map((r) => r.toJSON()),

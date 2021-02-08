@@ -224,6 +224,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     result: {
       topics: topics.map((t) => t.toJSON()),
       //
+      numPrevotingThreads: 0,
+      numVotingThreads: 0,
       threads, // already converted to JSON earlier
       comments: comments.map((c) => c.toJSON()),
       reactions: reactions.map((r) => r.toJSON()),
