@@ -121,10 +121,6 @@ class ThreadsController {
     return result;
   }
 
-  public getByStage(stage: OffchainThreadStage) {
-    return this._store.getAll().filter((thread) => thread.stage === stage);
-  }
-
   public async create(
     address: string,
     kind: string,
