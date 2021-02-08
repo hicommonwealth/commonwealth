@@ -131,7 +131,7 @@ const Login: m.Component<{}, {
         'Check your email to continue.'
       ]) : vnode.state.showMagicLoginPrompt ? m('.login-magic-prompt', [
         m('p', [
-          'Do you already have a crypto wallet?',
+          'Do you have a crypto wallet already?',
         ]),
         m('.login-magic-prompt-buttons', [
           m(Button, {
@@ -144,12 +144,10 @@ const Login: m.Component<{}, {
               e.preventDefault();
               vnode.state.disabled = true;
               const path = m.route.get();
-              const email = $(e.target).closest('.Login').find('[name="email"]').val()
-                .toString();
               const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
                 'chain': app.activeChainId(),
                 'community': app.activeCommunityId(),
-                email,
+                email: vnode.state.showMagicLoginPromptEmail,
                 path,
                 forceEmailLogin: true,
               });
@@ -166,7 +164,7 @@ const Login: m.Component<{}, {
             },
           }),
           m(Button, {
-            label: 'No, I need an address',
+            label: 'No, generate an address for me',
             intent: 'primary',
             rounded: true,
             compact: true,
