@@ -11,30 +11,31 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
   const { cutoff_date, topic_id, stage } = req.query;
+
+  const communityOptions = community
+    ? `community = :community `
+    : `chain = :chain `;
+
+  const replacements = community
+    ? { community: community.id }
+    : { chain: chain.id };
+
+  let topicOptions = '';
+  if (topic_id) {
+    topicOptions += `AND t.topic_id = :topic_id `;
+    replacements['topic_id'] = topic_id;
+  }
+  if (stage) {
+    topicOptions += `AND t.stage = :stage `;
+    replacements['stage'] = stage;
+  }
+
+  replacements['created_at'] = cutoff_date;
+
   // Threads
   let threads;
   let comments;
   if (cutoff_date) {
-    const communityOptions = community
-      ? `community = :community `
-      : `chain = :chain `;
-
-    const replacements = community
-      ? { community: community.id }
-      : { chain: chain.id };
-
-    let topicOptions = '';
-    if (topic_id) {
-      topicOptions += `AND t.topic_id = :topic_id `;
-      replacements['topic_id'] = topic_id;
-    }
-    if (stage) {
-      topicOptions += `AND t.stage = :stage `;
-      replacements['stage'] = stage;
-    }
-
-    replacements['created_at'] = cutoff_date;
-
     const query = `
       SELECT addr.id AS addr_id, addr.address AS addr_address,
         addr.chain AS addr_chain, thread_id, thread_title,
@@ -80,7 +81,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       LEFT JOIN "OffchainTopics" topics
       ON threads.topic_id = topics.id`;
 
-    let preprocessedThreads;
+    let preprocessedThreads, threadsInVoting;
     try {
       preprocessedThreads = await models.sequelize.query(query, {
         replacements,
@@ -88,6 +89,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       });
     } catch (e) {
       console.log(e);
+      return next(new Error('Could not fetch threads'));
     }
 
     const root_ids = [];
@@ -177,11 +179,22 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     order: [['created_at', 'DESC']],
   });
 
+  const countsQuery = `
+     SELECT id, title, stage FROM "OffchainThreads"
+     WHERE ${communityOptions} AND stage = 'proposal_in_review' OR stage = 'voting'`;
+
+  const threadsInVoting = await models.sequelize.query(countsQuery, {
+    replacements,
+    type: QueryTypes.SELECT
+  });
+  const numPrevotingThreads = threadsInVoting.filter((t) => t.stage === 'proposal_in_review').length;
+  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
+
   return res.json({
     status: 'Success',
     result: {
-      numPrevotingThreads: 0,
-      numVotingThreads: 0,
+      numPrevotingThreads,
+      numVotingThreads,
       threads: cutoff_date ? threads : threads.map((t) => t.toJSON()),
       comments: comments.map((c) => c.toJSON()),
       reactions: reactions.map((r) => r.toJSON()),
