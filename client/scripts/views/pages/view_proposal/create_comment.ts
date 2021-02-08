@@ -7,7 +7,6 @@ import { Button, Callout } from 'construct-ui';
 import app from 'state';
 
 import { OffchainThread, OffchainComment, AnyProposal } from 'models';
-import { parseMentionsForServer } from 'helpers/threads';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
@@ -67,11 +66,6 @@ const CreateComment: m.Component<{
       const commentText = quillEditorState.markdownMode
         ? quillEditorState.editor.getText()
         : JSON.stringify(quillEditorState.editor.getContents());
-      const mentions = !quillEditorState
-        ? null
-        : quillEditorState.markdownMode
-          ? parseMentionsForServer(quillEditorState.editor.getText(), true)
-          : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
       const attachments = [];
       // const attachments = vnode.state.files ?
@@ -84,7 +78,7 @@ const CreateComment: m.Component<{
       const communityId = app.activeCommunityId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, communityId, commentText, parentComment?.id, attachments, mentions);
+          chainId, communityId, commentText, parentComment?.id, attachments);
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
@@ -139,7 +133,7 @@ const CreateComment: m.Component<{
               class: 'no-profile-callout',
               intent: 'primary',
               content: [
-                'You haven\'t set a display name yet, so other people can only see your address. ',
+                'You haven\'t set a display name yet. ',
                 m('a', {
                   href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
                     + `?base=${app.user.activeAccount.chain}`,
@@ -153,7 +147,7 @@ const CreateComment: m.Component<{
                       },
                     });
                   }
-                }, 'Add your name'),
+                }, 'Set a display name'),
               ],
             }),
             m(QuillEditor, {

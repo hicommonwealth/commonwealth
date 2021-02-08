@@ -5,6 +5,7 @@ import { NotificationCategories, ProposalType } from '../../shared/types';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
+import { parseUserMentions } from '../util/parseUserMentions';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -22,12 +23,6 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { topic_name, topic_id, title, body, kind, url, readOnly } = req.body;
-
-  const mentions = typeof req.body['mentions[]'] === 'string'
-    ? [req.body['mentions[]']]
-    : typeof req.body['mentions[]'] === 'undefined'
-      ? []
-      : req.body['mentions[]'];
 
   if (kind === 'forum') {
     if (!title || !title.trim()) {
@@ -213,24 +208,29 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   }));
 
   // grab mentions to notify tagged users
+  const bodyText = decodeURIComponent(body);
   let mentionedAddresses;
-  if (mentions?.length > 0) {
-    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-      mention = mention.split(',');
-      try {
-        return models.Address.findOne({
-          where: {
-            chain: mention[0],
-            address: mention[1],
-          },
-          include: [ models.User, models.Role ]
-        });
-      } catch (err) {
-        return next(new Error(err));
-      }
-    }));
-    // filter null results
-    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+  try {
+    const mentions = parseUserMentions(bodyText);
+    if (mentions?.length > 0) {
+      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+        try {
+          return models.Address.findOne({
+            where: {
+              chain: mention[0],
+              address: mention[1],
+            },
+            include: [ models.User, models.Role ]
+          });
+        } catch (err) {
+          return next(new Error(err));
+        }
+      }));
+      // filter null results
+      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+    }
+  } catch (e) {
+    return next(new Error('Failed to parse mentions'));
   }
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);

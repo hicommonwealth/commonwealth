@@ -86,10 +86,16 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       m('.compact-modal-body', [
         m('.select-address-options', [
           activeAccountsByRole.length === 0 && m('.select-address-placeholder', [
-            'Connect an address to comment or vote'
+            app.chain?.meta.chain.id
+              ? `No ${app.chain?.meta?.chain.name} addresses found`
+              : 'Connect an address to comment or vote'
           ]),
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
-            m(UserBlock, { user: account }),
+            m('.select-address-option-left', [
+              m(UserBlock, { user: account }),
+              app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id)?.isMagic
+                && m('.magic-label', `Magically linked to ${app.user.email}`),
+            ]),
             m('.role-remove', [
               m('span.already-connected', `${formatAsTitleCase(role.permission)} of '${activeEntityInfo?.name}'`),
               m('span.icon', {
@@ -104,7 +110,11 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
               vnode.state.selectedIndex = index;
             },
           }, [
-            m(UserBlock, { user: account, showRole: true, selected: vnode.state.selectedIndex === index }),
+            m('.select-address-option-left', [
+              m(UserBlock, { user: account, showRole: true, selected: vnode.state.selectedIndex === index }),
+              app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id)?.isMagic
+                && m('.magic-label', `Magically linked to ${app.user.email}`),
+            ]),
             role && m('.role-permission', [
               m(Tag, { label: formatAsTitleCase(role.permission), rounded: true, size: 'sm' }),
               role.is_user_default && m(Tag, { label: 'Last used', rounded: true, size: 'sm' }),
