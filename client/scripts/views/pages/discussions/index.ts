@@ -7,8 +7,8 @@ import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
 import app from 'state';
 
-import { Spinner, Button, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
-import { pluralize, offchainThreadStageToLabel, offchainThreadStageToIndex } from 'helpers';
+import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
+import { pluralize, offchainThreadStageToLabel } from 'helpers';
 import { NodeInfo, CommunityInfo, OffchainThreadStage } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -46,56 +46,45 @@ const getLastSeenDivider = (hasText = true) => {
   ]);
 };
 
-const DiscussionStagesBar: m.Component<{ topic: string, stage: OffchainThreadStage }, {}> = {
+const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
   view: (vnode) => {
     const { topic, stage } = vnode.attrs;
     return m('.DiscussionStagesBar.discussions-stages', [
-      m(PopoverMenu, {
-        transitionDuration: 0,
-        hoverCloseDelay: 0,
-        closeOnContentClick: true,
-        position: 'bottom',
-        trigger: m(Button, {
+      m(ButtonGroup, [
+        m(Button, {
           rounded: true,
           compact: true,
           size: 'sm',
           class: 'discussions-stage',
-          active: !!stage,
-          label: stage
-            ? `${offchainThreadStageToIndex(stage)}. ${offchainThreadStageToLabel(stage)}`
-            : 'Filter by stage',
-          iconRight: Icons.CHEVRON_DOWN
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(topic ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}` : `/${app.activeId()}`);
+          },
+          active: !stage,
+          label: 'All Stages'
         }),
-        content: [
+        [
           OffchainThreadStage.Discussion,
           OffchainThreadStage.ProposalInReview,
           OffchainThreadStage.Voting,
           OffchainThreadStage.Passed,
           OffchainThreadStage.Abandoned,
-          null,
         ].map((targetStage, index) => m(Button, {
           class: 'discussions-stage',
           active: stage === targetStage,
           rounded: true,
           size: 'sm',
-          style: 'margin: 3px 10px;',
           onclick: (e) => {
             e.preventDefault();
-            if (targetStage === null) {
-              m.route.set(topic ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}` : `/${app.activeId()}`);
-            } else {
-              m.route.set(
-                topic
-                  ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}?stage=${targetStage}`
-                  : `/${app.activeId()}?stage=${targetStage}`
-              );
-            }
+            m.route.set(
+              topic
+                ? `/${app.activeId()}/discussions/${encodeURI(topic.trim())}?stage=${targetStage}`
+                : `/${app.activeId()}?stage=${targetStage}`
+            );
           },
-          label: targetStage
-            ? `${offchainThreadStageToIndex(targetStage)}. ${offchainThreadStageToLabel(targetStage)}`
-            : 'Clear filter',
+          label: `${offchainThreadStageToLabel(targetStage)}`,
         })),
-      }),
+      ]),
     ]);
   }
 };
@@ -143,7 +132,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
   },
   view: (vnode) => {
     const { topic } = vnode.attrs;
-    const stage = m.route.param('stage') as OffchainThreadStage;
+    const stage = m.route.param('stage');
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
       title: topic || 'Discussions',
