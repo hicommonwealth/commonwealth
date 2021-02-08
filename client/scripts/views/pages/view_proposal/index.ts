@@ -40,8 +40,8 @@ import {
 } from './header';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
-  ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
-  ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
+  ProposalBodyLastEdited, ProposalBodyCancelEdit, ProposalBodySaveEdit,
+  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, EditPermissionsButton,
   ProposalEditorPermissions
 } from './body';
@@ -118,19 +118,18 @@ const ProposalHeader: m.Component<{
                   && m(ProposalBodyEditMenuItem, {
                     item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                   }),
-                (isAuthor || isAdmin)
-                  && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                (isAuthor)
-                  && m(EditPermissionsButton, {
-                    openEditPermissions: () => {
-                      vnode.state.editPermissionsIsOpen = true;
-                    }
-                  }),
+                isAuthor && m(EditPermissionsButton, {
+                  openEditPermissions: () => {
+                    vnode.state.editPermissionsIsOpen = true;
+                  }
+                }),
                 isAdmin && proposal instanceof OffchainThread && m(TopicEditorButton, {
                   openTopicEditor: () => {
                     vnode.state.topicEditorIsOpen = true;
                   }
                 }),
+                (isAuthor || isAdmin)
+                  && m(ProposalBodyDeleteMenuItem, { item: proposal }),
                 (isAuthor || isAdmin)
                   && m(ProposalHeaderPrivacyButtons, { proposal, getSetGlobalEditingStatus }),
                 (isAuthor || isAdmin)
@@ -251,21 +250,6 @@ const ProposalComment: m.Component<{
           m(ProposalBodyAuthor, { item: comment }),
           m(ProposalBodyCreated, { item: comment, link: commentLink }),
           m(ProposalBodyLastEdited, { item: comment }),
-
-          // !vnode.state.editing
-          //   && app.user.activeAccount
-          //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          //   && app.user.activeAccount?.chain.id === comment.authorChain
-          //   && app.user.activeAccount?.address === comment.author
-          //   && [
-          //     m(ProposalBodyEdit, {
-          //       item: comment,
-          //       getSetGlobalReplyStatus,
-          //       getSetGlobalEditingStatus,
-          //       parentState: vnode.state
-          //     }),
-          //     m(ProposalBodyDelete, { item: comment }),
-          //   ],
 
           !vnode.state.editing
           && app.user.activeAccount

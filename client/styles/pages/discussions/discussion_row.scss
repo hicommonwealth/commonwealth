@@ -119,4 +119,7 @@
             }
         }
     }
+    &:hover .row-right .discussion-row-stage {
+        background: shade($background-color-white-hover, 3%);
+    }
 }
