@@ -41,6 +41,12 @@
             border-color: $text-color-black;
         }
     }
+    .discussions-stage-count {
+        display: inline;
+        color: $positive-bg-color;
+        font-weight: 500;
+        margin-left: 2px;
+    }
 
     // content
     .LastSeenDivider {
