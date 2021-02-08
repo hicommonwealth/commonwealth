@@ -41,7 +41,7 @@ const Login: m.Component<{}, {
       }
     }, [
       m(Form, { gutter: 10 }, [
-        m(FormGroup, { span: 9 }, [
+        !vnode.state.showMagicLoginPrompt && m(FormGroup, { span: 9 }, [
           m(Input, {
             fluid: true,
             name: 'email',
@@ -50,13 +50,12 @@ const Login: m.Component<{}, {
             onclick: (e) => {
               e.stopPropagation();
             },
-            disabled: vnode.state.showMagicLoginPrompt,
             oncreate: (vvnode) => {
               $(vvnode.dom).focus();
             }
           }),
         ]),
-        m(FormGroup, { span: 3 }, [
+        !vnode.state.showMagicLoginPrompt && m(FormGroup, { span: 3 }, [
           m(Button, {
             intent: 'primary',
             fluid: true,
@@ -132,13 +131,40 @@ const Login: m.Component<{}, {
         'Check your email to continue.'
       ]) : vnode.state.showMagicLoginPrompt ? m('.login-magic-prompt', [
         m('p', [
-          'Commonwealth requires a crypto address to participate in discussions. Generate one for ',
-          m('strong', vnode.state.showMagicLoginPromptEmail),
-          '?',
+          'Do you have a crypto wallet already?',
         ]),
         m('.login-magic-prompt-buttons', [
           m(Button, {
-            label: 'Yes, generate an address for me',
+            label: 'Yes, I have a wallet',
+            intent: 'primary',
+            rounded: true,
+            compact: true,
+            disabled: vnode.state.disabled,
+            onclick: async (e) => {
+              e.preventDefault();
+              vnode.state.disabled = true;
+              const path = m.route.get();
+              const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
+                'chain': app.activeChainId(),
+                'community': app.activeCommunityId(),
+                email: vnode.state.showMagicLoginPromptEmail,
+                path,
+                forceEmailLogin: true,
+              });
+
+              if (legacyResponse.status === 'Success') {
+                // successfully kicked off a legacy-style login
+                vnode.state.emailLoginSucceeded = true;
+              } else {
+                vnode.state.failure = true;
+                vnode.state.error = legacyResponse.message;
+              }
+              vnode.state.disabled = false;
+              m.redraw();
+            },
+          }),
+          m(Button, {
+            label: 'No, generate an address for me',
             intent: 'primary',
             rounded: true,
             compact: true,
@@ -158,37 +184,11 @@ const Login: m.Component<{}, {
               }
             },
           }),
-          m(Button, {
-            label: 'No, I’ll connect an address later',
-            intent: 'none',
-            rounded: true,
-            compact: true,
-            disabled: vnode.state.disabled,
-            onclick: async (e) => {
-              e.preventDefault();
-              vnode.state.disabled = true;
-              const path = m.route.get();
-              const email = $(e.target).closest('.Login').find('[name="email"]').val()
-                .toString();
-              const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
-                'chain': app.activeChainId(),
-                'community': app.activeCommunityId(),
-                email,
-                path,
-                forceEmailLogin: true,
-              });
-
-              if (legacyResponse.status === 'Success') {
-                // successfully kicked off a legacy-style login
-                vnode.state.emailLoginSucceeded = true;
-              } else {
-                vnode.state.failure = true;
-                vnode.state.error = legacyResponse.message;
-              }
-              vnode.state.disabled = false;
-              m.redraw();
-            },
-          }),
+        ]),
+        m('p', [
+          'If you don’t, we’ll generate an address that you can use to log in from ',
+          m('strong', vnode.state.showMagicLoginPromptEmail),
+          '.'
         ]),
       ]) : '',
       !vnode.state.showMagicLoginPrompt && [
