@@ -10,9 +10,9 @@ export async function sleep(msec) {
 
 export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   if (stage === OffchainThreadStage.Discussion) {
-    return 'Initial Discussion';
+    return 'Discussion';
   } else if (stage === OffchainThreadStage.ProposalInReview) {
-    return 'Pre-Voting Discussion';
+    return 'Preparing for Voting';
   } else if (stage === OffchainThreadStage.Voting) {
     return 'Voting';
   } else if (stage === OffchainThreadStage.Passed) {

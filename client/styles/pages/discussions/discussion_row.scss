@@ -14,18 +14,6 @@
                     text-decoration: underline;
                 }
             }
-            .discussion-row-stage {
-                font-size: 15px;
-                margin-left: 8px;
-                padding: 0 8px;
-                min-height: 20px;
-                height: initial;
-                pointer-events: none;
-                user-select: none;
-                position: relative;
-                top: -2px;
-                border: none;
-            }
         }
         .row-subheader {
             // Styling specific to DiscussionRow subheader content
@@ -52,6 +40,7 @@
             .mobile-comment-count {
                 display: none;
                 color: $text-color-light;
+                white-space: nowrap;
                 margin-left: 14px;
                 @include xs-max {
                     display: inline;
@@ -103,10 +92,27 @@
         }
     }
     .row-right {
+        .discussion-row-right-meta {
+            margin-left: 20px;
+            margin-right: 4px;
+        }
+        .discussion-row-stage {
+            font-size: 15px;
+            padding: 0 8px;
+            min-height: 20px;
+            height: initial;
+            pointer-events: none;
+            user-select: none;
+            position: relative;
+            top: -1px;
+            margin-left: 8px;
+            border: none;
+            background: $background-color-white-hover;
+        }
         .discussion-row-menu {
             width: 28px;
             position: relative;
-            top: -2px;
+            top: 10px;
             svg {
                 position: relative;
                 top: 1px;
