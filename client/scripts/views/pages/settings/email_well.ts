@@ -51,7 +51,9 @@ const EmailWell: m.Component<IAttrs, IState> = {
           intent: 'primary',
           label: (app.user.email && !emailInputUpdated && !emailVerified) ? 'Retry verification' : 'Update email',
           class: 'update-email-button',
-          disabled: (!emailInputUpdated && emailVerified) || verificationSent,
+          disabled: (!emailInputUpdated && emailVerified)
+            || verificationSent
+            || app.user.addresses.some((a) => a.isMagic),
           rounded: true,
           onclick: async () => {
             vnode.state.errorMessage = null;

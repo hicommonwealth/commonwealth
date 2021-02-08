@@ -1,6 +1,6 @@
 import 'components/sidebar/notification_row.scss';
 
-import { Icon, Icons } from 'construct-ui';
+import { Icon, Icons, Tooltip, Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment-twitter';
@@ -218,6 +218,7 @@ const NotificationRow: m.Component<{
   MolochTypes: any,
   SubstrateTypes: any,
   scrollOrStop: boolean;
+  markingRead: boolean;
 }> = {
   oncreate: (vnode) => {
     if (m.route.param('id') && vnode.attrs.onListPage
@@ -327,7 +328,7 @@ const NotificationRow: m.Component<{
         pageJump
       } = getBatchNotificationFields(category, notificationData);
       return m('li.NotificationRow', {
-        class: notifications[0].isRead ? '' : 'unread',
+        class: notification.isRead ? '' : 'unread',
         key: notification.id,
         id: notification.id,
         onclick: async () => {
@@ -356,7 +357,19 @@ const NotificationRow: m.Component<{
           notificationBody
             && category !== `${NotificationCategories.NewReaction}`
             && m('.comment-body-excerpt', notificationBody),
-          m('.comment-body-created', createdAt.twitterShort()),
+          m('.comment-body-bottom-wrap', [
+            m('.comment-body-created', createdAt.twitterShort()),
+            !notification.isRead && m('.comment-body-mark-as-read', {
+              onclick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                app.user.notifications.markAsRead(notifications);
+                vnode.state.markingRead = true;
+              }
+            }, [
+              vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
+            ]),
+          ])
         ]),
       ]);
     }

@@ -393,6 +393,10 @@ const resetServer = (models): Promise<number> => {
           description: 'someone reacts to a post',
         }),
         models.NotificationCategory.create({
+          name: NotificationCategories.NewCollaboration,
+          description: 'someone reacts to a post',
+        }),
+        models.NotificationCategory.create({
           name: NotificationCategories.ChainEvent,
           description: 'a chain event occurs',
         }),
