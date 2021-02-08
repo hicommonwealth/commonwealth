@@ -16,8 +16,16 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
   if (!chain && !community) return next(new Error(Errors.NeedChainOrCommunity));
 
+  // globally shared SQL replacements
+  const communityOptions = community
+    ? `community = :community`
+    : `chain = :chain`;
+  const replacements = community
+    ? { community: community.id }
+    : { chain: chain.id };
+
   // parallelized queries
-  const [topics, threadsCommentsReactions, admins, mostActiveUsers] = await Promise.all([
+  const [topics, threadsCommentsReactions, admins, mostActiveUsers, threadsInVoting] = await Promise.all([
     // topics
     await models.OffchainTopic.findAll({
       where: community
@@ -26,14 +34,6 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     }),
     // threads, comments, reactions
     await (async () => {
-      const communityOptions = community
-        ? `community = :community`
-        : `chain = :chain`;
-
-      const replacements = community
-        ? { community: community.id }
-        : { chain: chain.id };
-
       const threadParams = Object.assign(replacements, { pinned: true });
       const pinnedThreads = await models.OffchainThread.findAll({
         where: threadParams,
@@ -215,15 +215,26 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       });
       return mostActiveUsers_;
     })(),
+    models.sequelize.query(`
+     SELECT id, title, stage FROM "OffchainThreads"
+     WHERE ${communityOptions} AND stage = 'proposal_in_review' OR stage = 'voting'`, {
+      replacements,
+      type: QueryTypes.SELECT
+    }),
   ]);
 
   const [threads, comments, reactions] = threadsCommentsReactions;
+
+  const numPrevotingThreads = threadsInVoting.filter((t) => t.stage === 'proposal_in_review').length;
+  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
 
   return res.json({
     status: 'Success',
     result: {
       topics: topics.map((t) => t.toJSON()),
       //
+      numPrevotingThreads,
+      numVotingThreads,
       threads, // already converted to JSON earlier
       comments: comments.map((c) => c.toJSON()),
       reactions: reactions.map((r) => r.toJSON()),

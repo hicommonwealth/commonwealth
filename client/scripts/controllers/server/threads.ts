@@ -110,6 +110,9 @@ class ThreadsController {
 
   public get initialized() { return this._initialized; }
 
+  public numPrevotingThreads: number;
+  public numVotingThreads: number;
+
   public getType(primary: string, secondary?: string, tertiary?: string) {
     const result = this._store.getAll().filter((thread) => {
       return tertiary
@@ -157,6 +160,10 @@ class ThreadsController {
       const result = modelFromServer(response.result);
       this._store.add(result);
 
+      // Update stage counts
+      if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
+      if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
+
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
       this._listingStore.add(result, storeOptions);
@@ -199,6 +206,11 @@ class ThreadsController {
       },
       success: (response) => {
         const result = modelFromServer(response.result);
+        // Update counters
+        if (proposal.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
+        if (proposal.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
+        if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
+        if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
@@ -246,6 +258,11 @@ class ThreadsController {
       },
       success: (response) => {
         const result = modelFromServer(response.result);
+        // Update counters
+        if (args.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
+        if (args.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
+        if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
+        if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
@@ -411,7 +428,7 @@ class ThreadsController {
         }
         // Threads that are posted in an offchain community are still linked to a chain / author address,
         // so when we want just chain threads, then we have to filter away those that have a community
-        const { threads } = response.result;
+        const { threads, numPrevotingThreads, numVotingThreads } = response.result;
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
           if (!thread.Address) {
@@ -428,6 +445,8 @@ class ThreadsController {
             console.error(e.message);
           }
         }
+        this.numPrevotingThreads = numPrevotingThreads;
+        this.numVotingThreads = numVotingThreads;
         this._initialized = true;
       }, (err) => {
         console.log('failed to load offchain discussions');
@@ -437,7 +456,7 @@ class ThreadsController {
       });
   }
 
-  public initialize(initialThreads: any[], reset = true) {
+  public initialize(initialThreads: any[], numPrevotingThreads, numVotingThreads, reset) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
@@ -456,6 +475,8 @@ class ThreadsController {
         console.error(e.message);
       }
     }
+    this.numPrevotingThreads = numPrevotingThreads;
+    this.numVotingThreads = numVotingThreads;
     this._initialized = true;
   }
 

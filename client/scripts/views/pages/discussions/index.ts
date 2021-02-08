@@ -83,7 +83,13 @@ const DiscussionStagesBar: m.Component<{ topic: string, stage: string }, {}> = {
                 : `/${app.activeId()}?stage=${targetStage}`
             );
           },
-          label: `${offchainThreadStageToLabel(targetStage)}`,
+          label: [
+            `${offchainThreadStageToLabel(targetStage)}`,
+            targetStage === OffchainThreadStage.ProposalInReview
+              && [ ' ', m('.discussions-stage-count', app.threads.numPrevotingThreads) ],
+            targetStage === OffchainThreadStage.Voting
+              && [ ' ', m('.discussions-stage-count', app.threads.numVotingThreads) ],
+          ],
         })),
       ]),
     ]);
