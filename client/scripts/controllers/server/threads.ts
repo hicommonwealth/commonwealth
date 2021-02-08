@@ -160,6 +160,10 @@ class ThreadsController {
       const result = modelFromServer(response.result);
       this._store.add(result);
 
+      // Update stage counts
+      if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
+      if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
+
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
       this._listingStore.add(result, storeOptions);
@@ -202,6 +206,11 @@ class ThreadsController {
       },
       success: (response) => {
         const result = modelFromServer(response.result);
+        // Update counters
+        if (proposal.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
+        if (proposal.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
+        if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
+        if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
@@ -249,6 +258,11 @@ class ThreadsController {
       },
       success: (response) => {
         const result = modelFromServer(response.result);
+        // Update counters
+        if (stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
+        if (stage === OffchainThreadStage.Voting) this.numVotingThreads--;
+        if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
+        if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
