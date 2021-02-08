@@ -15,10 +15,14 @@ module.exports = {
         ),
         queryInterface.addColumn(
           'ChainEntities',
-          'author',
+          'address_id',
           {
-            type: Sequelize.STRING,
+            type: Sequelize.INTEGER,
             allowNull: true,
+            references: {
+              model: 'Addresses',
+              key: 'id'
+            },
           },
           { transaction: t }
         )
@@ -40,10 +44,14 @@ module.exports = {
         ),
         queryInterface.removeColumn(
           'ChainEntities',
-          'author',
+          'address)id',
           {
             type: Sequelize.STRING,
             allowNull: true,
+            references: {
+              model: 'Addresses',
+              key: 'id'
+            },
           },
           { transaction: t }
         )

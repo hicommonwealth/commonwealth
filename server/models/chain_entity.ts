@@ -11,6 +11,7 @@ export interface ChainEntityAttributes {
   type_id: string;
   thread_id?: number;
   title?: string;
+  address_id?: number;
   completed?: boolean;
   created_at?: Date;
   updated_at?: Date;
@@ -40,6 +41,7 @@ export default (
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
     completed: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     title: { type: dataTypes.TEXT, allowNull: true },
+    address_id: { type: dataTypes.INTEGER, allowNull: true },
 
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
@@ -57,6 +59,7 @@ export default (
     models.ChainEntity.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
     models.ChainEntity.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
     models.ChainEntity.hasMany(models.ChainEvent, { foreignKey: 'entity_id' });
+    models.ChainEntity.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
   };
 
   return ChainEntity;
