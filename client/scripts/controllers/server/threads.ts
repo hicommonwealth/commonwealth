@@ -259,8 +259,8 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
-        if (stage === OffchainThreadStage.Voting) this.numVotingThreads--;
+        if (args.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
+        if (args.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
         if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
         if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
