@@ -68,6 +68,7 @@ export enum OffchainThreadStage {
   ProposalInReview = 'proposal_in_review',
   Voting = 'voting',
   Passed = 'passed',
+  Failed = 'failed',
   Abandoned = 'abandoned',
 }
 

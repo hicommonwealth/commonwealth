@@ -17,6 +17,8 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
     return 'Voting';
   } else if (stage === OffchainThreadStage.Passed) {
     return 'Passed';
+  } else if (stage === OffchainThreadStage.Failed) {
+    return 'Failed';
   } else if (stage === OffchainThreadStage.Abandoned) {
     return 'Abandoned';
   } else {
@@ -33,10 +35,12 @@ export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
     return 3;
   } else if (stage === OffchainThreadStage.Passed) {
     return 4;
-  } else if (stage === OffchainThreadStage.Abandoned) {
+  } else if (stage === OffchainThreadStage.Failed) {
     return 5;
-  } else {
+  } else if (stage === OffchainThreadStage.Abandoned) {
     return 6;
+  } else {
+    return 7;
   }
 }
 

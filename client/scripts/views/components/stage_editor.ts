@@ -35,6 +35,7 @@ const StageEditor: m.Component<{
             OffchainThreadStage.ProposalInReview,
             OffchainThreadStage.Voting,
             OffchainThreadStage.Passed,
+            OffchainThreadStage.Failed,
             OffchainThreadStage.Abandoned,
           ].map((targetStage) => m(Button, {
             class: 'discussions-stage',
