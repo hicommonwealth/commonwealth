@@ -108,6 +108,15 @@
             margin-left: 8px;
             border: none;
             background: $background-color-white-hover;
+            &.cui-button.cui-primary {
+                background: $primary-bg-color;
+            }
+            &.cui-button.cui-positive {
+                background: $positive-bg-color;
+            }
+            &.cui-button.cui-negative {
+                background: $negative-bg-color;
+            }
         }
         .discussion-row-menu {
             width: 28px;

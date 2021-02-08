@@ -116,7 +116,6 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    if (proposal.stage === OffchainThreadStage.Discussion) return;
     return m('.ProposalHeaderStage', [
       m(Button, {
         rounded: true,
@@ -128,6 +127,11 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
           m.route.set(`/${proposal.chain || proposal.community}?stage=${proposal.stage}`);
         },
         label: offchainThreadStageToLabel(proposal.stage),
+        intent: proposal.stage === OffchainThreadStage.Discussion ? 'none'
+          : proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+            : proposal.stage === OffchainThreadStage.Voting ? 'positive'
+              : proposal.stage === OffchainThreadStage.Passed ? 'positive'
+                : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
       }),
     ]);
   }

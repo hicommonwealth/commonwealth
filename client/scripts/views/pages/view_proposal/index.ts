@@ -17,6 +17,7 @@ import {
   OffchainThreadKind,
   OffchainComment,
   OffchainTopic,
+  OffchainThreadStage,
   AnyProposal,
   Account,
   ChainBase,
@@ -25,7 +26,10 @@ import {
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import TopicEditor from 'views/components/topic_editor';
-import { TopicEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/discussion_row_menu';
+import StageEditor from 'views/components/stage_editor';
+import {
+  TopicEditorButton, StageEditorButton, ThreadSubscriptionButton
+} from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import PageLoading from 'views/pages/loading';
@@ -63,6 +67,7 @@ const ProposalHeader: m.Component<{
   quillEditorState: any;
   currentText: any;
   topicEditorIsOpen: boolean;
+  stageEditorIsOpen: boolean;
   editPermissionsIsOpen: boolean;
 }> = {
   view: (vnode) => {
@@ -128,6 +133,11 @@ const ProposalHeader: m.Component<{
                     vnode.state.topicEditorIsOpen = true;
                   }
                 }),
+                isAdmin && proposal instanceof OffchainThread && m(StageEditorButton, {
+                  openStageEditor: () => {
+                    vnode.state.stageEditorIsOpen = true;
+                  }
+                }),
                 (isAuthor || isAdmin)
                   && m(ProposalBodyDeleteMenuItem, { item: proposal }),
                 (isAuthor || isAdmin)
@@ -157,6 +167,14 @@ const ProposalHeader: m.Component<{
                 popoverMenu: true,
                 onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
                 openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
+              }),
+            vnode.state.stageEditorIsOpen
+              && proposal instanceof OffchainThread
+              && m(StageEditor, {
+                thread: vnode.attrs.proposal as OffchainThread,
+                popoverMenu: true,
+                onChangeHandler: (stage: OffchainThreadStage) => { proposal.stage = stage; m.redraw(); },
+                openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
               }),
           ] : [
             m(ProposalHeaderOnchainId, { proposal }),
