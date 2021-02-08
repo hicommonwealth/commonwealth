@@ -235,6 +235,7 @@ describe('Webhook Tests', () => {
         title: decodeURIComponent(markdownThread.title),
         body: decodeURIComponent(markdownThread.body),
         kind: 'forum',
+        stage: 'discussion',
       });
       res = await modelUtils.createComment({
         chain,
@@ -253,6 +254,7 @@ describe('Webhook Tests', () => {
         title: decodeURIComponent(richTextThread.title),
         body: decodeURIComponent(richTextThread.body),
         kind: 'forum',
+        stage: 'discussion',
       });
       res = await modelUtils.createComment({
         chain,

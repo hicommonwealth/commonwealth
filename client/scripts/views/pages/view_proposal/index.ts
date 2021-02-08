@@ -17,6 +17,7 @@ import {
   OffchainThreadKind,
   OffchainComment,
   OffchainTopic,
+  OffchainThreadStage,
   AnyProposal,
   Account,
   ChainBase,
@@ -25,7 +26,10 @@ import {
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import TopicEditor from 'views/components/topic_editor';
-import { TopicEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/discussion_row_menu';
+import StageEditor from 'views/components/stage_editor';
+import {
+  TopicEditorButton, StageEditorButton, ThreadSubscriptionButton
+} from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import PageLoading from 'views/pages/loading';
@@ -33,15 +37,15 @@ import PageNotFound from 'views/pages/404';
 
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
-  ProposalHeaderTopics, ProposalHeaderTitle,
+  ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyButtons,
   ProposalTitleEditor,
 } from './header';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
-  ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
-  ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
+  ProposalBodyLastEdited, ProposalBodyCancelEdit, ProposalBodySaveEdit,
+  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, EditPermissionsButton,
   ProposalEditorPermissions
 } from './body';
@@ -63,6 +67,7 @@ const ProposalHeader: m.Component<{
   quillEditorState: any;
   currentText: any;
   topicEditorIsOpen: boolean;
+  stageEditorIsOpen: boolean;
   editPermissionsIsOpen: boolean;
 }> = {
   view: (vnode) => {
@@ -96,7 +101,10 @@ const ProposalHeader: m.Component<{
       m('.proposal-top', [
         m('.proposal-top-left', [
           !vnode.state.editing
-            && m('.proposal-title', m(ProposalHeaderTitle, { proposal })),
+            && m('.proposal-title', [
+              m(ProposalHeaderTitle, { proposal }),
+              proposal instanceof OffchainThread && m(ProposalHeaderStage, { proposal }),
+            ]),
           vnode.state.editing
             && m(ProposalTitleEditor, { item: proposal, parentState: vnode.state }),
           m('.proposal-body-meta', proposal instanceof OffchainThread ? [
@@ -115,19 +123,23 @@ const ProposalHeader: m.Component<{
                   && m(ProposalBodyEditMenuItem, {
                     item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                   }),
-                (isAuthor || isAdmin)
-                  && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                (isAuthor)
-                  && m(EditPermissionsButton, {
-                    openEditPermissions: () => {
-                      vnode.state.editPermissionsIsOpen = true;
-                    }
-                  }),
+                isAuthor && m(EditPermissionsButton, {
+                  openEditPermissions: () => {
+                    vnode.state.editPermissionsIsOpen = true;
+                  }
+                }),
                 isAdmin && proposal instanceof OffchainThread && m(TopicEditorButton, {
                   openTopicEditor: () => {
                     vnode.state.topicEditorIsOpen = true;
                   }
                 }),
+                isAdmin && proposal instanceof OffchainThread && m(StageEditorButton, {
+                  openStageEditor: () => {
+                    vnode.state.stageEditorIsOpen = true;
+                  }
+                }),
+                (isAuthor || isAdmin)
+                  && m(ProposalBodyDeleteMenuItem, { item: proposal }),
                 (isAuthor || isAdmin)
                   && m(ProposalHeaderPrivacyButtons, { proposal, getSetGlobalEditingStatus }),
                 (isAuthor || isAdmin)
@@ -155,7 +167,15 @@ const ProposalHeader: m.Component<{
                 popoverMenu: true,
                 onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
                 openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
-              })
+              }),
+            vnode.state.stageEditorIsOpen
+              && proposal instanceof OffchainThread
+              && m(StageEditor, {
+                thread: vnode.attrs.proposal as OffchainThread,
+                popoverMenu: true,
+                onChangeHandler: (stage: OffchainThreadStage) => { proposal.stage = stage; m.redraw(); },
+                openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
+              }),
           ] : [
             m(ProposalHeaderOnchainId, { proposal }),
             m(ProposalHeaderOnchainStatus, { proposal }),
@@ -248,21 +268,6 @@ const ProposalComment: m.Component<{
           m(ProposalBodyAuthor, { item: comment }),
           m(ProposalBodyCreated, { item: comment, link: commentLink }),
           m(ProposalBodyLastEdited, { item: comment }),
-
-          // !vnode.state.editing
-          //   && app.user.activeAccount
-          //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          //   && app.user.activeAccount?.chain.id === comment.authorChain
-          //   && app.user.activeAccount?.address === comment.author
-          //   && [
-          //     m(ProposalBodyEdit, {
-          //       item: comment,
-          //       getSetGlobalReplyStatus,
-          //       getSetGlobalEditingStatus,
-          //       parentState: vnode.state
-          //     }),
-          //     m(ProposalBodyDelete, { item: comment }),
-          //   ],
 
           !vnode.state.editing
           && app.user.activeAccount

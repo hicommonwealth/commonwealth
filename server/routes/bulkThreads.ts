@@ -10,7 +10,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
-  const { cutoff_date, topic_id } = req.query;
+  const { cutoff_date, topic_id, stage } = req.query;
   // Threads
   let threads;
   let comments;
@@ -28,6 +28,10 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       topicOptions += `AND t.topic_id = :topic_id `;
       replacements['topic_id'] = topic_id;
     }
+    if (stage) {
+      topicOptions += `AND t.stage = :stage `;
+      replacements['stage'] = stage;
+    }
 
     replacements['created_at'] = cutoff_date;
 
@@ -35,7 +39,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       SELECT addr.id AS addr_id, addr.address AS addr_address,
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_community, thread_chain, thread_created, threads.kind,
-        threads.version_history, threads.read_only, threads.body,
+        threads.version_history, threads.read_only, threads.body, threads.stage,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
         topics.community_id AS topic_community, collaborators
@@ -44,7 +48,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
           t.created_at AS thread_created, t.community AS thread_community,
           t.chain AS thread_chain, t.version_history, t.read_only, t.body,
-          t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(
+          t.stage, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(
             CONCAT(
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
               )
@@ -101,6 +105,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         body: t.body,
         version_history: t.version_history,
         kind: t.kind,
+        stage: t.stage,
         read_only: t.read_only,
         pinned: t.pinned,
         community: t.thread_community,
