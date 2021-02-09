@@ -42,7 +42,7 @@ module.exports = {
         icon_url: '/static/img/protocols/lin.png',
         type: 'dao',
         network: 'marlin-testnet',
-        active: true,
+        active: false,
         collapsed_on_homepage: true,
       }
       ], { transaction: t });
