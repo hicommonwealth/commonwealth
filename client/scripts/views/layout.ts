@@ -15,7 +15,7 @@ const CHAIN_LOADING_TIMEOUT = 3000;
 export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
   view: (vnode) => {
     const { hideSidebar } = vnode.attrs;
-    return m('.Layout.LoadingLayout.mithril-app', {
+    return m('.Layout.mithril-app', {
     }, [
       m(Sublayout, { loadingLayout: true, hideSidebar }),
       m(AppModals),

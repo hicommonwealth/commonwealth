@@ -2,8 +2,8 @@ import IdStore from './IdStore';
 import { OffchainThread } from '../models';
 import { ALL_PROPOSALS_KEY } from '../views/pages/discussions';
 
-class TopicScopedThreadStore extends IdStore<OffchainThread> {
-  private _threadsByCommunity: { [community: string]: { [topic: string] : Array<OffchainThread> } } = {};
+class FilterScopedThreadStore extends IdStore<OffchainThread> {
+  private _threadsByCommunity: { [community: string]: { [filter: string] : Array<OffchainThread> } } = {};
 
   public add(thread: OffchainThread, options?: { allProposals: boolean, exclusive: boolean }) {
     const parentEntity = thread.community ? thread.community : thread.chain;
@@ -12,18 +12,18 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
     }
     const communityStore = this._threadsByCommunity[parentEntity];
 
-    const addThread = (topic) => {
+    const addThread = (subpage) => {
       super.add(thread);
-      if (!communityStore[topic]) {
-        communityStore[topic] = [];
+      if (!communityStore[subpage]) {
+        communityStore[subpage] = [];
       }
-      const topicStore = communityStore[topic];
+      const topicStore = communityStore[subpage];
       const matchingThread = topicStore.filter((t) => t.id === thread.id)[0];
       if (matchingThread) {
         const proposalIndex = topicStore.indexOf(matchingThread);
         topicStore.splice(proposalIndex, 1);
       }
-      communityStore[topic].push(thread);
+      communityStore[subpage].push(thread);
     };
 
     if (options) {
@@ -35,7 +35,9 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
       }
     }
 
-    addThread(thread.topic?.name);
+    if (thread.topic && thread.stage) addThread(`${thread.topic?.name}#${thread.stage}`);
+    if (thread.topic) addThread(`${thread.topic?.name}#`);
+    if (thread.stage) addThread(`#${thread.stage}`);
     return this;
   }
 
@@ -46,19 +48,21 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
     if (!this._threadsByCommunity[parentEntity]) return;
     const communityStore = this._threadsByCommunity[parentEntity];
 
-    const updateThread = (topic) => {
-      if (!communityStore[topic]) return;
-      const topicStore = communityStore[topic];
+    const updateThread = (subpage) => {
+      if (!communityStore[subpage]) return;
+      const topicStore = communityStore[subpage];
       const matchingThread = topicStore.filter((t) => t.id === thread.id)[0];
       if (!matchingThread) return;
       super.remove(matchingThread);
       const proposalIndex = topicStore.indexOf(matchingThread);
       topicStore.splice(proposalIndex, 1);
       super.add(thread);
-      communityStore[topic].push(thread);
+      communityStore[subpage].push(thread);
     };
 
-    updateThread(thread.topic?.name);
+    if (thread.topic && thread.stage) updateThread(`${thread.topic?.name}#${thread.stage}`);
+    if (thread.topic) updateThread(`${thread.topic?.name}#`);
+    if (thread.stage) updateThread(`#${thread.stage}`);
     updateThread(ALL_PROPOSALS_KEY);
 
     return this;
@@ -68,9 +72,9 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
     const parentEntity = thread.community ? thread.community : thread.chain;
     const communityStore = this._threadsByCommunity[parentEntity];
 
-    const removeThread = (topic) => {
+    const removeThread = (subpage) => {
       super.remove(thread);
-      const topicStore = communityStore[topic];
+      const topicStore = communityStore[subpage];
       if (!topicStore) return;
       const matchingThread = topicStore.filter((t) => t.id === thread.id)[0];
       const proposalIndex = topicStore.indexOf(matchingThread);
@@ -78,7 +82,9 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
       topicStore.splice(proposalIndex, 1);
     };
 
-    removeThread(thread.topic?.name);
+    if (thread.topic && thread.stage) removeThread(`${thread.topic?.name}#${thread.stage}`);
+    if (thread.topic) removeThread(`${thread.topic?.name}#`);
+    if (thread.stage) removeThread(`#${thread.stage}`);
     removeThread(ALL_PROPOSALS_KEY);
 
     return this;
@@ -89,16 +95,18 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
     this._threadsByCommunity = {};
   }
 
-  public getByCommunityAndTopic(community: string, topic: string): Array<OffchainThread> {
+  public getByCommunityAndTopic(community: string, topic: string = '', stage: string = ''): Array<OffchainThread> {
+    const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     return this._threadsByCommunity[community]
-      ? this._threadsByCommunity[community][topic] || []
+      ? this._threadsByCommunity[community][subpage] || []
       : [];
   }
 
   public removeTopic(community: string, topicName: string) {
     const communityStore = this._threadsByCommunity[community];
     if (communityStore) {
-      delete this._threadsByCommunity[community][topicName];
+      delete this._threadsByCommunity[community][`${topicName || ''}#`];
+      // TODO: also delete topic#stage for all stages
       if (communityStore[ALL_PROPOSALS_KEY]) {
         communityStore[ALL_PROPOSALS_KEY].forEach((thread) => {
           if (thread.topic?.name === topicName) {
@@ -111,4 +119,4 @@ class TopicScopedThreadStore extends IdStore<OffchainThread> {
   }
 }
 
-export default TopicScopedThreadStore;
+export default FilterScopedThreadStore;

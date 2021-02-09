@@ -483,8 +483,9 @@ const LinkNewAddressModal: m.Component<{
               rounded: true,
               disabled: !app.chain.webWallet?.available // disable if unavailable
                 || vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
-              oninit: async (vvnode) => {
+              oncreate: async (vvnode) => {
                 // initialize API if needed before starting webwallet
+                // avoid oninit because it may be called multiple times
                 if (vnode.state.initializingWallet) return;
                 vnode.state.initializingWallet = true;
                 await app.chain.initApi();

@@ -28,17 +28,19 @@
         max-width: 340px;
         text-align: center;
         p {
-            margin: 0 0 10px;
+            margin: 5px 0;
+        }
+        .login-magic-prompt-buttons + p {
+            margin: 25px 0 0;
         }
         .login-magic-prompt-buttons {
-            display: flex;
             margin-top: 18px;
             .cui-button {
                 &:first-child {
                     margin-right: 20px;
                 }
                 width: calc(50% - 10px);
-                height: 60px;
+                height: 56px;
                 .cui-button-label {
                     white-space: normal;
                     line-height: 1.2;
