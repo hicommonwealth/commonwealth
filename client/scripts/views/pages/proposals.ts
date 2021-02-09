@@ -201,7 +201,7 @@ const ProposalsPage: m.Component<{}> = {
       && !activeCosmosProposals?.length
       && !activeMolochProposals?.length
       && !activeMarlinProposals?.length
-      ? [ m('.no-proposals', 'None') ]
+      ? [ m('.no-proposals', 'No active proposals') ]
       : (activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
@@ -233,7 +233,7 @@ const ProposalsPage: m.Component<{}> = {
       && !inactiveCosmosProposals?.length
       && !inactiveMolochProposals?.length
       && !inactiveMarlinProposals?.length
-      ? [ m('.no-proposals', 'None') ]
+      ? [ m('.no-proposals', 'No Past Proposals') ]
       : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
