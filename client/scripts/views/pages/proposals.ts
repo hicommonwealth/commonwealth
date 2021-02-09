@@ -233,7 +233,7 @@ const ProposalsPage: m.Component<{}> = {
       && !inactiveCosmosProposals?.length
       && !inactiveMolochProposals?.length
       && !inactiveMarlinProposals?.length
-      ? [ m('.no-proposals', 'No Past Proposals') ]
+      ? [ m('.no-proposals', 'No past proposals') ]
       : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
