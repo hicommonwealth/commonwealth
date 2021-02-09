@@ -133,7 +133,7 @@ const ProposalHeader: m.Component<{
                     vnode.state.topicEditorIsOpen = true;
                   }
                 }),
-                isAdmin && proposal instanceof OffchainThread && m(StageEditorButton, {
+                (isAuthor || isAdmin) && proposal instanceof OffchainThread && m(StageEditorButton, {
                   openStageEditor: () => {
                     vnode.state.stageEditorIsOpen = true;
                   }
