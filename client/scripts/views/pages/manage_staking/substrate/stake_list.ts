@@ -36,6 +36,7 @@ const StakeList = makeDynamicComponent<StakeListAttrs, IStakeListState>({
           m('th.val-controller', 'Controller'),
           m('th.val-rewards', 'Rewards'),
           m('th.val-bonded', 'Bonded Amount'),
+          m('th.val-nominations', 'Nominations'),
           m('th.val-action', 'Options'),
         ]),
         model.foundStashes.map((info) => {

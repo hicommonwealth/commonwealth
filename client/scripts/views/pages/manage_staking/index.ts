@@ -37,7 +37,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
         style: 'visibility: visible; opacity: 1;'
       });
 
-    const { bondedTotal } = extractBondedTotal(ownStashInfos);
+    // const { bondedTotal } = extractBondedTotal(ownStashInfos);
 
     let vComponents = [];
     switch (app.chain.class) {
@@ -45,10 +45,10 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
       case ChainClass.Kusama:
       case ChainClass.Polkadot:
         vComponents = [
-          m(SubstratePreHeader, {
-            sender: app.user.activeAccount as SubstrateAccount,
-            bondedTotal
-          }),
+          // m(SubstratePreHeader, {
+          //   sender: app.user.activeAccount as SubstrateAccount,
+          //   bondedTotal
+          // }),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;
