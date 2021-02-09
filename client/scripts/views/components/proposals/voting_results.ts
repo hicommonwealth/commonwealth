@@ -93,7 +93,6 @@ const VoteListing: m.Component<{
                 ]);
               case (vote instanceof MolochProposalVote):
                 return m('.vote', [
->>>>>>> master
                   m('.vote-voter', m(User, { user: vote.account, linkify: true })),
                   m('.vote-choice', (vote as MolochProposalVote).choice.toString()),
                   balance && m('.vote-balance', balance),
