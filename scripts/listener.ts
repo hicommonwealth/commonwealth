@@ -61,6 +61,12 @@ const argv = yargs.options({
     type: 'boolean',
     description: 'run listener in archival mode or not',
   },
+  startBlock: {
+    alias: 'b',
+    type: 'number',
+    description: 'when running in archival mode, which block should we start from',
+  },
+
 }).check((data) => {
   if (!chainSupportedBy(data.network, SubstrateEvents.Types.EventChains) && data.spec) {
     throw new Error('cannot pass spec on non-substrate network');
@@ -71,6 +77,8 @@ const argv = yargs.options({
   return true;
 }).argv;
 const archival: boolean = argv.archival;
+// if running in archival mode then which block shall we star from
+const startBlock: number = argv.startBlock ?? 0;
 const network = argv.network;
 const url: string = argv.url || networkUrls[network];
 const spec = networkSpecs[network] || {};
@@ -99,6 +107,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       handlers: [ new StandaloneEventHandler() ],
       skipCatchup,
       archival,
+      startBlock,
       verbose: true,
     });
   });

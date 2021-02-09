@@ -4,6 +4,7 @@ import { Header, EventRecord, Extrinsic } from '@polkadot/types/interfaces';
 import { Processor } from '../../../src/substrate/processor';
 import { EventKind, ISlash } from '../../../src/substrate/types';
 import { constructFakeApi } from './testUtil';
+import BN from 'bn.js';
 
 const { assert } = chai;
 
@@ -110,6 +111,10 @@ describe('Edgeware Event Processor Tests', () => {
           throw new Error('bad referendum idx');
         }
       },
+      getBlockHash: async (blockNumber) => {
+        return  2
+      },
+      'currentIndex.at' : async () => new BN(12),
     });
 
     // run test

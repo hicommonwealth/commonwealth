@@ -94,6 +94,39 @@ export function constructFakeApi(
   const identityOf = function (...args) { return callOverrides['identityOf'](...args); };
   identityOf.multi = callOverrides['identityOfMulti'];
 
+  const blockHash = function (...args) { return callOverrides['blockHash'](...args); };
+  blockHash.multi = callOverrides['blockHash.multi'];
+
+  const events = function (...args) { return callOverrides['events'](...args); };
+  events.at = callOverrides['events.at'];
+  
+  const currentIndex = function (...args) { return callOverrides['currentIndex'](...args); };
+  currentIndex.at = callOverrides['currentIndex.at'];
+
+  const validators = function (...args) { return callOverrides['validators'](...args); };
+  validators.at = callOverrides['validators.at'];
+  validators.keysAt = callOverrides['validators.keysAt'];
+
+  const bonded = function (...args) { return callOverrides['bonded'](...args); };
+  bonded.at = callOverrides['bonded.at'];
+
+  const stakers = function (...args) { return callOverrides['stakers'](...args); };
+  stakers.at = callOverrides['stakers.at'];
+  stakers.keysAt = callOverrides['stakers.keysAt'];
+
+  const currentEra = function (...args) { return callOverrides['currentEra'](...args); };
+  currentEra.at = callOverrides['currentEra.at'];
+
+
+  const erasRewardPoints = function (...args) { return callOverrides['erasRewardPoints'](...args); };
+  erasRewardPoints.at = callOverrides['erasRewardPoints.at'];
+
+  const currentEraPointsEarned = function (...args) { return callOverrides['currentEraPointsEarned'](...args); };
+  currentEraPointsEarned.at = callOverrides['currentEraPointsEarned.at'];
+
+  const payee = function (...args) { return callOverrides['payee'](...args); };
+  payee.at = callOverrides['payee.at'];
+  
   const proposals = function (...args) { return callOverrides['treasuryProposals'](...args); };
   proposals.multi = callOverrides['treasuryProposalsMulti'];
 
@@ -120,22 +153,24 @@ export function constructFakeApi(
     },
     query: {
       system: {
-        blockHash: {
-          multi: callOverrides['blockHash.multi'],
-        },
-        events: {
-          at: callOverrides['events.at'],
-        }
+        blockHash,
+        events,
       },
       session: {
-        nextKeys: callOverrides['nextKeys']
+        nextKeys: callOverrides['nextKeys'],
+        currentIndex,
+        validators,
       },
       staking: {
-        bonded: callOverrides['bonded'],
+        bonded,        
         currentPoints: callOverrides['currentPoints'],
-        currentEra: callOverrides['currentEra'],
-        stakers: callOverrides['stakers'],
         activeEra: callOverrides['activeEra'],
+        stakers,
+        currentEra,
+        validators,
+        erasRewardPoints,
+        currentEraPointsEarned,
+        payee,
       },
       democracy: {
         referendumInfoOf: callOverrides['referendumInfoOf'],

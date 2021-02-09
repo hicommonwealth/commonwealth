@@ -1,5 +1,4 @@
 import { WsProvider, ApiPromise } from '@polkadot/api';
-import { TypeRegistry } from '@polkadot/types';
 import { RegisteredTypes } from '@polkadot/types/types';
 
 import { IDisconnectedRange, CWEvent, SubscribeFunc, ISubscribeOptions } from '../interfaces';
@@ -46,7 +45,7 @@ export async function createApi(
  * @returns An active block subscriber.
  */
 export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions<ApiPromise>> = async (options) => {
-  const { chain, api, handlers, skipCatchup, archival, discoverReconnectRange, verbose } = options;
+  const { chain, api, handlers, skipCatchup, archival, startBlock, discoverReconnectRange, verbose } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>) => {
     let prevResult = null;
@@ -71,11 +70,22 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
     const events: CWEvent<IEventData>[] = await processor.process(block);
 
     // send all events through event-handlers in sequence
-    await Promise.all(events.map((event) => handleEventFn(event)));
+    for(const event of events) await handleEventFn(event); 
   };
 
   const subscriber = new Subscriber(api, verbose);
   const poller = new Poller(api);
+
+  // if running in archival mode: run poller.archive with batch_size 50
+  // then exit without subscribing.
+  // TODO: should we start subscription?
+  if (archival) {
+    // default to startBlock 0
+    const offlineRange: IDisconnectedRange = { startBlock : startBlock ?? 0 };
+    log.info(`Executing in archival mode, polling blocks starting from: ${offlineRange.startBlock}`);
+    await poller.archive(offlineRange, 50, processBlockFn);
+    return subscriber;
+  }
 
   // helper function that runs after we've been offline/the server's been down,
   // and attempts to fetch events from skipped blocks
@@ -101,37 +111,23 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
       offlineRange = { startBlock: lastBlockNumber };
     }
 
-    // if we can't figure out when the last block we saw was,
-    // and we are not running in archival mode, do nothing
-    // (i.e. don't try and fetch all events from block 0 onward)
-    if(!offlineRange || !offlineRange.startBlock){
-      if(archival){
-        offlineRange = {startBlock: 0}
-      }
-      else{
-        log.warn('Unable to determine offline time range.');
-        return;
-      }
-    }
     
-    // if running in archival mode then run poller.archive with 
-    // batch_size 500 
-    if(archival){
-      log.info(`Executing in archival mode, polling blocks starting from: ${offlineRange.startBlock}`);
-      await poller.archive(offlineRange,500,processBlockFn);
+    // if we can't figure out when the last block we saw was,
+    // do nothing
+    // (i.e. don't try and fetch all events from block 0 onward)
+    if (!offlineRange || !offlineRange.startBlock) {
+      log.warn('Unable to determine offline time range.');
+      return;
     }
-    // else just run poller normally
-    else {
-      try {
-        const blocks = await poller.poll(offlineRange);
-        await Promise.all(blocks.map(processBlockFn));
-      } catch (e) {
-        log.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
-      }
+    try {
+      const blocks = await poller.poll(offlineRange);
+      await Promise.all(blocks.map(processBlockFn));
+    } catch (e) {
+      log.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
     }
   };
 
-  if (!skipCatchup || archival) {
+  if (!skipCatchup) {
     await pollMissedBlocksFn();
   } else {
     log.info('Skipping event catchup on startup!');
@@ -146,6 +142,5 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
   } catch (e) {
     log.error(`Subscription error: ${e.message}`);
   }
-
   return subscriber;
 };

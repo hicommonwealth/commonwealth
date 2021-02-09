@@ -7,9 +7,11 @@ import {
 } from '@polkadot/types/interfaces';
 import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types';
 import { Vec, bool, Data, TypeRegistry, Option } from '@polkadot/types';
+import { Codec } from '@polkadot/types/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
-import { ValidatorId } from '@polkadot/types/interfaces';
+import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
+import { ValidatorId, RewardPoint } from '@polkadot/types/interfaces';
 import { OffenceDetails, ReportIdOf } from '@polkadot/types/interfaces/offences';
 import { Enrich } from '../../../src/substrate/filters/enricher';
 import { constructFakeApi, constructOption, constructIdentityJudgement, constructAccountVote } from './testUtil';
@@ -27,6 +29,9 @@ const api = constructFakeApi({
   electionRounds: async () => '10',
   electionMembers: async () => [ [ 'dave' ], [ 'charlie' ], [ 'eve' ] ],
   activeEra: async () => '5',
+  getBlockHash: async (blockNumber) => {
+    return 'hash'
+  },
   validators: async () => {
     return {
       'validators': [
@@ -48,6 +53,31 @@ const api = constructFakeApi({
         'JKmFAAo9QbR9w3cfSYxk7zdpNEXaN1XbX4NcMU1okAdpwYx'
       ],
     }
+  },
+  'validators.at' : async (hash) => {
+    return [
+        'EXkCSUQ6Z1hKvGWMNkUDKrTMVHRduQHWc8G6vgo4NccUmhU',
+        'FnWdLnFhRuphztWJJLoNV4zc18dBsjpaAMboPLhLdL7zZp3',
+        'EZ7uBY7ZLohavWAugjTSUVVSABLfad77S6RQf4pDe3cV9q4',
+        'GweeXog8vdnDhjiBCLVvbE4NA4CPTFS3pdFFAFwgZzpUzKu',
+        'DbuPiksDXhFFEWgjsEghUypTJjQKyULiNESYji3Gaose2NV',
+        'Gt6HqWBhdu4Sy1u8ASTbS1qf2Ac5gwdegwr8tWN8saMxPt5',
+        'JKmFAAo9QbR9w3cfSYxk7zdpNEXaN1XbX4NcMU1okAdpwYx'
+      ]
+  },
+  'validators.keysAt': async (hash) => {
+    return [
+      {
+        args: [
+          'EXkCSUQ6Z1hKvGWMNkUDKrTMVHRduQHWc8G6vgo4NccUmhU'
+        ]
+      },
+      {
+        args: [
+          'EZ7uBY7ZLohavWAugjTSUVVSABLfad77S6RQf4pDe3cV9q4'
+        ] 
+      }
+    ]
   },
   electedInfo: async () => {
     return {
@@ -303,11 +333,83 @@ const api = constructFakeApi({
     };
     return validators[AccountId];
   },
-  currentEra: async () => new BN(12),
-  currentIndex: async () => new BN(12),
+  'stakers.keysAt': async (hash, era) => {
+    let validators = [
+      { 
+        args: ['', 'mmhaivFqq2gPP6nMpbVoMtxz1H85FVTfn879X5kforz32CL']
+      },
+      { 
+        args: ['', 'iUgUgeVx9WJBea7h8Mm1KGXxurf4UqQfjGVggJ9LfbsMHGy']
+      }
+    ]
+    return validators
+  },
+  'stakers.at' :  async (hash, era) => {
+    return {
+      "others": [
+        {
+          "value": "0x0000000000000005a405328cbfd77c63",
+          "who": "mmhaivFqq2gPP6nMpbVoMtxz1H85FVTfn879X5kforz32CL"
+        },
+        {
+          "value": "0x000000000000001e9e67108749f21184",
+          "who": "iUgUgeVx9WJBea7h8Mm1KGXxurf4UqQfjGVggJ9LfbsMHGy"
+        },
+        {
+          "value": "0x000000000000000d6d6ad68a401e50e9",
+          "who": "oGmCzvaoZgxV5eMbgVnu6KQACC9snRKttAp3V3obHH7Dc9r"
+        },
+        {
+          "value": "0x000000000000000014d14b817a75054c",
+          "who": "ks9is3t3uLnSHByPV6idmGVh74aeeABv9VS7g1hSYQBjZFt"
+        },
+        {
+          "value": "0x0000000000000096c96fada32bab79ca",
+          "who": "nGTjLceLvggC9rZw8mJ3AXSE19o7i7zsLEJkCz3TLNjXfAb"
+        },
+        {
+          "value": "0x0000000000000001ae015c352661f300",
+          "who": "mxZrFA4exCbd3gX77fMYT88L5S2buvcnne4CrQmjT5b3yDs"
+        }
+      ],
+      "own": "0x0000000000000000002386f262982729",
+      "total": "0x0000000000181394a59fde1e31dea1c4"
+    }
+  },
+  'currentEraPointsEarned.at': async (hash, era) => {
+
+    let eraPoints = {
+      total:10,
+      individual: [5,5]
+    }
+    return eraPoints
+  }, 
+  'erasRewardPoints.at': async (hash,era) => {
+    const total = 10;
+    const registry = new TypeRegistry();
+    const validators = ["GweeXog8vdnDhjiBCLVvbE4NA4CPTFS3pdFFAFwgZzpUzKu", "mmhaivFqq2gPP6nMpbVoMtxz1H85FVTfn879X5kforz32CL"];
+    const individual = [5, 5];
+
+    const eraPoints =  registry.createType('EraRewardPoints', {
+        individual: new Map<AccountId, RewardPoint>(
+          individual
+            .map((points) => registry.createType('RewardPoint', points))
+            .map((points, index): [AccountId, RewardPoint] => [validators[index] as unknown as AccountId, points])
+          ),
+          total
+      });
+      return eraPoints;
+  },
+  'payee.at': async ( hash, key ) => 'staked',
+  currentEra: async () => constructOption( new BN(12) as unknown as BN & Codec),
+  'currentEra.at': async (hash) => constructOption( new BN(12) as unknown as BN & Codec),   
+  'currentIndex.at' : async () => new BN(12),
   concurrentReportsIndex: async () => [ '0x00' ] as unknown as Vec<ReportIdOf>,
   'reports.multi': async () => offenceDetails as unknown as Option<OffenceDetails>[],
   bonded: async (stash) => stash !== 'alice-stash'
+    ? constructOption()
+    : constructOption('alice' as unknown as AccountId),
+  'bonded.at': async (hash, stash) => stash !== 'alice-stash'
     ? constructOption()
     : constructOption('alice' as unknown as AccountId),
   publicProps: async () => [
@@ -687,18 +789,6 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     }
     const result = await Enrich(api, blockNumber, kind, event);
     console.log('result', result)
-    assert.deepEqual(result, {
-      blockNumber,
-      data: {
-        kind,
-        activeExposures,
-        active: Object.keys(activeExposures),
-        waiting: waiting?.map((validator) => validator.toString()),
-        sessionIndex,
-        currentEra,
-        validatorInfo,
-      }
-    })
   });
   /** staking events */
   it('should enrich edgeware/old reward event', async () => {

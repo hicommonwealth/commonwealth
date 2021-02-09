@@ -159,7 +159,6 @@ export interface IAllGood extends IEvent {
   sessionIndex: number;
   validators: Array<AccountId>;
 }
-
 export interface IHeartbeatReceived extends IEvent {
   kind: EventKind.HeartbeatReceived;
   authorityId: string;
@@ -182,19 +181,33 @@ export interface IOffence extends IEvent {
   offenders: Array<string>
 }
 
+// Individual Exposure
+export interface IndividualExposure {
+  who: AccountId,
+  value: string
+}
+
+// Active Exposure
+export interface ActiveExposure {
+  [key: string]: {
+    own: number,
+    total: number,
+    others: IndividualExposure[],
+  }
+}
+
 /**
  * Session Event
  */
 export interface INewSession extends IEvent {
   kind: EventKind.NewSession;
-  activeExposures: { [key: string]: any };
+  activeExposures: ActiveExposure;
   active: Array<AccountId>;
   waiting: Array<AccountId>;
   sessionIndex: number;
   currentEra?: number;
   validatorInfo: { [key: string]: Validator },
 }
-
 
 /**
  * Staking Events
@@ -525,6 +538,11 @@ export interface IIdentityCleared extends IEvent {
 export interface IIdentityKilled extends IEvent {
   kind: EventKind.IdentityKilled;
   who: AccountId;
+}
+
+// Interface for era reward points
+export interface AccountPoints {
+  [key: string]: number;
 }
 
 export type IEventData =
