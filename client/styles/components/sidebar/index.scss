@@ -5,14 +5,52 @@
         justify-content: left;
     }
     .cui-button.telegram-button {
-        border-color: #2480cc;
-        background: #2480cc;
-        color: $text-color-white;
+        border-color: tint(#2480cc, 25%);
+        color: #2480cc;
+        &:hover {
+            border-color: #2480cc;
+        }
+        .cui-button-label {
+            flex: 1;
+            text-align: left;
+        }
+        svg {
+            position: relative;
+            left: 2px;
+            stroke: #2480cc;
+        }
+    }
+    .cui-button.element-button {
+        border-color: tint(#0cbd8b, 25%);
+        color: #0cbd8b;
+        &:hover {
+            border-color: #0cbd8b;
+        }
+        .cui-button-label {
+            flex: 1;
+            text-align: left;
+        }
+        svg {
+            position: relative;
+            left: 2px;
+            stroke: #0cbd8b;
+        }
     }
     .cui-button.discord-button {
-        border-color: #677bc4;
-        background: #677bc4;
-        color: $text-color-white;
+        border-color: tint(#677bc4, 25%);
+        color: #677bc4;
+        &:hover {
+            border-color: #677bc4;
+        }
+        .cui-button-label {
+            flex: 1;
+            text-align: left;
+        }
+        svg {
+            position: relative;
+            left: 2px;
+            stroke: #677bc4;
+        }
     }
     .SubscriptionButton {
         margin-bottom: 10px;

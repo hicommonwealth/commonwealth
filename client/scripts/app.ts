@@ -22,6 +22,11 @@ import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 
+// Prefetch commonly used pages
+import(/* webpackPrefetch: true */ 'views/pages/home');
+import(/* webpackPrefetch: true */ 'views/pages/discussions');
+import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
+
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true): Promise<void> {
@@ -30,6 +35,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.chains.clear();
       app.config.nodes.clear();
       app.config.communities.clear();
+      app.user.notifications.store.clear();
+      app.user.notifications.clearSubscriptions();
       data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
       data.nodes.map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
@@ -46,7 +53,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           description: community.description,
           iconUrl: community.iconUrl,
           website: community.website,
-          chat: community.chat,
+          discord: community.discord,
+          element: community.element,
           telegram: community.telegram,
           github: community.github,
           default_chain: app.config.chains.getById(community.default_chain),

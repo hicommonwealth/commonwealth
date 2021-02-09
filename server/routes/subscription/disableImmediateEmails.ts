@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
+import { sequelize } from '../../database';
 import { factory, formatFilename } from '../../../shared/logging';
 import Errors from './errors';
 
@@ -29,11 +30,12 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     return next(new Error(Errors.NotUsersSubscription));
   }
 
-  // TODO: transactionalize this
-  await Promise.all(subscriptions.map((s) => {
-    s.immediate_email = false;
-    return s.save();
-  }));
+  await sequelize.transaction(async (t) => {
+    await Promise.all(subscriptions.map((s) => {
+      s.immediate_email = false;
+      return s.save({ transaction: t });
+    }));
+  });
 
   return res.json({ status: 'Success', result: 'Disabled Immediate Emails' });
 };

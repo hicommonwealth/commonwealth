@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import moment from 'moment';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
+import { parseUserMentions } from '../util/parseUserMentions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -48,9 +50,22 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    const arr = comment.version_history;
-    arr.unshift(req.body.version_history);
-    comment.version_history = arr;
+    let latestVersion;
+    try {
+      latestVersion = JSON.parse(comment.version_history[0]).body;
+    } catch (e) {
+      console.log(e);
+    }
+    // If new comment body text has been submitted, create another version history entry
+    if (decodeURIComponent(req.body.body) !== latestVersion) {
+      const recentEdit = {
+        timestamp: moment(),
+        body: decodeURIComponent(req.body.body)
+      };
+      const arr = comment.version_history;
+      arr.unshift(JSON.stringify(recentEdit));
+      comment.version_history = arr;
+    }
     comment.text = req.body.body;
     comment.plaintext = (() => {
       try {
@@ -97,7 +112,7 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
         root_id: comment.root_id,
         root_title,
         root_type: prefix,
-        comment_id: Number(finalComment.id),
+        comment_id: +finalComment.id,
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
         community_id: finalComment.community,
@@ -115,7 +130,91 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       req.wss,
       [ finalComment.Address.address ],
     );
-    // TODO: dispatch notifications for new mention(s)
+
+    let mentions;
+    try {
+      const previousDraftMentions = parseUserMentions(latestVersion);
+      const currentDraftMentions = parseUserMentions(decodeURIComponent(req.body.body));
+      mentions = currentDraftMentions.filter((addrArray) => {
+        let alreadyExists = false;
+        previousDraftMentions.forEach((addrArray_) => {
+          if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+            alreadyExists = true;
+          }
+        });
+        return !alreadyExists;
+      });
+    } catch (e) {
+      return next(new Error('Failed to parse mentions'));
+    }
+
+    // grab mentions to notify tagged users
+    let mentionedAddresses;
+    if (mentions?.length > 0) {
+      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+        try {
+          const user = await models.Address.findOne({
+            where: {
+              chain: mention[0],
+              address: mention[1],
+            },
+            include: [ models.User, models.Role ]
+          });
+          return user;
+        } catch (err) {
+          return next(new Error(err));
+        }
+      }));
+      // filter null results
+      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+    }
+
+    // notify mentioned users, given permissions are in place
+    if (mentionedAddresses?.length > 0) {
+      await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
+        if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
+
+        let shouldNotifyMentionedUser = true;
+        if (finalComment.community) {
+          const originCommunity = await models.OffchainCommunity.findOne({
+            where: { id: finalComment.community }
+          });
+          if (originCommunity.privacyEnabled) {
+            const destinationCommunity = mentionedAddress.Roles
+              .find((role) => role.offchain_community_id === originCommunity.id);
+            if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
+          }
+        }
+        if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
+          models,
+          NotificationCategories.NewMention,
+          `user-${mentionedAddress.User.id}`,
+          {
+            created_at: new Date(),
+            root_id: +id,
+            root_title,
+            root_type: prefix,
+            comment_id: +finalComment.id,
+            comment_text: finalComment.text,
+            chain_id: finalComment.chain,
+            community_id: finalComment.community,
+            author_address: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+          },
+          {
+            user: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+            url: cwUrl,
+            title: proposal.title || '',
+            chain: finalComment.chain,
+            community: finalComment.community,
+            body: finalComment.text,
+          },
+          req.wss,
+          [ finalComment.Address.address ],
+        );
+      }));
+    }
 
     // update author.last_active (no await)
     author.last_active = new Date();

@@ -75,6 +75,7 @@ export interface ThreadArgs {
   jwt: any,
   address: string,
   kind: string,
+  stage: string,
   chainId: string,
   communityId: string,
   title: string,
@@ -83,15 +84,13 @@ export interface ThreadArgs {
   body?: string,
   url?: string,
   attachments?: string[],
-  mentions?: string[],
   readOnly?: boolean
 }
 export const createThread = async (args: ThreadArgs) => {
-  const { chainId, communityId, address, jwt, title, body, topicName, topicId,
-    readOnly, kind, url, mentions, attachments } = args;
-  const timestamp = moment();
-  const firstVersion : any = { timestamp, body };
-  const versionHistory : string = JSON.stringify(firstVersion);
+  const {
+    chainId, communityId, address, jwt, title, body, topicName, topicId,
+    readOnly, kind, stage, url, attachments
+  } = args;
   const res = await chai.request.agent(app)
     .post('/api/createThread')
     .set('Accept', 'application/json')
@@ -103,11 +102,9 @@ export const createThread = async (args: ThreadArgs) => {
       'title': encodeURIComponent(title),
       'body': encodeURIComponent(body),
       'kind': kind,
-      'versionHistory': versionHistory,
       'attachments[]': undefined,
       'topic_name': topicName,
       'topic_id': topicId,
-      'mentions[]': mentions,
       'url': url,
       'readOnly': readOnly || false,
       'jwt': jwt,
@@ -123,13 +120,9 @@ export interface CommentArgs {
   text: any;
   parentCommentId?: any;
   root_id?: any;
-  mentions?: any;
 }
 export const createComment = async (args: CommentArgs) => {
-  const { chain, community, address, jwt, text, parentCommentId, root_id, mentions } = args;
-  const timestamp = moment();
-  const firstVersion : any = { timestamp, body: text };
-  const versionHistory : string = JSON.stringify(firstVersion);
+  const { chain, community, address, jwt, text, parentCommentId, root_id } = args;
   const res = await chai.request.agent(app)
     .post('/api/createComment')
     .set('Accept', 'application/json')
@@ -142,9 +135,7 @@ export const createComment = async (args: CommentArgs) => {
       'root_id': root_id,
       'attachments[]': undefined,
       'text': text,
-      'versionHistory': versionHistory,
       'jwt': jwt,
-      'mentions[]': mentions,
     });
   return res.body;
 };
@@ -160,8 +151,6 @@ export interface EditCommentArgs {
 
 export const editComment = async (args: EditCommentArgs) => {
   const { jwt, text, comment_id, chain, community, address } = args;
-  const recentEdit : any = { timestamp: moment(), body: text };
-  const versionHistory = JSON.stringify(recentEdit);
   const res = await chai.request.agent(app)
     .post('/api/editComment')
     .set('Accept', 'application/json')
@@ -170,7 +159,6 @@ export const editComment = async (args: EditCommentArgs) => {
       'author_chain': chain,
       'address': address,
       'body': encodeURIComponent(text),
-      'version_history': versionHistory,
       'attachments[]': undefined,
       'jwt': jwt,
       'chain': community ? undefined : chain,

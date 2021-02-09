@@ -84,7 +84,8 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
   view: (vnode) => {
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/discussions/`)
-      || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+      || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
+      || p.startsWith(`/${app.activeId()}?`);
     const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
       || p.startsWith(`/${app.activeId()}/account/`);
@@ -375,20 +376,23 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
     })));
 
     return m('.ChainStatusModule', [
-      m(PopoverMenu, {
+      app.chain.deferred ? m(Button, {
+        label: 'Connect to chain',
+        rounded: true,
+        fluid: true,
+        disabled: vnode.state.initializing,
+        onclick: async (e) => {
+          e.preventDefault();
+          vnode.state.initializing = true;
+          await initChain();
+          vnode.state.initializing = false;
+          m.redraw();
+        }
+      }) : m(PopoverMenu, {
         transitionDuration: 0,
         closeOnContentClick: true,
         closeOnOutsideClick: true,
-        content: app.chain.deferred ? m(MenuItem, {
-          label: 'Connect to chain',
-          onclick: async (e) => {
-            e.preventDefault();
-            vnode.state.initializing = true;
-            await initChain();
-            vnode.state.initializing = false;
-            m.redraw();
-          }
-        }) : nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
+        content: nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
           return m(MenuItem, {
             label: [
               node.label,
@@ -423,23 +427,33 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain && !app.community) return;
     const meta = app.chain ? app.chain.meta.chain : app.community.meta;
-    const { name, description, website, chat, telegram, github } = meta;
-    if (!website && !chat && !telegram && !github) return;
+    const { name, description, website, discord, element, telegram, github } = meta;
+    if (!website && !discord && !telegram && !github) return;
 
     return m('.ExternalLinksModule.SidebarModule', [
       m('.section-header', 'External Links'),
-      chat && m(Button, {
+      discord && m(Button, {
         fluid: true,
         rounded: true,
-        onclick: () => window.open(chat),
-        label: 'Chat on Discord',
+        onclick: () => window.open(discord),
+        label: 'Discord',
+        iconRight: Icons.EXTERNAL_LINK,
         class: 'discord-button',
+      }),
+      element && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: () => window.open(element),
+        label: 'Element',
+        iconRight: Icons.EXTERNAL_LINK,
+        class: 'element-button',
       }),
       telegram && m(Button, {
         fluid: true,
         rounded: true,
         onclick: () => window.open(telegram),
-        label: 'Chat on Telegram',
+        label: 'Telegram',
+        iconRight: Icons.EXTERNAL_LINK,
         class: 'telegram-button',
       }),
       (github || website) && m(PopoverMenu, {

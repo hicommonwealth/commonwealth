@@ -2,6 +2,11 @@
 
 $size: 46px;
 
+.EmptyStagePlaceholder {
+    padding: 40px 0;
+    color: $text-color-light;
+}
+
 .EmptyTopicPlaceholder {
     padding: 40px 0;
     .icon-circle {

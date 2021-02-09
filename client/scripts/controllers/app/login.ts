@@ -5,7 +5,9 @@ import $ from 'jquery';
 import app from 'state';
 import { isSameAccount } from 'helpers';
 
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { initAppState } from 'app';
+import { Magic } from 'magic-sdk';
+
 import {
   ChainInfo,
   SocialAccount,
@@ -15,6 +17,8 @@ import {
   AddressInfo,
 } from 'models';
 import moment from 'moment';
+import { notifyError } from 'controllers/app/notifications';
+
 
 function createAccount(account: Account<any>) {
   // TODO: Change to POST /address
@@ -158,7 +162,7 @@ export function updateActiveUser(data) {
     app.user.setEmailVerified(data.emailVerified);
     app.user.setJWT(data.jwt);
 
-    app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype)));
+    app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic)));
     app.user.setSocialAccounts(data.socialAccounts.map((sa) => new SocialAccount(sa.provider, sa.provider_username)));
 
     app.user.setSiteAdmin(data.isAdmin);
@@ -230,5 +234,40 @@ export async function unlinkLogin(account) {
     await setActiveAccount(app.user.activeAccounts[0]);
   } else {
     app.user.ephemerallySetActiveAccount(null);
+  }
+}
+
+const MAGIC_PUBLISHABLE_KEY = 'pk_test_436D33AFC319E080';
+
+export async function loginWithMagicLink(email: string) {
+  const magic = new Magic(MAGIC_PUBLISHABLE_KEY);
+  const didToken = await magic.auth.loginWithMagicLink({ email });
+  const response = await $.post({
+    url: `${app.serverUrl()}/auth/magic`,
+    headers: {
+      Authorization: `Bearer ${didToken}`,
+    },
+    xhrFields: {
+      withCredentials: true
+    },
+    data: {
+      // send chain/community to request
+      'chain': app.activeChainId(),
+      'community': app.activeCommunityId(),
+    },
+  });
+  if (response.status === 'Success') {
+    // log in as the new user (assume all verification done server-side)
+    await initAppState(false);
+    if (app.community) {
+      await updateActiveAddresses(undefined);
+    } else if (app.chain) {
+      const c = app.user.selectedNode
+        ? app.user.selectedNode.chain
+        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+      await updateActiveAddresses(c);
+    }
+  } else {
+    throw new Error(`Magic auth unsuccessful: ${response.status}`);
   }
 }
