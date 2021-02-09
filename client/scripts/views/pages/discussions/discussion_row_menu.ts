@@ -134,7 +134,6 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, {
         closeOnContentClick: true,
         menuAttrs: {},
         content: [
-          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
           m(ThreadSubscriptionButton, { proposal }),
           hasAdminPermissions && m(MenuDivider),
           hasAdminPermissions && m(MenuItem, {
@@ -162,6 +161,7 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, {
           (isAuthor || hasAdminPermissions) && m(StageEditorButton, {
             openStageEditor: () => { vnode.state.stageEditorIsOpen = true; }
           }),
+          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
         ],
         inline: true,
         trigger: m(Icon, {
