@@ -20,7 +20,7 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   } else if (stage === OffchainThreadStage.Failed) {
     return 'Not Passed';
   } else if (stage === OffchainThreadStage.Abandoned) {
-    return 'Abandoned';
+    return 'Not Being Pursued';
   } else {
     return 'Other';
   }
