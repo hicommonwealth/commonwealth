@@ -1,7 +1,6 @@
 import 'pages/view_proposal/editor_permissions.scss';
 
 import m from 'mithril';
-import moment from 'moment';
 import lity from 'lity';
 import Quill from 'quill';
 import $ from 'jquery';
@@ -16,6 +15,7 @@ import {
   AnyProposal,
   Account,
   Profile,
+  AddressInfo
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
@@ -26,9 +26,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import { parseMentionsForServer } from 'helpers/threads';
-const Delta = Quill.import('delta');
-import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, ControlGroup, Icon, Icons } from 'construct-ui';
+import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
 import { VersionHistory } from 'client/scripts/controllers/server/threads';
 
@@ -94,7 +92,21 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
         showAddressWithDisplayName: true,
       }),
       item instanceof OffchainThread && item.collaborators && item.collaborators.length > 0
-        && m('span.proposal-collaborators', ` and ${pluralize(item.collaborators?.length, 'other')}`),
+        && m('span.proposal-collaborators', [
+          ' and ',
+          m(Popover, {
+            inline: true,
+            interactionType: 'hover',
+            transitionDuration: 0,
+            hoverOpenDelay: 500,
+            closeOnContentClick: true,
+            class: 'proposal-collaborators-popover',
+            content: item.collaborators.map(({ address, chain }) => {
+              return m(User, { user: new AddressInfo(null, address, chain, null), linkify: true });
+            }),
+            trigger: m('a.proposal-collaborators', { href: '#' }, pluralize(item.collaborators?.length, 'other')),
+          }),
+        ]),
     ]);
   }
 };
@@ -181,37 +193,6 @@ export const ProposalBodyReplyMenuItem: m.Component<{
   }
 };
 
-export const ProposalBodyEdit: m.Component<{
-  item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
-}> = {
-  view: (vnode) => {
-    const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
-    if (!item) return;
-    if (item instanceof OffchainThread && item.readOnly) return;
-    const isThread = item instanceof OffchainThread;
-
-    return m('.ProposalBodyEdit', [
-      m('a', {
-        class: isThread ? 'edit-proposal' : 'edit-comment',
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-          parentState.currentText = item instanceof OffchainThread ? item.body : item.text;
-          if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
-            if (activeQuillEditorHasText()) {
-              const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-              if (!confirmed) return;
-            }
-            getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
-          }
-          parentState.editing = true;
-          getSetGlobalEditingStatus(GlobalStatus.Set, true);
-        },
-      }, 'Edit'),
-    ]);
-  }
-};
-
 export const ProposalBodyEditMenuItem: m.Component<{
   item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
 }> = {
@@ -238,32 +219,6 @@ export const ProposalBodyEditMenuItem: m.Component<{
         getSetGlobalEditingStatus(GlobalStatus.Set, true);
       },
     });
-  }
-};
-
-export const ProposalBodyDelete: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
-  view: (vnode) => {
-    const { item } = vnode.attrs;
-    if (!item) return;
-    const isThread = item instanceof OffchainThread;
-
-    return m('.ProposalBodyDelete', [
-      m('a', {
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-          const confirmed = await confirmationModalWithText(
-            isThread ? 'Delete this entire thread?' : 'Delete this comment?'
-          )();
-          if (!confirmed) return;
-          (isThread ? app.threads : app.comments).delete(item).then(() => {
-            if (isThread) m.route.set(`/${app.activeId()}/`);
-            m.redraw();
-            // TODO: set notification bar for 'thread deleted/comment deleted'
-          });
-        },
-      }, 'Delete'),
-    ]);
   }
 };
 
@@ -301,7 +256,7 @@ export const EditPermissionsButton: m.Component<{
   view: (vnode) => {
     const { openEditPermissions } = vnode.attrs;
     return m(MenuItem, {
-      label: 'Manage collaborators',
+      label: 'Edit collaborators',
       onclick: async (e) => {
         e.preventDefault();
         openEditPermissions();
@@ -439,7 +394,7 @@ export const ProposalEditorPermissions: m.Component<{
           vnode.state.isOpen = false;
         }
       },
-      title: 'Manage collaborators',
+      title: 'Edit collaborators',
       transitionDuration: 200,
       footer: m(`.${Classes.ALIGN_RIGHT}`, [
         m(Button, {
@@ -577,35 +532,9 @@ export const ProposalBodySaveEdit: m.Component<{
           const itemText = quillEditorState.markdownMode
             ? quillEditorState.editor.getText()
             : JSON.stringify(quillEditorState.editor.getContents());
-          let mentions;
-          if (isThread || isComment) {
-            const currentDraftMentions = !quillEditorState
-              ? []
-              : quillEditorState.markdownMode
-                ? parseMentionsForServer(quillEditorState.editor.getText(), true)
-                : parseMentionsForServer(quillEditorState.editor.getContents(), false);
-
-            const previousDraft = (item as OffchainThread).versionHistory[0];
-            let previousDraftMentions;
-            try {
-              const previousDraftQuill = new Delta(JSON.parse(previousDraft.body));
-              previousDraftMentions = parseMentionsForServer(previousDraftQuill, false);
-            } catch {
-              previousDraftMentions = parseMentionsForServer(previousDraft.body, true);
-            }
-            mentions = currentDraftMentions.filter((addrArray) => {
-              let alreadyExists = false;
-              previousDraftMentions.forEach((addrArray_) => {
-                if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
-                  alreadyExists = true;
-                }
-              });
-              return !alreadyExists;
-            });
-          }
           parentState.saving = true;
           if (item instanceof OffchainThread) {
-            app.threads.edit(item, itemText, parentState.updatedTitle, mentions).then(() => {
+            app.threads.edit(item, itemText, parentState.updatedTitle).then(() => {
               m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;
@@ -615,7 +544,7 @@ export const ProposalBodySaveEdit: m.Component<{
               notifySuccess('Thread successfully edited');
             });
           } else if (item instanceof OffchainComment) {
-            app.comments.edit(item, itemText, mentions).then((c) => {
+            app.comments.edit(item, itemText).then((c) => {
               parentState.editing = false;
               parentState.saving = false;
               clearEditingLocalStorage(item, false);

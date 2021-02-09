@@ -1,11 +1,11 @@
 import 'components/quill_editor.scss';
 
 import m, { VnodeDOM } from 'mithril';
+import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment-twitter';
 import Quill from 'quill-2.0-dev/quill';
 import { Tag, Tooltip } from 'construct-ui';
-import AutoLinks from 'quill-auto-links';
 import ImageUploader from 'quill-image-uploader';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
@@ -31,6 +31,17 @@ import PreviewModal from 'views/modals/preview_modal';
 // `formats` and the rich text toolbar (there doesn't appear to be a
 // way to unregister formats once the editor has been initialized)
 
+// Modified quill-auto-links for proper behavior with Markdown and pasting.
+
+const REGEXP_GLOBAL = /https?:\/\/[^\s]+/g;
+const REGEXP_WITH_PRECEDING_WS = /(?:\s|^)(https?:\/\/[^\s]+)/;
+
+const sliceFromLastWhitespace = (str) => {
+  const whitespaceI = str.lastIndexOf(' ');
+  const sliceI = whitespaceI === -1 ? 0 : whitespaceI + 1;
+  return str.slice(sliceI);
+};
+
 const instantiateEditor = (
   $editor: any,
   theme: string,
@@ -53,9 +64,6 @@ const instantiateEditor = (
   $editor.empty();
   $editor.siblings('.ql-toolbar').remove();
 
-  // Register automatic conversion to links
-  Quill.register('modules/autoLinks', AutoLinks);
-
   // Register image uploader extension
   Quill.register('modules/imageUploader', ImageUploader);
 
@@ -67,6 +75,19 @@ const instantiateEditor = (
 
   // Register mentions module
   Quill.register({ 'modules/mention': QuillMention });
+
+  const handleAutolinks = (range, context) => {
+    if (isMarkdownMode()) return true;
+    const url = sliceFromLastWhitespace(context.prefix);
+    const retain = range.index - url.length;
+    const ops = (retain ? [{ retain }] : []) as any;
+    ops.push(
+      { 'delete': url.length },
+      { insert: url, attributes: { link: url } }
+    );
+    quill.updateContents({ ops });
+    return true;
+  };
 
   const insertEmbeds = (text) => {
     const twitterRe = /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
@@ -248,7 +269,6 @@ const instantiateEditor = (
     return response.result;
   };
 
-  let typingListener;
   const queryMentions = async (searchTerm, renderList, mentionChar) => {
     if (mentionChar !== '@') return;
     // Optional code for tagging roles:
@@ -259,20 +279,17 @@ const instantiateEditor = (
     let members = [];
     let formattedMatches;
     if (searchTerm.length === 0) {
-      typingListener = setTimeout(() => {
-        const node = document.createElement('div');
-        const tip = document.createElement('span');
-        tip.innerText = 'Type to tag a member';
-        node.appendChild(tip);
-        formattedMatches = [{
-          link: '#',
-          name: '',
-          component: node.outerHTML,
-        }];
-        renderList(formattedMatches, searchTerm);
-      }, 300);
+      const node = document.createElement('div');
+      const tip = document.createElement('span');
+      tip.innerText = 'Type to tag a member';
+      node.appendChild(tip);
+      formattedMatches = [{
+        link: '#',
+        name: '',
+        component: node.outerHTML,
+      }];
+      renderList(formattedMatches, searchTerm);
     } else if (searchTerm.length > 0) {
-      if (typingListener) clearTimeout(typingListener);
       members = await searchMentionableAddresses(searchTerm);
       formattedMatches = members.map((addr) => {
         const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
@@ -480,7 +497,20 @@ const instantiateEditor = (
         if (!isMarkdownMode()) quill.format('underline', !context.format.underline, Quill.sources.USER);
         return false;
       }
-    }
+    },
+    // Check for links
+    'autolinks': {
+      collapsed: true,
+      key: ' ',
+      prefix: REGEXP_WITH_PRECEDING_WS,
+      handler: handleAutolinks,
+    },
+    'autolinks2': {
+      collapsed: true,
+      key: 'Enter',
+      prefix: REGEXP_WITH_PRECEDING_WS,
+      handler: handleAutolinks,
+    },
   };
 
   const createSpinner = () => {
@@ -587,10 +617,9 @@ const instantiateEditor = (
   quill = new Quill($editor[0], {
     debug: 'error',
     modules: {
-      autoLinks: true,
       toolbar: hasFormats ? ([[{ header: 1 }, { header: 2 }]] as any).concat([
-        ['bold', 'italic', 'strike', 'code-block'],
-        [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }, 'blockquote', 'link', 'preview'],
+        ['bold', 'italic', 'strike'], ['code-block', 'blockquote'],
+        [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }, 'link', 'preview'],
       ]) : false,
       imageDropAndPaste: {
         handler: imageHandler
@@ -608,7 +637,7 @@ const instantiateEditor = (
         dataAttributes: ['name', 'link', 'component'],
         renderItem: (item) => item.component,
         onSelect: selectMention,
-        source: queryMentions,
+        source: _.debounce(queryMentions, 300, { leading: true, trailing: true }),
         isolateChar: true,
       }
     },
@@ -619,6 +648,27 @@ const instantiateEditor = (
       'header', 'list', 'twitter', 'video', 'mention',
     ] : [],
     theme,
+  });
+
+  // Set up autolinks pasting
+  quill.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => {
+    if (typeof node.data !== 'string') return;
+
+    const matches = node.data.match(REGEXP_GLOBAL);
+    if (matches && matches.length > 0 && !isMarkdownMode()) {
+      const ops = [];
+      let str = node.data;
+      matches.forEach((match) => {
+        const split = str.split(match);
+        const beforeLink = split.shift();
+        ops.push({ insert: beforeLink });
+        ops.push({ insert: match, attributes: { link: match } });
+        str = split.join(match);
+      });
+      ops.push({ insert: str });
+      delta.ops = ops;
+    }
+    return delta;
   });
 
   // Set up toolbar
@@ -712,7 +762,7 @@ const instantiateEditor = (
   };
   makeMarkdownToolbarHandler('header', { 1: '# ', 2: '## ' });
   makeMarkdownToolbarHandler('blockquote', '> ');
-  makeMarkdownToolbarHandler('list', { ordered: ((index) => `${index + 1}. `), bullet: '- ', unchecked: '[ ] ' });
+  makeMarkdownToolbarHandler('list', { ordered: ((index) => `${index + 1}. `), bullet: '- ', unchecked: '- [ ] ' });
 
   // Set up remaining couple of Markdown toolbar options
   const defaultLinkHandler = quill.theme.modules.toolbar.handlers.link;

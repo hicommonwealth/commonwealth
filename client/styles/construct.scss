@@ -298,6 +298,14 @@ button, .cui-button {
     }
 }
 
+// set z-index
+.cui-button-group .cui-button:active,
+.cui-button-group .cui-button.cui-active,
+.cui-button-group .cui-button:focus,
+.cui-button-group .cui-button:hover {
+    z-index: 2;
+}
+
 // adjust callout padding, colors, spacing
 .cui-callout {
     line-height: 1.2;
@@ -537,6 +545,7 @@ $spinner-animation-duration: 1000ms;
 
 // dialog entry animation
 .cui-overlay-backdrop {
+    background: rgba(0,0,0,0.2);
     .fade-enter & {
         opacity: 0.01;
         transition: opacity 0.05s ease;

@@ -55,12 +55,11 @@ const NotificationsMenu: m.Component<{ small?: boolean }, { selectedChainEvents:
   view: (vnode) => {
     // TODO: Add helper directly on controller
     const { small } = vnode.attrs;
-    const notifications = app.user.notifications ? app.user.notifications.notifications : [];
+    const notifications = app.user.notifications?.notifications || [];
     const filteredNotifications = vnode.state.selectedChainEvents
       ? notifications.filter((n) => n.chainEvent)
       : notifications.filter((n) => !n.chainEvent);
     const sortedFilteredNotifications = sortNotifications(filteredNotifications).reverse();
-
     const unreadNotifications = notifications.filter((n) => !n.isRead);
     const unreadNotificationsCount = unreadNotifications.length;
     const unreadFilteredNotificationsCount = filteredNotifications.filter((n) => !n.isRead).length;

@@ -17,6 +17,7 @@ import {
   OffchainThreadKind,
   OffchainComment,
   OffchainTopic,
+  OffchainThreadStage,
   AnyProposal,
   Account,
   ChainBase,
@@ -25,7 +26,10 @@ import {
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import TopicEditor from 'views/components/topic_editor';
-import { TopicEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/discussion_row_menu';
+import StageEditor from 'views/components/stage_editor';
+import {
+  TopicEditorButton, StageEditorButton, ThreadSubscriptionButton
+} from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import PageLoading from 'views/pages/loading';
@@ -33,15 +37,15 @@ import PageNotFound from 'views/pages/404';
 
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
-  ProposalHeaderTopics, ProposalHeaderTitle,
+  ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyButtons,
   ProposalTitleEditor,
 } from './header';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
-  ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
-  ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
+  ProposalBodyLastEdited, ProposalBodyCancelEdit, ProposalBodySaveEdit,
+  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, EditPermissionsButton,
   ProposalEditorPermissions
 } from './body';
@@ -63,6 +67,7 @@ const ProposalHeader: m.Component<{
   quillEditorState: any;
   currentText: any;
   topicEditorIsOpen: boolean;
+  stageEditorIsOpen: boolean;
   editPermissionsIsOpen: boolean;
 }> = {
   view: (vnode) => {
@@ -86,8 +91,7 @@ const ProposalHeader: m.Component<{
       return (c.address === app.user.activeAccount?.address && c.chain === app.user.activeAccount?.chain.id);
     }).length > 0;
 
-    const isThread = proposal instanceof OffchainThread;
-    const attachments = isThread ? (proposal as OffchainThread).attachments : false;
+    const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
@@ -97,14 +101,17 @@ const ProposalHeader: m.Component<{
       m('.proposal-top', [
         m('.proposal-top-left', [
           !vnode.state.editing
-            && m('.proposal-title', m(ProposalHeaderTitle, { proposal })),
+            && m('.proposal-title', [
+              m(ProposalHeaderTitle, { proposal }),
+              proposal instanceof OffchainThread && m(ProposalHeaderStage, { proposal }),
+            ]),
           vnode.state.editing
             && m(ProposalTitleEditor, { item: proposal, parentState: vnode.state }),
           m('.proposal-body-meta', proposal instanceof OffchainThread ? [
             m(ProposalHeaderTopics, { proposal }),
-            m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
             m(ProposalBodyLastEdited, { item: proposal }),
+            m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalHeaderViewCount, { viewCount }),
             app.isLoggedIn() && !getSetGlobalEditingStatus(GlobalStatus.Get) && m(PopoverMenu, {
               transitionDuration: 0,
@@ -116,21 +123,25 @@ const ProposalHeader: m.Component<{
                   && m(ProposalBodyEditMenuItem, {
                     item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                   }),
-                (isAuthor || isAdmin)
-                  && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                (isAuthor)
-                  && m(EditPermissionsButton, {
-                    openEditPermissions: () => {
-                      vnode.state.editPermissionsIsOpen = true;
-                    }
-                  }),
+                isAuthor && m(EditPermissionsButton, {
+                  openEditPermissions: () => {
+                    vnode.state.editPermissionsIsOpen = true;
+                  }
+                }),
                 isAdmin && proposal instanceof OffchainThread && m(TopicEditorButton, {
                   openTopicEditor: () => {
                     vnode.state.topicEditorIsOpen = true;
                   }
                 }),
+                (isAuthor || isAdmin) && proposal instanceof OffchainThread && m(StageEditorButton, {
+                  openStageEditor: () => {
+                    vnode.state.stageEditorIsOpen = true;
+                  }
+                }),
                 (isAuthor || isAdmin)
-                  && m(ProposalHeaderPrivacyButtons, { proposal }),
+                  && m(ProposalBodyDeleteMenuItem, { item: proposal }),
+                (isAuthor || isAdmin)
+                  && m(ProposalHeaderPrivacyButtons, { proposal, getSetGlobalEditingStatus }),
                 (isAuthor || isAdmin)
                   && m(MenuDivider),
                 m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
@@ -156,7 +167,15 @@ const ProposalHeader: m.Component<{
                 popoverMenu: true,
                 onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
                 openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
-              })
+              }),
+            vnode.state.stageEditorIsOpen
+              && proposal instanceof OffchainThread
+              && m(StageEditor, {
+                thread: vnode.attrs.proposal as OffchainThread,
+                popoverMenu: true,
+                onChangeHandler: (stage: OffchainThreadStage) => { proposal.stage = stage; m.redraw(); },
+                openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
+              }),
           ] : [
             m(ProposalHeaderOnchainId, { proposal }),
             m(ProposalHeaderOnchainStatus, { proposal }),
@@ -249,21 +268,6 @@ const ProposalComment: m.Component<{
           m(ProposalBodyAuthor, { item: comment }),
           m(ProposalBodyCreated, { item: comment, link: commentLink }),
           m(ProposalBodyLastEdited, { item: comment }),
-
-          // !vnode.state.editing
-          //   && app.user.activeAccount
-          //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          //   && app.user.activeAccount?.chain.id === comment.authorChain
-          //   && app.user.activeAccount?.address === comment.author
-          //   && [
-          //     m(ProposalBodyEdit, {
-          //       item: comment,
-          //       getSetGlobalReplyStatus,
-          //       getSetGlobalEditingStatus,
-          //       parentState: vnode.state
-          //     }),
-          //     m(ProposalBodyDelete, { item: comment }),
-          //   ],
 
           !vnode.state.editing
           && app.user.activeAccount
@@ -476,6 +480,7 @@ const ViewProposalPage: m.Component<{
   viewCount: number,
   proposal: AnyProposal | OffchainThread,
   threadFetched,
+  threadFetchFailed,
 }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
@@ -489,7 +494,9 @@ const ViewProposalPage: m.Component<{
   },
   view: (vnode) => {
     const { identifier, type } = vnode.attrs;
-    if (typeof identifier !== 'string') return m(PageNotFound);
+    const headerTitle = m.route.param('type') === 'discussion' ? 'Discussions' : 'Proposals';
+    if (typeof identifier !== 'string') return m(PageNotFound, { title: headerTitle });
+    // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
     if (!vnode.state.prefetch || !vnode.state.prefetch[identifier]) {
       vnode.state.prefetch = {};
       vnode.state.prefetch[identifier] = {
@@ -502,14 +509,18 @@ const ViewProposalPage: m.Component<{
     const proposalId = identifier.split('-')[0];
     const proposalType = type;
 
+    if (vnode.state.threadFetchFailed) {
+      return m(PageNotFound, { title: headerTitle });
+    }
+
     // load app controller
     if (!app.threads.initialized) {
-      return m(PageLoading, { narrow: true, showNewProposalButton: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
     }
 
     const proposalRecentlyEdited = vnode.state.recentlyEdited;
     const proposalDoesNotMatch = vnode.state.proposal && Number(vnode.state.proposal.identifier) !== Number(proposalId);
-    // load proposal
+    // load proposal, and return m(PageLoading)
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
@@ -522,18 +533,20 @@ const ViewProposalPage: m.Component<{
               m.redraw();
             }).catch((err) => {
               notifyError('Thread not found');
-              return m(PageNotFound);
+              vnode.state.threadFetchFailed = true;
             });
             vnode.state.threadFetched = true;
           }
-          return m(PageLoading, { narrow: true, showNewProposalButton: true });
+          return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
         } else {
-          if (!app.chain.loaded) return m(PageLoading, { narrow: true, showNewProposalButton: true });
+          if (!app.chain.loaded) {
+            return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
+          }
           // check if module is still initializing
           const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
           if (!c.disabled && !c.initialized) {
             if (!c.initializing) loadCmd(proposalType);
-            return m(PageLoading, { narrow: true, showNewProposalButton: true });
+            return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
           }
         }
         // proposal does not exist, 404
@@ -603,10 +616,10 @@ const ViewProposalPage: m.Component<{
     }
 
     if (vnode.state.comments === undefined) {
-      return m(PageLoading, { narrow: true, showNewProposalButton: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
     }
     if (vnode.state.viewCount === undefined) {
-      return m(PageLoading, { narrow: true, showNewProposalButton: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
     }
 
     // load profiles
@@ -623,7 +636,7 @@ const ViewProposalPage: m.Component<{
       vnode.state.prefetch[identifier]['profilesStarted'] = true;
     }
     if (!app.profiles.allLoaded() && !vnode.state.prefetch[identifier]['profilesFinished']) {
-      return m(PageLoading, { narrow: true, showNewProposalButton: true });
+      return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
     }
     vnode.state.prefetch[identifier]['profilesFinished'] = true;
 
@@ -703,11 +716,7 @@ const ViewProposalPage: m.Component<{
     };
 
     const { replyParent } = vnode.state;
-    return m(Sublayout, {
-      class: 'ViewProposalPage',
-      showNewProposalButton: true,
-      title: (proposal instanceof OffchainThread) ? 'Discussions' : 'Proposals',
-    }, [
+    return m(Sublayout, { class: 'ViewProposalPage', showNewProposalButton: true, title: headerTitle }, [
       m(ProposalHeader, {
         proposal,
         commentCount,
