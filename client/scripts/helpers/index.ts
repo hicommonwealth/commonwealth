@@ -2,9 +2,46 @@ import m from 'mithril';
 import moment from 'moment-twitter';
 
 import app from 'state';
+import { OffchainThreadStage } from 'models/types';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
+}
+
+export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
+  if (stage === OffchainThreadStage.Discussion) {
+    return 'Discussion';
+  } else if (stage === OffchainThreadStage.ProposalInReview) {
+    return 'Preparing for Voting';
+  } else if (stage === OffchainThreadStage.Voting) {
+    return 'Voting';
+  } else if (stage === OffchainThreadStage.Passed) {
+    return 'Passed';
+  } else if (stage === OffchainThreadStage.Failed) {
+    return 'Failed';
+  } else if (stage === OffchainThreadStage.Abandoned) {
+    return 'Abandoned';
+  } else {
+    return 'Other';
+  }
+}
+
+export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
+  if (stage === OffchainThreadStage.Discussion) {
+    return 1;
+  } else if (stage === OffchainThreadStage.ProposalInReview) {
+    return 2;
+  } else if (stage === OffchainThreadStage.Voting) {
+    return 3;
+  } else if (stage === OffchainThreadStage.Passed) {
+    return 4;
+  } else if (stage === OffchainThreadStage.Failed) {
+    return 5;
+  } else if (stage === OffchainThreadStage.Abandoned) {
+    return 6;
+  } else {
+    return 7;
+  }
 }
 
 /*

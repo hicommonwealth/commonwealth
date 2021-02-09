@@ -193,37 +193,6 @@ export const ProposalBodyReplyMenuItem: m.Component<{
   }
 };
 
-export const ProposalBodyEdit: m.Component<{
-  item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
-}> = {
-  view: (vnode) => {
-    const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
-    if (!item) return;
-    if (item instanceof OffchainThread && item.readOnly) return;
-    const isThread = item instanceof OffchainThread;
-
-    return m('.ProposalBodyEdit', [
-      m('a', {
-        class: isThread ? 'edit-proposal' : 'edit-comment',
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-          parentState.currentText = item instanceof OffchainThread ? item.body : item.text;
-          if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
-            if (activeQuillEditorHasText()) {
-              const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-              if (!confirmed) return;
-            }
-            getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
-          }
-          parentState.editing = true;
-          getSetGlobalEditingStatus(GlobalStatus.Set, true);
-        },
-      }, 'Edit'),
-    ]);
-  }
-};
-
 export const ProposalBodyEditMenuItem: m.Component<{
   item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
 }> = {
@@ -250,32 +219,6 @@ export const ProposalBodyEditMenuItem: m.Component<{
         getSetGlobalEditingStatus(GlobalStatus.Set, true);
       },
     });
-  }
-};
-
-export const ProposalBodyDelete: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
-  view: (vnode) => {
-    const { item } = vnode.attrs;
-    if (!item) return;
-    const isThread = item instanceof OffchainThread;
-
-    return m('.ProposalBodyDelete', [
-      m('a', {
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-          const confirmed = await confirmationModalWithText(
-            isThread ? 'Delete this entire thread?' : 'Delete this comment?'
-          )();
-          if (!confirmed) return;
-          (isThread ? app.threads : app.comments).delete(item).then(() => {
-            if (isThread) m.route.set(`/${app.activeId()}/`);
-            m.redraw();
-            // TODO: set notification bar for 'thread deleted/comment deleted'
-          });
-        },
-      }, 'Delete'),
-    ]);
   }
 };
 
@@ -313,7 +256,7 @@ export const EditPermissionsButton: m.Component<{
   view: (vnode) => {
     const { openEditPermissions } = vnode.attrs;
     return m(MenuItem, {
-      label: 'Manage collaborators',
+      label: 'Edit collaborators',
       onclick: async (e) => {
         e.preventDefault();
         openEditPermissions();
@@ -451,7 +394,7 @@ export const ProposalEditorPermissions: m.Component<{
           vnode.state.isOpen = false;
         }
       },
-      title: 'Manage collaborators',
+      title: 'Edit collaborators',
       transitionDuration: 200,
       footer: m(`.${Classes.ALIGN_RIGHT}`, [
         m(Button, {

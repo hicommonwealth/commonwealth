@@ -21,9 +21,10 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
   const adminRoles = await models.Role.findAll({
     where: {
       address_id: { [Op.in]: userAddressIds },
+      permission: { [Op.in]: ['admin', 'moderator'] },
       ...chainOrCommObj,
     },
-  }).filter((role) => role.permission === 'admin' || role.permission === 'moderator');
+  });
   if (adminRoles.length === 0) {
     return next(new Error(Errors.MustBeAdmin));
   }

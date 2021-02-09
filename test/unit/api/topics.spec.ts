@@ -30,6 +30,7 @@ describe('Topic Tests', () => {
   const topicName = 'test topic';
   const topicId = undefined;
   const kind = 'forum';
+  const stage = 'discussion';
 
   before('reset database', async () => {
     await resetDatabase();
@@ -75,6 +76,7 @@ describe('Topic Tests', () => {
         topicName,
         topicId,
         kind,
+        stage,
       });
       expect(res2.status).to.be.equal('Success');
       expect(res2.result).to.not.be.null;
@@ -130,6 +132,7 @@ describe('Topic Tests', () => {
         topicName,
         topicId,
         kind,
+        stage,
       });
       thread = res3.result;
     });

@@ -83,7 +83,7 @@
             > div {
                 display: flex;
                 justify-content: flex-end;
-                > .UserGallery {
+                > .UserGallery, > * > .UserGallery {
                     margin-right: 10px;
                     text-align: right;
                     white-space: nowrap;

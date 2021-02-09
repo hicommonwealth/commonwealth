@@ -8,7 +8,7 @@ import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
-import { ITXModalData, ProposalModule, ChainBase, ChainClass, OffchainThreadKind } from 'models';
+import { ITXModalData, ProposalModule, ChainBase, ChainClass, OffchainThreadKind, OffchainThreadStage } from 'models';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
@@ -134,6 +134,7 @@ const NewProposalForm = {
         app.threads.create(
           author.address,
           OffchainThreadKind.Forum,
+          OffchainThreadStage.Discussion,
           app.activeChainId(),
           app.activeCommunityId(),
           vnode.state.form.title,

@@ -67,6 +67,15 @@ export enum OffchainThreadKind {
   Request = 'request',
 }
 
+export enum OffchainThreadStage {
+  Discussion = 'discussion',
+  ProposalInReview = 'proposal_in_review',
+  Voting = 'voting',
+  Passed = 'passed',
+  Failed = 'failed',
+  Abandoned = 'abandoned',
+}
+
 export enum TransactionStatus {
   'Ready',
   'Success',

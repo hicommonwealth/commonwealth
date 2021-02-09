@@ -75,8 +75,10 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       return false;
     }
 
-    const { threads, comments, reactions, topics, admins, activeUsers } = response.result;
-    this.app.threads.initialize(threads, true);
+    const {
+      threads, comments, reactions, topics, admins, activeUsers, numPrevotingThreads, numVotingThreads
+    } = response.result;
+    this.app.threads.initialize(threads, numPrevotingThreads, numVotingThreads, true);
     this.app.comments.initialize(comments, false);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);

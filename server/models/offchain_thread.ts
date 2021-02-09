@@ -12,6 +12,7 @@ export interface OffchainThreadAttributes {
   body?: string;
   plaintext?: string;
   kind: string;
+  stage: string;
   url?: string;
   topic_id?: number;
   pinned?: boolean;
@@ -50,6 +51,7 @@ export default (
     body: { type: dataTypes.TEXT, allowNull: true },
     plaintext: { type: dataTypes.TEXT, allowNull: true },
     kind: { type: dataTypes.TEXT, allowNull: false },
+    stage: { type: dataTypes.TEXT, allowNull: false, defaultValue: 'discussion' },
     url: { type: dataTypes.TEXT, allowNull: true },
     topic_id: { type: dataTypes.INTEGER, allowNull: true },
     pinned: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
