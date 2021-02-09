@@ -709,7 +709,7 @@ const instantiateEditor = (
   };
   makeMarkdownToolbarHandler('header', { 1: '# ', 2: '## ' });
   makeMarkdownToolbarHandler('blockquote', '> ');
-  makeMarkdownToolbarHandler('list', { ordered: ((index) => `${index + 1}. `), bullet: '- ', unchecked: '[ ] ' });
+  makeMarkdownToolbarHandler('list', { ordered: ((index) => `${index + 1}. `), bullet: '- ', unchecked: '- [ ] ' });
 
   // Set up remaining couple of Markdown toolbar options
   const defaultLinkHandler = quill.theme.modules.toolbar.handlers.link;
