@@ -25,6 +25,9 @@
             margin-top: 10px;
             margin-bottom: 10px;
         }
+        .cui-button-group {
+            flex-wrap: wrap;
+        }
     }
     .cui-button.discussions-topic {
         margin-right: 6px;
@@ -42,8 +45,16 @@
         }
     }
     .discussions-stage-count {
-        display: inline;
-        color: $positive-bg-color;
+        display: inline-block;
+        height: 19px;
+        font-size: 15px;
+        position: relative;
+        top: -1px;
+        left: 2px;
+        padding: 3px 6px 0;
+        border-radius: 9999px;
+        background: $positive-bg-color;
+        color: #fff;
         font-weight: 500;
         margin-left: 2px;
     }

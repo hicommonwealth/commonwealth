@@ -12,13 +12,13 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   if (stage === OffchainThreadStage.Discussion) {
     return 'Discussion';
   } else if (stage === OffchainThreadStage.ProposalInReview) {
-    return 'Preparing for Voting';
+    return 'Gathering Comments';
   } else if (stage === OffchainThreadStage.Voting) {
     return 'Voting';
   } else if (stage === OffchainThreadStage.Passed) {
     return 'Passed';
   } else if (stage === OffchainThreadStage.Failed) {
-    return 'Failed';
+    return 'Not Passed';
   } else if (stage === OffchainThreadStage.Abandoned) {
     return 'Abandoned';
   } else {
