@@ -28,7 +28,26 @@ const getValidatorHeaderDetails = async (models, req: Request, res: Response, ne
     attributes: ['stash', 'uptime', 'apr', 'rewardsStats', 'slashesStats', 'offencesStats']
   });
 
-  if (historicalData.length === 0) { return next(new Error(Errors.NoRecordsFound)); }
+  if (historicalData.length === 0) {
+    return res.json({
+      status: 'Success',
+      result: {
+        apr: '0',
+        imOnline: '0',
+        offenceOver30Days: 0,
+        slashesOver30DaysCount: 0,
+        slashesOver30DaysValue: '0',
+        rewardsOver30DaysCount: 0,
+        rewardsOver30DaysValue: '0',
+        totalSlashesValue: '0',
+        totalSlashesCount: 0,
+        totalRewardsValue: '0',
+        totalRewardsCount: 0,
+        totalOffences: 0
+      }
+    });
+    // return next(new Error(Errors.NoRecordsFound));
+  }
 
   const dataValues = historicalData[0].dataValues;
   req.query.version = '38';
