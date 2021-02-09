@@ -95,8 +95,7 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
               m('.profile-data-block',
                 vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.totalRewardsCount} (${formatCoin(app.chain.chain.coins(+vnode.attrs.apiResponse?.totalRewardsValue), true)})` : m('spinner', itemLoadingSpinner())))),
           m('.bio-actions-edit-profile',
-            m('.data-row-block',
-              m(Button, { label: 'Validator Profile' }))),
+            m('.data-row-block')),
         ]),
         m('div.profile-stats-row2.row', [
           m('.imonline',
@@ -128,8 +127,7 @@ export const ValidatorStats = makeDynamicComponent<IValidatorAttrs, IValidatorPa
               m('.profile-data-block',
                 vnode.attrs.apiResponse ? `${vnode.attrs.apiResponse?.rewardsOver30DaysCount} (${formatCoin(app.chain.chain.coins(+vnode.attrs.apiResponse?.rewardsOver30DaysValue), true)})` : m('spinner', itemLoadingSpinner())))),
           m('.bio-actions-edit-identity',
-            m('.info-row-block',
-              m(Button, { label: 'Another Button' }))),
+            m('.info-row-block')),
         ])
       ]));
   }
