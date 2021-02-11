@@ -49,6 +49,7 @@ const ValidateController = makeDynamicComponent<ValidateControllerAttrs, Validat
       : null;
 
     let newError: string | null = null;
+    let newError1: string | null = null;
     let isFatal = false;
     if (bondedId) {
       isFatal = true;
@@ -56,8 +57,8 @@ const ValidateController = makeDynamicComponent<ValidateControllerAttrs, Validat
       This selected controller is a stash, controlled by ${bondedId}`;
     } else if (stashId) {
       isFatal = true;
-      newError = `A controller account should not be set to manage multiple stashes. 
-      The selected controller is already controlling ${stashId}`;
+      newError = 'A controller account should not be set to manage multiple stashes.';
+      newError1 = `The selected controller is already controlling ${stashId}`;
     } else if (allBalances?.freeBalance.isZero()) {
       isFatal = true;
       newError = `The controller does no have sufficient funds available to cover transaction fees. 
@@ -70,7 +71,7 @@ const ValidateController = makeDynamicComponent<ValidateControllerAttrs, Validat
     onError(isFatal);
     if (!newError)
       return null;
-    return m(`p.${isFatal ? 'error' : 'warning'}`, newError);
+    return [m(`p.${isFatal ? 'error.er1' : 'warning.er1'}`, newError), m(`p.${isFatal ? 'error' : 'warning'}`, newError1) ];
   }
 });
 

@@ -17,8 +17,8 @@ span.pointer.nominate {
     padding-top: 7px;
 }
 
-span.pointer.nominate:hover ,
-span.pointer.nominate:focus{
+span.pointer.nominate:hover,
+span.pointer.nominate:focus {
     border: 1px solid #4f6dbd;
 }
 
@@ -30,13 +30,31 @@ h5.cth5 {
     min-width: 432px;
 }
 
+.NewNominator.manage-staking {
+    min-width: 432px;
+}
+
 h3.ManageStaking.loginError {
     margin: 0 auto;
     margin-top: 35vh;
     text-align: center;
 }
 
-.SetValidator {
+.SetValidator,
+.NewNominator {
+    p.error {
+        max-width: 409px;
+        color: #ea6d6d;
+        font-size: 14px;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        text-align: center;
+    }
+    
+    p.error.er1 {
+        padding-top: 10px
+    }
+
     .cui-button.cui-align-center.cui-primary {
         padding-top: 6px;
     }
