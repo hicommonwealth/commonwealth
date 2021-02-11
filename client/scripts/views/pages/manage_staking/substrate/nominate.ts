@@ -10,9 +10,11 @@ import Substrate from 'controllers/chain/substrate/main';
 import { GroupValidator } from 'controllers/chain/substrate/staking';
 import User from 'views/components/widgets/user';
 
-interface NominateState { dynamic: {
-  validators: string[]
-} }
+interface NominateState {
+  dynamic: {
+    validators: string[]
+  }
+}
 
 interface NominateAttrs {
   onChange(selected: string[]): void,
@@ -84,44 +86,29 @@ const Nominate = makeDynamicComponent<NominateAttrs, NominateState>({
       return m(Spinner, { active: true });
 
     return m('.Nominate', [
-      m('div.center-lg',
-        m(PopoverMenu, {
-          closeOnContentClick: true,
-          content: model.groups.map((group) => {
-            return m(MenuItem, {
-              label: group.name,
-              active: group.id === model.selectedGroup,
-              onclick: () => model.onGroupSelect(group)
-            });
-          }),
-          menuAttrs: { size: 'sm' },
-          trigger: m('span.pointer', [
-            m('h5.inline', 'Groups'),
-            m(Icon, { name: Icons.USERS, size: 'sm' })
-          ])
-        })),
+
       m('hr'),
       m(Grid, { gutter: { xs: 0, sm: 10, md: 20, lg: 30, xl: 40 } }, [
         m(Col, { span: { xs: 12, md: 6 }, class: 'border-r-1' },
-          m('h5', 'Candidate Accounts'),
+          m('h5.cth5', 'Candidate Accounts'),
           m('.not-selected.min-height-200', [
             app.chain.loaded
-          && model.not_selected.map((address) => m('span.pointer',
-            { onclick: () => model.add(address) },
-            m(User, {
-              user: app.chain.accounts.get(address)
-            }))),
+            && model.not_selected.map((address) => m('span.pointer.nominate',
+              { onclick: () => model.add(address) },
+              m(User, {
+                user: app.chain.accounts.get(address)
+              }))),
             !model.not_selected.length && m('p', 'Candidates not available')
           ])),
         m(Col, { span: { xs: 12, md: 6 } },
-          m('h5', 'Selected Candidate Accounts'),
+          m('h5.cth5', 'Selected Candidate Accounts'),
           m('.selected.min-height-200', [
             app.chain.loaded
-          && model.selected.map((address) => m('span.pointer',
-            { onclick: () => model.remove(address) },
-            m(User, {
-              user: app.chain.accounts.get(address)
-            }))),
+            && model.selected.map((address) => m('span.pointer.nominate',
+              { onclick: () => model.remove(address) },
+              m(User, {
+                user: app.chain.accounts.get(address)
+              }))),
             !model.selected.length && m('p', 'Select a candidate')
           ]))
       ])

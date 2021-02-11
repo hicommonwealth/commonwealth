@@ -43,7 +43,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     const { bondedTotal } = vnode.attrs;
 
     return [
-      m('.manage-staking-preheader.right', [
+      m('.manage-staking-preheader', [
+        m('h2.ct', 'Manage Staking'),
         m('.manage-staking-preheader-item.padding-l-r-12', [
           m('.preheader-item-text', [
             m('button.cui-button.cui-align-center.cui-primary', {

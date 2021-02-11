@@ -3,13 +3,14 @@ import app from 'state';
 import { makeDynamicComponent } from 'models/mithril';
 import { StakerState, sortStashes } from 'controllers/chain/substrate/staking';
 import StakeRow from 'views/pages/manage_staking/substrate/stake_row';
+import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
 
 export interface IStakeListState {
   dynamic: { }
 }
 
 export interface StakeListAttrs {
-  ownStashInfos?: StakerState[]
+  ownStashInfos?: StakerState[],
 }
 
 interface IModel {

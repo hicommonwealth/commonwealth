@@ -10,13 +10,17 @@ import { formatNumber, u8aConcat, u8aToHex, BN_ZERO } from '@polkadot/util';
 import { Observable, combineLatest, of, from } from 'rxjs';
 import { HeaderExtended } from '@polkadot/api-derive';
 import { map, flatMap, auditTime, switchMap, catchError } from 'rxjs/operators';
-import { EraIndex, AccountId, Exposure, StakingLedger,
-  SessionIndex, EraRewardPoints, Nominations, ValidatorPrefs } from '@polkadot/types/interfaces';
+import {
+  EraIndex, AccountId, Exposure, StakingLedger,
+  SessionIndex, EraRewardPoints, Nominations, ValidatorPrefs
+} from '@polkadot/types/interfaces';
 import { InterfaceTypes, Codec, ITuple } from '@polkadot/types/types';
-import { DeriveStakingValidators, DeriveStakingQuery, DeriveSessionInfo,
+import {
+  DeriveStakingValidators, DeriveStakingQuery, DeriveSessionInfo,
   DeriveSessionProgress, DeriveAccountInfo, DeriveAccountRegistration,
   DeriveHeartbeatAuthor, DeriveStakingElected,
-  DeriveStakingAccount, DeriveBalancesAll, DeriveSessionIndexes } from '@polkadot/api-derive/types';
+  DeriveStakingAccount, DeriveBalancesAll, DeriveSessionIndexes
+} from '@polkadot/api-derive/types';
 
 import { IValidators } from './account';
 import SubstrateChain from './shared';
@@ -48,7 +52,7 @@ export interface GroupValidator {
   chain?: string
 }
 
-export interface IAccountInfo extends DeriveAccountRegistration{
+export interface IAccountInfo extends DeriveAccountRegistration {
   name: string;
   isBad: boolean;
   isErroneous: boolean;
@@ -124,12 +128,12 @@ function toIdString(id?: AccountId | null): string | null {
 export function getStakerState(stashId: string, allAccounts: string[], allStashes: string[] | undefined,
   [isOwnStash, { controllerId: _controllerId, exposure, nextSessionIds, nominators, rewardDestination,
     sessionIds, stakingLedger, validatorPrefs }, validateInfo]:
-     [boolean, DeriveStakingAccount, ValidatorInfo]): StakerState {
+    [boolean, DeriveStakingAccount, ValidatorInfo]): StakerState {
   const isStashNominating = !!(nominators?.length);
   const isStashValidating = !(Array.isArray(validateInfo)
     ? validateInfo[1].isEmpty
     : validateInfo.isEmpty)
-  || !!allStashes?.includes(stashId);
+    || !!allStashes?.includes(stashId);
   const nextConcat = u8aConcat(...nextSessionIds.map((id): Uint8Array => id.toU8a()));
   const currConcat = u8aConcat(...sessionIds.map((id): Uint8Array => id.toU8a()));
   const controllerId = toIdString(_controllerId);
@@ -171,7 +175,7 @@ export function extractInactivesNominees(stashId: string, nominees: string[], ac
   // waiting if validator is inactive or we have not submitted long enough ago
   const nomsWaiting = exposures
     .map((exposure, index) => exposure.total.unwrap().isZero()
-    || (nomsInactive.includes(nominees[index]) && submittedIn && activeEra.sub(submittedIn).lten(2))
+      || (nomsInactive.includes(nominees[index]) && submittedIn && activeEra.sub(submittedIn).lten(2))
       ? nominees[index]
       : null)
     .filter((waitingId): waitingId is string => !!waitingId);
@@ -196,7 +200,7 @@ function extractNominators(nominations: [StorageKey, Option<Nominations>][]): Re
 
       optNoms.unwrap().targets.forEach((_validatorId, index): void => {
         const validatorId = _validatorId.toString();
-        const info = { stash : nominatorId, balance:  index + 1 };
+        const info = { stash: nominatorId, balance: index + 1 };
 
         if (!mapped[validatorId]) {
           mapped[validatorId] = [info];
@@ -323,8 +327,8 @@ class SubstrateStaking implements StorageModule {
       flatMap((
         [api, { nextElected, validators: currentSet }, era, allStashes,
           queryPoints, imOnline, electedInfo]:
-        [ApiRx, DeriveStakingValidators, EraIndex, AccountId[],
-        EraRewardPoints, Record<string, DeriveHeartbeatAuthor>, DeriveStakingElected]
+          [ApiRx, DeriveStakingValidators, EraIndex, AccountId[],
+            EraRewardPoints, Record<string, DeriveHeartbeatAuthor>, DeriveStakingElected]
       ) => {
         const eraPoints: Record<string, string> = {};
         const entries = [...queryPoints.individual.entries()]
@@ -366,11 +370,11 @@ class SubstrateStaking implements StorageModule {
         currentSet, toBeElected, controllers, exposures,
         nextUpControllers, nextUpExposures, waiting, eraPoints,
         imOnline, commissionInfo
-      ] : [
-        AccountId[], AccountId[], Vec<AccountId>, Exposure[],
-        Vec<AccountId>, Exposure[], Uint32Array[], Record<string, string>,
-        Record<string, DeriveHeartbeatAuthor>, ICommissionInfo
-      ]) => {
+      ]: [
+          AccountId[], AccountId[], Vec<AccountId>, Exposure[],
+          Vec<AccountId>, Exposure[], Uint32Array[], Record<string, string>,
+          Record<string, DeriveHeartbeatAuthor>, ICommissionInfo
+        ]) => {
         const result: IValidators = {};
         for (let i = 0; i < currentSet.length; ++i) {
           const key = currentSet[i].toString();
@@ -435,7 +439,7 @@ class SubstrateStaking implements StorageModule {
       )),
       flatMap((
         [api, { validators: currentSet }, era, electedInfo]:
-        [ApiRx, DeriveStakingValidators, Option<EraIndex>, DeriveStakingElected]
+          [ApiRx, DeriveStakingValidators, Option<EraIndex>, DeriveStakingElected]
       ) => {
         const commission: ICommissionInfo = {};
 
@@ -460,8 +464,8 @@ class SubstrateStaking implements StorageModule {
         );
       }),
       auditTime(100),
-      map(([exposures, accounts, rewards, commissions ] :
-        [Exposure[], AccountId[], IReward, ICommissionInfo ]) => {
+      map(([exposures, accounts, rewards, commissions]:
+        [Exposure[], AccountId[], IReward, ICommissionInfo]) => {
         const data = {};
         const n = 1000000000;
         const validatorRewards: ICommissionInfo = {};
@@ -525,14 +529,26 @@ class SubstrateStaking implements StorageModule {
   public allBalances(address: string): Observable<DeriveBalancesAll> {
     return this._Chain.query((api: ApiRx) => api.derive.balances.all(address));
   }
-  public get ownStashInfos(): Observable<StakerState[]> {
+  public ownStashInfos(address: string): Observable<StakerState[]> {
     return this._Chain?.api.pipe(
       switchMap((api: ApiRx) => combineLatest(
         of(api),
-        from(this._app.chainEvents.getChainStake({})),
+        from(
+          // this._app.chainEvents.getChainStake({})
+          new Promise((resolve) => {
+            return resolve([
+              {
+                amount: '0',
+                controller: '',
+                kind: '',
+                stash: address,
+              }
+            ]);
+          })
+        ),
       )),
-      flatMap(([api, allAccounts] :
-        [ApiRx, {stash: string}[]]) => {
+      flatMap(([api, allAccounts]:
+        [ApiRx, { stash: string }[]]) => {
         allAccounts = allAccounts || [];
         const authors: string[] = allAccounts.map((account) => account.stash);
         return combineLatest(
@@ -543,7 +559,7 @@ class SubstrateStaking implements StorageModule {
           of(api)
         );
       }),
-      flatMap(([ownBonded, ownLedger, allAccounts, allStash, api] :
+      flatMap(([ownBonded, ownLedger, allAccounts, allStash, api]:
         [Option<AccountId>[], Option<StakingLedger>[], string[], AccountId[], ApiRx]) => {
         const allStashes = allStash.map((stash) => stash.toString());
         const ownStashes: [string, IsInKeyring][] = [];
@@ -575,10 +591,10 @@ class SubstrateStaking implements StorageModule {
         );
       }),
       auditTime(100),
-      map(([accounts, validators, ownStashes, allStashes, allAccounts] :
-        [DeriveStakingAccount[], ValidatorInfo[], [string, IsInKeyring][], string[], string[] ]) => {
-        let queried : Queried | undefined;
-        let state : StakerState[] = [];
+      map(([accounts, validators, ownStashes, allStashes, allAccounts]:
+        [DeriveStakingAccount[], ValidatorInfo[], [string, IsInKeyring][], string[], string[]]) => {
+        let queried: Queried | undefined;
+        let state: StakerState[] = [];
 
         if (ownStashes.length === accounts.length && ownStashes.length === validators.length) {
           queried = ownStashes.reduce((query: Queried, [stashId, isOwnStash], index): Queried => ({
@@ -600,7 +616,7 @@ class SubstrateStaking implements StorageModule {
         of(api),
         api.derive.session.indexes()
       )),
-      flatMap(([api, indexes] :
+      flatMap(([api, indexes]:
         [ApiRx, DeriveSessionIndexes]) => {
         return combineLatest(
           api.queryMulti(
@@ -613,7 +629,7 @@ class SubstrateStaking implements StorageModule {
           of(indexes)
         );
       }),
-      map(([ [optNominators, ...exposures], indexes] :
+      map(([[optNominators, ...exposures], indexes]:
         [[Option<Nominations>, ...Exposure[]], DeriveSessionIndexes]) => {
         return extractInactivesNominees(stashId, nominees, indexes.activeEra,
           optNominators.unwrapOrDefault().submittedIn, exposures);

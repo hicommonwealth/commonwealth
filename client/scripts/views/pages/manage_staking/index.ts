@@ -23,16 +23,20 @@ export interface IValidatorPageState {
 export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   getObservables: () => ({
     groupKey: app.chain.class.toString(),
-    ownStashInfos: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.ownStashInfos
+    ownStashInfos: ((app.chain.base === ChainBase.Substrate) && app.user && app.user.activeAccount)
+      ? (app.chain as Substrate).staking.ownStashInfos(app.user.activeAccount.address)
       : null
   }),
   view: (vnode) => {
+    if ((app.chain.base === ChainBase.Substrate) && app.user && !app.user.activeAccount) {
+      return m('h3.ManageStaking.loginError', 'Please login to view this page');
+    }
+
     const { ownStashInfos } = vnode.state.dynamic;
     if (!ownStashInfos)
       return m(Spinner, {
         fill: true,
-        message: '',
+        message: 'Connecting to chain',
         size: 'xl',
         style: 'visibility: visible; opacity: 1;'
       });

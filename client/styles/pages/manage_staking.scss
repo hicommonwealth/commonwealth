@@ -1,6 +1,130 @@
 @import "client/styles/shared";
 
+.cui-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 30px;
+}
+
+span.pointer.nominate {
+    display: block;
+    margin-bottom: 10px;
+    border: 1px solid transparent;
+    padding-left: 8px;
+    padding-top: 7px;
+}
+
+span.pointer.nominate:hover ,
+span.pointer.nominate:focus{
+    border: 1px solid #4f6dbd;
+}
+
+h5.cth5 {
+    min-height: 37px;
+}
+
+.SetValidator.manage-staking {
+    min-width: 432px;
+}
+
+h3.ManageStaking.loginError {
+    margin: 0 auto;
+    margin-top: 35vh;
+    text-align: center;
+}
+
+.SetValidator {
+    .cui-button.cui-align-center.cui-primary {
+        padding-top: 6px;
+    }
+
+    .fmd {
+        font-weight: 500;
+        text-align: left;
+    }
+
+    .cmb-0 {
+        margin-bottom: 0;
+    }
+
+    .cth5 {
+        margin-top: 0px;
+        margin-bottom: 0px;
+        min-height: auto;
+        position: absolute;
+        top: 0px;
+        padding-top: 10px;
+    }
+
+    .Nominate {
+        width: 100%;
+    }
+
+    .cui-grid {
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+    }
+
+    .min-height-200 {
+        background-color: #fff;
+        border: 1px solid #dadada;
+        border-radius: 4px;
+        margin-top: 25px;
+        height: 172px;
+        max-width: 176px;
+        padding: 12px 10px;
+        overflow-y: auto;
+    }
+
+    .cui-col-md-6 {
+        position: relative;
+        padding: 4px !important;
+        padding-top: 16px !important;
+    }
+
+    .min-height-200 p {
+        color: #4f6dbd;
+        font-size: 15px;
+        padding: 5px;
+        text-align: center;
+    }
+
+    .Modal .popup {
+        min-width: 432px;
+    }
+
+    .Modal .compact-modal-body {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* width */
+    .min-height-200::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    /* Track */
+    .min-height-200::-webkit-scrollbar-track {
+        background: #f9f8f8;
+    }
+
+    /* Handle */
+    .min-height-200::-webkit-scrollbar-thumb {
+        background: #4f6dbd;
+    }
+
+    /* Handle on hover */
+    .min-height-200::-webkit-scrollbar-thumb:hover {
+        background: #4f6dbd;
+    }
+}
+
+
 .ManageStakingPage {
+
     @mixin small-gray {
         font-size: 12px;
         font-weight: 500;
@@ -30,8 +154,7 @@
 
     .manage-staking-preheader {
         margin-bottom: 0 !important;
-        padding: 20px 32px;
-        padding-right: 86px;
+        display: block;
     }
 
     .manage-staking-presentation .Tabs {
@@ -198,6 +321,13 @@
 
     .Validators {
         width: 100%;
+        border: 1px solid rgba(231, 231, 231, 0.5) !important;
+        box-shadow: 0px 1px 12px rgba(0, 0, 0, 0.07) !important;
+        border-radius: 3px !important;
+        padding: 20px 32px;
+        margin-bottom: 32px;
+        padding-top: 16px;
+        margin-top: 24px;
 
         .validators-table {
             table-layout: auto !important;
@@ -411,6 +541,10 @@
         .validators-heading {
             padding-top: 24px;
             padding-bottom: 24px;
+            background: white;
+            position: sticky;
+            z-index: 99;
+            top: 0;
         }
 
         @media only screen and (max-width: 1300px) {
@@ -473,10 +607,17 @@
     margin: 0 auto;
 
     .manage-staking-preheader {
-        display: grid;
-        grid-row-gap: 30px;
-        grid-template-columns: auto auto auto auto auto auto auto;
+        display: block;
+        text-align: right;
         margin-bottom: 30px;
+
+        .manage-staking-preheader-item {
+            display: inline-block;
+        }
+
+        .manage-staking-preheader-item:nth-child(2) {
+            margin-right: 16px;
+        }
 
         .manage-staking-preheader-item h3 {
             @include small-gray;
@@ -787,6 +928,7 @@
         border: 1px solid #4165e0;
         box-sizing: border-box;
         border-radius: 4px;
+        padding-top: 4px;
 
         &:hover {
             background: linear-gradient(180deg, #617cef 0%, #3e5ee9 100%);
@@ -800,6 +942,8 @@
     .preheader-item-text .cui-button .cui-icon svg {
         stroke: white !important;
         color: #ffffff;
+        top: -1.8px;
+        position: relative;
     }
 
     .dropDown-name a {
@@ -847,7 +991,8 @@
         flex: 1 1 auto;
         overflow: hidden;
         overflow-y: scroll;
-        height: 234px;
+        max-height: 70vh;
+        min-height: 374px;
 
         &::-webkit-scrollbar {
             width: 6px;
@@ -976,5 +1121,19 @@
 
     .cui-custom-select {
         margin-right: 33px;
+    }
+
+    .ct {
+        display: inline-block;
+        font-family: "Inter", sans-serif;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 21px;
+        line-height: 120%;
+        letter-spacing: -0.2px;
+        color: #000000;
+        float: left;
+        position: relative;
+        top: -14px;
     }
 }

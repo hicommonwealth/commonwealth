@@ -13,15 +13,15 @@ const StashController: m.Component<StashControllerAttrs, {}> = {
     const { controllerId, stashId } = vnode.attrs;
 
     return m('div.address-info', [
-      m(Grid, { gutter: 0, align: 'middle', justify: 'center' }, [
+      m(Grid, { gutter: 0, align: 'middle', justify: 'center', class:'cmb-0' }, [
         m(Col, { span: 6 }, m('.center-lg',
-          m('p', 'stash account'),
-          m('div.controller', m(User, {
+          m('p.fmd', 'stash account'),
+          m('div.controller.fmd', m(User, {
             user: app.chain.accounts.get(stashId),
             linkify: true })))),
         m(Col, { span: 6 }, m('.center-lg',
-          m('p', 'controller account'),
-          m('div.controller', m(User, {
+          m('p.fmd', 'controller account'),
+          m('div.controller.fmd', m(User, {
             user: app.chain.accounts.get(controllerId),
             linkify: true })))),
       ]),
