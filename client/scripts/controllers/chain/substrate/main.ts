@@ -3,6 +3,7 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
+import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
@@ -22,6 +23,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public democracyProposals: SubstrateDemocracyProposals;
   public democracy: SubstrateDemocracy;
   public treasury: SubstrateTreasury;
+  public bounties: SubstrateBountyTreasury;
   public identities: SubstrateIdentities;
   public signaling: EdgewareSignaling;
   public readonly webWallet: WebWalletController = new WebWalletController();
@@ -50,6 +52,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.democracyProposals = new SubstrateDemocracyProposals(this.app);
     this.democracy = new SubstrateDemocracy(this.app);
     this.treasury = new SubstrateTreasury(this.app);
+    this.bounties = new SubstrateBountyTreasury(this.app);
     this.identities = new SubstrateIdentities(this.app);
     this.signaling = new EdgewareSignaling(this.app);
   }
@@ -81,6 +84,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.democracyProposals,
       this.democracy,
       this.treasury,
+      this.bounties,
       this.identities,
     ].map((m) => m.initialized ? m.deinit() : Promise.resolve()));
     this.accounts.deinit();
