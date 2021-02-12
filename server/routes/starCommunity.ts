@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 
 export const Errors = {
   NoStarValue: 'Must specify true or false to set starred status',
 };
 
 const starCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
 
   if (req.body.star === 'true') {
     // star community

@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { factory, formatFilename } from '../../shared/logging';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,7 +16,9 @@ export const Errors = {
 
 const createInviteLink = async (models, req, res, next) => {
   if (!req.body.community && !req.body.chain) return next(new Error(Errors.NoCommunityId));
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
+    if (!chain && !community) return next(new Error(ChainCommunityError));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { time } = req.body;
   if (community && chain) return next(new Error(Errors.NoChainAndCommunity));

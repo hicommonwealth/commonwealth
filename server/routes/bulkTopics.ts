@@ -1,17 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export const Errors = {
-  NeedChainOrCommunity: 'Must provide a chain or community',
-};
+export const Errors = { };
 
 const bulkTopics = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
 
-  if (!chain && !community) return next(new Error(Errors.NeedChainOrCommunity));
   const topics = await models.OffchainTopic.findAll({
     where: community
       ? { community_id: community.id }

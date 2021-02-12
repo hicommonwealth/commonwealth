@@ -1,6 +1,6 @@
 /* eslint-disable dot-notation */
 import Sequelize from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 const { Op } = Sequelize;
 import { factory, formatFilename } from '../../shared/logging';
 
@@ -14,7 +14,8 @@ const log = factory.getLogger(formatFilename(__filename));
 // Otherwise, it defaults to returning them in order of ['created_at', 'DESC'] (following to /bulkMembers).
 
 const bulkAddresses = async (models, req, res, next) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
 
   const options = {
     order: req.query.order ? [req.query.order] : [['created_at', 'DESC']],

@@ -6,7 +6,7 @@ import {
 } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));

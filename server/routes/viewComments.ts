@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -9,7 +9,8 @@ export const Errors = {
 };
 
 const viewComments = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
 
   if (!req.query.root_id) {
     return next(new Error(Errors.NoRootId));

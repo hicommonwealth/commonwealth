@@ -2,7 +2,7 @@ import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
@@ -20,7 +20,8 @@ export const Errors = {
 };
 
 const createThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { topic_name, topic_id, title, body, kind, stage, url, readOnly } = req.body;
 

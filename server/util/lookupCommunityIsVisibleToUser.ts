@@ -1,9 +1,9 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
 // If a community is found, also check that the user is allowed to see it.
 
-import { NextFunction } from 'express';
+export const ChainCommunityError = 'Invalid community or chain';
 
-const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFunction): Promise<any> => {
+const lookupCommunityIsVisibleToUser = async (models, params, user): Promise<any> => {
   const chain = await models.Chain.findOne({
     where: {
       id: params.chain,
@@ -27,18 +27,18 @@ const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFu
     },
   });
   // searching for both chain and community
-  if (params.chain && params.community) return next(new Error('Invalid community or chain'));
+  if (params.chain && params.community) return [];
   // searching for chain that doesn't exist
-  if (params.chain && !chain) return next(new Error('Invalid community or chain'));
+  if (params.chain && !chain) return [];
   // searching for community that doesn't exist
-  if (params.community && !community) return next(new Error('Invalid community or chain'));
+  if (params.community && !community) return [];
   // searching for both chain and community with results
-  if (chain && community) return next(new Error('Invalid community or chain'));
+  if (chain && community) return [];
   // searching for chain and community that both don't exist
-  if (!chain && !community) return next(new Error('Invalid community or chain'));
+  if (!chain && !community) return [];
 
   if (community && community.privacyEnabled) {
-    if (!user) return next(new Error('Invalid community or chain'));
+    if (!user) return [];
     const userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
@@ -46,7 +46,7 @@ const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFu
         offchain_community_id: community.id,
       },
     });
-    if (!userMembership) return next(new Error('Invalid community or chain'));
+    if (!userMembership) return [];
   }
   return [chain, community];
 };

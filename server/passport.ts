@@ -16,7 +16,7 @@ import {
   MAGIC_DEFAULT_CHAIN
 } from './config';
 import { NotificationCategories } from '../shared/types';
-import lookupCommunityIsVisibleToUser from './util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from './util/lookupCommunityIsVisibleToUser';
 
 const GithubStrategy = passportGithub.Strategy;
 const JWTStrategy = passportJWT.Strategy;

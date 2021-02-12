@@ -1,8 +1,7 @@
 import { Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 
 export const Errors = {
-  InvalidChainOrCommunity: 'Invalid chain or community',
   NotLoggedIn: 'Not logged in',
   TopicRequired: 'Topic name required',
   MustBeAdmin: 'Must be an admin',
@@ -10,9 +9,8 @@ export const Errors = {
 
 const createTopic = async (models, req, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  if (!chain && !community) return next(new Error(Errors.InvalidChainOrCommunity));
-  if (chain && community) return next(new Error(Errors.InvalidChainOrCommunity));
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
 

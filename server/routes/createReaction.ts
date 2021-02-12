@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils';
@@ -18,7 +18,8 @@ export const Errors = {
 };
 
 const createReaction = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
   let proposal;

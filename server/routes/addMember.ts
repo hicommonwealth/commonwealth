@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -14,7 +14,8 @@ export const Errors = {
 };
 
 const addMember = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
   if (!community && !chain) return next(new Error(Errors.InvalidCommunity));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));

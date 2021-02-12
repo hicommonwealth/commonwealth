@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../../util/lookupCommunityIsVisibleToUser';
 import Errors from './errors';
 import { factory, formatFilename } from '../../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const updateWebhook = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
   // only admins should be able to update webhooks

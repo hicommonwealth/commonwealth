@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -17,7 +17,8 @@ const ValidRoles = ['admin', 'moderator', 'member'];
 
 const upgradeMember = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (!chain && !community) return next(new Error(ChainCommunityError));
   const { address, new_role } = req.body;
   if (!address) return next(new Error(Errors.InvalidAddress));
   if (!new_role) return next(new Error(Errors.InvalidRole));
