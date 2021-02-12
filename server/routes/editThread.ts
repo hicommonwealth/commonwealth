@@ -27,7 +27,6 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       return next(new Error(Errors.NoBodyOrAttachment));
     }
   }
-  console.log(req.body, req.user);
   const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (typeof communityResult === 'string') return next(new Error(communityResult));
   const [chain, community] = communityResult;

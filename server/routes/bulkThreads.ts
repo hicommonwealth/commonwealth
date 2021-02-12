@@ -149,7 +149,10 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     threads = await models.OffchainThread.findAll({
       where: whereOptions,
       include: [
-        models.Address,
+        {
+          model: models.Address,
+          as: 'Address'
+        },
         {
           model: models.Address,
           through: models.Collaboration,

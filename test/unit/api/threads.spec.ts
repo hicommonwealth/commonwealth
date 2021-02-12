@@ -490,6 +490,8 @@ describe('Thread Tests', () => {
         .set('Accept', 'application/json')
         .send({
           'chain': chain,
+          'address': adminAddress,
+          'author_chain': chain,
           'thread_id': thread_id,
           'kind': thread_kind,
           'stage': thread_stage,
@@ -499,7 +501,6 @@ describe('Thread Tests', () => {
           'jwt': userJWT,
         });
       expect(res.body.error).to.not.be.null;
-      console.log(res.error);
       expect(res.status).to.be.equal(500);
     });
 
@@ -514,6 +515,8 @@ describe('Thread Tests', () => {
         .set('Accept', 'application/json')
         .send({
           'chain': chain,
+          'address': adminAddress,
+          'author_chain': chain,
           'thread_id': null,
           'kind': thread_kind,
           'stage': thread_stage,
@@ -539,6 +542,8 @@ describe('Thread Tests', () => {
         .set('Accept', 'application/json')
         .send({
           'chain': chain,
+          'address': adminAddress,
+          'author_chain': chain,
           'thread_id': thread_id,
           'kind': thread_kind,
           'stage': thread_stage,
@@ -563,6 +568,8 @@ describe('Thread Tests', () => {
         .set('Accept', 'application/json')
         .send({
           'chain': chain,
+          'address': adminAddress,
+          'author_chain': chain,
           'thread_id': thread_id,
           'kind': thread_kind,
           'stage': thread_stage,
@@ -571,7 +578,6 @@ describe('Thread Tests', () => {
           'read_only': readOnly,
           'jwt': adminJWT,
         });
-      console.log(res.error);
       expect(res.status).to.be.equal(200);
       expect(res.body.result.body).to.be.equal(newBody);
     });
@@ -587,6 +593,8 @@ describe('Thread Tests', () => {
         .set('Accept', 'application/json')
         .send({
           'chain': chain,
+          'address': adminAddress,
+          'author_chain': chain,
           'thread_id': thread_id,
           'kind': thread_kind,
           'stage': thread_stage,
@@ -596,7 +604,6 @@ describe('Thread Tests', () => {
           'read_only': readOnly,
           'jwt': adminJWT,
         });
-      console.log(res.error);
       expect(res.status).to.be.equal(200);
       expect(res.body.result.title).to.be.equal(newTitle);
     });
