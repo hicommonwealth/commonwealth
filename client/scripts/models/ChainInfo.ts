@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
-import { ChainNetwork } from './types';
+import { ChainNetwork, ChainBase, networkToBase } from './types';
 import OffchainTopic from './OffchainTopic';
 
 class ChainInfo {
@@ -9,6 +9,7 @@ class ChainInfo {
   public readonly symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
+  public readonly base: ChainBase;
   public readonly iconUrl: string;
   public description: string;
   public website: string;
@@ -30,6 +31,7 @@ class ChainInfo {
   ) {
     this.id = id;
     this.network = network;
+    this.base = networkToBase(network);
     this.symbol = symbol;
     this.name = name;
     this.iconUrl = iconUrl;
