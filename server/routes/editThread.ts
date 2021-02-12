@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
 import { parseUserMentions } from '../util/parseUserMentions';
-import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
@@ -18,18 +18,21 @@ export const Errors = {
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const { body, title, kind, stage, thread_id, version_history, } = req.body;
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (!chain && !community) return next(new Error(ChainCommunityError));
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
-
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
   }
+
   if (kind === 'forum') {
     if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
       return next(new Error(Errors.NoBodyOrAttachment));
     }
   }
+  console.log(req.body, req.user);
+  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (typeof communityResult === 'string') return next(new Error(communityResult));
+  const [chain, community] = communityResult;
+  const author = await lookupAddressIsOwnedByUser(models, req);
+  if (typeof author === 'string') return next(new Error(author));
 
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {

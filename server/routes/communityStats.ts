@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 const communityStats = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
-  if (!chain && !community) return next(new Error(ChainCommunityError));
+  const communityResult = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  if (typeof communityResult === 'string') return next(new Error(communityResult));
+  const [chain, community] = communityResult;
 
   if (!req.user) {
     return next(new Error('Not logged in'));

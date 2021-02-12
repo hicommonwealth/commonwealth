@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
-import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
@@ -17,9 +17,11 @@ export const Errors = {
 };
 
 const editComment = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (!chain && !community) return next(new Error(ChainCommunityError));
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
+  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (typeof communityResult === 'string') return next(new Error(communityResult));
+  const [chain, community] = communityResult;
+  const author = await lookupAddressIsOwnedByUser(models, req);
+  if (typeof author === 'string') return next(new Error(author));
 
   if (!req.body.id) {
     return next(new Error(Errors.NoId));

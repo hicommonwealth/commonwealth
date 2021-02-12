@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { NotificationCategories } from '../../shared/types';
 
 export const Errors = {
@@ -11,8 +11,9 @@ export const Errors = {
 };
 
 const createRole = async (models, req, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (!chain && !community) return next(new Error(ChainCommunityError));
+  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (typeof communityResult === 'string') return next(new Error(communityResult));
+  const [chain, community] = communityResult;
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
 

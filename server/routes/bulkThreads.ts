@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
-import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -9,8 +9,9 @@ const log = factory.getLogger(formatFilename(__filename));
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
 const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
-  if (!chain && !community) return next(new Error(ChainCommunityError));
+  const communityResult = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  if (typeof communityResult === 'string') return next(new Error(communityResult));
+  const [chain, community] = communityResult;
   const { cutoff_date, topic_id, stage } = req.query;
 
   const communityOptions = community

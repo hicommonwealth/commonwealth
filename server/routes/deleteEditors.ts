@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 
@@ -24,9 +24,11 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
   } catch (e) {
     return next(new Error(Errors.InvalidEditorFormat));
   }
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (!chain && !community) return next(new Error(ChainCommunityError));
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
+  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (typeof communityResult === 'string') return next(new Error(communityResult));
+  const [chain, community] = communityResult;
+  const author = await lookupAddressIsOwnedByUser(models, req);
+  if (typeof author === 'string') return next(new Error(author));
 
   const userOwnedAddressIds = await (req.user as any).getAddresses()
     .filter((addr) => !!addr.verified).map((addr) => addr.id);

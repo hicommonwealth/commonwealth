@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { NotificationCategories } from '../../shared/types';
 
-import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
@@ -25,9 +25,11 @@ export const Errors = {
 };
 
 const createComment = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (!chain && !community) return next(new Error(ChainCommunityError));
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
+  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (typeof communityResult === 'string') return next(new Error(communityResult));
+  const [chain, community] = communityResult;
+  const author = await lookupAddressIsOwnedByUser(models, req);
+  if (typeof author === 'string') return next(new Error(author));
   const { parent_id, root_id, text } = req.body;
 
   const plaintext = (() => {

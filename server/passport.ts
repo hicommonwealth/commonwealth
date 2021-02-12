@@ -16,7 +16,7 @@ import {
   MAGIC_DEFAULT_CHAIN
 } from './config';
 import { NotificationCategories } from '../shared/types';
-import lookupCommunityIsVisibleToUser, { ChainCommunityError } from './util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from './util/lookupCommunityIsVisibleToUser';
 
 const GithubStrategy = passportGithub.Strategy;
 const JWTStrategy = passportJWT.Strategy;
@@ -53,7 +53,9 @@ function setupPassport(models) {
       // determine login location
       let chain, community;
       if (req.body.chain || req.body.community) {
-        [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, cb);
+        const result = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+        if (typeof result === 'string') return cb(result);
+        [ chain, community ] = result;
       }
       const registrationChain: string = chain ? chain.id : community?.default_chain
         ? community?.default_chain : MAGIC_DEFAULT_CHAIN;

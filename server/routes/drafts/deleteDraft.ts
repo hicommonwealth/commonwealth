@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
-import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -13,9 +13,11 @@ export const Errors = {
 };
 
 const deleteDraft = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (!chain && !community) return next(new Error(ChainCommunityError));
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
+  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (typeof communityResult === 'string') return next(new Error(communityResult));
+  const [chain, community] = communityResult;
+  const author = await lookupAddressIsOwnedByUser(models, req);
+  if (typeof author === 'string') return next(new Error(author));
 
   if (!req.body.id) {
     return next(new Error(Errors.NoId));

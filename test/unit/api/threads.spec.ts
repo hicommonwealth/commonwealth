@@ -290,7 +290,7 @@ describe('Thread Tests', () => {
       expect(res.status).to.equal('Success');
       expect(res.result).to.not.be.null;
       expect(res.result.title).to.equal(encodeURIComponent(title));
-      expect(res.result.body).to.equal(encodeURIComponent(body));
+      expect(res.result.body).to.equal(encodeURIComponent(bodyWithMentions));
       expect(res.result.Address).to.not.be.null;
       expect(res.result.Address.address).to.equal(userAddress);
     });
@@ -387,7 +387,7 @@ describe('Thread Tests', () => {
       expect(cRes.status).to.equal('Success');
       expect(cRes.result).to.not.be.null;
       expect(cRes.result.root_id).to.equal(`discussion_${thread.id}`);
-      expect(cRes.result.text).to.equal(markdownComment.text);
+      expect(cRes.result.text).to.equal(bodyWithMentions);
       expect(cRes.result.Address).to.not.be.null;
       expect(cRes.result.Address.address).to.equal(userAddress);
     });
@@ -489,6 +489,7 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
+          'chain': chain,
           'thread_id': thread_id,
           'kind': thread_kind,
           'stage': thread_stage,
@@ -498,6 +499,7 @@ describe('Thread Tests', () => {
           'jwt': userJWT,
         });
       expect(res.body.error).to.not.be.null;
+      console.log(res.error);
       expect(res.status).to.be.equal(500);
     });
 
@@ -511,6 +513,7 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
+          'chain': chain,
           'thread_id': null,
           'kind': thread_kind,
           'stage': thread_stage,
@@ -535,6 +538,7 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
+          'chain': chain,
           'thread_id': thread_id,
           'kind': thread_kind,
           'stage': thread_stage,
@@ -558,6 +562,7 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
+          'chain': chain,
           'thread_id': thread_id,
           'kind': thread_kind,
           'stage': thread_stage,
@@ -566,6 +571,7 @@ describe('Thread Tests', () => {
           'read_only': readOnly,
           'jwt': adminJWT,
         });
+      console.log(res.error);
       expect(res.status).to.be.equal(200);
       expect(res.body.result.body).to.be.equal(newBody);
     });
@@ -580,6 +586,7 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
+          'chain': chain,
           'thread_id': thread_id,
           'kind': thread_kind,
           'stage': thread_stage,
@@ -589,6 +596,7 @@ describe('Thread Tests', () => {
           'read_only': readOnly,
           'jwt': adminJWT,
         });
+      console.log(res.error);
       expect(res.status).to.be.equal(200);
       expect(res.body.result.title).to.be.equal(newTitle);
     });

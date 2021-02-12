@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser, { ChainCommunityError } from '../util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
@@ -19,15 +19,16 @@ export const Errors = {
 };
 
 const createInvite = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (!chain && !community) return next(new Error(ChainCommunityError));
+  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (typeof communityResult === 'string') return next(new Error(communityResult));
+  const [chain, community] = communityResult;
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.invitedAddress && !req.body.invitedEmail) {
     return next(new Error(Errors.NoEmailOrAddress));
   }
   if (req.body.invitedAddress && req.body.invitedEmail) {
     return next(new Error(Errors.NoEmailAndAddress));
-  } 
+  }
 
   const chainOrCommObj = chain
     ? { chain_id: chain.id }

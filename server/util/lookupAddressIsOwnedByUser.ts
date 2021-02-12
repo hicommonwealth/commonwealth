@@ -1,15 +1,15 @@
 // Helper function to look up an (address, author_chain) pair of parameters,
 // and check that it's owned by the current user. Only for POST requests.
 
-import { Request, NextFunction } from 'express';
+import { Request } from 'express';
 
-const lookupAddressIsOwnedByUser = async (models, req: Request, next: NextFunction) => {
+const lookupAddressIsOwnedByUser = async (models, req: Request) => {
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    return 'Not logged in';
   }
 
   if (!req.body.author_chain || !req.body.address) {
-    return next(new Error('Invalid public key/chain'));
+    return 'Invalid public key/chain';
   }
 
   const author = await models.Address.findOne({ where: {
@@ -18,7 +18,7 @@ const lookupAddressIsOwnedByUser = async (models, req: Request, next: NextFuncti
     user_id: req.user.id,
   } });
   if (!author || !author.verified || author.user_id !== req.user.id) {
-    return next(new Error('Invalid public key/chain'));
+    return 'Invalid public key/chain';
   }
   return author;
 };
