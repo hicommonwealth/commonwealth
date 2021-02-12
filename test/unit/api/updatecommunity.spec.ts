@@ -28,11 +28,6 @@ describe('Update Community/Chain Tests', () => {
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
     jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
-    const isAdmin = await modelUtils.assignRole({
-      address_id: result.address_id,
-      chainOrCommObj: { chain_id: chain },
-      role: 'admin',
-    });
 
     // create community for test
     const communityArgs: modelUtils.CommunityArgs = {

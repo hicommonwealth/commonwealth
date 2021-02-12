@@ -170,12 +170,13 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
           });
           return user;
         } catch (err) {
-          return next(new Error(err));
+          return null;
         }
       }));
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
+
     // notify mentioned users, given permissions are in place
     if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address

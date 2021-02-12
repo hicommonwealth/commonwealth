@@ -56,16 +56,9 @@ describe('Thread Tests', () => {
       chainOrCommObj: { offchain_community_id: community },
       role: 'admin',
     });
-    const isAdmin2 = await modelUtils.assignRole({
-      address_id: res.address_id,
-      chainOrCommObj: { chain_id: chain },
-      role: 'admin',
-    });
     expect(adminAddress).to.not.be.null;
     expect(adminJWT).to.not.be.null;
     expect(isAdmin).to.not.be.null;
-    expect(isAdmin2).to.not.be.null;
-
 
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
@@ -561,7 +554,7 @@ describe('Thread Tests', () => {
       const thread_stage = thread.stage;
       const newBody = 'new Body';
       const readOnly = false;
-      const res = await chai.request(app)
+      const res = await chai.request.agent(app)
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
