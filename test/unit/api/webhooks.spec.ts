@@ -51,6 +51,11 @@ describe('Webhook Tests', () => {
       chainOrCommObj: { offchain_community_id: community },
       role: 'admin',
     });
+    await modelUtils.updateRole({
+      address_id: result.address_id,
+      chainOrCommObj: { chain_id: chain },
+      role: 'admin',
+    });
     // get not logged in address
     result = await modelUtils.createAndVerifyAddress({ chain });
     notLoggedInAddr = result.address;
