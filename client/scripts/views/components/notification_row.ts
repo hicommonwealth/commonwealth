@@ -356,6 +356,7 @@ const NotificationRow: m.Component<{
           m('.comment-body-title', notificationHeader),
           notificationBody
             && category !== `${NotificationCategories.NewReaction}`
+            && category !== `${NotificationCategories.NewThread}`
             && m('.comment-body-excerpt', notificationBody),
           m('.comment-body-bottom-wrap', [
             m('.comment-body-created', createdAt.twitterShort()),
@@ -363,8 +364,14 @@ const NotificationRow: m.Component<{
               onclick: (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                app.user.notifications.markAsRead(notifications);
                 vnode.state.markingRead = true;
+                app.user.notifications.markAsRead(notifications).then(() => {
+                  vnode.state.markingRead = false;
+                  m.redraw();
+                }).catch(() => {
+                  vnode.state.markingRead = false;
+                  m.redraw();
+                });
               }
             }, [
               vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
