@@ -105,9 +105,9 @@ const BountyPage: m.Component<{}> = {
       });
     }
 
-    const activeBounties = (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed);
-    const inactiveBounties = (app.chain as Substrate).treasury.store.getAll().filter((p) => p.completed);
-    console.log(activeBounties.length, inactiveBounties.length);
+    (app.chain as Substrate).bounties.store.getAll();
+    const activeBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed);
+    const inactiveBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => p.completed);
     const activeBountyContent = activeBounties.length
       ? activeBounties.map((bounty) => m(BountyRow, { bounty }))
       : [ m('.no-proposals', 'None') ];
