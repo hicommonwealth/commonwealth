@@ -135,7 +135,7 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
   }
 };
 
-const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
+const VotingActions: m.Component<{ proposal: AnyProposal }, {
   conviction: number,
   amount: number,
   votingModalOpen: boolean
@@ -616,4 +616,4 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
   },
 };
 
-export default ProposalVotingActions;
+export default VotingActions;

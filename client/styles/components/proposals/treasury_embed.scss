@@ -1,0 +1,9 @@
+@import 'client/styles/shared';
+
+.TreasuryEmbed {
+    display: flex;
+    background-color: $background-color-light;
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 3px;
+}

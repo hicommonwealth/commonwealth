@@ -127,6 +127,7 @@ export class SubstrateDemocracyReferendum
   public get title() { return this._title; }
   public get description() { return null; }
   public get author() { return null; }
+  public get preimage() { return this._preimage; }
 
   public get votingType() {
     return VotingType.ConvictionYesNoVoting;
@@ -138,6 +139,7 @@ export class SubstrateDemocracyReferendum
     return account.chainBase === ChainBase.Substrate;
   }
   private _title: string;
+  private _preimage;
   private _endBlock: number;
   public readonly hash: string;
 
@@ -205,6 +207,7 @@ export class SubstrateDemocracyReferendum
     // see if preimage exists and populate data if it does
     const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
+      this._preimage = preimage;
       this._title = formatCall(preimage);
     } else {
       this._title = `Referendum #${this.data.index}`;
@@ -269,6 +272,7 @@ export class SubstrateDemocracyReferendum
       case SubstrateTypes.EventKind.PreimageNoted: {
         const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
+          this._preimage = preimage;
           this._title = formatCall(preimage);
         }
         break;

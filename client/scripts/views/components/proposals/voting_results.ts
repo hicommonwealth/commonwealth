@@ -133,14 +133,14 @@ const VoteListing: m.Component<{
   }
 };
 
-const ProposalVotingResults: m.Component<{ proposal }> = {
+const VotingResults: m.Component<{ proposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const votes = proposal.getVotes();
 
     // TODO: fix up this function for cosmos votes
     if (proposal instanceof EdgewareSignalingProposal) {
-      return m('.ProposalVotingResults', [
+      return m('.VotingResults', [
         proposal.data.choices.map((outcome) => {
           return m('.results-column', [
             m('.results-header', signalingVoteToString(outcome)),
@@ -154,7 +154,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
         }),
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
-      return m('.ProposalVotingResults', [
+      return m('.VotingResults', [
         m('.results-column', [
           m('.results-header', `Voted yes (${votes.filter((v) => v.choice === true).length})`),
           m('.results-cell', [
@@ -175,7 +175,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
         ])
       ]);
     } else if (proposal.votingType === VotingType.MolochYesNo) {
-      return m('.ProposalVotingResults', [
+      return m('.VotingResults', [
         m('.results-column', [
           m('.results-header', `Voted yes (${votes.filter((v) => v.choice === MolochVote.YES).length})`),
           m('.results-cell', [
@@ -196,7 +196,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
         ])
       ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
-      return m('.ProposalVotingResults', [
+      return m('.VotingResults', [
         m('.results-column', [
           m('.results-header', `Voted yes (${votes.filter((v) => v.choice === true).length})`),
           m('.results-cell', [
@@ -221,7 +221,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
         ])
       ]);
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
-      return m('.ProposalVotingResults', [
+      return m('.VotingResults', [
         m('.results-column', [
           m('.results-header', `Voted yes (${votes.filter((v) => v.choice === CosmosVoteChoice.YES).length})`),
           m('.results-cell', [
@@ -262,7 +262,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting
                && proposal instanceof CosmosProposal) {
       // special case for cosmos proposals in deposit stage
-      return m('.ProposalVotingResults', [
+      return m('.VotingResults', [
         m('.results-column', [
           m('.results-header', `Approved ${proposal.depositorsAsVotes.length}`),
           m('.results-cell', [
@@ -274,7 +274,7 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
         ]),
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
-      return m('.ProposalVotingResults', [
+      return m('.VotingResults', [
         m('.results-column', [
           m('.results-header', `Approved ${votes.length}`),
           m('.results-cell', [
@@ -293,4 +293,4 @@ const ProposalVotingResults: m.Component<{ proposal }> = {
   }
 };
 
-export default ProposalVotingResults;
+export default VotingResults;
