@@ -10,6 +10,7 @@ import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
 import { slugify, isSameAccount } from 'helpers';
 
+import Substrate from 'controllers/chain/substrate/main';
 import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
 import {
@@ -462,10 +463,14 @@ async function loadCmd(type: string) {
   if (app.chain.base !== ChainBase.Substrate) {
     return;
   }
-  const c = proposalSlugToClass().get(type);
-  if (c && c instanceof ProposalModule && !c.disabled) {
-    await c.init(app.chain.chain, app.chain.accounts);
-  }
+  const chain = app.chain as Substrate;
+  await Promise.all([
+    chain.council.init(chain.chain, chain.accounts),
+    chain.signaling.init(chain.chain, chain.accounts),
+    chain.treasury.init(chain.chain, chain.accounts),
+    chain.democracyProposals.init(chain.chain, chain.accounts),
+    chain.democracy.init(chain.chain, chain.accounts),
+  ]);
 }
 
 const ViewProposalPage: m.Component<{
