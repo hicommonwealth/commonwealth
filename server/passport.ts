@@ -2,6 +2,7 @@ import passport from 'passport';
 import passportGithub from 'passport-github';
 import passportJWT from 'passport-jwt';
 import { Request } from 'express';
+import request from 'superagent';
 
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
@@ -83,6 +84,28 @@ function setupPassport(models) {
         return cb(new Error('Unsupported magic chain.'));
       }
 
+      // ensure all eth addresses are lowercase
+      let address = userMetadata.publicAddress.toLowerCase();
+
+      // if on polkadot chain, retrieve the address for the user
+      console.log(userMetadata.publicAddress);
+      if (registrationChain === 'edgeware') {
+        try {
+          const polkadotResp = await request
+            // eslint-disable-next-line max-len
+            .get(`https://api.magic.link/v1/admin/auth/user/public/address/get?issuer=did:ethr:${userMetadata.publicAddress}`)
+            .set('X-Magic-Secret-key', MAGIC_API_KEY)
+            .accept('json');
+          if (polkadotResp.body?.status !== 'ok') {
+            throw new Error(polkadotResp.body?.message || 'Failed to fetch polkadot address');
+          }
+          // TODO: convert this to different SS58 format?
+          address = polkadotResp.body?.data?.public_address;
+        } catch (err) {
+          return cb(new Error(err.message));
+        }
+      }
+      console.log(`Received magic address: ${address}.`);
       if (!existingUser) {
         const result = await sequelize.transaction(async (t) => {
           // create new user and unverified address if doesn't exist
@@ -95,7 +118,7 @@ function setupPassport(models) {
 
           // TODO: use non-default chain in certain cases?
           const newAddress = await models.Address.create({
-            address: userMetadata.publicAddress.toLowerCase(), // ensure all eth addresses are lowercase
+            address,
             chain: registrationChain,
             verification_token: 'MAGIC',
             verification_token_expires: null,

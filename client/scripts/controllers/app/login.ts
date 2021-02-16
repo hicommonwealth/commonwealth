@@ -7,6 +7,7 @@ import { isSameAccount } from 'helpers';
 
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
+import { PolkadotExtension } from '@magic-ext/polkadot';
 
 import {
   ChainInfo,
@@ -240,7 +241,16 @@ export async function unlinkLogin(account) {
 const MAGIC_PUBLISHABLE_KEY = 'pk_test_436D33AFC319E080';
 
 export async function loginWithMagicLink(email: string) {
-  const magic = new Magic(MAGIC_PUBLISHABLE_KEY);
+  const polkadotUrl = app.chain?.base === ChainBase.Substrate && app.chain.meta.url;
+  const magic = new Magic(MAGIC_PUBLISHABLE_KEY, polkadotUrl
+    ? {
+      extensions: [
+        new PolkadotExtension({
+          rpcUrl: polkadotUrl,
+        })
+      ]
+    }
+    : {});
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
