@@ -298,6 +298,14 @@ button, .cui-button {
     }
 }
 
+// set z-index
+.cui-button-group .cui-button:active,
+.cui-button-group .cui-button.cui-active,
+.cui-button-group .cui-button:focus,
+.cui-button-group .cui-button:hover {
+    z-index: 2;
+}
+
 // adjust callout padding, colors, spacing
 .cui-callout {
     line-height: 1.2;

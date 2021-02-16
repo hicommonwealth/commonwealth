@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
+import { parseUserMentions } from '../util/parseUserMentions';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
@@ -16,7 +17,7 @@ export const Errors = {
 };
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, title, kind, thread_id } = req.body;
+  const { body, title, kind, stage, thread_id, version_history, } = req.body;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
@@ -91,6 +92,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       thread.version_history = arr;
     }
     thread.body = body;
+    thread.stage = stage;
     thread.plaintext = (() => {
       try {
         return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
@@ -137,18 +139,27 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       [ userOwnedAddresses[0].address ],
     );
 
-    const mentions = typeof req.body['mentions[]'] === 'string'
-      ? [req.body['mentions[]']]
-      : typeof req.body['mentions[]'] === 'undefined'
-        ? []
-        : req.body['mentions[]'];
+    let mentions;
+    try {
+      const previousDraftMentions = parseUserMentions(latestVersion);
+      const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
+      mentions = currentDraftMentions.filter((addrArray) => {
+        let alreadyExists = false;
+        previousDraftMentions.forEach((addrArray_) => {
+          if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+            alreadyExists = true;
+          }
+        });
+        return !alreadyExists;
+      });
+    } catch (e) {
+      return next(new Error('Failed to parse mentions'));
+    }
 
     // grab mentions to notify tagged users
     let mentionedAddresses;
     if (mentions?.length > 0) {
       mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-
-        mention = mention.split(',');
         try {
           const user = await models.Address.findOne({
             where: {

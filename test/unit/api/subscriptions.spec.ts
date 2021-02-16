@@ -72,6 +72,7 @@ describe('Subscriptions Tests', () => {
         title: 't',
         body: 't',
         kind: 'forum',
+        stage: 'discussion',
         topicName: 't',
         topicId: undefined
       });
@@ -98,6 +99,7 @@ describe('Subscriptions Tests', () => {
         title: 't2',
         body: 't2',
         kind: 'forum',
+        stage: 'discussion',
         topicName: 't',
         topicId: undefined
       });
@@ -124,6 +126,7 @@ describe('Subscriptions Tests', () => {
         title: 't2',
         body: 't2',
         kind: 'forum',
+        stage: 'discussion',
         topicName: 't',
         topicId: undefined
       });
@@ -158,6 +161,7 @@ describe('Subscriptions Tests', () => {
         title: 't3',
         body: 't3',
         kind: 'forum',
+        stage: 'discussion',
         topicName: 't',
         topicId: undefined
       });
@@ -604,6 +608,7 @@ describe('Subscriptions Tests', () => {
         title: 'hi',
         body: 'hi you!',
         kind: 'forum',
+        stage: 'discussion',
         topicName: 't',
         topicId: undefined
       });

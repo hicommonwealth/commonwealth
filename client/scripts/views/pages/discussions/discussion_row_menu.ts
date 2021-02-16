@@ -5,9 +5,10 @@ import app from 'state';
 import { MenuItem, PopoverMenu, Icon, Icons, MenuDivider } from 'construct-ui';
 
 import { NotificationCategories } from 'types';
-import { OffchainThread, OffchainTopic } from 'models';
+import { OffchainThread, OffchainTopic, OffchainThreadStage } from 'models';
 
 import TopicEditor from 'views/components/topic_editor';
+import StageEditor from 'views/components/stage_editor';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
@@ -81,7 +82,26 @@ export const TopicEditorButton: m.Component<{ openTopicEditor: Function }, { isO
   }
 };
 
-const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditorIsOpen: boolean }> = {
+export const StageEditorButton: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
+  view: (vnode) => {
+    const { openStageEditor } = vnode.attrs;
+    return m('.StageEditorButton', [
+      m(MenuItem, {
+        fluid: true,
+        label: 'Edit stage',
+        onclick: (e) => {
+          e.preventDefault();
+          openStageEditor();
+        },
+      })
+    ]);
+  }
+};
+
+const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, {
+  topicEditorIsOpen: boolean,
+  stageEditorIsOpen: boolean
+}> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;
@@ -114,7 +134,6 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
         closeOnContentClick: true,
         menuAttrs: {},
         content: [
-          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
           m(ThreadSubscriptionButton, { proposal }),
           hasAdminPermissions && m(MenuDivider),
           hasAdminPermissions && m(MenuItem, {
@@ -139,6 +158,10 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
           hasAdminPermissions && m(TopicEditorButton, {
             openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; }
           }),
+          (isAuthor || hasAdminPermissions) && m(StageEditorButton, {
+            openStageEditor: () => { vnode.state.stageEditorIsOpen = true; }
+          }),
+          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
         ],
         inline: true,
         trigger: m(Icon, {
@@ -150,6 +173,12 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
         popoverMenu: true,
         onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
         openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
+      }),
+      vnode.state.stageEditorIsOpen && m(StageEditor, {
+        thread: vnode.attrs.proposal,
+        popoverMenu: true,
+        onChangeHandler: (stage: OffchainThreadStage) => { proposal.stage = stage; m.redraw(); },
+        openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
       })
     ]);
   },

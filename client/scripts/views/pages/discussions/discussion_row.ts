@@ -4,13 +4,13 @@ import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment-twitter';
-import { Icon, Icons, Tag } from 'construct-ui';
+import { Button, Icon, Icons, Tag } from 'construct-ui';
 
 import { updateRoute } from 'app';
 import app from 'state';
-import { formatLastUpdated, slugify, link, externalLink, extractDomain } from 'helpers';
+import { formatLastUpdated, slugify, link, externalLink, extractDomain, offchainThreadStageToLabel } from 'helpers';
 
-import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
+import { OffchainThread, OffchainThreadKind, OffchainThreadStage, AddressInfo } from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import QuillFormattedText from 'views/components/quill_formatted_text';
@@ -68,16 +68,31 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     ];
 
     const rowMetadata = [
-      m(UserGallery, {
-        avatarSize: 20,
-        popover: true,
-        maxUsers: 4,
-        users: app.comments.uniqueCommenters(
-          proposal,
-          proposal.author,
-          proposal.authorChain
-        )
-      }),
+      m('.discussion-row-right-meta', [
+        m(UserGallery, {
+          avatarSize: 20,
+          popover: true,
+          maxUsers: 4,
+          users: app.comments.uniqueCommenters(
+            proposal,
+            proposal.author,
+            proposal.authorChain
+          )
+        }),
+        m(Button, {
+          class: 'discussion-row-stage',
+          label: offchainThreadStageToLabel(proposal.stage),
+          intent: proposal.stage === OffchainThreadStage.Discussion ? 'none'
+            : proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+              : proposal.stage === OffchainThreadStage.Voting ? 'positive'
+                : proposal.stage === OffchainThreadStage.Passed ? 'positive'
+                  : proposal.stage === OffchainThreadStage.Failed ? 'negative'
+                    : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
+          size: 'xs',
+          rounded: true,
+          compact: true,
+        }),
+      ]),
       app.isLoggedIn() && m('.discussion-row-menu', [
         m(DiscussionRowMenu, { proposal }),
       ]),

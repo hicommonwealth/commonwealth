@@ -1,6 +1,6 @@
 import 'components/sidebar/notification_row.scss';
 
-import { Icon, Icons } from 'construct-ui';
+import { Icon, Icons, Tooltip, Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment-twitter';
@@ -217,6 +217,7 @@ const NotificationRow: m.Component<{
   MolochTypes: any,
   SubstrateTypes: any,
   scrollOrStop: boolean;
+  markingRead: boolean;
 }> = {
   oncreate: (vnode) => {
     if (m.route.param('id') && vnode.attrs.onListPage
@@ -320,7 +321,7 @@ const NotificationRow: m.Component<{
         pageJump
       } = getBatchNotificationFields(category, notificationData);
       return m('li.NotificationRow', {
-        class: notifications[0].isRead ? '' : 'unread',
+        class: notification.isRead ? '' : 'unread',
         key: notification.id,
         id: notification.id,
         onclick: async () => {
@@ -348,8 +349,27 @@ const NotificationRow: m.Component<{
           m('.comment-body-title', notificationHeader),
           notificationBody
             && category !== `${NotificationCategories.NewReaction}`
+            && category !== `${NotificationCategories.NewThread}`
             && m('.comment-body-excerpt', notificationBody),
-          m('.comment-body-created', createdAt.twitterShort()),
+          m('.comment-body-bottom-wrap', [
+            m('.comment-body-created', createdAt.twitterShort()),
+            !notification.isRead && m('.comment-body-mark-as-read', {
+              onclick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                vnode.state.markingRead = true;
+                app.user.notifications.markAsRead(notifications).then(() => {
+                  vnode.state.markingRead = false;
+                  m.redraw();
+                }).catch(() => {
+                  vnode.state.markingRead = false;
+                  m.redraw();
+                });
+              }
+            }, [
+              vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
+            ]),
+          ])
         ]),
       ]);
     }
