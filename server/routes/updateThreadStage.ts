@@ -1,10 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import moment from 'moment';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
-import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));

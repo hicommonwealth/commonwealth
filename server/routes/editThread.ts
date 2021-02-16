@@ -29,8 +29,8 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   }
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
-  const author = await lookupAddressIsOwnedByUser(models, req);
-  if (typeof author === 'string') return next(new Error(author));
+  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
+  if (authorError) return next(new Error(authorError));
 
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {

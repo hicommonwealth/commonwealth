@@ -3,13 +3,13 @@
 
 import { Request } from 'express';
 
-const lookupAddressIsOwnedByUser = async (models, req: Request) => {
+const lookupAddressIsOwnedByUser = async (models, req: Request): Promise<[any, string | null]> => {
   if (!req.user) {
-    return 'Not logged in';
+    return [null, 'Not logged in'];
   }
 
   if (!req.body.author_chain || !req.body.address) {
-    return 'Invalid public key/chain';
+    return [null, 'Invalid public key/chain'];
   }
 
   const author = await models.Address.findOne({ where: {
@@ -18,9 +18,9 @@ const lookupAddressIsOwnedByUser = async (models, req: Request) => {
     user_id: req.user.id,
   } });
   if (!author || !author.verified || author.user_id !== req.user.id) {
-    return 'Invalid public key/chain';
+    return [null, 'Invalid public key/chain'];
   }
-  return author;
+  return [author, null];
 };
 
 export default lookupAddressIsOwnedByUser;
