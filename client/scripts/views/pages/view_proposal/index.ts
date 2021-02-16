@@ -523,7 +523,9 @@ const ViewProposalPage: m.Component<{
     }
 
     const proposalRecentlyEdited = vnode.state.recentlyEdited;
-    const proposalDoesNotMatch = vnode.state.proposal && Number(vnode.state.proposal.identifier) !== Number(proposalId);
+    const proposalDoesNotMatch = vnode.state.proposal
+      && (Number(vnode.state.proposal.identifier) !== Number(proposalId)
+          || vnode.state.proposal.slug !== proposalType);
     // load proposal, and return m(PageLoading)
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
