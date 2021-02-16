@@ -99,10 +99,11 @@ class NotificationsController {
 
   public markAsRead(notifications: Notification[]) {
     // TODO: Change to PUT /notificationsRead
+    const unreadNotifications = notifications.filter((notif) => !notif.isRead);
     return post('/markNotificationsRead', {
-      'notification_ids[]': notifications.map((n) => n.id),
+      'notification_ids[]': unreadNotifications.map((n) => n.id)
     }, (result) => {
-      for (const n of notifications.filter((notif) => !notif.isRead)) {
+      for (const n of unreadNotifications) {
         n.markRead();
       }
     });
