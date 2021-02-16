@@ -21,8 +21,19 @@
             min-width: calc(50% - 15px);
         }
     }
+    @include sm-max {
+        display: block;
+        width: 100%;
+        .results-header, .results-cell {
+            width: 100%;
+        }
+    }
     .results-column:nth-child(even) {
         border-left: 1px solid $background-color-light-hover;
+        @include sm-max {
+            border-left: none;
+            border-top: 1px solid $background-color-light-hover;
+        }
     }
     .vote {
         display: flex;
