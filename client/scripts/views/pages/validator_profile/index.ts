@@ -104,6 +104,7 @@ const threadModelFromServer = (thread) => {
     moment(thread.created_at),
     thread.topic,
     thread.kind,
+    thread.stage,
     thread.version_history,
     thread.community,
     thread.chain,
