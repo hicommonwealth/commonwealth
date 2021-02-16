@@ -69,6 +69,7 @@ async function loadCmd() {
   }
   const chain = (app.chain as Substrate);
   await Promise.all([
+    chain.treasury.init(chain.chain, chain.accounts),
     chain.democracy.init(chain.chain, chain.accounts),
     chain.democracyProposals.init(chain.chain, chain.accounts),
   ]);

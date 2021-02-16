@@ -1,0 +1,11 @@
+@import 'client/styles/shared';
+
+.TreasuryEmbed {
+    background-color: $background-color-light;
+    margin-top: 25px;
+    padding: 12px 20px 6px;
+    border-radius: 3px;
+    p {
+        margin: 10px 0;
+    }
+}
