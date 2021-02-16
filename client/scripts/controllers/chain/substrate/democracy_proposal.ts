@@ -50,6 +50,9 @@ class SubstrateDemocracyProposal extends Proposal<
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
 
+  private _preimage;
+  public get preimage() { return this._preimage; }
+
   public readonly hash: string;
 
   public get votingType() {
@@ -143,6 +146,7 @@ class SubstrateDemocracyProposal extends Proposal<
     if (preimage) {
       this._method = preimage.method;
       this._section = preimage.section;
+      this._preimage = preimage;
       this._title = formatCall(preimage);
     } else {
       this._title = `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
@@ -182,6 +186,7 @@ class SubstrateDemocracyProposal extends Proposal<
         if (preimage) {
           this._method = preimage.method;
           this._section = preimage.section;
+          this._preimage = preimage;
           this._title = formatCall(preimage);
         }
         break;

@@ -10,6 +10,7 @@ import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType, proposalSlugToClass } from 'identifiers';
 import { slugify, isSameAccount } from 'helpers';
 
+import Substrate from 'controllers/chain/substrate/main';
 import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
 import {
@@ -32,6 +33,7 @@ import {
 } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
+import ProposalVotingTreasuryEmbed from 'views/components/proposals/treasury_embed';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
@@ -180,8 +182,6 @@ const ProposalHeader: m.Component<{
             m(ProposalHeaderOnchainId, { proposal }),
             m(ProposalHeaderOnchainStatus, { proposal }),
             m(ProposalBodyAuthor, { item: proposal }),
-            m(ProposalHeaderViewCount, { viewCount }),
-            m(ProposalBodyReaction, { item: proposal }),
           ]),
           proposal instanceof OffchainThread
             && proposal.kind === OffchainThreadKind.Link
@@ -461,10 +461,14 @@ async function loadCmd(type: string) {
   if (app.chain.base !== ChainBase.Substrate) {
     return;
   }
-  const c = proposalSlugToClass().get(type);
-  if (c && c instanceof ProposalModule && !c.disabled) {
-    await c.init(app.chain.chain, app.chain.accounts);
-  }
+  const chain = app.chain as Substrate;
+  await Promise.all([
+    chain.council.init(chain.chain, chain.accounts),
+    chain.signaling.init(chain.chain, chain.accounts),
+    chain.treasury.init(chain.chain, chain.accounts),
+    chain.democracyProposals.init(chain.chain, chain.accounts),
+    chain.democracy.init(chain.chain, chain.accounts),
+  ]);
 }
 
 const ViewProposalPage: m.Component<{
@@ -724,6 +728,8 @@ const ViewProposalPage: m.Component<{
         getSetGlobalEditingStatus,
         getSetGlobalReplyStatus
       }),
+      !(proposal instanceof OffchainThread)
+        && m(ProposalVotingTreasuryEmbed, { proposal }),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingResults, { proposal }),
       !(proposal instanceof OffchainThread)

@@ -89,6 +89,7 @@ async function loadCmd() {
     await Promise.all([
       chain.council.init(chain.chain, chain.accounts),
       chain.signaling.init(chain.chain, chain.accounts),
+      chain.treasury.init(chain.chain, chain.accounts),
       chain.democracyProposals.init(chain.chain, chain.accounts),
       chain.democracy.init(chain.chain, chain.accounts),
     ]);

@@ -208,9 +208,10 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
 
     return m('.HomepageCommunityCards', [
       m('.communities-list', [
+        sortedChainsAndCommunities.length > 0 && m('h4', 'Live Networks'),
         sortedChainsAndCommunities,
         m('.clear'),
-        betaChainsAndCommunities.length > 0 && m('h4', 'Testnets & New Communities'),
+        betaChainsAndCommunities.length > 0 && m('h4', 'Testnets & Alpha Networks'),
         betaChainsAndCommunities,
         m('.clear'),
       ]),

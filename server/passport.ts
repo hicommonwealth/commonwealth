@@ -174,7 +174,6 @@ function setupPassport(models) {
     clientID: GITHUB_CLIENT_ID,
     clientSecret: GITHUB_CLIENT_SECRET,
     callbackURL: GITHUB_OAUTH_CALLBACK,
-    scope: 'gist',
     passReqToCallback: true,
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     const githubAccount = await models.SocialAccount.findOne({
