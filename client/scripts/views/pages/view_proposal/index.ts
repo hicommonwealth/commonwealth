@@ -182,8 +182,6 @@ const ProposalHeader: m.Component<{
             m(ProposalHeaderOnchainId, { proposal }),
             m(ProposalHeaderOnchainStatus, { proposal }),
             m(ProposalBodyAuthor, { item: proposal }),
-            m(ProposalHeaderViewCount, { viewCount }),
-            m(ProposalBodyReaction, { item: proposal }),
           ]),
           proposal instanceof OffchainThread
             && proposal.kind === OffchainThreadKind.Link
