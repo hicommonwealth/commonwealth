@@ -13,9 +13,12 @@
     }
     h4 {
         margin-top: 32px;
-        font-weight: 600;
+        font-weight: 400;
         font-size: 17px;
-        color: $text-color-light;
+        color: $text-color-lighter;
+    }
+    h4:first-child {
+        margin-top: 0;
     }
     .communities-list,
     .other-list {
