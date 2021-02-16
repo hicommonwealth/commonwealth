@@ -17,9 +17,8 @@ const ValidRoles = ['admin', 'moderator', 'member'];
 
 const upgradeMember = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (typeof communityResult === 'string') return next(new Error(communityResult));
-  const [chain, community] = communityResult;
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
   const { address, new_role } = req.body;
   if (!address) return next(new Error(Errors.InvalidAddress));
   if (!new_role) return next(new Error(Errors.InvalidRole));

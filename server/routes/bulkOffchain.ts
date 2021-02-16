@@ -11,9 +11,8 @@ export const Errors = { };
 // Topics, comments, reactions, members+admins, threads
 const bulkOffchain = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-  const communityResult = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
-  if (typeof communityResult === 'string') return next(new Error(communityResult));
-  const [chain, community] = communityResult;
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  if (error) return next(new Error(error));
 
   // globally shared SQL replacements
   const communityOptions = community

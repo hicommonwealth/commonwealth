@@ -11,7 +11,7 @@ export const ChainCommunityErrors = {
   NotMember: 'User is not member of private community',
 };
 
-const lookupCommunityIsVisibleToUser = async (models, params, user): Promise<any> => {
+const lookupCommunityIsVisibleToUser = async (models, params, user): Promise<[any, any, string | null]> => {
   const chain = await models.Chain.findOne({
     where: {
       id: params.chain,
@@ -35,18 +35,18 @@ const lookupCommunityIsVisibleToUser = async (models, params, user): Promise<any
     },
   });
   // searching for both chain and community
-  if (params.chain && params.community) return ChainCommunityErrors.CannotProvideBothCommunityAndChain;
+  if (params.chain && params.community) return [null, null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
   // searching for chain that doesn't exist
-  if (params.chain && !chain) return ChainCommunityErrors.ChainDNE;
+  if (params.chain && !chain) return [null, null, ChainCommunityErrors.ChainDNE];
   // searching for community that doesn't exist
-  if (params.community && !community) return ChainCommunityErrors.CommunityDNE;
+  if (params.community && !community) return [null, null, ChainCommunityErrors.CommunityDNE];
   // searching for both chain and community with results
-  if (chain && community) return ChainCommunityErrors.CannotProvideBothCommunityAndChain;
+  if (chain && community) return [null, null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
   // searching for chain and community that both don't exist
-  if (!chain && !community) return ChainCommunityErrors.BothChainAndCommunityDNE;
+  if (!chain && !community) return [null, null, ChainCommunityErrors.BothChainAndCommunityDNE];
 
   if (community && community.privacyEnabled) {
-    if (!user) return ChainCommunityErrors.NoUserProvided;
+    if (!user) return [null, null, ChainCommunityErrors.NoUserProvided];
     const userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
@@ -54,9 +54,9 @@ const lookupCommunityIsVisibleToUser = async (models, params, user): Promise<any
         offchain_community_id: community.id,
       },
     });
-    if (!userMembership) return ChainCommunityErrors.NotMember;
+    if (!userMembership) return [null, null, ChainCommunityErrors.NotMember];
   }
-  return [chain, community];
+  return [chain, community, null];
 };
 
 export default lookupCommunityIsVisibleToUser;

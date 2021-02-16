@@ -6,9 +6,8 @@ export const Errors = {
 };
 
 const starCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
-  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (typeof communityResult === 'string') return next(new Error(communityResult));
-  const [chain, community] = communityResult;
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
 
   if (req.body.star === 'true') {
     // star community

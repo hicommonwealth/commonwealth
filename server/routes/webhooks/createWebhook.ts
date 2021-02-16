@@ -6,9 +6,8 @@ import { factory, formatFilename } from '../../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const createWebhook = async (models, req: Request, res: Response, next: NextFunction) => {
-  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (typeof communityResult === 'string') return next(new Error(communityResult));
-  const [chain, community] = communityResult;
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
 

@@ -12,9 +12,8 @@ export const Errors = {
 };
 
 const createInviteLink = async (models, req, res, next) => {
-  const communityResult = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-  if (typeof communityResult === 'string') return next(new Error(communityResult));
-  const [chain, community] = communityResult;
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { time } = req.body;
   if (!time) return next(new Error(Errors.NoTimeLimit));
