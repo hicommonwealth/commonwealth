@@ -4,12 +4,13 @@
     padding-bottom: 40px;
     .hero-unit {
         margin: 0 auto;
-        background: #f8f8f8;
+        background: $background-color-white-hover;
+        border-bottom: 1px solid $border-color-off-white;
+        margin-bottom: 48px;
         .layout-container {
             padding: 28px 30px 30px;
             max-width: 820px;
             margin: 0 auto;
-            margin-bottom: 48px;
             display: flex;
         }
         .hero-unit-left {

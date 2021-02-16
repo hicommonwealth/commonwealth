@@ -19,12 +19,10 @@ const Homepage: m.Component<{}, {}> = {
             ]),
           ]),
           m('.hero-unit-right', [
-            m('h2', 'Discussions & governance for decentralized organizations'),
+            m('h2', 'Discussions and governance for decentralized communities'),
             m('p', [
-              'Create longform threads, vote on proposals, and poll your community.',
-            ]),
-            m('p', [
-              'Commonwealth keeps your governance activity organized and searchable.',
+              'Commonwealth lets you conduct ongoing discussions, manage on-chain proposals, ',
+              'and poll community members from one simple interface.',
             ]),
           ]),
         ]),

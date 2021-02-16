@@ -61,7 +61,7 @@
             display: none;
         }
         margin: 0 auto;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid $border-color-off-white;
         padding: 24px 0 22px;
         padding-right: 20px;
         @include md-max {
