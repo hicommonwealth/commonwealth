@@ -24,8 +24,10 @@ const deleteEditors = async (models, req: Request, res: Response, next: NextFunc
   } catch (e) {
     return next(new Error(Errors.InvalidEditorFormat));
   }
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
+  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
+  if (authorError) return next(new Error(authorError));
 
   const userOwnedAddressIds = await (req.user as any).getAddresses()
     .filter((addr) => !!addr.verified).map((addr) => addr.id);

@@ -11,9 +11,8 @@ export const Errors = {
 };
 
 const createRole = async (models, req, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  if (!chain && !community) return next(new Error(Errors.InvalidChainComm));
-  if (chain && community) return next(new Error(Errors.InvalidChainComm));
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
 
