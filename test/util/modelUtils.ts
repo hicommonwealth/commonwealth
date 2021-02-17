@@ -223,6 +223,19 @@ export const assignRole = async (args: AssignRoleArgs) => {
   return role;
 };
 
+export const updateRole = async (args: AssignRoleArgs) => {
+  const role = await models['Role'].findOne({
+    where: {
+      ...args.chainOrCommObj,
+      address_id: args.address_id,
+    }
+  });
+  if (!role) return null;
+  role.permission = args.role;
+  await role.save();
+  return role;
+};
+
 export interface SubscriptionArgs {
   object_id: string | number;
   jwt: any;

@@ -41,10 +41,9 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
   // check whether to recommend magic.link registration instead
   // 1. user should not already exist
   // 2. chain or community default chain should be "supported"
-  const [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, (err) => {
-    log.warn(`Could not look up chain/community for login email ${email}: ${err.message}`);
-    return [ null, null ];
-  });
+  const [ chain, community, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
+
   let magicChain;
   if (chain?.id) {
     magicChain = chain;

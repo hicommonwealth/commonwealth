@@ -21,6 +21,7 @@ import WebsocketController from 'controllers/server/socket/index';
 import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
+import { alertModalWithText } from 'views/modals/alert_modal';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/home');
@@ -448,7 +449,10 @@ $(() => {
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
     if (typeof errorMsg === 'string' && resizeObserverLoopErrRe.test(errorMsg)) return false;
     if (typeof errorMsg === 'string' && chunkLoadingErrRe.test(errorMsg)) {
-      notifyError('A new version of the application has been released. Please save your work and refresh.');
+      alertModalWithText(
+        'A new version of the application has been released. Please save your work and refresh.',
+        'Okay'
+      )();
       return false;
     }
     notifyError(`${errorMsg}`);

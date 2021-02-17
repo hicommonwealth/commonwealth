@@ -1,9 +1,17 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
 // If a community is found, also check that the user is allowed to see it.
 
-import { NextFunction } from 'express';
+export const ChainCommunityErrors = {
+  CannotProvideBothCommunityAndChain: 'Cannot provide both community and chain',
+  ChainDNE: 'Chain does not exist',
+  CommunityDNE: 'Community does not exist',
+  MustProvideCommunityOrChain: 'Must provide community or chain',
+  BothChainAndCommunityDNE: 'Neither chain nor community exist',
+  NoUserProvided: 'No user provided for privacy-enabled community',
+  NotMember: 'User is not member of private community',
+};
 
-const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFunction): Promise<any> => {
+const lookupCommunityIsVisibleToUser = async (models, params, user): Promise<[any, any, string | null]> => {
   const chain = await models.Chain.findOne({
     where: {
       id: params.chain,
@@ -27,18 +35,18 @@ const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFu
     },
   });
   // searching for both chain and community
-  if (params.chain && params.community) return next(new Error('Invalid community or chain'));
+  if (params.chain && params.community) return [null, null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
   // searching for chain that doesn't exist
-  if (params.chain && !chain) return next(new Error('Invalid community or chain'));
+  if (params.chain && !chain) return [null, null, ChainCommunityErrors.ChainDNE];
   // searching for community that doesn't exist
-  if (params.community && !community) return next(new Error('Invalid community or chain'));
+  if (params.community && !community) return [null, null, ChainCommunityErrors.CommunityDNE];
   // searching for both chain and community with results
-  if (chain && community) return next(new Error('Invalid community or chain'));
+  if (chain && community) return [null, null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
   // searching for chain and community that both don't exist
-  if (!chain && !community) return next(new Error('Invalid community or chain'));
+  if (!chain && !community) return [null, null, ChainCommunityErrors.BothChainAndCommunityDNE];
 
   if (community && community.privacyEnabled) {
-    if (!user) return next(new Error('Invalid community or chain'));
+    if (!user) return [null, null, ChainCommunityErrors.NoUserProvided];
     const userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
@@ -46,9 +54,9 @@ const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFu
         offchain_community_id: community.id,
       },
     });
-    if (!userMembership) return next(new Error('Invalid community or chain'));
+    if (!userMembership) return [null, null, ChainCommunityErrors.NotMember];
   }
-  return [chain, community];
+  return [chain, community, null];
 };
 
 export default lookupCommunityIsVisibleToUser;

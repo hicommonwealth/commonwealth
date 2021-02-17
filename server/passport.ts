@@ -54,9 +54,10 @@ function setupPassport(models) {
     const magic = new Magic(MAGIC_API_KEY);
     passport.use(new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
       // determine login location
-      let chain, community;
+      let chain, community, error;
       if (req.body.chain || req.body.community) {
-        [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, cb);
+        [ chain, community, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+        if (error) return cb(error);
       }
       let registrationChain;
       if (chain?.id) {
