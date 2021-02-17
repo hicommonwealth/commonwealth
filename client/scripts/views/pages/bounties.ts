@@ -65,7 +65,7 @@ async function loadCmd() {
     return;
   }
   const chain = (app.chain as Substrate);
-  await chain.treasury.init(chain.chain, chain.accounts);
+  await chain.bounties.init(chain.chain, chain.accounts);
 }
 
 const BountyRow: m.Component<{bounty: AnyProposal}> = {
@@ -96,14 +96,15 @@ const BountyPage: m.Component<{}> = {
       });
     }
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-    if (onSubstrate && !(app.chain as Substrate).treasury.initialized) {
-      if (!(app.chain as Substrate).treasury.initializing) loadCmd();
+    if (onSubstrate && !(app.chain as Substrate).bounties.initialized) {
+      if (!(app.chain as Substrate).bounties.initializing) loadCmd();
       return m(PageLoading, {
         message: 'Connecting to chain (may take up to 10s)...',
         title: 'Bounties',
         showNewProposalButton: true,
       });
     }
+
 
     const activeBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed);
     const inactiveBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => p.completed);
@@ -120,7 +121,7 @@ const BountyPage: m.Component<{}> = {
       title: 'Bounties',
       showNewProposalButton: true,
     }, [
-      m(SubstrateBountyStats),
+      // m(SubstrateBountyStats),
       m(Listing, {
         content: activeBountyContent,
         columnHeader: 'Active Bounties',
