@@ -11,7 +11,8 @@ export const Errors = {
 };
 
 const deleteMembership = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
 
   // Privacy check: Cannot join a private community, but we shouldn't reveal the existence of private communities here
