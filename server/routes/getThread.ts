@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 const getThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  if (error) return next(new Error(error));
 
   let thread;
   try {
