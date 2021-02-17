@@ -105,7 +105,6 @@ const BountyPage: m.Component<{}> = {
       });
     }
 
-    (app.chain as Substrate).bounties.store.getAll();
     const activeBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed);
     const inactiveBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => p.completed);
     const activeBountyContent = activeBounties.length
@@ -115,7 +114,6 @@ const BountyPage: m.Component<{}> = {
     const inactiveBountyContent = inactiveBounties.length
       ? inactiveBounties.map((bounty) => m(BountyRow, { bounty }))
       : [ m('.no-proposals', 'None') ];
-    console.log(inactiveBountyContent);
 
     return m(Sublayout, {
       class: 'BountiesPage TreasuryPage',

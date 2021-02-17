@@ -65,7 +65,7 @@ class SubstrateBountyTreasury extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryProposal);
+    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryBounty);
     const proposals = entities.map((e) => this._entityConstructor(e));
 
     return new Promise((resolve, reject) => {
