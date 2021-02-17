@@ -86,7 +86,12 @@ async function loadCmd() {
     return;
   }
   const chain = (app.chain as Substrate);
-  await chain.treasury.init(chain.chain, chain.accounts);
+  await Promise.all([
+    chain.council.init(chain.chain, chain.accounts),
+    chain.treasury.init(chain.chain, chain.accounts),
+    chain.democracyProposals.init(chain.chain, chain.accounts),
+    chain.democracy.init(chain.chain, chain.accounts),
+  ]);
 }
 
 const TreasuryPage: m.Component<{}> = {

@@ -54,11 +54,11 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   }
 
   if (name) chain.name = name;
+  if (description) chain.description = description;
   if (symbol) chain.symbol = symbol;
   if (icon_url) chain.icon_url = icon_url;
   if (active !== undefined) chain.active = active;
   if (type) chain.type = type;
-  chain.description = description;
   chain.website = website;
   chain.discord = discord;
   chain.element = element;

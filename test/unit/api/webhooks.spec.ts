@@ -51,7 +51,7 @@ describe('Webhook Tests', () => {
       chainOrCommObj: { offchain_community_id: community },
       role: 'admin',
     });
-    await modelUtils.assignRole({
+    await modelUtils.updateRole({
       address_id: result.address_id,
       chainOrCommObj: { chain_id: chain },
       role: 'admin',

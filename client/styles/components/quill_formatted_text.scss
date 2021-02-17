@@ -64,10 +64,11 @@
     }
     pre {
         font-family: $monospace-fonts;
-        font-size: 0.833em;
+        font-size: 0.725em;
+        line-height: 1.4;
         white-space: pre-wrap;
         margin: 22px 0;
-        padding: 12px 16px;
+        padding: 12px 16px 14px;
         background: $background-color-light;
         border-radius: 3px;
     }
