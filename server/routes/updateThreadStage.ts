@@ -15,7 +15,7 @@ const updateThreadStage = async (models, req: Request, res: Response, next: Next
   const { thread_id, stage } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
   if (!stage) return next(new Error(Errors.NoStage));
-  if (!req.user) return next(new Error(Errors.NotAdminOrOwnerOrOwner));
+  if (!req.user) return next(new Error(Errors.NotAdminOrOwner));
 
   try {
     const thread = await models.OffchainThread.findOne({
