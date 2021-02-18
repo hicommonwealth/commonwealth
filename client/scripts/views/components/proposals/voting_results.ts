@@ -14,6 +14,8 @@ import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloc
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 
+const COLLAPSE_VOTERS_AFTER = 6;
+
 const VoteListing: m.Component<{
   proposal: AnyProposal,
   votes : Array<IVote<any>>,
