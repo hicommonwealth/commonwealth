@@ -1,8 +1,7 @@
 import _ from 'underscore';
-import { takeWhile, switchMap, flatMap, take } from 'rxjs/operators';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { VoteOutcome, VoteRecord } from '@edgeware/node-types';
-import { ApiRx } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { Option } from '@polkadot/types';
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
 import {
@@ -57,7 +56,7 @@ export class SignalingVote implements IVote<SubstrateCoin> {
 }
 
 export class EdgewareSignalingProposal
-  extends Proposal<ApiRx, SubstrateCoin, IEdgewareSignalingProposal, SignalingVote> {
+  extends Proposal<ApiPromise, SubstrateCoin, IEdgewareSignalingProposal, SignalingVote> {
   public get shortIdentifier() {
     return `#${this.data.voteIndex.toString()}`;
   }
@@ -170,9 +169,10 @@ export class EdgewareSignalingProposal
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
-    this._subscribeVoters();
-    this._Signaling.store.add(this);
+    this._initVoters().then(() => {
+      this._initialized.next(true);
+      this._Signaling.store.add(this);
+    });
   }
 
   protected complete() {
@@ -223,36 +223,22 @@ export class EdgewareSignalingProposal
   private async _initVoters(): Promise<void> {
     const voteRecord = await this._Chain.api.query.voting.voteRecords<Option<VoteRecord>>(this.data.voteIndex);
     if (voteRecord.isSome) {
-      const balances = voteRecord.unwrap().reveals.map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance);
-    }
-    return this._Chain.api.pipe(
-      switchMap((api: ApiRx) => 
-      takeWhile<Option<VoteRecord>>((v) => v.isSome && this.initialized),
-      // permit one vote query even if completed
-      takeWhile<Option<VoteRecord>>((v) => !this.completed, true),
-
-      // grab latest voter balances as well, to avoid subscribing to each on vote-creation
-      flatMap((v) => combineLatest(
-        of(v),
-        combineLatest(
-          v.unwrap().reveals
-            .map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance)
-        ).pipe(take(1)),
-      )),
-    ).subscribe(([ v, balances ]) => {
-      const record = v.unwrap();
+      const record = voteRecord.unwrap();
+      const balances = await Promise.all(
+        record.reveals.map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance)
+      );
       // eslint-disable-next-line no-restricted-syntax
       for (const [ [ voter, reveals ], balance ] of _.zip(record.reveals, balances)) {
         const acct = this._Accounts.fromAddress(voter.toString());
         this.addOrUpdateVote(new SignalingVote(this, acct, reveals, balance));
       }
-    });
+    }
   }
 
   public submitVoteTx(vote: SignalingVote, cb?) {
     return this._Chain.createTXModalData(
       vote.account,
-      (api: ApiRx) => api.tx.voting.reveal(this.data.voteIndex, vote.choices, null),
+      (api: ApiPromise) => api.tx.voting.reveal(this.data.voteIndex, vote.choices, null),
       'submitSignalingVote',
       this.title,
       cb
