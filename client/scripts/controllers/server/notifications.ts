@@ -99,7 +99,9 @@ class NotificationsController {
 
   public markAsRead(notifications: Notification[]) {
     // TODO: Change to PUT /notificationsRead
-    const unreadNotifications = notifications.filter((notif) => !notif.isRead);
+    const MAX_NOTIFICATIONS_READ = 40; // mark up to 40 notifications read at a time
+    const unreadNotifications = notifications.filter((notif) => !notif.isRead).slice(0, MAX_NOTIFICATIONS_READ);
+    if (unreadNotifications.length === 0) return;
     return post('/markNotificationsRead', {
       'notification_ids[]': unreadNotifications.map((n) => n.id)
     }, (result) => {
@@ -112,7 +114,7 @@ class NotificationsController {
   public clearAllRead() {
     // TODO: Change to DELETE /notificationsRead (combine with mark route)
     return post('/clearReadNotifications', { }, (result) => {
-      const toClear = this._store.getAll().filter((n) => n.isRead);
+      const toClear = this._store.getAll().filter((n) => n.isRead)
       for (const n of toClear) {
         this._store.remove(n);
       }
@@ -120,11 +122,14 @@ class NotificationsController {
   }
 
   public clear(notifications: Notification[]) {
-    // TODO: Decide REST API handling
+    // TODO: Change to PUT /clearNotifications
+    const MAX_NOTIFICATIONS_CLEAR = 40; // clear up to 40 notifications at a time
+    const notificationsToClear = notifications.slice(0, MAX_NOTIFICATIONS_CLEAR);
+    if (notificationsToClear.length === 0) return;
     return post('/clearNotifications', {
-      'notification_ids[]': notifications.slice(0, 200).map((n) => n.id), // Avoid URL too long error
+      'notification_ids[]': notificationsToClear.map((n) => n.id)
     }, async (result) => {
-      notifications.slice(0, 200).map((n) => this._store.remove(n));
+      notificationsToClear.map((n) => this._store.remove(n));
     });
   }
 
