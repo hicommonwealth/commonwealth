@@ -37,9 +37,6 @@ export const proposalSlugToClass = () => {
   if (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot) {
     mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
   }
-  if (app.chain.class === ChainClass.Edgeware) {
-    mmap.set('signalingproposal', (app.chain as any).signaling);
-  }
   if (app.chain.class === ChainClass.Moloch) {
     mmap.set('molochproposal', (app.chain as any).governance);
   }

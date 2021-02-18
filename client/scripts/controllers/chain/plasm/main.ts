@@ -15,7 +15,6 @@ class Plasm extends Substrate {
     this.democracyProposals.disable();
     this.democracy.disable();
     this.treasury.disable();
-    this.signaling.disable();
     this.identities.disable();
   }
 
