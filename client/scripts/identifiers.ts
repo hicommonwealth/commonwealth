@@ -32,6 +32,7 @@ export const proposalSlugToClass = () => {
     mmap.set('councilmotion', (app.chain as any).council);
     mmap.set('phragmenelection', (app.chain as any).phragmenElections);
     mmap.set('treasuryproposal', (app.chain as any).treasury);
+    mmap.set('bountyproposal', (app.chain as any).bounties);
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     mmap.set('cosmosproposal', (app.chain as any).governance);
   }
@@ -58,6 +59,7 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['referendum', 'Democracy Referendum'],
   ['democracyproposal', 'Democracy Proposal'],
   ['democracypreimage', 'Democracy Preimage'],
+  ['bountyproposal', 'Bounty Proposal'],
   ['democracyimminent', 'Democracy Imminent Preimage'],
   ['signalingproposal', 'Signaling Proposal'],
   ['councilmotion', 'Council Motion'],

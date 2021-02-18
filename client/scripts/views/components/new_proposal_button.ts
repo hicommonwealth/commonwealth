@@ -51,13 +51,12 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
         }),
         label: 'New council motion'
       }),
-      app.chain?.base === ChainBase.Substrate && app.chain?.class !== ChainClass.Plasm && [
-        m(MenuItem, {
-          onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
-            type: ProposalType.SubstrateBountyProposal,
-          }),
-          label: 'New bounty'
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          type: ProposalType.SubstrateBountyProposal,
         }),
+        label: 'New bounty proposal'
+      }),
       candidates
         && [
           m(MenuDivider),
