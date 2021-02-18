@@ -1,21 +1,13 @@
 import m from 'mithril';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
-import { switchMap, catchError, map, shareReplay, first, filter, throwIfEmpty } from 'rxjs/operators';
-import { of, combineLatest, Observable, Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
 
-import { ApiRx, WsProvider, SubmittableResult, Keyring, ApiPromise } from '@polkadot/api';
+import { WsProvider, SubmittableResult, Keyring, ApiPromise } from '@polkadot/api';
 import { u8aToHex } from '@polkadot/util';
 import {
-  Moment,
   Balance,
-  EventRecord,
-  BlockNumber,
-  Index,
   Hash,
-  AccountId,
-  ChainProperties,
   DispatchError,
   ActiveEraInfo,
   EraIndex,
@@ -23,8 +15,8 @@ import {
   Call
 } from '@polkadot/types/interfaces';
 
-import { Vec, Compact } from '@polkadot/types/codec';
-import { ApiOptions, Signer, SubmittableExtrinsic, SubmittableResultSubscription, VoidFn } from '@polkadot/api/types';
+import { Compact } from '@polkadot/types/codec';
+import { ApiOptions, Signer, SubmittableExtrinsic, VoidFn } from '@polkadot/api/types';
 
 import { formatCoin } from 'adapters/currency';
 import { BlocktimeHelper } from 'helpers';
@@ -426,7 +418,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     txFunc: (api: ApiPromise) => SubmittableExtrinsic<'promise'>,
     additionalDeposit?: SubstrateCoin,
   ): Promise<boolean> {
-    const senderBalance = await sender.freeBalance.pipe(first()).toPromise();
+    const senderBalance = await sender.freeBalance;
     const netBalance = additionalDeposit ? senderBalance.sub(additionalDeposit) : senderBalance;
     let fees: SubstrateCoin;
     if (sender.chainClass === ChainClass.Edgeware) {

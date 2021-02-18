@@ -220,9 +220,13 @@ export class EdgewareSignalingProposal
     }
   }
 
-  private _subscribeVoters(): Unsubscribable {
+  private async _initVoters(): Promise<void> {
+    const voteRecord = await this._Chain.api.query.voting.voteRecords<Option<VoteRecord>>(this.data.voteIndex);
+    if (voteRecord.isSome) {
+      const balances = voteRecord.unwrap().reveals.map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance);
+    }
     return this._Chain.api.pipe(
-      switchMap((api: ApiRx) => api.query.voting.voteRecords<Option<VoteRecord>>(this.data.voteIndex)),
+      switchMap((api: ApiRx) => 
       takeWhile<Option<VoteRecord>>((v) => v.isSome && this.initialized),
       // permit one vote query even if completed
       takeWhile<Option<VoteRecord>>((v) => !this.completed, true),
