@@ -151,7 +151,7 @@ class SubstrateDemocracyProposal extends Proposal<
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
+    this._initialized = true;
     this._initDepositors();
     this._Proposals.store.add(this);
   }

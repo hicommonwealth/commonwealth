@@ -126,7 +126,7 @@ export class SubstrateTreasuryProposal
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
+    this._initialized = true;
     this._Treasury.store.add(this);
   }
 

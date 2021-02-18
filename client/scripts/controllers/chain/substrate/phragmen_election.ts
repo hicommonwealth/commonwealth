@@ -99,7 +99,7 @@ export class SubstratePhragmenElection extends Proposal<
     this._title = `Set council votes for election ${data.round}`;
     this.moduleName = moduleName;
 
-    this._initialized.next(true);
+    this._initialized = true;
     this._initCandidates();
     this._initVotes();
     this._Elections.store.add(this);

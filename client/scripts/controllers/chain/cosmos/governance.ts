@@ -77,7 +77,6 @@ class CosmosGovernance extends ProposalModule<
               return of(props);
             } else {
               return of(props);
-              // return forkJoin(props.map((p) => p.initialized$)).pipe(map(() => props));
             }
           })
         ).subscribe((props: CosmosProposal[]) => {

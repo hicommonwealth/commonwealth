@@ -112,7 +112,7 @@ export class SubstrateCollectiveProposal
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
+    this._initialized = true;
     this._initVoters();
     this._Collective.store.add(this);
   }

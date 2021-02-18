@@ -1,12 +1,10 @@
 import BN from 'bn.js';
 import moment from 'moment-twitter';
-import { Observable } from 'rxjs';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';
 import { TransactionStatus } from './types';
 import Account from './Account';
 import StorageModule from './StorageModule';
-import { IApp } from '../state';
 
 export interface IBlockInfo {
   height: number;

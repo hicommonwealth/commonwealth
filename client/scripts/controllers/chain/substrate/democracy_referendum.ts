@@ -12,7 +12,6 @@ import {
   ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
-import { BehaviorSubject } from 'rxjs';
 import { Coin } from 'adapters/currency';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
@@ -215,7 +214,7 @@ export class SubstrateDemocracyReferendum
     // handle events params for passing, if exists at init time
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
+    this._initialized = true;
     this._initVoters();
     this._Democracy.store.add(this);
   }

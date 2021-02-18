@@ -324,7 +324,7 @@ export class CosmosProposal extends Proposal<
   protected updateState(store: ProposalStore<CosmosProposal>, state: ICosmosProposalState) {
     if (!state) return;
     if (!this.initialized) {
-      this._initialized.next(true);
+      this._initialized = true;
     }
     this._status = state.status;
     this._tally = state.tally;
