@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 
 import { AddressAttributes } from './address';
-import { ChainAttributes } from './chain';
+import { ChainAttributes, ChainInstance } from './chain';
 import { StarredCommunityAttributes } from './starred_community';
 import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainThreadAttributes } from './offchain_thread';
