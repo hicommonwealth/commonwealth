@@ -346,6 +346,12 @@ button, .cui-button {
     }
 }
 
+// adjust select height
+.cui-select select {
+    height: 41px;
+    padding-top: 5px;
+}
+
 // adjust card padding
 .cui-card {
     padding: 1.3em 1.2em 1em;
