@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
-import { switchMap, catchError, map, shareReplay, first, filter } from 'rxjs/operators';
+import { switchMap, catchError, map, shareReplay, first, filter, throwIfEmpty } from 'rxjs/operators';
 import { of, combineLatest, Observable, Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
 
@@ -24,7 +24,7 @@ import {
 } from '@polkadot/types/interfaces';
 
 import { Vec, Compact } from '@polkadot/types/codec';
-import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
+import { ApiOptions, Signer, SubmittableExtrinsic, SubmittableResultSubscription, VoidFn } from '@polkadot/api/types';
 
 import { formatCoin } from 'adapters/currency';
 import { BlocktimeHelper } from 'helpers';
@@ -63,9 +63,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   private _existentialdeposit: SubstrateCoin;
   public get existentialdeposit() { return this._existentialdeposit; }
 
-  private _creationfee: SubstrateCoin;
-  public get creationfee() { return this._creationfee; }
-
   private _metadataInitialized: boolean = false;
   public get metadataInitialized() { return this._metadataInitialized; }
 
@@ -94,13 +91,10 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   private readonly _silencedEvents = { };
 
-  private _blockSubscription: Unsubscribable;
-  private _timestampSubscription: Unsubscribable;
-  private _eventSubscription: Unsubscribable;
+  private _blockSubscription: VoidFn;
 
   private _suppressAPIDisconnectErrors: boolean = false;
-  private _api: ApiRx;
-  private _apiPromise: ApiPromise;
+  private _api: ApiPromise;
 
   private _reservationFee: SubstrateCoin;
   public get reservationFee() { return this._reservationFee; }
@@ -123,12 +117,12 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   public createType<K extends keyof InterfaceTypes>(type: K, ...params: any[]): InterfaceTypes[K] {
-    return this._api.registry.createType(type, ...params);
+    return this.api.registry.createType(type, ...params);
   }
   public findCall(callIndex: Uint8Array | string): CallFunction {
-    return this._api.findCall(callIndex);
+    return this.api.findCall(callIndex);
   }
-  public get registry() { return this._api.registry; }
+  public get registry() { return this.api.registry; }
 
   private _connectTime = 0;
   private _timedOut: boolean = false;
@@ -200,7 +194,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return provider;
   }
 
-  public async resetApi(selectedNode: NodeInfo, additionalOptions?): Promise<ApiRx> {
+  public async resetApi(selectedNode: NodeInfo, additionalOptions?): Promise<ApiPromise> {
     const provider = await this.createApiProvider(selectedNode);
 
     // note that we reuse the same provider and type registry to create both an rxjs
@@ -209,10 +203,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       provider,
       ...additionalOptions,
     };
-    this._api = await ApiRx.create(options).toPromise();
-
-    // clone API as promise (reuse type registry)
-    this._apiPromise = await ApiPromise.create({ source: this._api, ...options });
+    this._api = await ApiPromise.create(options);
     return this._api;
   }
 
@@ -220,36 +211,35 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   private _removeDisconnectedCb: () => void;
   private _removeErrorCb: () => void;
 
-  public deinitApi() {
-    if (!this._api) return;
+  public async deinitApi() {
+    if (!this.api) return;
     try {
-      this._api.disconnect();
+      await this.api.disconnect();
       if (this._removeConnectedCb) this._removeConnectedCb();
       if (this._removeDisconnectedCb) this._removeDisconnectedCb();
       if (this._removeErrorCb) this._removeErrorCb();
       this._api = null;
-      this._apiPromise = null;
     } catch (e) {
       console.error('Error disconnecting from API, it might already be disconnected.');
     }
   }
 
-  public get api(): Observable<ApiRx> {
-    if (!this._api) {
+  public get api(): ApiPromise {
+    if (!this.api) {
       throw new Error('Must initialize API before using.');
     }
-    return this._api.isReady;
+    return this._api;
   }
 
   public get apiInitialized() : boolean {
-    return !!this._api;
+    return !!this.api;
   }
 
   // load existing events and subscribe to future via client node connection
   public initChainEntities(): Promise<void> {
-    this._fetcher = new SubstrateEvents.StorageFetcher(this._apiPromise);
-    const subscriber = new SubstrateEvents.Subscriber(this._apiPromise);
-    const processor = new SubstrateEvents.Processor(this._apiPromise);
+    this._fetcher = new SubstrateEvents.StorageFetcher(this.api);
+    const subscriber = new SubstrateEvents.Subscriber(this.api);
+    const processor = new SubstrateEvents.Processor(this.api);
     return this._app.chain.chainEntities.subscribeEntities(
       this._app.chain.id,
       subscriber,
@@ -257,29 +247,25 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     );
   }
 
-  public query<T>(fn: (api: ApiRx) => Observable<T>): Observable<T> {
-    return this.api.pipe(switchMap((api: ApiRx) => fn(api)));
-  }
-
   public listApiModules() {
-    if (!this._api.tx) {
+    if (!this.api.tx) {
       return [];
     }
-    return Object.keys(this._api.tx).filter((mod) => !!(mod.trim()));
+    return Object.keys(this.api.tx).filter((mod) => !!(mod.trim()));
   }
 
   public listModuleFunctions(mod : string) {
-    if (!mod || !this._api.tx) {
+    if (!mod || !this.api.tx) {
       return [];
     }
-    return Object.keys(this._api.tx[mod] || {}).filter((modName) => !!(modName.trim()));
+    return Object.keys(this.api.tx[mod] || {}).filter((modName) => !!(modName.trim()));
   }
 
   public generateArgumentInputs(mod: string, func: string) {
     if (!mod || !func) {
       return [];
     }
-    const tx = this._api.tx[mod][func];
+    const tx = this.api.tx[mod][func];
     const args = tx.meta.args;
     return args.toArray();
   }
@@ -288,15 +274,15 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     if (!mod || !func) {
       return null;
     }
-    return this._api.tx[mod][func](...args);
+    return this.api.tx[mod][func](...args);
   }
 
   public getTxMethod(mod: string, func: string, args: any[]): Call {
-    const result = this._api.tx[mod][func];
+    const result = this.api.tx[mod][func];
     if (!result) {
       throw new Error(`unsupported transaction: ${mod}::${func}`);
     }
-    return this._api.findCall(result.callIndex)(...args);
+    return this.api.findCall(result.callIndex)(...args);
   }
 
   public deinitMetadata() {
@@ -305,82 +291,53 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   // Loads chain metadata such as issuance and block period
   // TODO: lazy load this
-  public initMetadata(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.api.pipe(
-        switchMap((api: ApiRx) => {
-          return combineLatest(
-            api.rpc.system.chain(),
-            api.rpc.system.version(),
-            api.rpc.system.name(),
-            of(api.consts.timestamp.minimumPeriod),
-            api.derive.chain.bestNumber(),
-            api.query.balances.totalIssuance(),
-            of(api.consts.balances.existentialDeposit),
-            of(api.consts.balances.creationFee),
-            api.query.sudo ? api.query.sudo.key() : of(null),
-            api.rpc.system.properties(),
-            api.consts.nicks ? of(api.consts.nicks.reservationFee) : of(null),
-          );
-        }),
-        first(), // TODO: leave this open?
-      ).subscribe(([
-        chainname, chainversion, chainruntimename, minimumperiod, blockNumber,
-        totalbalance, existentialdeposit, creationfee, sudokey,
-        chainProps, reservationFee,
-      ]: [
-          string, string, string, Moment, BlockNumber,
-          Balance, Balance, Balance, AccountId, ChainProperties, Balance
-      ]) => {
-        this.app.chain.name = chainname;
-        this.app.chain.version = chainversion;
-        this.app.chain.runtimeName = chainruntimename;
+  public async initMetadata(): Promise<void> {
+    const chainname = await this.api.rpc.system.chain();
+    const chainversion = await this.api.rpc.system.version();
+    const chainruntimename = await this.api.rpc.system.name();
+    const minimumperiod = this.api.consts.timestamp.minimumPeriod;
+    const blockNumber = await this.api.derive.chain.bestNumber();
+    const totalbalance = await this.api.query.balances.totalIssuance();
+    const existentialdeposit = this.api.consts.balances.existentialDeposit;
+    const sudokey = this.api.query.sudo ? (await this.api.query.sudo.key()) : null;
+    const chainProps = await this.api.rpc.system.properties();
+    const reservationFee = this.api.consts.nicks ? (this.api.consts.nicks.reservationFee as Balance) : null;
+    this.app.chain.name = chainname.toString();
+    this.app.chain.version = chainversion.toString();
+    this.app.chain.runtimeName = chainruntimename.toString();
 
-        this.app.chain.block.height = +blockNumber;
-        // TODO: this is still wrong on edgeware local -- fix chain spec to get 4s rather than 8s blocktimes
-        this.app.chain.block.duration = (+minimumperiod * 2) / 1000;
+    this.app.chain.block.height = +blockNumber;
+    // TODO: this is still wrong on edgeware local -- fix chain spec to get 4s rather than 8s blocktimes
+    this.app.chain.block.duration = (+minimumperiod * 2) / 1000;
 
-        // chainProps needs to be set first so calls to coins() correctly populate the denom
-        if (chainProps) {
-          const { ss58Format, tokenDecimals, tokenSymbol } = chainProps;
-          this.registry.setChainProperties(this.createType('ChainProperties', { ...chainProps, ss58Format }));
-          this._ss58Format = +ss58Format.unwrapOr(42);
-          this._tokenDecimals = +tokenDecimals.unwrapOr([ 12 ])[0];
-          this._tokenSymbol = `${tokenSymbol.unwrapOr([ this.app.chain.currency ])[0]}`;
-        }
+    // chainProps needs to be set first so calls to coins() correctly populate the denom
+    if (chainProps) {
+      const { ss58Format, tokenDecimals, tokenSymbol } = chainProps;
+      this.registry.setChainProperties(this.createType('ChainProperties', { ...chainProps, ss58Format }));
+      this._ss58Format = +ss58Format.unwrapOr(42);
+      this._tokenDecimals = +tokenDecimals.unwrapOr([ 12 ])[0];
+      this._tokenSymbol = `${tokenSymbol.unwrapOr([ this.app.chain.currency ])[0]}`;
+    }
 
-        this._totalbalance = this.coins(totalbalance);
-        this._existentialdeposit = this.coins(existentialdeposit);
-        this._creationfee = this.coins(creationfee);
-        this._sudoKey = sudokey ? sudokey.toString() : undefined;
-        this._reservationFee = reservationFee ? this.coins(reservationFee) : null;
+    this._totalbalance = this.coins(totalbalance);
+    this._existentialdeposit = this.coins(existentialdeposit);
+    this._sudoKey = sudokey ? sudokey.toString() : undefined;
+    this._reservationFee = reservationFee ? this.coins(reservationFee) : null;
 
-        // redraw
-        m.redraw();
+    // redraw
+    m.redraw();
 
-        // grab last timestamps from storage and use to compute blocktime
-        const TIMESTAMP_LOOKBACK = 5;
-        this.api.pipe(
-          switchMap((api: ApiRx) => {
-            const blockNumbers = [...Array(TIMESTAMP_LOOKBACK).keys()].map((i) => +blockNumber - i - 1);
-            return combineLatest(api.query.system.blockHash.multi(blockNumbers), of(api));
-          }),
-          switchMap(([hashes, api]: [Hash[], ApiRx]) => combineLatest(
-            hashes.map((hash) => api.query.timestamp.now.at(hash))
-          )),
-          first(),
-        ).subscribe((timestamps: Moment[]) => {
-          const blocktimeHelper = new BlocktimeHelper();
-          for (const timestamp of timestamps.reverse()) {
-            blocktimeHelper.stamp(moment(+timestamp));
-          }
-          this.app.chain.block.duration = blocktimeHelper.blocktime;
-          this._metadataInitialized = true;
-          resolve();
-        });
-      },
-      (err) => reject(new Error(err)));
-    });
+    // grab last timestamps from storage and use to compute blocktime
+    const TIMESTAMP_LOOKBACK = 5;
+    const blockNumbers = [...Array(TIMESTAMP_LOOKBACK).keys()].map((i) => +blockNumber - i - 1);
+    const hashes = await this.api.query.system.blockHash.multi<Hash>(blockNumbers);
+    const timestamps = await Promise.all(hashes.map((hash) => this.api.query.timestamp.now.at(hash)));
+    const blocktimeHelper = new BlocktimeHelper();
+    for (const timestamp of timestamps.reverse()) {
+      blocktimeHelper.stamp(moment(+timestamp));
+    }
+    this.app.chain.block.duration = blocktimeHelper.blocktime;
+    this._metadataInitialized = true;
   }
 
   public silenceEvent(moduleName: string, eventName: string) {
@@ -403,29 +360,31 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     for (const event of Object.keys(this._silencedEvents)) {
       delete this._silencedEvents[event];
     }
-    if (this._eventSubscription) {
-      this._eventSubscription.unsubscribe();
-    }
     if (this._blockSubscription) {
-      this._blockSubscription.unsubscribe();
-    }
-    if (this._timestampSubscription) {
-      this._timestampSubscription.unsubscribe();
+      this._blockSubscription();
     }
   }
 
-  public initEventLoop() {
-    // grab block numbers from header
-    this._blockSubscription = this.api.pipe(
-      switchMap((api: ApiRx) => combineLatest(
-        api.derive.chain.bestNumber(),
-        api.query.timestamp.now()
-      ))
-    ).subscribe(([blockNumber, timestamp]: [BlockNumber, Moment]) => {
+  public async initEventLoop() {
+    // silence annoying events in the console
+    this.silenceEvent('system', 'ExtrinsicSuccess');
+    // TODO: these two should NOT be silenced in production
+    this.silenceEvent('staking', 'OfflineSlash');
+    this.silenceEvent('staking', 'OfflineWarning');
+    this.silenceEvent('session', 'NewSession');
+    this.silenceEvent('imOnline', 'HeartbeatReceived');
+    this.silenceEvent('treasuryReward', 'TreasuryMinting');
+
+    this._blockSubscription = await this.api.derive.chain.subscribeNewBlocks(async (signedBlock) => {
       // if app.chain has gone away, just return -- the subscription should be removed soon
       if (!this.app.chain) return;
 
+      const block = signedBlock.block;
+      const blockNumber = block.header.number;
+      const timestamp = await this.api.query.timestamp.now();
       this.app.chain.block.height = +blockNumber;
+
+      // update timestamp and handle stalling
       const blocktime = moment(+timestamp);
       if (this.app.chain.block.lastTime) {
         const computedDuration = blocktime.seconds() - this.app.chain.block.lastTime.seconds();
@@ -437,25 +396,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         }
       }
       this.app.chain.block.lastTime = blocktime;
-      m.redraw();
-    });
 
-    // silence annoying events in the console
-    this.silenceEvent('system', 'ExtrinsicSuccess');
-    // TODO: these two should NOT be silenced in production
-    this.silenceEvent('staking', 'OfflineSlash');
-    this.silenceEvent('staking', 'OfflineWarning');
-    this.silenceEvent('session', 'NewSession');
-    this.silenceEvent('imOnline', 'HeartbeatReceived');
-    this.silenceEvent('treasuryReward', 'TreasuryMinting');
-
-    // init main event loop
-    this._eventSubscription = this.api.pipe(
-      switchMap((api: ApiRx) => api.query.system.events()),
-    ).subscribe((events: Vec<EventRecord>) => {
-      // if app.chain has gone away, just return -- the subscription should be removed soon
-      if (!this.app.chain) return;
-      events.forEach((record) => {
+      // update events
+      signedBlock.events.forEach((record) => {
         // extract the phase, event and the event types
         const { event, phase } = record;
         const types = event.typeDef;
@@ -471,9 +414,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           }
         }
       });
-    },
-    (err: string) => {
-      console.error(`Failed to get chain events: ${err}`);
+      m.redraw();
     });
     this._eventsInitialized = true;
   }
@@ -482,7 +423,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   //   and shown at TX creation time
   public async canPayFee(
     sender: SubstrateAccount,
-    txFunc: (api: ApiRx) => SubmittableExtrinsic<'rxjs'>,
+    txFunc: (api: ApiPromise) => SubmittableExtrinsic<'promise'>,
     additionalDeposit?: SubstrateCoin,
   ): Promise<boolean> {
     const senderBalance = await sender.freeBalance.pipe(first()).toPromise();
@@ -502,22 +443,15 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   public async computeFees(
     senderAddress: string,
-    txFunc: (api: ApiRx) => SubmittableExtrinsic<'rxjs'>,
+    txFunc: (api: ApiPromise) => SubmittableExtrinsic<'promise'>,
   ): Promise<SubstrateCoin> {
-    return new Promise((resolve, reject) => {
-      this.api.pipe(
-        switchMap((api: ApiRx) => {
-          return txFunc(api).paymentInfo(senderAddress);
-        }),
-      ).subscribe((fees) => {
-        resolve(this.coins(fees.partialFee.toBn()));
-      }, (error) => reject(error));
-    });
+    return txFunc(this.api).paymentInfo(senderAddress)
+      .then((fees) => this.coins(fees.partialFee.toBn()));
   }
 
   public createTXModalData(
     author: SubstrateAccount,
-    txFunc,
+    txFunc: (api: ApiPromise) => SubmittableExtrinsic<'promise'>,
     txName: string,
     objName: string,
     cb?: (success: boolean) => void, // TODO: remove this argument
@@ -528,103 +462,85 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       txType: txName,
       cb,
       txData: {
-        unsignedData: (): Promise<ISubstrateTXData> => {
-          return new Promise((resolve, reject) => {
-            this.api.pipe(
-              switchMap((api: ApiRx) => {
-                return combineLatest(
-                  of(txFunc(api).method.toHex()),
-                  api.query.system.accountNonce
-                    ? api.query.system.accountNonce(author.address)
-                    : api.query.system.account(author.address).pipe(map((a) => a.nonce)),
-                  of(api.genesisHash)
-                );
-              }),
-              switchMap(([txHex, nonce, genesisHash]: [string, Index, Hash]): Observable<ISubstrateTXData> => {
-                return of({
-                  call: txHex,
-                  nonce: nonce.toNumber().toString(),
-                  blockHash: genesisHash.toHex(),
-                  isEd25519: author.isEd25519,
-                });
-              }),
-              first(),
-            ).subscribe(
-              (data) => resolve(data),
-              (error) => reject(new Error(error)),
-            );
-          });
+        unsignedData: async (): Promise<ISubstrateTXData> => {
+          const txHex = txFunc(this.api).method.toHex();
+          const nonce = this.api.query.system.accountNonce
+            ? await this.api.query.system.accountNonce(author.address)
+            : (await this.api.query.system.account(author.address)).nonce;
+          const genesisHash = this.api.genesisHash.toHex();
+          return {
+            call: txHex,
+            nonce: (+nonce).toString(),
+            blockHash: genesisHash,
+            isEd25519: author.isEd25519,
+          };
         },
-        transact: (hexTxOrAddress?: string, signer?: Signer): Observable<ITransactionResult> => {
-          return this.api.pipe(
-            switchMap((api: ApiRx) => {
-              if (signer) {
-                api.setSigner(signer);
-              }
-              return combineLatest(
-                of(api),
-                signer ? txFunc(api).signAndSend(hexTxOrAddress)
-                  : hexTxOrAddress ? api.tx(hexTxOrAddress).send()
-                    : txFunc(api).signAndSend(author.getKeyringPair())
-              );
-            }),
-            map(([api, result]: [ApiRx, SubmittableResult]) => {
-              const status = result.status;
-              if (status.isReady) {
-                notifySuccess(`Pending ${txName}: "${objName}"`);
-                return { status: TransactionStatus.Ready };
-              }
-              if (status.isFinalized) {
-                for (const e of result.events) {
-                  const { data, method, section } = e.event;
-                  if (section === 'system') {
-                    if (method === 'ExtrinsicSuccess') {
-                      notifySuccess(`Confirmed ${txName}: "${objName}"`);
-                      return {
-                        status: TransactionStatus.Success,
-                        hash: status.asFinalized.toHex(),
-                        blocknum: this.app.chain.block.height,
-                        timestamp: this.app.chain.block.lastTime,
-                      };
-                    } else if (method === 'ExtrinsicFailed') {
-                      const errorData = data[0] as DispatchError;
-                      let errorInfo;
-                      if (errorData.isModule) {
-                        const details = this.registry.findMetaError(errorData.asModule.toU8a());
-                        errorInfo = `${details.section}::${details.name}: ${details.documentation[0]}`;
-                      } else if (errorData.isBadOrigin) {
-                        errorInfo = 'TX Error: invalid sender origin';
-                      } else if (errorData.isCannotLookup) {
-                        errorInfo = 'TX Error: cannot lookup call';
-                      } else {
-                        errorInfo = 'TX Error: unknown';
-                      }
-                      console.error(errorInfo);
-                      notifyError(`Failed ${txName}: "${objName}"`);
-                      return {
-                        status: TransactionStatus.Failed,
-                        hash: status.asFinalized.toHex(),
-                        blocknum: this.app.chain.block.height,
-                        timestamp: this.app.chain.block.lastTime,
-                        err: errorInfo,
-                      };
+        transact: (txCb: (r: ITransactionResult) => void, hexTxOrAddress?: string, signer?: Signer): void => {
+          let unsubscribe: Promise<VoidFn>;
+          const txResultHandler = (result: SubmittableResult) => {
+            const status = result.status;
+            if (status.isReady) {
+              notifySuccess(`Pending ${txName}: "${objName}"`);
+              txCb({ status: TransactionStatus.Ready });
+            } else if (status.isFinalized) {
+              for (const e of result.events) {
+                const { data, method, section } = e.event;
+                if (section === 'system') {
+                  if (method === 'ExtrinsicSuccess') {
+                    notifySuccess(`Confirmed ${txName}: "${objName}"`);
+                    txCb({
+                      status: TransactionStatus.Success,
+                      hash: status.asFinalized.toHex(),
+                      blocknum: this.app.chain.block.height,
+                      timestamp: this.app.chain.block.lastTime,
+                    });
+                    if (unsubscribe) unsubscribe.then((u) => u());
+                  } else if (method === 'ExtrinsicFailed') {
+                    const errorData = data[0] as DispatchError;
+                    let errorInfo;
+                    if (errorData.isModule) {
+                      const details = this.registry.findMetaError(errorData.asModule.toU8a());
+                      errorInfo = `${details.section}::${details.name}: ${details.documentation[0]}`;
+                    } else if (errorData.isBadOrigin) {
+                      errorInfo = 'TX Error: invalid sender origin';
+                    } else if (errorData.isCannotLookup) {
+                      errorInfo = 'TX Error: cannot lookup call';
+                    } else {
+                      errorInfo = 'TX Error: unknown';
                     }
+                    console.error(errorInfo);
+                    notifyError(`Failed ${txName}: "${objName}"`);
+                    txCb({
+                      status: TransactionStatus.Failed,
+                      hash: status.asFinalized.toHex(),
+                      blocknum: this.app.chain.block.height,
+                      timestamp: this.app.chain.block.lastTime,
+                      err: errorInfo,
+                    });
+                    if (unsubscribe) unsubscribe.then((u) => u());
                   }
                 }
               }
-            }),
-            catchError((err) => {
-              if (err.message.indexOf('1014: Priority is too low') !== -1) {
-                notifyError('Another transaction is already queued for processing');
-              } else {
-                notifyError(err.toString());
-              }
-              m.redraw();
-              return of({ status: TransactionStatus.Error, err: err.toString() });
-            }),
-            filter((txResult) => !!txResult),
-            shareReplay(),
-          );
+            }
+          };
+          try {
+            if (signer) {
+              this.api.setSigner(signer);
+              unsubscribe = txFunc(this.api).signAndSend(hexTxOrAddress, txResultHandler);
+            } else if (hexTxOrAddress) {
+              unsubscribe = this.api.tx(hexTxOrAddress).send(txResultHandler);
+            } else {
+              unsubscribe = txFunc(this.api).signAndSend(author.getKeyringPair(), txResultHandler);
+            }
+          } catch (err) {
+            if (err.message.indexOf('1014: Priority is too low') !== -1) {
+              notifyError('Another transaction is already queued for processing');
+            } else {
+              notifyError(err.toString());
+            }
+            m.redraw();
+            txCb({ status: TransactionStatus.Error, err: err.toString() });
+          }
         },
       }
     };
@@ -653,43 +569,21 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return `${name}(${args.reduce((prev, curr, idx) => prev + (idx > 0 ? ', ' : '') + curr, '')})`;
   }
 
-  public get currentEra(): Observable<EraIndex> {
-    return this.query((api: ApiRx) => api.query.staking.currentEra<EraIndex>())
-      .pipe(map((era: EraIndex) => {
-        if (era) {
-          return era;
-        } else {
-          return null;
-        }
-      }));
+  public get currentEra(): Promise<EraIndex> {
+    return this.api.query.staking.currentEra<EraIndex>();
   }
 
-  public get activeEra(): Observable<ActiveEraInfo> {
-    return this.query((api: ApiRx) => {
-      if (api.query.staking.activeEra) {
-        return api.query.staking.activeEra();
-      } else {
-        return of(null);
-      }
-    })
-      .pipe(map((era: ActiveEraInfo) => {
-        if (era) {
-          return era;
-        } else {
-          return null;
-        }
-      }));
+  public get activeEra(): Promise<ActiveEraInfo> {
+    if (this.api.query.staking.activeEra) {
+      return this.api.query.staking.activeEra()
+        .then((eraOpt) => eraOpt.unwrapOr(null));
+    } else {
+      return Promise.resolve(null);
+    }
   }
 
-  public get session(): Observable<SessionIndex> {
-    return this.query((api: ApiRx) => api.query.session.currentIndex())
-      .pipe(map((sessionInx) => {
-        if (sessionInx) {
-          return sessionInx;
-        } else {
-          return null;
-        }
-      }));
+  public get session(): Promise<SessionIndex> {
+    return this.api.query.session.currentIndex();
   }
 }
 

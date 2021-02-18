@@ -66,7 +66,7 @@ export interface ITXModalData {
     unsignedData: () => Promise<ITXData>,
 
     // perform transaction
-    transact: () => Observable<ITransactionResult>
+    transact: (txCb: (r: ITransactionResult) => void) => void,
   };
 
   // callback triggered upon exit

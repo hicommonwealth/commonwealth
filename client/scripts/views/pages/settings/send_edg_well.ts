@@ -48,19 +48,7 @@ const getBalanceTransferChecks = (
     ]);
   }
 
-  const creationFee = (app.chain as Substrate).chain.creationfee;
-  if (canTransfer && recipientBalance.eqn(0) && creationFee) {
-    if (creationFee.gtn(0)) {
-      checks.push([
-        featherIcon('info', 14, 2, '#444'),
-        `Account creation fee: ${formatCoin((app.chain as Substrate).chain.creationfee)}`
-      ]);
-    }
-  }
-
-  const resultingBalance = app.chain.chain.coins(recipientBalance.add(recipientBalance.gtn(0)
-    ? amount.sub(txFee)
-    : (creationFee) ? amount.sub(txFee).sub(creationFee) : amount.sub(txFee)));
+  const resultingBalance = app.chain.chain.coins(recipientBalance.add(amount.sub(txFee)));
   if (recipientBalance.eqn(0) && resultingBalance.lt((app.chain as Substrate).chain.existentialdeposit)) {
     checks.push([
       featherIcon('slash', 14, 2, '#444'),
