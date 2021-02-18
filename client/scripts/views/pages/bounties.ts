@@ -68,18 +68,6 @@ async function loadCmd() {
   await chain.bounties.init(chain.chain, chain.accounts);
 }
 
-const BountyRow: m.Component<{bounty: AnyProposal}> = {
-  view: (vnode) => {
-    const { bounty } = vnode.attrs;
-    return m('', [
-      m('h4', `${bounty.title}`),
-      m('span', `${(bounty as SubstrateBounty).bond.format(true)} `),
-      m('span', 'managed by '),
-      m(User, { user: bounty.author }),
-    ]);
-  }
-};
-
 const BountyPage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
