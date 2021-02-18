@@ -1,6 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
-import { ApiRx } from '@polkadot/api';
-
+import { ApiPromise } from '@polkadot/api';
 import { formatCoin } from 'adapters/currency';
 import { ISubstrateTreasuryProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
@@ -28,7 +26,7 @@ const backportEventToAdapter = (
 };
 
 export class SubstrateTreasuryProposal
-  extends Proposal<ApiRx, SubstrateCoin, ISubstrateTreasuryProposal, null> {
+  extends Proposal<ApiPromise, SubstrateCoin, ISubstrateTreasuryProposal, null> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
@@ -44,7 +42,8 @@ export class SubstrateTreasuryProposal
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
 
-  private _awarded: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private _awarded: boolean = false;
+  get awarded() { return this._awarded; }
 
   public readonly value: SubstrateCoin;
   public readonly bond: SubstrateCoin;
@@ -144,12 +143,12 @@ export class SubstrateTreasuryProposal
         break;
       }
       case SubstrateTypes.EventKind.TreasuryAwarded: {
-        this._awarded.next(true);
+        this._awarded = true;
         this.complete();
         break;
       }
       case SubstrateTypes.EventKind.TreasuryRejected: {
-        this._awarded.next(false);
+        this._awarded = false;
         this.complete();
         break;
       }
@@ -165,8 +164,5 @@ export class SubstrateTreasuryProposal
   // TRANSACTIONS
   public submitVoteTx(vote: BinaryVote<SubstrateCoin>): ITXModalData {
     throw new Error('Cannot vote on a treasury proposal');
-  }
-  get awarded() {
-    return this._awarded.getValue();
   }
 }

@@ -138,14 +138,14 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   // Accounts may set a proxy that can take council and democracy actions on behalf of their account
   public get proxyFor(): Observable<SubstrateAccount> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.query((api: ApiPromise) => api.query.democracy.proxy(this.address))
-      .pipe(map((proxy) => {
+    return this._Chain.api.query.democracy.proxy(this.address)
+      .then((proxy) => {
         if (proxy && proxy.isSome) {
           return this._Accounts.fromAddress(proxy.unwrap().toString());
         } else {
           return null;
         }
-      }));
+      });
   }
   */
 

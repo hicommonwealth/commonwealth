@@ -138,13 +138,11 @@ export class CosmosProposal extends Proposal<
         tally: null,
       };
       if (depositResp) {
-        // eslint-disable-next-line no-restricted-syntax
         for (const deposit of depositResp) {
           state.depositors.push([ deposit.depositor, deposit.amount.amount ]);
         }
       }
       if (voteResp) {
-        // eslint-disable-next-line no-restricted-syntax
         for (const voter of voteResp) {
           const vote = voteToEnum(voter.option);
           if (vote) {
@@ -312,7 +310,6 @@ export class CosmosProposal extends Proposal<
       return;
     }
     if (voteResp) {
-      // eslint-disable-next-line no-restricted-syntax
       for (const voter of voteResp) {
         const vote = voteToEnum(voter.option);
         if (vote) {
@@ -331,11 +328,9 @@ export class CosmosProposal extends Proposal<
     }
     this._status = state.status;
     this._tally = state.tally;
-    // eslint-disable-next-line no-restricted-syntax
     for (const [ voterAddr, choice ] of state.voters) {
       this.addOrUpdateVote({ account: this._Accounts.fromAddress(voterAddr), choice });
     }
-    // eslint-disable-next-line no-restricted-syntax
     for (const [ depositor, deposit ] of state.depositors) {
       this._depositors[depositor] = deposit;
     }

@@ -474,43 +474,40 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             if (status.isReady) {
               notifySuccess(`Pending ${txName}: "${objName}"`);
               txCb({ status: TransactionStatus.Ready });
-            } else if (status.isFinalized) {
+            } else if (status.isInBlock || status.isFinalized) {
               for (const e of result.events) {
-                const { data, method, section } = e.event;
-                if (section === 'system') {
-                  if (method === 'ExtrinsicSuccess') {
-                    notifySuccess(`Confirmed ${txName}: "${objName}"`);
-                    txCb({
-                      status: TransactionStatus.Success,
-                      hash: status.asFinalized.toHex(),
-                      blocknum: this.app.chain.block.height,
-                      timestamp: this.app.chain.block.lastTime,
-                    });
-                    if (unsubscribe) unsubscribe.then((u) => u());
-                  } else if (method === 'ExtrinsicFailed') {
-                    const errorData = data[0] as DispatchError;
-                    let errorInfo;
-                    if (errorData.isModule) {
-                      const details = this.registry.findMetaError(errorData.asModule.toU8a());
-                      errorInfo = `${details.section}::${details.name}: ${details.documentation[0]}`;
-                    } else if (errorData.isBadOrigin) {
-                      errorInfo = 'TX Error: invalid sender origin';
-                    } else if (errorData.isCannotLookup) {
-                      errorInfo = 'TX Error: cannot lookup call';
-                    } else {
-                      errorInfo = 'TX Error: unknown';
-                    }
-                    console.error(errorInfo);
-                    notifyError(`Failed ${txName}: "${objName}"`);
-                    txCb({
-                      status: TransactionStatus.Failed,
-                      hash: status.asFinalized.toHex(),
-                      blocknum: this.app.chain.block.height,
-                      timestamp: this.app.chain.block.lastTime,
-                      err: errorInfo,
-                    });
-                    if (unsubscribe) unsubscribe.then((u) => u());
+                if (this.api.events.system.ExtrinsicSuccess.is(e.event)) {
+                  notifySuccess(`Confirmed ${txName}: "${objName}"`);
+                  txCb({
+                    status: TransactionStatus.Success,
+                    hash: status.asFinalized.toHex(),
+                    blocknum: this.app.chain.block.height,
+                    timestamp: this.app.chain.block.lastTime,
+                  });
+                  if (unsubscribe) unsubscribe.then((u) => u());
+                } else if (this.api.events.system.ExtrinsicFailed.is(e.event)) {
+                  const errorData = e.event.data[0] as DispatchError;
+                  let errorInfo;
+                  if (errorData.isModule) {
+                    const details = this.registry.findMetaError(errorData.asModule.toU8a());
+                    errorInfo = `${details.section}::${details.name}: ${details.documentation[0]}`;
+                  } else if (errorData.isBadOrigin) {
+                    errorInfo = 'TX Error: invalid sender origin';
+                  } else if (errorData.isCannotLookup) {
+                    errorInfo = 'TX Error: cannot lookup call';
+                  } else {
+                    errorInfo = 'TX Error: unknown';
                   }
+                  console.error(errorInfo);
+                  notifyError(`Failed ${txName}: "${objName}"`);
+                  txCb({
+                    status: TransactionStatus.Failed,
+                    hash: status.asFinalized.toHex(),
+                    blocknum: this.app.chain.block.height,
+                    timestamp: this.app.chain.block.lastTime,
+                    err: errorInfo,
+                  });
+                  if (unsubscribe) unsubscribe.then((u) => u());
                 }
               }
             }

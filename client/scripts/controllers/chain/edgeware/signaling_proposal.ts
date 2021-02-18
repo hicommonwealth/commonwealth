@@ -169,10 +169,9 @@ export class EdgewareSignalingProposal
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initVoters().then(() => {
-      this._initialized.next(true);
-      this._Signaling.store.add(this);
-    });
+    this._initialized.next(true);
+    this._initVoters();
+    this._Signaling.store.add(this);
   }
 
   protected complete() {
@@ -227,7 +226,6 @@ export class EdgewareSignalingProposal
       const balances = await Promise.all(
         record.reveals.map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance)
       );
-      // eslint-disable-next-line no-restricted-syntax
       for (const [ [ voter, reveals ], balance ] of _.zip(record.reveals, balances)) {
         const acct = this._Accounts.fromAddress(voter.toString());
         this.addOrUpdateVote(new SignalingVote(this, acct, reveals, balance));
