@@ -34,6 +34,32 @@ export enum IdentityJudgement {
   LowQuality = 'low-quality',
   Erroneous = 'erroneous',
 }
+export interface BountyStatus {
+  isProposed: boolean,
+  isApproved: boolean,
+  isFunded: boolean,
+  isCuratorProposed: boolean,
+  asCuratorProposed: BountyStatusCuratorProposed,
+  isActive: boolean,
+  asActive: BountyStatusActive,
+  isPendingPayout: boolean,
+  asPendingPayout: BountyStatusPendingPayout,
+}
+
+export interface BountyStatusCuratorProposed {
+  curator: AccountId,
+}
+
+export interface BountyStatusActive {
+  curator: AccountId,
+  updateDue: BlockNumber,
+}
+
+export interface BountyStatusPendingPayout {
+  curator: AccountId,
+  beneficiary: AccountId,
+  unlockAt: BlockNumber,
+}
 
 export function parseJudgement(j: SubstrateJudgement): IdentityJudgement {
   if (j.isFeePaid) return IdentityJudgement.FeePaid;
@@ -73,6 +99,7 @@ export enum EntityKind {
   TreasuryProposal = 'treasury-proposal',
   CollectiveProposal = 'collective-proposal',
   SignalingProposal = 'signaling-proposal',
+  TreasuryBounty = 'treasury-bounty',
 }
 
 // Each kind of event we handle
@@ -110,6 +137,14 @@ export enum EventKind {
   TreasuryProposed = 'treasury-proposed',
   TreasuryAwarded = 'treasury-awarded',
   TreasuryRejected = 'treasury-rejected',
+
+  TreasuryBountyProposed = 'treasury-bounty-proposed',
+  TreasuryBountyAwarded = 'treasury-bounty-awarded',
+  TreasuryBountyRejected = 'treasury-bounty-rejected',
+  TreasuryBountyBecameActive = 'treasury-bounty-became-active',
+  TreasuryBountyClaimed = 'treasury-bounty-claimed',
+  TreasuryBountyCanceled = 'treasury-bounty-canceled',
+  TreasuryBountyExtended = 'treasury-bounty-extended',
 
   ElectionNewTerm = 'election-new-term',
   ElectionEmptyTerm = 'election-empty-term',
@@ -379,6 +414,59 @@ export interface ITreasuryRejected extends IEvent {
   // cannot fetch other data because proposal data disappears on rejection
 }
 
+// Treasury Bounty Event Interfaces
+
+export interface ITreasuryBountyProposed extends IEvent {
+  // New bounty proposal. [index]
+  kind: EventKind.TreasuryBountyProposed,
+  bountyIndex: number,
+  proposer: AccountId,
+  value: BalanceString,
+  fee: BalanceString,
+  curatorDeposit: BalanceString,
+  bond: BalanceString,
+}
+
+export interface ITreasuryBountyAwarded extends IEvent {
+  // A bounty is awarded to a beneficiary. [index, beneficiary]
+  kind: EventKind.TreasuryBountyAwarded,
+  bountyIndex: number,
+  beneficiary: AccountId,
+}
+
+export interface ITreasuryBountyRejected extends IEvent {
+  // A bounty proposal was rejected; funds were slashed. [index, bond]
+  kind: EventKind.TreasuryBountyRejected,
+  bountyIndex: number,
+  bond: BalanceString,
+}
+
+export interface ITreasuryBountyBecameActive extends IEvent {
+  // A bounty proposal is funded and became active. [index]
+  kind: EventKind.TreasuryBountyBecameActive,
+  bountyIndex: number,
+}
+
+export interface ITreasuryBountyClaimed extends IEvent {
+  // A bounty is claimed by beneficiary. [index, payout, beneficiary]
+  kind: EventKind.TreasuryBountyClaimed,
+  bountyIndex: number,
+  payout: BalanceString,
+  beneficiary: AccountId,
+}
+
+export interface ITreasuryBountyCanceled extends IEvent {
+  // A bounty is cancelled. [index]
+  kind: EventKind.TreasuryBountyCanceled,
+  bountyIndex: number,
+}
+
+export interface ITreasuryBountyExtended extends IEvent {
+  // A bounty expiry is extended. [index]
+  kind: EventKind.TreasuryBountyExtended,
+  bountyIndex: number,
+}
+
 /**
  * Elections Events
  */
@@ -569,6 +657,13 @@ export type IEventData =
   | ITreasuryProposed
   | ITreasuryAwarded
   | ITreasuryRejected
+  | ITreasuryBountyProposed
+  | ITreasuryBountyAwarded
+  | ITreasuryBountyRejected
+  | ITreasuryBountyBecameActive
+  | ITreasuryBountyCanceled
+  | ITreasuryBountyClaimed
+  | ITreasuryBountyExtended
   | IElectionNewTerm
   | IElectionEmptyTerm
   | ICandidacySubmitted
@@ -620,3 +715,6 @@ export type ICollectiveProposalEvents =
 export type ISignalingProposalEvents =
   ISignalingNewProposal | ISignalingCommitStarted
   | ISignalingVotingStarted | ISignalingVotingCompleted;
+export type ITreasuryBountyEvents =
+  ITreasuryBountyBecameActive | ITreasuryBountyCanceled | ITreasuryBountyClaimed | ITreasuryBountyAwarded 
+    | ITreasuryBountyExtended | ITreasuryBountyProposed | ITreasuryBountyRejected; 

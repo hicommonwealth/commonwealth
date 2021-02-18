@@ -99,6 +99,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
     try {
       await fetcher.fetch();
     } catch (err) {
+      console.log(err);
       console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
     }
     SubstrateEvents.subscribeEvents({

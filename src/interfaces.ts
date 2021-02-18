@@ -147,6 +147,9 @@ export function entityToFieldName(entity: IChainEntityKind): string | null {
     case SubstrateTypes.EntityKind.TreasuryProposal: {
       return 'proposalIndex';
     }
+    case SubstrateTypes.EntityKind.TreasuryBounty: {
+      return 'bountyIndex';
+    }
     case SubstrateTypes.EntityKind.CollectiveProposal: {
       return 'proposalHash';
     }
@@ -169,6 +172,7 @@ export function entityToFieldName(entity: IChainEntityKind): string | null {
 
 export function eventToEntity(event: IChainEventKind): [ IChainEntityKind, EntityEventKind ] {
   switch (event) {
+    // Democracy Events
     case SubstrateTypes.EventKind.DemocracyProposed: {
       return [ SubstrateTypes.EntityKind.DemocracyProposal, EntityEventKind.Create ];
     }
@@ -188,6 +192,7 @@ export function eventToEntity(event: IChainEventKind): [ IChainEntityKind, Entit
       return [ SubstrateTypes.EntityKind.DemocracyReferendum, EntityEventKind.Complete ];
     }
 
+    // Preimage Events
     case SubstrateTypes.EventKind.PreimageNoted: {
       return [ SubstrateTypes.EntityKind.DemocracyPreimage, EntityEventKind.Create ];
     }
@@ -197,6 +202,7 @@ export function eventToEntity(event: IChainEventKind): [ IChainEntityKind, Entit
       return [ SubstrateTypes.EntityKind.DemocracyPreimage, EntityEventKind.Complete ];
     }
 
+    // Treasury Events
     case SubstrateTypes.EventKind.TreasuryProposed: {
       return [ SubstrateTypes.EntityKind.TreasuryProposal, EntityEventKind.Create ];
     }
@@ -205,6 +211,30 @@ export function eventToEntity(event: IChainEventKind): [ IChainEntityKind, Entit
       return [ SubstrateTypes.EntityKind.TreasuryProposal, EntityEventKind.Complete ];
     }
 
+    // Bounty Events
+    case SubstrateTypes.EventKind.TreasuryBountyProposed: {
+      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Create ];
+    }
+    case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
+      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update ];
+    }
+    case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
+      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update ];
+    }
+    case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
+      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Complete ];
+    }
+    case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
+      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Complete ]; 
+    }
+    case SubstrateTypes.EventKind.TreasuryBountyExtended: {
+      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update ];
+    }
+    case SubstrateTypes.EventKind.TreasuryBountyRejected: {
+      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Complete ];
+    }
+
+    // Collective Events
     case SubstrateTypes.EventKind.CollectiveProposed: {
       return [ SubstrateTypes.EntityKind.CollectiveProposal, EntityEventKind.Create ];
     }

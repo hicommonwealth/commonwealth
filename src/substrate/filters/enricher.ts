@@ -2,7 +2,7 @@ import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Extrinsic,
-  ReferendumInfo, ValidatorId, Exposure, AuthorityId, IdentificationTuple, AccountVote,
+  ReferendumInfo, ValidatorId, Exposure, AuthorityId, IdentificationTuple, AccountVote, BountyIndex, Bounty
 } from '@polkadot/types/interfaces';
 import { Option, bool, Vec, u32, u64, Compact, StorageKey } from '@polkadot/types';
 import { Codec, AnyTuple } from '@polkadot/types/types';
@@ -474,11 +474,100 @@ export async function Enrich(
       }
 
       case EventKind.TreasuryRejected: {
-        const [ proposalIndex, slashedBond ] = event.data as unknown as [ ProposalIndex, Balance ] & Codec;
+        const [ proposalIndex, ] = event.data as unknown as [ ProposalIndex, ] & Codec;
         return {
           data: {
             kind,
             proposalIndex: +proposalIndex,
+          }
+        };
+      }
+
+      /**
+       * Bounty Events
+       */
+
+      case EventKind.TreasuryBountyProposed: {
+        const [ bountyIndex ] = event.data as unknown as [ BountyIndex ] & Codec;
+        const bounties = await api.derive.bounties.bounties();
+        if (!bounties) return;
+        const bounty = bounties.find((b) => +b.index === +bountyIndex);
+        if (!bounty) {
+          throw new Error(`could not fetch treasury proposals`);
+        }
+        return {
+          data: {
+            kind,
+            bountyIndex: +bountyIndex,
+            proposer: bounty.bounty.proposer.toString(),
+            value: bounty.bounty.value.toString(),
+            fee: bounty.bounty.fee.toString(),
+            curatorDeposit: bounty.bounty.curatorDeposit.toString(),
+            bond: bounty.bounty.bond.toString(),
+          }
+        };
+      }
+
+      case EventKind.TreasuryBountyAwarded: {
+        const [ bountyIndex, beneficiary ] = event.data as unknown as [ BountyIndex, AccountId ] & Codec;
+        return {
+          data: {
+            kind,
+            bountyIndex: +bountyIndex,
+            beneficiary: beneficiary.toString(),
+          }
+        };
+      }
+
+      case EventKind.TreasuryBountyRejected: {
+        const [ bountyIndex, bond ] = event.data as unknown as [ BountyIndex, Balance ] & Codec;
+        return {
+          data: {
+            kind,
+            bountyIndex: +bountyIndex,
+            bond: bond.toString(),
+          }
+        };
+      }
+
+      case EventKind.TreasuryBountyExtended: {
+        const [ bountyIndex ] = event.data as unknown as [ BountyIndex ] & Codec;
+        return {
+          data: {
+            kind,
+            bountyIndex: +bountyIndex,
+          }
+        };
+      }
+
+      case EventKind.TreasuryBountyClaimed: {
+        const [ bountyIndex, payout, beneficiary ] = event.data as unknown as [ BountyIndex, Balance, AccountId  ] & Codec;
+        return {
+          data: {
+            kind,
+            bountyIndex: +bountyIndex,
+            payout: payout.toString(),
+            beneficiary: beneficiary?.toString(),
+          }
+        };
+      }
+
+      case EventKind.TreasuryBountyCanceled: {
+        const [ bountyIndex ] = event.data as unknown as [ BountyIndex ] & Codec;
+        return {
+          data: {
+            kind,
+            bountyIndex: +bountyIndex,
+          }
+        };
+      }
+
+      case EventKind.TreasuryBountyBecameActive: {
+        const [ bountyIndex ] = event.data as unknown as [ BountyIndex ] & Codec;
+        return {
+          data: {
+            kind,
+            bountyIndex: +bountyIndex,
           }
         };
       }

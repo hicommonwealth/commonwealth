@@ -1,11 +1,13 @@
 import chai from 'chai';
 import {
-  AccountId, BalanceOf, Registration, RegistrarInfo, TreasuryProposal, Proposal, Votes
+  AccountId, BalanceOf, Registration, RegistrarInfo, TreasuryProposal, Proposal, Votes, Bounty, 
 } from '@polkadot/types/interfaces';
-import { Vec, Data, TypeRegistry } from '@polkadot/types';
+import { Vec, Data, TypeRegistry, } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
-import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
+import { DeriveReferendum, } from '@polkadot/api-derive/democracy/types';
+import { DeriveBounty, } from '@polkadot/api-derive/types';
+
 
 import { constructFakeApi, constructOption, constructIdentityJudgement } from './testUtil';
 import {
@@ -20,13 +22,16 @@ import {
   ISignalingVotingStarted,
   ISignalingVotingCompleted,
   ICollectiveVoted,
-  IdentityJudgement
+  IdentityJudgement,
+  ITreasuryBountyProposed,
+  ITreasuryBountyBecameActive,
 } from '../../../src/substrate/types';
 import { StorageFetcher } from '../../../src/substrate/storageFetcher';
 
 const { assert } = chai;
 
 const blockNumber = 10;
+
 const api = constructFakeApi({
   getHeader: async () => ({
     number: blockNumber,
@@ -117,6 +122,33 @@ const api = constructFakeApi({
     } as unknown as TreasuryProposal)
   ] : [], // should not see anything else
 
+  // bounty proposals
+  bountyApprovals: async () => [ '0', '1', '2' ],
+  bountyCount: async () => '3',
+  bountiesMulti: async (ids) => ids.length === 1 && +ids[0] === 3 ? [
+    constructOption({
+      proposer: 'alice',
+      value: 50,
+      fee: 10,
+      curatorDeposit: 10,
+      bond: 10,
+      status: {}
+    } as unknown as Bounty)
+  ] : [], // should not see anything else
+  bounties: async () => [{
+    bounty: {
+      proposer: 'alice',
+      value: 50,
+      fee: 10,
+      curatorDeposit: 10,
+      bond: 10,
+      status: "Proposed"
+    },
+    description: 'test bounty description',
+    index: 0,
+    proposals: [{}]
+  } as unknown as DeriveBounty],
+  
   // collective proposals
   collectiveProposals: async () => [ 'council-hash2', 'council-hash' ],
   votingMulti: async () => [
@@ -386,10 +418,29 @@ describe('Edgeware Event Migration Tests', () => {
           voteId: '3',
         } as ISignalingVotingCompleted
       },
+      {
+        blockNumber,
+        data: {
+          kind: 'treasury-bounty-proposed',
+          bountyIndex: 0,
+          proposer: 'alice',
+          value: '50',
+          fee: '10',
+          curatorDeposit: '10',
+          bond: '10'
+        } as ITreasuryBountyProposed
+      },
+      {
+        blockNumber,
+        data: {
+          kind: 'treasury-bounty-became-active',
+          bountyIndex: 0
+        } as ITreasuryBountyBecameActive
+      },
     ]);
   });
 
-  it('should generate identity-set events events', async () => {
+  it('should generate identity-set events', async () => {
     const fetcher = new StorageFetcher(api);
     const events = await fetcher.fetchIdentities(['alice', 'bob', 'charlie', 'dave']);
     assert.sameDeepMembers(events, [

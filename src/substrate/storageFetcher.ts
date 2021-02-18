@@ -10,7 +10,8 @@ import { ApiPromise } from '@polkadot/api';
 import { Option, Vec } from '@polkadot/types';
 import {
   BalanceOf, AccountId, Hash, BlockNumber, Registration,
-  ProposalIndex, TreasuryProposal, Proposal, Votes
+  ProposalIndex, TreasuryProposal, Proposal, Votes,
+  Bounty, BountyIndex,
 } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage } from '@polkadot/api-derive/types';
@@ -24,6 +25,7 @@ import {
   IDemocracyPassed,
   IPreimageNoted,
   ITreasuryProposed,
+  ITreasuryBountyProposed,
   ICollectiveProposed,
   ICollectiveVoted,
   ISignalingNewProposal,
@@ -34,6 +36,12 @@ import {
   IIdentitySet,
   parseJudgement,
   IdentityJudgement,
+  ITreasuryBountyBecameActive,
+  BountyStatusPendingPayout,
+  ITreasuryBountyAwarded,
+  ITreasuryBountyClaimed,
+  ITreasuryBountyEvents,
+  ITreasuryBountyRejected,
 } from './types';
 
 import { factory, formatFilename } from '../logging';
@@ -100,6 +108,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
 
     /** treasury proposals */
     const treasuryProposalEvents = await this.fetchTreasuryProposals(blockNumber);
+    const bountyEvents = await this.fetchBounties(blockNumber);
 
     /** collective proposals */
     let technicalCommitteeProposalEvents = [];
@@ -117,6 +126,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       ...democracyReferendaEvents,
       ...democracyPreimageEvents,
       ...treasuryProposalEvents,
+      ...bountyEvents,
       ...technicalCommitteeProposalEvents,
       ...councilProposalEvents,
       ...signalingProposalEvents,
@@ -243,6 +253,52 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     }).filter((e) => !!e);
     log.info(`Found ${proposedEvents.length} treasury proposals!`);
     return proposedEvents.map((data) => ({ blockNumber, data }));
+  }
+
+  public async fetchBounties(blockNumber: number): Promise<CWEvent<ITreasuryBountyEvents>[]> { // TODO: List all relevant events explicitly?
+    log.info('Migrating treasury bounties...');
+
+    const bounties = await this._api.derive.bounties.bounties();
+    const events = [];
+    bounties.forEach((b) => {
+      events.push({
+        kind: EventKind.TreasuryBountyProposed,
+        bountyIndex: +b.index,
+        proposer: b.bounty.proposer.toString(),
+        value: b.bounty.value.toString(),
+        fee: b.bounty.fee.toString(),
+        curatorDeposit: b.bounty.curatorDeposit.toString(),
+        bond: b.bounty.bond.toString(),
+      } as ITreasuryBountyProposed);
+
+      if (b.bounty.status.isProposed
+        || b.bounty.status.isNone
+        || b.bounty.status.isCuratorProposed) return; // Return here, not progressed
+      
+      events.push({
+        kind: EventKind.TreasuryBountyBecameActive,
+        bountyIndex: +b.index,
+      } as ITreasuryBountyBecameActive);
+      if (b.bounty.status.isActive) return;
+      if (b.bounty.status.isPendingPayout){
+        events.push({
+          kind: EventKind.TreasuryBountyAwarded,
+          bountyIndex: +b.index,
+          value: b.bounty.value.toString(),
+          beneficiary: (b.bounty.status.asPendingPayout).beneficiary.toString(),
+        } as ITreasuryBountyAwarded);
+        events.push({
+          kind: EventKind.TreasuryBountyClaimed,
+          bountyIndex: +b.index,
+          payout: b.bounty.value.toString(),
+          beneficiary: (b.bounty.status.asPendingPayout).beneficiary.toString(),
+        } as ITreasuryBountyClaimed);
+      }
+      // No other events can be extracted from a derivable bounty itself
+    });
+
+    log.info(`Found ${bounties.length} bounties!`);
+    return events.map((data) => ({ blockNumber, data }));
   }
 
   public async fetchCollectiveProposals(

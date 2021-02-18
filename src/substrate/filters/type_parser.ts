@@ -119,6 +119,17 @@ export function ParseType (
         default: return null;
       }
     }
+    case 'bounties': {
+      switch (method) {
+        case 'BountyProposed': return EventKind.TreasuryBountyProposed;
+        case 'BountyRejected': return EventKind.TreasuryBountyRejected;
+        case 'BountyBecameActive': return EventKind.TreasuryBountyBecameActive;
+        case 'BountyAwarded': return EventKind.TreasuryBountyAwarded;
+        case 'BountyClaimed': return EventKind.TreasuryBountyClaimed;
+        case 'BountyCanceled': return EventKind.TreasuryBountyCanceled;
+        case 'BountyExtended': return EventKind.TreasuryBountyExtended;
+      }
+    }
     default:
       return null;
   }

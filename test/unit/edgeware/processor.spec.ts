@@ -68,6 +68,11 @@ describe('Edgeware Event Processor Tests', () => {
           isApplyExtrinsic: true,
           asApplyExtrinsic: 0,
         }
+      },
+      {
+        section: 'bounty',
+        method: 'BountyProposed',
+        data: [ '1', ]
       }
     ];
 
@@ -85,7 +90,7 @@ describe('Edgeware Event Processor Tests', () => {
 
     const fakeBlocks = [
       constructFakeBlock(1, fakeEvents.slice(0, 2)),
-      constructFakeBlock(2, fakeEvents.slice(2, 4), fakeExtrinsics),
+      constructFakeBlock(2, fakeEvents.slice(2, 5), fakeExtrinsics),
     ];
 
     const api = constructFakeApi({
