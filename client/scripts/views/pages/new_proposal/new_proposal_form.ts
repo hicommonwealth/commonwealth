@@ -29,6 +29,7 @@ import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
 import ErrorPage from 'views/pages/error';
+import SubstrateBountyTreasury from 'client/scripts/controllers/chain/substrate/bountyTreasury';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -55,6 +56,8 @@ const NewProposalForm = {
     let hasBeneficiaryAndAmount : boolean;
     let hasPhragmenInfo : boolean;
     let hasDepositChooser : boolean;
+    // bounty proposal
+    let hasValue : boolean;
     // council motion
     let hasVotingPeriodAndDelaySelector : boolean;
     let hasReferendumSelector : boolean;
@@ -96,6 +99,11 @@ const NewProposalForm = {
       hasBeneficiaryAndAmount = true;
       const treasury = (app.chain as Substrate).treasury;
       dataLoaded = !!treasury.bondMinimum && !!treasury.bondPct;
+    } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
+      hasTitleAndDescription = true;
+      hasValue = true;
+      const bountyTreasury = (app.chain as Substrate).bounties as SubstrateBountyTreasury;
+      dataLoaded = !!bountyTreasury.bondMinimum && !!bountyTreasury.bondPct;
     } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
       hasPhragmenInfo = true;
       const elections = (app.chain as Substrate).phragmenElections;
@@ -236,6 +244,10 @@ const NewProposalForm = {
           'Proposal Type': 'Treasury',
           'Thread Type': 'Proposal',
         });
+      } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
+        // TODO: fix these lines
+        if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
+        args = [author, vnode.state.form.amount];
       } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
         args = [author];
         createFunc = ([a]) => (app.chain as Substrate).phragmenElections.activeElection.submitCandidacyTx(a);
