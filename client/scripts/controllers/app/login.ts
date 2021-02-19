@@ -20,7 +20,7 @@ import {
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
 
-const MAGIC_PUBLISHABLE_KEY = 'pk_test_49DC030B5B46F522';
+const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(account: Account<any>) {
   // TODO: Change to POST /address
