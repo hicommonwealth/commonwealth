@@ -24,6 +24,7 @@ export interface IChainModule<C extends Coin, A extends Account<C>> {
   // Signs and submits an on-chain transaction, wrapping it in a modal dialog that tracks its status.
   createTXModalData(
     author: A,
+    // TODO: type txfunc
     txFunc,
     txName: string,
     objName: string,

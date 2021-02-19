@@ -1,6 +1,5 @@
 import {
   ITXModalData,
-  ITransactionResult,
   TransactionStatus,
   NodeInfo,
   IChainModule,
@@ -11,7 +10,6 @@ import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import { CosmosApi } from 'adapters/chain/cosmos/api';
 import { BlocktimeHelper } from 'helpers';
-import { Observable, Subject } from 'rxjs';
 import BN from 'bn.js';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { CosmosAccount } from './account';
@@ -76,6 +74,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     // creates the endpoint necessary. However, it doesn't send headers correctly
     // on its own, so you need to configure a reverse-proxy server (I did it with nginx)
     // that forwards the requests to it, and adds the header 'Access-Control-Allow-Origin: *'
+    /* eslint-disable prefer-template */
     const wsUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1)
       ? ('ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657/websocket')
       : ('wss://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':36657/websocket');
@@ -130,8 +129,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
             sequence,
           };
         },
-        transact: (signature?, computedGas?: number): Observable<ITransactionResult> => {
-          const subject = new Subject<ITransactionResult>();
+        transact: (txCb, signature?, computedGas?: number): void => {
           let signer;
           if (signature) {
             // create replacement signer that delivers signature as needed
@@ -146,24 +144,24 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
           txFunc(computedGas).then(({ msg, memo, cmdData: { gas } }) => {
             return msg.send({ gas: `${gas}`, memo }, signer);
           }).then(({ hash, sequence, included }) => {
-            subject.next({ status: TransactionStatus.Ready, hash });
+            txCb({ status: TransactionStatus.Ready, hash });
             // wait for transaction to process
             return included();
           }).then((txObj) => {
             // TODO: is this necessarily success or can it fail?
             console.log(txObj);
             // TODO: add gas wanted/gas used to the modal?
-            subject.next({
+            txCb({
               status: TransactionStatus.Success,
               blocknum: +txObj.height,
               timestamp: moment(txObj.timestamp),
               hash: '--', // TODO: fetch the hash value of the block rather than the tx
             });
-          }).catch((err) => {
-            console.error(err);
-            subject.next({ status: TransactionStatus.Error, err: err.message });
-          });
-          return subject.asObservable();
+          })
+            .catch((err) => {
+              console.error(err);
+              txCb({ status: TransactionStatus.Error, err: err.message });
+            });
         },
       }
     };

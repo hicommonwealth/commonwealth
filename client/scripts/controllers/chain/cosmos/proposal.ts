@@ -12,8 +12,6 @@ import {
   ICosmosProposal, ICosmosProposalState, CosmosToken, CosmosVoteChoice, CosmosProposalState, ICosmosProposalTally
 } from 'adapters/chain/cosmos/types';
 import { CosmosApi } from 'adapters/chain/cosmos/api';
-import { Unsubscribable, BehaviorSubject } from 'rxjs';
-import { filter, takeWhile } from 'rxjs/operators';
 import { ProposalStore } from 'stores';
 import moment from 'moment-twitter';
 import { CosmosAccount, CosmosAccounts } from './account';
@@ -90,8 +88,6 @@ export class CosmosProposal extends Proposal<
   private _Governance: CosmosGovernance;
   private _completedVotesFetched: boolean = false;
 
-  private _stateSubscription: Unsubscribable;
-
   constructor(ChainInfo: CosmosChain, Accounts: CosmosAccounts, Governance: CosmosGovernance, data: ICosmosProposal) {
     super('cosmosproposal', data);
     this._Chain = ChainInfo;
@@ -101,7 +97,7 @@ export class CosmosProposal extends Proposal<
 
     // workaround to avoid fetching all voters for completed proposals
     if (!data.state.completed) {
-      this._stateSubscription = this._subscribeState();
+      this._initState();
     } else {
       this.updateState(this._Governance.store, data.state);
     }
@@ -112,14 +108,13 @@ export class CosmosProposal extends Proposal<
     throw new Error('unimplemented');
   }
 
-  private _subscribeState() {
+  private async _initState() {
     if (this.completed) {
       throw new Error('should not subscribe cosmos proposal state if completed');
     }
-    const subject = new BehaviorSubject<ICosmosProposalState>(null);
+
     const api = this._Chain.api;
-    // TODO: observe real-time events here re: proposal
-    Promise.all([
+    const [depositResp, voteResp, tallyResp] = await Promise.all([
       api.query.proposalDeposits(this.data.identifier),
       this.status === CosmosProposalState.DEPOSIT_PERIOD
         ? Promise.resolve(null)
@@ -127,78 +122,35 @@ export class CosmosProposal extends Proposal<
       this.status === CosmosProposalState.DEPOSIT_PERIOD
         ? Promise.resolve(null)
         : api.query.proposalTally(this.data.identifier),
-    ]).then(([depositResp, voteResp, tallyResp]) => {
-      const state: ICosmosProposalState = {
-        identifier: this.data.identifier,
-        completed: false,
-        status: this.status,
-        depositors: [],
-        totalDeposit: 0,
-        voters: [],
-        tally: null,
-      };
-      if (depositResp) {
-        for (const deposit of depositResp) {
-          state.depositors.push([ deposit.depositor, deposit.amount.amount ]);
-        }
-      }
-      if (voteResp) {
-        for (const voter of voteResp) {
-          const vote = voteToEnum(voter.option);
-          if (vote) {
-            state.voters.push([ voter.voter, vote ]);
-          } else {
-            console.error(`voter: ${voter.voter} has invalid vote option: ${voter.option}`);
-          }
-        }
-      }
-      if (tallyResp) {
-        state.tally = marshalTally(tallyResp);
-      }
-      subject.next(state);
+    ]);
 
-      // init stream listeners for updates
-      if (state.status === CosmosProposalState.DEPOSIT_PERIOD) {
-        api.observeEvent('MsgDeposit').pipe(
-          filter(({ msg }) => msg.value.proposal_id.toString() === this.data.identifier),
-          takeWhile(() => !state.completed),
-        ).subscribe(async ({ msg: deposit }) => {
-          state.depositors.push([ deposit.value.sender, deposit.value.amount.amount ]);
-          state.totalDeposit += +deposit.value.amount.amount;
-          subject.next(state);
-        });
+    const state: ICosmosProposalState = {
+      identifier: this.data.identifier,
+      completed: false,
+      status: this.status,
+      depositors: [],
+      totalDeposit: 0,
+      voters: [],
+      tally: null,
+    };
+    if (depositResp) {
+      for (const deposit of depositResp) {
+        state.depositors.push([ deposit.depositor, deposit.amount.amount ]);
       }
-
-      // keep vote subscription open even during deposit period in case
-      // the proposal goes into voting stage -- we can identify this and
-      // shift the type
-      api.observeEvent('MsgVote').pipe(
-        filter(({ msg }) => msg.value.proposal_id.toString() === this.data.identifier),
-        takeWhile(() => !state.completed),
-      ).subscribe(async ({ msg: voter }) => {
-        const vote = voteToEnum(voter.value.option);
-        const voterAddress = voter.value.voter || voter.value.sender;
-        if (!vote) {
-          console.error(`voter: ${voterAddress} has invalid vote option: ${voter.value.option}`);
-        }
-        const voterIdx = state.voters.findIndex(([v]) => v === voterAddress);
-        if (voterIdx === -1) {
-          // new voter
-          state.voters.push([ voterAddress, vote ]);
+    }
+    if (voteResp) {
+      for (const voter of voteResp) {
+        const vote = voteToEnum(voter.option);
+        if (vote) {
+          state.voters.push([ voter.voter, vote ]);
         } else {
-          state.voters[voterIdx][1] = vote;
+          console.error(`voter: ${voter.voter} has invalid vote option: ${voter.option}`);
         }
-        const tallyRespEvt = await api.query.proposalTally(this.data.identifier);
-        if (tallyRespEvt) state.tally = marshalTally(tallyRespEvt);
-        subject.next(state);
-      });
-    }).catch((err) => {
-      console.log(`error fetching state for proposal ${this.data.identifier}, err: ${err}`);
-    });
-    const obs = subject.asObservable();
-    return obs.subscribe((state) => {
-      this.updateState(this._Governance.store, state);
-    });
+      }
+    }
+    if (tallyResp) {
+      state.tally = marshalTally(tallyResp);
+    }
   }
 
   // TODO: add getters for various vote features: tally, quorum, threshold, veto

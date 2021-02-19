@@ -10,7 +10,6 @@ import {
 } from 'models';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { BehaviorSubject, Unsubscribable, combineLatest, of } from 'rxjs';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
 
@@ -130,17 +129,17 @@ export class EdgewareSignalingProposal
     return ProposalStatus.None;
   }
 
-  private _stage: BehaviorSubject<SignalingProposalStage> = new BehaviorSubject(SignalingProposalStage.PreVoting);
+  private _stage: SignalingProposalStage;
   get stage() {
-    return this._stage.getValue();
+    return this._stage;
   }
 
-  private _endBlock: BehaviorSubject<number> = new BehaviorSubject(undefined);
+  private _endBlock: number;
   get endTime(): ProposalEndTime {
     return this.completed
       ? { kind: 'unavailable' }
-      : this._endBlock.getValue()
-        ? { kind: 'fixed_block', blocknum: this._endBlock.getValue() }
+      : this._endBlock
+        ? { kind: 'fixed_block', blocknum: this._endBlock }
         : { kind: 'not_started' };
   }
 
@@ -191,8 +190,8 @@ export class EdgewareSignalingProposal
           console.error('signaling stage out of order!');
           return;
         }
-        this._stage.next(SignalingProposalStage.Commit);
-        this._endBlock.next(e.data.endBlock);
+        this._stage = SignalingProposalStage.Commit;
+        this._endBlock = e.data.endBlock;
         break;
       }
       case SubstrateTypes.EventKind.SignalingVotingStarted: {
@@ -200,8 +199,8 @@ export class EdgewareSignalingProposal
           console.error('signaling stage out of order!');
           return;
         }
-        this._stage.next(SignalingProposalStage.Voting);
-        this._endBlock.next(e.data.endBlock);
+        this._stage = SignalingProposalStage.Voting;
+        this._endBlock = e.data.endBlock;
         break;
       }
       case SubstrateTypes.EventKind.SignalingVotingCompleted: {
@@ -209,7 +208,7 @@ export class EdgewareSignalingProposal
           console.error('signaling stage out of order!');
           return;
         }
-        this._stage.next(SignalingProposalStage.Completed);
+        this._stage = SignalingProposalStage.Completed;
         this.complete();
         break;
       }

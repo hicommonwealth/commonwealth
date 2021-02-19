@@ -12,7 +12,6 @@ import { Account, ChainBase } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
-import { first } from 'rxjs/operators';
 import AddressInput from 'views/components/addresses/address_input';
 
 const getBalanceTransferChecks = (
@@ -70,7 +69,7 @@ const getBalanceTransferChecks = (
 
 const fetchBalance = (address: string) => {
   const recipient: Account<any> = app.chain.accounts.get(address);
-  return recipient.balance.pipe(first()).toPromise();
+  return recipient.balance;
 };
 
 interface IAttrs {

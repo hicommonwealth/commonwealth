@@ -104,7 +104,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
   public async initData(): Promise<void> {
     this._loaded = true;
-    this.app.chainModuleReady.next(true);
+    this.app.chainModuleReady.emit('ready');
     console.log(`Loaded data for ${this.meta.chain.id} on node: ${this.meta.url}.`);
   }
 

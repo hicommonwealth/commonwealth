@@ -3,9 +3,7 @@ import 'pages/admin.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { SubmittableResult, ApiRx } from '@polkadot/api';
 import { ISubmittableResult } from '@polkadot/types/types';
-import { switchMap } from 'rxjs/operators';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -188,9 +186,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
           vnode.state.txProcessing = true;
           vnode.state.resultText = 'Waiting...';
           m.redraw();
-          (app.chain as Substrate).chain.api.pipe(
-            switchMap((api: ApiRx) => api.tx.sudo.sudo(call).signAndSend(keyring))
-          ).subscribe((result: ISubmittableResult) => {
+          (app.chain as Substrate).chain.api.tx.sudo.sudo(call).signAndSend(keyring, (result: ISubmittableResult) => {
             if (result.isCompleted) {
               vnode.state.txProcessing = false;
               if (result.isFinalized) {

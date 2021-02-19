@@ -1,6 +1,4 @@
 /* eslint-disable consistent-return */
-import { first } from 'rxjs/operators';
-
 import { ApiPromise } from '@polkadot/api';
 import { decodeAddress } from '@polkadot/keyring';
 import { KeyringPair } from '@polkadot/keyring/types';
@@ -193,7 +191,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     if (!ChainInfo?.metadataInitialized) {
       // defer chain initialization
       super(app, app.chain.meta.chain, address, null);
-      app.chainModuleReady.pipe(first()).subscribe(() => {
+      app.chainModuleReady.once('ready', () => {
         if (app.chain.chain instanceof SubstrateChain) {
           this._Chain = app.chain.chain;
           this.setEncoding(this._Chain.ss58Format);
