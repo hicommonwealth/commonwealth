@@ -53,7 +53,7 @@ export class CosmosAccount extends Account<CosmosToken> {
 
   constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
     super(app, app.chain.meta.chain, address);
-    if (!ChainInfo) {
+    if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {
         if (app.chain.chain instanceof CosmosChain) this._Chain = app.chain.chain;

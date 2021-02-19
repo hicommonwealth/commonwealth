@@ -368,6 +368,7 @@ export async function initChain(): Promise<void> {
 
   // Emit chain as updated
   app.chainAdapterReady.emit('ready');
+  app.isAdapterReady = true;
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects

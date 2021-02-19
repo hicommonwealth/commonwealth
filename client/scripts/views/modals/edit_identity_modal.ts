@@ -4,20 +4,16 @@ import m from 'mithril';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup, FormLabel, Icon, Icons } from 'construct-ui';
 
-import { IdentityInfo } from '@polkadot/types/interfaces';
 import { Data } from '@polkadot/types/primitive';
 import { u8aToString } from '@polkadot/util';
 
 import app from 'state';
-import { Account } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import { IdentityInfoProps } from 'controllers/chain/substrate/identities';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
-import AvatarUpload from 'views/components/avatar_upload';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { makeDynamicComponent } from 'models/mithril';
 
 interface IAttrs {
   account: SubstrateAccount;
@@ -25,19 +21,19 @@ interface IAttrs {
 }
 
 interface IState {
-  dynamic: {
-    identity: SubstrateIdentity | null;
-  },
+  identity: SubstrateIdentity | null;
   saving: boolean;
 }
 
-const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
-  getObservables: (attrs) => ({
-    groupKey: attrs.account.address,
-    identity: (app.chain as Substrate).identities.get(attrs.account),
-  }),
+const EditIdentityModal: m.Component<IAttrs, IState> = {
+  oninit: (vnode) => {
+    app.runWhenReady(async () => {
+      vnode.state.identity = await (app.chain as Substrate).identities.get(vnode.attrs.account);
+      m.redraw();
+    });
+  },
   oncreate: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    if (vnode.state.dynamic.identity?.info) {
+    if (vnode.state.identity?.info) {
       const {
         additional,
         display,
@@ -48,7 +44,7 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
         // pgpFingerprint,
         image,
         twitter
-      } = vnode.state.dynamic.identity?.info;
+      } = vnode.state.identity?.info;
 
       // do not display SHA values, only raw strings
       const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
@@ -160,6 +156,6 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
       ])
     ]);
   }
-});
+};
 
 export default EditIdentityModal;

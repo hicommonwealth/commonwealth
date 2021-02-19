@@ -11,7 +11,6 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import { Account, ChainBase } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import Substrate from 'controllers/chain/substrate/main';
-import { makeDynamicComponent } from 'models/mithril';
 import AddressInput from 'views/components/addresses/address_input';
 
 const getBalanceTransferChecks = (
@@ -77,13 +76,8 @@ interface IAttrs {
 }
 
 interface IState {
-  // we may not want senderBalance to be a fully dynamic property, as it might be
-  // confusing for a transaction to suddenly go from passing to failing as the user
-  // sits with the page open. But this seems a minor point for now.
-  dynamic: {
-    senderBalance: SubstrateCoin;
-    substrateTxFee: SubstrateCoin;
-  };
+  senderBalance: SubstrateCoin;
+  substrateTxFee: SubstrateCoin;
   recipientBalance: SubstrateCoin;
   recipientAddress: string;
   amount: SubstrateCoin;
@@ -91,25 +85,27 @@ interface IState {
   error: string;
 }
 
-const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
-  getObservables: (attrs: IAttrs) => ({
-    groupKey: attrs.sender.address,
-    senderBalance: attrs.sender.balance,
-    substrateTxFee: attrs.sender.chainBase === ChainBase.Substrate
-      ? (attrs.sender as SubstrateAccount).balanceTransferFee
-      : null,
-  }),
+const SendEDGWell: m.Component<IAttrs, IState> = {
+  oninit: (vnode) => {
+    app.runWhenReady(async () => {
+      vnode.state.senderBalance = await vnode.attrs.sender.balance;
+      vnode.state.substrateTxFee = vnode.attrs.sender.chainBase === ChainBase.Substrate
+        ? await (vnode.attrs.sender as SubstrateAccount).balanceTransferFee
+        : null;
+      m.redraw();
+    });
+  },
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     let canTransfer = true;
     let checks = [];
     if (vnode.attrs.sender && vnode.state.recipientBalance && vnode.state.amount) {
       [ canTransfer, checks ] = getBalanceTransferChecks(
-        vnode.state.dynamic.senderBalance,
+        vnode.state.senderBalance,
         vnode.state.recipientBalance,
         vnode.state.amount,
         vnode.state.recipientAddress,
         vnode.attrs.sender.address,
-        vnode.state.dynamic.substrateTxFee,
+        vnode.state.substrateTxFee,
       );
     }
 
@@ -209,6 +205,6 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
       m('span.error-message', vnode.state.error),
     ]);
   }
-});
+};
 
 export default SendEDGWell;

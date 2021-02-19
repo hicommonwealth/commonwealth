@@ -188,7 +188,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     address: string,
     isEd25519: boolean = false
   ) {
-    if (!ChainInfo?.metadataInitialized) {
+    if (!app.isModuleReady) {
       // defer chain initialization
       super(app, app.chain.meta.chain, address, null);
       app.chainModuleReady.once('ready', () => {

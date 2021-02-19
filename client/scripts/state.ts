@@ -38,7 +38,10 @@ export interface IApp {
 
   chainPreloading: boolean;
   chainAdapterReady: EventEmitter;
+  isAdapterReady: boolean;
+  runWhenReady: (cb: () => any) => void;
   chainModuleReady: EventEmitter;
+  isModuleReady: boolean;
 
   profiles: ProfilesController;
   comments: CommentsController;
@@ -90,7 +93,13 @@ const app: IApp = {
 
   chainPreloading: false,
   chainAdapterReady: new EventEmitter(),
+  isAdapterReady: false,
+  runWhenReady: (cb) => {
+    if (app.isAdapterReady) cb();
+    else app.chainAdapterReady.on('ready', cb);
+  },
   chainModuleReady: new EventEmitter(),
+  isModuleReady: false,
 
   profiles: new ProfilesController(),
   comments: new CommentsController(),

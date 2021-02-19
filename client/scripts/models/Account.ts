@@ -18,7 +18,7 @@ abstract class Account<C extends Coin> {
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
-  public async abstract signMessage(message: string): Promise<string>;
+  public abstract signMessage(message: string): Promise<string>;
   protected abstract addressFromMnemonic(mnemonic: string): string;
   protected abstract addressFromSeed(seed: string): string;
 
@@ -106,7 +106,7 @@ abstract class Account<C extends Coin> {
         jwt: this.app.user.jwt,
         signature,
       };
-      return new Promise((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         $.post(`${this.app.serverUrl()}/verifyAddress`, params).then((result) => {
           if (result.status === 'Success') return resolve();
           else reject();
