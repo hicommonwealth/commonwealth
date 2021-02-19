@@ -1,10 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import moment from 'moment';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
-import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -13,13 +8,14 @@ export const Errors = {
   NoThreadId: 'Must provide thread_id',
   NoStage: 'Must pass in stage',
   NoThread: 'Cannot find thread',
-  NotAdmin: 'Not an admin',
+  NotAdminOrOwner: 'Not an admin or owner of this thread',
 };
 
 const updateThreadStage = async (models, req: Request, res: Response, next: NextFunction) => {
   const { thread_id, stage } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
   if (!stage) return next(new Error(Errors.NoStage));
+  if (!req.user) return next(new Error(Errors.NotAdminOrOwner));
 
   try {
     const thread = await models.OffchainThread.findOne({
@@ -39,7 +35,7 @@ const updateThreadStage = async (models, req: Request, res: Response, next: Next
       const role = roles.find((r) => {
         return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
       });
-      if (!role) return next(new Error(Errors.NotAdmin));
+      if (!role) return next(new Error(Errors.NotAdminOrOwner));
     }
 
     await thread.update({ stage });

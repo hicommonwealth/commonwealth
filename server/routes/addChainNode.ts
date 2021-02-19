@@ -20,7 +20,7 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
   if (!req.user.isAdmin) {
     return next(new Error(Errors.MustBeAdmin));
   }
-  if (!req.body.id || !req.body.name || !req.body.symbol || !req.body.network || !req.body.node_url) {
+  if (!req.body.id || !req.body.name || !req.body.symbol || !req.body.network || !req.body.node_url || !req.body.base) {
     return next(new Error(Errors.MissingParams));
   }
 
@@ -47,6 +47,7 @@ const addChainNode = async (models, req: Request, res: Response, next: NextFunct
       network: req.body.network,
       icon_url: req.body.icon_url,
       active: true,
+      base: req.body.base,
     });
   }
 

@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import {
-  SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES, MAGIC_SUPPORTED_CHAINS,
+  SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES, MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN
 } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
@@ -41,15 +41,23 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
   // check whether to recommend magic.link registration instead
   // 1. user should not already exist
   // 2. chain or community default chain should be "supported"
-  const [ chain, community ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, (err) => {
-    log.warn(`Could not look up chain/community for login email ${email}: ${err.message}`);
-    return [ null, null ];
-  });
-  const magicChain: string = chain ? chain.id : community ? community.default_chain : MAGIC_DEFAULT_CHAIN;
+  //
+  // ignore error because someone might try to log in from the homepage, or another page without
+  // chain or community
+  const [ chain, community, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+
+  let magicChain;
+  if (chain?.id) {
+    magicChain = chain;
+  } else {
+    const chainId = community?.default_chain || MAGIC_DEFAULT_CHAIN;
+    magicChain = await models.Chain.findOne({ where: { id: chainId } });
+  }
+
   const isNewRegistration = !previousUser;
   const isExistingMagicUser = previousUser && !!previousUser.lastMagicLoginAt;
   if (isExistingMagicUser // existing magic users should always use magic login, even if they're in the wrong community
-      || (isNewRegistration && magicChain && MAGIC_SUPPORTED_CHAINS.includes(magicChain)
+      || (isNewRegistration && magicChain?.base && MAGIC_SUPPORTED_BASES.includes(magicChain.base)
           && !req.body.forceEmailLogin)) {
     return res.json({
       status: 'Success',

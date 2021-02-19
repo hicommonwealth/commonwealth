@@ -14,7 +14,8 @@ export const Errors = {
 };
 
 const addMember = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
   if (!community && !chain) return next(new Error(Errors.InvalidCommunity));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));

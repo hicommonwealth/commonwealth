@@ -176,18 +176,6 @@ export default class extends Base {
   }
 
   /**
-   * Given a chain/community ID, grabs the first admin role
-   * @param options A chain or a community ID
-   */
-  public getAdmin(options: { chain?: string, community?: string }): RoleInfo {
-    return this.roles.find((role) => {
-      return role.permission === RolePermission.admin && (
-        (role.offchain_community_id === options.community) || (role.chain_id === options.chain)
-      );
-    });
-  }
-
-  /**
    * Given a chain/community ID, determines if the
    * active account is an admin of the specified community.
    * @param options A chain or a community ID
@@ -195,70 +183,13 @@ export default class extends Base {
   public isAdminOfEntity(options: { chain?: string, community?: string }): boolean {
     if (!this.activeAccount) return false;
     const adminRole = this.roles.find((role) => {
-      return (role.address === this.activeAccount.address
+      return role.address === this.activeAccount.address
         && role.permission === RolePermission.admin
-        && (role.offchain_community_id === options.community || role.chain_id === options.chain)
-      );
+        && ((options.community && role.offchain_community_id === options.community)
+            || (options.chain && role.chain_id === options.chain));
     });
 
     return !!adminRole;
-  }
-
-  /**
-   * Given a chain/community ID, determines if the
-   * active account is an admin or moderator of the
-   * specified community.
-   * @param options A chain or a community ID
-   */
-  public isAdminOrModOfEntity(options: { account?: Account<any>, chain?: string, community?: string }): boolean {
-    const account = options.account || this.activeAccount;
-    if (!account) return false;
-
-    const activeRoleCheck = (r) => (
-      r.address === account.address && (
-        r.permission === RolePermission.admin
-        || r.permission === RolePermission.moderator
-      )
-    );
-
-    this.roles.forEach((r) => {
-      if (r.chain_id === options.chain && activeRoleCheck(r)) {
-        return true;
-      }
-
-      if (r.offchain_community_id === options.community && activeRoleCheck(r)) {
-        return true;
-      }
-    });
-
-    return false;
-  }
-
-  public isAdminOrMod(options: { account?: AddressInfo | Account<any> }): boolean {
-    const account = options.account || this.activeAccount;
-    if (!account) return false;
-    return this.roles.findIndex((r) => {
-      return r.address === account.address && r.permission !== RolePermission.member;
-    }) !== -1;
-  }
-
-  public isAdminOrModOfChain(options: { account?: AddressInfo | Account<any> }): boolean {
-    const account = options.account || this.activeAccount;
-    if (!account) return false;
-    return this.roles.findIndex((r) => {
-      const chain = (account instanceof AddressInfo) ? account.chain : account.chain.id;
-      return r.address === account.address
-        && r.permission !== RolePermission.member
-        && r.address_chain === chain;
-    }) !== -1;
-  }
-
-  public isAdmin(options: { account?: AddressInfo | Account<any> }): boolean {
-    const account = options.account || this.activeAccount;
-    if (!account) return false;
-    return this.roles.findIndex((r) => {
-      return r.address === account.address && r.permission === RolePermission.admin;
-    }) !== -1;
   }
 
   /**

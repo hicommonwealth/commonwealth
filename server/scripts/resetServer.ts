@@ -90,6 +90,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/edg.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 7,
         }),
         models.Chain.create({
           id: 'edgeware-testnet',
@@ -99,6 +101,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/edg.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 7,
         }),
         models.Chain.create({
           id: 'edgeware',
@@ -108,6 +112,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/edg.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 7,
         }),
         models.Chain.create({
           id: 'kusama-local',
@@ -117,6 +123,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/ksm.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 42,
         }),
         models.Chain.create({
           id: 'kusama',
@@ -126,6 +134,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/ksm.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 2,
         }),
         models.Chain.create({
           id: 'polkadot-local',
@@ -135,6 +145,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/dot.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 42,
         }),
         models.Chain.create({
           id: 'polkadot',
@@ -144,6 +156,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/dot.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 0,
         }),
         models.Chain.create({
           id: 'kulupu',
@@ -153,6 +167,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/klp.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 16,
         }),
         models.Chain.create({
           id: 'plasm',
@@ -162,6 +178,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/plm.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 5,
         }),
         models.Chain.create({
           id: 'stafi',
@@ -171,6 +189,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/fis.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 20,
         }),
         models.Chain.create({
           id: 'darwinia',
@@ -180,6 +200,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/ring.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 18,
         }),
         models.Chain.create({
           id: 'phala',
@@ -189,6 +211,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/pha.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 30,
         }),
         models.Chain.create({
           id: 'centrifuge',
@@ -198,6 +222,8 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/cennz.png',
           active: true,
           type: 'chain',
+          base: 'substrate',
+          ss58_prefix: 36,
         }),
         models.Chain.create({
           id: 'cosmos-local',
@@ -207,6 +233,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/atom.png',
           active: true,
           type: 'chain',
+          base: 'cosmos',
         }),
         models.Chain.create({
           id: 'cosmos-testnet',
@@ -216,6 +243,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/atom.png',
           active: true,
           type: 'chain',
+          base: 'cosmos',
         }),
         models.Chain.create({
           id: 'cosmos',
@@ -225,6 +253,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/atom.png',
           active: true,
           type: 'chain',
+          base: 'cosmos',
         }),
         // models.Chain.create({
         //   id: 'ethereum-ropsten',
@@ -234,6 +263,7 @@ const resetServer = (models): Promise<number> => {
         //   icon_url: '/static/img/protocols/eth.png',
         //   active: false,
         //   type: 'chain',
+        //   base: 'ethereum',
         // }),
         models.Chain.create({
           id: 'ethereum-local',
@@ -243,6 +273,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/eth.png',
           active: true,
           type: 'chain',
+          base: 'ethereum',
         }),
         models.Chain.create({
           id: 'ethereum',
@@ -252,6 +283,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/eth.png',
           active: true,
           type: 'chain',
+          base: 'ethereum',
         }),
         models.Chain.create({
           id: 'near-local',
@@ -261,6 +293,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/near.png',
           active: true,
           type: 'chain',
+          base: 'near',
         }),
         models.Chain.create({
           id: 'near',
@@ -270,6 +303,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/near.png',
           active: true,
           type: 'chain',
+          base: 'near',
         }),
         models.Chain.create({
           id: 'moloch',
@@ -279,6 +313,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/molochdao.png',
           active: true,
           type: 'dao',
+          base: 'ethereum',
         }),
         // This is the same exact as Moloch, but I want to show the picture on the front end
         models.Chain.create({
@@ -289,6 +324,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/metacartel.png',
           active: true,
           type: 'dao',
+          base: 'ethereum',
         }),
         models.Chain.create({
           id: 'moloch-local',
@@ -298,6 +334,7 @@ const resetServer = (models): Promise<number> => {
           icon_url: '/static/img/protocols/molochdao.png',
           active: true,
           type: 'dao',
+          base: 'ethereum',
         }),
         models.Chain.create({
           id: 'marlin',
