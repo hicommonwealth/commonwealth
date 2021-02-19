@@ -246,8 +246,10 @@ const NewProposalForm = {
         });
       } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
         // TODO: fix these lines
-        if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
-        args = [author, vnode.state.form.amount];
+        if (!vnode.state.form.title) throw new Error('Invalid title');
+        if (!vnode.state.form.description) throw new Error('Invalid description');
+        if (!vnode.state.value) throw new Error('Invalid value');
+        args = [author, `${vnode.state.form.title}: ${vnode.state.form.description}`, vnode.state.value];
       } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
         args = [author];
         createFunc = ([a]) => (app.chain as Substrate).phragmenElections.activeElection.submitCandidacyTx(a);
@@ -459,6 +461,21 @@ const NewProposalForm = {
               ],
               name: 'democracy-tx-switcher',
             }),
+          ],
+          hasValue && [
+            m(FormGroup, [
+              m(FormLabel, 'Value'),
+              m(Input, {
+                name: 'value',
+                placeholder: 'Min: 0',
+                oncreate: (vvnode) => $(vvnode.dom).val('0'),
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.value = parseFloat(result);
+                  m.redraw();
+                },
+              }),
+            ]),
           ],
           hasDepositChooser && [
             m(FormGroup, [
