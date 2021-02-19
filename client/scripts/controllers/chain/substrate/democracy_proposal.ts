@@ -193,6 +193,7 @@ class SubstrateDemocracyProposal extends Proposal<
 
   private async _initDepositors() {
     const depositOpt = await this._Chain.api.query.democracy.depositOf(this.data.index);
+    if (!depositOpt.isSome) return;
     const depositorsTuple: ITuple<[ BalanceOf | Vec<AccountId>, BalanceOf | Vec<AccountId> ]> = depositOpt.unwrap();
     let depositors: Vec<AccountId>;
     if (isFunction((depositorsTuple[1] as BalanceOf).mul)) {

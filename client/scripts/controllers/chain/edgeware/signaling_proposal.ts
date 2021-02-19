@@ -177,6 +177,7 @@ export class EdgewareSignalingProposal
     super.complete(this._Signaling.store);
   }
 
+  // TODO: figure out why we have duplicate events
   public update(e: ChainEvent) {
     if (this.completed) {
       return;
@@ -186,7 +187,7 @@ export class EdgewareSignalingProposal
         break;
       }
       case SubstrateTypes.EventKind.SignalingCommitStarted: {
-        if (this.stage !== SignalingProposalStage.PreVoting) {
+        if (this.stage !== SignalingProposalStage.PreVoting && this.stage !== SignalingProposalStage.Commit) {
           console.error('signaling stage out of order!');
           return;
         }
@@ -195,7 +196,7 @@ export class EdgewareSignalingProposal
         break;
       }
       case SubstrateTypes.EventKind.SignalingVotingStarted: {
-        if (this.stage !== SignalingProposalStage.Commit && this.stage !== SignalingProposalStage.PreVoting) {
+        if (this.stage === SignalingProposalStage.Completed) {
           console.error('signaling stage out of order!');
           return;
         }

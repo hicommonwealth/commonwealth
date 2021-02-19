@@ -98,7 +98,8 @@ const app: IApp = {
     if (app.isAdapterReady) cb();
     else app.chainAdapterReady.on('ready', cb);
   },
-  chainModuleReady: new EventEmitter(),
+  // need many max listeners because every account will wait on this
+  chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
 
   profiles: new ProfilesController(),

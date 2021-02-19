@@ -204,9 +204,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   private _removeErrorCb: () => void;
 
   public async deinitApi() {
-    if (!this.api) return;
+    if (!this._api) return;
     try {
-      await this.api.disconnect();
+      await this._api.disconnect();
       if (this._removeConnectedCb) this._removeConnectedCb();
       if (this._removeDisconnectedCb) this._removeDisconnectedCb();
       if (this._removeErrorCb) this._removeErrorCb();
@@ -217,14 +217,14 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   public get api(): ApiPromise {
-    if (!this.api) {
+    if (!this._api) {
       throw new Error('Must initialize API before using.');
     }
     return this._api;
   }
 
   public get apiInitialized() : boolean {
-    return !!this.api;
+    return !!this._api;
   }
 
   // load existing events and subscribe to future via client node connection
