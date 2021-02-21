@@ -110,7 +110,12 @@ export enum ProposalStatus {
 }
 
 export enum BountyStatus {
-  // TODO: Fill in
+  Proposed = 'proposed',
+  Approved = 'approved',
+  Funded = 'funded',
+  CuratorProposed = 'curator_proposed',
+  Active = 'active',
+  PendingPayout = 'pending_payout',
 }
 
 export enum VotingType {
