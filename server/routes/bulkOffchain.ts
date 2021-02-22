@@ -215,7 +215,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
     })(),
     models.sequelize.query(`
      SELECT id, title, stage FROM "OffchainThreads"
-     WHERE ${communityOptions} AND stage = 'proposal_in_review' OR stage = 'voting'`, {
+     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`, {
       replacements,
       type: QueryTypes.SELECT
     }),
