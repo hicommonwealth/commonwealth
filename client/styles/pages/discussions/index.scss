@@ -16,7 +16,8 @@
         }
     }
 
-    .discussions-topics {
+    .discussions-topics,
+    .discussions-stages {
         margin-bottom: 20px;
         font-size: 17px;
         line-height: 1.25;
@@ -24,17 +25,37 @@
             margin-top: 10px;
             margin-bottom: 10px;
         }
+        .cui-button-group {
+            flex-wrap: wrap;
+        }
     }
     .cui-button.discussions-topic {
+        margin-right: 6px;
+    }
+    .cui-button.discussions-topic,
+    .cui-button.discussions-stage {
+        color: $text-color-black;
         padding: 0 15px;
         display: inline-block;
-        margin-right: 6px;
         margin-bottom: 6px;
         cursor: pointer;
         line-height: 1 !important;
         &.active {
             border-color: $text-color-black;
         }
+    }
+    .discussions-stage-count {
+        display: inline-block;
+        height: 19px;
+        font-size: 15px;
+        position: relative;
+        left: 2px;
+        padding: 3px 5px 0;
+        border-radius: 9999px;
+        background: $primary-bg-color;
+        color: #fff;
+        font-weight: 500;
+        margin: -2px 0 -2px 2px;
     }
 
     // content

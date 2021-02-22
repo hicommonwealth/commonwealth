@@ -75,6 +75,7 @@ export interface ThreadArgs {
   jwt: any,
   address: string,
   kind: string,
+  stage: string,
   chainId: string,
   communityId: string,
   title: string,
@@ -86,8 +87,10 @@ export interface ThreadArgs {
   readOnly?: boolean
 }
 export const createThread = async (args: ThreadArgs) => {
-  const { chainId, communityId, address, jwt, title, body, topicName, topicId,
-    readOnly, kind, url, attachments } = args;
+  const {
+    chainId, communityId, address, jwt, title, body, topicName, topicId,
+    readOnly, kind, stage, url, attachments
+  } = args;
   const res = await chai.request.agent(app)
     .post('/api/createThread')
     .set('Accept', 'application/json')
@@ -217,6 +220,19 @@ export const assignRole = async (args: AssignRoleArgs) => {
     permission: args.role,
   });
 
+  return role;
+};
+
+export const updateRole = async (args: AssignRoleArgs) => {
+  const role = await models['Role'].findOne({
+    where: {
+      ...args.chainOrCommObj,
+      address_id: args.address_id,
+    }
+  });
+  if (!role) return null;
+  role.permission = args.role;
+  await role.save();
   return role;
 };
 

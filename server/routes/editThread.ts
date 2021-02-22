@@ -17,18 +17,20 @@ export const Errors = {
 };
 
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { body, title, kind, thread_id } = req.body;
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
-
+  const { body, title, kind, stage, thread_id, version_history, } = req.body;
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
   }
+
   if (kind === 'forum') {
     if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
       return next(new Error(Errors.NoBodyOrAttachment));
     }
   }
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
+  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
+  if (authorError) return next(new Error(authorError));
 
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
@@ -92,6 +94,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       thread.version_history = arr;
     }
     thread.body = body;
+    thread.stage = stage;
     thread.plaintext = (() => {
       try {
         return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
@@ -169,12 +172,13 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
           });
           return user;
         } catch (err) {
-          return next(new Error(err));
+          return null;
         }
       }));
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
+
     // notify mentioned users, given permissions are in place
     if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address

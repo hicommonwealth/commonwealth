@@ -191,6 +191,7 @@ $discussion-title-font-size: 1.45rem;
 
     // proposal-meta
     .ProposalHeaderTopics,
+    .ProposalHeaderStage,
     .ProposalHeaderOnchainId,
     .ProposalHeaderOnchainStatus,
     .ProposalBodyAuthor,
@@ -218,6 +219,32 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
+    .ProposalHeaderStage {
+        position: relative;
+        top: -4px;
+        margin-left: 12px;
+        a.cui-button {
+            padding: 0 10px;
+            border: none;
+            background: $background-color-light;
+            color: $text-color-black;
+            &.cui-button.cui-primary {
+                background: $primary-bg-color;
+                color: $text-color-white;
+            }
+            &.cui-button.cui-positive {
+                background: $positive-bg-color;
+                color: $text-color-white;
+            }
+            &.cui-button.cui-negative {
+                background: $negative-bg-color;
+                color: $text-color-white;
+            }
+        }
+        a.cui-button:hover {
+            text-decoration: none;
+        }
+    }
     .proposal-collaborators-popover {
         color: $text-color-black;
         .cui-popover-content {
@@ -227,6 +254,7 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
+
     .QuillEditor {
         margin-top: 8px;
     }

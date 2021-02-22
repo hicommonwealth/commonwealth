@@ -84,7 +84,8 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
   view: (vnode) => {
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
       || p.startsWith(`/${app.activeId()}/discussions/`)
-      || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+      || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
+      || p.startsWith(`/${app.activeId()}?`);
     const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
       || p.startsWith(`/${app.activeId()}/account/`);

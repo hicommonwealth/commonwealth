@@ -20,6 +20,8 @@ export interface ChainAttributes {
   featured_topics: string[];
   symbol: string;
   network: string;
+  base: string;
+  ss58_prefix?: number;
   icon_url: string;
   blockExplorerIds: string;
   collapsed_on_homepage: boolean;
@@ -62,6 +64,8 @@ export default (
     featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
     symbol: { type: dataTypes.STRING, allowNull: false },
     network: { type: dataTypes.STRING, allowNull: false },
+    base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
+    ss58_prefix: { type: dataTypes.INTEGER, allowNull: true },
     icon_url: { type: dataTypes.STRING },
     active: { type: dataTypes.BOOLEAN },
     blockExplorerIds: { type: dataTypes.STRING, allowNull: true, },

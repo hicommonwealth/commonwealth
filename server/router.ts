@@ -68,6 +68,9 @@ import setDefaultRole from './routes/setDefaultRole';
 import getUploadSignature from './routes/getUploadSignature';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
+import updateThreadStage from './routes/updateThreadStage';
+import updateThreadPrivacy from './routes/updateThreadPrivacy';
+import updateThreadPinned from './routes/updateThreadPinned';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
@@ -92,8 +95,6 @@ import updateTopics from './routes/updateTopics';
 import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
-import setPrivacy from './routes/setPrivacy';
-import pinThread from './routes/pinThread';
 import bulkOffchain from './routes/bulkOffchain';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
@@ -150,6 +151,9 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/createThread', passport.authenticate('jwt', { session: false }), createThread.bind(this, models));
   // TODO: Change to PUT /thread
   router.put('/editThread', passport.authenticate('jwt', { session: false }), editThread.bind(this, models));
+  router.post('/updateThreadStage', passport.authenticate('jwt', { session: false }), updateThreadStage.bind(this, models));
+  router.post('/updateThreadPrivacy', passport.authenticate('jwt', { session: false }), updateThreadPrivacy.bind(this, models));
+  router.post('/updateThreadPinned', passport.authenticate('jwt', { session: false }), updateThreadPinned.bind(this, models));
   router.post('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this, models));
   router.post('/deleteEditors', passport.authenticate('jwt', { session: false }), deleteEditors.bind(this, models));
   // TODO: Change to DELETE /thread
@@ -160,9 +164,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/search', search.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
-
-  router.post('/setPrivacy', passport.authenticate('jwt', { session: false }), setPrivacy.bind(this, models));
-  router.post('/pinThread', passport.authenticate('jwt', { session: false }), pinThread.bind(this, models));
 
   // offchain discussion drafts
   router.post('/drafts', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));

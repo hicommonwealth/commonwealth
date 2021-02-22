@@ -298,6 +298,14 @@ button, .cui-button {
     }
 }
 
+// set z-index
+.cui-button-group .cui-button:active,
+.cui-button-group .cui-button.cui-active,
+.cui-button-group .cui-button:focus,
+.cui-button-group .cui-button:hover {
+    z-index: 2;
+}
+
 // adjust callout padding, colors, spacing
 .cui-callout {
     line-height: 1.2;
@@ -336,6 +344,12 @@ button, .cui-button {
     .cui-input.cui-#{$size} textarea {
         padding: 22px 15.6px 15.6px !important;
     }
+}
+
+// adjust select height
+.cui-select select {
+    height: 41px;
+    padding-top: 5px;
 }
 
 // adjust card padding

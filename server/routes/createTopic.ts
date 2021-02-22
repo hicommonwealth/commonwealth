@@ -2,7 +2,6 @@ import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 export const Errors = {
-  InvalidChainOrCommunity: 'Invalid chain or community',
   NotLoggedIn: 'Not logged in',
   TopicRequired: 'Topic name required',
   MustBeAdmin: 'Must be an admin',
@@ -10,9 +9,8 @@ export const Errors = {
 
 const createTopic = async (models, req, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  if (!chain && !community) return next(new Error(Errors.InvalidChainOrCommunity));
-  if (chain && community) return next(new Error(Errors.InvalidChainOrCommunity));
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
 
@@ -21,9 +19,10 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
   const adminRoles = await models.Role.findAll({
     where: {
       address_id: { [Op.in]: userAddressIds },
+      permission: { [Op.in]: ['admin', 'moderator'] },
       ...chainOrCommObj,
     },
-  }).filter((role) => role.permission === 'admin' || role.permission === 'moderator');
+  });
   if (adminRoles.length === 0) {
     return next(new Error(Errors.MustBeAdmin));
   }

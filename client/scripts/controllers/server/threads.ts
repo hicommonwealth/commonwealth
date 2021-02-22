@@ -5,10 +5,11 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { ProposalStore, TopicScopedThreadStore } from 'stores';
+import { ProposalStore, FilterScopedThreadStore } from 'stores';
 import {
   OffchainThread,
   OffchainAttachment,
+  OffchainThreadStage,
   CommunityInfo,
   NodeInfo,
   OffchainTopic,
@@ -51,6 +52,7 @@ export const modelFromServer = (thread) => {
     moment(thread.created_at),
     thread.topic,
     thread.kind,
+    thread.stage,
     versionHistory,
     thread.community,
     thread.chain,
@@ -68,7 +70,7 @@ export const modelFromServer = (thread) => {
 
 Threads are stored in two stores. One store, the listingStore, is responsible for all posts
 rendered in the forum/community discussions listing (pages/discussions/index.ts). It organizes
-threads first by community, then by topic or "subpage," using the const ALL_PROPOSALS_KEY to
+threads first by community, then by topic/stage or "subpage," using the const ALL_PROPOSALS_KEY to
 store non-topic-sorted threads for the main discussion listing. The relevant sub-store, for a
 given discussion listing, can be accessed via getStoreByCommunityAndTopic, again passing
 ALL_PROPOSALS_KEY for all proposals.
@@ -99,7 +101,7 @@ export interface VersionHistory {
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
-  private _listingStore = new TopicScopedThreadStore();
+  private _listingStore = new FilterScopedThreadStore();
 
   public get store() { return this._store; }
   public get listingStore() { return this._listingStore; }
@@ -107,6 +109,9 @@ class ThreadsController {
   private _initialized = false;
 
   public get initialized() { return this._initialized; }
+
+  public numPrevotingThreads: number;
+  public numVotingThreads: number;
 
   public getType(primary: string, secondary?: string, tertiary?: string) {
     const result = this._store.getAll().filter((thread) => {
@@ -122,6 +127,7 @@ class ThreadsController {
   public async create(
     address: string,
     kind: string,
+    stage: string,
     chainId: string,
     communityId: string,
     title: string,
@@ -143,6 +149,7 @@ class ThreadsController {
         'title': encodeURIComponent(title),
         'body': encodeURIComponent(body),
         'kind': kind,
+        'stage': stage,
         'attachments[]': attachments,
         'topic_name': topicName,
         'topic_id': topicId,
@@ -152,6 +159,10 @@ class ThreadsController {
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
+
+      // Update stage counts
+      if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
+      if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
@@ -187,6 +198,7 @@ class ThreadsController {
         'community': app.activeCommunityId(),
         'thread_id': proposal.id,
         'kind': proposal.kind,
+        'stage': proposal.stage,
         'body': encodeURIComponent(newBody),
         'title': newTitle,
         'attachments[]': attachments,
@@ -194,6 +206,11 @@ class ThreadsController {
       },
       success: (response) => {
         const result = modelFromServer(response.result);
+        // Update counters
+        if (proposal.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
+        if (proposal.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
+        if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
+        if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
@@ -228,9 +245,40 @@ class ThreadsController {
     });
   }
 
-  public async setPrivacy(args: { threadId: number, readOnly: boolean, }) {
+  public async setStage(args: { threadId: number, stage: OffchainThreadStage }) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadStage`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
+        'thread_id': args.threadId,
+        'stage': args.stage,
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const result = modelFromServer(response.result);
+        // Update counters
+        if (args.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads--;
+        if (args.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
+        if (result.stage === OffchainThreadStage.ProposalInReview) this.numPrevotingThreads++;
+        if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
+        // Post edits propagate to all thread stores
+        this._store.update(result);
+        this._listingStore.update(result);
+        return result;
+      },
+      error: (err) => {
+        console.log('Failed to update stage');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to update stage');
+      }
+    });
+  }
+
+  public async setPrivacy(args: { threadId: number, readOnly: boolean }) {
     return $.ajax({
-      url: `${app.serverUrl()}/setPrivacy`,
+      url: `${app.serverUrl()}/updateThreadPrivacy`,
       type: 'POST',
       data: {
         'jwt': app.user.jwt,
@@ -251,9 +299,9 @@ class ThreadsController {
     });
   }
 
-  public async pin(args: {proposal: OffchainThread, }) {
+  public async pin(args: { proposal: OffchainThread }) {
     return $.ajax({
-      url: `${app.serverUrl()}/pinThread`,
+      url: `${app.serverUrl()}/updateThreadPinned`,
       type: 'POST',
       data: {
         'jwt': app.user.jwt,
@@ -297,8 +345,9 @@ class ThreadsController {
     cutoffDate: moment.Moment,
     pageSize?: number,
     topicId?: OffchainTopic
+    stage?: string,
   }) : Promise<boolean> {
-    const { chainId, communityId, cutoffDate, topicId } = options;
+    const { chainId, communityId, cutoffDate, topicId, stage } = options;
     // pageSize can not exceed 50
     const pageSize = options.pageSize
       ? Math.min(options.pageSize, MAX_PAGE_SIZE)
@@ -310,6 +359,7 @@ class ThreadsController {
       page_size: pageSize,
     };
     if (topicId) params['topic_id'] = topicId;
+    if (stage) params['stage'] = stage;
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
@@ -322,7 +372,7 @@ class ThreadsController {
       }
       try {
         const storeOptions = {
-          allProposals: !topicId,
+          allProposals: !topicId && !stage,
           exclusive: true
         };
         this._store.add(modeledThread);
@@ -378,7 +428,7 @@ class ThreadsController {
         }
         // Threads that are posted in an offchain community are still linked to a chain / author address,
         // so when we want just chain threads, then we have to filter away those that have a community
-        const { threads } = response.result;
+        const { threads, numPrevotingThreads, numVotingThreads } = response.result;
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
           if (!thread.Address) {
@@ -395,6 +445,8 @@ class ThreadsController {
             console.error(e.message);
           }
         }
+        this.numPrevotingThreads = numPrevotingThreads;
+        this.numVotingThreads = numVotingThreads;
         this._initialized = true;
       }, (err) => {
         console.log('failed to load offchain discussions');
@@ -404,7 +456,7 @@ class ThreadsController {
       });
   }
 
-  public initialize(initialThreads: any[], reset = true) {
+  public initialize(initialThreads: any[], numPrevotingThreads, numVotingThreads, reset) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
@@ -423,6 +475,8 @@ class ThreadsController {
         console.error(e.message);
       }
     }
+    this.numPrevotingThreads = numPrevotingThreads;
+    this.numVotingThreads = numVotingThreads;
     this._initialized = true;
   }
 

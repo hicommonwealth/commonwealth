@@ -1,18 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  MustBeAdmin: 'Must be admin or mod',
-  NeedThread: 'Must provide thread',
+  NotAdmin: 'Not an admin',
+  NoThread: 'Cannot find thread',
 };
 
-const pinThread = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateThreadPinned = async (models, req: Request, res: Response, next: NextFunction) => {
   const { thread_id } = req.body;
-  if (!thread_id) return next(new Error(Errors.NeedThread));
+  if (!thread_id) return next(new Error(Errors.NoThread));
 
   try {
     const thread = await models.OffchainThread.findOne({
@@ -20,24 +19,19 @@ const pinThread = async (models, req: Request, res: Response, next: NextFunction
         id: thread_id,
       },
     });
-    const user = await models.User.findOne({
-      where: {
-        id: req.user.id,
-      },
-    });
-    const userAddressIds = await user.getAddresses().map((a) => a.id);
+    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
+
+    // only community mods and admin can pin
     const roles = await models.Role.findAll({
       where: {
-        address_id: { [Op.in]: userAddressIds, },
-        permission: { [Op.in]: ['admin', 'moderator'], },
-      },
+        address_id: { [Op.in]: userOwnedAddressIds, },
+        permission: { [Op.in]: ['admin', 'moderator'] },
+      }
     });
-
-    const adminRoles = roles.filter((r) => ['admin', 'moderator'].includes(r.permission));
-    const roleCommunities = adminRoles.map((r) => r.offchain_community_id || r.chain_id);
-    const isAdminOfCommunity = roleCommunities.includes(thread.community);
-    const isAdminOfChain = roleCommunities.includes(thread.chain);
-    if (!isAdminOfCommunity && !isAdminOfChain) return next(new Error(Errors.MustBeAdmin));
+    const role = roles.find((r) => {
+      return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
+    });
+    if (!role) return next(new Error(Errors.NotAdmin));
 
     await thread.update({ pinned: !thread.pinned });
 
@@ -67,4 +61,4 @@ const pinThread = async (models, req: Request, res: Response, next: NextFunction
   }
 };
 
-export default pinThread;
+export default updateThreadPinned;

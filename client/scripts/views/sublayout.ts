@@ -25,6 +25,7 @@ const Sublayout: m.Component<{
   class?: string,
   title?: any,                        // displayed at the top of the layout
   description?: string,               // displayed at the top of the layout
+  hero?: any,
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
   hideSidebar?: boolean,
@@ -33,6 +34,7 @@ const Sublayout: m.Component<{
     const {
       title,
       description,
+      hero,
       showNewProposalButton,
       showCouncilMenu,
       hideSidebar,
@@ -47,7 +49,7 @@ const Sublayout: m.Component<{
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
-      (!m.route.param('scope') && m.route.get() === '/') ? [
+      (!m.route.param('scope') && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
         m('h3', 'Commonwealth')
       ] : chain ? [
         m(ChainIcon, { size: ICON_SIZE, chain }),
@@ -109,6 +111,7 @@ const Sublayout: m.Component<{
               sublayoutHeaderRight,
             ]),
           ]),
+          hero && m('.sublayout-hero', hero),
           m('.sublayout-body', [
             m('.sublayout-grid', [
               !hideSidebar && m('.sublayout-sidebar-col', [
