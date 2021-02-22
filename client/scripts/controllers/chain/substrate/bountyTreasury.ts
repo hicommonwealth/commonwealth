@@ -101,12 +101,12 @@ class SubstrateBountyTreasury extends ProposalModule<
     });
   }
 
-  public createTx(author: SubstrateAccount, value: SubstrateCoin, beneficiary: SubstrateAccount) {
+  public createTx(author: SubstrateAccount, description: string, value: SubstrateCoin) {
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => api.tx.treasury.proposeSpend(value, beneficiary.address),
-      'proposeSpend',
-      `proposeSpend(${value.format()}, ${formatAddressShort(beneficiary.address, beneficiary.chain.id)})`
+      (api: ApiRx) => api.tx.bounties.createBounty(author.address, description, value),
+      'createBounty',
+      `createBounty(${author.address}, ${description}, ${value.format()})`
     );
   }
 }
