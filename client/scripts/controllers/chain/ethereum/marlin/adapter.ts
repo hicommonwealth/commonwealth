@@ -23,8 +23,6 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Marlin;
   public chain: MarlinChain;
-  // public ethAccounts: EthereumAccounts;
-  // public accounts: MarlinHolders;
   public accounts: EthereumAccounts;
   public marlinAccounts:  MarlinHolders;
   public governance: MarlinGovernance;
@@ -54,15 +52,18 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
   }
 
   public async initApi() {
-    console.log('Marlin initApi()');
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
-    // await this.ethAccounts.init(this.chain);
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     const mpondContractAddress = this.meta.address;
     const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
-    const api = new MarlinAPI(this.meta.address, governorAlphaContractAddress, this.chain.api.currentProvider as any, activeAddress);
+    const api = new MarlinAPI(
+      this.meta.address,
+      governorAlphaContractAddress,
+      this.chain.api.currentProvider as any,
+      activeAddress,
+    );
     await api.init().catch((e) => {
       this._failed = true;
       notifyError('Please change your Metamask network');
@@ -71,11 +72,7 @@ export default class Marlin extends IChainAdapter<EthereumCoin, EthereumAccount>
 
     if ((window as any).ethereum || (window as any).web3) {
       await this.webWallet.enable();
-      await this.webWallet.enable().catch((e) => { console.log('thowing!22'); console.error(e); });
-      await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
-        const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-        setActiveAccount(updatedAddress);
-      });
+      await this.webWallet.enable().catch((e) => console.error(e));
 
       await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
         const updatedAddress = this.app.user.activeAccounts.find((addr) => addr.address === accounts[0]);

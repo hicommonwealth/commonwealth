@@ -44,16 +44,17 @@ export default class MarlinAPI {
     web3Provider: AsyncSendable,
     userAddress?: string,
   ) {
+    this._Provider = new ethers.providers.Web3Provider(web3Provider);
+
     if (userAddress) {
       this._userAddress = userAddress.toLowerCase();
       this._Signer = this._Provider.getSigner(userAddress);
     }
 
-    this._Provider = new ethers.providers.Web3Provider(web3Provider);
     this._MPondAddress = mPondAddress.toLowerCase();
     this._GovernorAlphaAddress = governorAlphaAddress.toLowerCase();
-    if (this._Signer) { 
-      this._MPondContract = MPondFactory.connect(mPondAddress, this._Signer); 
+    if (this._Signer) {
+      this._MPondContract = MPondFactory.connect(mPondAddress, this._Signer);
       this._GovernorAlphaContract = GovernorAlphaFactory.connect(governorAlphaAddress, this._Signer);
     } else {
       this._MPondContract = MPondFactory.connect(mPondAddress, this._Provider);
