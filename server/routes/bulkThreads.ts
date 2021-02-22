@@ -141,12 +141,13 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       },
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
-    }).map((c) => {
-      const last_edited = getLastEdited(c);
-      delete c['version_history'];
-      c['last_edited'] = last_edited;
-      console.log(c);
-      return c;
+    }).map((c, idx) => {
+      const jsonC = c.toJSON();
+      const last_edited = getLastEdited(jsonC);
+      delete jsonC['version_history'];
+      jsonC['last_edited'] = last_edited;
+      if (idx === 0) console.log(jsonC);
+      return jsonC;
     });
   } else {
     const whereOptions = (community)
@@ -171,24 +172,26 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         }
       ],
       order: [['created_at', 'DESC']],
-    }).map((t) => {
-      const last_edited = getLastEdited(t);
-      delete t['version_history'];
-      t['last_edited'] = last_edited;
-      console.log(t);
-      return t;
+    }).map((t, idx) => {
+      const jsonT = t.toJSON();
+      const last_edited = getLastEdited(jsonT);
+      delete jsonT['version_history'];
+      jsonT['last_edited'] = last_edited;
+      if (idx === 0) console.log(jsonT);
+      return jsonT;
     });
 
     comments = await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
-    }).map((c) => {
-      const last_edited = getLastEdited(c);
-      delete c['version_history'];
-      c['last_edited'] = last_edited;
-      console.log(c);
-      return c;
+    }).map((c, idx) => {
+      const jsonC = c.toJSON();
+      const last_edited = getLastEdited(jsonC);
+      delete jsonC['version_history'];
+      jsonC['last_edited'] = last_edited;
+      if (idx === 0) console.log(jsonC);
+      return jsonC;
     });
   }
 
@@ -220,7 +223,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       numPrevotingThreads,
       numVotingThreads,
       threads: cutoff_date ? threads : threads.map((t) => t.toJSON()),
-      comments: comments.map((c) => c.toJSON()),
+      comments, // already converted to JSON earlier
       reactions: reactions.map((r) => r.toJSON()),
     }
   });

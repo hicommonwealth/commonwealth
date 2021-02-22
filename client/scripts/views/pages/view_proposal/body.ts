@@ -29,6 +29,7 @@ import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
 import { VersionHistory } from 'client/scripts/controllers/server/threads';
+import moment from 'moment';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -145,6 +146,10 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
     const { item } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
+    const x = moment(null);
+    console.log(x);
+    console.log(x.fromNow());
+    debugger
     const missingVersionHistory = (!item.versionHistory || item.versionHistory.length === 0);
     let lastEdited;
     if (item instanceof OffchainThread || item instanceof OffchainComment) {

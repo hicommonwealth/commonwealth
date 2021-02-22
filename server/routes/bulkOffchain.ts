@@ -158,12 +158,13 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         },
         include: [models.Address, models.OffchainAttachment],
         order: [['created_at', 'DESC']],
-      }).map((c) => {
-        const last_edited = getLastEdited(c);
-        delete c['version_history'];
-        c['last_edited'] = last_edited;
-        console.log(c);
-        return c;
+      }).map((c, idx) => {
+        const jsonC = c.toJSON();
+        const last_edited = getLastEdited(jsonC);
+        delete jsonC['version_history'];
+        jsonC['last_edited'] = last_edited;
+        if (idx === 0) console.log(jsonC);
+        return jsonC;
       });
 
       // Reactions
@@ -242,7 +243,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       numPrevotingThreads,
       numVotingThreads,
       threads, // already converted to JSON earlier
-      comments: comments.map((c) => c.toJSON()),
+      comments, // already converted to JSON earlier
       reactions: reactions.map((r) => r.toJSON()),
       //
       admins: admins.map((a) => a.toJSON()),
