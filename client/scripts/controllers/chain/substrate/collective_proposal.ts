@@ -43,12 +43,14 @@ export class SubstrateCollectiveProposal
   public get title() { return this._title; }
   public get description() { return null; }
   public get author() { return null; }
+  public get call() { return this._call; }
 
   // MEMBERS
   public canVoteFrom(account: SubstrateAccount) {
     return this._Collective.isMember(account);
   }
   private readonly _title: string;
+  private readonly _call;
   private _approved: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   private _Chain: SubstrateChain;
@@ -104,6 +106,7 @@ export class SubstrateCollectiveProposal
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Collective = Collective;
+    this._call = eventData.call;
     this._title = formatCall(eventData.call);
     this.createdAt = entity.createdAt;
 

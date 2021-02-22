@@ -34,7 +34,7 @@ interface IChainManagerState {
 
 const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
   view: (vnode) => {
-    const nodeRows = (chain) => (app.config.nodes.getByChain(chain.id) || [])
+    const nodeRows = (chain: ChainInfo) => (app.config.nodes.getByChain(chain.id) || [])
       .map((node, nodeIndex) => {
         return m('li.chain-node', [
           m('span', node.url),
@@ -70,7 +70,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
         ]);
       });
 
-    const addNodeRow = (chain) => m('li', [
+    const addNodeRow = (chain: ChainInfo) => m('li', [
       m('a', {
         href: '#',
         onclick: (e) => {
@@ -81,11 +81,13 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
           vnode.attrs.error = null;
           const url = prompt('Enter the node url:');
           // TODO: Change to POST /chainNode
+          // TODO: add ss58_prefix for substrate chains
           $.post(`${app.serverUrl()}/addChainNode`, {
             id: chain.id,
             name: chain.name,
             symbol: chain.symbol,
             network: chain.network,
+            base: chain.base,
             node_url: url,
             auth: true,
             jwt: app.user.jwt,

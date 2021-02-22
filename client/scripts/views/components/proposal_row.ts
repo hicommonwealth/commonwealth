@@ -29,7 +29,6 @@ import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/
 import MarlinProposal, { MarlinProposalState, MarlinProposalVote } from 'controllers/chain/ethereum/marlin/proposal';
 
 import { Icon, Icons, Grid, Col } from 'construct-ui';
-import ReactionButton, { ReactionType } from './reaction_button';
 import ListingRow from './listing_row';
 import UserGallery from './widgets/user_gallery';
 
@@ -288,13 +287,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
       })(),
     ]);
 
-    const reaction = m(ReactionButton, {
-      post: proposal,
-      type: ReactionType.Like,
-      tooltip: true,
-      large: true,
-    });
-
     const rowMetadata = [
       m(UserGallery, {
         popover: true,
@@ -314,7 +306,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
         contentLeft: {
           header: rowHeader,
           subheader: m('.proposal-row-sub', [rowSubheader, rowComments]),
-          reaction,
         },
         contentRight: rowMetadata,
         rightColSpacing: [6, 6],

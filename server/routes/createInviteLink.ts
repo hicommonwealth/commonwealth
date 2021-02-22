@@ -6,20 +6,16 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NoCommunityId: 'Error finding community or chain',
-  NoChainAndCommunity: 'Must provide only chain/community',
   NoTimeLimit: 'Must provide a time limit',
-  InvalidCommunity: 'Invalid community',
   NotAdminMod: 'Must be an admin/mod to create invite links in this community',
   InvalidUses: 'Must provide a valid number of uses',
 };
 
 const createInviteLink = async (models, req, res, next) => {
-  if (!req.body.community && !req.body.chain) return next(new Error(Errors.NoCommunityId));
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { time } = req.body;
-  if (community && chain) return next(new Error(Errors.NoChainAndCommunity));
   if (!time) return next(new Error(Errors.NoTimeLimit));
 
   const chainOrCommunityObj = chain ? { chain_id: chain.id }
