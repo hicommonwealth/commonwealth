@@ -25,37 +25,6 @@ import ErrorPage from './error';
 import User from '../components/widgets/user';
 
 
-const SubstrateBountyStats: m.Component<{}> = {
-  view: (vnode) => {
-    if (!app.chain) return;
-
-    return m(Grid, {
-      align: 'middle',
-      class: 'stats-container',
-      gutter: 5,
-      justify: 'space-between'
-    }, [
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Next treasury spend'),
-          (app.chain as Substrate).treasury.nextSpendBlock
-            ? m(CountdownUntilBlock, {
-              block: (app.chain as Substrate).treasury.nextSpendBlock,
-              includeSeconds: false
-            })
-            : '--',
-        ]),
-      ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        // TODO: Pot is under construction
-        m('.stats-tile', [
-          m('.stats-heading', 'Treasury balance'),
-          app.chain && formatCoin((app.chain as Substrate).treasury.pot),
-        ]),
-      ]),
-    ]);
-  }
-};
 
 async function loadCmd() {
   if (!app || !app.chain || !app.chain.loaded) {
@@ -109,7 +78,6 @@ const BountyPage: m.Component<{}> = {
       title: 'Bounties',
       showNewProposalButton: true,
     }, [
-      m(SubstrateBountyStats),
       m(Listing, {
         content: activeBountyContent,
         columnHeader: 'Active Bounties',
