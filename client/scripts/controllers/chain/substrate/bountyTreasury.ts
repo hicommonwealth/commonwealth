@@ -15,6 +15,7 @@ import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateBounty } from './bounty';
+import { String } from 'aws-sdk/clients/acm';
 
 class SubstrateBountyTreasury extends ProposalModule<
   ApiRx,
@@ -101,13 +102,17 @@ class SubstrateBountyTreasury extends ProposalModule<
     });
   }
 
-  public createTx(author: SubstrateAccount, description: string, value: SubstrateCoin) {
+  public createBounty(author: SubstrateAccount, description: string, value: SubstrateCoin) {
     return this._Chain.createTXModalData(
       author,
       (api: ApiRx) => api.tx.bounties.createBounty(author.address, description, value),
       'createBounty',
       `createBounty(${author.address}, ${description}, ${value.format()})`
     );
+  }
+
+  public createTx(...args) {
+    return null;
   }
 }
 

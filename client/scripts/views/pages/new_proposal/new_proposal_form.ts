@@ -250,7 +250,7 @@ const NewProposalForm = {
         if (!vnode.state.form.description) throw new Error('Invalid description');
         if (!vnode.state.value) throw new Error('Invalid value');
         args = [author, `${vnode.state.form.title}: ${vnode.state.form.description}`, vnode.state.value];
-        createFunc = ([a, d, v]) => (app.chain as Substrate).bounties.createTx(a, d, v);
+        createFunc = ([a, d, v]) => (app.chain as Substrate).bounties.createBounty(a, d, v);
         return createTXModal(createFunc(args)).then(done);
       } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
         args = [author];
