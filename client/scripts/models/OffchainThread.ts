@@ -29,6 +29,7 @@ class OffchainThread implements IUniqueId {
   public readonly versionHistory: VersionHistory[];
   public readonly community: string;
   public readonly chain: string;
+  public readonly lastEdited: moment.Moment;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -53,6 +54,7 @@ class OffchainThread implements IUniqueId {
     authorChain?: string,
     pinned?: boolean,
     collaborators?: any[],
+    lastEdited?: moment.Moment,
   ) {
     this.author = author;
     this.title = title;
@@ -73,6 +75,7 @@ class OffchainThread implements IUniqueId {
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];
+    this.lastEdited = lastEdited;
   }
 }
 

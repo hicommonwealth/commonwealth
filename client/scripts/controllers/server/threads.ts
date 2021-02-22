@@ -30,21 +30,22 @@ export const modelFromServer = (thread) => {
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
-  // if (thread.version_history) {
-  //   const versionHistory = thread.version_history.map((v) => {
-  //     let history;
-  //     try {
-  //       history = JSON.parse(v || '{}');
-  //       history.author = typeof history.author === 'string'
-  //         ? JSON.parse(history.author)
-  //         : typeof history.author === 'object' ? history.author : null;
-  //       history.timestamp = moment(history.timestamp);
-  //     } catch (e) {
-  //       console.log(e);
-  //     }
-  //     return history;
-  //   });
-  // }
+  let versionHistory;
+  if (thread.version_history) {
+    versionHistory = thread.version_history.map((v) => {
+      let history;
+      try {
+        history = JSON.parse(v || '{}');
+        history.author = typeof history.author === 'string'
+          ? JSON.parse(history.author)
+          : typeof history.author === 'object' ? history.author : null;
+        history.timestamp = moment(history.timestamp);
+      } catch (e) {
+        console.log(e);
+      }
+      return history;
+    });
+  }
 
   return new OffchainThread(
     thread.Address.address,
@@ -55,7 +56,7 @@ export const modelFromServer = (thread) => {
     thread.topic,
     thread.kind,
     thread.stage,
-    [],
+    versionHistory || [],
     thread.community,
     thread.chain,
     thread.read_only,
