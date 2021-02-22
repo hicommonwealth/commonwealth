@@ -91,6 +91,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         vnode.state.saving = false;
         m.redraw();
       }).catch((error) => {
+        console.log(error);
         if (typeof error === 'string') {
           notifyError(error);
         } else if (error.txType === 'setIdentity') {

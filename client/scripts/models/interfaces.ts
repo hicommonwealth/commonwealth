@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 import moment from 'moment-twitter';
+import { EventEmitter } from 'events';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';
 import { TransactionStatus } from './types';
@@ -61,11 +62,14 @@ export interface ITXModalData {
   author: Account<any>;
   txType: string;
   txData: {
+    // subscribe to transaction events
+    events: EventEmitter,
+
     // get blob of tx data to sign
     unsignedData: () => Promise<ITXData>,
 
     // perform transaction
-    transact: (txCb: (r: ITransactionResult) => void) => void,
+    transact: (...args) => void,
   };
 
   // callback triggered upon exit

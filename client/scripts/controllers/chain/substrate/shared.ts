@@ -31,6 +31,7 @@ import {
 } from 'models';
 
 import { SubstrateEvents } from '@commonwealth/chain-events';
+import { EventEmitter } from 'events';
 
 import { notifySuccess, notifyError, notifyInfo } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -449,11 +450,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     cb?: (success: boolean) => void, // TODO: remove this argument
   ): ITXModalData {
     // TODO: check if author has funds for tx fee
+    const events = new EventEmitter();
     return {
       author,
       txType: txName,
       cb,
       txData: {
+        events,
         unsignedData: async (): Promise<ISubstrateTXData> => {
           const txHex = txFunc(this.api).method.toHex();
           const nonce = this.api.query.system.accountNonce
@@ -467,19 +470,18 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             isEd25519: author.isEd25519,
           };
         },
-        transact: (txCb: (r: ITransactionResult) => void, hexTxOrAddress?: string, signer?: Signer): void => {
+        transact: (hexTxOrAddress?: string, signer?: Signer): void => {
           let unsubscribe: Promise<VoidFn>;
           const txResultHandler = (result: SubmittableResult) => {
             const status = result.status;
             if (status.isReady) {
               notifySuccess(`Pending ${txName}: "${objName}"`);
-              txCb({ status: TransactionStatus.Ready });
-            } else if (status.isInBlock || status.isFinalized) {
+              events.emit(TransactionStatus.Ready.toString(), {});
+            } else if (status.isFinalized) {
               for (const e of result.events) {
                 if (this.api.events.system.ExtrinsicSuccess.is(e.event)) {
                   notifySuccess(`Confirmed ${txName}: "${objName}"`);
-                  txCb({
-                    status: TransactionStatus.Success,
+                  events.emit(TransactionStatus.Success.toString(), {
                     hash: status.asFinalized.toHex(),
                     blocknum: this.app.chain.block.height,
                     timestamp: this.app.chain.block.lastTime,
@@ -500,8 +502,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                   }
                   console.error(errorInfo);
                   notifyError(`Failed ${txName}: "${objName}"`);
-                  txCb({
-                    status: TransactionStatus.Failed,
+                  events.emit(TransactionStatus.Failed.toString(), {
                     hash: status.asFinalized.toHex(),
                     blocknum: this.app.chain.block.height,
                     timestamp: this.app.chain.block.lastTime,
@@ -528,7 +529,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
               notifyError(err.toString());
             }
             m.redraw();
-            txCb({ status: TransactionStatus.Error, err: err.toString() });
+            events.emit(TransactionStatus.Error.toString(), { err: err.toString() });
           }
         },
       }

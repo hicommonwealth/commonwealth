@@ -89,6 +89,39 @@ const TXSigningTransactionBox = {
 // tx signing options
 //
 
+const setupEventListeners = (vnode) => {
+  vnode.attrs.txData.events.once(TransactionStatus.Ready.toString(), () => {
+    vnode.attrs.next('WaitingToConfirmTransaction', { events: vnode.attrs.txData.events });
+  });
+  vnode.attrs.txData.events.once(TransactionStatus.Error.toString(), ({ err }) => {
+    vnode.attrs.txData.events.removeAllListeners();
+    vnode.attrs.next('SentTransactionRejected', {
+      error: new Error('Transaction Failed'), hash: null, err,
+    });
+  });
+  vnode.attrs.txData.events.once(TransactionStatus.Failed.toString(), ({ hash, blocknum, err, timestamp }) => {
+    // the transaction may be submitted twice, so only go to a
+    // failure state if transaction has not already succeeded
+    if (vnode.state.timerHandle) {
+      clearInterval(vnode.state.timerHandle);
+    }
+    vnode.attrs.txData.events.removeAllListeners();
+    vnode.attrs.next('SentTransactionRejected', {
+      error: err,
+      hash,
+      blocknum,
+      timestamp
+    });
+  });
+  vnode.attrs.txData.events.once(TransactionStatus.Success.toString(), ({ hash, blocknum, timestamp }) => {
+    const $parent = $(vnode.dom).closest('.TXSigningModal');
+    vnode.attrs.txData.events.removeAllListeners();
+    vnode.attrs.next('SentTransactionSuccess', { hash, blocknum, timestamp });
+    // TODO: why doesn't this actually set the modal to complete?
+    $parent.trigger('modalcomplete');
+  });
+};
+
 const TXSigningCLIOption = {
   oncreate: async (vnode) => {
     if (vnode.state.calldata === undefined) {
@@ -98,16 +131,8 @@ const TXSigningCLIOption = {
   },
   view: (vnode) => {
     const transact = (...args) => {
-      const obs = vnode.attrs.txData.transact(...args);
-      obs.subscribe((txData: ITransactionResult) => {
-        if (txData.status === TransactionStatus.Ready) {
-          vnode.attrs.next('WaitingToConfirmTransaction', { obs });
-        } else {
-          vnode.attrs.next('SentTransactionRejected', {
-            error: new Error('Transaction Failed'), hash: null, err: txData.err
-          });
-        }
-      });
+      setupEventListeners(vnode);
+      vnode.attrs.txData.transact(...args);
     };
 
     // TODO: this is substrate specific, add a cosmos codepath
@@ -210,15 +235,11 @@ const TXSigningWebWalletOption = {
       const acct = vnode.attrs.author;
       try {
         const signer = await (app.chain as Substrate).webWallet.getSigner(acct.address);
-        const obs = vnode.attrs.txData.transact(acct.address, signer);
-        obs.subscribe((txData: ITransactionResult) => {
-          if (txData.status === TransactionStatus.Ready) {
-            vnode.attrs.next('WaitingToConfirmTransaction', { obs });
-          } else {
-            vnode.attrs.next('SentTransactionRejected', { hash: null, error: txData.err });
-          }
-        });
-      } catch (e) { console.log(e); }
+        setupEventListeners(vnode);
+        vnode.attrs.txData.transact(acct.address, signer);
+      } catch (e) {
+        console.log(e);
+      }
     };
     const isWebWalletAvailable = (app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available;
     const isWebWalletEnabled = (app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.enabled;
@@ -257,14 +278,8 @@ const TXSigningWebWalletOption = {
 const TXSigningSeedOrMnemonicOption = {
   view: (vnode) => {
     const transact = () => {
-      const obs = vnode.attrs.txData.transact();
-      obs.subscribe((txData: ITransactionResult) => {
-        if (txData.status === TransactionStatus.Ready) {
-          vnode.attrs.next('WaitingToConfirmTransaction', { obs });
-        } else {
-          vnode.attrs.next('SentTransactionRejected', { error: txData.err, hash: null });
-        }
-      });
+      setupEventListeners(vnode);
+      vnode.attrs.txData.transact();
     };
     return m('.TXSigningSeedOrMnemonicOption', [
       (!vnode.attrs.author.getSeed() && !vnode.attrs.author.getMnemonic()) ? m('form', [
@@ -389,31 +404,6 @@ const TXSigningModalStates = {
           $parent.trigger('modalcomplete');
         }, 10000);
       }
-
-      vnode.attrs.stateData.obs.subscribe((data: ITransactionResult) => {
-        if (data.status === TransactionStatus.Success) {
-          vnode.attrs.next('SentTransactionSuccess', {
-            hash: data.hash,
-            blocknum: data.blocknum,
-            timestamp: data.timestamp
-          });
-          $parent.trigger('modalcomplete');
-        }
-        // the transaction may be submitted twice, so only go to a
-        // failure state if transaction has not already succeeded
-        if (vnode.state.stateName !== 'SentTransactionRejected'
-            && (data.status === TransactionStatus.Failed || data.status === TransactionStatus.Error)) {
-          if (vnode.state.timerHandle) {
-            clearInterval(vnode.state.timerHandle);
-          }
-          vnode.attrs.next('SentTransactionRejected', {
-            error: data.err,
-            hash: data.hash,
-            blocknum: data.blocknum,
-            timestamp: data.timestamp
-          });
-        }
-      });
     },
     onremove: (vnode) => {
       if (vnode.state.timerHandle) {
