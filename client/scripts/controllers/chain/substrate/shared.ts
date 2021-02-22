@@ -477,12 +477,12 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             if (status.isReady) {
               notifySuccess(`Pending ${txName}: "${objName}"`);
               events.emit(TransactionStatus.Ready.toString(), {});
-            } else if (status.isFinalized) {
+            } else if (status.isFinalized || status.isInBlock) {
               for (const e of result.events) {
                 if (this.api.events.system.ExtrinsicSuccess.is(e.event)) {
                   notifySuccess(`Confirmed ${txName}: "${objName}"`);
                   events.emit(TransactionStatus.Success.toString(), {
-                    hash: status.asFinalized.toHex(),
+                    hash: status.isFinalized ? status.asFinalized.toHex() : status.asInBlock.toHex(),
                     blocknum: this.app.chain.block.height,
                     timestamp: this.app.chain.block.lastTime,
                   });
@@ -503,7 +503,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                   console.error(errorInfo);
                   notifyError(`Failed ${txName}: "${objName}"`);
                   events.emit(TransactionStatus.Failed.toString(), {
-                    hash: status.asFinalized.toHex(),
+                    hash: status.isFinalized ? status.asFinalized.toHex() : status.asInBlock.toHex(),
                     blocknum: this.app.chain.block.height,
                     timestamp: this.app.chain.block.lastTime,
                     err: errorInfo,
