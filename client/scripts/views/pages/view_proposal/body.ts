@@ -165,7 +165,12 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
             e.preventDefault();
             let postWithHistory;
             if (isThread && missingVersionHistory) {
-              postWithHistory = await app.threads.fetchThread(item.id);
+              try {
+                postWithHistory = await app.threads.fetchThread(item.id);
+              } catch (err) {
+                notifyError('Version history not found.');
+                return;
+              }
             }
             app.modals.create({
               modal: VersionHistoryModal,

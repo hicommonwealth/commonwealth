@@ -108,7 +108,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
             })
           ])
           : m('.versions.versions-loading', [
-            m(Spinner)
+            m(Spinner, { active: true })
           ])
       ])
     ]);

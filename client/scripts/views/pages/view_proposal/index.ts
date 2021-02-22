@@ -524,7 +524,7 @@ const ViewProposalPage: m.Component<{
 
     const proposalRecentlyEdited = vnode.state.recentlyEdited;
     const proposalDoesNotMatch = vnode.state.proposal
-      && (Number(vnode.state.proposal.identifier) !== Number(proposalId)
+      && (+vnode.state.proposal.identifier !== +proposalId
           || vnode.state.proposal.slug !== proposalType);
     // load proposal, and return m(PageLoading)
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
@@ -534,7 +534,7 @@ const ViewProposalPage: m.Component<{
         // proposal might be loading, if it's not an offchain thread
         if (proposalType === ProposalType.OffchainThread) {
           if (!vnode.state.threadFetched) {
-            app.threads.fetchThread(Number(proposalId)).then((res) => {
+            app.threads.fetchThread(+proposalId).then((res) => {
               vnode.state.proposal = res;
               m.redraw();
             }).catch((err) => {
