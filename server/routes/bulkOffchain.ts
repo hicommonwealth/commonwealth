@@ -118,13 +118,14 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           const collaborators = JSON.parse(t.collaborators[0]).address?.length
             ? t.collaborators.map((c) => JSON.parse(c))
             : [];
+          const last_edited = getLastEdited(t);
 
           const data = {
             id: t.thread_id,
             title: t.thread_title,
             url: t.url,
             body: t.body,
-            version_history: t.version_history,
+            last_edited,
             kind: t.kind,
             stage: t.stage,
             read_only: t.read_only,
