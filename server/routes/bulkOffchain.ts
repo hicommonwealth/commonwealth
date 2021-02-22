@@ -165,11 +165,11 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           include: [models.Address, models.OffchainAttachment],
           order: [['created_at', 'DESC']],
         }).map((c, idx) => {
-          const jsonC = c.toJSON();
-          const last_edited = getLastEdited(jsonC);
-          delete jsonC['version_history'];
-          jsonC['last_edited'] = last_edited;
-          return jsonC;
+          const row = c.toJSON();
+          const last_edited = getLastEdited(row);
+          delete row['version_history'];
+          row['last_edited'] = last_edited;
+          return row;
         });
 
         // Reactions
