@@ -229,7 +229,6 @@ class CommentsController {
           const model = modelFromServer(comment);
           this._store.add(model);
         });
-        console.log(response.result);
         resolve();
       } catch (err) {
         console.log('Failed to load comments');

@@ -343,7 +343,6 @@ class ThreadsController {
     const existing = this._store.getByIdentifier(thread.id);
     if (existing) this._store.remove(existing);
     this._store.update(thread);
-    console.log({ thread, store: this._store });
     return thread;
   }
 

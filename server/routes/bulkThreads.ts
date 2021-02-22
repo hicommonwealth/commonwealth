@@ -146,7 +146,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       const last_edited = getLastEdited(jsonC);
       delete jsonC['version_history'];
       jsonC['last_edited'] = last_edited;
-      if (idx === 0) console.log(jsonC);
       return jsonC;
     });
   } else {
@@ -177,7 +176,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       const last_edited = getLastEdited(jsonT);
       delete jsonT['version_history'];
       jsonT['last_edited'] = last_edited;
-      if (idx === 0) console.log(jsonT);
       return jsonT;
     });
 
@@ -190,7 +188,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       const last_edited = getLastEdited(jsonC);
       delete jsonC['version_history'];
       jsonC['last_edited'] = last_edited;
-      if (idx === 0) console.log(jsonC);
       return jsonC;
     });
   }
