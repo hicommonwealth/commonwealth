@@ -42,7 +42,7 @@
     }
     .HorizontalTabs .tab-content {
         width: 490px;
-        min-height: 440px;
+        min-height: 450px;
         @incude sm-max {
             width: initial;
         }
@@ -64,6 +64,13 @@
                 text-decoration: underline;
             }
         }
+    }
+    .TXSigningBodyText {
+        margin-bottom: 20px;
+    }
+    .cui-spinner {
+        margin: 20px 0 26px;
+        width: 100%;
     }
     .TXSigningTransactionBox {
         border: 1px solid $background-color-light;
