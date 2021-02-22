@@ -50,6 +50,10 @@ export const modelFromServer = (comment) => {
     // no proposal
   }
 
+  const last_edited = comment.last_edited
+    ? moment(comment.last_edited)
+    : null;
+
   return new OffchainComment(
     comment.chain,
     comment?.Address?.address || comment.author,
@@ -65,7 +69,7 @@ export const modelFromServer = (comment) => {
     comment.parent_id,
     comment.community,
     comment?.Address?.chain || comment.authorChain,
-    moment(comment.last_edited)
+    last_edited
   );
 };
 

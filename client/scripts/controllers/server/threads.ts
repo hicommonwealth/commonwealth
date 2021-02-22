@@ -47,6 +47,10 @@ export const modelFromServer = (thread) => {
     });
   }
 
+  const last_edited = thread.last_edited
+    ? moment(thread.last_edited)
+    : null;
+
   return new OffchainThread(
     thread.Address.address,
     decodeURIComponent(thread.title),
@@ -66,7 +70,7 @@ export const modelFromServer = (thread) => {
     thread.Address.chain,
     thread.pinned,
     thread.collaborators,
-    moment(thread.last_edited)
+    last_edited,
   );
 };
 

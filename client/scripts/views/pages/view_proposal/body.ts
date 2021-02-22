@@ -146,10 +146,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
     const { item } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
-    const x = moment(null);
-    console.log(x);
-    console.log(x.fromNow());
-    debugger
+    console.log(item);
     const missingVersionHistory = (!item.versionHistory || item.versionHistory.length === 0);
     let lastEdited;
     if (item instanceof OffchainThread || item instanceof OffchainComment) {
