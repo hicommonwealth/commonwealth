@@ -9,7 +9,6 @@ import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
-import Substrate from 'client/scripts/controllers/chain/substrate/main';
 import { CandidacyButton, CollectiveVotingButton, getCouncilCandidates } from '../pages/council';
 
 const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {

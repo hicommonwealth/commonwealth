@@ -514,7 +514,7 @@ const ViewProposalPage: m.Component<{
     }
 
     const proposalRecentlyEdited = vnode.state.recentlyEdited;
-    const proposalDoesNotMatch = vnode.state.proposal && Number(vnode.state.proposal.identifier) !== Number(proposalId);
+    const proposalDoesNotMatch = vnode.state.proposal && (+vnode.state.proposal.identifier !== +proposalId);
     // load proposal, and return m(PageLoading)
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
@@ -523,7 +523,7 @@ const ViewProposalPage: m.Component<{
         // proposal might be loading, if it's not an offchain thread
         if (proposalType === ProposalType.OffchainThread) {
           if (!vnode.state.threadFetched) {
-            app.threads.fetchThread(Number(proposalId)).then((res) => {
+            app.threads.fetchThread(+proposalId).then((res) => {
               vnode.state.proposal = res;
               m.redraw();
             }).catch((err) => {
@@ -549,6 +549,7 @@ const ViewProposalPage: m.Component<{
       }
     }
     const { proposal } = vnode.state;
+    console.log((proposal as any).author);
     if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
       m.route.set(`/${app.activeId()}/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`, {},

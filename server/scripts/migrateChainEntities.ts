@@ -47,6 +47,9 @@ export default async function (models, chain?: string): Promise<void> {
 
     log.info(`Writing chain events to db... (count: ${events.length})`);
     for (const event of events) {
+      if (event?.data?.kind !== 'preimage-noted') {
+        console.log(event);
+      }
       try {
         // eslint-disable-next-line no-await-in-loop
         const dbEvent = await migrationHandler.handle(event);
