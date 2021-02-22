@@ -91,19 +91,22 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         ]);
       }
     };
+
     return m('.VersionHistoryModal', [
       m('.compact-modal-title', [
         m('h3', 'Version History'),
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
-        m('.versions', [
-          post.versionHistory.map((edit, idx) => {
-            const prevEdit = post.versionHistory[idx + 1];
-            if (!edit) return null;
-            return getVersion(edit, prevEdit);
-          })
-        ]),
+        post.versionHistory
+          ? m('.versions', [
+            post.versionHistory.map((edit, idx) => {
+              const prevEdit = post.versionHistory[idx + 1];
+              if (!edit) return null;
+              return getVersion(edit, prevEdit);
+            })
+          ])
+          : m('.versions.versions-loading')
       ])
     ]);
   }

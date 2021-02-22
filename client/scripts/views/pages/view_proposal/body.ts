@@ -154,8 +154,9 @@ export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainT
       return m('.ProposalBodyLastEdited', [
         m('a', {
           href: '#',
-          onclick: (e) => {
+          onclick: async (e) => {
             e.preventDefault();
+            if (isThread) await app.threads.fetchThread(item.id);
             app.modals.create({
               modal: VersionHistoryModal,
               data: isThread ? { proposal: item } : { comment: item }

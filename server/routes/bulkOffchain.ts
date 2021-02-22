@@ -56,7 +56,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         SELECT addr.id AS addr_id, addr.address AS addr_address,
           addr.chain AS addr_chain, thread_id, thread_title,
           thread_community, thread_chain, thread_created, threads.kind, threads.stage,
-          threads.version_history, threads.read_only, threads.body,
+          threads.read_only, threads.body,
           threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
           topics.description AS topic_description, topics.chain_id AS topic_chain,
           topics.community_id AS topic_community, collaborators
@@ -64,7 +64,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         RIGHT JOIN (
           SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
             t.created_at AS thread_created, t.community AS thread_community,
-            t.chain AS thread_chain, t.version_history, t.read_only, t.body,
+            t.chain AS thread_chain, t.read_only, t.body,
             t.stage, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(
               CONCAT(
                 '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
@@ -117,7 +117,6 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           title: t.thread_title,
           url: t.url,
           body: t.body,
-          version_history: t.version_history,
           kind: t.kind,
           stage: t.stage,
           read_only: t.read_only,
