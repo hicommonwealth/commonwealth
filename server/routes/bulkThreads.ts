@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+import { getLastEdited } from '../util/getLastEdited';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -100,15 +101,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];
-      let last_edited;
-      if (t.version_history) {
-        try {
-          const latestVersion = JSON.parse(t.version_history[0]);
-          last_edited = latestVersion.timestamp;
-        } catch (e) {
-          console.log(e);
-        }
-      }
+      const last_edited = getLastEdited(t);
 
       const data = {
         id: t.thread_id,
@@ -148,6 +141,12 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       },
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
+    }).map((c) => {
+      const last_edited = getLastEdited(c);
+      delete c['version_history'];
+      c['last_edited'] = last_edited;
+      console.log(c);
+      return c;
     });
   } else {
     const whereOptions = (community)
@@ -172,12 +171,24 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         }
       ],
       order: [['created_at', 'DESC']],
+    }).map((t) => {
+      const last_edited = getLastEdited(t);
+      delete t['version_history'];
+      t['last_edited'] = last_edited;
+      console.log(t);
+      return t;
     });
 
     comments = await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
+    }).map((c) => {
+      const last_edited = getLastEdited(c);
+      delete c['version_history'];
+      c['last_edited'] = last_edited;
+      console.log(c);
+      return c;
     });
   }
 

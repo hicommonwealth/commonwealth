@@ -528,24 +528,23 @@ const ViewProposalPage: m.Component<{
           || vnode.state.proposal.slug !== proposalType);
     // load proposal, and return m(PageLoading)
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
-      if (proposalType === ProposalType.OffchainThread) {
-        // All offchainthreads need to be re-fetched to populate versionHistory
-        if (!vnode.state.threadFetched) {
-          app.threads.fetchThread(+proposalId).then((res) => {
-            vnode.state.proposal = res;
-            m.redraw();
-          }).catch((err) => {
-            notifyError('Thread not found');
-            vnode.state.threadFetchFailed = true;
-          });
-          vnode.state.threadFetched = true;
-        }
-        return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
-      } else {
-        try {
-          vnode.state.proposal = idToProposal(proposalType, proposalId);
-        } catch (e) {
-          // proposal might be loading
+      try {
+        vnode.state.proposal = idToProposal(proposalType, proposalId);
+      } catch (e) {
+        // proposal might be loading, if it's not an offchain thread
+        if (proposalType === ProposalType.OffchainThread) {
+          if (!vnode.state.threadFetched) {
+            app.threads.fetchThread(Number(proposalId)).then((res) => {
+              vnode.state.proposal = res;
+              m.redraw();
+            }).catch((err) => {
+              notifyError('Thread not found');
+              vnode.state.threadFetchFailed = true;
+            });
+            vnode.state.threadFetched = true;
+          }
+          return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
+        } else {
           if (!app.chain.loaded) {
             return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
           }
@@ -556,11 +555,10 @@ const ViewProposalPage: m.Component<{
             return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
           }
         }
+        // proposal does not exist, 404
+        return m(PageNotFound);
       }
-      // proposal does not exist, 404
-      return m(PageNotFound);
     }
-
     const { proposal } = vnode.state;
     if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {

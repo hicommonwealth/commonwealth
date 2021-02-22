@@ -1,5 +1,4 @@
 import m from 'mithril';
-import moment from 'moment';
 import app from 'state';
 
 import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
@@ -15,19 +14,10 @@ import {
   OffchainThreadKind,
   OffchainThreadStage,
   OffchainComment,
-  Proposal,
   AnyProposal,
-  Account,
-  Profile,
-  ChainBase,
 } from 'models';
-import { NotificationCategories } from 'types';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import User from 'views/components/widgets/user';
 import { getStatusClass, getStatusText, getSupportText } from 'views/components/proposal_row';
-import VersionHistoryModal from 'views/modals/version_history_modal';
-import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import { GlobalStatus } from './body';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {

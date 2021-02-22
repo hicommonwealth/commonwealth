@@ -140,30 +140,40 @@ export const ProposalBodyCreated: m.Component<{
   }
 };
 
-export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainThread | OffchainComment<any> }> = {
+export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
-
+    const isThread = item instanceof OffchainThread;
+    const missingVersionHistory = (!item.versionHistory || item.versionHistory.length === 0);
+    let lastEdited;
     if (item instanceof OffchainThread || item instanceof OffchainComment) {
-      if (!item.versionHistory || item.versionHistory.length === 0) return;
-      const isThread = item instanceof OffchainThread;
-      const lastEdit : VersionHistory = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
-      if (!lastEdit) return;
+      if (item.lastEdited) {
+        lastEdited = item.lastEdited;
+      } else {
+        if (missingVersionHistory) return;
+        const lastEdit : VersionHistory = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
+        if (!lastEdit) return;
+        lastEdited = lastEdit.timestamp;
+      }
 
       return m('.ProposalBodyLastEdited', [
         m('a', {
           href: '#',
           onclick: async (e) => {
             e.preventDefault();
+            let postWithHistory;
+            if (isThread && missingVersionHistory) {
+              postWithHistory = await app.threads.fetchThread(item.id);
+            }
             app.modals.create({
               modal: VersionHistoryModal,
-              data: isThread ? { proposal: item } : { comment: item }
+              data: isThread ? { proposal: postWithHistory } : { comment: item }
             });
           }
         }, [
           'Edited ',
-          lastEdit.timestamp.fromNow()
+          lastEdited.fromNow()
         ])
       ]);
     } else {
