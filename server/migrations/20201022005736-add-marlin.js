@@ -35,10 +35,11 @@ module.exports = {
         type: 'dao',
         network: 'marlin',
         active: true,
+        collapsed_on_homepage: false,
       }, {
         id: 'marlin-testnet',
         symbol: 'TESTLIN',
-        name: 'Marlin (Ropsten)',
+        name: 'Marlin Testnet (Ropsten)',
         icon_url: '/static/img/protocols/lin.png',
         type: 'dao',
         network: 'marlin-testnet',
