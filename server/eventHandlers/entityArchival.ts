@@ -56,9 +56,6 @@ export default class extends IEventHandler {
       log.trace('no db event found!');
       return;
     }
-    if (event?.data?.kind !== 'preimage-noted' && event?.data?.kind !== 'democracy-started') {
-      console.log(event.data);
-    }
 
     /* We expect to see 3 types of events:
      * 1. Entity creation events, "new proposal", e.g.

@@ -19,10 +19,6 @@ module.exports = {
           {
             type: Sequelize.STRING,
             allowNull: true,
-            references: {
-              model: 'Addresses',
-              key: 'address'
-            },
           },
           { transaction: t }
         )
@@ -48,10 +44,6 @@ module.exports = {
           {
             type: Sequelize.STRING,
             allowNull: true,
-            references: {
-              model: 'Addresses',
-              key: 'address'
-            },
           },
           { transaction: t }
         )
