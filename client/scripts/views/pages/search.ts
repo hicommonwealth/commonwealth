@@ -16,8 +16,9 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
+import PageLoading from 'views/pages/loading';
 
-const SEARCH_PAGE_SIZE = 20;
+const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 const SEARCH_DELAY = 750;
 
 const searchCache = {}; // only used to restore search results when returning to the page
@@ -53,6 +54,17 @@ const search = _.debounce((searchTerm, vnode) => {
 
 const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorText: string }> = {
   view: (vnode) => {
+    if (!app.chain && !app.community) {
+      return m(PageLoading, {
+        narrow: true,
+        showNewProposalButton: true,
+        title: [
+          'Search Discussions ',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
+      });
+    }
+
     return m(Sublayout, {
       class: 'SearchPage',
       title: [
@@ -76,6 +88,7 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
               if (searchCache[searchTerm]) {
                 vnode.state.results = searchCache[searchTerm];
                 vnode.state.searchLoading = false;
+                vnode.state.searchTerm = searchTerm;
                 m.redraw();
               } else {
                 search(searchTerm, vnode);
@@ -111,7 +124,9 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
         // TODO: prompt to start searching
       ]) : m('.search-results', [
         m('.search-results-caption', [
-          pluralize(vnode.state.results.length, 'result'),
+          vnode.state.results.length === SEARCH_PAGE_SIZE
+            ? `${vnode.state.results.length}+ results`
+            : pluralize(vnode.state.results.length, 'result'),
           ' for \'',
           vnode.state.searchTerm,
           '\'',
@@ -158,10 +173,20 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
                     try {
                       const doc = JSON.parse(decodeURIComponent(result.body));
                       if (!doc.ops) throw new Error();
-                      return m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
+                      return m(QuillFormattedText, {
+                        doc,
+                        hideFormatting: true,
+                        collapse: true,
+                        searchTerm: vnode.state.searchTerm,
+                      });
                     } catch (e) {
                       const doc = decodeURIComponent(result.body);
-                      return m(MarkdownFormattedText, { doc, hideFormatting: true, collapse: true });
+                      return m(MarkdownFormattedText, {
+                        doc,
+                        hideFormatting: true,
+                        collapse: true,
+                        searchTerm: vnode.state.searchTerm,
+                      });
                     }
                   })(),
                 ])
@@ -179,10 +204,20 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
                     try {
                       const doc = JSON.parse(decodeURIComponent(result.body));
                       if (!doc.ops) throw new Error();
-                      return m(QuillFormattedText, { doc, hideFormatting: true, collapse: true });
+                      return m(QuillFormattedText, {
+                        doc,
+                        hideFormatting: true,
+                        collapse: true,
+                        searchTerm: vnode.state.searchTerm,
+                      });
                     } catch (e) {
                       const doc = decodeURIComponent(result.body);
-                      return m(MarkdownFormattedText, { doc, hideFormatting: true, collapse: true });
+                      return m(MarkdownFormattedText, {
+                        doc,
+                        hideFormatting: true,
+                        collapse: true,
+                        searchTerm: vnode.state.searchTerm,
+                      });
                     }
                   })(),
                 ]),

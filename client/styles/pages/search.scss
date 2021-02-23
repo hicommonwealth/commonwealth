@@ -53,6 +53,15 @@
             .search-results-comment {
                 color: $text-color-light;
             }
+            .search-results-thread-body,
+            .search-results-comment {
+                mark {
+                    background: $background-color-light;
+                    padding: 5px 2px 0;
+                    margin: 0 3px;
+                    border-radius: 5px;
+                }
+            }
         }
     }
 }

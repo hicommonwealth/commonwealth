@@ -185,7 +185,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
   const countsQuery = `
      SELECT id, title, stage FROM "OffchainThreads"
-     WHERE ${communityOptions} AND stage = 'proposal_in_review' OR stage = 'voting'`;
+     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
   const threadsInVoting = await models.sequelize.query(countsQuery, {
     replacements,
