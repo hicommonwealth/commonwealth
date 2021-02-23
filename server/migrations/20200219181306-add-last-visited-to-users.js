@@ -1,24 +1,24 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn(
       'Users',
       'lastVisited',
       {
-        type: DataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: '{}',
       }
     );
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn(
       'Users',
       'lastVisited',
       {
-        type: DataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: '{}',
       }

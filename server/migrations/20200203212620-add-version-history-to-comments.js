@@ -1,24 +1,24 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn(
       'OffchainComments',
       'version_history',
       {
-        type: DataTypes.ARRAY(DataTypes.TEXT),
+        type: Sequelize.ARRAY(Sequelize.TEXT),
         allowNull: false,
         defaultValue: []
       }
     )
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn(
       'OffchainComments',
       'version_history',
       {
-        type: DataTypes.ARRAY(DataTypes.TEXT),
+        type: Sequelize.ARRAY(Sequelize.TEXT),
         allowNull: false,
         defaultValue: []
       }

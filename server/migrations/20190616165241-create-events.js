@@ -1,14 +1,14 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Events', {
-      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      origin: { type: DataTypes.STRING, allowNull: false },
-      blocknum: { type: DataTypes.INTEGER, allowNull: false },
-      timestamp: { type: DataTypes.STRING, allowNull: true },
-      name: { type: DataTypes.STRING, allowNull: false },
-      data: { type: DataTypes.TEXT, allowNull: true },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      origin: { type: Sequelize.STRING, allowNull: false },
+      blocknum: { type: Sequelize.INTEGER, allowNull: false },
+      timestamp: { type: Sequelize.STRING, allowNull: true },
+      name: { type: Sequelize.STRING, allowNull: false },
+      data: { type: Sequelize.TEXT, allowNull: true },
     }, {
       underscored: true,
       indexes: [
@@ -18,7 +18,7 @@ module.exports = {
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('Events');
   }
 };
