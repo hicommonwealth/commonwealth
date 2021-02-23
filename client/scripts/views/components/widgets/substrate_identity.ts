@@ -39,8 +39,7 @@ const SubstrateOnlineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubst
   view: (vnode) => {
     const { profile, linkify, account, addrShort, hideIdentityIcon, showAddressWithDisplayName } = vnode.attrs;
     // if invalidated by change, load the new identity immediately
-    vnode.state.identity = (account instanceof SubstrateAccount
-      && (!profile.isOnchain || profile.isNameInvalid)
+    vnode.state.identity = ((!profile.isOnchain || profile.isNameInvalid)
       && (app.chain as Substrate).identities)
       ? (app.chain as Substrate).identities.get(account.address)
       : null;
@@ -60,8 +59,8 @@ const SubstrateOnlineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubst
       quality = vnode.state.identity.quality;
     }
 
-    if (displayName && quality && !hideIdentityIcon) {
-      const name = [ displayName, m(`span.identity-icon${quality === IdentityQuality.Good
+    if (displayName && quality) {
+      const name = [ displayName, !hideIdentityIcon && m(`span.identity-icon${quality === IdentityQuality.Good
         ? '.green' : quality === IdentityQuality.Bad
           ? '.red' : '.gray'}`, [
         quality === IdentityQuality.Good ? '✓' : quality === IdentityQuality.Bad ? '✗' : '-'
