@@ -40,7 +40,7 @@ export default (
     type_id: { type: dataTypes.STRING, allowNull: false },
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
     completed: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-    title: { type: dataTypes.TEXT, allowNull: true },
+    title: { type: dataTypes.STRING, allowNull: true },
     author: { type: dataTypes.STRING, allowNull: true },
 
     created_at: { type: dataTypes.DATE, allowNull: false },
