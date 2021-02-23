@@ -16,6 +16,7 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
+import PageLoading from 'views/pages/loading';
 
 const SEARCH_PAGE_SIZE = 20;
 const SEARCH_DELAY = 750;
@@ -53,6 +54,17 @@ const search = _.debounce((searchTerm, vnode) => {
 
 const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorText: string }> = {
   view: (vnode) => {
+    if (!app.chain && !app.community) {
+      return m(PageLoading, {
+        narrow: true,
+        showNewProposalButton: true,
+        title: [
+          'Search Discussions ',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
+      });
+    }
+
     return m(Sublayout, {
       class: 'SearchPage',
       title: [
