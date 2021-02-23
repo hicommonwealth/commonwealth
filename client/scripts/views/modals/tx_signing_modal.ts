@@ -114,11 +114,10 @@ const setupEventListeners = (vnode) => {
     });
   });
   vnode.attrs.txData.events.once(TransactionStatus.Success.toString(), ({ hash, blocknum, timestamp }) => {
-    const $parent = $(vnode.dom).closest('.TXSigningModal');
     vnode.attrs.txData.events.removeAllListeners();
+    const $modal = $('.TXSigningModal');
+    $modal.trigger('modalcomplete');
     vnode.attrs.next('SentTransactionSuccess', { hash, blocknum, timestamp });
-    // TODO: why doesn't this actually set the modal to complete?
-    $parent.trigger('modalcomplete');
   });
 };
 
@@ -383,7 +382,7 @@ const TXSigningModalStates = {
   },
   WaitingToConfirmTransaction: {
     oncreate: (vnode) => {
-      const $parent = $(vnode.dom).closest('.TXSigningModal');
+      const $parent = $('.TXSigningModal');
 
       vnode.state.timer = 0;
       // TODO: set a timeout? We currently have no failure case due to how event handling works.

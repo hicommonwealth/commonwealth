@@ -60,7 +60,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
     }
   },
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    const updateIdentity = () => {
+    const updateIdentity = async () => {
       const data = {
         display: `${$(vnode.dom).find('input[name=display]').val()}`.trim(),
         legal: `${$(vnode.dom).find('input[name=legal]').val()}`.trim(),
@@ -85,12 +85,11 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         additional: [],
       };
 
-      createTXModal(
-        (app.chain as Substrate).identities.setIdentityTx(app.user.activeAccount as SubstrateAccount, idData)
-      ).then(() => {
-        vnode.state.saving = false;
-        m.redraw();
-      }).catch((error) => {
+      try {
+        await createTXModal(
+          (app.chain as Substrate).identities.setIdentityTx(app.user.activeAccount as SubstrateAccount, idData)
+        );
+      } catch (error) {
         if (typeof error === 'string') {
           notifyError(error);
         } else if (error.txType === 'setIdentity') {
@@ -98,9 +97,10 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         } else {
           notifyError('Unknown error');
         }
-        vnode.state.saving = false;
-        m.redraw();
-      });
+      }
+
+      vnode.state.saving = false;
+      m.redraw();
     };
 
     const getInput = (inputLabel, inputName, description, prefixAt = false) => {
@@ -138,7 +138,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
               rounded: true,
               onclick: (e) => {
                 e.preventDefault();
-                updateIdentity();
+                updateIdentity().then(() => $(vnode.dom).trigger('modalexit'));
               },
               label: 'Set identity'
             }),
