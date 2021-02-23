@@ -76,10 +76,11 @@ class SubstrateIdentities implements StorageModule {
   }
 
   // given an account, fetch the corresponding identity (works on sub-accounts)
-  public async get(who: SubstrateAccount): Promise<SubstrateIdentity> {
+  public async load(who: SubstrateAccount): Promise<SubstrateIdentity> {
     // check immediately if we have the id
     const existingIdentity = this.store.getById(who.address);
     if (existingIdentity) {
+      await existingIdentity.update();
       return existingIdentity;
     }
 
@@ -87,6 +88,10 @@ class SubstrateIdentities implements StorageModule {
     const id = new SubstrateIdentity(this._Chain, this._Accounts, this, who);
     await id.update();
     return id;
+  }
+
+  public get(address: string): SubstrateIdentity | null {
+    return this.store.getById(address);
   }
 
   public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {

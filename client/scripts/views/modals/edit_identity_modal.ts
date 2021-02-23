@@ -28,7 +28,7 @@ interface IState {
 const EditIdentityModal: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     app.runWhenReady(async () => {
-      vnode.state.identity = await (app.chain as Substrate).identities.get(vnode.attrs.account);
+      vnode.state.identity = await (app.chain as Substrate).identities.load(vnode.attrs.account);
       m.redraw();
     });
   },
@@ -99,6 +99,16 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         }
       }
 
+      // force creation and update of the user's on-chain identity, guaranteeing that the identity
+      // component has immediate access to the new identity.
+      await (app.chain as Substrate).identities.load(app.user.activeAccount as SubstrateAccount);
+
+      // temporarily mark the user's profile as invalid, since they've potentially updated their
+      // display name. this ensures that any identity display will fall back to the loaded identity.
+      const profile = app.profiles.getProfile(app.chain.id, app.user.activeAccount.address);
+      if (profile) {
+        profile.invalidateName();
+      }
       vnode.state.saving = false;
       m.redraw();
     };

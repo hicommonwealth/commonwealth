@@ -31,18 +31,24 @@ const SubstrateOnlineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubst
       vnode.state.identity = (vnode.attrs.account instanceof SubstrateAccount
           && !vnode.attrs.profile.isOnchain
           && (app.chain as Substrate).identities)
-        ? await (app.chain as Substrate).identities.get(vnode.attrs.account)
+        ? await (app.chain as Substrate).identities.load(vnode.attrs.account)
         : null;
       m.redraw();
     });
   },
   view: (vnode) => {
     const { profile, linkify, account, addrShort, hideIdentityIcon, showAddressWithDisplayName } = vnode.attrs;
+    // if invalidated by change, load the new identity immediately
+    vnode.state.identity = (account instanceof SubstrateAccount
+      && (!profile.isOnchain || profile.isNameInvalid)
+      && (app.chain as Substrate).identities)
+      ? (app.chain as Substrate).identities.get(account.address)
+      : null;
 
     // return polkadot identity if possible
     let displayName: string;
     let quality: IdentityQuality;
-    if (profile.isOnchain) {
+    if (profile.isOnchain && !profile.isNameInvalid) {
       // first try to use identity fetched from server
       displayName = (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName);
       quality = getIdentityQuality(Object.values(profile.judgements));
