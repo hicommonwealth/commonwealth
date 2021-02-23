@@ -8,7 +8,7 @@ module.exports = {
           'ChainEntities',
           'title',
           {
-            type: Sequelize.TEXT,
+            type: Sequelize.STRING,
             allowNull: true,
           },
           { transaction: t }
@@ -32,19 +32,11 @@ module.exports = {
         queryInterface.removeColumn(
           'ChainEntities',
           'title',
-          {
-            type: Sequelize.TEXT,
-            allowNull: true,
-          },
           { transaction: t }
         ),
         queryInterface.removeColumn(
           'ChainEntities',
           'author',
-          {
-            type: Sequelize.STRING,
-            allowNull: true,
-          },
           { transaction: t }
         )
       ]);
