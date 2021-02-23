@@ -32,7 +32,7 @@ export class SubstrateTreasuryProposal
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public get title() {
+  public generateTitle() {
     const account = this._Accounts.fromAddress(this.beneficiaryAddress);
     const displayName = account.profile && account.profile.name
       ? `${account.profile.name} (${formatAddressShort(this.beneficiaryAddress, account.chain.id)})`
@@ -43,6 +43,9 @@ export class SubstrateTreasuryProposal
 
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
+
+  private readonly _title: string;
+  public get title() { return this._title || this.generateTitle(); }
 
   private _awarded: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
@@ -123,6 +126,7 @@ export class SubstrateTreasuryProposal
     this.bond = this._Chain.coins(this.data.bond);
     this.beneficiaryAddress = this.data.beneficiary;
     this._author = this._Accounts.fromAddress(this.data.proposer);
+    this._title = entity.title;
     this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));

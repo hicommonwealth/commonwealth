@@ -29,6 +29,9 @@ export abstract class ProposalModule<
   public get app() { return this._app; }
 
   protected _entityConstructor(entity: ChainEntity): ProposalT {
+    console.log(this._constructorFunc);
+    console.log(entity);
+    debugger
     try {
       return this._constructorFunc(entity);
     } catch (e) {
