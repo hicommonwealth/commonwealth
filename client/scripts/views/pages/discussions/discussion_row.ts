@@ -18,7 +18,6 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import UserGallery from 'views/components/widgets/user_gallery';
 import ListingRow from 'views/components/listing_row';
-import { ThreadLinkedChainEntity } from 'views/pages/view_proposal/chain_entity';
 
 import DiscussionRowMenu from './discussion_row_menu';
 

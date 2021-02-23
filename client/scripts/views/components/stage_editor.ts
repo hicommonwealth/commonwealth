@@ -1,6 +1,6 @@
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, Classes, Dialog, Icon, Icons, MenuItem } from 'construct-ui';
+import { Button, Classes, Dialog, InputSelect, Icon, Icons, MenuItem } from 'construct-ui';
 
 import app from 'state';
 import { offchainThreadStageToLabel } from 'helpers';
@@ -30,24 +30,49 @@ const StageEditor: m.Component<{
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
         content: [
-          [
-            OffchainThreadStage.Discussion,
-            OffchainThreadStage.ProposalInReview,
-            OffchainThreadStage.Voting,
-            OffchainThreadStage.Passed,
-            OffchainThreadStage.Failed,
-            OffchainThreadStage.Abandoned,
-          ].map((targetStage) => m(Button, {
-            class: 'discussions-stage',
-            active: vnode.state.stage === targetStage,
-            rounded: true,
-            size: 'sm',
-            style: 'margin: 3px 6px;',
-            label: offchainThreadStageToLabel(targetStage),
-            onclick: (e) => {
-              vnode.state.stage = targetStage;
-            }
-          })),
+          m('.stage-options', [
+            [
+              OffchainThreadStage.Discussion,
+              OffchainThreadStage.ProposalInReview,
+              OffchainThreadStage.Voting,
+              OffchainThreadStage.Passed,
+              OffchainThreadStage.Failed,
+              OffchainThreadStage.Abandoned,
+            ].map((targetStage) => m(Button, {
+              class: 'discussions-stage',
+              active: vnode.state.stage === targetStage,
+              rounded: true,
+              size: 'sm',
+              style: 'margin: 3px 6px;',
+              label: offchainThreadStageToLabel(targetStage),
+              onclick: (e) => {
+                vnode.state.stage = targetStage;
+              }
+            })),
+          ]),
+          // TODO: connect to chain button
+          // TODO: retrieve, display, select, and persist linked proposals
+          // vnode.attrs.thread.chainEntities.map((ce) => {
+          //   m('.existing-linked-chain-entity', '...'),
+          // }),
+          m(InputSelect, {
+            style: 'margin: 24px 6px 10px;',
+            defaultActiveIndex: null, // existing linked proposal
+            items: [
+              { name: 'la', a: 10 },
+              { name: 'lo', b: 20 },
+            ],
+            itemRender: (item: any, index: number) => m('', item.name),
+            onActiveItemChange: (activeItem: any, index: number) => {
+              // TODO: set to state
+            },
+            onSelect: (item, e, index) => {
+              // TODO: set to state
+            },
+            popoverAttrs: {
+              transitionDuration: 0,
+            },
+          }),
         ],
         hasBackdrop: true,
         isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
@@ -63,7 +88,7 @@ const StageEditor: m.Component<{
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
-            label: 'Close',
+            label: 'Cancel',
             rounded: true,
             onclick: () => {
               if (vnode.attrs.popoverMenu) {
