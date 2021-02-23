@@ -27,7 +27,7 @@ const search = async (models, req: Request, res: Response, next: NextFunction) =
     ? { community: community.id }
     : { chain: chain.id };
   replacements['searchTerm'] = req.query.search;
-  replacements['limit'] = 20;
+  replacements['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
 
   if (req.query.search.length < 3) {
     return next(new Error(Errors.QueryTooShort));
