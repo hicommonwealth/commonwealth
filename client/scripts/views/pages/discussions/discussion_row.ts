@@ -8,6 +8,7 @@ import { Button, Icon, Icons, Tag } from 'construct-ui';
 
 import { updateRoute } from 'app';
 import app from 'state';
+import { chainEntityTypeToProposalShortName } from 'identifiers';
 import { formatLastUpdated, slugify, link, externalLink, extractDomain, offchainThreadStageToLabel } from 'helpers';
 
 import { OffchainThread, OffchainThreadKind, OffchainThreadStage, AddressInfo } from 'models';
@@ -30,7 +31,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
-    const rowHeader = [
+    const rowHeader: any = [
       (propType === OffchainThreadKind.Link && proposal.url)
         && externalLink('a.external-discussion-link', proposal.url, [
           extractDomain(proposal.url),
@@ -38,14 +39,20 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       (propType === OffchainThreadKind.Link && proposal.url)
         && m('span.spacer', ' '),
       link('a', discussionLink, proposal.title),
-      proposal.chainEntities?.length > 0 && m('span.spacer', ' '),
-      proposal.chainEntities?.length > 0 && m(Button, {
-        class: 'discussion-row-linked-chain-entity',
-        label: 'On chain',
-        intent: 'primary',
-        size: 'xs',
-        rounded: true,
-        compact: true,
+      proposal.chainEntities?.length > 0 && m('span.spacer', m.trust(' &nbsp; ')),
+      proposal.chainEntities?.length > 0 && proposal.chainEntities.map((ce) => {
+        if (!chainEntityTypeToProposalShortName(ce.type)) return;
+        return m(Button, {
+          class: 'discussion-row-linked-chain-entity',
+          label: [
+            chainEntityTypeToProposalShortName(ce.type),
+            Number.isNaN(parseInt(ce.type_id, 10)) ? '' : ` #${ce.type_id}`,
+          ],
+          intent: 'primary',
+          size: 'xs',
+          rounded: true,
+          compact: true,
+        });
       }),
     ];
     const rowSubheader = [

@@ -8,7 +8,7 @@ import {
   pluralize, link, externalLink, isSameAccount, extractDomain,
   offchainThreadStageToLabel, offchainThreadStageToIndex,
 } from 'helpers';
-import { proposalSlugToFriendlyName, chainEntityTypeToProposalSlug } from 'identifiers';
+import { proposalSlugToFriendlyName, chainEntityTypeToProposalSlug, chainEntityTypeToProposalName } from 'identifiers';
 
 import {
   OffchainThread,
@@ -82,8 +82,9 @@ export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: Offc
         'a',
         `/${proposal.chain}/proposal/${slug}/${chainEntity.type_id}`,
         [
-          `${chainEntity.type} ${chainEntity.type_id}`,
-          chainEntity.completed === 't' ? ' (Completed)' : ''
+          `${chainEntityTypeToProposalName(chainEntity.type)} #${chainEntity.type_id}`,
+          chainEntity.completed === 't' ? ' (Completed) ' : ' ',
+          m(Icon, { name: Icons.EXTERNAL_LINK }),
         ],
       ),
     ]);

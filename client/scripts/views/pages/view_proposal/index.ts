@@ -106,6 +106,7 @@ const ProposalHeader: m.Component<{
           !vnode.state.editing
             && m('.proposal-title', [
               m(ProposalHeaderTitle, { proposal }),
+              m.trust(' &nbsp; '),
               proposal instanceof OffchainThread && m(ProposalHeaderStage, { proposal }),
             ]),
           vnode.state.editing
