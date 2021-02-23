@@ -8,7 +8,6 @@ class ChainEntity {
   public readonly chain: string;
   public readonly type: IChainEntityKind;
   public readonly typeId: string;
-  public readonly title?: string;
 
   public readonly threadId?: number;
   public readonly createdAt?: moment.Moment;
@@ -27,13 +26,12 @@ class ChainEntity {
     return e.chain === this.chain && e.type === this.type && e.typeId === this.typeId;
   }
 
-  constructor(chain, type, typeId, chainEvents, createdAt?, updatedAt?, id?, threadId?, title?) {
+  constructor(chain, type, typeId, chainEvents, createdAt?, updatedAt?, id?, threadId?) {
     this.id = id;
     this.chain = chain;
     this.type = type;
     this.typeId = typeId;
     this.threadId = threadId;
-    this.title = title;
     this.createdAt = moment(createdAt);
     this._updatedAt = moment(updatedAt);
 
@@ -56,7 +54,6 @@ class ChainEntity {
       json.updated_at,
       json.id,
       json.thread_id,
-      json.title,
     );
   }
 

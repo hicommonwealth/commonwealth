@@ -59,7 +59,6 @@ export default (
     models.ChainEntity.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
     models.ChainEntity.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
     models.ChainEntity.hasMany(models.ChainEvent, { foreignKey: 'entity_id' });
-    models.ChainEntity.belongsTo(models.Address, { foreignKey: 'author', targetKey: 'address' });
   };
 
   return ChainEntity;
