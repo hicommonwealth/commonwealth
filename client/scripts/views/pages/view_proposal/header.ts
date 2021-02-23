@@ -8,7 +8,7 @@ import {
   pluralize, link, externalLink, isSameAccount, extractDomain,
   offchainThreadStageToLabel, offchainThreadStageToIndex,
 } from 'helpers';
-import { proposalSlugToFriendlyName } from 'identifiers';
+import { proposalSlugToFriendlyName, chainEntityTypeToProposalSlug } from 'identifiers';
 
 import {
   OffchainThread,
@@ -67,6 +67,25 @@ export const ProposalHeaderVotingInterfaceLink: m.Component<{ proposal: AnyPropo
         proposal['votingInterfaceLinkLabel'] || extractDomain(proposal['votingInterfaceLink']),
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
+    ]);
+  }
+};
+
+export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: OffchainThread, chainEntity }> = {
+  view: (vnode) => {
+    const { proposal, chainEntity } = vnode.attrs;
+    const slug = chainEntityTypeToProposalSlug(chainEntity.type);
+    if (!slug) return;
+
+    return m('.ProposalHeaderThreadLinkedChainEntity', [
+      link(
+        'a',
+        `/${proposal.chain}/proposal/${slug}/${chainEntity.type_id}`,
+        [
+          `${chainEntity.type} ${chainEntity.type_id}`,
+          chainEntity.completed === 't' ? ' (Completed)' : ''
+        ],
+      ),
     ]);
   }
 };

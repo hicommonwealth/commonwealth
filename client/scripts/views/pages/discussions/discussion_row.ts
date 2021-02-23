@@ -17,6 +17,7 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import UserGallery from 'views/components/widgets/user_gallery';
 import ListingRow from 'views/components/listing_row';
+import { ThreadLinkedChainEntity } from 'views/pages/view_proposal/chain_entity';
 
 import DiscussionRowMenu from './discussion_row_menu';
 
@@ -37,6 +38,15 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       (propType === OffchainThreadKind.Link && proposal.url)
         && m('span.spacer', ' '),
       link('a', discussionLink, proposal.title),
+      proposal.chainEntities?.length > 0 && m('span.spacer', ' '),
+      proposal.chainEntities?.length > 0 && m(Button, {
+        class: 'discussion-row-linked-chain-entity',
+        label: 'On chain',
+        intent: 'primary',
+        size: 'xs',
+        rounded: true,
+        compact: true,
+      }),
     ];
     const rowSubheader = [
       proposal.readOnly && m('.discussion-locked', [

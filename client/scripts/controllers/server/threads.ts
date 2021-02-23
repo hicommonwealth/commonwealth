@@ -62,7 +62,8 @@ export const modelFromServer = (thread) => {
     thread.url,
     thread.Address.chain,
     thread.pinned,
-    thread.collaborators
+    thread.collaborators,
+    thread.chain_entities,
   );
 };
 

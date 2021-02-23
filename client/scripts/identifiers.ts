@@ -81,3 +81,10 @@ export const uniqueIdToProposal = (uid) => {
   const [ slug, id ] = uid.split('_');
   return idToProposal(slug, id);
 };
+
+export const chainEntityTypeToProposalSlug = (t: string) => {
+  if (t === 'treasury-proposal') return ProposalType.SubstrateTreasuryProposal;
+  else if (t === 'democracy-referendum') return ProposalType.SubstrateDemocracyReferendum;
+  else if (t === 'democracy-proposal') return ProposalType.SubstrateDemocracyProposal;
+  else if (t === 'collective-proposal') return ProposalType.SubstrateCollectiveProposal;
+};

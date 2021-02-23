@@ -39,6 +39,7 @@ import PageNotFound from 'views/pages/404';
 
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
+  ProposalHeaderThreadLinkedChainEntity,
   ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyButtons,
@@ -183,14 +184,21 @@ const ProposalHeader: m.Component<{
             m(ProposalHeaderOnchainStatus, { proposal }),
             m(ProposalBodyAuthor, { item: proposal }),
           ]),
-          proposal instanceof OffchainThread
-            && proposal.kind === OffchainThreadKind.Link
-            && m('.proposal-body-link', m(ProposalHeaderExternalLink, { proposal })),
-          (proposal['blockExplorerLink'] || proposal['votingInterfaceLink']) && m('.proposal-body-link', [
-            proposal['blockExplorerLink']
-              && m(ProposalHeaderBlockExplorerLink, { proposal }),
-            proposal['votingInterfaceLink']
-              && m(ProposalHeaderVotingInterfaceLink, { proposal }),
+          m('.proposal-body-link', [
+            proposal instanceof OffchainThread
+              && proposal.kind === OffchainThreadKind.Link
+              && m(ProposalHeaderExternalLink, { proposal }),
+            proposal instanceof OffchainThread
+              && proposal.chainEntities.length > 0
+              && proposal.chainEntities.map((chainEntity) => {
+                return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
+              }),
+            (proposal['blockExplorerLink'] || proposal['votingInterfaceLink']) && m('.proposal-body-link', [
+              proposal['blockExplorerLink']
+                && m(ProposalHeaderBlockExplorerLink, { proposal }),
+              proposal['votingInterfaceLink']
+                && m(ProposalHeaderVotingInterfaceLink, { proposal }),
+            ]),
           ]),
         ]),
       ]),
