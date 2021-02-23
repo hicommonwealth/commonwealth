@@ -536,9 +536,9 @@ $spinner-animation-duration: 1000ms;
 }
 
 // prevent overlay from breaking inline text
-// .cui-overlay-inline {
-//     display: inline-block;
-// }
+.cui-overlay-inline {
+    display: inline-block;
+}
 
 // dialog headers
 .cui-dialog-header {

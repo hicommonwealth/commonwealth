@@ -15,6 +15,7 @@ import { getCouncilCandidates } from 'views/pages/council/index';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import Substrate from 'controllers/chain/substrate/main';
 
 const Sublayout: m.Component<{
   // overrides
