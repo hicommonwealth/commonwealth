@@ -113,7 +113,7 @@ export class SubstrateCollectiveProposal
     entity.chainEvents.forEach((e) => this.update(e));
 
     this._initialized = true;
-    this._initVoters();
+    this.updateVoters();
     this._Collective.store.add(this);
   }
 
@@ -163,7 +163,7 @@ export class SubstrateCollectiveProposal
     }
   }
 
-  private async _initVoters() {
+  public updateVoters = async () => {
     const v = await this._Chain.api.query[this.collectiveName].voting<Option<Votes>>(this.data.hash);
     if (v.isSome) {
       const votes = v.unwrap();

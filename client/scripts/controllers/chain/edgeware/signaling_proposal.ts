@@ -129,7 +129,7 @@ export class EdgewareSignalingProposal
     return ProposalStatus.None;
   }
 
-  private _stage: SignalingProposalStage;
+  private _stage = SignalingProposalStage.PreVoting;
   get stage() {
     return this._stage;
   }
@@ -169,7 +169,7 @@ export class EdgewareSignalingProposal
     entity.chainEvents.forEach((e) => this.update(e));
 
     this._initialized = true;
-    this._initVoters();
+    this.updateVoters();
     this._Signaling.store.add(this);
   }
 
@@ -219,7 +219,7 @@ export class EdgewareSignalingProposal
     }
   }
 
-  private async _initVoters(): Promise<void> {
+  public updateVoters = async () => {
     const voteRecord = await this._Chain.api.query.voting.voteRecords<Option<VoteRecord>>(this.data.voteIndex);
     if (voteRecord.isSome) {
       const record = voteRecord.unwrap();
@@ -239,7 +239,7 @@ export class EdgewareSignalingProposal
       (api: ApiPromise) => api.tx.voting.reveal(this.data.voteIndex, vote.choices, null),
       'submitSignalingVote',
       this.title,
-      cb
+      (result) => { this.updateVoters(); cb(result); }
     );
   }
 }

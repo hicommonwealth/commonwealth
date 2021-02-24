@@ -100,8 +100,7 @@ export class SubstratePhragmenElection extends Proposal<
     this.moduleName = moduleName;
 
     this._initialized = true;
-    this._initCandidates();
-    this._initVotes();
+    this.updateVoters();
     this._Elections.store.add(this);
   }
 
@@ -113,16 +112,15 @@ export class SubstratePhragmenElection extends Proposal<
     throw new Error('unimplemented');
   }
 
-  private async _initCandidates() {
+  public updateVoters = async () => {
+    // first, update candidates
     const candidates  = await this._Chain.api.query[this.moduleName].candidates() as Vec<AccountId>;
     const completed = this !== this._Elections.activeElection;
     this._exposedCandidates = candidates.map((c) => c.toString());
     if (completed) {
       this.complete();
     }
-  }
 
-  private async _initVotes() {
     const votingData: { [voter: string]: PhragmenElectionVote } = {};
     if (this._Chain.api.query[this.moduleName].voting) {
       const voting = await this._Chain.api.query[this.moduleName].voting.entries();
@@ -186,6 +184,7 @@ export class SubstratePhragmenElection extends Proposal<
       (api: ApiPromise) => api.tx[this.moduleName].vote(vote.votes, vote.stake),
       'vote',
       this.title,
+      () => this.updateVoters(),
     );
   }
   public removeVoterTx(voter: SubstrateAccount) {
@@ -193,7 +192,8 @@ export class SubstratePhragmenElection extends Proposal<
       voter,
       (api: ApiPromise) => api.tx[this.moduleName].removeVoter(),
       'removeVoter',
-      this.title
+      this.title,
+      () => this.updateVoters(),
     );
   }
   public reportDefunctVoterTx(reporter: SubstrateAccount, voter: SubstrateAccount) {
@@ -201,7 +201,8 @@ export class SubstratePhragmenElection extends Proposal<
       reporter,
       (api: ApiPromise) => api.tx[this.moduleName].reportDefunctVoter(voter.address),
       'reportDefunctVoter',
-      this.title
+      this.title,
+      () => this.updateVoters(),
     );
   }
   public async submitCandidacyTx(candidate: SubstrateAccount) {
@@ -217,7 +218,8 @@ export class SubstratePhragmenElection extends Proposal<
       candidate,
       txFunc,
       'submitCandidacy',
-      this.title
+      this.title,
+      () => this.updateVoters(),
     );
   }
   public renounceCandidacyTx(candidate: SubstrateAccount) {
@@ -225,7 +227,8 @@ export class SubstratePhragmenElection extends Proposal<
       candidate,
       (api: ApiPromise) => api.tx[this.moduleName].renounceCandidacy(),
       'renounceCandidacy',
-      this.title
+      this.title,
+      () => this.updateVoters(),
     );
   }
 }

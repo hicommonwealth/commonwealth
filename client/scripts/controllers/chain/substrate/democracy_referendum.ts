@@ -215,7 +215,7 @@ export class SubstrateDemocracyReferendum
     entity.chainEvents.forEach((e) => this.update(e));
 
     this._initialized = true;
-    this._initVoters();
+    this.updateVoters();
     this._Democracy.store.add(this);
   }
 
@@ -281,7 +281,7 @@ export class SubstrateDemocracyReferendum
     }
   }
 
-  private async _initVoters() {
+  public updateVoters = async () => {
     const referenda = await this._Chain.api.derive.democracy.referendumsInfo([ new BN(this.data.index) ]);
     if (referenda?.length) {
       const votes = await this._Chain.api.derive.democracy._referendumVotes(referenda[0]);

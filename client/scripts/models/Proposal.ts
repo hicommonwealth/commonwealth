@@ -55,6 +55,7 @@ abstract class Proposal<
   }
 
   public abstract update(e: ChainEvent): any;
+  public updateVoters?: () => Promise<void>;
 
   protected complete(
     store: ProposalStore<Proposal<ApiT, C, ConstructorT, VoteT>>

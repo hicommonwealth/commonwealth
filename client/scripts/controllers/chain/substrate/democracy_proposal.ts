@@ -152,7 +152,7 @@ class SubstrateDemocracyProposal extends Proposal<
     entity.chainEvents.forEach((e) => this.update(e));
 
     this._initialized = true;
-    this._initDepositors();
+    this.updateVoters();
     this._Proposals.store.add(this);
   }
 
@@ -191,7 +191,7 @@ class SubstrateDemocracyProposal extends Proposal<
     }
   }
 
-  private async _initDepositors() {
+  public updateVoters = async () => {
     const depositOpt = await this._Chain.api.query.democracy.depositOf(this.data.index);
     if (!depositOpt.isSome) return;
     const depositorsTuple: ITuple<[ BalanceOf | Vec<AccountId>, BalanceOf | Vec<AccountId> ]> = depositOpt.unwrap();
