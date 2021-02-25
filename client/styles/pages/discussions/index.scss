@@ -5,7 +5,10 @@
         position: relative;
         flex: 1;
         margin: 0px auto;
-        padding: 24px 0 36px;
+        padding: 36px 0 36px;
+        @include sm-max {
+            padding-top: 24px;
+        }
         &.empty-list {
             height: calc(100vh - 200px);
         }
@@ -21,12 +24,16 @@
         margin-bottom: 20px;
         font-size: 17px;
         line-height: 1.25;
-        @include xs-max {
-            margin-top: 10px;
-            margin-bottom: 10px;
-        }
         .cui-button-group {
             flex-wrap: wrap;
+        }
+    }
+    @include xs-max {
+        .discussions-topics {
+            margin-top: 10px;
+        }
+        .discussions-stages {
+            margin-bottom: 10px;
         }
     }
     .cui-button.discussions-topic {
@@ -35,14 +42,22 @@
     .cui-button.discussions-topic,
     .cui-button.discussions-stage {
         color: $text-color-black;
-        padding: 0 15px;
+        padding: 0 12px;
         display: inline-block;
         margin-bottom: 6px;
         cursor: pointer;
         line-height: 1 !important;
+        &.cui-sm {
+            height: 26px;
+            min-height: 26px;
+            line-height: 1 !important;
+        }
         &.active {
             border-color: $text-color-black;
         }
+    }
+    .cui-button.discussions-stage {
+        padding: 0 13px;
     }
     .discussions-stage-count {
         display: inline-block;

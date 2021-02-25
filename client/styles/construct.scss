@@ -27,11 +27,11 @@ $cui-headings-font-family: inherit;
 $cui-headings-font-weight: 400;
 $cui-headings-line-height: 1.2;
 
-$cui-font-size:    floor($cui-base-size) * 1.4;
-$cui-font-size-xs: floor($cui-base-size) * 1.2;
-$cui-font-size-sm: floor($cui-base-size) * 1.3;
-$cui-font-size-lg: floor($cui-base-size) * 1.6;
-$cui-font-size-xl: floor($cui-base-size) * 1.8;
+$cui-font-size:    floor($cui-base-size * 1.4);
+$cui-font-size-xs: floor($cui-base-size * 1.1);
+$cui-font-size-sm: floor($cui-base-size * 1.3);
+$cui-font-size-lg: floor($cui-base-size * 1.6);
+$cui-font-size-xl: floor($cui-base-size * 1.8);
 
 $cui-h1-font-size: $cui-font-size * 2.5;
 $cui-h2-font-size: $cui-font-size * 2;
