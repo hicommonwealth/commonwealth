@@ -94,30 +94,30 @@ function setupPassport(models) {
 
       if (!existingUser) {
         // ensure all eth addresses are lowercase
-        let address = userMetadata.publicAddress.toLowerCase();
+        const ethAddress = userMetadata.publicAddress.toLowerCase();
+        let polkadotAddress;
 
-        // if on polkadot chain, retrieve the address for the user
-        if (registrationChain.base === 'substrate') {
-          try {
-            const polkadotResp = await request
-              // eslint-disable-next-line max-len
-              .get(`https://api.magic.link/v1/admin/auth/user/public/address/get?issuer=did:ethr:${userMetadata.publicAddress}`)
-              .set('X-Magic-Secret-key', MAGIC_API_KEY)
-              .accept('json');
-            if (polkadotResp.body?.status !== 'ok') {
-              throw new Error(polkadotResp.body?.message || 'Failed to fetch polkadot address');
-            }
-            const polkadotAddress = polkadotResp.body?.data?.public_address;
-
-            // convert to chain-specific address based on ss58 prefix
-            if (registrationChain.ss58_prefix) {
-              address = encodeAddress(polkadotAddress, registrationChain.ss58_prefix);
-            } else {
-              address = polkadotAddress;
-            }
-          } catch (err) {
-            return cb(new Error(err.message));
+        // always retrieve the polkadot address for the user regardless of chain
+        try {
+          const polkadotResp = await request
+            // eslint-disable-next-line max-len
+            .get(`https://api.magic.link/v1/admin/auth/user/public/address/get?issuer=did:ethr:${userMetadata.publicAddress}`)
+            .set('X-Magic-Secret-key', MAGIC_API_KEY)
+            .accept('json');
+          if (polkadotResp.body?.status !== 'ok') {
+            throw new Error(polkadotResp.body?.message || 'Failed to fetch polkadot address');
           }
+          const polkadotRespAddress = polkadotResp.body?.data?.public_address;
+
+          // convert to chain-specific address based on ss58 prefix, if we are on a specific
+          // polkadot chain. otherwise, encode to edgeware.
+          if (registrationChain.ss58_prefix) {
+            polkadotAddress = encodeAddress(polkadotRespAddress, registrationChain.ss58_prefix);
+          } else {
+            polkadotAddress = encodeAddress(polkadotRespAddress, 7); // edgeware SS58 prefix
+          }
+        } catch (err) {
+          return cb(new Error(err.message));
         }
 
         const result = await sequelize.transaction(async (t) => {
@@ -129,17 +129,69 @@ function setupPassport(models) {
             lastMagicLoginAt: user.claim.iat,
           }, { transaction: t });
 
-          // TODO: use non-default chain in certain cases?
-          const newAddress = await models.Address.create({
-            address,
-            chain: registrationChain.id,
-            verification_token: 'MAGIC',
-            verification_token_expires: null,
-            verified: new Date(), // trust addresses from magic
-            last_active: new Date(),
-            user_id: newUser.id,
-            is_magic: true,
-          }, { transaction: t });
+          // create an address on their selected chain
+          let newAddress;
+          if (registrationChain.base === 'substrate') {
+            newAddress = await models.Address.create({
+              address: polkadotAddress,
+              chain: registrationChain.id,
+              verification_token: 'MAGIC',
+              verification_token_expires: null,
+              verified: new Date(), // trust addresses from magic
+              last_active: new Date(),
+              user_id: newUser.id,
+              is_magic: true,
+            }, { transaction: t });
+
+            // if they selected a substrate chain, create an additional address on ethereum
+            // and auto-add them to the eth forum
+            const ethAddressInstance = await models.Address.create({
+              address: ethAddress,
+              chain: 'ethereum',
+              verification_token: 'MAGIC',
+              verification_token_expires: null,
+              verified: new Date(), // trust addresses from magic
+              last_active: new Date(),
+              user_id: newUser.id,
+              is_magic: true,
+            }, { transaction: t });
+
+            await models.Role.create({
+              address_id: ethAddressInstance.id,
+              chain_id: 'ethereum',
+              permission: 'member',
+            });
+          } else {
+            newAddress = await models.Address.create({
+              address: ethAddress,
+              chain: registrationChain.id,
+              verification_token: 'MAGIC',
+              verification_token_expires: null,
+              verified: new Date(), // trust addresses from magic
+              last_active: new Date(),
+              user_id: newUser.id,
+              is_magic: true,
+            }, { transaction: t });
+
+            // if they selected an eth chain, create an additional address on edgeware
+            // and auto-add them to the forum
+            const edgewareAddressInstance = await models.Address.create({
+              address: polkadotAddress,
+              chain: 'edgeware',
+              verification_token: 'MAGIC',
+              verification_token_expires: null,
+              verified: new Date(), // trust addresses from magic
+              last_active: new Date(),
+              user_id: newUser.id,
+              is_magic: true,
+            }, { transaction: t });
+
+            await models.Role.create({
+              address_id: edgewareAddressInstance.id,
+              chain_id: 'edgeware',
+              permission: 'member',
+            });
+          }
 
           if (req.body.chain || req.body.community) await models.Role.create(req.body.community ? {
             address_id: newAddress.id,
