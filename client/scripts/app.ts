@@ -98,6 +98,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
 }
 
 export async function deinitChainOrCommunity() {
+  app.isAdapterReady = false;
   if (app.chain) {
     app.chain.networkStatus = ApiStatus.Disconnected;
     app.chain.deinitServer();
