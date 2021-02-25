@@ -33,10 +33,12 @@ export enum ChainNetwork {
   Moloch = 'moloch',
   Metacartel = 'metacartel',
   Commonwealth = 'commonwealth',
+  Clover = 'clover'
 }
 
 export function networkToBase(n: ChainNetwork): ChainBase {
   switch (n) {
+    case ChainNetwork.Clover: return ChainBase.Substrate;
     case ChainNetwork.Edgeware: return ChainBase.Substrate;
     case ChainNetwork.Kusama: return ChainBase.Substrate;
     case ChainNetwork.Kulupu: return ChainBase.Substrate;
@@ -59,6 +61,7 @@ export function networkToBase(n: ChainNetwork): ChainBase {
 
 // TODO: this should be deprecated, and replaced with ChainNetwork in most instances
 export enum ChainClass {
+  Clover = 'clover',
   Edgeware = 'edgeware',
   Kusama = 'kusama',
   Kulupu = 'kulupu',
