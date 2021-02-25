@@ -240,16 +240,13 @@ export async function unlinkLogin(account) {
 }
 
 export async function loginWithMagicLink(email: string) {
-  const polkadotUrl = app.chain?.base === ChainBase.Substrate && app.chain.meta.url;
-  const magic = new Magic(MAGIC_PUBLISHABLE_KEY, polkadotUrl
-    ? {
-      extensions: [
-        new PolkadotExtension({
-          rpcUrl: polkadotUrl,
-        })
-      ]
-    }
-    : {});
+  const magic = new Magic(MAGIC_PUBLISHABLE_KEY, { extensions: [
+    new PolkadotExtension({
+      // we don't need a real node URL because we're only generating an address,
+      // not doing anything requiring chain connection
+      rpcUrl: 'ws://localhost:9944',
+    })
+  ] });
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
