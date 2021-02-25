@@ -46,7 +46,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
-    this.chain.deinitApi();
+    await this.chain.deinitApi();
   }
 
   public async getEthersProvider() {

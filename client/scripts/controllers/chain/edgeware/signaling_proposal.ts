@@ -1,8 +1,7 @@
 import _ from 'underscore';
-import { takeWhile, switchMap, flatMap, take } from 'rxjs/operators';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { VoteOutcome, VoteRecord } from '@edgeware/node-types';
-import { ApiRx } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { Option } from '@polkadot/types';
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
 import {
@@ -11,7 +10,6 @@ import {
 } from 'models';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { BehaviorSubject, Unsubscribable, combineLatest, of } from 'rxjs';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
 
@@ -57,7 +55,7 @@ export class SignalingVote implements IVote<SubstrateCoin> {
 }
 
 export class EdgewareSignalingProposal
-  extends Proposal<ApiRx, SubstrateCoin, IEdgewareSignalingProposal, SignalingVote> {
+  extends Proposal<ApiPromise, SubstrateCoin, IEdgewareSignalingProposal, SignalingVote> {
   public get shortIdentifier() {
     return `#${this.data.voteIndex.toString()}`;
   }
@@ -131,17 +129,17 @@ export class EdgewareSignalingProposal
     return ProposalStatus.None;
   }
 
-  private _stage: BehaviorSubject<SignalingProposalStage> = new BehaviorSubject(SignalingProposalStage.PreVoting);
+  private _stage = SignalingProposalStage.PreVoting;
   get stage() {
-    return this._stage.getValue();
+    return this._stage;
   }
 
-  private _endBlock: BehaviorSubject<number> = new BehaviorSubject(undefined);
+  private _endBlock: number;
   get endTime(): ProposalEndTime {
     return this.completed
       ? { kind: 'unavailable' }
-      : this._endBlock.getValue()
-        ? { kind: 'fixed_block', blocknum: this._endBlock.getValue() }
+      : this._endBlock
+        ? { kind: 'fixed_block', blocknum: this._endBlock }
         : { kind: 'not_started' };
   }
 
@@ -170,8 +168,8 @@ export class EdgewareSignalingProposal
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
-    this._subscribeVoters();
+    this._initialized = true;
+    this.updateVoters();
     this._Signaling.store.add(this);
   }
 
@@ -179,6 +177,7 @@ export class EdgewareSignalingProposal
     super.complete(this._Signaling.store);
   }
 
+  // TODO: figure out why we have duplicate events
   public update(e: ChainEvent) {
     if (this.completed) {
       return;
@@ -188,21 +187,21 @@ export class EdgewareSignalingProposal
         break;
       }
       case SubstrateTypes.EventKind.SignalingCommitStarted: {
-        if (this.stage !== SignalingProposalStage.PreVoting) {
+        if (this.stage !== SignalingProposalStage.PreVoting && this.stage !== SignalingProposalStage.Commit) {
           console.error('signaling stage out of order!');
           return;
         }
-        this._stage.next(SignalingProposalStage.Commit);
-        this._endBlock.next(e.data.endBlock);
+        this._stage = SignalingProposalStage.Commit;
+        this._endBlock = e.data.endBlock;
         break;
       }
       case SubstrateTypes.EventKind.SignalingVotingStarted: {
-        if (this.stage !== SignalingProposalStage.Commit && this.stage !== SignalingProposalStage.PreVoting) {
+        if (this.stage === SignalingProposalStage.Completed) {
           console.error('signaling stage out of order!');
           return;
         }
-        this._stage.next(SignalingProposalStage.Voting);
-        this._endBlock.next(e.data.endBlock);
+        this._stage = SignalingProposalStage.Voting;
+        this._endBlock = e.data.endBlock;
         break;
       }
       case SubstrateTypes.EventKind.SignalingVotingCompleted: {
@@ -210,7 +209,7 @@ export class EdgewareSignalingProposal
           console.error('signaling stage out of order!');
           return;
         }
-        this._stage.next(SignalingProposalStage.Completed);
+        this._stage = SignalingProposalStage.Completed;
         this.complete();
         break;
       }
@@ -220,38 +219,27 @@ export class EdgewareSignalingProposal
     }
   }
 
-  private _subscribeVoters(): Unsubscribable {
-    return this._Chain.api.pipe(
-      switchMap((api: ApiRx) => api.query.voting.voteRecords<Option<VoteRecord>>(this.data.voteIndex)),
-      takeWhile<Option<VoteRecord>>((v) => v.isSome && this.initialized),
-      // permit one vote query even if completed
-      takeWhile<Option<VoteRecord>>((v) => !this.completed, true),
-
-      // grab latest voter balances as well, to avoid subscribing to each on vote-creation
-      flatMap((v) => combineLatest(
-        of(v),
-        combineLatest(
-          v.unwrap().reveals
-            .map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance)
-        ).pipe(take(1)),
-      )),
-    ).subscribe(([ v, balances ]) => {
-      const record = v.unwrap();
-      // eslint-disable-next-line no-restricted-syntax
+  public updateVoters = async () => {
+    const voteRecord = await this._Chain.api.query.voting.voteRecords<Option<VoteRecord>>(this.data.voteIndex);
+    if (voteRecord.isSome) {
+      const record = voteRecord.unwrap();
+      const balances = await Promise.all(
+        record.reveals.map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance)
+      );
       for (const [ [ voter, reveals ], balance ] of _.zip(record.reveals, balances)) {
         const acct = this._Accounts.fromAddress(voter.toString());
         this.addOrUpdateVote(new SignalingVote(this, acct, reveals, balance));
       }
-    });
+    }
   }
 
   public submitVoteTx(vote: SignalingVote, cb?) {
     return this._Chain.createTXModalData(
       vote.account,
-      (api: ApiRx) => api.tx.voting.reveal(this.data.voteIndex, vote.choices, null),
+      (api: ApiPromise) => api.tx.voting.reveal(this.data.voteIndex, vote.choices, null),
       'submitSignalingVote',
       this.title,
-      cb
+      (result) => { this.updateVoters(); cb(result); }
     );
   }
 }
