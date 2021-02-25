@@ -24,7 +24,7 @@ class Controller {
   }
   renderItem(item: SubstrateAccount) {
     return m(ListItem, {
-      contentRight: m('span.controller', m(User, {
+      contentRight: m('span.controller.v-cont-rc', m(User, {
         user: item,
         hideAvatar: true,
         hideIdentityIcon: true,
@@ -32,11 +32,11 @@ class Controller {
         showRole: true,
       })),
       label:  m('span.controller', [
-        m(User, {
+        m('.v-md', m(User, {
           user: item,
           avatarOnly: true,
-          avatarSize: 36
-        }),
+          avatarSize: 28
+        })),
       item.profile?.address && truncate(item.profile.address, { length: 30 })
       ]),
       selected: this.selectedItem === item
@@ -56,7 +56,8 @@ class Controller {
       return null;
     return m('span', [
       m('span.padding-r7', truncate(this.selectedItem.profile.displayName, { length: 20 })),
-      truncate(this.selectedItem.profile.address, { length: 25 }),
+      ' ',
+      truncate(this.selectedItem.profile.address, { length: 15 }),
     ]);
   }
 }
@@ -188,6 +189,11 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
     errors.balance = true;
     ctlModel.selectedItem = null;
     stashModel.selectedItem = null;
+
+
+
+    
+
   },
   getObservables: (attrs) => ({
     groupKey:  app.chain.class.toString()
@@ -205,6 +211,9 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
     };
     onChange(payload, isError);
 
+   
+    
+
     return m(Grid, {
       gutter: 20,
       align: 'middle',
@@ -214,6 +223,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
         m('.nominee-stash.new-row',
           m('h5', 'stash account'),
           m(SelectList, {
+            class: 'v-cdm',
             emptyContent: 'No accounts available',
             items: app.user.activeAccounts.length
               ? app.user.activeAccounts
@@ -241,6 +251,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
             trigger: m('span.help-pointer', m(Icon, { name: Icons.HELP_CIRCLE, size: 'sm' }))
           })),
           m(SelectList, {
+            class: 'v-cdm',
             emptyContent: 'No accounts available',
             items: app.user.activeAccounts.length
               ? app.user.activeAccounts
@@ -280,6 +291,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
               onchange: bondedModel.balanceChange,
               placeholder: 'Positive number',
               contentRight: m(SelectList, {
+                class: 'v-bond-curr',
                 items: bondedModel.options,
                 itemRender: bondedModel.renderItem,
                 itemPredicate: bondedModel.itemPredicate,
@@ -304,7 +316,6 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
           }),
         stashModel.selectedItem
           && m('div.padding-t-10.center-lg.new-row',
-            m('h5', 'Balance'),
             m(FormatBalance, {
               controller: stashModel.selectedItem
             })),
@@ -319,6 +330,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
           })),
           m('span.pointer',
             m(SelectList, {
+              class: 'v-cdm',
               items: paymentModel.options,
               itemRender: paymentModel.renderItem,
               itemPredicate: paymentModel.itemPredicate,

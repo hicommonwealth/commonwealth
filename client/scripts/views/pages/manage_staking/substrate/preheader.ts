@@ -4,7 +4,7 @@ import BN from 'bn.js';
 import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { formatCoin } from 'adapters/currency';
-import { Icon, Icons, Intent } from 'construct-ui';
+import { Button, Icon, Icons, Intent } from 'construct-ui';
 import NewNominator from 'views/pages/manage_staking/substrate/new_nominator';
 import NewValidator from 'views/pages/manage_staking/substrate/new_validator';
 
@@ -47,16 +47,25 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         m('h2.ct', 'Manage Staking'),
         m('.manage-staking-preheader-item.padding-l-r-12', [
           m('.preheader-item-text', [
-            m('button.cui-button.cui-align-center.cui-primary', {
+            m(Button, {
+              label: m('', ['Nominator ', m(Icon, { name: Icons.PLUS, size: 'sm' })]),
+              class: app.user.activeAccount ? '' : 'disabled',
+              href: 'javascript;',
               onclick: model.onNewNominee,
-            }, 'Nominator ', m(Icon, { name: Icons.PLUS, size: 'xl' }))
+              disabled: !app.user.activeAccount
+            })
           ]),
         ]),
         m('.manage-staking-preheader-item.padding-l-r-12', [
           m('.preheader-item-text', [
-            m('button.cui-button.cui-align-center.cui-primary', {
+
+            m(Button, {
+              label: m('', ['Validator ', m(Icon, { name: Icons.PLUS, size: 'sm' })]),
+              class: app.user.activeAccount ? '' : 'disabled',
+              href: 'javascript;',
               onclick: model.onNewValidate,
-            }, 'Validator ', m(Icon, { name: Icons.PLUS, size: 'xl' }))
+              disabled: !app.user.activeAccount
+            })
           ]),
         ]),
       ])

@@ -1,62 +1,138 @@
 @import "client/styles/shared";
 
-.cui-grid {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin-right: 0;
-    margin-left: 0;
-    margin-bottom: 30px;
-}
-
-span.pointer.nominate {
-    display: block;
-    margin-bottom: 10px;
-    border: 1px solid transparent;
-    padding-left: 8px;
-    padding-top: 7px;
-}
-
-span.pointer.nominate:hover,
-span.pointer.nominate:focus {
-    border: 1px solid #4f6dbd;
-}
-
-h5.cth5 {
-    min-height: 37px;
-}
-
-.SetValidator.manage-staking {
-    min-width: 432px;
-}
-
-.NewNominator.manage-staking {
-    min-width: 432px;
-}
-
 h3.ManageStaking.loginError {
-    margin: 0 auto;
-    margin-top: 35vh;
-    text-align: center;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.v-md {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 7px;
+    top: 2px;
+    position: relative;
+}
+
+.v-cont-rc {
+    top: 2px;
+    position: relative;
+}
+
+.v-cdm .cui-query-list {
+    outline: none;
+    max-width: 342px;
+    min-width: 360px;
+    width: 100%;
+}
+
+.v-cdm .controller {
+    font-size: 15px;
+}
+
+.v-cdm .cui-query-list-checkmark .cui-list-item-content-left {
+    left: 2px;
+    padding-right: 7px;
+    top: 1px !important;
+}
+
+.v-bond-curr .cui-list.cui-interactive {
+    max-height: 200px;
+}
+
+.v-bond-curr .cui-query-list-checkmark .cui-list-item-content-left {
+    left: 0px;
+}
+
+.v-bond-curr input{
+    max-width: 160px;
+}
+
+.v-cdm .cui-list .cui-list-item.cui-selected {
+    padding-top: 8px !important;
+}
+.v-cdm .cui-list .cui-list-item {
+    padding: 13px;
+    font-size: 15px;
 }
 
 .SetValidator,
-.NewNominator {
+.NewNominator, 
+.NewValidator{
+    width: 100%;
+    max-width: 503px;
+    min-width: 503px;
+
+    h5 {
+        margin-top: 20px;
+        margin-bottom: 4px;
+    }
+
+    h5.mt-0 {
+        margin-top: 0px;
+    }
+
+    .help-pointer {
+        margin-left: 4px;
+        position: relative;
+        top: -.8px;
+    }
+
+
+    .cui-grid {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-right: 0;
+        margin-left: 0;
+        margin-bottom: 30px;
+    }
+
+    span.pointer.nominate {
+        display: block;
+        margin-bottom: 10px;
+        border: 1px solid transparent;
+        padding-left: 8px;
+        padding-top: 7px;
+    }
+
+
+    h5.cth5 {
+        min-height: 37px;
+    }
+
+    p.balance {
+        margin-top: 15px;
+    }
+
+    .SetValidator.manage-staking {
+        min-width: 432px;
+    }
+
+    .NewNominator.manage-staking {
+        min-width: 432px;
+    }
+
     p.error {
-        max-width: 409px;
+        max-width: 361px;
         color: #ea6d6d;
         font-size: 14px;
+        margin: auto;
         margin-top: 0px;
         margin-bottom: 0px;
         text-align: center;
-    }
-    
-    p.error.er1 {
-        padding-top: 10px
+        border: 1px solid #ff0c0c;
+        background-color: #fff2f2;
+        color: #4e4e4e;
+        border-left: 4px solid #ff0c0c;
+        border-radius: 4px;
+        margin-top: 10px;
+        padding: 6px;
     }
 
-    .cui-button.cui-align-center.cui-primary {
-        padding-top: 6px;
+    p.error.er1 {
+        padding-top: 10px
     }
 
     .fmd {
@@ -103,12 +179,7 @@ h3.ManageStaking.loginError {
         padding-top: 16px !important;
     }
 
-    .min-height-200 p {
-        color: #4f6dbd;
-        font-size: 15px;
-        padding: 5px;
-        text-align: center;
-    }
+
 
     .Modal .popup {
         min-width: 432px;
@@ -129,15 +200,7 @@ h3.ManageStaking.loginError {
         background: #f9f8f8;
     }
 
-    /* Handle */
-    .min-height-200::-webkit-scrollbar-thumb {
-        background: #4f6dbd;
-    }
 
-    /* Handle on hover */
-    .min-height-200::-webkit-scrollbar-thumb:hover {
-        background: #4f6dbd;
-    }
 }
 
 
@@ -208,14 +271,6 @@ h3.ManageStaking.loginError {
     .button-col {
         padding: 19px 0px 16px 19px;
         margin-left: 30px;
-
-        .cui-button {
-            color: #536e7c !important;
-
-            &:visited {
-                color: #536e7c !important;
-            }
-        }
     }
 
     .ManageStakingModal {
@@ -526,11 +581,7 @@ h3.ManageStaking.loginError {
             text-align: right;
         }
 
-        .cui-icon svg {
-            width: 13px !important;
-            height: auto !important;
-            stroke: #536e7c;
-        }
+
 
         .User {
             display: inline-block;
@@ -941,28 +992,7 @@ h3.ManageStaking.loginError {
         padding-top: 0.4em !important;
     }
 
-    .preheader-item-text .cui-button {
-        background: linear-gradient(180deg, #617cef 0%, #4d6bed 100%);
-        border: 1px solid #4165e0;
-        box-sizing: border-box;
-        border-radius: 4px;
-        padding-top: 4px;
 
-        &:hover {
-            background: linear-gradient(180deg, #617cef 0%, #3e5ee9 100%);
-        }
-    }
-
-    .preheader-item-text .cui-button .cui-icon {
-        padding-left: 10px;
-    }
-
-    .preheader-item-text .cui-button .cui-icon svg {
-        stroke: white !important;
-        color: #ffffff;
-        top: -1.8px;
-        position: relative;
-    }
 
     .dropDown-name a {
         font-family: "Inter", sans-serif !important;

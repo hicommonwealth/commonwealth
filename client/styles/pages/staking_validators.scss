@@ -203,14 +203,6 @@
     .button-col {
         padding: 19px 0px 16px 19px;
         margin-left: 30px;
-
-        .cui-button {
-            color: #536e7c !important;
-
-            &:visited {
-                color: #536e7c !important;
-            }
-        }
     }
 
     .ManageStakingModal {
@@ -889,12 +881,6 @@
     
     td.modal-val-stash {
         padding-top: 0.4em !important;
-    }
-    
-    .preheader-item-text .cui-button {
-        background: linear-gradient(180deg, #79c081 0%, #60a167 100%) !important;
-        border-radius: 4px !important;
-        color: #ffffff !important;
     }
     
     .dropDown-name a {

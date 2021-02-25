@@ -19,7 +19,7 @@ interface FormatBalanceAttrs {
 
 const FormatBalance = makeDynamicComponent<FormatBalanceAttrs, FormatBalanceState>({
   getObservables: (attrs) => ({
-    groupKey:  attrs.controller.profile.address,
+    groupKey: attrs.controller.profile.address,
     allBalances: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.allBalances(attrs.controller.profile.address)
       : null
@@ -28,7 +28,7 @@ const FormatBalance = makeDynamicComponent<FormatBalanceAttrs, FormatBalanceStat
     const { allBalances } = vnode.state.dynamic;
     const balanceBN = new BN(allBalances?.freeBalance);
     const balance = (app.chain as Substrate).chain.coins(balanceBN);
-    return m('p.balance', balance.format(true));
+    return m('p.balance', m('b', 'Balance: '), balance.format(true));
   }
 });
 
