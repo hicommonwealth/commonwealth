@@ -148,6 +148,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
     const isThread = item instanceof OffchainThread;
     const missingVersionHistory = (!item.versionHistory || item.versionHistory.length === 0);
     let lastEdited;
+    console.log({ lE: item.lastEdited, cA: item.createdAt });
     if (item instanceof OffchainThread || item instanceof OffchainComment) {
       if (item.lastEdited) {
         lastEdited = item.lastEdited;
