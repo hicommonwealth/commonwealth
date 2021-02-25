@@ -244,7 +244,7 @@ export async function loginWithMagicLink(email: string) {
     new PolkadotExtension({
       // we don't need a real node URL because we're only generating an address,
       // not doing anything requiring chain connection
-      rpcUrl: '',
+      rpcUrl: 'ws://localhost:9944',
     })
   ] });
   const didToken = await magic.auth.loginWithMagicLink({ email });

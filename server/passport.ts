@@ -190,7 +190,7 @@ function setupPassport(models) {
               address_id: edgewareAddressInstance.id,
               chain_id: 'edgeware',
               permission: 'member',
-            });
+            }, { transaction: t });
           }
 
           if (req.body.chain || req.body.community) await models.Role.create(req.body.community ? {
