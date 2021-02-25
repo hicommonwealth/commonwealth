@@ -1,15 +1,15 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('OffchainReactions', {
-      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain: { type: DataTypes.STRING, allowNull: false },
-      object_id: { type: DataTypes.STRING, allowNull: false },
-      address_id: { type: DataTypes.INTEGER, allowNull: false },
-      reaction: { type: DataTypes.STRING, allowNull: false },
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      chain: { type: Sequelize.STRING, allowNull: false },
+      object_id: { type: Sequelize.STRING, allowNull: false },
+      address_id: { type: Sequelize.INTEGER, allowNull: false },
+      reaction: { type: Sequelize.STRING, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     }).then(async () => {
 
       await queryInterface.addIndex('OffchainReactions', { fields: ['id'] });
@@ -22,7 +22,7 @@ module.exports = {
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('OffchainReactions');
   }
 };

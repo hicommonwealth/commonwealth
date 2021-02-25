@@ -8,13 +8,19 @@ import app from 'state';
 import { sortNotifications } from 'helpers/notifications';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
+import PageError from 'views/pages/error';
 import PageLoading from 'views/pages/loading';
 
 const NotificationsPage: m.Component<{}> = {
   view: (vnode) => {
-    if (!app.isLoggedIn()) {
-      return m('div', 'Must be logged in to view notifications.');
-    }
+    if (!app.isLoggedIn()) return m(PageError, {
+      title: [
+        'Notifications ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
+      message: 'This page requires you to be logged in.'
+    });
+
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
       title: [

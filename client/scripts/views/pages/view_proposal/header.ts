@@ -88,7 +88,6 @@ export const ProposalHeaderTopics: m.Component<{ proposal: AnyProposal | Offchai
 
     return m('.ProposalHeaderTopics', [
       link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
-        m('span.proposal-topic-icon'),
         m('span.proposal-topic-name', `${proposal.topic?.name}`),
       ]),
     ]);

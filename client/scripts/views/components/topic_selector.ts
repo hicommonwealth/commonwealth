@@ -28,7 +28,6 @@ const TopicSelector: m.Component<{
       return m(ListItem, {
         class: featuredTopics.includes(topic) ? 'featured-topic' : 'other-topic',
         label: [
-          m('span.proposal-topic-icon'),
           m('span.topic-name', topic.name),
         ],
         selected: (selectedTopic as OffchainTopic)?.name === topic.name,

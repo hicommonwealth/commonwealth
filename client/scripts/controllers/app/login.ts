@@ -20,6 +20,7 @@ import {
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
 
+const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(account: Account<any>) {
   // TODO: Change to POST /address
@@ -237,8 +238,6 @@ export async function unlinkLogin(account) {
     app.user.ephemerallySetActiveAccount(null);
   }
 }
-
-const MAGIC_PUBLISHABLE_KEY = 'pk_test_436D33AFC319E080';
 
 export async function loginWithMagicLink(email: string) {
   const polkadotUrl = app.chain?.base === ChainBase.Substrate && app.chain.meta.url;

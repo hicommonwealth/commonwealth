@@ -1,22 +1,22 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('InviteLinks', {
-      id: { type: DataTypes.STRING, primaryKey: true, allowNull: false },
-      community_id: { type: DataTypes.STRING, allowNull: false },
-      creator_id: { type: DataTypes.INTEGER, allowNull: false },
-      active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
-      multi_use: { type: DataTypes.INTEGER, allowNull: true, defaultValue: null },
-      used: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+      id: { type: Sequelize.STRING, primaryKey: true, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: false },
+      creator_id: { type: Sequelize.INTEGER, allowNull: false },
+      active: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: true },
+      multi_use: { type: Sequelize.INTEGER, allowNull: true, defaultValue: null },
+      used: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 0 },
       time_limit: {
-        type: DataTypes.ENUM,
+        type: Sequelize.ENUM,
         values: ['24h', '48h', '1w', '30d', 'none'],
         defaultValue: 'none',
         allowNull: false,
       },
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     }, {
       underscored: true,
       indexes: [
@@ -25,7 +25,7 @@ module.exports = {
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('InviteLinks');
   }
 };

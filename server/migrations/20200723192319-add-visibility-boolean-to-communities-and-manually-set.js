@@ -1,12 +1,12 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn(
       'OffchainCommunities',
       'visible',
       {
-        type: DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
@@ -15,12 +15,12 @@ module.exports = {
     return queryInterface.sequelize.query(query);
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     return queryInterface.removeColumn(
       'OffchainCommunities',
       'visible',
       {
-        type: DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },

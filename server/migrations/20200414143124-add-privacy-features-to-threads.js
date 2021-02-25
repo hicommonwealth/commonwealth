@@ -1,24 +1,24 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('read_only_roles_threads', {
-      id: { type: DataTypes.INTEGER, allowNull: false },
-      thread_id: { type: DataTypes.INTEGER, allowNull: false },
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false },
+      id: { type: Sequelize.INTEGER, allowNull: false },
+      thread_id: { type: Sequelize.INTEGER, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     });
     await queryInterface.createTable('private_threads_roles', {
-      id: { type: DataTypes.INTEGER, allowNull: false },
-      thread_id: { type: DataTypes.INTEGER, allowNull: false },
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false },
+      id: { type: Sequelize.INTEGER, allowNull: false },
+      thread_id: { type: Sequelize.INTEGER, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     });
     await queryInterface.addColumn(
       'OffchainThreads',
       'private',
       {
-        type: DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
       }
@@ -27,21 +27,21 @@ module.exports = {
       'OffchainThreads',
       'read_only',
       {
-        type: DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
       }
     );
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('readOnlyRolesThreads');
     await queryInterface.dropTable('privateThreadsRoles');
     await queryInterface.removeColumn(
       'OffchainThreads',
       'private',
       {
-        type: DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
       }
@@ -50,7 +50,7 @@ module.exports = {
       'OffchainThreads',
       'read_only',
       {
-        type: DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
       }

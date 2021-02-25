@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('OffchainThreadCategories', [{
       name: 'Introductions',
       description: 'Introduce yourselves',
@@ -36,7 +36,7 @@ module.exports = {
     }]);
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.bulkDelete('OffchainThreadCategories', { '$or': [{
       name: 'Introductions'
     }, {

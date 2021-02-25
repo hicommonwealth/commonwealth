@@ -1,13 +1,13 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn('OffchainThreads', 'category_id');
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.addColumn('OffchainThreads', 'category_id', {
-      type: DataTypes.INTEGER,
+      type: Sequelize.INTEGER,
     });
   }
 };

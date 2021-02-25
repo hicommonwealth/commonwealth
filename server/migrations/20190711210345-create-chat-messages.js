@@ -1,18 +1,18 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('ChatMessages', {
-      address: { type: DataTypes.STRING, allowNull: false },
-      chain: { type: DataTypes.STRING, allowNull: false },
-      text: { type: DataTypes.TEXT, allowNull: false },
-      room: { type: DataTypes.STRING, allowNull: false },
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false },
+      address: { type: Sequelize.STRING, allowNull: false },
+      chain: { type: Sequelize.STRING, allowNull: false },
+      text: { type: Sequelize.TEXT, allowNull: false },
+      room: { type: Sequelize.STRING, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('ChatMessages');
   }
 };
