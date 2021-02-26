@@ -78,9 +78,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public async activeAddressHasToken(activeAddress?: string) {
     if (!activeAddress) return false;
     const account = this.accounts.get(activeAddress);
-    console.log(account);
     const balance = await account.tokenBalance(this.contractAddress);
-    console.log(balance);
     this.hasToken = balance && !balance.isZero();
   }
 }
