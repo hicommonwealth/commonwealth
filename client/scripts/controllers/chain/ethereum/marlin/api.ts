@@ -63,6 +63,7 @@ export default class MarlinAPI {
   }
 
   public updateSigner(userAddress: string) {
+    console.log('inside signer', userAddress);
     this._Signer = this._Provider.getSigner(userAddress);
     this._MPondContract = MPondFactory.connect(this._MPondAddress, this._Signer);
     this._GovernorAlphaContract = GovernorAlphaFactory.connect(this._GovernorAlphaAddress, this._Signer);
