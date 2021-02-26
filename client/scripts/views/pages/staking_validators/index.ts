@@ -226,7 +226,7 @@ const ValidatorPage : m.Component<{}> = {
     mixpanel.track('PageVisit', { 'Page Name': 'ValidatorPage' });
   },
   view: (vnode) => {
-    if (!app.chain) return m(PageLoading, { message: 'Chain is loading...' });
+    if (!app.chain) return m(PageLoading);
 
     // Catch a Substrate validators issue where app.chain.accounts.validators
     // makes a call using the API, which fails when API is not loaded.
@@ -234,7 +234,9 @@ const ValidatorPage : m.Component<{}> = {
       try {
         (app.chain as Substrate).accounts.validators;
       } catch (e) {
-        return m(PageLoading);
+        return m(PageLoading, {
+          message: 'Connecting to chain'
+        });
       }
     }
 

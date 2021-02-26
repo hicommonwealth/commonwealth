@@ -2,13 +2,16 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { get } from 'lodash';
-import Substrate from 'controllers/chain/substrate/main';
-import { ChainBase } from 'models';
-import { formatNumber } from '@polkadot/util';
-import { Icon, Icons, Spinner, ListItem, Select, InputSelect } from 'construct-ui';
-import StakingController from 'client/scripts/controllers/server/staking';
 import BN from 'bn.js';
-import Tabs from '../../../components/widgets/tabs';
+import { Icon, Icons, Spinner, ListItem, Select, Input, InputSelect } from 'construct-ui';
+
+import { formatNumber } from '@polkadot/util';
+
+import { ChainBase } from 'models';
+import Substrate from 'controllers/chain/substrate/main';
+import StakingController from 'controllers/server/staking';
+import Tabs from 'views/components/widgets/tabs';
+
 import ValidatorRow from './validator_row';
 import ValidatorRowWaiting from './validator_row_waiting';
 import RecentBlock from './recent_block';
@@ -142,10 +145,11 @@ export const PresentationComponent_: m.Component<{ validators, valCount }, { fir
           refreshTableVals();
         },
         content: m('div.row-input',
-          m('input', {
+          m(Input, {
             type: 'text',
             name: 'searchCurrent',
             autofocus: true,
+            fluid: true,
             placeholder: 'Search for a name, address or index...',
             value: model.searchInput,
             oninput: (e) => {
@@ -243,8 +247,9 @@ export const PresentationComponent_: m.Component<{ validators, valCount }, { fir
           refreshTableVals();
         },
         content: [m('div.row-input',
-          m('input', {
+          m(Input, {
             type: 'text',
+            fluid: true,
             name: 'searchWaiting',
             autofocus: true,
             placeholder: 'Search for a name, address or index...',
