@@ -102,6 +102,7 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
 
   public init(ChainInfo: EthereumChain): Promise<void> {
     this._Chain = ChainInfo;
+    this._initialized = true;
     return Promise.resolve();
   }
 }

@@ -52,10 +52,14 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     const api = new TokenAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
     await api.init();
     this.chain.tokenAPI = api;
-    this.activeAddressHasToken(activeAddress);
-
-    await this.chain.initEventLoop();
     await super.initApi();
+  }
+
+  public async initData() {
+    await this.chain.initEventLoop();
+    await super.initData();
+    const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
+    await this.activeAddressHasToken(activeAddress);
   }
 
   public async deinit() {
@@ -73,8 +77,10 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
 
   public async activeAddressHasToken(activeAddress?: string) {
     if (!activeAddress) return false;
-    const address = this.accounts.get(activeAddress);
-    const balance = await address.tokenBalance(this.contractAddress);
+    const account = this.accounts.get(activeAddress);
+    console.log(account);
+    const balance = await account.tokenBalance(this.contractAddress);
+    console.log(balance);
     this.hasToken = balance && !balance.isZero();
   }
 }
