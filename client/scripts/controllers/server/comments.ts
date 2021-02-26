@@ -26,6 +26,17 @@ export const modelFromServer = (comment) => {
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
+  const versionHistory = comment.version_history.map((v) => {
+    let history;
+    try {
+      history = JSON.parse(v || '{}');
+      history.timestamp = moment(history.timestamp);
+    } catch (e) {
+      console.log(e);
+    }
+    return history;
+  });
+
   let proposal;
   try {
     proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
@@ -38,7 +49,7 @@ export const modelFromServer = (comment) => {
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
     comment.plaintext,
-    comment.version_history,
+    versionHistory,
     attachments,
     proposal,
     comment.id,
@@ -50,7 +61,6 @@ export const modelFromServer = (comment) => {
     comment?.Address?.chain || comment.authorChain,
   );
 };
-
 
 class CommentsController {
   private _store: CommentsStore = new CommentsStore();
@@ -98,13 +108,14 @@ class CommentsController {
   }
 
   public async create<T extends IUniqueId>(
-    address: string, proposalIdentifier: string, chain: string,
-    community: string, unescapedText: string, parentCommentId: any = null,
-    attachments?: string[], mentions?: string[]
+    address: string,
+    proposalIdentifier: string,
+    chain: string,
+    community: string,
+    unescapedText: string,
+    parentCommentId: any = null,
+    attachments?: string[],
   ) {
-    const timestamp = moment();
-    const firstVersion : any = { timestamp, body: unescapedText };
-    const versionHistory : string = JSON.stringify(firstVersion);
     try {
       // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
@@ -115,9 +126,7 @@ class CommentsController {
         'parent_id': parentCommentId,
         'root_id': proposalIdentifier,
         'attachments[]': attachments,
-        'mentions[]': mentions,
         'text': encodeURIComponent(unescapedText),
-        'versionHistory': versionHistory,
         'jwt': app.user.jwt,
       });
       const { result } = res;
@@ -139,10 +148,12 @@ class CommentsController {
     }
   }
 
-  public async edit(comment: OffchainComment<any>, body?: string, attachments?: string[]) {
+  public async edit(
+    comment: OffchainComment<any>,
+    body: string,
+    attachments?: string[]
+  ) {
     const newBody = body || comment.text;
-    const recentEdit : any = { timestamp: moment(), body };
-    const versionHistory = JSON.stringify(recentEdit);
     try {
       // TODO: Change to PUT /comment
       const response = await $.post(`${app.serverUrl()}/editComment`, {
@@ -152,7 +163,6 @@ class CommentsController {
         'chain': comment.chain,
         'community': comment.community,
         'body': encodeURIComponent(newBody),
-        'version_history': versionHistory,
         'attachments[]': attachments,
         'jwt': app.user.jwt,
       });

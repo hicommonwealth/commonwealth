@@ -1,150 +1,131 @@
 @import 'client/styles/shared';
 
-.MobileSidebarHeader {
-    // only content styles here. layout styles are in layout.scss
-    background: $background-color-light;
-    border-bottom: 1px solid $background-color-border;
-
-    .mobile-sidebar-center {
-        flex: 1;
-        max-width: calc(100% - 100px);
-        &.logged-in {
-            max-width: calc(100% - 242px);
-        }
-        &.logged-in.no-community {
-            max-width: calc(100% - 142px);
-        }
+@mixin sidebar {
+    .cui-button.cui-align-center {
+        justify-content: left;
     }
-    .mobile-sidebar-left {
-        padding-left: 6px !important;
-    }
-    .mobile-sidebar-right {
-        padding-right: 13px !important;
-    }
-
-    // TODO: split this up so CSS classes aren't duplicated
-    .mobile-sidebar-left,
-    .mobile-sidebar-center,
-    .mobile-sidebar-right {
-        padding: 13px 0;
-        .CommunitySelector .cui-button {
-            width: 100%;
-            padding: 0 14px;
-            background: $background-color-white;
-            overflow: hidden;
-            border: 1px solid #c5cdd1 !important;
-            border-radius: 4px !important;
-            .cui-icon-menu {
-                display: none;
-            }
+    .cui-button.telegram-button {
+        border-color: tint(#2480cc, 25%);
+        color: #2480cc;
+        &:hover {
+            border-color: #2480cc;
         }
-        > .MobileNewProposalButton,
-        > .cui-button,
-        > .cui-overlay {
-            display: inline-block;
+        .cui-button-label {
+            flex: 1;
+            text-align: left;
         }
-        > .LoginSelector > .cui-button > .cui-button-label > * {
-            display: inline-block;
-        }
-        > .cui-button,
-        > .MobileNewProposalButton,
-        > .community-label,
-        > .LoginSelector {
-            margin-left: 9px;
-        }
-        > .cui-button .cui-button-label {
-            display: inline-block;
+        svg {
             position: relative;
-            top: 1px;
+            left: 2px;
+            stroke: #2480cc;
         }
-        @include xs-max {
-            .MobileNewProposalButton .cui-button {
-                .cui-button-label {
-                    top: 0 !important;
-                }
+    }
+    .cui-button.element-button {
+        border-color: tint(#0cbd8b, 25%);
+        color: #0cbd8b;
+        &:hover {
+            border-color: #0cbd8b;
+        }
+        .cui-button-label {
+            flex: 1;
+            text-align: left;
+        }
+        svg {
+            position: relative;
+            left: 2px;
+            stroke: #0cbd8b;
+        }
+    }
+    .cui-button.discord-button {
+        border-color: tint(#677bc4, 25%);
+        color: #677bc4;
+        &:hover {
+            border-color: #677bc4;
+        }
+        .cui-button-label {
+            flex: 1;
+            text-align: left;
+        }
+        svg {
+            position: relative;
+            left: 2px;
+            stroke: #677bc4;
+        }
+    }
+    .SubscriptionButton {
+        margin-bottom: 10px;
+    }
+    .ChainStatusModule {
+        .chain-deferred {
+            color: $text-color-medium;
+        }
+
+        // form stuff
+        .form-group {
+            margin-bottom: 0;
+            select {
+                width: 100%;
+                border-color: $border-color-lightest;
+                border-radius: 2px;
+                padding: 5px 6px;
+            }
+            .chain-status-main {
+                width: calc(100% - 28px);
             }
         }
-        @include sm-max {
-            .MobileNewProposalButton .cui-button {
-                padding: 0 12px;
-                .cui-button-label {
-                    top: 2px;
-                }
-            }
-            .cui-button.mobile-sidebar-trigger {
-                padding-left: 12px;
-                padding-right: 12px;
-                .cui-icon {
-                    margin-left: -2px;
-                    margin-right: -2px;
-                }
-            }
-            .community-label .CommunityLabel .community-label-left {
-                padding-right: 8px;
-            }
-            .LoginSelector {
-                // responsive logged-in state
-                .User {
-                    position: relative;
-                    top: -1px;
-                }
-                .user-avatar {
-                    margin-right: 0;
-                }
-                .user-display-name {
-                    display: none;
-                }
-                .role-icon {
-                    display: none;
-                }
-                .LoginSelectorMenu .user-display-name {
-                    display: inline;
-                }
-                .cui-button-label .cui-icon-user {
-                    margin-right: 0;
-                }
-                .hidden-sm {
-                    display: none !important;
-                }
-                // responsive logged-out state
-                .login-selector-user .cui-button {
-                    padding-left: 12px;
-                    padding-right: 12px;
-                }
-                .login-selector-user .cui-icon-user {
-                    margin-right: 0;
-                }
-                .login-selector-user .cui-button-label {
-                    display: none;
-                }
-            }
+        .cui-button-label {
+            text-align: left;
+            width: 100%;
+        }
+        .cui-icon svg {
+            min-width: 12px;
+            min-height: 12px;
+            width: 12px;
+            height: 12px;
         }
     }
 }
 
-.hidden-sidebar .SidebarQuickSwitcher {
-    display: none;
-}
 .SidebarQuickSwitcher {
     position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
-    padding: 12px 14px;
+    padding: 0 14px;
     width: $quick-switcher-width;
-    background: $background-color-border;
+    border-right: 1px solid $border-color-off-white;
     z-index: 3;
+    // overflow-y: auto;
     @include sm-max {
         display: none;
     }
-    .ChainIcon, .CommunityIcon {
-        cursor: pointer;
-        opacity: 0.3;
-        height: 50px;
-        padding-top: 6px;
-        &:hover {
-            opacity: 0.33;
+    .sidebar-home-link.cui-button {
+        margin: 15px 0 14px;
+        height: 38px;
+        width: 38px;
+        padding: 0;
+        .cui-icon {
+            position: relative;
+            top: -2px;
         }
+    }
+    .CommunitySelector {
+        margin: 0 0 14px;
+    }
+    .SidebarQuickSwitcherItem {
+        height: 38px;
+        width: 38px;
+        margin-bottom: 14px;
+        border: 1px solid transparent;
+        border-radius: 9999px;
+        &:hover {
+            border-color: #111;
+        }
+    }
+    > .SidebarQuickSwitcherItem .ChainIcon,
+    > .SidebarQuickSwitcherItem .CommunityIcon {
+        cursor: pointer;
+        opacity: 0.33;
     }
     .cui-overlay-inline {
         display: block;
@@ -164,22 +145,54 @@
 }
 
 .Sidebar {
+    position: relative;
+    z-index: 2;
+    padding-top: 36px;
     .sidebar-content {
         max-height: calc(100vh - 60px);
         padding-top: 16px;
         padding-bottom: 60px;
         overflow-y: auto;
     }
-    z-index: 2;
     @include sm-max {
+        padding-top: 30px;
         max-height: calc(100vh - 60px); // $mobile-sidebar-height
         overflow-y: scroll;
         .SidebarHeader {
             display: none;
         }
     }
+    .sidebar-fadeout {
+        display: none; // TODO
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 80px;
+        z-index: 4;
+        pointer-events: none;
+        background: -webkit-linear-gradient(
+            rgba(255, 255, 255, 0) 0%,
+            $background-color-light 100%
+        );
+        background-image: -moz-linear-gradient(
+            rgba(255, 255, 255, 0) 0%,
+            $background-color-light 100%
+        );
+        background-image: -o-linear-gradient(
+            rgba(255, 255, 255, 0) 0%,
+            $background-color-light 100%
+        );
+        background-image: linear-gradient(
+            rgba(255, 255, 255, 0) 0%,
+            $background-color-light 100%
+        );
+        background-image: -ms-linear-gradient(
+            rgba(255, 255, 255, 0) 0%,
+            $background-color-light 100%
+        );
+    }
     .SidebarHeader {
-        border-bottom: 1px solid $background-color-border;
+        border-bottom: 1px solid $border-color-lightest;
         .cui-button {
             padding: 0;
             width: 100%;
@@ -205,173 +218,19 @@
             }
         }
     }
-    .SidebarModule {
-        margin: 0 15px 20px;
-        > .cui-list {
-            // reset list styles
-            overflow-x: hidden;
-            max-height: 100%;
-            user-select: none;
-            background: transparent;
-            .cui-list-item {
-                font-size: 17px;
-                font-weight: 500;
-                padding: 6px 12px 0 !important;
-                border-radius: 4px;
-                border: none;
-                white-space: nowrap;
-                &.section-header, &.section-callout {
-                    background: initial !important;
-                    cursor: initial;
-                }
-                &.section-header {
-                    font-size: 15px;
-                    color: $text-color-lighter;
-                    margin-bottom: 4px;
-                    .cui-icon svg {
-                        stroke: $text-color-lightest;
-                    }
-                    .cui-icon:hover svg {
-                        stroke: $text-color-medium;
-                    }
-                }
-                &.section-callout {
-                    margin-top: 8px;
-                    white-space: initial;
-                }
-                .cui-list-item-content-left {
-                    padding-right: 10px;
-                }
-                .cui-list-item-content-right {
-                    position: relative;
-                    right: -6px;
-                }
-                .cui-list-item-content-left .cui-icon svg {
-                    stroke: $text-color-lighter;
-                    position: relative;
-                    top: -1px;
-                }
-                &:hover {
-                    background: $background-color-light-hover;
-                }
-                &.cui-active, &.cui-active:hover {
-                    background: $primary-bg-color !important;
-                    color: $text-color-white;
-                    .cui-icon svg {
-                        stroke: $text-color-white;
-                    }
-                    .proposal-topic-icon {
-                        border-color: $text-color-white;
-                    }
-                }
-                .cui-icon-action {
-                    position: absolute;
-                    right: 0;
-                    top: 0;
-                    bottom: 0;
-                    width: 36px;
-                    // center the icon
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    .cui-icon svg {
-                        opacity: 0.6;
-                    }
-                }
-                .cui-callout {
-                    font-weight: initial;
-                }
-            }
-        }
-        > .cui-list.cui-interactive {
-            .cui-list-item:hover {
-                background: $background-color-light-hover;
-            }
-            .cui-icon-action:hover {
-                .cui-icon svg {
-                    opacity: 1;
-                }
-            }
-        }
+    .section-header {
+        font-size: 18px;
+        color: $text-color-light;
+        margin-top: 20px;
+        margin-bottom: 6px;
     }
-
-    .OffchainNavigationModule {
-        > .cui-list {
-            .cui-list.more-topics-list {
-                border-top: 1px solid $background-color-light-hover;
-                margin-top: 10px;
-                padding: 10px 0;
-                max-height: 230px;
-                margin-bottom: -10px;
-            }
-        }
-
-        // tag icons
-        .topic-row.cui-list-item {
-            @include proposal-topic-inline;
-        }
-        .cui-list .topic-row.cui-list-item .cui-list-item-content-left {
-            padding-left: 3px !important;
-            padding-right: 8px !important;
-        }
-        .proposal-topic-icon {
-            margin-right: 0;
-            border-color: $background-color-placeholder;
-            position: relative;
-            top: 2px;
-        }
+    .cui-button {
+        margin-bottom: 4px;
     }
 }
 
-.MobileSidebarHeader,
 .Sidebar {
-    .ChainStatusModule {
-        position: absolute;
-        bottom: 16px;
-        left: 30px;
-        margin-bottom: 0 !important;
-        width: calc(100% - 60px);
-        max-width: calc(100% - 60px);
-        @include sm-max {
-            position: relative;
-            bottom: initial;
-        }
-
-        // background
-        font-size: 0.94rem;
-        .chain-deferred {
-            color: $text-color-medium;
-        }
-
-        // form stuff
-        .form-group {
-            margin-bottom: 0;
-            select {
-                width: 100%;
-                border-color: $background-color-border;
-                border-radius: 2px;
-                padding: 5px 6px;
-            }
-            .chain-status-main {
-                width: calc(100% - 28px);
-            }
-        }
-        .cui-button-group {
-            position: relative;
-            width: 100%;
-        }
-        .cui-button-label {
-            font-weight: 400;
-            text-align: center;
-            width: 100%;
-        }
-        .cui-icon svg {
-            min-width: 12px;
-            min-height: 12px;
-            width: 12px;
-            height: 12px;
-        }
-    }
+    @include sidebar();
 }
 
 .cui-popover.sidebar-edit-topic .cui-menu,

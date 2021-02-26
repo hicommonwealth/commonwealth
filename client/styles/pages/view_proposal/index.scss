@@ -2,9 +2,9 @@
 
 $discussion-outer-padding: 60px;
 $discussion-separator-padding: 30px; // padding around horizontal rule between header and body
-$discussion-meta-padding: 12px; // padding between comment meta & comment content
-$discussion-reaction-padding: 18px; // padding between comment content & comment reaction
-$discussion-comment-padding: 28px; // padding between comment content & avatar
+$discussion-meta-padding: 12px;      // padding between comment meta & comment content
+$discussion-reaction-padding: 18px;  // padding between comment content & comment reaction
+$discussion-comment-padding: 28px;   // padding between comment content & avatar
 
 $discussion-meta-font-size: 1rem;
 $discussion-meta-color: $text-color-light;
@@ -90,12 +90,13 @@ $discussion-title-font-size: 1.45rem;
             }
         }
         .proposal-title {
+            margin-bottom: 6px;
             .ProposalHeaderTitle {
                 display: inline;
                 font-size: $discussion-title-font-size;
-                font-weight: 500;
+                font-weight: 600;
                 flex: 1;
-                line-height: 1.15;
+                line-height: 1.1;
                 .cui-tag {
                     font-weight: 400;
                     margin-left: 12px;
@@ -113,7 +114,7 @@ $discussion-title-font-size: 1.45rem;
             display: inline-block;
             margin-right: 12px;
             margin-top: 18px;
-            font-weight: 500;
+            font-weight: 600;
             a:link,
             a:visited {
                 display: block;
@@ -182,14 +183,9 @@ $discussion-title-font-size: 1.45rem;
         }
     }
 
-    .ProposalHeaderTopics {
-        .proposal-topic {
-            @include proposal-topic-inline;
-        }
-    }
-
     // proposal-meta
     .ProposalHeaderTopics,
+    .ProposalHeaderStage,
     .ProposalHeaderOnchainId,
     .ProposalHeaderOnchainStatus,
     .ProposalBodyAuthor,
@@ -206,9 +202,10 @@ $discussion-title-font-size: 1.45rem;
         display: inline-block;
         color: $discussion-meta-color;
         margin-right: 17px;
-        a:link,
-        a:visited,
-        .User a.user-display-name {
+        > a:link,
+        > a:visited,
+        a.proposal-collaborators,
+        > .User a.user-display-name {
             color: $discussion-meta-color;
             text-decoration: none;
             &:hover {
@@ -216,6 +213,42 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
+    .ProposalHeaderStage {
+        position: relative;
+        top: -4px;
+        margin-left: 12px;
+        a.cui-button {
+            padding: 0 10px;
+            border: none;
+            background: $background-color-light;
+            color: $text-color-black;
+            &.cui-button.cui-primary {
+                background: $primary-bg-color;
+                color: $text-color-white;
+            }
+            &.cui-button.cui-positive {
+                background: $positive-bg-color;
+                color: $text-color-white;
+            }
+            &.cui-button.cui-negative {
+                background: $negative-bg-color;
+                color: $text-color-white;
+            }
+        }
+        a.cui-button:hover {
+            text-decoration: none;
+        }
+    }
+    .proposal-collaborators-popover {
+        color: $text-color-black;
+        .cui-popover-content {
+            padding-top: 22px;
+            .User {
+                display: block;
+            }
+        }
+    }
+
     .QuillEditor {
         margin-top: 8px;
     }
@@ -256,18 +289,5 @@ $discussion-title-font-size: 1.45rem;
         left: 19px;
         width: 2px;
         z-index: -1;
-    }
-
-    // responsive styles
-    .proposal-mobile-sidebar {
-        display: none;
-    }
-    @include sm-max {
-        .ProposalSidebar {
-            display: none;
-        }
-        .proposal-mobile-sidebar {
-            display: block;
-        }
     }
 }

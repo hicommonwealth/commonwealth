@@ -14,6 +14,7 @@ class Profile {
   private _lastActive: Date;
   private _isCouncillor: boolean = false;
   private _isValidator: boolean = false;
+  private _isNameInvalid: boolean = false;
   get name() { return this._name; }
   get headline() { return this._headline; }
   get bio() { return this._bio; }
@@ -24,6 +25,7 @@ class Profile {
   get lastActive() { return this._lastActive; }
   get isCouncillor() { return this._isCouncillor; }
   get isValidator() { return this._isValidator; }
+  get isNameInvalid() { return this._isNameInvalid; }
 
   public readonly chain: string;
   public readonly address: string;
@@ -35,6 +37,14 @@ class Profile {
 
   public initializeEmpty() {
     this._initialized = true;
+  }
+
+  // When the user updates their name locally, mark it invalid for the duration
+  // of the session, so we can fall-back to the identity loaded from chain.
+  public invalidateName() {
+    // only applies to onchain names
+    if (!this._isOnchain) return;
+    this._isNameInvalid = true;
   }
 
   public initializeWithChain(name, headline, bio, avatarUrl, judgements, lastActive, isCouncillor = false, isValidator = false) {
@@ -61,9 +71,23 @@ class Profile {
     this._isValidator = isValidator;
   }
 
+  // this.name() is only the user-set name, and will be blank if the
+  // user has not set an name (from within Commonwealth or by
+  // registering an on-chain identity)
+  //
+  // this.displayName() is the user-set name or the address, and
+  // this.displayNameWithAddress() is the user-set name with the address,
+  // or just the address if the user has not set a name.
   get displayName() : string {
     if (!this._initialized) return 'Loading...';
     return this.name || formatAddressShort(this.address, this.chain);
+  }
+
+  get displayNameWithAddress() : string {
+    if (!this._initialized) return 'Loading...';
+    return this.name
+      ? `${this.name} · ${formatAddressShort(this.address, this.chain)}`
+      : formatAddressShort(this.address, this.chain);
   }
 
   public getAvatar(size: number) {

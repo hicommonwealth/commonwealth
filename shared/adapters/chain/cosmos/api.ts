@@ -1,7 +1,5 @@
-import { Observable, Subject } from 'rxjs';
 import * as $ from 'jquery';
 import _ from 'lodash';
-import { takeWhile } from 'rxjs/operators';
 
 export interface ITxEvent {
   type: string;
@@ -25,7 +23,7 @@ export interface ITx {
 export class CosmosApi {
   private _lunieApi;
   private _rpc;
-  private _eventHandlers: { [e: string]: Subject<ITx> } = {};
+  private _eventHandlers: { [e: string]: (tx: ITx) => void | Promise<void> } = {};
   private _chainId: string;
   private _initialized: boolean;
   public get chainId(): string {
@@ -48,7 +46,7 @@ export class CosmosApi {
     console.log('headers');
     this._initHeaders(headerListener);
     console.log('chain id');
-    this._chainId = await this._lunieApi.setChainId();
+    // this._chainId = await this._lunieApi.setChainId(); // TODO: replace deprecated call
     this._initialized = true;
   }
 
@@ -74,14 +72,10 @@ export class CosmosApi {
   }
 
   // e.g. 'MsgSend', 'MsgDelegate'
-  public observeEvent(e: string): Observable<ITx> {
+  public observeEvent(e: string, cb: (tx: ITx) => void | Promise<void>) {
     if (!this._eventHandlers[e]) {
-      this._eventHandlers[e] = new Subject<ITx>();
+      this._eventHandlers[e] = cb;
     }
-    return this._eventHandlers[e].asObservable().pipe(
-      // this should automatically close the observables upon deinit
-      takeWhile(() => this._initialized !== false)
-    );
   }
 
   private logTx(tx: any) {
@@ -153,7 +147,7 @@ export class CosmosApi {
         txJson.value.msg.forEach((msg) => {
           const msgName = msg.type.split('/')[1];
           if (this._eventHandlers[msgName]) {
-            this._eventHandlers[msgName].next({ msg, events, memo });
+            this._eventHandlers[msgName]({ msg, events, memo });
           }
         });
       } catch (e) {

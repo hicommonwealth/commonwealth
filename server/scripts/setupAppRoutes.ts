@@ -32,10 +32,8 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     $tmpl('meta[name="author"]').attr('content', author);
     $tmpl('meta[name="twitter:title"]').attr('content', title);
     $tmpl('meta[name="twitter:description"]').attr('content', description);
-    // $tmpl('meta[name="twitter:image"]').attr('content', '');
     $tmpl('meta[property="og:title"]').attr('content', title);
     $tmpl('meta[property="og:description"]').attr('content', description);
-    // $tmpl('meta[property="og:image"]').attr('content', '');
     res.send($tmpl.html());
   };
 
@@ -96,6 +94,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
           model: models.Chain,
         }, {
           model: models.Address,
+          as: 'Address',
           include: [ models.OffchainProfile ]
         }],
       });
@@ -106,6 +105,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
           where: { privacyEnabled: false },
         }, {
           model: models.Address,
+          as: 'Address',
           include: [ models.OffchainProfile ]
         }],
       });

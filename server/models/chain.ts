@@ -12,13 +12,16 @@ export interface ChainAttributes {
   id?: string;
   name: string;
   description?: string;
-  chat?: string;
+  discord?: string;
+  element?: string;
   website?: string;
   telegram?: string;
   github?: string;
   featured_topics: string[];
   symbol: string;
   network: string;
+  base: string;
+  ss58_prefix?: number;
   icon_url: string;
   blockExplorerIds: string;
   collapsed_on_homepage: boolean;
@@ -54,12 +57,15 @@ export default (
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.STRING, allowNull: true },
     website: { type: dataTypes.STRING, allowNull: true },
-    chat: { type: dataTypes.STRING, allowNull: true },
+    discord: { type: dataTypes.STRING, allowNull: true },
+    element: { type: dataTypes.STRING, allowNull: true },
     telegram: { type: dataTypes.STRING, allowNull: true },
     github: { type: dataTypes.STRING, allowNull: true },
     featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
     symbol: { type: dataTypes.STRING, allowNull: false },
     network: { type: dataTypes.STRING, allowNull: false },
+    base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
+    ss58_prefix: { type: dataTypes.INTEGER, allowNull: true },
     icon_url: { type: dataTypes.STRING },
     active: { type: dataTypes.BOOLEAN },
     blockExplorerIds: { type: dataTypes.STRING, allowNull: true, },

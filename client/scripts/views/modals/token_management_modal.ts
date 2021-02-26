@@ -127,6 +127,7 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
         ...content,
         m(Button, {
           type: 'submit',
+          rounded: true,
           disabled: !vnode.state.tokensAvailable || !vnode.state.tokenAmount,
           onclick: (e) => {
             e.preventDefault();

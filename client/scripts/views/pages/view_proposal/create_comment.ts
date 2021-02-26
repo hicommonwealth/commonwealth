@@ -9,7 +9,6 @@ import app from 'state';
 import { OffchainThread, OffchainComment, AnyProposal } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
-import { parseMentionsForServer } from 'views/pages/threads';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
@@ -68,11 +67,6 @@ const CreateComment: m.Component<{
       const commentText = quillEditorState.markdownMode
         ? quillEditorState.editor.getText()
         : JSON.stringify(quillEditorState.editor.getContents());
-      const mentions = !quillEditorState
-        ? null
-        : quillEditorState.markdownMode
-          ? parseMentionsForServer(quillEditorState.editor.getText(), true)
-          : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
       const attachments = [];
       // const attachments = vnode.state.files ?
@@ -85,7 +79,7 @@ const CreateComment: m.Component<{
       const communityId = app.activeCommunityId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, communityId, commentText, parentComment?.id, attachments, mentions);
+          chainId, communityId, commentText, parentComment?.id, attachments);
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
@@ -140,7 +134,7 @@ const CreateComment: m.Component<{
               class: 'no-profile-callout',
               intent: 'primary',
               content: [
-                'You haven\'t set a display name yet, so other people can\'t see who you are. ',
+                'You haven\'t set a display name yet. ',
                 m('a', {
                   href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
                     + `?base=${app.user.activeAccount.chain}`,
@@ -154,7 +148,7 @@ const CreateComment: m.Component<{
                       },
                     });
                   }
-                }, 'Complete your profile'),
+                }, 'Set a display name'),
               ],
             }),
             m(QuillEditor, {
@@ -176,6 +170,7 @@ const CreateComment: m.Component<{
                 compact: true,
                 disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
                   || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+                rounded: true,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
                   ? 'Uploading...'
@@ -186,6 +181,7 @@ const CreateComment: m.Component<{
                   intent: 'none',
                   type: 'cancel',
                   compact: true,
+                  rounded: true,
                   onclick: (e) => {
                     e.preventDefault();
                     getSetGlobalReplyStatus(GlobalStatus.Set, false, true);

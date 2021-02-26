@@ -6,19 +6,6 @@ import app from 'state';
 import { OffchainThread, OffchainTopic } from 'models';
 import TopicSelector from './topic_selector';
 
-interface ITopicEditorAttrs {
-  thread: OffchainThread;
-  popoverMenu?: boolean;
-  onChangeHandler: Function;
-  openStateHandler: Function;
-}
-
-interface ITopicEditorState {
-  topicName: string;
-  topicId: number;
-  isOpen: boolean;
-}
-
 const TopicWindow: m.Component<{
   thread: OffchainThread,
   onChangeHandler: Function
@@ -47,7 +34,16 @@ const TopicWindow: m.Component<{
   }
 };
 
-const TopicEditor: m.Component<ITopicEditorAttrs, ITopicEditorState> = {
+const TopicEditor: m.Component<{
+  thread: OffchainThread;
+  popoverMenu?: boolean;
+  onChangeHandler: Function;
+  openStateHandler: Function;
+}, {
+  topicName: string;
+  topicId: number;
+  isOpen: boolean;
+}> = {
   oncreate: (vnode) => {
     if (!vnode.attrs.thread.topic) return;
     vnode.state.topicName = vnode.attrs.thread.topic.name;
@@ -88,6 +84,7 @@ const TopicEditor: m.Component<ITopicEditorAttrs, ITopicEditorState> = {
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
             label: 'Close',
+            rounded: true,
             onclick: () => {
               if (vnode.attrs.popoverMenu) {
                 vnode.attrs.openStateHandler(false);
@@ -99,6 +96,7 @@ const TopicEditor: m.Component<ITopicEditorAttrs, ITopicEditorState> = {
           m(Button, {
             label: 'Save changes',
             intent: 'primary',
+            rounded: true,
             onclick: async () => {
               const { topicName, topicId } = vnode.state;
               const { thread } = vnode.attrs;

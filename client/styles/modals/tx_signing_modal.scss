@@ -42,7 +42,7 @@
     }
     .HorizontalTabs .tab-content {
         width: 490px;
-        min-height: 440px;
+        min-height: 450px;
         @incude sm-max {
             width: initial;
         }
@@ -50,15 +50,6 @@
 
     &.Intro {
         width: 710px;
-    }
-    &.WaitingToConfirmTransaction {
-        .icon-spinner2.animate-spin {
-            margin: 40px auto 10px;
-            text-align: center;
-            display: block;
-            font-size: 18px;
-            color: $text-color-light;
-        }
     }
 
     // reusable components
@@ -73,6 +64,13 @@
                 text-decoration: underline;
             }
         }
+    }
+    .TXSigningBodyText {
+        margin-bottom: 20px;
+    }
+    .cui-spinner {
+        margin: 20px 0 26px;
+        width: 100%;
     }
     .TXSigningTransactionBox {
         border: 1px solid $background-color-light;
@@ -90,10 +88,10 @@
             word-break: break-word;
         }
         .txbox-content.txbox-success {
-            color: $positive-text-color;
+            color: $positive-bg-color;
         }
         .txbox-content.txbox-fail {
-            color: $negative-text-color;
+            color: $negative-bg-color;
         }
     }
 }

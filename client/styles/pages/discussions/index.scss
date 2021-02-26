@@ -5,7 +5,10 @@
         position: relative;
         flex: 1;
         margin: 0px auto;
-        padding: 24px 0 36px;
+        padding: 36px 0 36px;
+        @include sm-max {
+            padding-top: 24px;
+        }
         &.empty-list {
             height: calc(100vh - 200px);
         }
@@ -14,9 +17,74 @@
         .discussions-main {
             padding: 12px 0;
         }
-        .ListingHeader {
-            display: none;
+    }
+
+    .discussions-topics,
+    .discussions-stages {
+        margin-bottom: 20px;
+        font-size: 17px;
+        line-height: 1.25;
+        .cui-button-group {
+            flex-wrap: wrap;
         }
+    }
+    @include xs-max {
+        .discussions-topics {
+            margin-top: 10px;
+        }
+        .discussions-stages {
+            margin-bottom: 10px;
+        }
+    }
+    .cui-button.discussions-topic {
+        margin-right: 6px;
+        .cui-icon {
+            margin-left: 1px;
+        }
+        .cui-icon svg {
+            $size: 13px;
+            min-height: $size;
+            min-width: $size;
+            height: $size;
+            width: $size;
+            stroke: tint(#2480cc, 25%);
+        }
+        .cui-icon:hover svg {
+            stroke: tint(#2480cc, 10%);
+        }
+    }
+    .cui-button.discussions-topic,
+    .cui-button.discussions-stage {
+        color: $text-color-black;
+        padding: 0 12px;
+        display: inline-block;
+        margin-bottom: 6px;
+        cursor: pointer;
+        line-height: 1 !important;
+        &.cui-sm {
+            height: 26px;
+            min-height: 26px;
+            line-height: 1 !important;
+        }
+        &.active {
+            border-color: $text-color-black;
+        }
+    }
+    .cui-button.discussions-stage {
+        padding: 0 13px;
+    }
+    .discussions-stage-count {
+        display: inline-block;
+        height: 19px;
+        font-size: 15px;
+        position: relative;
+        left: 2px;
+        padding: 3px 5px 0;
+        border-radius: 9999px;
+        background: $primary-bg-color;
+        color: #fff;
+        font-weight: 500;
+        margin: -2px 0 -2px 2px;
     }
 
     // content

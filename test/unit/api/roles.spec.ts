@@ -205,7 +205,7 @@ describe('Roles Test', () => {
       expect(res.body.error).to.be.equal(upgradeErrors.NoMember);
     });
 
-    it('should pass when an admin demotes self', async () => {
+    it('should fail when the only admin demotes self', async () => {
       const role = 'member';
       const res = await chai.request(app)
         .post('/api/upgradeMember')
@@ -216,8 +216,37 @@ describe('Roles Test', () => {
           address: loggedInAddr,
           new_role: role,
         });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(upgradeErrors.MustHaveAdmin);
+    });
+
+    it('should pass when admin demotes self', async () => {
+      // set new user as new admin
+      const role = 'admin';
+      const res = await chai.request(app)
+        .post('/api/upgradeMember')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          community,
+          address: newUserAddress,
+          new_role: role,
+        });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.permission).to.be.equal(role);
+
+      const newAdminRole = 'member';
+      const demoteRes = await chai.request(app)
+        .post('/api/upgradeMember')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          community,
+          address: loggedInAddr,
+          new_role: newAdminRole,
+        });
+      expect(demoteRes.body.status).to.be.equal('Success');
+      expect(demoteRes.body.result.permission).to.be.equal(newAdminRole);
     });
   });
 
@@ -278,6 +307,15 @@ describe('Roles Test', () => {
     });
 
     it('should fail to delete role where there is none in chain community', async () => {
+      // ensure does not exist before attempting to delete
+      await chai.request(app)
+        .post('/api/deleteRole')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: memberJwt,
+          chain,
+          address_id: memberAddressId,
+        });
       const res = await chai.request(app)
         .post('/api/deleteRole')
         .set('Accept', 'application/json')

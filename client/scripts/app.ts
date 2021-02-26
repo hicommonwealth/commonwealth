@@ -22,6 +22,12 @@ import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import { alertModalWithText } from 'views/modals/alert_modal';
+
+// Prefetch commonly used pages
+import(/* webpackPrefetch: true */ 'views/pages/home');
+import(/* webpackPrefetch: true */ 'views/pages/discussions');
+import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -31,6 +37,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.chains.clear();
       app.config.nodes.clear();
       app.config.communities.clear();
+      app.user.notifications.store.clear();
+      app.user.notifications.clearSubscriptions();
       data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
       data.nodes.map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
@@ -47,7 +55,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           description: community.description,
           iconUrl: community.iconUrl,
           website: community.website,
-          chat: community.chat,
+          discord: community.discord,
+          element: community.element,
           telegram: community.telegram,
           github: community.github,
           default_chain: app.config.chains.getById(community.default_chain),
@@ -90,6 +99,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
 }
 
 export async function deinitChainOrCommunity() {
+  app.isAdapterReady = false;
   if (app.chain) {
     app.chain.networkStatus = ApiStatus.Disconnected;
     app.chain.deinitServer();
@@ -270,6 +280,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/cosmos/main'
     )).default;
     newChain = new Cosmos(n, app);
+  } else if (n.chain.network === ChainNetwork.Straightedge) {
+    const Straightedge = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "straightedge-main" */
+      './controllers/chain/straightedge/main'
+    )).default;
+    newChain = new Straightedge(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import(
       /* webpackMode: "lazy" */
@@ -299,6 +316,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     //   './controllers/chain/ethereum/token/adapter'
     // )).default;
     newChain = new Token(n, app);
+  } else if (n.chain.network === ChainNetwork.Commonwealth) {
+    const Commonwealth = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "commonwealth-main" */
+      './controllers/chain/ethereum/commonwealth/adapter'
+    )).default;
+    newChain = new Commonwealth(n, app);
   } else {
     throw new Error('Invalid chain');
   }
@@ -352,7 +376,8 @@ export async function initChain(): Promise<void> {
   await app.chain.initData();
 
   // Emit chain as updated
-  app.chainAdapterReady.next(true);
+  app.chainAdapterReady.emit('ready');
+  app.isAdapterReady = true;
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
@@ -429,8 +454,17 @@ $(() => {
   // set window error handler
   // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
   const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
+  // replace chunk loading errors with a notification that the app has been updated
+  const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token '<'/;
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
     if (typeof errorMsg === 'string' && resizeObserverLoopErrRe.test(errorMsg)) return false;
+    if (typeof errorMsg === 'string' && chunkLoadingErrRe.test(errorMsg)) {
+      alertModalWithText(
+        'A new version of the application has been released. Please save your work and refresh.',
+        'Okay'
+      )();
+      return false;
+    }
     notifyError(`${errorMsg}`);
     return false;
   };
@@ -503,6 +537,11 @@ $(() => {
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
     '/edgeware/stats':           importRoute('views/stats/edgeware', { scoped: false }),
 
+    // Commonwealth protocol
+    '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
+    // '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
+    '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
+
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
@@ -510,7 +549,8 @@ $(() => {
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
-    '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
+    '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
+    '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),

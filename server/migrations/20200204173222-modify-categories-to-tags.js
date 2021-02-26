@@ -1,13 +1,13 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn(
         'OffchainTags',
         'color',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: false,
         },
         { transaction: t },
@@ -16,7 +16,7 @@ module.exports = {
         'OffchainTags',
         'description',
         {
-          type: DataTypes.TEXT,
+          type: Sequelize.TEXT,
           allowNull: false,
         },
         { transaction: t },
@@ -24,13 +24,13 @@ module.exports = {
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn(
         'OffchainTags',
         'color',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t },
@@ -39,7 +39,7 @@ module.exports = {
         'OffchainTags',
         'description',
         {
-          type: DataTypes.TEXT,
+          type: Sequelize.TEXT,
           allowNull: true,
         },
         { transaction: t },

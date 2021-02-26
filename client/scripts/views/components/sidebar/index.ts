@@ -5,25 +5,21 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, List, ListItem, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
+  Button, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
 } from 'construct-ui';
 
 import { selectNode, initChain } from 'app';
 
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
-import { link } from 'helpers';
+import { link, removeUrlPrefix } from 'helpers';
 import { ChainClass, ChainBase, ChainNetwork, ChainInfo, CommunityInfo, AddressInfo, NodeInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
-import EditTopicModal from 'views/modals/edit_topic_modal';
 
+import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
-import { MobileNewProposalButton } from 'views/components/new_proposal_button';
-import NotificationsMenu from 'views/components/header/notifications_menu';
-import LoginSelector from 'views/components/header/login_selector';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
-
-import CommunitySelector, { CommunityLabel } from './community_selector';
+import CommunitySelector from 'views/components/sidebar/community_selector';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -32,32 +28,21 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
     return m('.SidebarQuickSwitcherItem', {
       key: `${item instanceof ChainInfo ? 'chain' : 'community'}-${item.id}`
     }, [
-      m(Popover, {
-        interactionType: 'hover',
-        hoverOpenDelay: 500,
-        hoverCloseDelay: 0,
-        transitionDuration: 0,
-        position: 'right',
-        restoreFocus: false,
-        inline: true,
-        content: m('.quick-switcher-option-text', item.name),
-        class: 'SidebarQuickSwitcherItemTooltip',
-        trigger: m('.quick-switcher-option', {
-          class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
-            || (item instanceof CommunityInfo && item.id === app?.community?.id)
-            ? ' active' : '',
-        }, item instanceof ChainInfo
-          ? m(ChainIcon, {
+      m('.quick-switcher-option', {
+        class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
+          || (item instanceof CommunityInfo && item.id === app?.community?.id)
+          ? ' active' : '',
+      }, item instanceof ChainInfo
+        ? m(ChainIcon, {
+          size,
+          chain: item,
+          onclick: link ? (() => m.route.set(`/${item.id}`)) : null
+        }) : item instanceof CommunityInfo
+          ? m(CommunityIcon, {
             size,
-            chain: item,
+            community: item,
             onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-          }) : item instanceof CommunityInfo
-            ? m(CommunityIcon, {
-              size,
-              community: item,
-              onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-            }) : null),
-      }),
+          }) : null),
     ]);
   }
 };
@@ -78,159 +63,88 @@ const SidebarQuickSwitcher: m.Component<{}> = {
       return true;
     });
 
-    const quickSwitcherCommunities = starredCommunities.length > 0 ? starredCommunities : allCommunities;
-
     const size = 36;
     return m('.SidebarQuickSwitcher', [
-      quickSwitcherCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
+      m(Button, {
+        class: 'sidebar-home-link',
+        rounded: true,
+        label: m(Icon, { name: Icons.HOME }),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set('/');
+        },
+      }),
+      m(CommunitySelector),
+      starredCommunities.map((item) => m(SidebarQuickSwitcherItem, { item, size })),
     ]);
   }
 };
 
-const OffchainNavigationModule: m.Component<{ sidebarTopic: number }, { dragulaInitialized: true }> = {
+export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
   view: (vnode) => {
-    const { sidebarTopic } = vnode.attrs;
-
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
-      || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
+      || p.startsWith(`/${app.activeId()}/discussions/`)
+      || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
+      || p.startsWith(`/${app.activeId()}?`);
     const onSearchPage = (p) => p.startsWith(`/${app.activeId()}/search`);
+    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
+      || p.startsWith(`/${app.activeId()}/account/`);
     const onChatPage = (p) => p === `/${app.activeId()}/chat`;
 
-    const featuredTopics = {};
-    const otherTopics = {};
-    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
-
-    const getTopicRow = (id, name, description) => m(ListItem, {
-      class: 'topic-row',
-      key: id,
-      contentLeft: m('.proposal-topic-icon'),
-      contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
-        && app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-        && m(PopoverMenu, {
-          class: 'sidebar-edit-topic',
-          position: 'bottom',
-          transitionDuration: 0,
-          hoverCloseDelay: 0,
-          closeOnContentClick: true,
-          trigger: m(Icon, {
-            name: Icons.CHEVRON_DOWN,
-          }),
-          content: m(MenuItem, {
-            label: 'Edit topic',
-            onclick: (e) => {
-              app.modals.create({
-                modal: EditTopicModal,
-                data: { description, id, name }
-              });
-            }
-          })
-        }),
-      label: [
-        name,
-      ],
-      active: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name.toString().trim())}`
-        || (sidebarTopic && sidebarTopic === id),
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeId()}/discussions/${name}`);
-      },
-    });
-
-    app.topics.getByCommunity(app.activeId()).forEach((topic) => {
-      const { id, name, description } = topic;
-      if (featuredTopicIds.includes(`${topic.id}`)) {
-        featuredTopics[topic.name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
-      } else {
-        otherTopics[topic.name] = { id, name, description };
-      }
-    });
-    const otherTopicListItems = Object.keys(otherTopics)
-      .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
-      .map((name, idx) => getTopicRow(otherTopics[name].id, name, otherTopics[name].description));
-    const featuredTopicListItems = Object.keys(featuredTopics)
-      .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
-      .map((name, idx) => getTopicRow(featuredTopics[name].id, name, featuredTopics[name].description));
-
     return m('.OffchainNavigationModule.SidebarModule', [
-      m(List, [
-        m(ListItem, {
-          class: 'section-header',
-          label: 'Off-chain Discussions',
-          contentRight: app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-            && m(PopoverMenu, {
-              class: 'sidebar-add-topic',
-              position: 'bottom',
-              transitionDuration: 0,
-              hoverCloseDelay: 0,
-              closeOnContentClick: true,
-              trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
-              content: m(MenuItem, {
-                label: 'New topic',
-                onclick: (e) => {
-                  e.preventDefault();
-                  app.modals.create({ modal: NewTopicModal });
-                }
-              }),
-            }),
-        }),
-        m(ListItem, {
-          active: onDiscussionsPage(m.route.get())
-            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true)
-            && (sidebarTopic === null || !m.route.get().startsWith(`/${app.activeId()}/proposal/discussion/`)),
-          label: 'All Discussions',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeId()}`);
-          },
-          contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
-        }),
-        m(ListItem, {
-          active: onSearchPage(m.route.get())
-            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-          label: 'Search',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeId()}/search`);
-          },
-          contentLeft: m(Icon, { name: Icons.SEARCH }),
-        }),
-        // m(ListItem, {
-        //   active: onChatPage(m.route.get()),
-        //   label: 'Chat',
-        //   onclick: (e) => {
-        //     e.preventDefault();
-        //     m.route.set(`/${app.activeId()}/chat`);
-        //   },
-        //   contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
-        // }),
-      ]),
-      m(List, [
-        featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && !app.threads.initialized
-          && m(ListItem, {
-            class: 'section-callout',
-            label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
-          }),
-      ]),
-      m(List, {
-        onupdate: (vvnode) => {
-          if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
-              && !vnode.state.dragulaInitialized) {
-            vnode.state.dragulaInitialized = true;
-            dragula([vvnode.dom]).on('drop', async (el, target, source) => {
-              const reorder = Array.from(source.children).map((child) => {
-                return (child as HTMLElement).id;
-              });
-              await app.community.meta.updateFeaturedTopics(reorder);
-            });
-          }
-        }
-      }, featuredTopicListItems),
-      m(List, { class: 'more-topics-list' }, otherTopicListItems),
+      // m('.section-header', 'Discuss'),
+      m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onDiscussionsPage(m.route.get())
+          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        label: 'Discussions',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeId()}`);
+        },
+        contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+      }),
+      m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onSearchPage(m.route.get())
+          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        label: 'Search',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeId()}/search`);
+        },
+        contentLeft: m(Icon, { name: Icons.SEARCH }),
+      }),
+      m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onMembersPage(m.route.get())
+          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        label: 'Members',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeId()}/members`);
+        },
+        contentLeft: m(Icon, { name: Icons.USERS }),
+      }),
+      // m(Button, {
+      //   rounded: true,
+      //   fluid: true,
+      //   active: onChatPage(m.route.get()),
+      //   label: 'Chat',
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeId()}/chat`);
+      //   },
+      //   contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
+      // }),
     ]);
   }
 };
 
-const OnchainNavigationModule: m.Component<{}, {}> = {
+export const OnchainNavigationModule: m.Component<{}, {}> = {
   view: (vnode) => {
     // // proposal counts
     // const substrateGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.Substrate)
@@ -249,11 +163,12 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || app.chain.class === ChainClass.Moloch);
+        || app.chain.class === ChainClass.Moloch || app.chain.class === ChainClass.Commonwealth);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.class === ChainClass.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
+    const showCommonwealthMenuOptions = app.chain?.class === ChainClass.Commonwealth;
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
@@ -272,129 +187,158 @@ const OnchainNavigationModule: m.Component<{}, {}> = {
     if (onNotificationsPage(m.route.get())) return;
 
     return m('.OnchainNavigationModule.SidebarModule', [
-      m(List, [
-        m(ListItem, {
-          label: 'On-chain Governance',
-          class: 'section-header',
+      m('.section-header', 'Vote'),
+      // referenda (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onReferendaPage(m.route.get()),
+          label: 'Referenda',
+          contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/referenda`);
+          },
+          contentRight: [], // TODO
         }),
-        // referenda (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia
-          && m(ListItem, {
-            active: onReferendaPage(m.route.get()),
-            label: 'Referenda',
-            contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/referenda`);
-            },
-            contentRight: [], // TODO
-          }),
-        // proposals (substrate, cosmos, moloch only)
-        m(ListItem, {
-          active: onProposalPage(m.route.get()) && app.chain.network !== ChainNetwork.Darwinia,
-          label: 'Proposals & Motions',
+      // proposals (substrate, cosmos, moloch only)
+      !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
+                         || app.chain?.base === ChainBase.CosmosSDK
+                         || app.chain?.class === ChainClass.Moloch)
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onProposalPage(m.route.get()),
+          label: 'Proposals',
           contentLeft: m(Icon, { name: Icons.SEND }),
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/proposals`);
           },
-          // contentRight: [
-          //   (app.chain?.base === ChainBase.Substrate)
-          //     && m(Tag, {
-          //       rounded: true,
-          //       label: app.chain?.loaded ? allSubstrateGovernanceProposals : '-',
-          //     }),
-          //   (app.chain?.base === ChainBase.CosmosSDK) && m(Tag, {
-          //     rounded: true,
-          //     label: app.chain?.loaded ? cosmosGovernanceProposals : '-',
-          //   }),
-          //   (app.chain?.class === ChainClass.Moloch) && m(Tag, {
-          //     rounded: true,
-          //     label: app.chain?.loaded ? molochProposals : '-',
-          //   }),
-          // ],
         }),
-        // treasury (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
-          && m(ListItem, {
-            active: onTreasuryPage(m.route.get()),
-            label: 'Treasury',
-            contentLeft: m(Icon, { name: Icons.TRUCK }),
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/treasury`);
-            },
-            contentRight: [], // TODO
-          }),
-        // council (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate
-          && m(ListItem, {
-            active: onCouncilPage(m.route.get()),
-            label: 'Council',
-            contentLeft: m(Icon, { name: Icons.AWARD }),
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/council`);
-            },
-            contentRight: [], // TODO
-          }),
-        // validators (substrate and cosmos only)
-        // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-        //   m(ListItem, {
-        //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
-        //     active: onValidatorsPage(m.route.get()),
-        //     label: 'Validators',
-        //     onclick: (e) => {
-        //       e.preventDefault();
-        //       m.route.set(`/${app.activeChainId()}/validators`),
-        //     },
-        //   }),
-        showMolochMemberOptions && m(ListItem, {
+      // treasury (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onTreasuryPage(m.route.get()),
+          label: 'Treasury',
+          contentLeft: m(Icon, { name: Icons.TRUCK }),
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
+            m.route.set(`/${app.activeChainId()}/treasury`);
           },
-          label: 'New proposal',
-          contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
         }),
-        showMolochMemberOptions && m(ListItem, {
+      // council (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          active: onCouncilPage(m.route.get()),
+          label: 'Council',
+          contentLeft: m(Icon, { name: Icons.AWARD }),
           onclick: (e) => {
             e.preventDefault();
-            app.modals.lazyCreate('update_delegate_modal', {
-              account: app.user.activeAccount,
-              delegateKey: (app.user.activeAccount as any).delegateKey,
-            });
+            m.route.set(`/${app.activeChainId()}/council`);
           },
-          label: 'Update delegate key',
-          contentLeft: m(Icon, { name: Icons.KEY }),
         }),
-        showMolochMemberOptions && m(ListItem, {
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
-          },
-          label: 'Rage quit',
-          contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
-        }),
-        showMolochMenuOptions && m(ListItem, {
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.lazyCreate('token_management_modal', {
-              account: app.user.activeAccount,
-              accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
-              contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
-              tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
-            });
-          },
-          label: 'Approve tokens',
-          contentLeft: m(Icon, { name: Icons.POWER }),
-        }),
-      ]),
+      // validators (substrate and cosmos only)
+      // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
+      //   m(Button, {
+      //     fluid: true,
+      //     rounded: true,
+      //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
+      //     active: onValidatorsPage(m.route.get()),
+      //     label: 'Validators',
+      //     onclick: (e) => {
+      //       e.preventDefault();
+      //       m.route.set(`/${app.activeChainId()}/validators`),
+      //     },
+      //   }),
+      showMolochMemberOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
+        },
+        label: 'New proposal',
+        contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
+      }),
+      showMolochMemberOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.lazyCreate('update_delegate_modal', {
+            account: app.user.activeAccount,
+            delegateKey: (app.user.activeAccount as any).delegateKey,
+          });
+        },
+        label: 'Update delegate key',
+        contentLeft: m(Icon, { name: Icons.KEY }),
+      }),
+      showMolochMemberOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
+        },
+        label: 'Rage quit',
+        contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
+      }),
+      showMolochMenuOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.lazyCreate('token_management_modal', {
+            account: app.user.activeAccount,
+            accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
+            contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
+            tokenAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.tokenContract.address,
+          });
+        },
+        label: 'Approve tokens',
+        contentLeft: m(Icon, { name: Icons.POWER }),
+      }),
+      showCommonwealthMenuOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        label: 'Projects',
+        active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/projects`);
+        },
+      }),
+      // showCommonwealthMenuOptions && m(Button, {
+      //   fluid: true,
+      //   rounded: true,
+      //   label: 'Backers',
+      //   active: m.route.get().startsWith(`/${app.activeChainId()}/backers`),
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeChainId()}/backers`);
+      //   },
+      // }),
+      showCommonwealthMenuOptions && m(Button, {
+        fluid: true,
+        rounded: true,
+        label: 'Collectives',
+        active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeChainId()}/collectives`);
+        },
+      }),
     ]);
   }
 };
 
-const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
+export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
   view: (vnode) => {
     const url = app.chain?.meta?.url;
     if (!url) return;
@@ -422,22 +366,28 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
     })));
 
     return m('.ChainStatusModule', [
-      m(PopoverMenu, {
+      app.chain.deferred ? m(Button, {
+        label: 'Connect to chain',
+        rounded: true,
+        fluid: true,
+        disabled: vnode.state.initializing,
+        onclick: async (e) => {
+          e.preventDefault();
+          vnode.state.initializing = true;
+          await initChain();
+          vnode.state.initializing = false;
+          m.redraw();
+        }
+      }) : m(PopoverMenu, {
         transitionDuration: 0,
         closeOnContentClick: true,
         closeOnOutsideClick: true,
-        content: app.chain.deferred ? m(MenuItem, {
-          label: 'Connect to chain',
-          onclick: async (e) => {
-            e.preventDefault();
-            vnode.state.initializing = true;
-            await initChain();
-            vnode.state.initializing = false;
-            m.redraw();
-          }
-        }) : nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
+        content: nodes.filter((node) => node.chainId === app.activeChainId()).map((node) => {
           return m(MenuItem, {
-            label: node.label,
+            label: [
+              node.label,
+              app.chain?.meta.id === node.value && ' (Selected)',
+            ],
             onclick: async (e) => {
               e.preventDefault();
               vnode.state.initializing = true;
@@ -451,67 +401,85 @@ const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
           });
         }),
         trigger: m(Button, {
+          rounded: true,
           class: 'chain-status-main',
           fluid: true,
           disabled: vnode.state.initializing,
           label: vnode.state.initializing ? 'Connecting...' : app.chain.deferred
-            ? 'Ready to connect' : m(ChainStatusIndicator),
+            ? 'Connect to chain' : m(ChainStatusIndicator),
         }),
       }),
     ]);
   }
 };
 
-const Sidebar: m.Component<{ sidebarTopic: number }, { open: boolean }> = {
+export const ExternalLinksModule: m.Component<{}, {}> = {
   view: (vnode) => {
-    const { sidebarTopic } = vnode.attrs;
+    if (!app.chain && !app.community) return;
+    const meta = app.chain ? app.chain.meta.chain : app.community.meta;
+    const { name, description, website, discord, element, telegram, github } = meta;
+    if (!website && !discord && !telegram && !github) return;
 
-    return [
-      m('.MobileSidebarHeader', {
-        onclick: (e) => {
-          e.preventDefault();
-          // clicking anywhere outside the trigger should close the sidebar
-          const onTrigger = $(e.target).hasClass('mobile-sidebar-trigger')
-            || $(e.target).closest('.mobile-sidebar-trigger').length > 0;
-          if (!onTrigger && vnode.state.open) vnode.state.open = false;
-        },
-      }, [
-        m('.mobile-sidebar-left', [
-          m(Button, {
-            class: 'mobile-sidebar-trigger',
-            compact: true,
-            onclick: (e) => {
-              e.preventDefault();
-              vnode.state.open = !vnode.state.open;
-            },
-            label: m(Icon, { name: Icons.MENU }),
+    return m('.ExternalLinksModule.SidebarModule', [
+      m('.section-header', 'External Links'),
+      discord && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: () => window.open(discord),
+        label: 'Discord',
+        iconRight: Icons.EXTERNAL_LINK,
+        class: 'discord-button',
+      }),
+      element && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: () => window.open(element),
+        label: 'Element',
+        iconRight: Icons.EXTERNAL_LINK,
+        class: 'element-button',
+      }),
+      telegram && m(Button, {
+        fluid: true,
+        rounded: true,
+        onclick: () => window.open(telegram),
+        label: 'Telegram',
+        iconRight: Icons.EXTERNAL_LINK,
+        class: 'telegram-button',
+      }),
+      (github || website) && m(PopoverMenu, {
+        closeOnContentClick: true,
+        transitionDuration: 0,
+        inline: true,
+        content: [
+          github && m(MenuItem, {
+            label: 'Github',
+            onclick: () => window.open(github),
           }),
-          app.isLoggedIn() && m(MobileNewProposalButton),
-        ]),
-        m('.mobile-sidebar-center', {
-          class: `${app.isLoggedIn() ? 'logged-in' : ''} ${((app.chain || app.community) && !app.chainPreloading) ? '' : 'no-community'}`,
-        }, [
-          m('.community-label', m(CommunitySelector)),
-        ]),
-        m('.mobile-sidebar-right', [
-          app.isLoggedIn() && m(NotificationsMenu, { small: false }),
-          m(LoginSelector, { small: false }),
-        ]),
-      ]),
+          website && m(MenuItem, {
+            onclick: () => window.open(website),
+            label: 'Project homepage',
+          }),
+        ],
+        trigger: m(Button, {
+          fluid: true,
+          rounded: true,
+          label: 'More...',
+        }),
+      }),
+    ]);
+  }
+};
+
+const Sidebar: m.Component<{}, {}> = {
+  view: (vnode) => {
+    return [
       m(SidebarQuickSwitcher),
-      m('.Sidebar', {
-        class: vnode.state.open ? 'open' : '',
-        onclick: (e) => {
-          e.preventDefault();
-          // clicking inside the sidebar should close the sidebar
-          vnode.state.open = false;
-        },
-      }, [
-        (app.chain || app.community) && m('.SidebarHeader', m(CommunitySelector)),
-        m('.sidebar-content', [ // container for overflow scrolling
-          (app.chain || app.community) && m(OffchainNavigationModule, { sidebarTopic }),
-          (app.chain || app.community) && m(OnchainNavigationModule),
-        ]),
+      m('.Sidebar', [
+        (app.chain || app.community) && m(OffchainNavigationModule),
+        (app.chain || app.community) && m(OnchainNavigationModule),
+        (app.chain || app.community) && m(ExternalLinksModule),
+        m('br'),
+        app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
       ])
     ];

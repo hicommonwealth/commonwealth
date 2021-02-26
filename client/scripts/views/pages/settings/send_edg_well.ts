@@ -11,8 +11,6 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import { Account, ChainBase } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import Substrate from 'controllers/chain/substrate/main';
-import { makeDynamicComponent } from 'models/mithril';
-import { first } from 'rxjs/operators';
 import AddressInput from 'views/components/addresses/address_input';
 
 const getBalanceTransferChecks = (
@@ -48,19 +46,7 @@ const getBalanceTransferChecks = (
     ]);
   }
 
-  const creationFee = (app.chain as Substrate).chain.creationfee;
-  if (canTransfer && recipientBalance.eqn(0) && creationFee) {
-    if (creationFee.gtn(0)) {
-      checks.push([
-        featherIcon('info', 14, 2, '#444'),
-        `Account creation fee: ${formatCoin((app.chain as Substrate).chain.creationfee)}`
-      ]);
-    }
-  }
-
-  const resultingBalance = app.chain.chain.coins(recipientBalance.add(recipientBalance.gtn(0)
-    ? amount.sub(txFee)
-    : (creationFee) ? amount.sub(txFee).sub(creationFee) : amount.sub(txFee)));
+  const resultingBalance = app.chain.chain.coins(recipientBalance.add(amount.sub(txFee)));
   if (recipientBalance.eqn(0) && resultingBalance.lt((app.chain as Substrate).chain.existentialdeposit)) {
     checks.push([
       featherIcon('slash', 14, 2, '#444'),
@@ -82,7 +68,7 @@ const getBalanceTransferChecks = (
 
 const fetchBalance = (address: string) => {
   const recipient: Account<any> = app.chain.accounts.get(address);
-  return recipient.balance.pipe(first()).toPromise();
+  return recipient.balance;
 };
 
 interface IAttrs {
@@ -90,13 +76,8 @@ interface IAttrs {
 }
 
 interface IState {
-  // we may not want senderBalance to be a fully dynamic property, as it might be
-  // confusing for a transaction to suddenly go from passing to failing as the user
-  // sits with the page open. But this seems a minor point for now.
-  dynamic: {
-    senderBalance: SubstrateCoin;
-    substrateTxFee: SubstrateCoin;
-  };
+  senderBalance: SubstrateCoin;
+  substrateTxFee: SubstrateCoin;
   recipientBalance: SubstrateCoin;
   recipientAddress: string;
   amount: SubstrateCoin;
@@ -104,25 +85,27 @@ interface IState {
   error: string;
 }
 
-const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
-  getObservables: (attrs: IAttrs) => ({
-    groupKey: attrs.sender.address,
-    senderBalance: attrs.sender.balance,
-    substrateTxFee: attrs.sender.chainBase === ChainBase.Substrate
-      ? (attrs.sender as SubstrateAccount).balanceTransferFee
-      : null,
-  }),
+const SendEDGWell: m.Component<IAttrs, IState> = {
+  oninit: (vnode) => {
+    app.runWhenReady(async () => {
+      vnode.state.senderBalance = await vnode.attrs.sender.balance;
+      vnode.state.substrateTxFee = vnode.attrs.sender.chainBase === ChainBase.Substrate
+        ? await (vnode.attrs.sender as SubstrateAccount).balanceTransferFee
+        : null;
+      m.redraw();
+    });
+  },
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     let canTransfer = true;
     let checks = [];
     if (vnode.attrs.sender && vnode.state.recipientBalance && vnode.state.amount) {
       [ canTransfer, checks ] = getBalanceTransferChecks(
-        vnode.state.dynamic.senderBalance,
+        vnode.state.senderBalance,
         vnode.state.recipientBalance,
         vnode.state.amount,
         vnode.state.recipientAddress,
         vnode.attrs.sender.address,
-        vnode.state.dynamic.substrateTxFee,
+        vnode.state.substrateTxFee,
       );
     }
 
@@ -190,6 +173,7 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
                 || !canTransfer
                 || vnode.state.sending),
         type: 'submit',
+        rounded: true,
         onclick: async (e) => {
           e.preventDefault();
           const address = vnode.state.recipientAddress;
@@ -221,6 +205,6 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
       m('span.error-message', vnode.state.error),
     ]);
   }
-});
+};
 
 export default SendEDGWell;

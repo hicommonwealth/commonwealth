@@ -18,20 +18,15 @@ export enum ReactionType {
   Dislike = 'dislike'
 }
 
-interface IAttrs {
+const ReactionButton: m.Component<{
   post: OffchainThread | AnyProposal | OffchainComment<any>;
   type: ReactionType;
   displayAsLink?: boolean;
   tooltip?: boolean;
-}
-
-interface IState {
-  loading: boolean;
-}
-
-const ReactionButton: m.Component<IAttrs, IState> = {
-  view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    const { post, type, displayAsLink, tooltip } = vnode.attrs;
+  large?: boolean;
+}, { loading: boolean }> = {
+  view: (vnode) => {
+    const { post, type, displayAsLink, tooltip, large } = vnode.attrs;
     const reactions = app.reactions.getByPost(post);
     let dislikes;
     let likes;
@@ -60,7 +55,10 @@ const ReactionButton: m.Component<IAttrs, IState> = {
 
     const rxnButton = m('.ReactionButton', {
       class: `${(disabled ? 'disabled' : type === hasReactedType ? 'active' : '')
-        + (displayAsLink ? ' as-link' : '')}`,
+        + (displayAsLink ? ' as-link' : '')
+        + (large ? ' large' : '')
+        + (type === ReactionType.Like ? ' like' : '')
+        + (type === ReactionType.Dislike ? ' dislike' : '')}`,
       onclick: (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -113,10 +111,10 @@ const ReactionButton: m.Component<IAttrs, IState> = {
         }
       },
     }, (type === ReactionType.Dislike) && [
-      m('.upvote-icon', '👎'),
+      m('.upvote-icon', large ? '▾' : '👎'),
       m('.upvote-count', dislikes.length),
     ], (type === ReactionType.Like) && [
-      m('.reactions-icon', '👍'),
+      m('.reactions-icon', large ? '▾' : '👍'),
       m('.reactions-count', likes.length),
     ]);
 

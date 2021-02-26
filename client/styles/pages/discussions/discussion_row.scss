@@ -1,17 +1,15 @@
 @import 'client/styles/shared';
 
-$discussion-meta-padding: 18px;
-
 .DiscussionRow {
     .row-left {
         .row-header {
             .spacer {
                 display: inline-block;
-                width: 4px;
+                width: 5px;
             }
             a.external-discussion-link {
                 font-size: 17px;
-                color: $theme-base-color;
+                color: $primary-bg-color;
                 &:hover {
                     text-decoration: underline;
                 }
@@ -21,27 +19,21 @@ $discussion-meta-padding: 18px;
             // Styling specific to DiscussionRow subheader content
             .discussion-locked {
                 margin-right: 12px;
+                .cui-tag.cui-xs .cui-icon svg {
+                    margin-right: 0;
+                }
             }
             a.proposal-topic {
-                @include proposal-topic-inline;
-                margin-right: $discussion-meta-padding;
+                margin-right: 16px;
                 color: $text-color-light;
-                span.proposal-topic-icon {
-                    display: inline-block;
-                    background: transparent;
-                    border: 1.5px solid #b5b7b9;
-                    border-radius: 99px;
-                    width: 9px;
-                    height: 9px;
-                    margin-right: 6px;
-                }
             }
             .mobile-comment-count {
                 display: none;
                 color: $text-color-light;
-                margin-left: 12px;
+                white-space: nowrap;
+                margin-left: 14px;
                 @include xs-max {
-                    display: block;
+                    display: inline;
                 }
                 .cui-icon svg {
                     position: relative;
@@ -59,8 +51,21 @@ $discussion-meta-padding: 18px;
                 color: $text-color-light;
                 margin-right: 12px;
             }
+            .proposal-collaborators {
+                margin-left: 8px;
+                color: $text-color-light;
+                position: relative;
+                font-size: 17px;
+            }
+            > .User {
+                display: inline-flex;
+                > .role-icon {
+                    position: relative;
+                    top: -1px;
+                }
+            }
             > .User > a {
-                display: inline-block;
+                display: block;
                 text-decoration: none;
                 color: $text-color-light;
                 &:hover {
@@ -68,25 +73,52 @@ $discussion-meta-padding: 18px;
                     text-decoration: underline;
                 }
                 > a.user-display-name {
-                    color: $theme-base-color;
+                    color: $primary-bg-color;
                 }
             }
-            .row-excerpt {
-                color: $text-color-light;
-                max-width: calc(44vw - 220px);
-                @include sm-max {
-                    max-width: calc(44vw);
-                }
-                @include xs-max {
-                    max-width: calc(100vw - 120px);
-                }
+            > .created-at {
+                margin-right: 14px;
             }
         }
     }
     .row-right {
+        .discussion-row-right-meta {
+            margin-left: 20px;
+            margin-right: 4px;
+        }
+        .discussion-row-stage {
+            font-size: 15px;
+            padding: 0 8px;
+            min-height: 20px;
+            height: initial;
+            pointer-events: none;
+            user-select: none;
+            position: relative;
+            top: -1px;
+            margin-left: 8px;
+            border: none;
+            background: $background-color-white-hover;
+            &.cui-button.cui-primary {
+                background: $primary-bg-color;
+            }
+            &.cui-button.cui-positive {
+                background: $positive-bg-color;
+            }
+            &.cui-button.cui-negative {
+                background: $negative-bg-color;
+            }
+        }
         .discussion-row-menu {
             width: 28px;
-            padding-top: 3px;
+            position: relative;
+            top: 10px;
+            svg {
+                position: relative;
+                top: 1px;
+            }
         }
+    }
+    &:hover .row-right .discussion-row-stage {
+        background: shade($background-color-white-hover, 3%);
     }
 }

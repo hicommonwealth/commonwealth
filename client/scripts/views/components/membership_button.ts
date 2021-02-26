@@ -101,6 +101,7 @@ const MembershipButton: m.Component<{
         inline: true,
         trigger: m(Button, {
           class: 'MembershipButton',
+          rounded: true,
           disabled: vnode.state.loading,
           intent: hasAnyExistingRole ? 'primary' : 'none',
           iconLeft: Icons.CHEVRON_DOWN,
@@ -112,6 +113,7 @@ const MembershipButton: m.Component<{
 
     return m(Button, {
       class: 'MembershipButton',
+      rounded: true,
       disabled: vnode.state.loading,
       onclick: hasAnyExistingRole ? deleteRole.bind(this, address) : createRoleWithAddress.bind(this, address),
       intent: hasAnyExistingRole ? 'primary' : 'none',

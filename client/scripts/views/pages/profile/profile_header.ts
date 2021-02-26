@@ -3,7 +3,6 @@ import _ from 'lodash';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
 import * as clipboard from 'clipboard-polyfill';
-import { Unsubscribable } from 'rxjs';
 
 import { initChain } from 'app';
 import app from 'state';
@@ -15,12 +14,7 @@ import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import PageLoading from 'views/pages/loading';
 import { formatAddressShort } from '../../../../../shared/utils';
-
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
@@ -31,6 +25,7 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
     intent: 'primary',
     // wait for info to load before making it clickable
     disabled: vnode.state.chainLoading,
+    rounded: true,
     onclick: async () => {
       if (app.activeId() !== chainObj.id) {
         let confirmed = false;
@@ -73,7 +68,6 @@ export interface IProfileHeaderAttrs {
 }
 
 export interface IProfileHeaderState {
-  subscription: Unsubscribable | null;
   identity: SubstrateIdentity | null;
   copied: boolean;
   loading: boolean;
@@ -113,7 +107,9 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', account.profile ? m(User, { user: account, hideAvatar: true, showRole: true }) : account.address),
+            m('.User', account.profile
+              ? m(User, { user: account, hideAvatar: true, showRole: true })
+              : account.address),
           ]),
           m('.info-row', [
             account.profile?.headline && m('span.profile-headline', account.profile.headline),
@@ -142,6 +138,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             editIdentityAction(account, vnode.state.identity, vnode),
             m(Button, {
               intent: 'primary',
+              rounded: true,
               onclick: () => {
                 app.modals.create({
                   modal: EditProfileModal,
@@ -153,6 +150,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ] : (showJoinCommunityButton && app.activeChainId())
             ? m(Button, {
               intent: 'primary',
+              rounded: true,
               onclick: async () => {
                 if (onLinkedProfile) {
                   vnode.state.loading = true;

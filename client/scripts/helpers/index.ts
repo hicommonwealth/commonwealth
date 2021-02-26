@@ -2,9 +2,46 @@ import m from 'mithril';
 import moment from 'moment-twitter';
 
 import app from 'state';
+import { OffchainThreadStage } from 'models/types';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
+}
+
+export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
+  if (stage === OffchainThreadStage.Discussion) {
+    return 'Discussion';
+  } else if (stage === OffchainThreadStage.ProposalInReview) {
+    return 'Gathering Comments';
+  } else if (stage === OffchainThreadStage.Voting) {
+    return 'Voting';
+  } else if (stage === OffchainThreadStage.Passed) {
+    return 'Passed';
+  } else if (stage === OffchainThreadStage.Failed) {
+    return 'Not Passed';
+  } else if (stage === OffchainThreadStage.Abandoned) {
+    return 'Abandoned';
+  } else {
+    return 'Other';
+  }
+}
+
+export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
+  if (stage === OffchainThreadStage.Discussion) {
+    return 1;
+  } else if (stage === OffchainThreadStage.ProposalInReview) {
+    return 2;
+  } else if (stage === OffchainThreadStage.Voting) {
+    return 3;
+  } else if (stage === OffchainThreadStage.Passed) {
+    return 4;
+  } else if (stage === OffchainThreadStage.Failed) {
+    return 5;
+  } else if (stage === OffchainThreadStage.Abandoned) {
+    return 6;
+  } else {
+    return 7;
+  }
 }
 
 /*
@@ -14,7 +51,16 @@ export function externalLink(selector, target, children) {
   return m(selector, {
     href: target,
     target: '_blank',
-    rel: 'noopener noreferrer'
+    rel: 'noopener noreferrer',
+    onclick: (e) => {
+      if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+      if (target.startsWith(`${document.location.origin}/`)) {
+        // don't open a new window if the link is on Commonwealth
+        e.preventDefault();
+        e.stopPropagation();
+        m.route.set(target);
+      }
+    },
   }, children);
 }
 
@@ -44,6 +90,10 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
 export function extractDomain(url) {
   const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');
   return re.exec(url)[1];
+}
+
+export function removeUrlPrefix(url) {
+  return url.replace(/^https?:\/\//, '');
 }
 
 /*
@@ -115,11 +165,11 @@ export function byAscendingCreationDate(a, b) {
 }
 
 export function byDescendingUpdatedDate(a, b) {
-  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt)
+  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt);
 }
 
 export function byAscendingUpdatedDate(a, b) {
-  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt)
+  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt);
 }
 
 export function orderAccountsByAddress(a, b) {
@@ -171,13 +221,13 @@ export function formatLastUpdated(timestamp) {
   if (formatted.indexOf(' month') !== -1) {
     return timestamp.format('MMM D');
   } else {
-    return formatted
+    return `${formatted
       .replace(' days', 'd')
       .replace(' day', 'd')
       .replace(' hours', 'h')
-      .replace(' hour', 'h');
+      .replace(' hour', 'h')} ago`;
   }
-};
+}
 
 // duplicated in adapters/currency.ts
 export function formatNumberLong(num: number) {

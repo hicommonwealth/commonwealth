@@ -2,23 +2,28 @@
 
 .HomepageCommunityCards {
     text-align: left;
+    margin: 0 auto;
+    max-width: 760px;
     position: relative;
     .ChainIcon {
         margin-bottom: 10px;
     }
     .CommunityIcon {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
     h4 {
         margin-top: 32px;
-        font-weight: 500;
+        font-weight: 400;
         font-size: 17px;
-        color: $text-color-light;
+        color: $text-color-lighter;
+    }
+    h4:first-child {
+        margin-top: 0;
     }
     .communities-list,
     .other-list {
-        width: calc(100% + 40px);
-        margin-right: -40px;
+        width: calc(100% + 30px);
+        margin-right: -30px;
         @include sm-max {
             width: initial;
             margin-right: 0;
@@ -32,7 +37,7 @@
     .home-card {
         box-sizing: border-box;
         float: left;
-        width: calc(50% - 40px);
+        width: calc(50% - 30px);
         max-width: none;
         margin-right: 30px;
         margin-bottom: 30px;
@@ -55,9 +60,9 @@
             }
             h3 {
                 flex: 1;
-                font-size: 21px;
-                font-weight: 500;
-                margin: 7px 0 5px;
+                font-size: 20px;
+                font-weight: 600;
+                margin: 8px 0 5px;
                 line-height: 1.1;
                 white-space: nowrap;
                 text-overflow: ellipse;

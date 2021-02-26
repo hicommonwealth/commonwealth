@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('Chains', [{
       id: 'cosmos',
       symbol: 'ATOM',
@@ -25,7 +25,7 @@ module.exports = {
     }]);
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.bulkDelete('Chains', { '$or': [{
       name: 'Cosmos'
     }, {

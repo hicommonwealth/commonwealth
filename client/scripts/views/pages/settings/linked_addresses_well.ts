@@ -44,7 +44,13 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
           }),
         ]),
         // checking for balance to guarantee that delegate key has loaded
-        m('.address', `${account.address} - ${app.config.chains.getById(account.chain)?.name}`),
+        m('.address', [
+          `${account.address} - ${app.config.chains.getById(account.chain)?.name}`,
+          account.isMagic && [
+            m('br'),
+            `Magically linked to ${app.user.email}`,
+          ]
+        ]),
         (account instanceof MolochMember && account.isMember && account.delegateKey) ? m('.moloch-delegatekey', [
           'Delegate: ',
           account.isMember
@@ -69,7 +75,8 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
               });
             }
           },
-          disabled: vnode.state.removing,
+          rounded: true,
+          disabled: vnode.state.removing || app.user.addresses.some((a) => a.isMagic),
           loading: vnode.state.removing,
           label: 'Remove',
         }),

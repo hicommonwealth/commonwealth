@@ -27,8 +27,6 @@
         }
     }
     &.has-notifications {
-        background: $negative-bg-color !important;
-        color: $text-color-white !important;
         padding: 0 7px !important;
         .cui-icon {
             display: none;
@@ -40,6 +38,10 @@
         }
     }
     .notification-count {
+        @include sm-max {
+            position: relative;
+            top: 4px;
+        }
         .visible-xs {
             @include sm-min {
                 display: none;
@@ -77,6 +79,7 @@
         @include xs-max {
             max-width: calc(100vw - 24px);
         }
+        border-color: #dce1e3; // match cui-popover border color
     }
     .cui-popover-arrow {
         background: white;

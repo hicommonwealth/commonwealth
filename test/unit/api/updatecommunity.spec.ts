@@ -28,11 +28,12 @@ describe('Update Community/Chain Tests', () => {
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
     jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
-    const isAdmin = await modelUtils.assignRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: result.address_id,
       chainOrCommObj: { chain_id: chain },
       role: 'admin',
     });
+    expect(isAdmin).to.not.be.null;
 
     // create community for test
     const communityArgs: modelUtils.CommunityArgs = {
@@ -82,14 +83,14 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.website).to.be.equal(website);
     });
 
-    it('should update chat', async () => {
-      const chat = 'http://discord.gg';
+    it('should update discord', async () => {
+      const discord = 'http://discord.gg';
       const res = await chai.request(app)
         .post('/api/updateChain')
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, chat, });
+        .send({ jwt: jwtToken, id: chain, discord, });
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.chat).to.be.equal(chat);
+      expect(res.body.result.discord).to.be.equal(discord);
     });
 
     it('should fail to update github without proper prefix', async () => {
@@ -244,14 +245,14 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.website).to.be.equal(website);
     });
 
-    it('should update chat', async () => {
-      const chat = 'http://discord.gg';
+    it('should update discord', async () => {
+      const discord = 'http://discord.gg';
       const res = await chai.request(app)
         .post('/api/updateCommunity')
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id, chat, });
+        .send({ jwt: jwtToken, id: offchainCommunity.id, discord, });
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.chat).to.be.equal(chat);
+      expect(res.body.result.discord).to.be.equal(discord);
     });
 
     it('should fail to update telegram without a proper prefix', async () => {
@@ -260,7 +261,7 @@ describe('Update Community/Chain Tests', () => {
         .post('/api/updateCommunity')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: offchainCommunity.id, telegram, });
-      expect(res.body.error).to.be.equal(CommunityError.InvalidTelegram)
+      expect(res.body.error).to.be.equal(CommunityError.InvalidTelegram);
     });
 
     it('should fail to update github without a proper prefix', async () => {
@@ -269,7 +270,7 @@ describe('Update Community/Chain Tests', () => {
         .post('/api/updateCommunity')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: offchainCommunity.id, github, });
-      expect(res.body.error).to.be.equal(CommunityError.InvalidGithub)
+      expect(res.body.error).to.be.equal(CommunityError.InvalidGithub);
     });
 
     it('should update telegram', async () => {
@@ -315,7 +316,7 @@ describe('Update Community/Chain Tests', () => {
       const res = await chai.request(app)
         .post('/api/updateCommunity')
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id ,network });
+        .send({ jwt: jwtToken, id: offchainCommunity.id, network });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(CommunityError.CantChangeNetwork);
     });

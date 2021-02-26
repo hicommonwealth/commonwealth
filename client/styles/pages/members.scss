@@ -1,0 +1,38 @@
+@import 'client/styles/shared';
+
+.MembersPage {
+    padding-bottom: 40px;
+
+    .members-list {
+        margin: 20px -16px;
+    }
+    a.members-item {
+        display: flex;
+        color: #111;
+        text-decoration: none;
+        padding: 10px 16px 4px;
+        margin-bottom: 6px;
+        border-radius: 4px;
+        &:hover {
+            background: $background-color-white-hover;
+        }
+    }
+    .members-item-icon {
+        width: 52px;
+        padding-top: 3px;
+    }
+
+    // content
+    .members-item-left {
+        .User {
+            font-weight: 600;
+            font-size: 19px;
+        }
+        .members-item-address {
+            color: $text-color-light;
+        }
+        .members-item-posts {
+            color: $text-color-light;
+        }
+    }
+}

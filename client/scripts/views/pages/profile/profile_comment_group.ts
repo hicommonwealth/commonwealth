@@ -21,7 +21,6 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
     if (!proposal) return;
 
     const { slug, identifier } = proposal;
-
     return m('.ProfileCommentGroup', [
       m('.summary', [
         m(User, {
@@ -46,6 +45,7 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           m('.comment-text', (() => {
             try {
               const doc = JSON.parse(comment.text);
+              if (!doc.ops) throw new Error();
               return m(QuillFormattedText, { doc, collapse: true });
             } catch (e) {
               return m(MarkdownFormattedText, { doc: comment.text, collapse: true });

@@ -14,7 +14,8 @@ export const Errors = {
 };
 
 const editTopic = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
   if (!req.body.id) {
     return next(new Error(Errors.NoTopicId));
   }
@@ -45,12 +46,13 @@ const editTopic = async (models, req: Request, res: Response, next: NextFunction
     return next(new Error(Errors.NotAdmin));
   }
 
-  const { description, featured_order, id, name } = req.body;
+  const { id, name, description, telegram, featured_order } = req.body;
   try {
     const topic = await models.OffchainTopic.findOne({ where: { id } });
     if (!topic) return next(new Error(Errors.TopicNotFound));
     if (name) topic.name = name;
     if (name || description) topic.description = description;
+    if (name || telegram) topic.telegram = telegram;
     await topic.save();
 
     if (featured_order) {

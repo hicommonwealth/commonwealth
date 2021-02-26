@@ -6,16 +6,13 @@ import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus } from 'state';
 import { Coin, formatCoin } from 'adapters/currency';
-import { makeDynamicComponent } from 'models/mithril';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
 import User from 'views/components/widgets/user';
 import PageLoading from 'views/pages/loading';
-import { ChainBase, Account, ChainClass } from 'models';
+import { ChainBase, ChainClass } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
-import Tabs from 'views/components/widgets/tabs';
-import { createTXModal } from 'views/modals/tx_signing_modal';
 import Sublayout from 'views/sublayout';
 
 import * as CosmosValidationViews from './cosmos';
@@ -37,9 +34,7 @@ export interface IValidatorAttrs {
 }
 
 export interface IValidatorPageState {
-  dynamic: {
-    validators: IValidators | { [address: string]: ICosmosValidator };
-  };
+  validators: IValidators | { [address: string]: ICosmosValidator };
   nominations: any[];
   originalNominations: any[];
   nominationsHasChanged: boolean;
@@ -76,11 +71,24 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr }> = 
   }
 };
 
-export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
+export const Validators: m.Component<IValidatorAttrs, IValidatorPageState> = {
   oninit: (vnode) => {
     vnode.state.nominations = [];
     vnode.state.originalNominations = [];
     vnode.state.nominationsHasChanged = false;
+    app.runWhenReady(async () => {
+      vnode.state.validators = (app.chain.base === ChainBase.Substrate)
+        ? await (app.chain as Substrate).accounts.validators : null;
+      // vnode.state.currentSession = (app.chain.base === ChainBase.Substrate)
+      //   ? await (app.chain as Substrate).chain.session : null;
+      // vnode.state.currentEra = (app.chain.base === ChainBase.Substrate)
+      //   ? await (app.chain as Substrate).chain.currentEra : null;
+      // vnode.state.activeEra = (app.chain.base === ChainBase.Substrate)
+      //   ? await (app.chain as Substrate).chain.activeEra : null;
+      // vnode.state.stakingLedger = (app.chain.base === ChainBase.Substrate && app.user.activeAccount)
+      //   ? await (app.user.activeAccount as SubstrateAccount).stakingLedger
+      //   : null;
+    });
   },
   onupdate: (vnode) => {
     vnode.state.nominationsHasChanged = !_.isEqual(
@@ -89,17 +97,6 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     );
     if (vnode.state.nominationsHasChanged) m.redraw();
   },
-  getObservables: (attrs) => ({
-    // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
-    groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).accounts.validators : null,
-    currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
-    currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
-    activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,
-    stakingLedger: (app.chain.base === ChainBase.Substrate && app.user.activeAccount)
-      ? (app.user.activeAccount as SubstrateAccount).stakingLedger
-      : null,
-  }),
   view: (vnode) => {
     let vComponents = [];
     switch (app.chain.class) {
@@ -128,7 +125,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
 
     return m('.Validators', vComponents);
   }
-});
+};
 
 const ValidatorPage : m.Component<{}> = {
   oncreate: (vnode) => {
@@ -136,17 +133,6 @@ const ValidatorPage : m.Component<{}> = {
   },
   view: (vnode) => {
     if (!app.chain || app.chain.networkStatus !== ApiStatus.Connected) return m(PageLoading);
-
-    // Catch a Substrate validators issue where app.chain.accounts.validators
-    // makes a call using the API, which fails when API is not loaded.
-    if (app.chain.base === ChainBase.Substrate) {
-      try {
-        (app.chain as Substrate).accounts.validators;
-      } catch (e) {
-        return m(PageLoading);
-      }
-    }
-
     return m(Sublayout, {
       class: 'ValidatorPage',
     }, [

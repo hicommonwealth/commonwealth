@@ -13,22 +13,30 @@
                 padding-bottom: 10px;
                 display: flex;
                 justify-content: space-between;
-                .timestamp {
+                .panel-left {
+                    display: flex;
+                    flex-direction: column;
                     flex: 2;
-                    color: $text-color-light;
-                    padding-right: 30px;
-                    text-align: right;
+                    padding-right: 25px;
+                    .timestamp {
+                        color: $text-color-light;
+                        padding-top: 5px;
+                    }
+                }
+                .panel-right {
+                    display: flex;
+                    flex: 5;
                 }
                 .QuillFormattedText, .MarkdownFormattedText {
                     flex: 5;
                     color: $text-color-darker;
                     .deleted {
-                        background: $negative-text-background !important;
-                        color: $positive-text-background !important;
+                        background: $background-color-light-negative !important;
+                        color: $negative-bg-color !important;
                     }
                     .added {
-                        background: $positive-text-background !important;
-                        color: $positive-text-color !important;
+                        background: $background-color-light-positive !important;
+                        color: $positive-bg-color !important;
                     }
                 }
             }

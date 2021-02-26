@@ -3,8 +3,8 @@ import * as Sequelize from 'sequelize';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
-import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
+import { ChainEntityAttributes } from './chain_entity';
 
 export interface OffchainThreadAttributes {
   id?: number;
@@ -13,6 +13,7 @@ export interface OffchainThreadAttributes {
   body?: string;
   plaintext?: string;
   kind: string;
+  stage: string;
   url?: string;
   topic_id?: number;
   pinned?: boolean;
@@ -30,6 +31,7 @@ export interface OffchainThreadAttributes {
   OffchainCommunity?: OffchainCommunityAttributes;
   Address?: AddressAttributes;
   OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
+  ChainEntity?: ChainEntityAttributes;
 }
 
 export interface OffchainThreadInstance extends Sequelize.Instance<OffchainThreadAttributes>, OffchainThreadAttributes {
@@ -51,6 +53,7 @@ export default (
     body: { type: dataTypes.TEXT, allowNull: true },
     plaintext: { type: dataTypes.TEXT, allowNull: true },
     kind: { type: dataTypes.TEXT, allowNull: false },
+    stage: { type: dataTypes.TEXT, allowNull: false, defaultValue: 'discussion' },
     url: { type: dataTypes.TEXT, allowNull: true },
     topic_id: { type: dataTypes.INTEGER, allowNull: true },
     pinned: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
@@ -66,13 +69,25 @@ export default (
     paranoid: true,
     indexes: [
       { fields: ['address_id'] },
+      { fields: ['chain'] },
+      { fields: ['community'] },
     ],
   });
 
   OffchainThread.associate = (models) => {
-    models.OffchainThread.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.OffchainThread.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
-    models.OffchainThread.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
+    models.OffchainThread.belongsTo(models.Chain, {
+      foreignKey: 'chain',
+      targetKey: 'id',
+    });
+    models.OffchainThread.belongsTo(models.OffchainCommunity, {
+      foreignKey: 'community',
+      targetKey: 'id'
+    });
+    models.OffchainThread.belongsTo(models.Address, {
+      as: 'Address',
+      foreignKey: 'address_id',
+      targetKey: 'id'
+    });
     models.OffchainThread.hasMany(models.OffchainAttachment, {
       foreignKey: 'attachment_id',
       constraints: false,
@@ -87,6 +102,15 @@ export default (
       as: 'read_only_roles',
       foreignKey: 'thread_id',
       otherKey: 'id',
+    });
+    models.OffchainThread.belongsToMany(models.Address, {
+      through: models.Collaboration,
+      as: 'collaborators'
+    });
+    models.OffchainThread.hasMany(models.Collaboration);
+    models.OffchainThread.hasMany(models.ChainEntity, {
+      foreignKey: 'thread_id',
+      constraints: false,
     });
   };
 

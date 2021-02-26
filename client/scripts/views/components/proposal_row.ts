@@ -27,7 +27,6 @@ import { SubstrateCollectiveProposal } from 'client/scripts/controllers/chain/su
 import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substrate/democracy_proposal';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 import { Icon, Icons, Grid, Col } from 'construct-ui';
-import ReactionButton, { ReactionType } from './reaction_button';
 import ListingRow from './listing_row';
 import UserGallery from './widgets/user_gallery';
 
@@ -292,11 +291,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
         avatarSize: 24,
         users: app.comments.uniqueCommenters(proposal)
       }),
-      m(ReactionButton, {
-        post: proposal,
-        type: ReactionType.Like,
-        tooltip: true
-      }),
       !proposal.completed
         ? m('.last-updated', 'Active')
         : createdAt && createdAt instanceof moment
@@ -312,7 +306,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
           subheader: m('.proposal-row-sub', [rowSubheader, rowComments]),
         },
         contentRight: rowMetadata,
-        rightColSpacing: [4, 4, 4],
+        rightColSpacing: [6, 6],
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();

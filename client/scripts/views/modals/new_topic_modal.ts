@@ -9,15 +9,17 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
 
 interface INewTopicModalForm {
-  description: string,
   id: number,
   name: string,
+  description: string,
+  telegram: string,
 }
 
 const NewTopicModal: m.Component<{
-  description: string,
   id: number,
   name: string,
+  description: string,
+  telegram: string,
 }, {
   error: any,
   form: INewTopicModalForm,
@@ -25,9 +27,9 @@ const NewTopicModal: m.Component<{
 }> = {
   view: (vnode) => {
     if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, description, name } = vnode.attrs;
+    const { id, name, description, telegram } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { description, id, name };
+      vnode.state.form = { id, name, description, telegram };
     }
 
     return m('.NewTopicModal', [
@@ -44,7 +46,7 @@ const NewTopicModal: m.Component<{
               name: 'name',
               class: 'topic-form-name',
               tabindex: 1,
-              defaultValue: vnode.state?.form?.name,
+              defaultValue: vnode.state.form.name,
               autocomplete: 'off',
               oncreate: (vvnode) => {
                 // use oncreate to focus because autofocus: true fails when component is recycled in a modal
@@ -67,13 +69,28 @@ const NewTopicModal: m.Component<{
               }
             }),
           ]),
+          m(FormGroup, [
+            m(FormLabel, { for: 'telegram' }, 'Telegram'),
+            m(Input, {
+              title: 'Telegram',
+              class: 'topic-form-telegram',
+              tabindex: 2,
+              defaultValue: vnode.state.form.telegram,
+              oninput: (e) => {
+                vnode.state.form.telegram = (e.target as any).value;
+              }
+            }),
+          ]),
           m(Button, {
             intent: 'primary',
             disabled: vnode.state.saving,
+            rounded: true,
             onclick: async (e) => {
               e.preventDefault();
               if (!vnode.state.form.name.trim()) return;
-              app.topics.add(vnode.state.form.name, vnode.state.form.description).then(() => {
+              app.topics.add(
+                vnode.state.form.name, vnode.state.form.description, vnode.state.form.telegram
+              ).then(() => {
                 vnode.state.saving = false;
                 m.redraw();
                 $(e.target).trigger('modalexit');

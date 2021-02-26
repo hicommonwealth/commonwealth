@@ -10,7 +10,10 @@ export const batchNotifications = (n: Notification[], prop: string, prop2: strin
   }, {}));
 };
 
-export const sortNotifications = (n: Notification[]) => {
+export const sortNotifications = (unsortedNotifications: Notification[]) => {
+  // The .sort method here is crucial; the sortNotifications fn only works when
+  // notifications are sorted in advance by createdAt
+  const n = unsortedNotifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
   const batched =  batchNotifications(n, 'subscription', 'objectId');
   const unbatchChainEvents = [];
   batched.forEach((a: Notification[]) => {
@@ -18,6 +21,7 @@ export const sortNotifications = (n: Notification[]) => {
       // unbatch chain-events, comments, and mentions
       || a[0].subscription.category === NotificationCategories.NewComment
       || a[0].subscription.category === NotificationCategories.NewMention
+      || a[0].subscription.category === NotificationCategories.NewCollaboration
     ) {
       a.forEach((n2) => unbatchChainEvents.push([n2]));
     } else if (!a[0].isRead) {

@@ -1,6 +1,5 @@
 import {
   ITXModalData,
-  ITransactionResult,
   TransactionStatus,
   NodeInfo,
   IChainModule,
@@ -11,8 +10,8 @@ import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import { CosmosApi } from 'adapters/chain/cosmos/api';
 import { BlocktimeHelper } from 'helpers';
-import { Observable, Subject } from 'rxjs';
 import BN from 'bn.js';
+import { EventEmitter } from 'events';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { CosmosAccount } from './account';
 
@@ -29,6 +28,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _api: CosmosApi;
   public get api(): CosmosApi {
     return this._api;
+  }
+
+  private _addressPrefix: string;
+  public get addressPrefix() {
+    return this._addressPrefix;
   }
 
   // TODO: rename this something like "bankDenom" or "gasDenom" or "masterDenom"
@@ -51,8 +55,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _app: IApp;
   public get app() { return this._app; }
 
-  constructor(app: IApp) {
+  constructor(app: IApp, addressPrefix: string) {
     this._app = app;
+    this._addressPrefix = addressPrefix;
   }
 
   public coins(n: number | BN, inDollars?: boolean) {
@@ -66,19 +71,21 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   private _blocktimeHelper: BlocktimeHelper = new BlocktimeHelper();
   public async init(node: NodeInfo, reset = false) {
-    const rpcUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1) ?
-      ('ws://' + node.url.split(':')[0] + ':26657') :
-      ('wss://' + node.url.split(':')[0] + ':36657');
-
-    // A note on RPC: gaiacli exposes a command line option "rest-server" which
+    // A note on REST RPC: gaiacli exposes a command line option "rest-server" which
     // creates the endpoint necessary. However, it doesn't send headers correctly
     // on its own, so you need to configure a reverse-proxy server (I did it with nginx)
     // that forwards the requests to it, and adds the header 'Access-Control-Allow-Origin: *'
-    const restUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1) ?
-      ('http://' + node.url.split(':')[0] + ':1318') :
-      ('https://' + node.url.split(':')[0] + ':11318');
-    console.log(`Starting Lunie API at ${restUrl} and Tendermint on ${rpcUrl}...`);
-    this._api = new CosmosApi(rpcUrl, restUrl);
+    /* eslint-disable prefer-template */
+    const wsUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1)
+      ? ('ws://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':26657/websocket')
+      : ('wss://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':36657/websocket');
+    const restUrl = (node.url.indexOf('localhost') !== -1 || node.url.indexOf('127.0.0.1') !== -1)
+      ? ('http://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318')
+      : ('https://' + node.url.replace('ws://', '').replace('wss://', '').split(':')[0] + ':1318');
+
+    console.log(`Starting Tendermint REST API at ${restUrl} and Websocket API on ${wsUrl}...`);
+
+    this._api = new CosmosApi(wsUrl, restUrl);
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
@@ -98,7 +105,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async deinit(): Promise<void> {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
-    this._api.deinit();
+    if (this._api) this._api.deinit();
   }
 
   public createTXModalData(
@@ -108,11 +115,13 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     objName: string,
     cb?: (success: boolean) => void,
   ): ITXModalData {
+    const events = new EventEmitter();
     return {
-      author: author,
+      author,
       txType: txName,
-      cb: cb,
+      cb,
       txData: {
+        events,
         unsignedData: async (): Promise<ICosmosTXData> => {
           const { cmdData: { messageToSign, chainId, accountNumber, gas, sequence } } = await txFunc();
           return {
@@ -123,8 +132,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
             sequence,
           };
         },
-        transact: (signature?, computedGas?: number): Observable<ITransactionResult> => {
-          const subject = new Subject<ITransactionResult>();
+        transact: (signature?, computedGas?: number): void => {
           let signer;
           if (signature) {
             // create replacement signer that delivers signature as needed
@@ -136,27 +144,26 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
             signer = (author as CosmosAccount).getLedgerSigner();
           }
           // perform transaction and coerce into compatible observable
-          txFunc(computedGas).then(({ msg, memo, cmdData: { gas }}) => {
-            return msg.send({ gas: '' + gas, memo }, signer);
+          txFunc(computedGas).then(({ msg, memo, cmdData: { gas } }) => {
+            return msg.send({ gas: `${gas}`, memo }, signer);
           }).then(({ hash, sequence, included }) => {
-            subject.next({ status: TransactionStatus.Ready, hash: hash });
+            events.emit(TransactionStatus.Ready.toString(), { hash });
             // wait for transaction to process
             return included();
           }).then((txObj) => {
             // TODO: is this necessarily success or can it fail?
             console.log(txObj);
             // TODO: add gas wanted/gas used to the modal?
-            subject.next({
-              status: TransactionStatus.Success,
+            events.emit(TransactionStatus.Success.toString(), {
               blocknum: +txObj.height,
               timestamp: moment(txObj.timestamp),
               hash: '--', // TODO: fetch the hash value of the block rather than the tx
             });
-          }).catch((err) => {
-            console.error(err);
-            subject.next({ status: TransactionStatus.Error, err: err.message });
-          });
-          return subject.asObservable();
+          })
+            .catch((err) => {
+              console.error(err);
+              events.emit(TransactionStatus.Error.toString(), { err: err.message });
+            });
         },
       }
     };

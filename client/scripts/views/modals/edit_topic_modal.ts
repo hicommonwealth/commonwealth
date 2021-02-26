@@ -12,12 +12,14 @@ interface IEditTopicModalForm {
   description: string,
   id: number,
   name: string,
+  telegram: string,
 }
 
 const EditTopicModal : m.Component<{
   description: string,
   id: number,
   name: string,
+  telegram: string,
 }, {
   error: any,
   form: IEditTopicModalForm,
@@ -25,9 +27,9 @@ const EditTopicModal : m.Component<{
 }> = {
   view: (vnode) => {
     if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
-    const { id, description, name } = vnode.attrs;
+    const { id, name, description, telegram } = vnode.attrs;
     if (!vnode.state.form) {
-      vnode.state.form = { description, id, name };
+      vnode.state.form = { id, name, description, telegram };
     }
 
     const updateTopic = async (form) => {
@@ -35,6 +37,7 @@ const EditTopicModal : m.Component<{
         id,
         description: form.description,
         name: form.name,
+        telegram: form.telegram,
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
       };
@@ -91,10 +94,24 @@ const EditTopicModal : m.Component<{
             }),
           ]),
           m(FormGroup, [
+            m(FormLabel, { for: 'telegram' }, 'Telegram'),
+            m(Input, {
+              title: 'Telegram',
+              name: 'telegram',
+              class: 'topic-form-telegram',
+              tabindex: 2,
+              defaultValue: vnode.state.form.telegram,
+              oninput: (e) => {
+                vnode.state.form.telegram = (e.target as any).value;
+              }
+            }),
+          ]),
+          m(FormGroup, [
             m(Button, {
               intent: 'primary',
               disabled: vnode.state.saving,
               style: 'margin-right: 8px',
+              rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
                 updateTopic(vnode.state.form).then(() => {
@@ -109,6 +126,7 @@ const EditTopicModal : m.Component<{
             m(Button, {
               intent: 'negative',
               disabled: vnode.state.saving,
+              rounded: true,
               onclick: async (e) => {
                 e.preventDefault();
                 const confirmed = await confirmationModalWithText('Delete this topic?')();

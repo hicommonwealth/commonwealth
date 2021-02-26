@@ -1,4 +1,4 @@
-(global as any).window = {};
+(global as any).window = { location: { href: '/' } };
 
 import * as Sequelize from 'sequelize';
 import crypto from 'crypto';
@@ -6,13 +6,13 @@ import crypto from 'crypto';
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 
-import * as secp256k1 from 'secp256k1';
-import * as CryptoJS from 'crypto-js';
+import { serializeSignDoc, decodeSignature } from '@cosmjs/launchpad';
+import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
+import { fromBase64 } from '@cosmjs/encoding';
+import { getCosmosAddress } from '@lunie/cosmos-keys'; // used to check address validity. TODO: remove
 
-import { getCosmosAddress } from '@lunie/cosmos-keys';
 import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
-import { keyToSignMsg } from '../../shared/adapters/chain/cosmos/keys';
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
@@ -20,6 +20,7 @@ import { UserAttributes } from './user';
 import { OffchainProfileAttributes } from './offchain_profile';
 import { RoleAttributes } from './role';
 import { factory, formatFilename } from '../../shared/logging';
+import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
 
 // tslint:disable-next-line
@@ -40,6 +41,7 @@ export interface AddressAttributes {
   user_id?: number;
   is_councillor?: boolean;
   is_validator?: boolean;
+  is_magic?: boolean;
 
   // associations
   Chain?: ChainAttributes;
@@ -100,6 +102,7 @@ export default (
     user_id:                    { type: dataTypes.INTEGER, allowNull: true },
     is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   }, {
     underscored: true,
     indexes: [
@@ -122,7 +125,7 @@ export default (
     user_id: number,
     chain: string,
     address: string,
-    keytype?: string
+    keytype?: string,
   ): Promise<AddressInstance> => {
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
@@ -168,6 +171,9 @@ export default (
     if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot'
         || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi'
         || chain.network === 'darwinia' || chain.network === 'phala' || chain.network === 'centrifuge') {
+      //
+      // substrate address handling
+      //
       const address = decodeAddress(addressModel.address);
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
       if (addressModel.keytype) {
@@ -206,28 +212,48 @@ export default (
         : hexToU8a(`0x${signatureString}`);
       isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
         || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
-    } else if (chain.network === 'cosmos') {
+    } else if (chain.network === 'cosmos' || chain.network === 'straightedge') {
+      //
+      // cosmos-sdk address handling
+      //
       const signatureData = JSON.parse(signatureString);
-      // this saved "address" is actually just the address
-      const msg = keyToSignMsg(addressModel.address, addressModel.verification_token);
-      const signature = Buffer.from(signatureData.signature, 'base64');
-      const pk = Buffer.from(signatureData.pub_key.value, 'base64');
+      const pk = Buffer.from(signatureData.signature.pub_key.value, 'base64');
 
       // we generate an address from the actual public key and verify that it matches,
       // this prevents people from using a different key to sign the message than
-      // the account they registered with
-      const generatedAddress = getCosmosAddress(pk);
-      if (generatedAddress === addressModel.address) {
-        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), `hex`);
-        isValid = secp256k1.ecdsaVerify(signHash, signature, pk);
+      // the account they registered with.
+      const bech32Prefix = chain.network === 'cosmos'
+        ? 'cosmos'
+        : chain.network === 'straightedge' ? 'str' : chain.network;
+      const generatedAddress = getCosmosAddress(pk, bech32Prefix);
+      const generatedAddressWithCosmosPrefix = getCosmosAddress(pk, 'cosmos');
+
+      if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
+        // get tx doc that was signed
+        const signDoc = await validationTokenToSignDoc(addressModel.address, addressModel.verification_token.trim());
+
+        // check for signature validity
+        // see the last test in @cosmjs/launchpad/src/secp256k1wallet.spec.ts for reference
+        const { pubkey, signature } = decodeSignature(signatureData.signature);
+        const secpSignature = Secp256k1Signature.fromFixedLength(fromBase64(signatureData.signature.signature));
+        if (serializeSignDoc(signatureData.signed).toString() !== serializeSignDoc(signDoc).toString()) {
+          isValid = false;
+        } else {
+          const messageHash = new Sha256(serializeSignDoc(signDoc)).digest();
+          isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
+        }
       } else {
         isValid = false;
       }
     } else if (chain.network === 'ethereum'
       || chain.network === 'moloch'
-      || chain.network === 'metacart'
       || chain.network === 'alex'
+      || chain.network === 'metacartel'
+      || chain.network === 'commonwealth'
     ) {
+      //
+      // ethereum address handling
+      //
       const msgBuffer = Buffer.from(addressModel.verification_token.trim());
       // toBuffer() doesn't work if there is a newline
       const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
@@ -270,6 +296,12 @@ export default (
           object_id: `user-${user.id}`,
           is_active: true,
         });
+        await models.Subscription.create({
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewCollaboration,
+          object_id: `user-${user.id}`,
+          is_active: true,
+        });
         addressModel.user_id = user.id;
       }
     } else if (isValid) {
@@ -287,6 +319,11 @@ export default (
     models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
+    models.Address.belongsToMany(models.OffchainThread, {
+      through: models.Collaboration,
+      as: 'collaboration'
+    });
+    models.Address.hasMany(models.Collaboration);
   };
 
   return Address;

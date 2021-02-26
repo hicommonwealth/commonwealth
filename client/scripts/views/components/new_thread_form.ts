@@ -1,7 +1,9 @@
 /* eslint-disable guard-for-in */
 import 'components/new_thread_form.scss';
+import 'pages/new_thread.scss';
 
 import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import _ from 'lodash';
 import $ from 'jquery';
 import Quill from 'quill-2.0-dev/quill';
@@ -11,13 +13,14 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
-import { link } from 'helpers';
-import { OffchainTopic } from 'models';
+import { detectURL } from 'helpers/threads';
+import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
+
+import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
-import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pages/threads';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
 import QuillFormattedText from './quill_formatted_text';
@@ -36,7 +39,170 @@ enum PostType {
   Link = 'Link',
 }
 
-export const checkForModifications = async (state, modalMsg) => {
+enum NewThreadErrors {
+  NoBody = 'Thread body cannot be blank',
+  NoTopic = 'Thread must have a topic',
+  NoTitle = 'Title cannot be blank',
+  NoUrl = 'URL cannot be blank',
+}
+
+enum NewDraftErrors {
+  InsufficientData = 'Draft must have a title, body, or attachment'
+}
+
+const saveDraft = async (
+  form,
+  quillEditorState,
+  author,
+  existingDraft?
+) => {
+  const bodyText = !quillEditorState ? ''
+    : quillEditorState.markdownMode
+      ? quillEditorState.editor.getText()
+      : JSON.stringify(quillEditorState.editor.getContents());
+  const { threadTitle, topicName } = form;
+  if (quillEditorState.editor.getText().length <= 1 && !threadTitle) {
+    throw new Error(NewDraftErrors.InsufficientData);
+  }
+  const attachments = [];
+  if (existingDraft) {
+    let result;
+    try {
+      result = await app.user.discussionDrafts.edit(
+        existingDraft,
+        threadTitle,
+        bodyText,
+        topicName,
+        attachments
+      );
+    } catch (err) {
+      throw new Error(err);
+    }
+    mixpanel.track('Update discussion draft', {
+      'Step No': 2,
+      Step: 'Filled in Proposal and Discussion',
+    });
+  } else {
+    let result;
+    try {
+      result = await app.user.discussionDrafts.create(
+        threadTitle,
+        bodyText,
+        topicName,
+        attachments
+      );
+    } catch (err) {
+      notifyError(err);
+      throw new Error(err);
+    }
+    mixpanel.track('Save discussion draft', {
+      'Step No': 2,
+      Step: 'Filled in Proposal and Discussion',
+    });
+  }
+};
+
+const newThread = async (
+  form,
+  quillEditorState,
+  author,
+  kind = OffchainThreadKind.Forum,
+  stage = OffchainThreadStage.Discussion,
+  readOnly?: boolean
+) => {
+  const topics = app.chain
+    ? app.chain.meta.chain.topics
+    : app.community.meta.topics;
+
+  if (kind === OffchainThreadKind.Forum) {
+    if (!form.threadTitle) {
+      throw new Error(NewThreadErrors.NoTitle);
+    }
+  }
+  if (kind === OffchainThreadKind.Link) {
+    if (!form.linkTitle) {
+      throw new Error(NewThreadErrors.NoTitle);
+    }
+    if (!form.url) {
+      throw new Error(NewThreadErrors.NoUrl);
+    }
+  }
+  if (!form.topicName && topics.length > 0) {
+    throw new Error(NewThreadErrors.NoTopic);
+  }
+  if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
+    throw new Error(NewThreadErrors.NoBody);
+  }
+
+  quillEditorState.editor.enable(false);
+
+  const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
+  if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
+  const bodyText = !quillEditorState ? ''
+    : quillEditorState.markdownMode
+      ? quillEditorState.editor.getText()
+      : JSON.stringify(quillEditorState.editor.getContents());
+
+  const { topicName, topicId, threadTitle, linkTitle, url } = form;
+  const title = threadTitle || linkTitle;
+  const attachments = [];
+  const chainId = app.activeCommunityId() ? null : app.activeChainId();
+  const communityId = app.activeCommunityId();
+
+  let result;
+  try {
+    result = await app.threads.create(
+      author.address,
+      kind,
+      stage,
+      chainId,
+      communityId,
+      title,
+      topicName,
+      topicId,
+      bodyText,
+      url,
+      attachments,
+      readOnly,
+    );
+  } catch (e) {
+    console.error(e);
+    quillEditorState.editor.enable();
+    throw new Error(e);
+  }
+  const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+  updateLastVisited(app.activeCommunityId()
+    ? (activeEntity.meta as CommunityInfo)
+    : (activeEntity.meta as NodeInfo).chain, true);
+  await app.user.notifications.refresh();
+  m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
+
+  if (result.topic) {
+    try {
+      const topicNames = Array.isArray(activeEntity?.meta?.topics)
+        ? activeEntity.meta.topics.map((t) => t.name)
+        : [];
+      if (!topicNames.includes(result.topic.name)) {
+        activeEntity.meta.topics.push(result.topic);
+      }
+    } catch (e) {
+      console.log(`Error adding new topic to ${activeEntity}.`);
+    }
+  }
+
+  mixpanel.track('Create Thread', {
+    'Step No': 2,
+    Step: 'Filled in Proposal and Discussion',
+    'Thread Type': kind,
+  });
+};
+
+const newLink = async (form, quillEditorState, author, kind = OffchainThreadKind.Link) => {
+  const errors = await newThread(form, quillEditorState, author, kind);
+  return errors;
+};
+
+const checkForModifications = async (state, modalMsg) => {
   const { fromDraft } = state;
   const quill = state.quillEditorState.editor;
   const Delta = Quill.import('delta');
@@ -99,6 +265,7 @@ export const loadDraft = async (dom, state, draft) => {
   if (draft.body) {
     try {
       newDraftDelta = JSON.parse(draft.body);
+      if (!newDraftDelta.ops) throw new Error();
     } catch (e) {
       newDraftMarkdown = draft.body;
     }
@@ -119,13 +286,12 @@ export const loadDraft = async (dom, state, draft) => {
   state.form.threadTitle = draft.title;
 
   localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, state.form.threadTitle);
-  state.activeTopic = draft.tag;
-  state.form.topicName = draft.tag;
+  state.activeTopic = draft.topic;
+  state.form.topicName = draft.topic;
   state.fromDraft = draft.id;
   if (state.quillEditorState?.alteredText) {
     state.quillEditorState.alteredText = false;
   }
-  m.redraw();
 };
 
 // export const cancelDraft = async (state) => {
@@ -207,7 +373,7 @@ export const NewThreadForm: m.Component<{
       }
       localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
       localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
-      localStorage.removeItem(`${app.activeId()}-active-tag`);
+      localStorage.removeItem(`${app.activeId()}-active-topic`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
     }
   },
@@ -219,21 +385,9 @@ export const NewThreadForm: m.Component<{
     if (vnode.state.quillEditorState?.container) {
       vnode.state.quillEditorState.container.tabIndex = 8;
     }
-    const getUrlForLinkPost = _.debounce(async () => {
-      try {
-        const title = await getLinkTitle(vnode.state.form.url);
-        if (!vnode.state.autoTitleOverride && title) {
-          localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, title);
-          vnode.state.form.linkTitle = title;
-        }
-      } catch (err) {
-        notifyError(err.message);
-      }
-      m.redraw();
-    }, 750);
 
     const updateTopicState = (topicName: string, topicId?: number) => {
-      localStorage.setItem(`${app.activeId()}-active-tag`, topicName);
+      localStorage.setItem(`${app.activeId()}-active-topic`, topicName);
       vnode.state.activeTopic = topicName;
       vnode.state.form.topicName = topicName;
       vnode.state.form.topicId = topicId;
@@ -272,7 +426,7 @@ export const NewThreadForm: m.Component<{
         localStorage.removeItem(`${app.activeId()}-new-link-storedTitle`);
         localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
       }
-      localStorage.removeItem(`${app.activeId()}-active-tag`);
+      localStorage.removeItem(`${app.activeId()}-active-topic`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
     };
 
@@ -334,7 +488,7 @@ export const NewThreadForm: m.Component<{
           class: 'no-profile-callout',
           intent: 'primary',
           content: [
-            'You haven\'t set a display name yet, so other people can\'t see who you are. ',
+            'You haven\'t set a display name yet. ',
             m('a', {
               href: `/${app.activeId()}/account/${app.user.activeAccount.address}?base=${app.user.activeAccount.chain}`,
               onclick: (e) => {
@@ -347,14 +501,14 @@ export const NewThreadForm: m.Component<{
                   },
                 });
               }
-            }, 'Complete your profile'),
+            }, 'Set a display name'),
           ],
         }),
         postType === PostType.Link && m(Form, [
           hasTopics
-            ? m(FormGroup, { span: { xs: 12, sm: 4 }, order: 1 }, [
+            ? m(FormGroup, { span: { xs: 12, sm: 5 }, order: 1 }, [
               m(TopicSelector, {
-                defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
+                defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-topic`),
                 topics: app.topics.getByCommunity(app.activeId()),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
@@ -363,7 +517,7 @@ export const NewThreadForm: m.Component<{
               }),
             ])
             : null,
-          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 8 : 12) }, order: 2 }, [
+          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 7 : 12) }, order: 2 }, [
             m(Input, {
               placeholder: 'https://',
               oninput: (e) => {
@@ -371,7 +525,6 @@ export const NewThreadForm: m.Component<{
                 const { value } = e.target as any;
                 vnode.state.form.url = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
-                if (detectURL(value)) getUrlForLinkPost();
               },
               defaultValue: vnode.state.form.url,
               tabindex: 2,
@@ -411,6 +564,7 @@ export const NewThreadForm: m.Component<{
               label: 'Create thread',
               name: 'submit',
               disabled: !author || vnode.state.saving,
+              rounded: true,
               onclick: async (e) => {
                 if (!detectURL(vnode.state.form.url)) {
                   notifyError('Must provide a valid URL.');
@@ -455,11 +609,11 @@ export const NewThreadForm: m.Component<{
             ])
             : null,
           hasTopics
-            ? m(FormGroup, { span: { xs: 12, sm: 4 }, order: { xs: 2, sm: 2 } }, [
+            ? m(FormGroup, { span: { xs: 12, sm: 5 }, order: { xs: 2, sm: 2 } }, [
               m(TopicSelector, {
                 defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
                   ? vnode.state.activeTopic
-                  : localStorage.getItem(`${app.activeId()}-active-tag`),
+                  : localStorage.getItem(`${app.activeId()}-active-topic`),
                 topics: app.topics.getByCommunity(app.activeId()),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
@@ -468,7 +622,7 @@ export const NewThreadForm: m.Component<{
               }),
             ])
             : null,
-          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 8 : 12) + (fromDraft ? -2 : 0) }, order: 3 }, [
+          m(FormGroup, { span: { xs: 12, sm: (hasTopics ? 7 : 12) + (fromDraft ? -2 : 0) }, order: 3 }, [
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
@@ -500,6 +654,7 @@ export const NewThreadForm: m.Component<{
             m(Button, {
               disabled: !author || saving || vnode.state.uploadsInProgress > 0,
               intent: 'primary',
+              rounded: true,
               onclick: async (e) => {
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
@@ -534,9 +689,9 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
             m(Button, {
-              disabled: !author || saving || vnode.state.uploadsInProgress > 0
-                || (fromDraft && !vnode.state.quillEditorState?.alteredText),
+              disabled: !author || saving || vnode.state.uploadsInProgress > 0,
               intent: 'none',
+              rounded: true,
               onclick: async (e) => {
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
@@ -586,6 +741,7 @@ export const NewThreadForm: m.Component<{
           if (body) {
             try {
               const doc = JSON.parse(body);
+              if (!doc.ops) throw new Error();
               doc.ops = doc.ops.slice(0, 3);
               bodyComponent = m(QuillFormattedText, {
                 doc,
@@ -606,6 +762,7 @@ export const NewThreadForm: m.Component<{
             onclick: (e) => {
               const parent = $(e.target).closest('.NewThreadForm');
               loadDraft(parent, vnode.state, draft);
+              m.redraw();
             },
             contentRight: [
               fromDraft === draft.id
@@ -646,6 +803,7 @@ export const NewThreadForm: m.Component<{
         // m(Button, {
         //   disabled: !author || vnode.state.uploadsInProgress > 0,
         //   intent: 'none',
+        //   rounded: true,
         //   onclick: () => cancelDraft(vnode.state),
         //   label: 'Cancel editing draft',
         // }),

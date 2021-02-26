@@ -7,7 +7,6 @@ import $ from 'jquery';
 import { RadioSelectorFormField } from 'views/components/forms';
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
-import { Icon, Icons, Button, Input } from 'construct-ui';
 
 const SettingsWell: m.Component<{}, { initialized: boolean }> = {
   view: (vnode) => {

@@ -3,35 +3,38 @@ import m from 'mithril';
 import { formatCoin } from 'adapters/currency';
 import app from 'state';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { makeDynamicComponent } from 'models/mithril';
 
 interface IState {
-  dynamic: { freeBalance, lockedBalance, balance }
+  freeBalance,
+  lockedBalance,
+  balance
 }
 
-const BalanceInfo = makeDynamicComponent<{ account }, IState>({
-  getObservables: (attrs) => ({
-    groupKey: attrs.account.address,
-    freeBalance: (attrs.account as SubstrateAccount).freeBalance,
-    lockedBalance: (attrs.account as SubstrateAccount).lockedBalance,
-    balance: (attrs.account as SubstrateAccount).balance,
-  }),
+const BalanceInfo = {
+  oninit: (vnode: m.Vnode<any, IState>) => {
+    app.runWhenReady(async () => {
+      vnode.state.freeBalance = await (vnode.attrs.account as SubstrateAccount).freeBalance;
+      vnode.state.lockedBalance = await (vnode.attrs.account as SubstrateAccount).lockedBalance;
+      vnode.state.balance = await (vnode.attrs.account as SubstrateAccount).balance;
+      m.redraw();
+    });
+  },
   view: (vnode) => {
-    return m('p.BalanceInfo', { style: 'font-size: 90%; line-height: 1.3;' }, [
+    return m('.BalanceInfo', { style: 'font-size: 90%; line-height: 1.3;' }, [
       m('div', [
         'Free: ',
-        vnode.state.dynamic?.freeBalance ? formatCoin(vnode.state.dynamic?.freeBalance) : '--',
+        vnode.state.freeBalance ? formatCoin(vnode.state.freeBalance) : '--',
       ]),
       m('div', [
         'Locked: ',
-        vnode.state.dynamic?.lockedBalance ? formatCoin(vnode.state.dynamic?.lockedBalance) : '--',
+        vnode.state.lockedBalance ? formatCoin(vnode.state.lockedBalance) : '--',
       ]),
       m('div', [
         'Total: ',
-        vnode.state.dynamic?.balance ? formatCoin(vnode.state.dynamic?.balance) : '--',
+        vnode.state.balance ? formatCoin(vnode.state.balance) : '--',
       ]),
     ]);
   }
-});
+};
 
 export default BalanceInfo;

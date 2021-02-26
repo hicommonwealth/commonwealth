@@ -4,12 +4,20 @@ import 'components/quill_formatted_text.scss';
 
 import m from 'mithril';
 import { Icon, Icons } from 'construct-ui';
+import { findAll } from 'highlight-words-core';
+import smartTruncate from 'smart-truncate';
+
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../shared/utils';
 
 const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
+
+  // trim beginning content...
+  if (typeof delta.ops[0]?.insert === 'string') {
+    delta.ops[0].insert = delta.ops[0].insert.trimLeft();
+  }
 
   // first, concatenate parent nodes for <ul> and <ol> into groups
   const groups = [];
@@ -86,8 +94,22 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
               target: '_blank',
               noreferrer: 'noreferrer',
               noopener: 'noopener',
+              onclick: (e) => {
+                if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+                if (child.attributes.link.startsWith(document.location.origin + '/')) {
+                  // don't open a new window if the link is on Commonwealth
+                  e.preventDefault();
+                  e.stopPropagation();
+                  m.route.set(child.attributes.link);
+                }
+              },
             }, `${child.insert}`);
-            return m('span', `${child.insert}`);
+            if (child.insert.match(/[A-Za-z0-9]$/)) {
+              // add a period and space after lines that end on a word or number, like Google does in search previews
+              return m('span', `${child.insert}. `);
+            } else {
+              return m('span', `${child.insert}`);
+            }
           })
         ]);
       }));
@@ -150,6 +172,15 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
             target: '_blank',
             noreferrer: 'noreferrer',
             noopener: 'noopener',
+            onclick: (e) => {
+              if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+              if (child.attributes.link.startsWith(document.location.origin + '/')) {
+                // don't open a new window if the link is on Commonwealth
+                e.preventDefault();
+                e.stopPropagation();
+                m.route.set(child.attributes.link);
+              }
+            },
           }, `${child.insert}`);
         } else {
           result = m('span', `${child.insert}`);
@@ -234,9 +265,46 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
     });
 };
 
-const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapse? }> = {
+const QuillFormattedText : m.Component<{
+  doc,
+  hideFormatting?: boolean,
+  collapse?: boolean,
+  searchTerm?: string,
+}, {
+  cachedDocWithHighlights: string,
+  cachedResultWithHighlights
+}> = {
   view: (vnode) => {
-    const { doc, hideFormatting, collapse } = vnode.attrs;
+    const { doc, hideFormatting, collapse, searchTerm } = vnode.attrs;
+
+    // if we're showing highlighted search terms, render the doc once, and cache the result
+    if (searchTerm) {
+      if (JSON.stringify(doc) !== vnode.state.cachedDocWithHighlights) {
+        const vnodes = renderQuillDelta(doc, hideFormatting, true); // collapse = true, to inline blocks
+        const root = document.createElement('div');
+        m.render(root, vnodes);
+        const textToHighlight = root.innerText.replace(/\n/g, ' ').replace(/\ +/g, ' ');
+        const chunks = findAll({
+          searchWords: [searchTerm.trim()],
+          textToHighlight,
+        });
+        vnode.state.cachedDocWithHighlights = JSON.stringify(doc);
+        vnode.state.cachedResultWithHighlights = chunks.map(({ end, highlight, start }, index) => {
+          const middle = 15;
+          const text = smartTruncate(
+            textToHighlight.substr(start, end - start),
+            chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
+            chunks.length <= 1 ? {} : index === 0 ? { position: 0 } : index === chunks.length - 1
+              ? {} : { position: middle }
+          );
+          console.log(text);
+          return highlight ? m('mark', text) : m('span', text);
+        });
+      }
+      return m('.QuillFormattedText', {
+        class: collapse ? 'collapsed' : '',
+      }, vnode.state.cachedResultWithHighlights);
+    }
 
     return m('.QuillFormattedText', {
       class: collapse ? 'collapsed' : '',

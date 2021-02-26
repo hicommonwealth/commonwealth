@@ -11,7 +11,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 // TODO: store ChainBase in the database, and check for substrate/cosmos chains instead
 const CHAINS_WITH_CLI = [
   'edgeware', 'kulupu', 'kusama', 'cosmos', 'edgeware-local', 'edgeware-testnet',
-  'darwinia', 'phala', 'plasm', 'polkadot', 'centrifuge'
+  'darwinia', 'phala', 'plasm', 'polkadot', 'centrifuge',
 ];
 
 const LoginWithWalletDropdown: m.Component<{
@@ -93,6 +93,7 @@ const LoginWithWalletDropdown: m.Component<{
         intent: 'primary',
         fluid: true,
         class: 'login-with-web3',
+        rounded: true,
         label: [
           label,
           m(Icon, { name: Icons.CHEVRON_DOWN }),

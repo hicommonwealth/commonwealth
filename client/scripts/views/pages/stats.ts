@@ -1,7 +1,7 @@
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
-import { Table } from 'construct-ui';
+import { Table, Tag } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -110,7 +110,10 @@ const StatsPage: m.Component<{}, { requested: boolean, error: string, data }> = 
 
     return m(Sublayout, {
       class: 'StatsPage',
-      title: 'Community Stats',
+      title: [
+        'Community Analytics',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
     }, [
       vnode.state.error
         ? m('.error', vnode.state.error)

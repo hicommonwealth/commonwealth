@@ -4,56 +4,63 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import { link } from 'helpers';
-import { formatAddressShort } from 'shared/utils';
 
 import app from 'state';
 import { Account, Profile } from 'models';
-
-import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity, { IdentityQuality, getIdentityQuality } from 'controllers/chain/substrate/identity';
+import { formatAddressShort } from '../../../../../shared/utils';
 
 export interface ISubstrateIdentityAttrs {
   account: Account<any>;
   linkify: boolean;
   profile: Profile;
   hideIdentityIcon: boolean; // only applies to substrate identities
+  showAddressWithDisplayName?: boolean;
   addrShort: string;
 }
 
 export interface ISubstrateIdentityState {
-  dynamic: {
-    identity: SubstrateIdentity | null;
-  },
+  identity: SubstrateIdentity | null;
 }
 
-const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
-  getObservables: (attrs) => ({
-    groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount && !attrs.profile.isOnchain
-               && (app.chain as Substrate).identities)
-      ? (app.chain as Substrate).identities.get(attrs.account)
-      : null,
-  }),
+const SubstrateOnlineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
+  oninit: (vnode) => {
+    app.runWhenReady(async () => {
+      vnode.state.identity = (vnode.attrs.account instanceof SubstrateAccount
+          && !vnode.attrs.profile.isOnchain
+          && (app.chain as Substrate).identities)
+        ? await (app.chain as Substrate).identities.load(vnode.attrs.account)
+        : null;
+      m.redraw();
+    });
+  },
   view: (vnode) => {
-    const { profile, linkify, account, addrShort, hideIdentityIcon } = vnode.attrs;
+    const { profile, linkify, account, addrShort, hideIdentityIcon, showAddressWithDisplayName } = vnode.attrs;
+    // if invalidated by change, load the new identity immediately
+    vnode.state.identity = ((!profile.isOnchain || profile.isNameInvalid)
+      && (app.chain as Substrate).identities)
+      ? (app.chain as Substrate).identities.get(account.address)
+      : null;
 
     // return polkadot identity if possible
     let displayName: string;
     let quality: IdentityQuality;
-    if (profile.isOnchain) {
+    if (profile.isOnchain && !profile.isNameInvalid) {
       // first try to use identity fetched from server
-      displayName = profile.displayName;
+      displayName = (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName);
       quality = getIdentityQuality(Object.values(profile.judgements));
-    } else if (vnode.state.dynamic?.identity?.exists) {
+    } else if (vnode.state.identity?.exists) {
       // then attempt to use identity fetched from chain
-      displayName = vnode.state.dynamic.identity.username;
-      quality = vnode.state.dynamic.identity.quality;
+      displayName = showAddressWithDisplayName
+        ? `${vnode.state.identity.username} · ${formatAddressShort(profile.address, profile.chain)}`
+        : vnode.state.identity.username;
+      quality = vnode.state.identity.quality;
     }
 
-    if (displayName && quality && !hideIdentityIcon) {
-      const name = [ displayName, m(`span.identity-icon${quality === IdentityQuality.Good
+    if (displayName && quality) {
+      const name = [ displayName, !hideIdentityIcon && m(`span.identity-icon${quality === IdentityQuality.Good
         ? '.green' : quality === IdentityQuality.Bad
           ? '.red' : '.gray'}`, [
         quality === IdentityQuality.Good ? '✓' : quality === IdentityQuality.Bad ? '✗' : '-'
@@ -72,23 +79,32 @@ const SubstrateOnlineIdentityWidget = makeDynamicComponent<ISubstrateIdentityAtt
     return linkify
       ? link('a.user-display-name.username',
         profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-        profile ? profile.displayName : addrShort)
-      : m('a.user-display-name.username', profile ? profile.displayName : addrShort);
+        profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort)
+      : m('a.user-display-name.username', [
+        profile
+          ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
+          : addrShort
+      ]);
   }
-});
+};
 
 const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubstrateIdentityState> = {
   view: (vnode) => {
-    const { profile, linkify, account, addrShort, hideIdentityIcon } = vnode.attrs;
+    const { profile, linkify, account, addrShort, hideIdentityIcon, showAddressWithDisplayName } = vnode.attrs;
 
     const quality = profile?.isOnchain && profile?.name && getIdentityQuality(Object.values(profile.judgements));
 
     if (profile?.isOnchain && profile?.name && quality && !hideIdentityIcon) {
-      const name = [ profile.name, m(`span.identity-icon${quality === IdentityQuality.Good
-        ? '.green' : quality === IdentityQuality.Bad
-          ? '.red' : '.gray'}`, [
-        quality === IdentityQuality.Good ? '✓' : quality === IdentityQuality.Bad ? '✗' : '-'
-      ]) ];
+      const name = [
+        showAddressWithDisplayName
+          ? [ profile.name, ` · ${formatAddressShort(profile.address, profile.chain)}` ]
+          : profile.name,
+        m(`span.identity-icon${quality === IdentityQuality.Good
+          ? '.green' : quality === IdentityQuality.Bad
+            ? '.red' : '.gray'}`, [
+          quality === IdentityQuality.Good ? '✓' : quality === IdentityQuality.Bad ? '✗' : '-'
+        ])
+      ];
 
       return linkify
         ? link(
@@ -103,8 +119,12 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
     return linkify
       ? link('a.user-display-name.username',
         profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
-        profile ? profile.displayName : addrShort)
-      : m('a.user-display-name.username', profile ? profile.displayName : addrShort);
+        profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort)
+      : m('a.user-display-name.username', [
+        profile
+          ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
+          : addrShort
+      ]);
   }
 };
 

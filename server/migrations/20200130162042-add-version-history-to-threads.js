@@ -1,24 +1,24 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn(
       'OffchainThreads',
       'version_history',
       {
-        type: DataTypes.ARRAY(DataTypes.TEXT),
+        type: Sequelize.ARRAY(Sequelize.TEXT),
         allowNull: false,
         defaultValue: []
       }
     )
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn(
       'OffchainThreads',
       'version_history',
       {
-        type: DataTypes.ARRAY(DataTypes.TEXT),
+        type: Sequelize.ARRAY(Sequelize.TEXT),
         allowNull: false,
         defaultValue: []
       }

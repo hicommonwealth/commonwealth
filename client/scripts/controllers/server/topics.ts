@@ -6,13 +6,7 @@ import { OffchainTopic } from 'models';
 import app from 'state';
 
 const modelFromServer = (topic) => {
-  return new OffchainTopic(
-    topic.name,
-    topic.id,
-    topic.description,
-    topic.community_id,
-    topic.chain_id,
-  );
+  return new OffchainTopic(topic.name, topic.id, topic.description, topic.telegram, topic.community_id, topic.chain_id);
 };
 
 class TopicsController {
@@ -34,6 +28,7 @@ class TopicsController {
         'chain': topic.chainId,
         'name': topic.name,
         'description': topic.description,
+        'telegram': topic.telegram,
         'featured_order': featured_order,
         'address': app.user.activeAccount.address,
         'jwt': app.user.jwt
@@ -75,7 +70,7 @@ class TopicsController {
     }
   }
 
-  public async add(name: string, description: string) {
+  public async add(name: string, description: string, telegram: string) {
     try {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
@@ -85,6 +80,7 @@ class TopicsController {
         ...chainOrCommObj,
         'name': name,
         'description': description,
+        'telegram': telegram,
         'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
@@ -164,9 +160,9 @@ class TopicsController {
     // addition to the TopicStore, since said store will be more up-to-date
     const existing = this.getByIdentifier(topic.id);
     if (!existing) this.addToStore(topic);
-    const { id, name, description } = existing || topic;
+    const { id, name, description, telegram } = existing || topic;
     const selected = name === activeTopic;
-    return { id, name, description, selected };
+    return { id, name, description, telegram, selected };
   }
 }
 

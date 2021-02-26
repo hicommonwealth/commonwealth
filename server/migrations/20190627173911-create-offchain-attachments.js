@@ -1,16 +1,16 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     try {
       await queryInterface.createTable('OffchainAttachments', {
-        id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        attachable: { type: DataTypes.STRING, allowNull: false },
-        attachment_id: { type: DataTypes.INTEGER, allowNull: false },
-        url: { type: DataTypes.TEXT, allowNull: false },
-        description: { type: DataTypes.TEXT, allowNull: false },
-        created_at: { type: DataTypes.DATE, allowNull: false },
-        updated_at: { type: DataTypes.DATE, allowNull: false },
+        id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+        attachable: { type: Sequelize.STRING, allowNull: false },
+        attachment_id: { type: Sequelize.INTEGER, allowNull: false },
+        url: { type: Sequelize.TEXT, allowNull: false },
+        description: { type: Sequelize.TEXT, allowNull: false },
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        updated_at: { type: Sequelize.DATE, allowNull: false },
       });
       await queryInterface.addIndex('OffchainAttachments', { fields: ['attachable', 'attachment_id'] });
       return new Promise((resolve, reject) => resolve());
@@ -19,7 +19,7 @@ module.exports = {
     }
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('OffchainAttachments');
   }
 };

@@ -5,18 +5,31 @@ import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
 import app from 'state';
-import { pluralize } from 'helpers';
 import { sortNotifications } from 'helpers/notifications';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
+import PageError from 'views/pages/error';
+import PageLoading from 'views/pages/loading';
 
 const NotificationsPage: m.Component<{}> = {
   view: (vnode) => {
-    if (!app.isLoggedIn()) {
-      return m('div', 'Must be logged in to view notifications.');
-    }
+    if (!app.isLoggedIn()) return m(PageError, {
+      title: [
+        'Notifications ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
+      message: 'This page requires you to be logged in.'
+    });
 
-    const notifications = app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
+    const activeEntity = app.community ? app.community : app.chain;
+    if (!activeEntity) return m(PageLoading, {
+      title: [
+        'Notifications ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
+    });
+
+    const notifications = app.user.notifications?.notifications || [];
     const sortedNotifications = sortNotifications(notifications).reverse();
 
     return m(Sublayout, {
@@ -51,6 +64,7 @@ const NotificationsPage: m.Component<{}> = {
               m(Button, {
                 label: 'Confirm',
                 fluid: true,
+                rounded: true,
                 onclick: async (e) => {
                   e.preventDefault();
                   const chainEventNotifications = app.user.notifications.notifications.filter((n) => n.chainEvent);

@@ -3,7 +3,8 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 
 const communityStats = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  if (error) return next(new Error(error));
 
   if (!req.user) {
     return next(new Error('Not logged in'));

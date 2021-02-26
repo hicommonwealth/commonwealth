@@ -2,29 +2,31 @@ import 'pages/proposals.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { Grid, Col, List, Tag } from 'construct-ui';
+import moment from 'moment';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase, ChainNetwork } from 'models';
+
 import Edgeware from 'controllers/chain/edgeware/main';
 import {
   convictionToWeight, convictionToLocktime, convictions
 } from 'controllers/chain/substrate/democracy_referendum';
+import Substrate from 'controllers/chain/substrate/main';
+import Cosmos from 'controllers/chain/cosmos/main';
+import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import Substrate from 'controllers/chain/substrate/main';
-import Cosmos from 'controllers/chain/cosmos/main';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
-import { Grid, Col, List } from 'construct-ui';
-import moment from 'moment';
-import Listing from './listing';
-import ErrorPage from './error';
+import Listing from 'views/pages/listing';
+import ErrorPage from 'views/pages/error';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -82,16 +84,24 @@ async function loadCmd() {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base !== ChainBase.Substrate) {
+  if (app.chain.base === ChainBase.Substrate) {
+    const chain = (app.chain as Substrate);
+    await Promise.all([
+      chain.council.init(chain.chain, chain.accounts),
+      chain.signaling.init(chain.chain, chain.accounts),
+      chain.treasury.init(chain.chain, chain.accounts),
+      chain.democracyProposals.init(chain.chain, chain.accounts),
+      chain.democracy.init(chain.chain, chain.accounts),
+    ]);
+  } else if (app.chain.base === ChainBase.CosmosSDK) {
+    const chain = (app.chain as Cosmos);
+    await Promise.all([
+      chain.governance.init(chain.chain, chain.accounts),
+    ]);
+    return;
+  } else {
     return;
   }
-  const chain = (app.chain as Substrate);
-  await Promise.all([
-    chain.council.init(chain.chain, chain.accounts),
-    chain.signaling.init(chain.chain, chain.accounts),
-    chain.democracyProposals.init(chain.chain, chain.accounts),
-    chain.democracy.init(chain.chain, chain.accounts),
-  ]);
 }
 
 const ProposalsPage: m.Component<{}> = {
@@ -114,12 +124,18 @@ const ProposalsPage: m.Component<{}> = {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
           message: 'Could not connect to chain',
-          title: 'Proposals',
+          title: [
+            'Proposals',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
         });
       }
       return m(PageLoading, {
         message: 'Connecting to chain',
-        title: 'Proposals',
+        title: [
+          'Proposals',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
         showNewProposalButton: true,
       });
     }
@@ -134,7 +150,10 @@ const ProposalsPage: m.Component<{}> = {
         if (!chain.democracy.initializing) loadCmd();
         return m(PageLoading, {
           message: 'Connecting to chain',
-          title: 'Proposals',
+          title: [
+            'Proposals',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
           showNewProposalButton: true,
         });
       }
@@ -200,20 +219,15 @@ const ProposalsPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'ProposalsPage',
-      title: 'Proposals',
+      title: [
+        'Proposals',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
-      m(Listing, {
-        content: activeProposalContent,
-        columnHeaders: ['Active Proposals', 'Comments', 'Likes', 'Updated'],
-        rightColSpacing: [4, 4, 4]
-      }),
-      m(Listing, {
-        content: inactiveProposalContent,
-        columnHeaders: ['Inactive Proposals', 'Comments', 'Likes', 'Updated'],
-        rightColSpacing: [4, 4, 4]
-      }),
+      m(Listing, { content: activeProposalContent }),
+      m(Listing, { content: inactiveProposalContent }),
     ]);
   }
 };

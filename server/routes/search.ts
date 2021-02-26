@@ -12,7 +12,8 @@ const Errors = {
 };
 
 const search = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  if (error) return next(new Error(error));
   const { cutoff_date } = req.query;
 
   // set up query parameters
@@ -26,7 +27,7 @@ const search = async (models, req: Request, res: Response, next: NextFunction) =
     ? { community: community.id }
     : { chain: chain.id };
   replacements['searchTerm'] = req.query.search;
-  replacements['limit'] = 20;
+  replacements['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
 
   if (req.query.search.length < 3) {
     return next(new Error(Errors.QueryTooShort));

@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import { Observable } from 'rxjs';
 import { IApp } from 'state';
 import { Coin } from 'adapters/currency';
 
@@ -17,10 +16,9 @@ abstract class Account<C extends Coin> {
   public readonly chainBase: ChainBase;
   public readonly chainClass: ChainClass;
   public get freeBalance() { return this.balance; }
-  public abstract balance: Observable<C>;
+  public abstract balance: Promise<C>;
   public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
-  public async abstract signMessage(message: string): Promise<string>;
-  public abstract async isValidSignature(message: string, signature: string): Promise<boolean>;
+  public abstract signMessage(message: string): Promise<string>;
   protected abstract addressFromMnemonic(mnemonic: string): string;
   protected abstract addressFromSeed(seed: string): string;
 
@@ -97,12 +95,8 @@ abstract class Account<C extends Coin> {
     if (!signature && (this.seed || this.mnemonic || this.chainBase === ChainBase.NEAR)) {
       // construct signature from private key
       signature = await this.signMessage(`${this._validationToken}\n`);
-    } else if (signature) {
-      const withoutNewline = !(await this.isValidSignature(this._validationToken, signature));
-      const withNewline = !(await this.isValidSignature(`${this._validationToken}\n`, signature));
-      if (withNewline && withoutNewline) {
-        throw new Error('invalid signature');
-      }
+    } else if (!signature) {
+      throw new Error('no signature or seed provided');
     }
 
     if (signature) {
@@ -112,7 +106,14 @@ abstract class Account<C extends Coin> {
         jwt: this.app.user.jwt,
         signature,
       };
-      return Promise.resolve($.post(`${this.app.serverUrl()}/verifyAddress`, params));
+      return new Promise<void>((resolve, reject) => {
+        $.post(`${this.app.serverUrl()}/verifyAddress`, params).then((result) => {
+          if (result.status === 'Success') return resolve();
+          else reject();
+        }).catch((error) => {
+          reject();
+        });
+      });
     } else {
       throw new Error('signature or key required for validation');
     }

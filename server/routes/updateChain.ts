@@ -11,7 +11,8 @@ export const Errors = {
   NotAdmin: 'Not an admin',
   NoChainFound: 'Chain not found',
   InvalidWebsite: 'Website must begin with https://',
-  InvalidChat: 'Chat must begin with https://',
+  InvalidDiscord: 'Discord must begin with https://',
+  InvalidElement: 'Element must begin with https://',
   InvalidTelegram: 'Telegram must begin with https://t.me/',
   InvalidGithub: 'Github must begin with https://github.com/',
 };
@@ -38,12 +39,14 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     }
   }
 
-  const { active, chat, description, icon_url, name, symbol, type, website, telegram, github } = req.body;
+  const { active, icon_url, symbol, type, name, description, website, discord, element, telegram, github } = req.body;
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
-  } else if (chat && !urlHasValidHTTPPrefix(chat)) {
-    return next(new Error(Errors.InvalidChat));
+  } else if (discord && !urlHasValidHTTPPrefix(discord)) {
+    return next(new Error(Errors.InvalidDiscord));
+  } else if (element && !urlHasValidHTTPPrefix(element)) {
+    return next(new Error(Errors.InvalidElement));
   } else if (telegram && !telegram.startsWith('https://t.me/')) {
     return next(new Error(Errors.InvalidTelegram));
   } else if (github && !github.startsWith('https://github.com/')) {
@@ -51,13 +54,14 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   }
 
   if (name) chain.name = name;
+  if (description) chain.description = description;
   if (symbol) chain.symbol = symbol;
   if (icon_url) chain.icon_url = icon_url;
   if (active !== undefined) chain.active = active;
   if (type) chain.type = type;
-  chain.description = description;
   chain.website = website;
-  chain.chat = chat;
+  chain.discord = discord;
+  chain.element = element;
   chain.telegram = telegram;
   chain.github = github;
   if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];

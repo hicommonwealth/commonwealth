@@ -27,7 +27,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
           .length;
         return m('.RoleChild', [
           m(User, {
-            user: new AddressInfo(addr.id, addr.address, addr.chain, null), //role.Address, // make AddressInfo?
+            user: new AddressInfo(addr.id, addr.address, addr.chain, null, addr.is_magic), //role.Address, // make AddressInfo?
             popover: false,
             linkify: false,
             hideAvatar: false,
@@ -37,7 +37,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
-              const adminsAndMods = await communityMeta.getAdminsAndMods(app.activeId());
+              const adminsAndMods = await communityMeta.getMembers(app.activeId());
               const userAdminsAndMods = adminsAndMods.filter((role_) => {
                 const belongsToUser = !!app.user.addresses
                   .filter((addr_) => addr_.id === role_.address_id)

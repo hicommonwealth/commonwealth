@@ -158,7 +158,9 @@ const LoginSelector: m.Component<{
               hideIdentityIcon: true,
             }) : [
               m('span.hidden-sm', [
-                app.user.activeAccounts.length === 0 ? 'No address' : 'Select address'
+                app.user.activeAccounts.length === 0
+                  ? `No ${app.chain?.meta?.chain.name || ''} address`
+                  : 'Select address'
               ]),
             ],
           ],
@@ -215,39 +217,6 @@ const LoginSelector: m.Component<{
               label: nAccountsWithoutRole > 0 ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
                 : activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'Connect a new address',
             }),
-            (app.community?.meta.invitesEnabled || isAdminOrMod) && m(MenuDivider),
-            (app.community?.meta.invitesEnabled || isAdmin) && m(MenuItem, {
-              class: 'invite-user',
-              align: 'left',
-              basic: true,
-              onclick: (e) => {
-                e.preventDefault();
-                const data = app.activeCommunityId()
-                  ? { communityInfo: app.community.meta } : { chainInfo: app.chain.meta.chain };
-                app.modals.create({
-                  modal: CreateInviteModal,
-                  data,
-                });
-              },
-              label: 'Invite members',
-            }),
-            isAdmin && m(MenuItem, {
-              class: 'manage-community',
-              align: 'left',
-              basic: true,
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({ modal: ManageCommunityModal });
-              },
-              label: 'Manage community'
-            }),
-            isAdminOrMod && m(MenuItem, {
-              class: 'view-stats',
-              align: 'left',
-              basic: true,
-              onclick: (e) => m.route.set(`/${app.activeId() || 'edgeware'}/communityStats`),
-              label: 'View community stats',
-            }),
           ],
         ]),
       }),
@@ -280,7 +249,7 @@ const LoginSelector: m.Component<{
             onclick: () => app.activeChainId()
               ? m.route.set(`/${app.activeChainId()}/settings`)
               : m.route.set('/settings'),
-            label: 'Login & address settings'
+            label: 'Account settings'
           }),
           m(MenuDivider),
           m(MenuItem, {

@@ -8,7 +8,7 @@ import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
-import { ITXModalData, ProposalModule, ChainBase, ChainClass, OffchainThreadKind } from 'models';
+import { ITXModalData, ProposalModule, ChainBase, ChainClass, OffchainThreadKind, OffchainThreadStage } from 'models';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
@@ -127,6 +127,7 @@ const NewProposalForm = {
         app.threads.create(
           author.address,
           OffchainThreadKind.Forum,
+          OffchainThreadStage.Discussion,
           app.activeChainId(),
           app.activeCommunityId(),
           vnode.state.form.title,
@@ -146,17 +147,17 @@ const NewProposalForm = {
           notifyError('Missing arguments');
           return;
         } else if (vnode.state.toggleValue === 'proposal') {
-          const proposalHash = blake2AsHex(EdgewareFunctionPicker.getMethod().method.toHex());
+          const proposalHash = blake2AsHex(EdgewareFunctionPicker.getMethod().toHex());
           args = [author, EdgewareFunctionPicker.getMethod(), proposalHash, deposit];
           createFunc = ([au, mt, pr, dep]) => (app.chain as Substrate).democracyProposals.createTx(au, mt, pr, dep);
         } else if (vnode.state.toggleValue === 'preimage') {
           vnode.attrs.onChangeSlugEnum('democracypreimage');
-          const encodedProposal = EdgewareFunctionPicker.getMethod().method.toHex();
+          const encodedProposal = EdgewareFunctionPicker.getMethod().toHex();
           args = [author, EdgewareFunctionPicker.getMethod(), encodedProposal];
           createFunc = ([au, mt, pr]) => (app.chain as Substrate).democracyProposals.notePreimage(au, mt, pr);
         } else if (vnode.state.toggleValue === 'imminent') {
           vnode.attrs.onChangeSlugEnum('democracyimminent');
-          const encodedProposal = EdgewareFunctionPicker.getMethod().method.toHex();
+          const encodedProposal = EdgewareFunctionPicker.getMethod().toHex();
           args = [author, EdgewareFunctionPicker.getMethod(), encodedProposal];
           createFunc = ([au, mt, pr]) => (app.chain as Substrate).democracyProposals.noteImminentPreimage(au, mt, pr);
         } else {
@@ -609,6 +610,7 @@ const NewProposalForm = {
               disabled: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
                 && !(author as SubstrateAccount).isCouncillor),
               intent: 'primary',
+              rounded: true,
               label: proposalTypeEnum === ProposalType.OffchainThread
                 ? 'Create thread'
                 : 'Send transaction',

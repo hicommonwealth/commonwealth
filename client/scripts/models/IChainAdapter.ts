@@ -26,6 +26,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public abstract accounts: IAccountsModule<C, A>;
   public readonly chainEntities?: ChainEntityController;
   public readonly usingServerChainEntities = false;
+  public readonly webWallet;
 
   public deferred: boolean;
 
@@ -71,8 +72,10 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       return false;
     }
 
-    const { threads, comments, reactions, topics, admins, activeUsers } = response.result;
-    this.app.threads.initialize(threads, true);
+    const {
+      threads, comments, reactions, topics, admins, activeUsers, numPrevotingThreads, numVotingThreads
+    } = response.result;
+    this.app.threads.initialize(threads, numPrevotingThreads, numVotingThreads, true);
     this.app.comments.initialize(comments, false);
     this.app.reactions.initialize(reactions, true);
     this.app.topics.initialize(topics, true);
@@ -101,12 +104,14 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
   public async initData(): Promise<void> {
     this._loaded = true;
-    this.app.chainModuleReady.next(true);
+    this.app.chainModuleReady.emit('ready');
+    this.app.isModuleReady = true;
     console.log(`Loaded data for ${this.meta.chain.id} on node: ${this.meta.url}.`);
   }
 
   public async deinit(): Promise<void> {
     this._apiInitialized = false;
+    this.app.isModuleReady = false;
     this._loaded = false;
     console.log(`Stopping ${this.meta.chain.id}...`);
   }

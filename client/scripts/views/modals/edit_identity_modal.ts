@@ -4,20 +4,16 @@ import m from 'mithril';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup, FormLabel, Icon, Icons } from 'construct-ui';
 
-import { IdentityInfo } from '@polkadot/types/interfaces';
 import { Data } from '@polkadot/types/primitive';
 import { u8aToString } from '@polkadot/util';
 
 import app from 'state';
-import { Account } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import { IdentityInfoProps } from 'controllers/chain/substrate/identities';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
-import AvatarUpload from 'views/components/avatar_upload';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { makeDynamicComponent } from 'models/mithril';
 
 interface IAttrs {
   account: SubstrateAccount;
@@ -25,19 +21,19 @@ interface IAttrs {
 }
 
 interface IState {
-  dynamic: {
-    identity: SubstrateIdentity | null;
-  },
+  identity: SubstrateIdentity | null;
   saving: boolean;
 }
 
-const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
-  getObservables: (attrs) => ({
-    groupKey: attrs.account.address,
-    identity: (app.chain as Substrate).identities.get(attrs.account),
-  }),
+const EditIdentityModal: m.Component<IAttrs, IState> = {
+  oninit: (vnode) => {
+    app.runWhenReady(async () => {
+      vnode.state.identity = await (app.chain as Substrate).identities.load(vnode.attrs.account);
+      m.redraw();
+    });
+  },
   oncreate: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    if (vnode.state.dynamic.identity?.info) {
+    if (vnode.state.identity?.info) {
       const {
         additional,
         display,
@@ -48,7 +44,7 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
         // pgpFingerprint,
         image,
         twitter
-      } = vnode.state.dynamic.identity?.info;
+      } = vnode.state.identity?.info;
 
       // do not display SHA values, only raw strings
       const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
@@ -64,7 +60,7 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
     }
   },
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    const updateIdentity = () => {
+    const updateIdentity = async () => {
       const data = {
         display: `${$(vnode.dom).find('input[name=display]').val()}`.trim(),
         legal: `${$(vnode.dom).find('input[name=legal]').val()}`.trim(),
@@ -89,12 +85,11 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
         additional: [],
       };
 
-      createTXModal(
-        (app.chain as Substrate).identities.setIdentityTx(app.user.activeAccount as SubstrateAccount, idData)
-      ).then(() => {
-        vnode.state.saving = false;
-        m.redraw();
-      }).catch((error) => {
+      try {
+        await createTXModal(
+          (app.chain as Substrate).identities.setIdentityTx(app.user.activeAccount as SubstrateAccount, idData)
+        );
+      } catch (error) {
         if (typeof error === 'string') {
           notifyError(error);
         } else if (error.txType === 'setIdentity') {
@@ -102,9 +97,20 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
         } else {
           notifyError('Unknown error');
         }
-        vnode.state.saving = false;
-        m.redraw();
-      });
+      }
+
+      // force creation and update of the user's on-chain identity, guaranteeing that the identity
+      // component has immediate access to the new identity.
+      await (app.chain as Substrate).identities.load(app.user.activeAccount as SubstrateAccount);
+
+      // temporarily mark the user's profile as invalid, since they've potentially updated their
+      // display name. this ensures that any identity display will fall back to the loaded identity.
+      const profile = app.profiles.getProfile(app.chain.id, app.user.activeAccount.address);
+      if (profile) {
+        profile.invalidateName();
+      }
+      vnode.state.saving = false;
+      m.redraw();
     };
 
     const getInput = (inputLabel, inputName, description, prefixAt = false) => {
@@ -139,13 +145,15 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
             m(Button, {
               intent: 'primary',
               disabled: vnode.state.saving || !app.chain?.loaded,
+              rounded: true,
               onclick: (e) => {
                 e.preventDefault();
-                updateIdentity();
+                updateIdentity().then(() => $(vnode.dom).trigger('modalexit'));
               },
               label: 'Set identity'
             }),
             m(Button, {
+              rounded: true,
               onclick: (e) => {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');
@@ -158,6 +166,6 @@ const EditIdentityModal = makeDynamicComponent<IAttrs, IState>({
       ])
     ]);
   }
-});
+};
 
 export default EditIdentityModal;

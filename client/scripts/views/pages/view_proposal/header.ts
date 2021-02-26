@@ -4,12 +4,16 @@ import app from 'state';
 
 import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
 
-import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
+import {
+  pluralize, link, externalLink, isSameAccount, extractDomain,
+  offchainThreadStageToLabel, offchainThreadStageToIndex,
+} from 'helpers';
 import { proposalSlugToFriendlyName } from 'identifiers';
 
 import {
   OffchainThread,
   OffchainThreadKind,
+  OffchainThreadStage,
   OffchainComment,
   Proposal,
   AnyProposal,
@@ -24,6 +28,7 @@ import User from 'views/components/widgets/user';
 import { getStatusClass, getStatusText, getSupportText } from 'views/components/proposal_row';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
+import { GlobalStatus } from './body';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -83,7 +88,6 @@ export const ProposalHeaderTopics: m.Component<{ proposal: AnyProposal | Offchai
 
     return m('.ProposalHeaderTopics', [
       link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
-        m('span.proposal-topic-icon'),
         m('span.proposal-topic-name', `${proposal.topic?.name}`),
       ]),
     ]);
@@ -102,6 +106,32 @@ export const ProposalHeaderTitle: m.Component<{ proposal: AnyProposal | Offchain
           m(Icon, { name: Icons.LOCK, size: 'xs' }),
           ' Locked'
         ],
+      }),
+    ]);
+  }
+};
+
+export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (!proposal) return;
+    return m('.ProposalHeaderStage', [
+      m(Button, {
+        rounded: true,
+        compact: true,
+        size: 'xs',
+        href: `/${proposal.chain || proposal.community}?stage=${proposal.stage}`,
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${proposal.chain || proposal.community}?stage=${proposal.stage}`);
+        },
+        label: offchainThreadStageToLabel(proposal.stage),
+        intent: proposal.stage === OffchainThreadStage.Discussion ? 'none'
+          : proposal.stage === OffchainThreadStage.ProposalInReview ? 'positive'
+            : proposal.stage === OffchainThreadStage.Voting ? 'positive'
+              : proposal.stage === OffchainThreadStage.Passed ? 'positive'
+                : proposal.stage === OffchainThreadStage.Failed ? 'negative'
+                  : proposal.stage === OffchainThreadStage.Abandoned ? 'negative' : 'none',
       }),
     ]);
   }
@@ -162,9 +192,12 @@ export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyPropos
   }
 };
 
-export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
+export const ProposalHeaderPrivacyButtons: m.Component<{
+  proposal: AnyProposal | OffchainThread,
+  getSetGlobalEditingStatus: CallableFunction
+}> = {
   view: (vnode) => {
-    const { proposal } = vnode.attrs;
+    const { proposal, getSetGlobalEditingStatus } = vnode.attrs;
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
 
@@ -176,7 +209,10 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
           app.threads.setPrivacy({
             threadId: proposal.id,
             readOnly: !proposal.readOnly,
-          }).then(() => m.redraw());
+          }).then(() => {
+            getSetGlobalEditingStatus(GlobalStatus.Set, false);
+            m.redraw();
+          });
         },
         label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
       }),

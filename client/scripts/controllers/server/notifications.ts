@@ -99,17 +99,23 @@ class NotificationsController {
 
   public markAsRead(notifications: Notification[]) {
     // TODO: Change to PUT /notificationsRead
+    const MAX_NOTIFICATIONS_READ = 100; // mark up to 100 notifications read at a time
+    const unreadNotifications = notifications.filter((notif) => !notif.isRead);
+    if (unreadNotifications.length === 0) return;
     return post('/markNotificationsRead', {
-      'notification_ids[]': notifications.map((n) => n.id),
+      'notification_ids[]': unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ).map((n) => n.id)
     }, (result) => {
-      for (const n of notifications.filter((notif) => !notif.isRead)) {
+      for (const n of unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ)) {
         n.markRead();
       }
+      if (unreadNotifications.slice(MAX_NOTIFICATIONS_READ).length > 0) {
+        this.markAsRead(unreadNotifications.slice(MAX_NOTIFICATIONS_READ));
+      }
+      // TODO: post(/markNotificationsRead) should wait on all notifications being marked as read before redrawing
     });
   }
 
   public clearAllRead() {
-    // TODO: Change to DELETE /notificationsRead (combine with mark route)
     return post('/clearReadNotifications', { }, (result) => {
       const toClear = this._store.getAll().filter((n) => n.isRead);
       for (const n of toClear) {
@@ -119,11 +125,18 @@ class NotificationsController {
   }
 
   public clear(notifications: Notification[]) {
-    // TODO: Decide REST API handling
+    // TODO: Change to PUT /clearNotifications
+    const MAX_NOTIFICATIONS_CLEAR = 100; // clear up to 100 notifications at a time
+
+    if (notifications.length === 0) return;
     return post('/clearNotifications', {
-      'notification_ids[]': notifications.slice(0, 200).map((n) => n.id), // Avoid URL too long error
+      'notification_ids[]': notifications.slice(0, MAX_NOTIFICATIONS_CLEAR).map((n) => n.id)
     }, async (result) => {
-      notifications.slice(0, 200).map((n) => this._store.remove(n));
+      notifications.slice(0, MAX_NOTIFICATIONS_CLEAR).map((n) => this._store.remove(n));
+      if (notifications.slice(MAX_NOTIFICATIONS_CLEAR).length > 0) {
+        this.clear(notifications.slice(MAX_NOTIFICATIONS_CLEAR));
+      }
+      // TODO: post(/clearNotifications) should wait on all notifications being marked as read before redrawing
     });
   }
 
@@ -131,6 +144,10 @@ class NotificationsController {
     if (!this._store.getById(n.id)) {
       this._store.add(n);
     }
+  }
+
+  public clearSubscriptions() {
+    this._subscriptions = [];
   }
 
   public refresh() {

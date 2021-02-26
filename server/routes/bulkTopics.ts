@@ -4,14 +4,12 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export const Errors = {
-  NeedChainOrCommunity: 'Must provide a chain or community',
-};
+export const Errors = { };
 
 const bulkTopics = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  if (error) return next(new Error(error));
 
-  if (!chain && !community) return next(new Error(Errors.NeedChainOrCommunity));
   const topics = await models.OffchainTopic.findAll({
     where: community
       ? { community_id: community.id }
