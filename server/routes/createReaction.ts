@@ -15,7 +15,8 @@ export const Errors = {
   NoPostId: 'Must provide a comment or thread ID',
   NoReaction: 'Must provide a reaction',
   NoCommentMatch: 'No matching comment found',
-  NoProposalMatch: 'No matching proposal found'
+  NoProposalMatch: 'No matching proposal found',
+  InsufficientTokenBalance: 'User does not have sufficient token balance to react',
 };
 
 const createReaction = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
@@ -23,6 +24,11 @@ const createReaction = async (models, tokenBalanceCache: TokenBalanceCache, req:
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
+  if (chain && chain.type === 'token') {
+    const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
+    if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+  }
+
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
   let proposal;
   let root_type;

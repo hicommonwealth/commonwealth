@@ -20,6 +20,7 @@ import setupWebsocketServer from './server/socket';
 import { NotificationCategories } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
+import TokenBalanceCache from './server/util/tokenBalanceCache';
 
 require('express-async-errors');
 
@@ -28,6 +29,7 @@ const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
 const identityFetchCache = new IdentityFetchCache(0);
+const tokenBalanceCache = new TokenBalanceCache(0, 1); // TODO: what args to use here?
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -277,11 +279,12 @@ const setupServer = () => {
 };
 
 setupPassport(models);
-setupAPI(app, models, viewCountCache, identityFetchCache);
+setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
 setupErrorHandlers();
 setupServer();
 
 export const resetDatabase = () => resetServer();
 export const getIdentityFetchCache = () => identityFetchCache;
+export const getTokenBalanceCache = () => tokenBalanceCache;
 
 export default app;

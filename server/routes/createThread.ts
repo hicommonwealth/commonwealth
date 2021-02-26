@@ -18,13 +18,19 @@ export const Errors = {
   NoBodyOrAttachments: 'Forum posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
+  InsufficientTokenBalance: 'User does not have sufficient token balance to post',
 };
 
-const createThread = async (models, tokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
+const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
+  if (chain && chain.type === 'token') {
+    const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
+    if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+  }
+
   const { topic_name, topic_id, title, body, kind, stage, url, readOnly } = req.body;
 
   if (kind === 'forum') {

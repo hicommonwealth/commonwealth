@@ -23,6 +23,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
+import TokenBalanceCache from './server/util/tokenBalanceCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
@@ -70,6 +71,7 @@ async function main() {
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
   const identityFetchCache = new IdentityFetchCache(10 * 60);
+  const tokenBalanceCache = new TokenBalanceCache();
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
@@ -88,7 +90,7 @@ async function main() {
           fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
         }
       }
-      identityFetchCache.start(models, fetchers);
+      await identityFetchCache.start(models, fetchers);
       return 0;
     } catch (e) {
       console.error(`Chain event listener setup failed: ${e.message}`);
@@ -272,7 +274,9 @@ async function main() {
 
   setupMiddleware();
   setupPassport(models);
-  setupAPI(app, models, viewCountCache, identityFetchCache);
+
+  await tokenBalanceCache.start(models);
+  setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 
