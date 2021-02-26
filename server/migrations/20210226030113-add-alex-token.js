@@ -10,7 +10,8 @@ module.exports = {
         name: '$ALEX',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
-        type: 'token'
+        type: 'token',
+        base: 'ethereum',
       }], { transaction: t });
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'alex',
