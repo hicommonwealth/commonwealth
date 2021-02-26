@@ -65,6 +65,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             threads.version_history, threads.read_only, threads.body,
             threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
             topics.description AS topic_description, topics.chain_id AS topic_chain,
+            topics.telegram AS topic_telegram,
             topics.community_id AS topic_community, collaborators
           FROM "Addresses" AS addr
           RIGHT JOIN (
@@ -144,7 +145,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
               name: t.topic_name,
               description: t.topic_description,
               communityId: t.topic_community,
-              chainId: t.topic_chain
+              chainId: t.topic_chain,
+              telegram: t.telegram,
             };
           }
           return data;

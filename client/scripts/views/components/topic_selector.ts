@@ -57,7 +57,7 @@ const TopicSelector: m.Component<{
     const addTopic = (topic?) => {
       const newTopic = topic || (document.getElementsByClassName('autocomplete-topic-input')[0]
         .firstChild as HTMLInputElement).value;
-      topics.push({ name: newTopic, id: null, description: '' });
+      topics.push({ name: newTopic, id: null, description: '', telegram: '' });
       setTimeout(() => { selectedTopic = newTopic; m.redraw(); }, 1);
       updateFormData(newTopic);
       if (!topic) manuallyClosePopover();
