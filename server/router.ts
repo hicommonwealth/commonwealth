@@ -105,10 +105,11 @@ import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
+import TokenBalanceCache from './util/tokenBalanceCache';
 
 import bulkEntities from './routes/bulkEntities';
 
-function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
+function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache, tokenBalanceCache: TokenBalanceCache) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
 
@@ -148,7 +149,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // offchain threads
   // TODO: Change to POST /thread
-  router.post('/createThread', passport.authenticate('jwt', { session: false }), createThread.bind(this, models));
+  router.post('/createThread', passport.authenticate('jwt', { session: false }), createThread.bind(this, models, tokenBalanceCache));
   // TODO: Change to PUT /thread
   router.put('/editThread', passport.authenticate('jwt', { session: false }), editThread.bind(this, models));
   router.post('/updateThreadStage', passport.authenticate('jwt', { session: false }), updateThreadStage.bind(this, models));
@@ -175,7 +176,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // offchain comments
   // TODO: Change to POST /comment
-  router.post('/createComment', passport.authenticate('jwt', { session: false }), createComment.bind(this, models));
+  router.post('/createComment', passport.authenticate('jwt', { session: false }), createComment.bind(this, models, tokenBalanceCache));
   // TODO: Change to PUT /comment
   router.post('/editComment', passport.authenticate('jwt', { session: false }), editComment.bind(this, models));
   // TODO: Change to DELETE /comment
@@ -198,7 +199,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // offchain reactions
   // TODO: Change to POST /reaction
-  router.post('/createReaction', passport.authenticate('jwt', { session: false }), createReaction.bind(this, models));
+  router.post('/createReaction', passport.authenticate('jwt', { session: false }), createReaction.bind(this, models, tokenBalanceCache));
   // TODO: Change to DELETE /reaction
   router.post('/deleteReaction', passport.authenticate('jwt', { session: false }), deleteReaction.bind(this, models));
   // TODO: Change to GET /reactions

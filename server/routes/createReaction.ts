@@ -6,6 +6,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
+import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -17,7 +18,7 @@ export const Errors = {
   NoProposalMatch: 'No matching proposal found'
 };
 
-const createReaction = async (models, req: Request, res: Response, next: NextFunction) => {
+const createReaction = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);

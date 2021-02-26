@@ -40,7 +40,7 @@ const createTopic = async (models, req, res: Response, next: NextFunction) => {
     default: options,
   });
 
-  return res.json({ status: 'Success', result: newTopic[0] });
+  return res.json({ status: 'Success', result: newTopic[0].toJSON() });
 };
 
 export default createTopic;

@@ -7,6 +7,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
+import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
@@ -24,7 +25,7 @@ export const Errors = {
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
 };
 
-const createComment = async (models, req: Request, res: Response, next: NextFunction) => {
+const createComment = async (models, tokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
