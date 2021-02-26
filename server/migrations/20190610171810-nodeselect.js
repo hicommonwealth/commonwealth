@@ -30,7 +30,7 @@ const newChainRecords = [{
 }];
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       // clean up old chains
       await queryInterface.bulkDelete('Chains', { id: [ 'cosmos', 'maker', 'tezos', 'polkadot', 'ethereum', ] },
@@ -43,19 +43,19 @@ module.exports = {
       await Promise.all([
         queryInterface.removeColumn('ChainNodes', 'port', { transaction: t }),
         queryInterface.addColumn('Chains', 'network', {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           defaultValue: 'edgeware', // set default value to populate preexisting models' fields
           allowNull: false,
         }, { transaction: t }),
         queryInterface.addColumn('OffchainThreads', 'chain', {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           defaultValue: 'edgeware-testnet', // set default value to populate preexisting models' fields
           references: { model: 'Chains', key: 'id' },
           onUpdate: 'CASCADE',
           onDelete: 'SET NULL',
         }, { transaction: t }),
         queryInterface.addColumn('Users', 'selected_node_id', {
-          type: DataTypes.INTEGER,
+          type: Sequelize.INTEGER,
           references: { model: 'ChainNodes', key: 'id' },
           constraints: false,
           onUpdate: 'CASCADE',
@@ -75,12 +75,12 @@ module.exports = {
       ], { transaction: t });
     });
   },
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       // remove chainNodes - leave empty afterwards (they were unused before, and there's no way to recover them)
       await queryInterface.bulkDelete('ChainNodes', { }, { transaction: t });
       await queryInterface.addColumn('ChainNodes', 'port', {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         defaultValue: 9944,
         allowNull: false,
       }, { transaction: t }),

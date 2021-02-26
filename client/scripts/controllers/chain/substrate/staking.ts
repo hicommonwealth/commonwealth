@@ -237,7 +237,7 @@ class SubstrateStaking implements StorageModule {
     return this._Chain.registry.createType(type, ...params);
   }
   public get nominatedBy(): Observable<Record<string, iInfo[]>> {
-    return this._Chain.query(
+    return this._Chain._api.query(
       (api: ApiRx) => api.query.staking.nominators.entries()
     ).pipe(map((nominations: any) => {
       this.nominations = extractNominators(nominations);
@@ -245,16 +245,16 @@ class SubstrateStaking implements StorageModule {
     }));
   }
   public get validatorCount(): Observable<SessionIndex> {
-    return this._Chain.query((api: ApiRx) => api.query.staking.validatorCount());
+    return this._Chain._api.query((api: ApiRx) => api.query.staking.validatorCount());
   }
   public get getValidatorGroups(): Observable<GroupValidator[]> {
-    return this._Chain.query(
+    return this._Chain._api.query(
       (api: ApiRx) => from(this._app.chainEvents.getValidatorGroups({}))
     ).pipe(map((validators: GroupValidator[]) => validators));
   }
   // TODO update this function with database call, when database api is integrated.
   public get validatorsAddress(): Observable<string[]> {
-    return this._Chain.query(
+    return this._Chain._api.query(
       (api: ApiRx) => api.derive.staking.validators()
     ).pipe(map((addresses) => {
       const { validators } = addresses;

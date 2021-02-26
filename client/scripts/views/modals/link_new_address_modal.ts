@@ -75,7 +75,8 @@ const EthereumLinkAccountItem: m.Component<{
               vnode.state.linking = false;
               return;
             } else {
-              const modalMsg = 'This address is currently linked to another account. Continue?';
+              const modalMsg = 'This address is currently linked to another account. '
+                + 'Remove it from that account and transfer to yours?';
               const confirmed = await confirmationModalWithText(modalMsg)();
               if (!confirmed) {
                 vnode.state.linking = false;
@@ -233,7 +234,8 @@ const SubstrateLinkAccountItem: m.Component<{
               notifyInfo('This address is already linked to your current account.');
               return;
             } else {
-              const modalMsg = 'This address is currently linked to another account. Continue?';
+              const modalMsg = 'This address is currently linked to another account. '
+                + 'Remove it from that account and transfer to yours?';
               const confirmed = await confirmationModalWithText(modalMsg)();
               if (!confirmed) {
                 vnode.state.linking = false;

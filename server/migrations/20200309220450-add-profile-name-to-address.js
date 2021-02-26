@@ -3,14 +3,14 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     const addresses = await queryInterface.sequelize
       .query(`SELECT * FROM "OffchainProfiles" JOIN "Addresses" ON "address_id"="id"`);
     await queryInterface.addColumn(
       'Addresses',
       'name',
       {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: true,
       }
     );
@@ -22,12 +22,12 @@ module.exports = {
     }));
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn(
       'Addresses',
       'name',
       {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: true,
       }
     );

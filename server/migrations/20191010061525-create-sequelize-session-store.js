@@ -1,17 +1,17 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Sessions', {
-      sid: { type: DataTypes.STRING, primaryKey: true },
-      expires: DataTypes.DATE,
-      data: DataTypes.TEXT,
-      createdAt: { type: DataTypes.DATE, allowNull: false },
-      updatedAt: { type: DataTypes.DATE, allowNull: false },
+      sid: { type: Sequelize.STRING, primaryKey: true },
+      expires: Sequelize.DATE,
+      data: Sequelize.TEXT,
+      createdAt: { type: Sequelize.DATE, allowNull: false },
+      updatedAt: { type: Sequelize.DATE, allowNull: false },
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('Sessions');
   }
 };

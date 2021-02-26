@@ -3,9 +3,7 @@ import 'pages/admin.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { SubmittableResult, ApiRx } from '@polkadot/api';
 import { ISubmittableResult } from '@polkadot/types/types';
-import { switchMap } from 'rxjs/operators';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -34,7 +32,7 @@ interface IChainManagerState {
 
 const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
   view: (vnode) => {
-    const nodeRows = (chain) => (app.config.nodes.getByChain(chain.id) || [])
+    const nodeRows = (chain: ChainInfo) => (app.config.nodes.getByChain(chain.id) || [])
       .map((node, nodeIndex) => {
         return m('li.chain-node', [
           m('span', node.url),
@@ -70,7 +68,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
         ]);
       });
 
-    const addNodeRow = (chain) => m('li', [
+    const addNodeRow = (chain: ChainInfo) => m('li', [
       m('a', {
         href: '#',
         onclick: (e) => {
@@ -81,11 +79,13 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
           vnode.attrs.error = null;
           const url = prompt('Enter the node url:');
           // TODO: Change to POST /chainNode
+          // TODO: add ss58_prefix for substrate chains
           $.post(`${app.serverUrl()}/addChainNode`, {
             id: chain.id,
             name: chain.name,
             symbol: chain.symbol,
             network: chain.network,
+            base: chain.base,
             node_url: url,
             auth: true,
             jwt: app.user.jwt,
@@ -186,9 +186,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
           vnode.state.txProcessing = true;
           vnode.state.resultText = 'Waiting...';
           m.redraw();
-          (app.chain as Substrate).chain.api.pipe(
-            switchMap((api: ApiRx) => api.tx.sudo.sudo(call).signAndSend(keyring))
-          ).subscribe((result: ISubmittableResult) => {
+          (app.chain as Substrate).chain.api.tx.sudo.sudo(call).signAndSend(keyring, (result: ISubmittableResult) => {
             if (result.isCompleted) {
               vnode.state.txProcessing = false;
               if (result.isFinalized) {
@@ -230,7 +228,6 @@ const ChainStats: m.Component<{}> = {
       stat('Total EDG', formatCoin((app.chain as Substrate).chain.totalbalance)),
       stat('Existential deposit', formatCoin((app.chain as Substrate).chain.existentialdeposit)),
       // stat('Transfer fee',        formatCoin((app.chain as Substrate).chain.transferfee)),
-      stat('Creation fee', formatCoin((app.chain as Substrate).chain.creationfee)),
       header('Democracy Proposals'),
       stat('Launch period', formatBlocks((app.chain as Substrate).democracyProposals.launchPeriod)),
       stat('Minimum deposit', formatCoin((app.chain as Substrate).democracyProposals.minimumDeposit)),

@@ -1,24 +1,24 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn(
       'Webhooks',
       'categories',
       {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         defaultValue: []
       }
     );
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn(
       'Webhooks',
       'categories',
       {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         defaultValue: []
       }

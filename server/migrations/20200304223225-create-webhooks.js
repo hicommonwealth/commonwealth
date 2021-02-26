@@ -1,14 +1,14 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Webhooks', {
-      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      url: { type: DataTypes.STRING, allowNull: false },
-      chain_id: { type: DataTypes.STRING, allowNull: true },
-      offchain_community_id: { type: DataTypes.STRING, allowNull: true },
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      url: { type: Sequelize.STRING, allowNull: false },
+      chain_id: { type: Sequelize.STRING, allowNull: true },
+      offchain_community_id: { type: Sequelize.STRING, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     }, {
       underscored: true,
       indexes: [
