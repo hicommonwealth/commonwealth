@@ -8,7 +8,6 @@ class Clover extends Substrate {
     super(n, app, ChainClass.Clover);
     this.signaling.disable();
     this.identities.disable();
-
   }
 
   public async initApi() {

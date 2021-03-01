@@ -9,7 +9,7 @@ module.exports = {
         name: 'Clover Finance',
         icon_url: '/static/img/protocols/clover.png',
         type: 'chain',
-        network: 'darwinia',
+        network: 'clover',
         active: true,
         description: 'An open cross-chain bridge protocol based on Substrate.',
         telegram: 'https://t.me/clover_en',

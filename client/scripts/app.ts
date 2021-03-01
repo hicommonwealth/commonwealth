@@ -304,7 +304,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   } else if (n.chain.network === ChainNetwork.Clover) {
     const Clover = (await import(
       /* webpackMode: "lazy" */
-      /* webpackChunkName: "near-main" */
+      /* webpackChunkName: "clover-main" */
       './controllers/chain/clover/main'
     )).default;
     newChain = new Clover(n, app);
