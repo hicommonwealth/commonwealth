@@ -3,6 +3,7 @@ import {
 } from '@polkadot/types/interfaces';
 
 export const EventChains = [
+  'clover',
   'edgeware',
   'edgeware-local',
   'edgeware-testnet',
