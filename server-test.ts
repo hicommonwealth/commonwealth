@@ -29,7 +29,9 @@ const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
 const identityFetchCache = new IdentityFetchCache(0);
-const tokenBalanceCache = new TokenBalanceCache(0, 1); // TODO: what args to use here?
+
+// always prune both token and non-token holders asap
+const tokenBalanceCache = new TokenBalanceCache(0, 0);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -121,6 +123,16 @@ const resetServer = (debug=false): Promise<void> => {
         icon_url: '/static/img/protocols/eth.png',
         active: true,
         type: 'chain',
+      });
+      const alex = await models['Chain'].create({
+        id: 'alex',
+        network: 'alex',
+        symbol: 'ALEX',
+        name: 'Alex',
+        icon_url: '/static/img/protocols/eth.png',
+        active: true,
+        type: 'token',
+        base: 'ethereum',
       });
 
       // Admin roles for specific communities
@@ -216,6 +228,7 @@ const resetServer = (debug=false): Promise<void> => {
       const nodes = [
         [ 'mainnet1.edgewa.re', 'edgeware' ],
         [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
+        [ 'wss://ropsten.infura.io/ws', 'alex', '0xFab46E002BbF0b4509813474841E0716E6730136'],
       ];
       await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
 

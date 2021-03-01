@@ -275,7 +275,8 @@ async function main() {
   setupMiddleware();
   setupPassport(models);
 
-  await tokenBalanceCache.start(models, DEV ? 'ropsten' : 'mainnet');
+  const tokenMeta = await TokenBalanceCache.connectTokens(models, DEV ? 'ropsten' : 'mainnet');
+  await tokenBalanceCache.start(tokenMeta);
   setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);

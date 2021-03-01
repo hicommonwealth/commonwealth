@@ -34,7 +34,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     super({}, noBalancePruneTimeS);
   }
 
-  public async start(models, network = 'mainnet') {
+  public static async connectTokens(models, network = 'mainnet'): Promise<TokenForumMeta[]> {
     // initialize web3 (we all URL fields should be the same -- infura)
     const web3Provider = new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`);
     const provider = new providers.Web3Provider(web3Provider);
@@ -46,13 +46,17 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     });
 
     // TODO: support customized balance thresholds
-    this._contracts = tokens
+    return tokens
       .filter(({ ChainNodes }) => ChainNodes)
       .map(({ ChainNodes }): TokenForumMeta => ({
         id: ChainNodes[0].chain,
         address: ChainNodes[0].address,
         api: Erc20Factory.connect(ChainNodes[0].address, provider),
       }));
+  }
+
+  public async start(tokenMeta: TokenForumMeta[]) {
+    this._contracts = tokenMeta;
 
     // write init values into saved cache
     await this.access(async (cache) => {
@@ -64,6 +68,16 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // kick off job
     super.start();
     log.info(`Started Token Balance Cache with tokens: ${JSON.stringify(this._contracts.map(({ id }) => id))}`);
+  }
+
+  public async reset(tokenMeta: TokenForumMeta[]) {
+    super.close();
+    await this.access(async (cache) => {
+      for (const key of Object.keys(cache)) {
+        delete cache[key];
+      }
+    });
+    return this.start(tokenMeta);
   }
 
   // query a user's balance on a given token contract and save in cache
@@ -106,7 +120,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
           // 24 hour lifetime if token balance
           const cutoff = moment().subtract(this._hasBalancePruneTimeS, 'seconds');
           const fetchedAt = cache[contract][address].fetchedAt;
-          if (fetchedAt.isBefore(cutoff)) {
+          if (fetchedAt.isSameOrBefore(cutoff)) {
             delete cache[contract][address];
           }
         }
