@@ -2,6 +2,7 @@ import 'components/stage_editor.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
+import { uuidv4 } from 'lib/util';
 import { QueryList, ListItem, Button, Classes, Dialog, InputSelect, Icon, Icons, MenuItem } from 'construct-ui';
 
 import app from 'state';
@@ -12,12 +13,13 @@ import ChainEntityController, { EntityRefreshOption } from 'controllers/server/c
 
 const ChainEntitiesSelector: m.Component<{
   thread: OffchainThread;
+  enabled: boolean;
 }, {
   initialized: boolean;
   chainEntities: ChainEntity[];
 }> = {
   view: (vnode) => {
-    const { thread } = vnode.attrs;
+    const { thread, enabled } = vnode.attrs;
     if (!app.chain || !app.activeChainId()) return;
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
@@ -28,7 +30,7 @@ const ChainEntitiesSelector: m.Component<{
     const associatedChainEntityIds = thread.chainEntities.map((ce) => ce.id);
 
     return m('.ChainEntitiesSelector', [
-      m(QueryList, {
+      enabled ? m(QueryList, {
         checkmark: true,
         items: app.chain.chainEntities.store.getAll(),
         inputAttrs: {
@@ -40,7 +42,7 @@ const ChainEntitiesSelector: m.Component<{
             label: chainEntityTypeToProposalName(ce.type) +
               (ce.typeId.startsWith('0x') ? '' : ` #${ce.typeId}`),
             selected,
-            key: ce.id,
+            key: ce.id ? ce.id : uuidv4(),
           });
         },
         itemPredicate: (query, ce: ChainEntity, idx) => {
@@ -58,7 +60,11 @@ const ChainEntitiesSelector: m.Component<{
             thread.chainEntities.push(ce); // TODO: actually write the updated chain entity relation to the backend
           }
         },
-      }),
+      }) : m('.chain-entities-selector-placeholder', [
+        m('.chain-entities-selector-placeholder-text', [
+          'Available once the thread is set to Voting or later'
+        ]),
+      ]),
     ]);
   }
 };
@@ -86,7 +92,9 @@ const StageEditor: m.Component<{
         basic: false,
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
+        class: 'StageEditorDialog',
         content: [
+          m('h4', 'Select a stage'),
           m('.stage-options', [
             [
               OffchainThreadStage.Discussion,
@@ -100,14 +108,18 @@ const StageEditor: m.Component<{
               active: vnode.state.stage === targetStage,
               rounded: true,
               size: 'sm',
-              style: 'margin: 3px 6px;',
               label: offchainThreadStageToLabel(targetStage),
               onclick: (e) => {
                 vnode.state.stage = targetStage;
               }
             })),
           ]),
-          m(ChainEntitiesSelector, { thread: vnode.attrs.thread }),
+          app.chain && app.activeChainId() && m('h4', 'Link an on-chain proposal'),
+          m(ChainEntitiesSelector, {
+            thread: vnode.attrs.thread,
+            enabled: vnode.state.stage !== OffchainThreadStage.Discussion
+              && vnode.state.stage !== OffchainThreadStage.ProposalInReview,
+          }),
         ],
         hasBackdrop: true,
         isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
