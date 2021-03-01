@@ -25,8 +25,18 @@ const createReaction = async (models, tokenBalanceCache: TokenBalanceCache, req:
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
   if (chain && chain.type === 'token') {
-    const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-    if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+    // skip check for admins
+    const isAdmin = await models.Role.findAll({
+      where: {
+        address_id: author.id,
+        chain_id: chain.id,
+        permission: ['admin'],
+      },
+    });
+    if (isAdmin.length === 0) {
+      const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
+      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+    }
   }
 
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
