@@ -1,9 +1,8 @@
-import { switchMap, first } from 'rxjs/operators';
-import { ApiRx } from '@polkadot/api';
-import { BlockNumber, BalanceOf, Balance } from '@polkadot/types/interfaces';
+import { ApiPromise } from '@polkadot/api';
+import { Balance } from '@polkadot/types/interfaces';
 import { IApp } from 'state';
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
-import { ProposalModule, ChainNetwork } from 'models';
+import { ProposalModule } from 'models';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -11,7 +10,7 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import { EdgewareSignalingProposal } from './signaling_proposal';
 
 class EdgewareSignaling extends ProposalModule<
-  ApiRx,
+  ApiPromise,
   IEdgewareSignalingProposal,
   EdgewareSignalingProposal
 > {
@@ -35,7 +34,7 @@ class EdgewareSignaling extends ProposalModule<
     super(app, (e) => new EdgewareSignalingProposal(this._Chain, this._Accounts, this, e));
   }
 
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+  public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
     this._Chain = ChainInfo;
@@ -45,37 +44,29 @@ class EdgewareSignaling extends ProposalModule<
     const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.SignalingProposal);
     const proposals = entities.map((e) => this._entityConstructor(e));
 
-    return new Promise((resolve, reject) => {
-      this._Chain.api.pipe(
-        switchMap((api: ApiRx) => api.queryMulti([
-          api.query.signaling.proposalCreationBond,
-          api.query.signaling.votingLength,
-        ])),
-        first(),
-      ).subscribe(async ([proposalcreationbond, votinglength]: [BalanceOf, BlockNumber]) => {
-        // save parameters
-        this._votingPeriod = +votinglength;
-        this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
+    // initialize parameters
+    const proposalcreationbond = await ChainInfo.api.query.signaling.proposalCreationBond();
+    const votinglength = await ChainInfo.api.query.signaling.votingLength();
 
-        // register new chain-event handlers
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.SignalingProposal, (entity, event) => {
-            this.updateProposal(entity, event);
-          }
-        );
+    // save parameters
+    this._votingPeriod = +votinglength;
+    this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
 
-        // fetch proposals from chain
-        await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          () => this._Chain.fetcher.fetchSignalingProposals(this.app.chain.block.height)
-        );
+    // register new chain-event handlers
+    this.app.chain.chainEntities.registerEntityHandler(
+      SubstrateTypes.EntityKind.SignalingProposal, (entity, event) => {
+        this.updateProposal(entity, event);
+      }
+    );
 
-        this._initialized = true;
-        this._initializing = false;
-        resolve();
-      },
-      (err) => reject(new Error(err)));
-    });
+    // fetch proposals from chain
+    await this.app.chain.chainEntities.fetchEntities(
+      this.app.chain.id,
+      () => this._Chain.fetcher.fetchSignalingProposals(this.app.chain.block.height)
+    );
+
+    this._initialized = true;
+    this._initializing = false;
   }
 
   public createTx(
@@ -91,7 +82,7 @@ class EdgewareSignaling extends ProposalModule<
     const tType = this._Chain.createType('TallyType', tallyType);
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => api.tx.signaling.createProposal(title, description, vOutcomes, vType, tType),
+      (api: ApiPromise) => api.tx.signaling.createProposal(title, description, vOutcomes, vType, tType),
       'createSignalingProposal',
       title
     );
@@ -100,7 +91,7 @@ class EdgewareSignaling extends ProposalModule<
   public advance(author: SubstrateAccount, proposal: EdgewareSignalingProposal) {
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => api.tx.signaling.advanceProposal(proposal.data.hash),
+      (api: ApiPromise) => api.tx.signaling.advanceProposal(proposal.data.hash),
       'advanceSignalingProposal',
       proposal.title
     );

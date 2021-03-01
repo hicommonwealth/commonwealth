@@ -64,7 +64,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
         }),
       ]),
       proposal.topic && link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
-        m('span.proposal-topic-icon'),
         m('span.proposal-topic-name', `${proposal.topic.name}`),
       ]),
       m('.created-at', link('a', discussionLink, formatLastUpdated(proposal.createdAt))),

@@ -35,18 +35,8 @@
                 }
             }
             a.proposal-topic {
-                @include proposal-topic-inline;
                 margin-right: 16px;
                 color: $text-color-light;
-                span.proposal-topic-icon {
-                    display: inline-block;
-                    background: transparent;
-                    border: 1.5px solid #b5b7b9;
-                    border-radius: 99px;
-                    width: 9px;
-                    height: 9px;
-                    margin-right: 6px;
-                }
             }
             .mobile-comment-count {
                 display: none;

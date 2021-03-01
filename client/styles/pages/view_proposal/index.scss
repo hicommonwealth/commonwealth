@@ -184,12 +184,6 @@ $discussion-title-font-size: 1.45rem;
         }
     }
 
-    .ProposalHeaderTopics {
-        .proposal-topic {
-            @include proposal-topic-inline;
-        }
-    }
-
     // proposal-meta
     .ProposalHeaderTopics,
     .ProposalHeaderStage,
