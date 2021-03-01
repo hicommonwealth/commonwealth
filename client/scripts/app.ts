@@ -301,6 +301,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Near(n, app);
     initApi = true;
+  } else if (n.chain.network === ChainNetwork.HydraDx) {
+    const HydraDx = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "hydradx-main" */
+      './controllers/chain/hydradx/main'
+    )).default;
+    newChain = new HydraDx(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
