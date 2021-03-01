@@ -1,10 +1,67 @@
+import 'components/stage_editor.scss';
+
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, Classes, Dialog, InputSelect, Icon, Icons, MenuItem } from 'construct-ui';
+import { QueryList, ListItem, Button, Classes, Dialog, InputSelect, Icon, Icons, MenuItem } from 'construct-ui';
 
 import app from 'state';
 import { offchainThreadStageToLabel } from 'helpers';
-import { OffchainThread, OffchainThreadStage } from 'models';
+import { ChainEntity, OffchainThread, OffchainThreadStage } from 'models';
+import { chainEntityTypeToProposalName } from 'identifiers';
+import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
+
+const ChainEntitiesSelector: m.Component<{
+  thread: OffchainThread;
+}, {
+  initialized: boolean;
+  chainEntities: ChainEntity[];
+}> = {
+  view: (vnode) => {
+    const { thread } = vnode.attrs;
+    if (!app.chain || !app.activeChainId()) return;
+    if (!vnode.state.initialized) {
+      vnode.state.initialized = true;
+      app.chain.chainEntities.refresh(app.chain.id, EntityRefreshOption.AllEntities);
+      // We don't handle the returned data right now, and instead look directly in the app.chain.chainEntities store
+    }
+
+    const associatedChainEntityIds = thread.chainEntities.map((ce) => ce.id);
+
+    return m('.ChainEntitiesSelector', [
+      m(QueryList, {
+        checkmark: true,
+        items: app.chain.chainEntities.store.getAll(),
+        inputAttrs: {
+          placeholder: 'Search for an existing proposal...',
+        },
+        itemRender: (ce: ChainEntity, idx: number) => {
+          const selected = associatedChainEntityIds.indexOf(ce.id) !== -1;
+          return m(ListItem, {
+            label: chainEntityTypeToProposalName(ce.type) +
+              (ce.typeId.startsWith('0x') ? '' : ` #${ce.typeId}`),
+            selected,
+            key: ce.id,
+          });
+        },
+        itemPredicate: (query, ce: ChainEntity, idx) => {
+          if (ce.typeId.startsWith('0x')) {
+            return false;
+          } else {
+            return ce.typeId.toString().toLowerCase().includes(query.toLowerCase());
+          }
+        },
+        onSelect: (ce: ChainEntity) => {
+          if (associatedChainEntityIds.indexOf(ce.id) !== -1) {
+            const index = thread.chainEntities.findIndex((ce_) => ce_.id === ce.id);
+            thread.chainEntities.splice(index, 1); // TODO: actually write the updated chain entity relation to the backend
+          } else {
+            thread.chainEntities.push(ce); // TODO: actually write the updated chain entity relation to the backend
+          }
+        },
+      }),
+    ]);
+  }
+};
 
 const StageEditor: m.Component<{
   thread: OffchainThread;
@@ -50,29 +107,7 @@ const StageEditor: m.Component<{
               }
             })),
           ]),
-          // TODO: connect to chain button
-          // TODO: retrieve, display, select, and persist linked proposals
-          // vnode.attrs.thread.chainEntities.map((ce) => {
-          //   m('.existing-linked-chain-entity', '...'),
-          // }),
-          m(InputSelect, {
-            style: 'margin: 24px 6px 10px;',
-            defaultActiveIndex: null, // existing linked proposal
-            items: [
-              { name: 'la', a: 10 },
-              { name: 'lo', b: 20 },
-            ],
-            itemRender: (item: any, index: number) => m('', item.name),
-            onActiveItemChange: (activeItem: any, index: number) => {
-              // TODO: set to state
-            },
-            onSelect: (item, e, index) => {
-              // TODO: set to state
-            },
-            popoverAttrs: {
-              transitionDuration: 0,
-            },
-          }),
+          m(ChainEntitiesSelector, { thread: vnode.attrs.thread }),
         ],
         hasBackdrop: true,
         isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,

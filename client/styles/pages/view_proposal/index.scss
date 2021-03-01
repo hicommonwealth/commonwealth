@@ -219,6 +219,8 @@ $discussion-title-font-size: 1.45rem;
         top: -4px;
         margin-top: 9px;
         a.cui-button {
+            height: 20px;
+            min-height: 20px;
             padding: 0 10px;
             border: none;
             background: $background-color-light;
