@@ -164,7 +164,7 @@ export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Fun
       class: 'ProposalHeaderStageEditorButton',
       rounded: true,
       size: 'xs',
-      label: 'Edit',
+      label: 'Select stage',
       onclick: (e) => {
         e.preventDefault();
         openStageEditor();
