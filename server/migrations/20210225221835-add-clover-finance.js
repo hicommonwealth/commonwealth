@@ -4,6 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkInsert('Chains', [{
+        base: 'substrate',
         id: 'clover',
         symbol: 'CLV',
         name: 'Clover Finance',
