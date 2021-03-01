@@ -83,7 +83,7 @@ pre {
     display: none;
 }
 .LoadingLayout {
-    @include sm-min {
+    @include md-min {
         .cui-spinner.cui-spinner-fill {
             position: absolute;
             top: 82px;
