@@ -9,10 +9,8 @@ module.exports = {
         timestamp: thread.created_at,
         body: decodeURIComponent(thread.body)
       };
-      const version_history = [ JSON.stringify(firstVersion) ];
-      if (i === 0) console.log(version_history);
-      const update = `UPDATE "OffchainThreads" SET version_history=${version_history} WHERE id=${thread.id}`;
-      return queryInterface.sequelize.query(update, { transaction: t });
+      const update = `UPDATE "OffchainThreads" SET version_history=ARRAY[${firstVersion}] WHERE id='${thread.id}'`;
+      return queryInterface.sequelize.query(update);
     }));
   },
 
