@@ -21,7 +21,7 @@ module.exports = {
 
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'clover',
-        url: 'wss://api.clover.finance/',
+        url: 'ws://api.clover.finance/',
       }], { transaction: t });
     });
 

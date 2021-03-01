@@ -1,7 +1,7 @@
 import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
 import Substrate from '../substrate/main';
-import spec from './spec';
+import * as CloverSpecTypes from '@clover-network/node-tpye';
 
 class Clover extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
@@ -12,7 +12,7 @@ class Clover extends Substrate {
 
   public async initApi() {
     await super.initApi({
-      'types': spec,
+      'types': CloverSpecTypes,
     });
   }
 }
