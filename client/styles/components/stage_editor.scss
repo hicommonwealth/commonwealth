@@ -27,6 +27,9 @@
     border-radius: 5px;
     .cui-list {
         max-height: 200px;
+        .cui-active {
+            background: initial;
+        }
     }
     .cui-query-list-checkmark .cui-list-item-content-left {
         left: 0;
