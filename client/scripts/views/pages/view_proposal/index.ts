@@ -29,7 +29,7 @@ import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import TopicEditor from 'views/components/topic_editor';
 import StageEditor from 'views/components/stage_editor';
 import {
-  TopicEditorButton, StageEditorButton, ThreadSubscriptionButton
+  TopicEditorMenuItem, StageEditorMenuItem, ThreadSubscriptionMenuItem
 } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
@@ -40,9 +40,9 @@ import PageNotFound from 'views/pages/404';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderThreadLinkedChainEntity,
-  ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage,
+  ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage, ProposalHeaderStageEditorButton,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
-  ProposalHeaderPrivacyButtons,
+  ProposalHeaderPrivacyMenuItems,
   ProposalTitleEditor,
 } from './header';
 import {
@@ -108,6 +108,11 @@ const ProposalHeader: m.Component<{
               m(ProposalHeaderTitle, { proposal }),
               m.trust(' &nbsp; '),
               proposal instanceof OffchainThread && m(ProposalHeaderStage, { proposal }),
+              (isAuthor || isAdmin) && proposal instanceof OffchainThread && m(ProposalHeaderStageEditorButton, {
+                openStageEditor: () => {
+                  vnode.state.stageEditorIsOpen = true;
+                }
+              }),
             ]),
           vnode.state.editing
             && m(ProposalTitleEditor, { item: proposal, parentState: vnode.state }),
@@ -132,23 +137,18 @@ const ProposalHeader: m.Component<{
                     vnode.state.editPermissionsIsOpen = true;
                   }
                 }),
-                isAdmin && proposal instanceof OffchainThread && m(TopicEditorButton, {
+                isAdmin && proposal instanceof OffchainThread && m(TopicEditorMenuItem, {
                   openTopicEditor: () => {
                     vnode.state.topicEditorIsOpen = true;
-                  }
-                }),
-                (isAuthor || isAdmin) && proposal instanceof OffchainThread && m(StageEditorButton, {
-                  openStageEditor: () => {
-                    vnode.state.stageEditorIsOpen = true;
                   }
                 }),
                 (isAuthor || isAdmin)
                   && m(ProposalBodyDeleteMenuItem, { item: proposal }),
                 (isAuthor || isAdmin)
-                  && m(ProposalHeaderPrivacyButtons, { proposal, getSetGlobalEditingStatus }),
+                  && m(ProposalHeaderPrivacyMenuItems, { proposal, getSetGlobalEditingStatus }),
                 (isAuthor || isAdmin)
                   && m(MenuDivider),
-                m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
+                m(ThreadSubscriptionMenuItem, { proposal: proposal as OffchainThread }),
               ],
               inline: true,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),

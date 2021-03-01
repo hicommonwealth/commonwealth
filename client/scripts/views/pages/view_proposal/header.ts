@@ -157,6 +157,22 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   }
 };
 
+export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
+  view: (vnode) => {
+    const { openStageEditor } = vnode.attrs;
+    return m(Button, {
+      class: 'ProposalHeaderStageEditorButton',
+      rounded: true,
+      size: 'xs',
+      label: 'Edit',
+      onclick: (e) => {
+        e.preventDefault();
+        openStageEditor();
+      },
+    });
+  }
+};
+
 export const ProposalHeaderOnchainId: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -212,7 +228,7 @@ export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyPropos
   }
 };
 
-export const ProposalHeaderPrivacyButtons: m.Component<{
+export const ProposalHeaderPrivacyMenuItems: m.Component<{
   proposal: AnyProposal | OffchainThread,
   getSetGlobalEditingStatus: CallableFunction
 }> = {
