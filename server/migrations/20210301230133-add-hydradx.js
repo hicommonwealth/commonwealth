@@ -6,7 +6,7 @@ module.exports = {
       await queryInterface.bulkInsert('Chains', [{
         id: 'hydradx',
         symbol: 'HDX',
-        name: 'HydraDX',/*
+        name: 'HydraDX',
         icon_url: '/static/img/protocols/hydradx.png',
         type: 'chain',
         network: 'hydradx',
@@ -15,10 +15,9 @@ module.exports = {
         telegram: 'https://t.me/hydradx',
         website: 'https://hydradx.io/',
         github: 'https://github.com/galacticcouncil',
-        collapsed_on_homepage: false,*/
+        collapsed_on_homepage: false,
       }], { transaction: t });
 
-      console.log("Inserting second record")
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'hydradx',
         url: 'wss://hack.hydradx.io:9944/',

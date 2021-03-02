@@ -3,11 +3,13 @@ import { IApp } from 'state';
 import Substrate from '../substrate/main';
 import SpecTypes from './spec';
 
-class HydraDx extends Substrate {
+class HydraDX extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
-    super(n, app, ChainClass.HydraDx);
+    super(n, app, ChainClass.HydraDX);
     this.signaling.disable();
     this.identities.disable();
+    this.democracy.disable();
+    this.democracyProposals.disable();
   }
 
   public async initApi() {
@@ -17,4 +19,4 @@ class HydraDx extends Substrate {
   }
 }
 
-export default HydraDx;
+export default HydraDX;

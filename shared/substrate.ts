@@ -9,11 +9,13 @@ export function constructSubstrateUrl(url: string): string {
     'cc1.darwinia.network',
     'fullnode.centrifuge.io',
     'poc3.phala.network',
+    'hack.hydradx.io:9944',
   ];
   const hasProtocol = url.indexOf('wss://') !== -1 || url.indexOf('ws://') !== -1;
   url = hasProtocol ? url.split('://')[1] : url;
   const isInsecureProtocol = !secureNodes.find((path) => url.indexOf(path) !== -1);
   const protocol = isInsecureProtocol ? 'ws://' : 'wss://';
+  //This block will need to be commented out for it to work
   if (url.indexOf(':9944') !== -1) {
     url = isInsecureProtocol ? url : url.split(':9944')[0];
   }

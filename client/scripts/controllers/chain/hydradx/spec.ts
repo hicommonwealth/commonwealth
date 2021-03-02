@@ -1,5 +1,4 @@
 export default {
-  types: {
       "Amount": "i128",
       "AmountOf": "Amount",
       "Address": "AccountId",
@@ -26,6 +25,4 @@ export default {
       },
       "LookupSource": "AccountId",
       "Price": "Balance"
-    }
   }
-
