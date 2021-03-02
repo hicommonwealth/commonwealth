@@ -53,7 +53,6 @@ import {
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, EditPermissionsButton,
   ProposalEditorPermissions,
   ProposalTitleEditMenuItem,
-  ProposalTitleSaveEdit
 } from './body';
 import CreateComment from './create_comment';
 
