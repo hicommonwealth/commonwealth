@@ -13,7 +13,8 @@ import {
   CommunityInfo,
   NodeInfo,
   OffchainTopic,
-  Profile
+  Profile,
+  ChainEntity,
 } from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -318,6 +319,32 @@ class ThreadsController {
       error: (err) => {
         notifyError('Could not update pinned state');
         console.error(err);
+      }
+    });
+  }
+
+  public async setLinkedChainEntities(args: { threadId: number, entities: ChainEntity[] }) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
+        'thread_id': args.threadId,
+        'chain_entity_id': args.entities.map((ce) => ce.id),
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const result = modelFromServer(response.result);
+        // Post edits propagate to all thread stores
+        this._store.update(result);
+        this._listingStore.update(result);
+        return result;
+      },
+      error: (err) => {
+        console.log('Failed to update linked proposals');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to update linked proposals');
       }
     });
   }

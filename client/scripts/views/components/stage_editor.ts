@@ -14,30 +14,34 @@ import ChainEntityController, { EntityRefreshOption } from 'controllers/server/c
 const ChainEntitiesSelector: m.Component<{
   thread: OffchainThread;
   enabled: boolean;
+  chainEntitiesToSet: ChainEntity[];
 }, {
   initialized: boolean;
   chainEntities: ChainEntity[];
+  chainEntitiesLoaded: boolean;
 }> = {
   view: (vnode) => {
     const { thread, enabled } = vnode.attrs;
     if (!app.chain || !app.activeChainId()) return;
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
-      app.chain.chainEntities.refresh(app.chain.id, EntityRefreshOption.AllEntities);
-      // We don't handle the returned data right now, and instead look directly in the app.chain.chainEntities store
+      app.chain.chainEntities.refresh(app.chain.id, EntityRefreshOption.AllEntities).then((entities) => {
+        // refreshing loads the latest chain entities into app.chain.chainEntities store
+        vnode.state.chainEntitiesLoaded = true;
+        m.redraw();
+      });
     }
 
-    const associatedChainEntityIds = thread.chainEntities.map((ce) => ce.id);
-
     return m('.ChainEntitiesSelector', [
-      enabled ? m(QueryList, {
+      (enabled && vnode.state.chainEntitiesLoaded) ? m(QueryList, {
         checkmark: true,
         items: app.chain.chainEntities.store.getAll(),
         inputAttrs: {
           placeholder: 'Search for an existing proposal...',
         },
         itemRender: (ce: ChainEntity, idx: number) => {
-          const selected = associatedChainEntityIds.indexOf(ce.id) !== -1;
+          const selected = vnode.attrs.chainEntitiesToSet.map((ce_) => ce_.id).indexOf(ce.id) !== -1;
+          // TODO: show additional info on the ListItem, like any set proposal title, the creator, or other metadata
           return m(ListItem, {
             label: chainEntityTypeToProposalName(ce.type) +
               (ce.typeId.startsWith('0x') ? '' : ` #${ce.typeId}`),
@@ -53,16 +57,18 @@ const ChainEntitiesSelector: m.Component<{
           }
         },
         onSelect: (ce: ChainEntity) => {
-          if (associatedChainEntityIds.indexOf(ce.id) !== -1) {
-            const index = thread.chainEntities.findIndex((ce_) => ce_.id === ce.id);
-            thread.chainEntities.splice(index, 1); // TODO: actually write the updated chain entity relation to the backend
+          if (vnode.attrs.chainEntitiesToSet.map((ce_) => ce_.id).indexOf(ce.id) !== -1) {
+            const index = vnode.attrs.chainEntitiesToSet.findIndex((ce_) => ce_.id === ce.id);
+            vnode.attrs.chainEntitiesToSet.splice(index, 1);
           } else {
-            thread.chainEntities.push(ce); // TODO: actually write the updated chain entity relation to the backend
+            vnode.attrs.chainEntitiesToSet.push(ce);
           }
         },
       }) : m('.chain-entities-selector-placeholder', [
         m('.chain-entities-selector-placeholder-text', [
-          'Available once the thread is set to Voting or later'
+          vnode.state.chainEntitiesLoaded
+            ? 'Available once the thread is set to Voting or later'
+            : 'Loading on-chain proposals...'
         ]),
       ]),
     ]);
@@ -77,10 +83,14 @@ const StageEditor: m.Component<{
 }, {
   stage: OffchainThreadStage;
   isOpen: boolean;
+  chainEntitiesToSet: ChainEntity[];
 }> = {
   oninit: (vnode) => {
     vnode.state.isOpen = !!vnode.attrs.popoverMenu;
     vnode.state.stage = vnode.attrs.thread.stage;
+
+    vnode.state.chainEntitiesToSet = [];
+    vnode.attrs.thread.chainEntities.forEach((ce) => vnode.state.chainEntitiesToSet.push(ce));
   },
   view: (vnode) => {
     return m('.StageEditor', [
@@ -119,6 +129,7 @@ const StageEditor: m.Component<{
             thread: vnode.attrs.thread,
             enabled: vnode.state.stage !== OffchainThreadStage.Discussion
               && vnode.state.stage !== OffchainThreadStage.ProposalInReview,
+            chainEntitiesToSet: vnode.state.chainEntitiesToSet,
           }),
         ],
         hasBackdrop: true,
@@ -152,6 +163,8 @@ const StageEditor: m.Component<{
             onclick: async () => {
               const { stage } = vnode.state;
               const { thread } = vnode.attrs;
+
+              // set stage
               try {
                 await app.threads.setStage({ threadId: thread.id, stage: vnode.state.stage });
                 vnode.attrs.onChangeHandler(vnode.state.stage);
@@ -161,6 +174,17 @@ const StageEditor: m.Component<{
                   ? err.responseJSON.error
                   : 'Failed to update stage');
               }
+
+              // set linked chain entities
+              try {
+                await app.threads.setLinkedChainEntities({ threadId: thread.id, entities: vnode.state.chainEntitiesToSet });
+              } catch (err) {
+                console.log('Failed to update linked proposals');
+                throw new Error((err.responseJSON && err.responseJSON.error)
+                  ? err.responseJSON.error
+                  : 'Failed to update linked proposals');
+              }
+
               if (vnode.attrs.popoverMenu) {
                 vnode.attrs.openStateHandler(false);
               } else {
