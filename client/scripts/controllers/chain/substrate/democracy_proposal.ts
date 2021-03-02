@@ -42,6 +42,7 @@ class SubstrateDemocracyProposal extends Proposal<
 
   private _title: string;
   public get title() { return this._title; }
+  public set title(title) { this._title = title; }
 
   public get description() { return null; }
 

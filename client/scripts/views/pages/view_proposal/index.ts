@@ -99,7 +99,6 @@ const ProposalHeader: m.Component<{
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
-    console.log(app.isLoggedIn() && !getSetGlobalEditingStatus(GlobalStatus.Get));
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [

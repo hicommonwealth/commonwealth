@@ -11,6 +11,7 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
   }
 
   public update(newProposal: ProposalT) {
+    debugger
     const oldProposal = this.getByIdentifier(newProposal.identifier);
     if (oldProposal) {
       this.remove(oldProposal);

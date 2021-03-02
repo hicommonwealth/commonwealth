@@ -8,7 +8,13 @@ import {
   offchainThreadStageToLabel,
   slugify,
 } from 'helpers';
-import { proposalSlugToFriendlyName, chainEntityTypeToProposalSlug, chainEntityTypeToProposalName } from 'identifiers';
+import {
+  proposalSlugToFriendlyName,
+  chainEntityTypeToProposalSlug,
+  chainEntityTypeToProposalName,
+  proposalSlugToStore,
+  proposalSlugToClass
+} from 'identifiers';
 
 import {
   OffchainThread,
@@ -212,11 +218,16 @@ export const ProposalTitleSaveEdit: m.Component<{
         onclick: (e) => {
           e.preventDefault();
           parentState.saving = true;
-          app.chain.chainEntities.updateEntityTitle(proposal.uniqueIdentifier, parentState.updatedTitle).then(() => {
+          app.chain.chainEntities.updateEntityTitle(proposal.uniqueIdentifier, parentState.updatedTitle).then((response) => {
             m.route.set(proposalLink);
             parentState.editing = false;
             parentState.saving = false;
             getSetGlobalEditingStatus(GlobalStatus.Set, false);
+            const a = app;
+            const controller = (proposalSlugToClass().get(proposal.slug) as any);
+            const newProposal = controller._constructorFunc(response.result);
+            controller.store.update(newProposal);
+            debugger
             m.redraw();
             notifySuccess('Thread successfully edited');
           });

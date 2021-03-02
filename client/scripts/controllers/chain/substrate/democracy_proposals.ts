@@ -104,7 +104,6 @@ class SubstrateDemocracyProposals extends ProposalModule<
   }
 
   public notePreimage(author: SubstrateAccount, action: Call, encodedProposal: string) {
-    debugger
     const title = this._Chain.methodToTitle(action);
     return this._Chain.createTXModalData(
       author,
