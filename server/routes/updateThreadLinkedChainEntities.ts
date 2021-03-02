@@ -5,6 +5,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 export const Errors = {
   NoThread: 'Cannot find thread',
   NotAdminOrOwner: 'Not an admin or owner of this thread',
+  ChainEntityAlreadyHasThread: 'Proposal linked to another thread',
 };
 
 const updateThreadLinkedChainEntities = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -54,13 +55,12 @@ const updateThreadLinkedChainEntities = async (models, req: Request, res: Respon
     }
   });
   for (let i = 0; i < entitiesToSet.length; i++) {
+    if (entitiesToSet[i].thread_id) {
+      return next(new Error(Errors.ChainEntityAlreadyHasThread));
+    }
     entitiesToSet[i].thread_id = thread_id;
     await entitiesToSet[i].save();
   }
-
-  console.log(entitiesToClear);
-  console.log(entityIdsToSet);
-  console.log(entitiesToSet);
 
   const finalThread = await models.OffchainThread.findOne({
     where: { id: thread_id, },
