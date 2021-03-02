@@ -14,6 +14,7 @@ import {
   SubstrateTypes,
   IChainEntityKind,
 } from '@commonwealth/chain-events';
+import { notifyError } from '../app/notifications';
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -140,6 +141,27 @@ class ChainEntityController {
         }
       }
     }
+  }
+
+  public async updateEntityTitle(id, title: string) {
+    return $.ajax({
+      url: `${app.serverUrl()}/updateChainEntityTitle`,
+      type: 'POST',
+      data: {
+        'jwt': app.user.jwt,
+        'id': id,
+        'title': title,
+      },
+      success: (response) => {
+        const entity = ChainEntity.fromJSON(response.result);
+        console.log(entity);
+        this._store.add(entity);
+      },
+      error: (err) => {
+        notifyError('Could not set entity title');
+        console.error(err);
+      },
+    });
   }
 
   public async fetchEntities<T extends CWEvent>(

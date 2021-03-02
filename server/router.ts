@@ -157,6 +157,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/updateThreadPrivacy', passport.authenticate('jwt', { session: false }), updateThreadPrivacy.bind(this, models));
   router.post('/updateThreadPinned', passport.authenticate('jwt', { session: false }), updateThreadPinned.bind(this, models));
   router.post('/updateThreadLinkedChainEntities', passport.authenticate('jwt', { session: false }), updateThreadLinkedChainEntities.bind(this, models));
+  router.post('/updateChainEntityTitle', passport.authenticate('jwt', { session: false }), updateChainEntityTitle.bind(this, models));
   router.post('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this, models));
   router.post('/deleteEditors', passport.authenticate('jwt', { session: false }), deleteEditors.bind(this, models));
   // TODO: Change to DELETE /thread
