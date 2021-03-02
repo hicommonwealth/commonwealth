@@ -1,6 +1,7 @@
 import * as yargs from 'yargs';
 
 import { spec as EdgewareSpec } from '@edgeware/node-types';
+import { HydraDXSpec } from './specs/hydraDX';
 import * as CloverSpecTypes from '@clover-network/node-tpye';
 import {
   chainSupportedBy, IEventHandler, CWEvent, SubstrateEvents, MarlinEvents, MolochEvents, EventSupportingChains
@@ -12,6 +13,7 @@ const CloverSpec = {
 
 const networkUrls = {
   'clover': 'ws://api.clover.finance',
+  'hydradx': 'wss://hack.hydradx.io:9944',
   'edgeware': 'ws://mainnet1.edgewa.re:9944',
   'edgeware-local': 'ws://localhost:9944',
   'edgeware-testnet': 'wss://beresheet1.edgewa.re',
@@ -29,6 +31,7 @@ const networkUrls = {
 
 const networkSpecs = {
   'clover': CloverSpec,
+  'hydradx': HydraDXSpec,
   'edgeware': EdgewareSpec,
   'edgeware-local': EdgewareSpec,
   'edgeware-testnet': EdgewareSpec,

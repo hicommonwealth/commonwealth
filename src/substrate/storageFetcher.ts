@@ -49,6 +49,11 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   public async fetchIdentities(addresses: string[]): Promise<CWEvent<IIdentitySet>[]> {
+    if (!this._api.query.identity) {
+      log.info('Identities module not detected.');
+      return [];
+    }
+
     const blockNumber = +(await this._api.rpc.chain.getHeader()).number;
 
     // fetch all identities and registrars from chain
@@ -134,6 +139,9 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   public async fetchDemocracyProposals(blockNumber: number): Promise<CWEvent<IDemocracyProposed>[]> {
+    if (!this._api.query.democracy) {
+      return [];
+    }
     log.info('Fetching democracy proposals...');
     const publicProps = await this._api.query.democracy.publicProps();
     const deposits: Array<Option<[BalanceOf, Vec<AccountId>] & Codec>> = await this._api.queryMulti(
@@ -165,6 +173,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   public async fetchDemocracyReferenda(blockNumber: number): Promise<CWEvent<IDemocracyStarted | IDemocracyPassed>[]> {
+    if (!this._api.query.democracy) {
+      log.info('Democracy module not detected.');
+      return [];
+    }
+
     log.info('Migrating democracy referenda...');
     const activeReferenda = await this._api.derive.democracy.referendumsActive();
     const startEvents = activeReferenda.map((r) => {
@@ -203,6 +216,9 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
 
   // must pass proposal hashes found in prior events
   public async fetchDemocracyPreimages(hashes: string[]): Promise<CWEvent<IPreimageNoted>[]> {
+    if (!this._api.query.democracy) {
+      return [];
+    }
     log.info('Migrating preimages...');
     const hashCodecs = hashes.map((hash) => this._api.createType('Hash', hash));
     const preimages = await this._api.derive.democracy.preimages(hashCodecs);
@@ -228,6 +244,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   public async fetchTreasuryProposals(blockNumber: number): Promise<CWEvent<ITreasuryProposed>[]> {
+    if (!this._api.query.treasury) {
+      log.info('Treasury module not detected.');
+      return [];
+    }
+
     log.info('Migrating treasury proposals...');
     const approvals = await this._api.query.treasury.approvals();
     const nProposals = await this._api.query.treasury.proposalCount();
@@ -256,8 +277,12 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   public async fetchBounties(blockNumber: number): Promise<CWEvent<ITreasuryBountyEvents>[]> { // TODO: List all relevant events explicitly?
-    log.info('Migrating treasury bounties...');
+    if (!this._api.query.democracy) {
+      log.info('Bounties module not detected.');
+      return [];
+    }
 
+    log.info('Migrating treasury bounties...');
     const bounties = await this._api.derive.bounties.bounties();
     const events = [];
     bounties.forEach((b) => {
@@ -304,6 +329,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   public async fetchCollectiveProposals(
     moduleName: 'council' | 'technicalCommittee', blockNumber: number
   ): Promise<CWEvent<ICollectiveProposed | ICollectiveVoted>[]> {
+    if (!this._api.query[moduleName]) {
+      log.info(`${moduleName} module not detected.`);
+      return [];
+    }
+
     log.info(`Migrating ${moduleName} proposals...`);
     const proposalHashes = await this._api.query[moduleName].proposals();
     const proposals: Array<Option<Proposal>> = await Promise.all(proposalHashes.map(async (h) => {
@@ -362,6 +392,11 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   public async fetchSignalingProposals(
     blockNumber: number
   ): Promise<CWEvent<ISignalingNewProposal | ISignalingCommitStarted | ISignalingVotingStarted | ISignalingVotingCompleted>[]> {
+    if (!this._api.query.signaling || !this._api.query.voting) {
+      log.info('Signaling module not detected.');
+      return [];
+    }
+
     log.info('Migrating signaling proposals...');
     if (!this._api.query.voting || !this._api.query.signaling) {
       log.info('Found no signaling proposals (wrong chain)!');

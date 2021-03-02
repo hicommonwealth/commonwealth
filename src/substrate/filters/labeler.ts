@@ -44,6 +44,7 @@ const getDenom = (chain: EventSupportingChainT): string => {
     case 'edgeware': return 'EDG';
     case 'edgeware-local':
     case 'edgeware-testnet': return 'tEDG';
+    case 'hydradx': return 'HDX';
     case 'kusama': return 'KSM';
     case 'kusama-local': return 'tKSM';
     case 'kulupu': return 'KLP';

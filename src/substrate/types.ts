@@ -7,6 +7,7 @@ export const EventChains = [
   'edgeware',
   'edgeware-local',
   'edgeware-testnet',
+  'hydradx',
   'kusama',
   'kusama-local',
   'polkadot',
