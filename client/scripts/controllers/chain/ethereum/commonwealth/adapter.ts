@@ -76,7 +76,7 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
-    this.chain.deinitApi();
+    await this.chain.deinitApi();
     console.log('Ethereum/Commonwealth stopped.');
   }
 }

@@ -1,19 +1,19 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Roles', {
-      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true},
-      address_id: { type: DataTypes.INTEGER, allowNull: false },
-      offchain_community_id: { type: DataTypes.STRING, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true},
+      address_id: { type: Sequelize.INTEGER, allowNull: false },
+      offchain_community_id: { type: Sequelize.STRING, allowNull: false },
       permission: {
-          type: DataTypes.ENUM,
+          type: Sequelize.ENUM,
           values: ['admin', 'moderator', 'member'],
           defaultValue: 'member',
           allowNull: false
         },
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     }, {
       underscored: true,
       indexes: [

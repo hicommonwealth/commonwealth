@@ -53,7 +53,7 @@ export abstract class ProposalModule<
     this._app = app;
   }
 
-  public abstract async init(chain: IChainModule<any, any>, accounts: IAccountsModule<any, any>): Promise<void>;
+  public abstract init(chain: IChainModule<any, any>, accounts: IAccountsModule<any, any>): Promise<void>;
 
   public deinit() {
     this._initialized = false;

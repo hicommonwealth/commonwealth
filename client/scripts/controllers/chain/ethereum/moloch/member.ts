@@ -1,7 +1,5 @@
 import BN from 'bn.js';
 import { IApp } from 'state';
-import { from, of, Observable, BehaviorSubject } from 'rxjs';
-import { switchMap, first } from 'rxjs/operators';
 
 import { MolochShares } from 'adapters/chain/ethereum/types';
 import { IMolochMember } from 'adapters/chain/moloch/types';
@@ -17,23 +15,23 @@ export default class MolochMember extends EthereumAccount {
   private _delegateKey: string;
   // shares is a behavior subject so long-running balance subscriptions will
   // deal with ragequit/other share holding changes correctly
-  private _shares: BehaviorSubject<MolochShares> = new BehaviorSubject(null);
+  private _shares: MolochShares;
   private _highestIndexYesVote: BN;
   private _tokenTribute: BN; // Not populated
 
   private _Members: MolochMembers;
 
-  public get balance(): Observable<MolochShares> {
-    return from(this.initialized).pipe(
-      switchMap(() => this.isMember
-        ? this._shares.asObservable()
-        : of(new MolochShares(this._Members.api.contractAddress, 0)))
+  public get balance(): Promise<MolochShares> {
+    return this.initialized.then(
+      () => this.isMember
+        ? this._shares
+        : new MolochShares(this._Members.api.contractAddress, 0)
     );
   }
 
   public get isMember() { return this._isMember; }
   public get delegateKey() { return this._delegateKey; }
-  public get shares() { return this._shares.value; }
+  public get shares() { return this._shares; }
   public get highestIndexYesVote() { return this._highestIndexYesVote; }
 
   constructor(
@@ -52,7 +50,7 @@ export default class MolochMember extends EthereumAccount {
       }
       this._isMember = true;
       this._delegateKey = data.delegateKey.toLowerCase();
-      this._shares.next(new MolochShares(this._Members.api.contractAddress, new BN(data.shares)));
+      this._shares = new MolochShares(this._Members.api.contractAddress, new BN(data.shares));
       this._highestIndexYesVote = data.highestIndexYesVote ? new BN(data.highestIndexYesVote) : null;
       this._initialized = Promise.resolve(true);
     } else {
@@ -67,11 +65,11 @@ export default class MolochMember extends EthereumAccount {
     const m = await this._Members.api.Contract.members(this.address);
     if (!m.exists) {
       this._isMember = false;
-      this._shares.next(new MolochShares(this._Members.api.contractAddress, new BN(0)));
+      this._shares = new MolochShares(this._Members.api.contractAddress, new BN(0));
     } else {
       this._isMember = true;
       this._delegateKey = m.delegateKey.toLowerCase();
-      this._shares.next(new MolochShares(this._Members.api.contractAddress, new BN(m.shares.toString())));
+      this._shares = new MolochShares(this._Members.api.contractAddress, new BN(m.shares.toString()));
       this._highestIndexYesVote = m.highestIndexYesVote ? new BN(m.highestIndexYesVote.toString()) : null;
     }
   }
@@ -125,7 +123,7 @@ export default class MolochMember extends EthereumAccount {
       throw new Error('sender must be member');
     }
 
-    const shares = await this.balance.pipe(first()).toPromise();
+    const shares = await this.balance;
     if (shares.lt(sharesToBurn)) {
       throw new Error('not enough shares');
     }

@@ -8,7 +8,6 @@ import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
 import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling_proposal';
-import { first } from 'rxjs/operators';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
@@ -61,7 +60,7 @@ const VoteListing: m.Component<{
               } else {
                 // fetch balance and store in cache
                 vnode.state.balancesCacheInitialized[vote.account.address] = true;
-                vote.account.balance.pipe(first()).toPromise().then((b) => {
+                vote.account.balance.then((b) => {
                   balance = b;
                   vnode.state.balancesCache[vote.account.address] = formatCoin(b, true);
                   m.redraw();

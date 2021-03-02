@@ -1,13 +1,13 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn(
         'OffchainCommunities',
         'website',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -16,7 +16,7 @@ module.exports = {
         'OffchainCommunities',
         'chat',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -25,7 +25,7 @@ module.exports = {
         'OffchainCommunities',
         'telegram',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -34,7 +34,7 @@ module.exports = {
         'OffchainCommunities',
         'github',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -43,7 +43,7 @@ module.exports = {
         'Chains',
         'website',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -52,7 +52,7 @@ module.exports = {
         'Chains',
         'chat',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -61,7 +61,7 @@ module.exports = {
         'Chains',
         'telegram',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -70,7 +70,7 @@ module.exports = {
         'Chains',
         'github',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -78,13 +78,13 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn(
         'OffchainCommunities',
         'website',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -93,7 +93,7 @@ module.exports = {
         'OffchainCommunities',
         'chat',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -102,7 +102,7 @@ module.exports = {
         'OffchainCommunities',
         'telegram',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -111,7 +111,7 @@ module.exports = {
         'OffchainCommunities',
         'github',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -120,7 +120,7 @@ module.exports = {
         'Chains',
         'website',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -129,7 +129,7 @@ module.exports = {
         'Chains',
         'chat',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -138,7 +138,7 @@ module.exports = {
         'Chains',
         'telegram',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
@@ -147,7 +147,7 @@ module.exports = {
         'Chains',
         'github',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t }
