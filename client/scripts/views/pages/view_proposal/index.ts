@@ -3,7 +3,7 @@ import 'pages/view_proposal/index.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { PopoverMenu, MenuDivider, Icon, Icons } from 'construct-ui';
+import { PopoverMenu, MenuDivider, Icon, Icons, Button } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -52,7 +52,8 @@ import {
   ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, EditPermissionsButton,
   ProposalEditorPermissions,
-  ProposalTitleEditMenuItem
+  ProposalTitleEditMenuItem,
+  ProposalTitleSaveEdit
 } from './body';
 import CreateComment from './create_comment';
 
@@ -118,6 +119,11 @@ const ProposalHeader: m.Component<{
             ]),
           vnode.state.editing
             && m(ProposalTitleEditor, { item: proposal, parentState: vnode.state }),
+          vnode.state.editing
+            && !(proposal instanceof OffchainThread)
+            && m(ProposalTitleSaveEdit, {
+              item: proposal, getSetGlobalEditingStatus, parentState: vnode.state
+            }),
           m('.proposal-body-meta', proposal instanceof OffchainThread
             ? [
               m(ProposalHeaderTopics, { proposal }),
@@ -193,7 +199,7 @@ const ProposalHeader: m.Component<{
               m(ProposalHeaderOnchainStatus, { proposal }),
               m(ProposalBodyAuthor, { item: proposal }),
               app.isLoggedIn()
-              && isAdmin
+              && (isAdmin || isAuthor)
               && !getSetGlobalEditingStatus(GlobalStatus.Get)
               && m(PopoverMenu, {
                 transitionDuration: 0,
@@ -201,7 +207,7 @@ const ProposalHeader: m.Component<{
                 closeOnContentClick: true,
                 menuAttrs: { size: 'default' },
                 content: [
-                  (isEditor || isAuthor)
+                  (isAdmin || isAuthor)
                     && m(ProposalTitleEditMenuItem, {
                       item: proposal,
                       getSetGlobalReplyStatus,

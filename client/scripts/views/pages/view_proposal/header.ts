@@ -206,13 +206,6 @@ export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyPropos
   view: (vnode) => {
     const { item, parentState } = vnode.attrs;
     if (!item) return;
-    const isThread = item instanceof OffchainThread;
-    const body = item instanceof OffchainComment
-      ? item.text
-      : (item instanceof OffchainThread
-        ? item.body
-        : null);
-    if (!body) return;
 
     return m(Input, {
       size: 'lg',

@@ -201,7 +201,7 @@ export const ProposalTitleEditMenuItem: m.Component<{
     if (!item) return;
 
     return m(MenuItem, {
-      label: 'Edit',
+      label: 'Edit title',
       class: 'edit-proposal-title',
       onclick: async (e) => {
         e.preventDefault();
@@ -527,6 +527,41 @@ export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStat
           m.redraw();
         }
       }, 'Cancel')
+    ]);
+  }
+};
+
+export const ProposalTitleSaveEdit: m.Component<{
+  item: AnyProposal,
+  getSetGlobalEditingStatus,
+  parentState,
+}> = {
+  view: (vnode) => {
+    const { item, getSetGlobalEditingStatus, parentState } = vnode.attrs;
+    if (!item) return;
+
+    return m('.ProposalBodySaveEdit', [
+      m(Button, {
+        class: 'save-editing',
+        label: 'Save',
+        disabled: parentState.saving,
+        intent: 'primary',
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          parentState.saving = true;
+          console.log(item.uniqueIdentifier);
+          debugger
+          app.chain.chainEntities.updateEntityTitle(item.uniqueIdentifier, parentState.updatedTitle).then(() => {
+            m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.identifier}`);
+            parentState.editing = false;
+            parentState.saving = false;
+            getSetGlobalEditingStatus(GlobalStatus.Set, false);
+            m.redraw();
+            notifySuccess('Thread successfully edited');
+          });
+        }
+      }, 'Save'),
     ]);
   }
 };
