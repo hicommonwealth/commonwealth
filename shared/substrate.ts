@@ -1,5 +1,6 @@
-import { RegisteredTypes } from '@polkadot/types/types';
+import * as CloverSpecTypes from '@clover-network/node-tpye';
 import { spec as EdgewareSpec } from '@edgeware/node-types';
+import { RegisteredTypes } from '@polkadot/types/types';
 import StafiSpec from './adapters/chain/stafi/spec';
 
 export function selectSpec(chain: string): RegisteredTypes {
@@ -7,6 +8,8 @@ export function selectSpec(chain: string): RegisteredTypes {
     return EdgewareSpec;
   } else if (chain === 'stafi') {
     return { types: StafiSpec };
+  } else if (chain === 'clover') {
+    return { types: CloverSpecTypes }
   } else {
     return {};
   }
