@@ -4,6 +4,7 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkInsert('Chains', [{
+        base: 'substrate',
         id: 'hydradx',
         symbol: 'HDX',
         name: 'HydraDX',

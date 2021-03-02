@@ -10,6 +10,7 @@ class HydraDX extends Substrate {
     this.identities.disable();
     this.democracy.disable();
     this.democracyProposals.disable();
+    this.technicalCommittee.disable();
   }
 
   public async initApi() {

@@ -205,7 +205,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       // proposals (substrate, cosmos, moloch only)
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia
-                        && app.chain.network != ChainNetwork.HydraDX)
+                )//        && app.chain.network != ChainNetwork.HydraDX)
                          || app.chain?.base === ChainBase.CosmosSDK
                          || app.chain?.class === ChainClass.Moloch)
         && m(Button, {
