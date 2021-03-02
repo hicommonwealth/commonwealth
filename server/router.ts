@@ -71,6 +71,7 @@ import editThread from './routes/editThread';
 import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
+import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
@@ -154,6 +155,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/updateThreadStage', passport.authenticate('jwt', { session: false }), updateThreadStage.bind(this, models));
   router.post('/updateThreadPrivacy', passport.authenticate('jwt', { session: false }), updateThreadPrivacy.bind(this, models));
   router.post('/updateThreadPinned', passport.authenticate('jwt', { session: false }), updateThreadPinned.bind(this, models));
+  router.post('/updateThreadLinkedChainEntities', passport.authenticate('jwt', { session: false }), updateThreadLinkedChainEntities.bind(this, models));
   router.post('/addEditors', passport.authenticate('jwt', { session: false }), addEditors.bind(this, models));
   router.post('/deleteEditors', passport.authenticate('jwt', { session: false }), deleteEditors.bind(this, models));
   // TODO: Change to DELETE /thread

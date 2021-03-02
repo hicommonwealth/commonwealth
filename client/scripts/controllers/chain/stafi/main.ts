@@ -1,5 +1,6 @@
 import { ChainClass, NodeInfo } from 'models';
 import { IApp } from 'state';
+import StafiSpec from 'adapters/chain/stafi/spec';
 import Substrate from '../substrate/main';
 
 class Stafi extends Substrate {
@@ -11,11 +12,7 @@ class Stafi extends Substrate {
 
   public async initApi() {
     await super.initApi({
-      types: {
-        ChainId: 'u8',
-        DepositNonce: 'u64',
-        ResourceId: '[u8; 32]',
-      }
+      types: StafiSpec,
     });
   }
 }
