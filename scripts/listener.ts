@@ -13,7 +13,7 @@ const CloverSpec = {
 
 const networkUrls = {
   'clover': 'ws://api.clover.finance',
-  'hydradx': 'wss://hack.hydradx.io:9944',
+  'hydradx': 'wss://rpc-01.snakenet.hydradx.io',
   'edgeware': 'ws://mainnet1.edgewa.re:9944',
   'edgeware-local': 'ws://localhost:9944',
   'edgeware-testnet': 'wss://beresheet1.edgewa.re',
