@@ -1,12 +1,15 @@
 import { RegisteredTypes } from '@polkadot/types/types';
 import { spec as EdgewareSpec } from '@edgeware/node-types';
 import StafiSpec from './adapters/chain/stafi/spec';
+import HydraSpec from './adapters/chain/hydradx/spec';
 
 export function selectSpec(chain: string): RegisteredTypes {
   if (chain.includes('edgeware')) {
     return EdgewareSpec;
   } else if (chain === 'stafi') {
     return { types: StafiSpec };
+  } else if (chain === 'hydradx') {
+    return { types: HydraSpec };
   } else {
     return {};
   }
