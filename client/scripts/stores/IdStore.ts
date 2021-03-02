@@ -17,7 +17,7 @@ class IdStore<T extends IHasId> extends Store<T> {
   }
 
   public update(n: T) {
-    super.update(n);
+    super.update(n, (a) => a.id === n.id);
     this._storeId[n.id.toString()] = n;
     return this;
   }

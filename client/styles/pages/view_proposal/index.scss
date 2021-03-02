@@ -108,6 +108,7 @@ $discussion-title-font-size: 1.45rem;
                 }
             }
         }
+        .ProposalHeaderThreadLinkedChainEntity,
         .ProposalHeaderExternalLink,
         .ProposalHeaderBlockExplorerLink,
         .ProposalHeaderVotingInterfaceLink {
@@ -183,12 +184,6 @@ $discussion-title-font-size: 1.45rem;
         }
     }
 
-    .ProposalHeaderTopics {
-        .proposal-topic {
-            @include proposal-topic-inline;
-        }
-    }
-
     // proposal-meta
     .ProposalHeaderTopics,
     .ProposalHeaderStage,
@@ -219,11 +214,22 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
-    .ProposalHeaderStage {
+    .ProposalHeaderStage,
+    .ProposalHeaderStageEditorButton {
         position: relative;
         top: -4px;
-        margin-left: 12px;
+        margin-right: 7px;
+    }
+    .ProposalHeaderStageEditorButton.cui-button {
+        height: 22px;
+        min-height: 22px;
+        padding: 0 10px;
+    }
+    .ProposalHeaderStage {
+        margin-top: 9px;
         a.cui-button {
+            height: 20px;
+            min-height: 20px;
             padding: 0 10px;
             border: none;
             background: $background-color-light;

@@ -8,7 +8,7 @@ import moment from 'moment-twitter';
 import app from 'state';
 
 import { Spinner, Button, ButtonGroup, Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
-import { pluralize, offchainThreadStageToLabel } from 'helpers';
+import { pluralize, offchainThreadStageToLabel, externalLink } from 'helpers';
 import { NodeInfo, CommunityInfo, OffchainThreadStage } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -326,15 +326,17 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       vnode.state.lastSubpage = subpage;
     }
 
-    let topicDescription;
     let topicId;
     let topicName;
+    let topicDescription;
+    let topicTelegram;
     if (topic && app.activeId()) {
       const topics = app.topics.getByCommunity(app.activeId());
       const topicObject = topics.find((t) => t.name === topic);
-      topicName = topicObject?.name;
       topicId = topicObject?.id;
+      topicName = topicObject?.name;
       topicDescription = topicObject?.description;
+      topicTelegram = topicObject?.telegram;
     }
 
     localStorage.setItem(`${app.activeId()}-lookback-${subpage}`, vnode.state.lookback[subpage]);
@@ -346,7 +348,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const otherTopics = {};
     const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
 
-    const getTopicRow = (key, name, description) => m(Button, {
+    const getTopicRow = (key, name, description, telegram) => m(Button, {
       rounded: true,
       compact: true,
       class: 'discussions-topic',
@@ -357,7 +359,17 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
         e.preventDefault();
         m.route.set(`/${app.activeId()}/discussions/${name}`);
       },
-      label: name,
+      label: [
+        name,
+        telegram && m('a.topic-telegram', {
+          href: telegram,
+          onclick: (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            window.open(telegram);
+          }
+        }, [ ' ', m(Icon, { name: Icons.SEND }) ])
+      ],
       size: 'sm',
     });
 
@@ -374,19 +386,20 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       size: 'sm',
     });
 
-    app.topics.getByCommunity(app.activeId()).forEach(({ id, name, description }) => {
+    app.topics.getByCommunity(app.activeId()).forEach(({ id, name, description, telegram }) => {
       if (featuredTopicIds.includes(`${id}`)) {
-        featuredTopics[name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
+        featuredTopics[name] = { id, name, description, telegram, featured_order: featuredTopicIds.indexOf(`${id}`) };
       } else {
-        otherTopics[name] = { id, name, description };
+        otherTopics[name] = { id, name, description, telegram };
       }
     });
     const otherTopicListItems = Object.keys(otherTopics)
       .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
-      .map((name, idx) => getTopicRow(otherTopics[name].name, name, otherTopics[name].description));
+      .map((name, idx) => getTopicRow(otherTopics[name].name, name, otherTopics[name].description, otherTopics[name].telegram));
     const featuredTopicListItems = Object.keys(featuredTopics)
       .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
-      .map((name, idx) => getTopicRow(featuredTopics[name].name, name, featuredTopics[name].description));
+      .map((name, idx) => getTopicRow(
+        featuredTopics[name].name, name, featuredTopics[name].description, featuredTopics[name].telegram));
 
     const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
     const isMod = app.user.isRoleOfCommunity({
@@ -423,7 +436,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
                   e.preventDefault();
                   app.modals.create({
                     modal: EditTopicModal,
-                    data: { description: topicDescription, id: topicId, name: topicName }
+                    data: { description: topicDescription, id: topicId, name: topicName, telegram: topicTelegram }
                   });
                 }
               }),

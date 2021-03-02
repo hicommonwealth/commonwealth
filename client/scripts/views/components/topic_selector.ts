@@ -28,7 +28,6 @@ const TopicSelector: m.Component<{
       return m(ListItem, {
         class: featuredTopics.includes(topic) ? 'featured-topic' : 'other-topic',
         label: [
-          m('span.proposal-topic-icon'),
           m('span.topic-name', topic.name),
         ],
         selected: (selectedTopic as OffchainTopic)?.name === topic.name,
@@ -58,7 +57,7 @@ const TopicSelector: m.Component<{
     const addTopic = (topic?) => {
       const newTopic = topic || (document.getElementsByClassName('autocomplete-topic-input')[0]
         .firstChild as HTMLInputElement).value;
-      topics.push({ name: newTopic, id: null, description: '' });
+      topics.push({ name: newTopic, id: null, description: '', telegram: '' });
       setTimeout(() => { selectedTopic = newTopic; m.redraw(); }, 1);
       updateFormData(newTopic);
       if (!topic) manuallyClosePopover();

@@ -1,23 +1,19 @@
 import m from 'mithril';
 import app from 'state';
+import { ChainBase } from 'models';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { makeDynamicComponent } from 'models/mithril';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount, IValidators } from 'controllers/chain/substrate/account';
 import { StakingLedger, ActiveEraInfo, EraIndex, SessionIndex } from '@polkadot/types/interfaces';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
-import { ChainBase } from 'models';
-import { IValidatorPageState } from '..';
 
 interface IPreHeaderState {
-  dynamic: {
-    validators: IValidators;
-    currentSession: SessionIndex;
-    currentEra: EraIndex;
-    activeEra: ActiveEraInfo;
-    stakingLedger: StakingLedger;
-  },
+  validators: IValidators;
+  currentSession: SessionIndex;
+  currentEra: EraIndex;
+  activeEra: ActiveEraInfo;
+  stakingLedger: StakingLedger;
 }
 
 interface IPreHeaderAttrs {
@@ -26,33 +22,30 @@ interface IPreHeaderAttrs {
   sender: SubstrateAccount;
 }
 
-export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
-  getObservables: (attrs) => ({
-    // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
-    groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).accounts.validators : null,
-    currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
-    currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
-    activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,
-    stakingLedger: (app.chain.base === ChainBase.Substrate && app.user.activeAccount)
-      ? (app.user.activeAccount as SubstrateAccount).stakingLedger
-      : null,
-  }),
+export const SubstratePreHeader: m.Component<IPreHeaderAttrs, IPreHeaderState> = {
+  oninit: (vnode) => {
+    app.runWhenReady(async () => {
+      vnode.state.validators = (app.chain.base === ChainBase.Substrate)
+        ? await (app.chain as Substrate).accounts.validators : null;
+      vnode.state.currentSession = (app.chain.base === ChainBase.Substrate)
+        ? await (app.chain as Substrate).chain.session : null;
+      vnode.state.currentEra = (app.chain.base === ChainBase.Substrate)
+        ? await (app.chain as Substrate).chain.currentEra : null;
+      vnode.state.activeEra = (app.chain.base === ChainBase.Substrate)
+        ? await (app.chain as Substrate).chain.activeEra : null;
+      vnode.state.stakingLedger = (app.chain.base === ChainBase.Substrate && app.user.activeAccount)
+        ? await (app.user.activeAccount as SubstrateAccount).stakingLedger
+        : null;
+    });
+  },
   view: (vnode) => {
-    const { validators, stakingLedger, currentSession, currentEra, activeEra } = vnode.state.dynamic;
+    const { validators, stakingLedger, currentSession, currentEra, activeEra } = vnode.state;
     const { nominations, nominationsHasChanged, sender } = vnode.attrs;
     if (!validators) return;
 
     let totalStaked = (app.chain as Substrate).chain.coins(0);
-    let hasClaimablePayouts = false;
-    if (app.chain.base === ChainBase.Substrate) {
-      (app.chain as Substrate).chain.api.toPromise()
-        .then((api) => {
-          if (api.query.staking.erasStakers) {
-            hasClaimablePayouts = true;
-          }
-        });
-    }
+    const hasClaimablePayouts = app.chain.base === ChainBase.Substrate
+      && !!(app.chain as Substrate).chain.api.query.staking.erasStakers;
 
     Object.entries(validators).forEach(([_stash, { exposure }]) => {
       const valStake = (app.chain as Substrate).chain.coins(exposure.total.toBn());
@@ -124,7 +117,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                 : sender.nominateTx(nominations)).then(() => {
                 // vnode.attrs.sending = false;
                 m.redraw();
-              }, (e) => {
+              }, () => {
                 // vnode.attrs.sending = false;
                 m.redraw();
               });
@@ -134,6 +127,6 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       ]),
     ]);
   }
-});
+};
 
 export default SubstratePreHeader;

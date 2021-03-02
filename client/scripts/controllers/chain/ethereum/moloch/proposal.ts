@@ -246,7 +246,7 @@ export default class MolochProposal extends Proposal<
     this._Gov = Gov;
 
     entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
-    this._initialized.next(true);
+    this._initialized = true;
     this._Gov.store.add(this);
   }
 

@@ -1,10 +1,9 @@
 import WebSocket from 'ws';
-import _ from 'underscore';
+import _, { chain } from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
-import { spec } from '@edgeware/node-types';
 
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
@@ -13,7 +12,7 @@ import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { sequelize } from '../database';
-import { constructSubstrateUrl } from '../../shared/substrate';
+import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainNodeInstance } from '../models/chain_node';
 const log = factory.getLogger(formatFilename(__filename));
@@ -113,7 +112,7 @@ const setupChainEventListeners = async (
       handlers.push(identityHandler, userFlagsHandler);
 
       const nodeUrl = constructSubstrateUrl(node.url);
-      const api = await SubstrateEvents.createApi(nodeUrl, spec);
+      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
       subscriber = await SubstrateEvents.subscribeEvents({
         chain: node.chain,
         handlers,
