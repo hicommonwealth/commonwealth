@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import proposalIdToEntity from 'server/util/proposalIdToEntity';
+import proposalIdToEntity from '../util/proposalIdToEntity';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 export const Errors = {
@@ -34,10 +34,18 @@ const updateThreadLinkedChainEntities = async (models, req: Request, res: Respon
   entity.title = title;
   entity.save();
 
-  const finalEntity = await models.ChainEntity.findAll({
-    where: { id: entity.id }
-    // TODO includes
+  const finalEntity = await models.ChainEntity.findOne({
+    where: { id: entity.id },
+    include: [ {
+      model: models.ChainEvent,
+      order: [
+        [ models.ChainEvent, 'id', 'asc' ]
+      ],
+      include: [ models.ChainEventType ],
+    } ],
   });
+
+  console.log(finalEntity);
 
   return res.json({ status: 'Success', result: finalEntity.toJSON() });
 };

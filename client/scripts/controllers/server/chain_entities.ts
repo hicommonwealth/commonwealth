@@ -151,6 +151,7 @@ class ChainEntityController {
         'jwt': app.user.jwt,
         'unique_id': uniqueIdentifier,
         'title': title,
+        'chain': app.activeChainId(),
       },
       success: (response) => {
         const entity = ChainEntity.fromJSON(response.result);
