@@ -573,6 +573,7 @@ const ViewProposalPage: m.Component<{
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
+        console.log(vnode.state.proposal.title);
       } catch (e) {
         // proposal might be loading, if it's not an offchain thread
         if (proposalType === ProposalType.OffchainThread) {

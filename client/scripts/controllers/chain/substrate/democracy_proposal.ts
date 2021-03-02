@@ -181,7 +181,7 @@ class SubstrateDemocracyProposal extends Proposal<
           this._method = preimage.method;
           this._section = preimage.section;
           this._preimage = preimage;
-          this._title = formatCall(preimage);
+          this._title = this._title || formatCall(preimage);
         }
         break;
       }

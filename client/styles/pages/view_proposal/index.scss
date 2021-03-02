@@ -214,6 +214,10 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
+    .ProposalTitleSaveEdit {
+        font-size: $discussion-meta-font-size;
+        color: $discussion-meta-color;
+    }
     .ProposalHeaderStage,
     .ProposalHeaderStageEditorButton {
         position: relative;

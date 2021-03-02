@@ -543,7 +543,7 @@ export const ProposalTitleSaveEdit: m.Component<{
     const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
 
-    return m('.ProposalBodySaveEdit', [
+    return m('.ProposalTitleSaveEdit', [
       m(Button, {
         class: 'save-editing',
         label: 'Save',
