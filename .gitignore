@@ -17,6 +17,10 @@ coverage/
 # Database downloads
 latest.dump
 latest.dump.*
+out.dump
+out.dump.*
+redacted.dump
+redacted.dump.*
 
 # Cosmos TX
 tx.json
