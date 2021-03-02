@@ -143,13 +143,13 @@ class ChainEntityController {
     }
   }
 
-  public async updateEntityTitle(id, title: string) {
+  public async updateEntityTitle(uniqueIdentifier, title: string) {
     return $.ajax({
       url: `${app.serverUrl()}/updateChainEntityTitle`,
       type: 'POST',
       data: {
         'jwt': app.user.jwt,
-        'id': id,
+        'unique_id': uniqueIdentifier,
         'title': title,
       },
       success: (response) => {

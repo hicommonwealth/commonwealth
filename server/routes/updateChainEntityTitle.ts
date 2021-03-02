@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import proposalIdToEntity from 'server/util/proposalIdToEntity';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
 export const Errors = {
@@ -10,11 +11,9 @@ export const Errors = {
 const updateThreadLinkedChainEntities = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
-  const { id, title } = req.body;
+  const { unique_id, title } = req.body;
 
-  const entity = await models.ChainEntity.findOne({
-    where: { id },
-  });
+  const entity = await proposalIdToEntity(models, chain.id, unique_id);
   if (!entity) return next(new Error(Errors.NoEntity));
   const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => {
     return !!addr.verified;
