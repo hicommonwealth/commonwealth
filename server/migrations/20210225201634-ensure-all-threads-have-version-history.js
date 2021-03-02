@@ -5,16 +5,19 @@ module.exports = {
     const query = `SELECT * FROM "OffchainThreads" WHERE version_history IS NULL OR version_history='{}'`;
     const threads = await queryInterface.sequelize.query(query);
     return Promise.all(threads[0].map(async (thread, i) => {
-      const firstVersion = {
+      const firstVersion = JSON.stringify({
         timestamp: thread.created_at,
         body: decodeURIComponent(thread.body)
-      };
-      const update = `UPDATE "OffchainThreads" SET version_history=ARRAY[${firstVersion}] WHERE id='${thread.id}'`;
-      return queryInterface.sequelize.query(update);
+      });
+      return queryInterface.bulkUpdate('OffchainThreads', {
+        version_history: [firstVersion],
+      }, {
+        id: thread.id,
+      });
     }));
   },
 
   down: (queryInterface, Sequelize) => {
-    return null;
+    return new Promise((resolve, reject) => resolve());
   }
 };
