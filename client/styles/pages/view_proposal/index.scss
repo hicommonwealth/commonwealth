@@ -217,6 +217,10 @@ $discussion-title-font-size: 1.45rem;
     .ProposalTitleSaveEdit {
         font-size: $discussion-meta-font-size;
         color: $discussion-meta-color;
+        display: inline-block;
+        .proposal-title-buttons {
+            display: flex;
+        }
     }
     .ProposalHeaderStage,
     .ProposalHeaderStageEditorButton {

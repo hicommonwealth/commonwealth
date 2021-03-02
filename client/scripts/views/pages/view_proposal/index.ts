@@ -118,11 +118,10 @@ const ProposalHeader: m.Component<{
               }),
             ]),
           vnode.state.editing
-            && m(ProposalTitleEditor, { item: proposal, parentState: vnode.state }),
-          vnode.state.editing
-            && !(proposal instanceof OffchainThread)
-            && m(ProposalTitleSaveEdit, {
-              proposal, getSetGlobalEditingStatus, parentState: vnode.state
+            && m(ProposalTitleEditor, {
+              item: proposal,
+              getSetGlobalEditingStatus,
+              parentState: vnode.state
             }),
           m('.proposal-body-meta', proposal instanceof OffchainThread
             ? [
@@ -573,7 +572,6 @@ const ViewProposalPage: m.Component<{
     if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
-        console.log(vnode.state.proposal.title);
       } catch (e) {
         // proposal might be loading, if it's not an offchain thread
         if (proposalType === ProposalType.OffchainThread) {

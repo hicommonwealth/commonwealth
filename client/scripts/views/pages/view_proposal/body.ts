@@ -531,42 +531,6 @@ export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStat
   }
 };
 
-// Component for saving chain proposal titles
-export const ProposalTitleSaveEdit: m.Component<{
-  proposal: AnyProposal,
-  getSetGlobalEditingStatus,
-  parentState,
-}> = {
-  view: (vnode) => {
-    const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
-    if (!proposal) return;
-    const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
-      + `-${slugify(proposal.title)}`;
-
-    return m('.ProposalTitleSaveEdit', [
-      m(Button, {
-        class: 'save-editing',
-        label: 'Save',
-        disabled: parentState.saving,
-        intent: 'primary',
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          parentState.saving = true;
-          app.chain.chainEntities.updateEntityTitle(proposal.uniqueIdentifier, parentState.updatedTitle).then(() => {
-            m.route.set(proposalLink);
-            parentState.editing = false;
-            parentState.saving = false;
-            getSetGlobalEditingStatus(GlobalStatus.Set, false);
-            m.redraw();
-            notifySuccess('Thread successfully edited');
-          });
-        }
-      }, 'Save'),
-    ]);
-  }
-};
-
 export const ProposalBodySaveEdit: m.Component<{
   item: OffchainThread | OffchainComment<any>,
   getSetGlobalEditingStatus,
