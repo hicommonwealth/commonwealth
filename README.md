@@ -83,19 +83,6 @@ npx sequelize db:create
 psql -d commonwealth -U commonwealth -f latest.dump
 ```
 
-Legacy instructions:
-
-```
-nvm use
-heroku pg:backups:capture -a commonwealthapp
-heroku pg:backups:download -a commonwealthapp
-brew services restart postgres     # For Mac OS X restart the database to close any open connections
-npx sequelize db:drop              # Reset the database
-npx sequelize db:create            # Create a new empty database
-pg_restore --verbose --clean --no-acl --no-owner --if-exists -h localhost -U commonwealth -d commonwealth latest.dump
-npx sequelize db:migrate
-```
-
 To access the production DB:
 
 ```
