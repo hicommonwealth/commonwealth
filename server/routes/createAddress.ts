@@ -26,7 +26,7 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.InvalidChain));
   }
 
-  const existingAddress = await models.Address.findOne({
+  const existingAddress = await models.Address.scope('withPrivateData').findOne({
     where: { chain: req.body.chain, address: req.body.address }
   });
   if (existingAddress) {
