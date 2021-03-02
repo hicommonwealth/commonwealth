@@ -4,7 +4,8 @@ import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy
 } from '@commonwealth/chain-events';
-import { spec } from '@edgeware/node-types';
+import { spec as EdgewareSpec } from '@edgeware/node-types';
+import HydraSpec from '../../shared/adapters/chain/hydradx/spec';
 
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
@@ -113,6 +114,16 @@ const setupChainEventListeners = async (
       handlers.push(identityHandler, userFlagsHandler);
 
       const nodeUrl = constructSubstrateUrl(node.url);
+      let spec = {};
+      if (node.chain.indexOf('edgeware') !== -1) {
+        spec = EdgewareSpec;
+      } else if (node.chain === 'hydradx') {
+        spec = {
+          'types': HydraSpec,
+        };
+      } /* else if (node.chain === 'clover') {
+        spec = CloverSpec;
+      } */
       const api = await SubstrateEvents.createApi(nodeUrl, spec);
       subscriber = await SubstrateEvents.subscribeEvents({
         chain: node.chain,

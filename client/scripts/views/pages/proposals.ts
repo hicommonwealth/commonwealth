@@ -145,9 +145,11 @@ const ProposalsPage: m.Component<{}> = {
     if (onSubstrate) {
       // Democracy, Council, and Signaling (Edgeware-only) must be loaded to proceed
       const chain = app.chain as Substrate;
-      if (!chain.democracy.initialized || !chain.council.initialized || !chain.democracyProposals.initialized
+      if ((!chain.democracy.initialized && !chain.democracy.disabled)
+          || (!chain.council.initialized && !chain.council.disabled)
+          || (!chain.democracyProposals.initialized && !chain.democracyProposals.disabled)
           || (!chain.signaling.disabled && !chain.signaling.initialized)) {
-        if (!chain.democracy.initializing) loadCmd();
+        if (!chain.democracy.initializing && !chain.council.initializing) loadCmd();
         return m(PageLoading, {
           message: 'Connecting to chain',
           title: [
