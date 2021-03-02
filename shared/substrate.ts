@@ -13,11 +13,14 @@ export function constructSubstrateUrl(url: string): string {
   ];
   const hasProtocol = url.indexOf('wss://') !== -1 || url.indexOf('ws://') !== -1;
   url = hasProtocol ? url.split('://')[1] : url;
-  const isInsecureProtocol = !secureNodes.find((path) => url.indexOf(path) !== -1);
+  const secureNodeSubstring = secureNodes.find((path) => url.indexOf(path) !== -1);
+  const isInsecureProtocol = !secureNodeSubstring;
   const protocol = isInsecureProtocol ? 'ws://' : 'wss://';
-  //This block will need to be commented out for it to work
   if (url.indexOf(':9944') !== -1) {
-    url = isInsecureProtocol ? url : url.split(':9944')[0];
+    // do not override the port if it is included in the secure node substring
+    url = isInsecureProtocol || secureNodeSubstring.indexOf(':9944') !== -1
+      ? url
+      : url.split(':9944')[0];
   }
   url = protocol + url;
   return url;
