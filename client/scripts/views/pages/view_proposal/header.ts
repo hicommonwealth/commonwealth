@@ -21,6 +21,7 @@ import {
   OffchainThreadKind,
   OffchainThreadStage,
   AnyProposal,
+  ChainEntity
 } from 'models';
 
 import { getStatusClass, getStatusText } from 'views/components/proposal_row';
@@ -223,11 +224,12 @@ export const ProposalTitleSaveEdit: m.Component<{
             parentState.editing = false;
             parentState.saving = false;
             getSetGlobalEditingStatus(GlobalStatus.Set, false);
-            const a = app;
+            // TODO: Avoid double instantiation
+            const chainEntity = ChainEntity.fromJSON(response.result);
+            console.log(chainEntity);
             const controller = (proposalSlugToClass().get(proposal.slug) as any);
-            const newProposal = controller._constructorFunc(response.result);
+            const newProposal = controller.updateProposal(chainEntity);
             controller.store.update(newProposal);
-            debugger
             m.redraw();
             notifySuccess('Thread successfully edited');
           });

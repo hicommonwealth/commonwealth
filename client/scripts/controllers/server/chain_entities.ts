@@ -15,7 +15,6 @@ import {
   IChainEntityKind,
 } from '@commonwealth/chain-events';
 import { notifyError } from '../app/notifications';
-import { proposalSlugToStore } from 'client/scripts/identifiers';
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -157,7 +156,6 @@ class ChainEntityController {
       },
       success: (response) => {
         const entity = ChainEntity.fromJSON(response.result);
-        console.log(entity);
         this._store.remove(entity);
         this._store.add(entity);
         return entity;
