@@ -22,6 +22,7 @@ import {
   AnyProposal,
   Account,
   ChainBase,
+  ChainEntity,
   ProposalModule,
 } from 'models';
 
@@ -177,7 +178,11 @@ const ProposalHeader: m.Component<{
               && m(StageEditor, {
                 thread: vnode.attrs.proposal as OffchainThread,
                 popoverMenu: true,
-                onChangeHandler: (stage: OffchainThreadStage) => { proposal.stage = stage; m.redraw(); },
+                onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[]) => {
+                  proposal.stage = stage;
+                  proposal.chainEntities = chainEntities;
+                  m.redraw();
+                },
                 openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
               }),
           ] : [

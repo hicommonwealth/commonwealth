@@ -167,7 +167,6 @@ const StageEditor: m.Component<{
               // set stage
               try {
                 await app.threads.setStage({ threadId: thread.id, stage: vnode.state.stage });
-                vnode.attrs.onChangeHandler(vnode.state.stage);
               } catch (err) {
                 console.log('Failed to update stage');
                 throw new Error((err.responseJSON && err.responseJSON.error)
@@ -184,6 +183,8 @@ const StageEditor: m.Component<{
                   ? err.responseJSON.error
                   : 'Failed to update linked proposals');
               }
+
+              vnode.attrs.onChangeHandler(vnode.state.stage, vnode.state.chainEntitiesToSet);
 
               if (vnode.attrs.popoverMenu) {
                 vnode.attrs.openStateHandler(false);

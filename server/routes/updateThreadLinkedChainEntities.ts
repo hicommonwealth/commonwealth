@@ -32,7 +32,8 @@ const updateThreadLinkedChainEntities = async (models, req: Request, res: Respon
     if (!role) return next(new Error(Errors.NotAdminOrOwner));
   }
 
-  const chain_entity_ids = req.body['chain_entity_id[]'].map((id) => +id);
+  const chain_entity_ids = typeof req.body['chain_entity_id[]'] === 'string' ? [req.body['chain_entity_id[]']]
+    : req.body['chain_entity_id[]'] ? req.body['chain_entity_id[]'].map((id) => +id) : [];
 
   // remove any chain entities no longer linked to this thread
   const existingChainEntities = await models.ChainEntity.findAll({

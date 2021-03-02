@@ -335,11 +335,10 @@ class ThreadsController {
         'jwt': app.user.jwt
       },
       success: (response) => {
-        const result = modelFromServer(response.result);
-        // Post edits propagate to all thread stores
-        this._store.update(result);
-        this._listingStore.update(result);
-        return result;
+        const thread = this._store.getByIdentifier(args.threadId);
+        thread.chainEntities.splice(0);
+        args.entities.forEach((ce) => thread.chainEntities.push(ce));
+        return thread;
       },
       error: (err) => {
         console.log('Failed to update linked proposals');
