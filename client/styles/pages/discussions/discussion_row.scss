@@ -5,7 +5,7 @@
         .row-header {
             .spacer {
                 display: inline-block;
-                width: 5px;
+                width: 8px;
             }
             a.external-discussion-link {
                 font-size: 17px;
@@ -13,6 +13,20 @@
                 &:hover {
                     text-decoration: underline;
                 }
+            }
+            .discussion-row-linked-chain-entity {
+                font-size: 14px;
+                padding: 0 8px;
+                min-height: 19px;
+                height: initial;
+                pointer-events: none;
+                user-select: none;
+                position: relative;
+                top: -1px;
+                margin: -3px 0;
+                margin-left: -1px;
+                margin-right: 5px;
+                border: none;
             }
         }
         .row-subheader {
@@ -97,7 +111,7 @@
             top: -1px;
             margin-left: 8px;
             border: none;
-            background: $background-color-white-hover;
+            background: tint($background-color-light, 1%);
             &.cui-button.cui-primary {
                 background: $primary-bg-color;
             }

@@ -153,6 +153,15 @@ $cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
 .cui-button.cui-xl .cui-button-label {
     top: 4px;
 }
+.cui-button.cui-sm,
+.cui-button-group.cui-sm .cui-button,
+.cui-menu.cui-sm .cui-button {
+    padding: 0 17px;
+    font-size: 16px;
+    height: 26px;
+    min-height: 26px;
+    line-height: 26px;
+}
 
 
 .cui-popover-content {

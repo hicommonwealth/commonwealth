@@ -8,7 +8,7 @@ import {
   pluralize, link, externalLink, isSameAccount, extractDomain,
   offchainThreadStageToLabel, offchainThreadStageToIndex,
 } from 'helpers';
-import { proposalSlugToFriendlyName } from 'identifiers';
+import { proposalSlugToFriendlyName, chainEntityTypeToProposalSlug, chainEntityTypeToProposalName } from 'identifiers';
 
 import {
   OffchainThread,
@@ -67,6 +67,26 @@ export const ProposalHeaderVotingInterfaceLink: m.Component<{ proposal: AnyPropo
         proposal['votingInterfaceLinkLabel'] || extractDomain(proposal['votingInterfaceLink']),
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
+    ]);
+  }
+};
+
+export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: OffchainThread, chainEntity }> = {
+  view: (vnode) => {
+    const { proposal, chainEntity } = vnode.attrs;
+    const slug = chainEntityTypeToProposalSlug(chainEntity.type);
+    if (!slug) return;
+
+    return m('.ProposalHeaderThreadLinkedChainEntity', [
+      link(
+        'a',
+        `/${proposal.chain}/proposal/${slug}/${chainEntity.typeId}`,
+        [
+          `${chainEntityTypeToProposalName(chainEntity.type)} #${chainEntity.typeId}`,
+          chainEntity.completed === 't' ? ' (Completed) ' : ' ',
+          m(Icon, { name: Icons.EXTERNAL_LINK }),
+        ],
+      ),
     ]);
   }
 };
@@ -137,6 +157,22 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   }
 };
 
+export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
+  view: (vnode) => {
+    const { openStageEditor } = vnode.attrs;
+    return m(Button, {
+      class: 'ProposalHeaderStageEditorButton',
+      rounded: true,
+      size: 'xs',
+      label: 'Select stage',
+      onclick: (e) => {
+        e.preventDefault();
+        openStageEditor();
+      },
+    });
+  }
+};
+
 export const ProposalHeaderOnchainId: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -192,7 +228,7 @@ export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyPropos
   }
 };
 
-export const ProposalHeaderPrivacyButtons: m.Component<{
+export const ProposalHeaderPrivacyMenuItems: m.Component<{
   proposal: AnyProposal | OffchainThread,
   getSetGlobalEditingStatus: CallableFunction
 }> = {

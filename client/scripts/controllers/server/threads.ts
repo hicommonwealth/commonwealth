@@ -13,7 +13,8 @@ import {
   CommunityInfo,
   NodeInfo,
   OffchainTopic,
-  Profile
+  Profile,
+  ChainEntity,
 } from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -62,7 +63,8 @@ export const modelFromServer = (thread) => {
     thread.url,
     thread.Address.chain,
     thread.pinned,
-    thread.collaborators
+    thread.collaborators,
+    thread.chain_entities,
   );
 };
 
@@ -317,6 +319,35 @@ class ThreadsController {
       error: (err) => {
         notifyError('Could not update pinned state');
         console.error(err);
+      }
+    });
+  }
+
+  public async setLinkedChainEntities(args: { threadId: number, entities: ChainEntity[] }) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
+        'thread_id': args.threadId,
+        'chain_entity_id': args.entities.map((ce) => ce.id),
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const thread = this._store.getByIdentifier(args.threadId);
+        thread.chainEntities.splice(0);
+        args.entities.forEach((ce) => thread.chainEntities.push({
+          id: ce.id,
+          type: ce.type,
+          typeId: ce.typeId,
+        }));
+        return thread;
+      },
+      error: (err) => {
+        console.log('Failed to update linked proposals');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to update linked proposals');
       }
     });
   }

@@ -43,7 +43,7 @@ const commentModelFromServer = (comment) => {
         comment.chain,
         null,
         null,
-        null
+        null,
       );
     } else {
       proposal = {
@@ -96,6 +96,8 @@ const threadModelFromServer = (thread) => {
     thread.url,
     thread.Address.chain,
     thread.pinned,
+    thread.collaborators,
+    thread.chain_entities,
   );
 };
 
