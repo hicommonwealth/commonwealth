@@ -337,7 +337,11 @@ class ThreadsController {
       success: (response) => {
         const thread = this._store.getByIdentifier(args.threadId);
         thread.chainEntities.splice(0);
-        args.entities.forEach((ce) => thread.chainEntities.push(ce));
+        args.entities.forEach((ce) => thread.chainEntities.push({
+          id: ce.id,
+          type: ce.type,
+          typeId: ce.typeId,
+        }));
         return thread;
       },
       error: (err) => {

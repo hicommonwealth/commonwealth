@@ -5,7 +5,7 @@
         .row-header {
             .spacer {
                 display: inline-block;
-                width: 5px;
+                width: 8px;
             }
             a.external-discussion-link {
                 font-size: 17px;
@@ -16,14 +16,17 @@
             }
             .discussion-row-linked-chain-entity {
                 font-size: 14px;
-                padding: 1px 8px;
-                min-height: 20px;
+                padding: 0 8px;
+                min-height: 19px;
                 height: initial;
                 pointer-events: none;
                 user-select: none;
                 position: relative;
                 top: -1px;
                 margin: -3px 0;
+                margin-left: -1px;
+                margin-right: 5px;
+                border: none;
             }
         }
         .row-subheader {

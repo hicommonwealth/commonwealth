@@ -75,7 +75,14 @@ class OffchainThread implements IUniqueId {
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];
-    this.chainEntities = chainEntities || [];
+    this.chainEntities = chainEntities ? chainEntities.map((ce) => {
+      return {
+        id: +ce.id,
+        type: ce.type,
+        typeId: ce.type_id,
+        completed: ce.completed,
+      };
+    }) : [];
   }
 }
 

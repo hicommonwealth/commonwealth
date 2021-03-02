@@ -45,7 +45,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
           class: 'discussion-row-linked-chain-entity',
           label: [
             chainEntityTypeToProposalShortName(ce.type),
-            Number.isNaN(parseInt(ce.type_id, 10)) ? '' : ` #${ce.type_id}`,
+            Number.isNaN(parseInt(ce.typeId, 10)) ? '' : ` #${ce.typeId}`,
           ],
           intent: 'primary',
           size: 'xs',

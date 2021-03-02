@@ -80,9 +80,9 @@ export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: Offc
     return m('.ProposalHeaderThreadLinkedChainEntity', [
       link(
         'a',
-        `/${proposal.chain}/proposal/${slug}/${chainEntity.type_id}`,
+        `/${proposal.chain}/proposal/${slug}/${chainEntity.typeId}`,
         [
-          `${chainEntityTypeToProposalName(chainEntity.type)} #${chainEntity.type_id}`,
+          `${chainEntityTypeToProposalName(chainEntity.type)} #${chainEntity.typeId}`,
           chainEntity.completed === 't' ? ' (Completed) ' : ' ',
           m(Icon, { name: Icons.EXTERNAL_LINK }),
         ],
