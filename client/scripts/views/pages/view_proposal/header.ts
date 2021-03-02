@@ -6,6 +6,7 @@ import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
 import {
   pluralize, link, externalLink, extractDomain,
   offchainThreadStageToLabel,
+  slugify,
 } from 'helpers';
 import { proposalSlugToFriendlyName, chainEntityTypeToProposalSlug, chainEntityTypeToProposalName } from 'identifiers';
 
@@ -229,7 +230,7 @@ export const ProposalTitleCancelEdit: m.Component<{ proposal, getSetGlobalEditin
   view: (vnode) => {
     const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
 
-    return m('.ProposalBodyCancelEdit', [
+    return m('.ProposalTitleCancelEdit', [
       m(Button, {
         class: 'cancel-editing',
         label: 'Cancel',
