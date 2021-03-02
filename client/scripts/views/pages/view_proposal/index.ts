@@ -122,7 +122,7 @@ const ProposalHeader: m.Component<{
           vnode.state.editing
             && !(proposal instanceof OffchainThread)
             && m(ProposalTitleSaveEdit, {
-              item: proposal, getSetGlobalEditingStatus, parentState: vnode.state
+              proposal, getSetGlobalEditingStatus, parentState: vnode.state
             }),
           m('.proposal-body-meta', proposal instanceof OffchainThread
             ? [

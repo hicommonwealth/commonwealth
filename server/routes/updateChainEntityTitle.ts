@@ -35,7 +35,7 @@ const updateThreadLinkedChainEntities = async (models, req: Request, res: Respon
   entity.save();
 
   const finalEntity = await models.ChainEntity.findAll({
-    where: { id }
+    where: { id: entity.id }
     // TODO includes
   });
 

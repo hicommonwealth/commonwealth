@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 import { updateRoute } from 'app';
 import app from 'state';
-import { pluralize } from 'helpers';
+import { pluralize, slugify } from 'helpers';
 import {
   OffchainThread,
   OffchainComment,
@@ -531,14 +531,17 @@ export const ProposalBodyCancelEdit: m.Component<{ item, getSetGlobalEditingStat
   }
 };
 
+// Component for saving chain proposal titles
 export const ProposalTitleSaveEdit: m.Component<{
-  item: AnyProposal,
+  proposal: AnyProposal,
   getSetGlobalEditingStatus,
   parentState,
 }> = {
   view: (vnode) => {
-    const { item, getSetGlobalEditingStatus, parentState } = vnode.attrs;
-    if (!item) return;
+    const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
+    if (!proposal) return;
+    const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
+      + `-${slugify(proposal.title)}`;
 
     return m('.ProposalBodySaveEdit', [
       m(Button, {
@@ -550,10 +553,8 @@ export const ProposalTitleSaveEdit: m.Component<{
         onclick: (e) => {
           e.preventDefault();
           parentState.saving = true;
-          console.log(item.uniqueIdentifier);
-          debugger
-          app.chain.chainEntities.updateEntityTitle(item.uniqueIdentifier, parentState.updatedTitle).then(() => {
-            m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.identifier}`);
+          app.chain.chainEntities.updateEntityTitle(proposal.uniqueIdentifier, parentState.updatedTitle).then(() => {
+            m.route.set(proposalLink);
             parentState.editing = false;
             parentState.saving = false;
             getSetGlobalEditingStatus(GlobalStatus.Set, false);
