@@ -6,7 +6,6 @@ import { Near as NearApi, connect as nearConnect } from 'nearlib/lib/near';
 import { BrowserLocalStorageKeyStore } from 'nearlib/lib/key_stores';
 import moment from 'moment-twitter';
 import * as m from 'mithril';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { NodeStatusResult } from 'nearlib/lib/providers/provider';
 import { NearAccount } from './account';
 
@@ -32,9 +31,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   public get chainId() { return this._chainId; }
 
   private _syncHandle;
-  private _nodeStatus: Subject<NodeStatusResult> = new Subject();
-  public get nodeStatus$(): Observable<NodeStatusResult> {
-    return this._nodeStatus.asObservable();
+  private _nodeStatus: NodeStatusResult;
+  public get nodeStatus(): NodeStatusResult {
+    return this._nodeStatus;
   }
 
   private _app: IApp;
@@ -59,14 +58,11 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     // block times seem about 1.5-2.5 seconds, so querying every 2s feels right
     this._syncHandle = setInterval(async () => {
       try {
-        const nodeStatus = await this._api.connection.provider.status();
-
-        // maintain observable so Accounts can access the status without a separate query
-        this._nodeStatus.next(nodeStatus);
+        this._nodeStatus = await this._api.connection.provider.status();
 
         // handle chain-related updates
-        this._chainId = nodeStatus.chain_id;
-        const { latest_block_time, latest_block_height } = nodeStatus.sync_info;
+        this._chainId = this._nodeStatus.chain_id;
+        const { latest_block_time, latest_block_height } = this._nodeStatus.sync_info;
 
         // update block heights and times
         const lastTime: moment.Moment = this.app.chain.block && this.app.chain.block.lastTime;
@@ -87,7 +83,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         }
       } catch (e) {
         if (this.app.chain.networkStatus !== ApiStatus.Disconnected) {
-          console.error('failed to query NEAR status: ' + JSON.stringify(e));
+          console.error(`failed to query NEAR status: ${JSON.stringify(e)}`);
           this.app.chain.networkStatus = ApiStatus.Disconnected;
           m.redraw();
         }
@@ -97,16 +93,16 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
   public async deinit(): Promise<void> {
     clearInterval(this._syncHandle);
-    this._nodeStatus.complete();
     this.app.chain.networkStatus = ApiStatus.Disconnected;
   }
 
   public createTXModalData(
-      author: NearAccount,
-      txFunc,
-      txName: string,
-      objName: string,
-      cb?: (success: boolean) => void): ITXModalData {
+    author: NearAccount,
+    txFunc,
+    txName: string,
+    objName: string,
+    cb?: (success: boolean) => void,
+  ): ITXModalData {
     // TODO
     throw new Error('Txs not yet implemented');
   }

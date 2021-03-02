@@ -7,8 +7,6 @@ import {
   ICosmosProposal, CosmosToken, ICosmosProposalTally
 } from 'adapters/chain/cosmos/types';
 import { CosmosApi } from 'adapters/chain/cosmos/api';
-import { of, forkJoin, Subject, Unsubscribable } from 'rxjs';
-import { map, flatMap } from 'rxjs/operators';
 import { CosmosAccount, CosmosAccounts } from './account';
 import CosmosChain from './chain';
 import { CosmosProposal } from './proposal';
@@ -48,8 +46,6 @@ class CosmosGovernance extends ProposalModule<
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
 
-  private _proposalSubscription: Unsubscribable;
-
   public async init(ChainInfo: CosmosChain, Accounts: CosmosAccounts): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -68,38 +64,12 @@ class CosmosGovernance extends ProposalModule<
     this._minDeposit = new CosmosToken(depositParams.min_deposit[0].denom, +depositParams.min_deposit[0].amount);
 
     // query existing proposals
-    return new Promise((resolve, reject) => {
-      this._proposalSubscription = this._subscribeNew()
-        .pipe(
-          flatMap((ps: ICosmosProposal[]) => {
-            const props = ps.map((p) => new CosmosProposal(ChainInfo, Accounts, this, p));
-            if (props.length === 0) {
-              return of(props);
-            } else {
-              return of(props);
-              // return forkJoin(props.map((p) => p.initialized$)).pipe(map(() => props));
-            }
-          })
-        ).subscribe((props: CosmosProposal[]) => {
-          this._initialized = true; // module is initialized once we get something back
-          resolve();
-        }, (err) => {
-          console.error(`${this.constructor.name}: proposal error: ${JSON.stringify(err)}`);
-          reject(new Error(err));
-        });
-    });
+    await this._initProposals();
+    this._initialized = true;
   }
 
-  public deinit() {
-    super.deinit();
-    if (this._proposalSubscription) {
-      this._proposalSubscription.unsubscribe();
-    }
-  }
-
-  private _subscribeNew() {
+  private async _initProposals(): Promise<void> {
     const api = this._Chain.api;
-    const subject = new Subject<ICosmosProposal[]>();
     const msgToIProposal = (p): ICosmosProposal => {
       // handle older cosmoshub types
       const content = p.content || p.proposal_content;
@@ -124,42 +94,17 @@ class CosmosGovernance extends ProposalModule<
         }
       };
     };
-    Promise.all([
+    const proposalResps = await Promise.all([
       api.queryUrl('/gov/proposals?status=deposit_period', null, null, false),
       api.queryUrl('/gov/proposals?status=voting_period', null, null, false),
       api.queryUrl('/gov/proposals?status=passed', null, null, false),
       // limit the number of rejected proposals we fetch
       api.queryUrl('/gov/proposals?status=rejected', 1, 10, false),
-    ]).then((proposalResps) => {
-      const proposals = _.flatten(proposalResps.map((ps) => ps || [])).sort((p1, p2) => +p2.id - +p1.id);
-      if (proposals) {
-        const proposalPromises = proposals.map(async (p): Promise<ICosmosProposal> => {
-          return msgToIProposal(p);
-        });
-        // emit all proposals
-        Promise.all(proposalPromises).then((ps) => subject.next(ps));
+    ]);
 
-        // init stream listener for new proposals
-        api.observeEvent('MsgSubmitProposal').subscribe(async ({ msg, events }) => {
-          let id;
-          /* eslint-disable no-restricted-syntax */
-          for (const { attributes } of events) {
-            for (const { key, value } of attributes) {
-              if (key === 'proposal_id') {
-                id = value;
-              }
-            }
-          }
-          if (id === undefined) {
-            console.log('could not find proposal id in events: ', events);
-            return;
-          }
-          const p = await api.queryUrl(`/gov/proposals/${id}`);
-          subject.next([ msgToIProposal(p) ]);
-        });
-      }
-    }, (err) => console.error(err));
-    return subject.asObservable();
+    const proposalMsgs = _.flatten(proposalResps.map((ps) => ps || [])).sort((p1, p2) => +p2.id - +p1.id);
+    const proposals = proposalMsgs.map((p) => msgToIProposal(p));
+    proposals.forEach((p) => new CosmosProposal(this._Chain, this._Accounts, this, p));
   }
 
   // TODO: cosmos-api only supports text proposals and not parameter_change or software_upgrade

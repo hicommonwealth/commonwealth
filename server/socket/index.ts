@@ -106,7 +106,6 @@ export default function (
   // TODO: maybe unify these, or else remove the event type from payload and add it manually here?
   wss.on(WebsocketMessageType.InitializeScrollback, (payload: IWebsocketsPayload<any>, userIds: number[]) => {
     if (logging) log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(userIds)}`);
-    // eslint-disable-next-line no-restricted-syntax
     for (const user of userIds) {
       if (user && user in userMap && userMap[user].isAlive) {
         userMap[user].send(JSON.stringify(payload));
@@ -120,7 +119,6 @@ export default function (
       if (logging) {
         log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(Object.keys(notifications))}`);
       }
-      // eslint-disable-next-line no-restricted-syntax
       for (const [ user, notification ] of Object.entries(notifications)) {
         if (user && user in userMap && userMap[user].isAlive) {
           // augment notification with unique database id
@@ -134,7 +132,6 @@ export default function (
 
   wss.on(WebsocketMessageType.ChainEntity, (payload: IWebsocketsPayload<any>) => {
     if (logging) log.info(`Payloading ${JSON.stringify(payload)}`);
-    // eslint-disable-next-line no-restricted-syntax
     for (const [ session, sessionSocket ] of Object.entries(sessionMap)) {
       if (sessionSocket && sessionSocket.isAlive) {
         sessionSocket.send(JSON.stringify(payload), (err?) => {

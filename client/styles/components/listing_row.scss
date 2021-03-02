@@ -13,7 +13,7 @@
         .reaction {
             margin-right: 22px;
             position: relative;
-            top: -2px;
+            top: -4px;
             @include xs-max {
                 margin-right: 20px;
             }
@@ -21,7 +21,7 @@
         .pinned {
             flex-shrink: 0;
             position: relative;
-            top: -2px;
+            top: -4px;
             margin-right: 22px;
             @include xs-max {
                 margin-right: 20px;

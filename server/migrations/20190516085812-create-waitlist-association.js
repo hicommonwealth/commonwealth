@@ -1,17 +1,17 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('WaitlistRegistrations', {
-      user_id: { type: DataTypes.INTEGER, allowNull: false },
-      chain_id: { type: DataTypes.STRING, allowNull: false },
-      address: { type: DataTypes.STRING, allowNull: true },
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false },
+      user_id: { type: Sequelize.INTEGER, allowNull: false },
+      chain_id: { type: Sequelize.STRING, allowNull: false },
+      address: { type: Sequelize.STRING, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('WaitlistRegistrations');
   }
 };

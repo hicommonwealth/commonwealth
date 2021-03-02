@@ -3,7 +3,7 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     let comments = await queryInterface.sequelize
       .query(`SELECT (id, parent_id, parent_type) FROM "OffchainComments"`);
     comments = comments[0].map((comment) => {
@@ -44,16 +44,16 @@ module.exports = {
     await queryInterface.removeColumn(
       'OffchainComments',
       'parent_type',
-      { type: DataTypes.STRING }
+      { type: Sequelize.STRING }
     );
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn(
       'OffchainComments',
       'parent_type',
       {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
         defaultValue: 'proposal'
       }

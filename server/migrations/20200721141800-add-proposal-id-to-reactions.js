@@ -1,12 +1,12 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn(
       'OffchainReactions',
       'proposal_id',
       {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: true,
       },
     );
@@ -18,13 +18,13 @@ module.exports = {
     );
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn(
         'OffchainReactions',
         'proposal_id',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         }
       );

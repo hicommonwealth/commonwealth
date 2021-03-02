@@ -1,7 +1,6 @@
 import m from 'mithril';
 import app from 'state';
 import Substrate from 'controllers/chain/substrate/main';
-import { makeDynamicComponent } from 'models/mithril';
 import User from 'views/components/widgets/user';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
@@ -12,34 +11,33 @@ import ControllerAccountForm from './controller_form';
 import NewStashForm from './new_stash_form';
 
 interface IManageStakingModalState {
-  dynamic: {
-    exposures: any;
-    validators: IValidators | { [address: string]: ICosmosValidator };
-    bonded?: SubstrateAccount;
-    stakingLedger?: StakingLedger;
-  };
+  exposures: any;
+  validators: IValidators | { [address: string]: ICosmosValidator };
+  bonded?: SubstrateAccount;
+  stakingLedger?: StakingLedger;
   sending: boolean;
   error: any;
 }
 
-const ManageStakingModal = makeDynamicComponent<{ account }, IManageStakingModalState>({
-  getObservables: (attrs) => ({
-    groupKey: attrs.account.address,
-    exposures: attrs.account.stakingExposure,
-    bonded: attrs.account.bonded,
-    stakingLedger: attrs.account.stakingLedger,
-    // TODO: this should get bonded/ledger status instead of validators
-    validators: (app.chain as Substrate).accounts.validators,
-  }),
+const ManageStakingModal: m.Component<{ account }, IManageStakingModalState> = {
+  oninit: (vnode) => {
+    app.runWhenReady(async () => {
+      vnode.state.exposures = await vnode.attrs.account.stakingExposure;
+      vnode.state.bonded = await vnode.attrs.account.bonded;
+      vnode.state.stakingLedger = await vnode.attrs.account.stakingLedger;
+      // TODO: this should get bonded/ledger status instead of validators
+      vnode.state.validators = await (app.chain as Substrate).accounts.validators;
+    });
+  },
   view: (vnode) => {
-    const { exposures, validators, stakingLedger, bonded } = vnode.state.dynamic;
+    const { exposures, validators, stakingLedger, bonded } = vnode.state;
     const stashes = Object.entries(validators || {})
       .filter(([stash, { controller }]) => controller === vnode.attrs.account.address);
 
     let accountForm;
     // checks whether the account is a stash account because they are bonded, if not
     // checks whether the account is a controller because controllers have stakingLedgers
-    if (vnode.state.dynamic.bonded) {
+    if (vnode.state.bonded) {
       accountForm = m(StashAccountForm, {
         controller: bonded,
       });
@@ -73,6 +71,6 @@ const ManageStakingModal = makeDynamicComponent<{ account }, IManageStakingModal
       ] : accountForm),
     ]);
   },
-});
+};
 
 export default ManageStakingModal;

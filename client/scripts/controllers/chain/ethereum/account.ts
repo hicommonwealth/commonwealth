@@ -1,9 +1,7 @@
 import BN from 'bn.js';
 import { Wallet } from 'ethereumjs-wallet';
-import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
 import {
-  hashPersonalMessage, fromRpcSig, ecrecover, publicToAddress, bufferToHex, ecsign, toRpcSig
+  hashPersonalMessage, fromRpcSig, ecrecover, ecsign, toRpcSig
 } from 'ethereumjs-util';
 import { providers } from 'ethers';
 
@@ -17,12 +15,10 @@ import EthereumAccounts, {
 } from './accounts';
 
 export default class EthereumAccount extends Account<EthereumCoin> {
-  public get balance(): Observable<EthereumCoin> {
+  public get balance(): Promise<EthereumCoin> {
     if (!this._Chain) return; // TODO
-    return from(this._Chain.api.eth.getBalance(this.address)).pipe(
-      map((v) => {
-        return new EthereumCoin('ETH', new BN(v), false);
-      })
+    return this._Chain.api.eth.getBalance(this.address).then(
+      (v) => new EthereumCoin('ETH', new BN(v), false)
     );
   }
 
