@@ -224,12 +224,7 @@ export const ProposalTitleSaveEdit: m.Component<{
             parentState.editing = false;
             parentState.saving = false;
             getSetGlobalEditingStatus(GlobalStatus.Set, false);
-            // TODO: Avoid double instantiation
-            const chainEntity = ChainEntity.fromJSON(response.result);
-            console.log(chainEntity);
-            const controller = (proposalSlugToClass().get(proposal.slug) as any);
-            const newProposal = controller.updateProposal(chainEntity);
-            controller.store.update(newProposal);
+            proposal.title = parentState.updatedTitle;
             m.redraw();
             notifySuccess('Thread successfully edited');
           });

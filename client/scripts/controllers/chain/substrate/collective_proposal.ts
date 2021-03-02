@@ -38,7 +38,6 @@ export class SubstrateCollectiveProposal
   public get shortIdentifier() {
     return `#${this.data.index.toString()}`;
   }
-  public get title() { return this._title; }
   public get description() { return null; }
   public get author() { return null; }
   public get call() { return this._call; }
@@ -47,7 +46,7 @@ export class SubstrateCollectiveProposal
   public canVoteFrom(account: SubstrateAccount) {
     return this._Collective.isMember(account);
   }
-  private readonly _title: string;
+  public title: string;
   private readonly _call;
   private _approved: boolean = false;
 
@@ -107,7 +106,7 @@ export class SubstrateCollectiveProposal
     this._Accounts = Accounts;
     this._Collective = Collective;
     this._call = eventData.call;
-    this._title = entity.title || formatCall(eventData.call);
+    this.title = entity.title || formatCall(eventData.call);
     this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));

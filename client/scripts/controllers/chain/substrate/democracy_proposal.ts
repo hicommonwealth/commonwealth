@@ -40,9 +40,7 @@ class SubstrateDemocracyProposal extends Proposal<
     return `#${this.identifier.toString()}`;
   }
 
-  private _title: string;
-  public get title() { return this._title; }
-  public set title(title) { this._title = title; }
+  public title: string;
 
   public get description() { return null; }
 
@@ -145,9 +143,9 @@ class SubstrateDemocracyProposal extends Proposal<
       this._method = preimage.method;
       this._section = preimage.section;
       this._preimage = preimage;
-      this._title = entity.title || formatCall(preimage);
+      this.title = entity.title || formatCall(preimage);
     } else {
-      this._title = entity.title || `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
+      this.title = entity.title || `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
     }
 
     entity.chainEvents.forEach((e) => this.update(e));
@@ -182,7 +180,7 @@ class SubstrateDemocracyProposal extends Proposal<
           this._method = preimage.method;
           this._section = preimage.section;
           this._preimage = preimage;
-          this._title = this._title || formatCall(preimage);
+          this.title = this.title || formatCall(preimage);
         }
         break;
       }

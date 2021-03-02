@@ -37,7 +37,6 @@ export abstract class ProposalModule<
   }
 
   public updateProposal(entity: ChainEntity, event: ChainEvent): void {
-    debugger
     const proposal = this.store.getByIdentifier(entity.typeId);
     if (!proposal) {
       this._entityConstructor(entity);

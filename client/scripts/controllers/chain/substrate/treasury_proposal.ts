@@ -42,8 +42,7 @@ export class SubstrateTreasuryProposal
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
 
-  private readonly _title: string;
-  public get title() { return this._title || this.generateTitle(); }
+  public title: string;
 
   private _awarded: boolean = false;
   get awarded() { return this._awarded; }
@@ -125,7 +124,7 @@ export class SubstrateTreasuryProposal
     this.bond = this._Chain.coins(this.data.bond);
     this.beneficiaryAddress = this.data.beneficiary;
     this._author = this._Accounts.fromAddress(this.data.proposer);
-    this._title = entity.title;
+    this.title = entity.title;
     this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
