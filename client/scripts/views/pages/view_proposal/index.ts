@@ -51,7 +51,8 @@ import {
   ProposalBodyLastEdited, ProposalBodyCancelEdit, ProposalBodySaveEdit,
   ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, EditPermissionsButton,
-  ProposalEditorPermissions
+  ProposalEditorPermissions,
+  ProposalTitleEditMenuItem
 } from './body';
 import CreateComment from './create_comment';
 
@@ -98,7 +99,7 @@ const ProposalHeader: m.Component<{
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
-
+    console.log(app.isLoggedIn() && !getSetGlobalEditingStatus(GlobalStatus.Get));
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
@@ -117,79 +118,101 @@ const ProposalHeader: m.Component<{
             ]),
           vnode.state.editing
             && m(ProposalTitleEditor, { item: proposal, parentState: vnode.state }),
-          m('.proposal-body-meta', proposal instanceof OffchainThread ? [
-            m(ProposalHeaderTopics, { proposal }),
-            m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
-            m(ProposalBodyLastEdited, { item: proposal }),
-            m(ProposalBodyAuthor, { item: proposal }),
-            m(ProposalHeaderViewCount, { viewCount }),
-            app.isLoggedIn() && !getSetGlobalEditingStatus(GlobalStatus.Get) && m(PopoverMenu, {
-              transitionDuration: 0,
-              closeOnOutsideClick: true,
-              closeOnContentClick: true,
-              menuAttrs: { size: 'default' },
-              content: [
-                (isEditor || isAuthor)
-                  && m(ProposalBodyEditMenuItem, {
-                    item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+          m('.proposal-body-meta', proposal instanceof OffchainThread
+            ? [
+              m(ProposalHeaderTopics, { proposal }),
+              m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
+              m(ProposalBodyLastEdited, { item: proposal }),
+              m(ProposalBodyAuthor, { item: proposal }),
+              m(ProposalHeaderViewCount, { viewCount }),
+              app.isLoggedIn() && !getSetGlobalEditingStatus(GlobalStatus.Get) && m(PopoverMenu, {
+                transitionDuration: 0,
+                closeOnOutsideClick: true,
+                closeOnContentClick: true,
+                menuAttrs: { size: 'default' },
+                content: [
+                  (isEditor || isAuthor)
+                    && m(ProposalBodyEditMenuItem, {
+                      item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+                    }),
+                  isAuthor && m(EditPermissionsButton, {
+                    openEditPermissions: () => {
+                      vnode.state.editPermissionsIsOpen = true;
+                    }
                   }),
-                isAuthor && m(EditPermissionsButton, {
-                  openEditPermissions: () => {
-                    vnode.state.editPermissionsIsOpen = true;
-                  }
+                  isAdmin && proposal instanceof OffchainThread && m(TopicEditorMenuItem, {
+                    openTopicEditor: () => {
+                      vnode.state.topicEditorIsOpen = true;
+                    }
+                  }),
+                  (isAuthor || isAdmin)
+                    && m(ProposalBodyDeleteMenuItem, { item: proposal }),
+                  (isAuthor || isAdmin)
+                    && m(ProposalHeaderPrivacyMenuItems, { proposal, getSetGlobalEditingStatus }),
+                  (isAuthor || isAdmin)
+                    && m(MenuDivider),
+                  m(ThreadSubscriptionMenuItem, { proposal: proposal as OffchainThread }),
+                ],
+                inline: true,
+                trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+              }),
+              vnode.state.editPermissionsIsOpen
+                && proposal instanceof OffchainThread
+                && m(ProposalEditorPermissions, {
+                  thread: vnode.attrs.proposal as OffchainThread,
+                  popoverMenu: true,
+                  openStateHandler: (v) => {
+                    vnode.state.editPermissionsIsOpen = v;
+                  },
+                  // TODO: Onchange logic
+                  onChangeHandler: () => {},
                 }),
-                isAdmin && proposal instanceof OffchainThread && m(TopicEditorMenuItem, {
-                  openTopicEditor: () => {
-                    vnode.state.topicEditorIsOpen = true;
-                  }
+              vnode.state.topicEditorIsOpen
+                && proposal instanceof OffchainThread
+                && m(TopicEditor, {
+                  thread: vnode.attrs.proposal as OffchainThread,
+                  popoverMenu: true,
+                  onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
+                  openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
                 }),
-                (isAuthor || isAdmin)
-                  && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                (isAuthor || isAdmin)
-                  && m(ProposalHeaderPrivacyMenuItems, { proposal, getSetGlobalEditingStatus }),
-                (isAuthor || isAdmin)
-                  && m(MenuDivider),
-                m(ThreadSubscriptionMenuItem, { proposal: proposal as OffchainThread }),
-              ],
-              inline: true,
-              trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
-            }),
-            vnode.state.editPermissionsIsOpen
-              && proposal instanceof OffchainThread
-              && m(ProposalEditorPermissions, {
-                thread: vnode.attrs.proposal as OffchainThread,
-                popoverMenu: true,
-                openStateHandler: (v) => {
-                  vnode.state.editPermissionsIsOpen = v;
-                },
-                // TODO: Onchange logic
-                onChangeHandler: () => {},
+              vnode.state.stageEditorIsOpen
+                && proposal instanceof OffchainThread
+                && m(StageEditor, {
+                  thread: vnode.attrs.proposal as OffchainThread,
+                  popoverMenu: true,
+                  onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[]) => {
+                    proposal.stage = stage;
+                    proposal.chainEntities = chainEntities;
+                    m.redraw();
+                  },
+                  openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
+                }),
+            ]
+            : [
+              m(ProposalHeaderOnchainId, { proposal }),
+              m(ProposalHeaderOnchainStatus, { proposal }),
+              m(ProposalBodyAuthor, { item: proposal }),
+              app.isLoggedIn()
+              && isAdmin
+              && !getSetGlobalEditingStatus(GlobalStatus.Get)
+              && m(PopoverMenu, {
+                transitionDuration: 0,
+                closeOnOutsideClick: true,
+                closeOnContentClick: true,
+                menuAttrs: { size: 'default' },
+                content: [
+                  (isEditor || isAuthor)
+                    && m(ProposalTitleEditMenuItem, {
+                      item: proposal,
+                      getSetGlobalReplyStatus,
+                      getSetGlobalEditingStatus,
+                      parentState: vnode.state,
+                    }),
+                ],
+                inline: true,
+                trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               }),
-            vnode.state.topicEditorIsOpen
-              && proposal instanceof OffchainThread
-              && m(TopicEditor, {
-                thread: vnode.attrs.proposal as OffchainThread,
-                popoverMenu: true,
-                onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
-                openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
-              }),
-            vnode.state.stageEditorIsOpen
-              && proposal instanceof OffchainThread
-              && m(StageEditor, {
-                thread: vnode.attrs.proposal as OffchainThread,
-                popoverMenu: true,
-                onChangeHandler: (stage: OffchainThreadStage, chainEntities: ChainEntity[]) => {
-                  proposal.stage = stage;
-                  proposal.chainEntities = chainEntities;
-                  m.redraw();
-                },
-                openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
-              }),
-          ] : [
-            m(ProposalHeaderOnchainId, { proposal }),
-            m(ProposalHeaderOnchainStatus, { proposal }),
-            m(ProposalBodyAuthor, { item: proposal }),
-          ]),
+            ]),
           m('.proposal-body-link', [
             proposal instanceof OffchainThread
               && proposal.kind === OffchainThreadKind.Link

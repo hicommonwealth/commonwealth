@@ -193,6 +193,32 @@ export const ProposalBodyReplyMenuItem: m.Component<{
   }
 };
 
+export const ProposalTitleEditMenuItem: m.Component<{
+  item: AnyProposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
+}> = {
+  view: (vnode) => {
+    const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
+    if (!item) return;
+
+    return m(MenuItem, {
+      label: 'Edit',
+      class: 'edit-proposal-title',
+      onclick: async (e) => {
+        e.preventDefault();
+        if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
+          if (activeQuillEditorHasText()) {
+            const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
+            if (!confirmed) return;
+          }
+          getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+        }
+        parentState.editing = true;
+        getSetGlobalEditingStatus(GlobalStatus.Set, true);
+      },
+    });
+  }
+};
+
 export const ProposalBodyEditMenuItem: m.Component<{
   item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
 }> = {
