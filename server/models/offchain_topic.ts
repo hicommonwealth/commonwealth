@@ -47,6 +47,11 @@ export default (
   }, {
     underscored: true,
     paranoid: true,
+    defaultScope: {
+      attributes: {
+        exclude: [ 'created_at', 'updated_at', 'deleted_at' ],
+      }
+    },
   });
 
   OffchainTopic.associate = (models) => {
