@@ -1,0 +1,46 @@
+import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+
+export const Errors = {
+  NoEntity: 'Cannot find entity',
+  NotAdminOrOwner: 'Not an admin or owner of this entity',
+};
+
+const updateThreadLinkedChainEntities = async (models, req: Request, res: Response, next: NextFunction) => {
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
+  const { id, title } = req.body;
+
+  const entity = await models.ChainEntity.findOne({
+    where: { id },
+  });
+  if (!entity) return next(new Error(Errors.NoEntity));
+  const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => {
+    return !!addr.verified;
+  }).map((addr) => addr.id);
+  // if (!userOwnedAddressIds.includes(entity.address_id)) {
+  const roles = await models.Role.findAll({
+    where: {
+      address_id: { [Op.in]: userOwnedAddressIds, },
+      permission: { [Op.in]: ['admin', 'moderator'] },
+    }
+  });
+  const role = roles.find((r) => {
+    return r.offchain_community_id === entity.community || r.chain_id === entity.chain;
+  });
+  if (!role) return next(new Error(Errors.NotAdminOrOwner));
+  // }
+
+  entity.title = title;
+  entity.save();
+
+  const finalEntity = await models.ChainEntity.findAll({
+    where: { id }
+    // TODO includes
+  });
+
+  return res.json({ status: 'Success', result: finalEntity.toJSON() });
+};
+
+export default updateThreadLinkedChainEntities;

@@ -72,6 +72,7 @@ import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
+import updateChainEntityTitle from './routes/updateChainEntityTitle';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
