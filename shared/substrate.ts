@@ -9,7 +9,7 @@ export function constructSubstrateUrl(url: string): string {
     'cc1.darwinia.network',
     'fullnode.centrifuge.io',
     'poc3.phala.network',
-    'hack.hydradx.io:9944',
+    'rpc-01.snakenet.hydradx.io',
   ];
   const hasProtocol = url.indexOf('wss://') !== -1 || url.indexOf('ws://') !== -1;
   url = hasProtocol ? url.split('://')[1] : url;

@@ -36,7 +36,7 @@ const nodes = [
   // [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
-  [ 'wss://hack.hydradx.io:9944', 'hydradx'],
+  [ 'wss://rpc-01.snakenet.hydradx.io', 'hydradx'],
 ];
 const resetServer = (models): Promise<number> => {
   log.debug('Resetting database...');

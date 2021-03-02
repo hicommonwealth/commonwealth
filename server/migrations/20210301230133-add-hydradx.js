@@ -20,7 +20,7 @@ module.exports = {
 
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'hydradx',
-        url: 'wss://hack.hydradx.io:9944/',
+        url: 'wss://rpc-01.snakenet.hydradx.io/',
       }], { transaction: t });
     });
   },
