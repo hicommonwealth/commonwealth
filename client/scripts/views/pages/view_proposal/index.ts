@@ -468,24 +468,6 @@ interface IPrefetch {
   }
 }
 
-function getModules() {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base === ChainBase.Substrate) {
-    const chain = (app.chain as Substrate);
-    return [
-      chain.treasury,
-      chain.council,
-      chain.technicalCommittee,
-      chain.democracy,
-      chain.democracyProposals
-    ];
-  } else {
-    throw new Error('invalid chain');
-  }
-}
-
 const ViewProposalPage: m.Component<{
   identifier: string,
   type: string
