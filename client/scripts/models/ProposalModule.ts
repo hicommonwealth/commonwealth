@@ -51,7 +51,30 @@ export abstract class ProposalModule<
     this._app = app;
   }
 
-  public abstract init(chain: IChainModule<any, any>, accounts: IAccountsModule<any, any>): Promise<void>;
+  /* `init()` MUST do the following:
+    - set `this._initializing` to true while in progress, false before returning
+    - set `this._initialized` to true before returning
+    - set itself to disabled if the functionality is unavailable on the active chain
+    - guard against multiple calls by returning immediately if initializing/initialized/ready
+    - an example:
+        (note that it's safe for multiple calls because JS threads will not yield until `return`)
+    ```
+      public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+        this._disabled = !ChainInfo.api.query.democracy;
+        if (this._initializing || this._initialized || this.disabled) return;
+        this._initializing = true;
+        this._Chain = ChainInfo;
+        this._Accounts = Accounts;
+
+        .....perform initialization.....
+
+        this._initialized = true;
+        this._initializing = false;
+      }
+    ```
+    TODO: create a helper function that encapsulates this boilerplate
+  */
+  public abstract init(ChainInfo: IChainModule<any, any>, Accounts: IAccountsModule<any, any>): Promise<void>;
 
   public deinit() {
     this._initialized = false;
