@@ -6,7 +6,6 @@ import ThreadsController from './controllers/server/threads';
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
-  EdgewareSignalingProposal = 'signalingproposal',
   SubstrateCollectiveProposal = 'councilmotion',
   PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',
@@ -37,9 +36,6 @@ export const proposalSlugToClass = () => {
   if (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot) {
     mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
   }
-  if (app.chain.class === ChainClass.Edgeware) {
-    mmap.set('signalingproposal', (app.chain as any).signaling);
-  }
   if (app.chain.class === ChainClass.Moloch) {
     mmap.set('molochproposal', (app.chain as any).governance);
   }
@@ -58,7 +54,6 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['democracyproposal', 'Democracy Proposal'],
   ['democracypreimage', 'Democracy Preimage'],
   ['democracyimminent', 'Democracy Imminent Preimage'],
-  ['signalingproposal', 'Signaling Proposal'],
   ['councilmotion', 'Council Motion'],
   ['phragmenelection', 'Phragmen Council Candidacy'],
   ['treasuryproposal', 'Treasury Proposal'],
