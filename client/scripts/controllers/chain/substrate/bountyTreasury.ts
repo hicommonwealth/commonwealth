@@ -1,5 +1,5 @@
 import { ApiPromise } from '@polkadot/api';
-import { BalanceOf, Permill } from '@polkadot/types/interfaces';
+import { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
 import { IApp } from 'state';
 import {
   ISubstrateBounty,
@@ -25,26 +25,12 @@ class SubstrateBountyTreasury extends ProposalModule<
   get bountyDepositBase() { return this._bountyDepositBase; }
 
   // The payout delay for a bounty
-  private _bountyDepositPayoutDelay: SubstrateCoin = null;
+  private _bountyDepositPayoutDelay: BlockNumber = null;
   get bountyDepositPayoutDelay() { return this._bountyDepositPayoutDelay; }
 
   // The minimum value for a bounty
   private _bountyValueMinimum: SubstrateCoin = null;
   get bountyValueMinimum() { return this._bountyValueMinimum; }
-
-
-  // The percentage of a proposal value that will be bonded
-  private _bondPct: number = null;
-  get bondPct() { return this._bondPct; }
-
-  // The minimum bond for a proposal
-  private _bondMinimum: SubstrateCoin = null;
-  get bondMinimum() { return this._bondMinimum; }
-
-  public computeBond(amount: SubstrateCoin): SubstrateCoin {
-    const computed = amount.muln(this.bondPct);
-    return this.bondMinimum.gt(computed) ? this.bondMinimum : this._Chain.coins(computed);
-  }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
@@ -64,12 +50,11 @@ class SubstrateBountyTreasury extends ProposalModule<
     entities.forEach((e) => this._entityConstructor(e));
 
     // save parameters
-    this._bondPct = +(ChainInfo.api.consts.treasury.proposalBond as Permill) / 1_000_000;
-    this._bondMinimum = this._Chain.coins(ChainInfo.api.consts.treasury.proposalBondMinimum as BalanceOf);
-    this._bountyCuratorDeposit = this._Chain.coins(ChainInfo.api.consts.treasury.bountyCuratorDeposit);
-    this._bountyDepositBase = this._Chain.coins(ChainInfo.api.consts.treasury.bountyDepositBase);
-    this._bountyDepositPayoutDelay = this._Chain.coins(ChainInfo.api.consts.treasury.bountyDepositPayoutDelay);
-    this._bountyValueMinimum = this._Chain.coins(ChainInfo.api.consts.treasury.bountyValueMinimum);
+    const bountyModule = ChainInfo.api.consts.bounties || ChainInfo.api.consts.treasury;
+    this._bountyCuratorDeposit = this._Chain.coins(bountyModule.bountyCuratorDeposit as Permill);
+    this._bountyDepositBase = this._Chain.coins(bountyModule.bountyDepositBase as BalanceOf);
+    this._bountyDepositPayoutDelay = bountyModule.bountyDepositPayoutDelay as BlockNumber;
+    this._bountyValueMinimum = this._Chain.coins(bountyModule.bountyValueMinimum as BalanceOf);
 
     // kick off subscriptions
     // const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
@@ -94,7 +79,9 @@ class SubstrateBountyTreasury extends ProposalModule<
   public createTx(author: SubstrateAccount, description: string, value: string) {
     return this._Chain.createTXModalData(
       author,
-      (api: ApiPromise) => api.tx.bounties.createBounty(author.address, description, value),
+      (api: ApiPromise) => api.tx.bounties
+        ? api.tx.bounties.createBounty(author.address, description, value)
+        : api.tx.treasury.proposeBounty(value, description),
       'createBounty',
       `createBounty(${author.address}, ${description}, ${value})`
     );
