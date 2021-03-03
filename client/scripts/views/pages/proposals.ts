@@ -9,7 +9,7 @@ import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase, ChainNetwork } from 'models';
+import { ChainClass, ChainBase, ChainNetwork, ProposalModule } from 'models';
 
 import Edgeware from 'controllers/chain/edgeware/main';
 import {
@@ -80,24 +80,24 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   }
 };
 
-async function loadCmd() {
+function getModules(): ProposalModule<any, any, any>[] {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
   if (app.chain.base === ChainBase.Substrate) {
     const chain = (app.chain as Substrate);
-    await Promise.all([
-      chain.council.init(chain.chain, chain.accounts),
-      chain.technicalCommittee.init(chain.chain, chain.accounts),
-      chain.treasury.init(chain.chain, chain.accounts),
-      chain.democracyProposals.init(chain.chain, chain.accounts),
-      chain.democracy.init(chain.chain, chain.accounts),
-    ]);
+    return [
+      chain.council,
+      chain.technicalCommittee,
+      chain.treasury,
+      chain.democracyProposals,
+      chain.democracy
+    ];
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     const chain = (app.chain as Cosmos);
-    await Promise.all([
-      chain.governance.init(chain.chain, chain.accounts),
-    ]);
+    return [ chain.governance ];
+  } else {
+    throw new Error('invalid chain');
   }
 }
 
@@ -140,10 +140,9 @@ const ProposalsPage: m.Component<{}> = {
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 
     if (onSubstrate) {
-      // Democracy, Council must be loaded to proceed
-      const chain = app.chain as Substrate;
-      if (!chain.democracy.initialized || !chain.council.initialized || !chain.democracyProposals.initialized) {
-        if (!chain.democracy.initializing && !chain.council.initializing) loadCmd();
+      const modules = getModules();
+      if (modules.some((mod) => !mod.ready)) {
+        app.chain.loadModules(modules);
         return m(PageLoading, {
           message: 'Connecting to chain',
           title: [

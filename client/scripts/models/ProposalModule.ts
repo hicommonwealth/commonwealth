@@ -24,6 +24,7 @@ export abstract class ProposalModule<
   public get initializing() { return this._initializing; }
   protected _initialized: boolean = false;
   public get initialized() { return this._initialized; }
+  public get ready() { return this._initialized || this._disabled; }
 
   private _app: IApp;
   public get app() { return this._app; }

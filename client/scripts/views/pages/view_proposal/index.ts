@@ -468,20 +468,22 @@ interface IPrefetch {
   }
 }
 
-async function loadCmd(type: string) {
+function getModules() {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
+  if (app.chain.base === ChainBase.Substrate) {
+    const chain = (app.chain as Substrate);
+    return [
+      chain.treasury,
+      chain.council,
+      chain.technicalCommittee,
+      chain.democracy,
+      chain.democracyProposals
+    ];
+  } else {
+    throw new Error('invalid chain');
   }
-  const chain = app.chain as Substrate;
-  await Promise.all([
-    chain.council.init(chain.chain, chain.accounts),
-    chain.treasury.init(chain.chain, chain.accounts),
-    chain.democracyProposals.init(chain.chain, chain.accounts),
-    chain.democracy.init(chain.chain, chain.accounts),
-  ]);
 }
 
 const ViewProposalPage: m.Component<{
@@ -563,8 +565,8 @@ const ViewProposalPage: m.Component<{
           }
           // check if module is still initializing
           const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
-          if (!c.disabled && !c.initialized) {
-            if (!c.initializing) loadCmd(proposalType);
+          if (!c.ready) {
+            app.chain.loadModules([ c ]);
             return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
           }
         }
