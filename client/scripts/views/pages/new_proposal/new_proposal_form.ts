@@ -74,7 +74,7 @@ const NewProposalForm = {
       hasToggle = true;
       hasDepositChooser = (vnode.state.toggleValue === 'proposal');
       if (hasDepositChooser) {
-        dataLoaded = !!(app.chain as Substrate).democracyProposals?.minimumDeposit;
+        dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
       }
     } else if (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal) {
       hasCouncilMotionChooser = true;
@@ -89,27 +89,27 @@ const NewProposalForm = {
       hasTreasuryProposalSelector = vnode.state.councilMotionType === 'createTreasuryApprovalMotion'
         || vnode.state.councilMotionType === 'createTreasuryRejectionMotion';
       hasThreshold = vnode.state.councilMotionType !== 'vetoNextExternal';
-      if (hasExternalProposalSelector) dataLoaded = !!(app.chain as Substrate).democracyProposals;
+      if (hasExternalProposalSelector) dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
     } else if (proposalTypeEnum === ProposalType.OffchainThread) {
       hasTitleAndDescription = true;
       hasTopics = true;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
       hasBeneficiaryAndAmount = true;
       const treasury = (app.chain as Substrate).treasury;
-      dataLoaded = !!treasury.bondMinimum && !!treasury.bondPct;
+      dataLoaded = !!treasury.initialized;
     } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
       hasTitleAndDescription = true;
       hasValue = true;
       const bountyTreasury = (app.chain as Substrate).bounties;
-      dataLoaded = !!bountyTreasury.bondMinimum && !!bountyTreasury.bondPct;
+      dataLoaded = !!bountyTreasury.initialized;
     } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
       hasPhragmenInfo = true;
       const elections = (app.chain as Substrate).phragmenElections;
-      dataLoaded = !!elections.candidacyBond && !!elections.desiredRunnersUp;
+      dataLoaded = !!elections.initialized;
     } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
       hasTitleAndDescription = true;
       hasDepositChooser = true;
-      dataLoaded = !!(app.chain as Cosmos).governance;
+      dataLoaded = !!(app.chain as Cosmos).governance.initialized;
     } else if (proposalTypeEnum === ProposalType.MolochProposal) {
       hasMolochFields = true;
     } else {

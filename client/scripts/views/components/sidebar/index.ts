@@ -228,7 +228,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
         }),
       // bounties (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
         && m(Button, {
           fluid: true,
           rounded: true,
