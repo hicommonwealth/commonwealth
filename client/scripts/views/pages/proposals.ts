@@ -88,6 +88,7 @@ async function loadCmd() {
     const chain = (app.chain as Substrate);
     await Promise.all([
       chain.council.init(chain.chain, chain.accounts),
+      chain.technicalCommittee.init(chain.chain, chain.accounts),
       chain.treasury.init(chain.chain, chain.accounts),
       chain.democracyProposals.init(chain.chain, chain.accounts),
       chain.democracy.init(chain.chain, chain.accounts),
@@ -97,9 +98,6 @@ async function loadCmd() {
     await Promise.all([
       chain.governance.init(chain.chain, chain.accounts),
     ]);
-    return;
-  } else {
-    return;
   }
 }
 
@@ -145,7 +143,7 @@ const ProposalsPage: m.Component<{}> = {
       // Democracy, Council must be loaded to proceed
       const chain = app.chain as Substrate;
       if (!chain.democracy.initialized || !chain.council.initialized || !chain.democracyProposals.initialized) {
-        if (!chain.democracy.initializing) loadCmd();
+        if (!chain.democracy.initializing && !chain.council.initializing) loadCmd();
         return m(PageLoading, {
           message: 'Connecting to chain',
           title: [

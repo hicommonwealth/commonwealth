@@ -29,6 +29,7 @@ class SubstrateCollective extends ProposalModule<
 
   // TODO: we may want to track membership here as well as in elections
   public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    this._disabled = !ChainInfo.api.query[this.moduleName];
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
     this._Chain = ChainInfo;
