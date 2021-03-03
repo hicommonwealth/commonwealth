@@ -20,7 +20,6 @@ const SUPPORTED_KIND_FIELDS = {
   [SubstrateTypes.EventKind.ElectionCandidacySubmitted]: 'candidate',
   [SubstrateTypes.EventKind.CollectiveProposed]: 'proposer',
   [SubstrateTypes.EventKind.CollectiveVoted]: 'voter',
-  [SubstrateTypes.EventKind.SignalingNewProposal]: 'proposer',
   [SubstrateTypes.EventKind.IdentitySet]: 'who',
 };
 

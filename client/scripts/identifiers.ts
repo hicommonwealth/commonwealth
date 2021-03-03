@@ -6,7 +6,6 @@ import ThreadsController from './controllers/server/threads';
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
-  EdgewareSignalingProposal = 'signalingproposal',
   SubstrateCollectiveProposal = 'councilmotion',
   PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',
@@ -55,7 +54,6 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['democracyproposal', 'Democracy Proposal'],
   ['democracypreimage', 'Democracy Preimage'],
   ['democracyimminent', 'Democracy Imminent Preimage'],
-  ['signalingproposal', 'Signaling Proposal'],
   ['councilmotion', 'Council Motion'],
   ['phragmenelection', 'Phragmen Council Candidacy'],
   ['treasuryproposal', 'Treasury Proposal'],
