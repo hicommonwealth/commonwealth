@@ -1,30 +1,15 @@
 import 'pages/proposals.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import app from 'state';
 
-
-import { formatCoin } from 'adapters/currency';
-import { formatDuration, blockperiodToDuration } from 'helpers';
-import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase, AnyProposal } from 'models';
-import Edgeware from 'controllers/chain/edgeware/main';
+import { ChainBase } from 'models';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
-import { CountdownUntilBlock } from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
-import NewProposalPage from 'views/pages/new_proposal/index';
-import { Grid, Col, List } from 'construct-ui';
-import moment from 'moment';
-import { SubstrateBounty } from 'client/scripts/controllers/chain/substrate/bounty';
 import Listing from './listing';
 import ErrorPage from './error';
-import User from '../components/widgets/user';
-
-
 
 async function loadCmd() {
   if (!app || !app.chain || !app.chain.loaded) {
@@ -52,7 +37,8 @@ const BountyPage: m.Component<{}> = {
         showNewProposalButton: true,
       });
     }
-    const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
+
+    const onSubstrate = app.chain?.base === ChainBase.Substrate;
     if (onSubstrate && !(app.chain as Substrate).bounties.initialized) {
       if (!(app.chain as Substrate).bounties.initializing) loadCmd();
       return m(PageLoading, {
@@ -61,7 +47,6 @@ const BountyPage: m.Component<{}> = {
         showNewProposalButton: true,
       });
     }
-
 
     const activeBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed);
     const inactiveBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => p.completed);

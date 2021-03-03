@@ -951,11 +951,17 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.4.2.tgz#e8ae4d4554267be2042c285726ada2f6c414d698"
-  integrity sha512-7dKJaQbReFA4DxKmU7hIFY06NBzR3oWb0C1ui5infn78kCuZvOt3xYnLCvHioMtopLPyWY9QDEBfN3l4NZrLiw==
+"@clover-network/node-tpye@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@clover-network/node-tpye/-/node-tpye-1.0.1.tgz#cb61a6ef57c3207ce3baec6f0bdcd23287dc5209"
+  integrity sha512-edR5xE6I3DdcNboBTnK9U6cVHPKsvJRD19o+LUelvJnqrH+DHipMZVr8VBLpf9CvLBxHNZffGX6Jf/iJmkR9+g==
+
+"@commonwealth/chain-events@0.5.0-beta.4":
+  version "0.5.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.5.0-beta.4.tgz#6daf02bd3473fe8025a1e1dbb0b4a1660e03f038"
+  integrity sha512-uejk3ysJAfbPMIHBkpGDn5MNDxmiQzGtJeTizwHmPP3MO524geXw3xFyNWD6ps+S0qqFaXCQ9FoPsBW5AKiXMQ==
   dependencies:
+    "@clover-network/node-tpye" "^1.0.1"
     "@edgeware/node-types" "3.3.1"
     "@polkadot/api" "3.6.4"
     bn.js "^5.1.3"

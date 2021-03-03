@@ -1,5 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
-import { ApiRx } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 
 import { formatCoin } from 'adapters/currency';
 import { ISubstrateBounty, SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -8,9 +7,9 @@ import {
   VotingType, VotingUnit, ChainEntity, ChainEvent,
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import { formatAddressShort } from 'shared/utils';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
-import { formatAddressShort } from '../../../../../shared/utils';
 import SubstrateBountyTreasury from './bountyTreasury';
 
 const backportEventToAdapter = (
@@ -29,7 +28,7 @@ const backportEventToAdapter = (
 };
 
 export class SubstrateBounty
-  extends Proposal<ApiRx, SubstrateCoin, ISubstrateBounty, null> {
+  extends Proposal<ApiPromise, SubstrateCoin, ISubstrateBounty, null> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
@@ -45,7 +44,11 @@ export class SubstrateBounty
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
 
-  private _awarded: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private _awarded: boolean = false;
+  get awarded() { return this._awarded; }
+
+  private _active: boolean = false;
+  get active() { return this._active; }
 
   public readonly _value: SubstrateCoin;
   public get value() { return this._value; }
@@ -126,7 +129,9 @@ export class SubstrateBounty
     super('bountyproposal', backportEventToAdapter( // TODO: check if this is the right backport string
       ChainInfo,
       entity.chainEvents
-        .find((e) => e.data.kind === SubstrateTypes.EventKind.TreasuryBountyProposed).data as SubstrateTypes.ITreasuryBountyProposed
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.TreasuryBountyProposed
+        ).data as SubstrateTypes.ITreasuryBountyProposed
     ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -140,7 +145,7 @@ export class SubstrateBounty
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
+    this._initialized = true;
     this._Treasury.store.add(this);
   }
 
@@ -157,9 +162,11 @@ export class SubstrateBounty
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
+        this._active = true;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
+        this._active = false;
         this.complete();
         break;
       }
@@ -167,15 +174,18 @@ export class SubstrateBounty
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
-        this._awarded.next(true);
+        this._awarded = true;
+        this._active = false;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyRejected: {
         this.complete();
+        this._active = false;
         break;
       }
       case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-        this._awarded.next(true);
+        this._awarded = true;
+        this._active = false;
         this.complete();
         break;
       }
@@ -185,14 +195,8 @@ export class SubstrateBounty
     }
   }
 
-  // GETTERS AND SETTERS
-  // none
-
   // TRANSACTIONS
   public submitVoteTx(vote: BinaryVote<SubstrateCoin>): ITXModalData {
     throw new Error('Cannot vote on a treasury proposal');
-  }
-  get awarded() {
-    return this._awarded.getValue();
   }
 }

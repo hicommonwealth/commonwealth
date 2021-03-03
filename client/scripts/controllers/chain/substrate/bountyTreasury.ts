@@ -1,9 +1,5 @@
-import { BehaviorSubject, Unsubscribable } from 'rxjs';
-import { first, switchMap } from 'rxjs/operators';
-import { ApiRx } from '@polkadot/api';
-import { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
-import { DeriveBalancesAccount } from '@polkadot/api-derive/types';
-import { stringToU8a, u8aToHex } from '@polkadot/util';
+import { ApiPromise } from '@polkadot/api';
+import { BalanceOf, Permill } from '@polkadot/types/interfaces';
 import { IApp } from 'state';
 import {
   ISubstrateBounty,
@@ -13,12 +9,10 @@ import { ProposalModule } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
-import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateBounty } from './bounty';
-import { String } from 'aws-sdk/clients/acm';
 
 class SubstrateBountyTreasury extends ProposalModule<
-  ApiRx,
+  ApiPromise,
   ISubstrateBounty,
   SubstrateBounty
 > {
@@ -59,7 +53,7 @@ class SubstrateBountyTreasury extends ProposalModule<
     super(app, (e) => new SubstrateBounty(this._Chain, this._Accounts, this, e));
   }
 
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+  public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
     this._Chain = ChainInfo;
@@ -67,52 +61,43 @@ class SubstrateBountyTreasury extends ProposalModule<
 
     // load server proposals
     const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryBounty);
-    const proposals = entities.map((e) => this._entityConstructor(e));
+    entities.forEach((e) => this._entityConstructor(e));
 
-    return new Promise((resolve, reject) => {
-      this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
-        // save parameters
-        this._bondPct = +(api.consts.treasury.proposalBond as Permill) / 1_000_000;
-        this._bondMinimum = this._Chain.coins(api.consts.treasury.proposalBondMinimum as BalanceOf);
-        this._bountyCuratorDeposit = this._Chain.coins(api.consts.treasury.bountyCuratorDeposit);
-        this._bountyDepositBase = this._Chain.coins(api.consts.treasury.bountyDepositBase);
-        this._bountyDepositPayoutDelay = this._Chain.coins(api.consts.treasury.bountyDepositPayoutDelay);
-        this._bountyValueMinimum = this._Chain.coins(api.consts.treasury.bountyValueMinimum);
+    // save parameters
+    this._bondPct = +(ChainInfo.api.consts.treasury.proposalBond as Permill) / 1_000_000;
+    this._bondMinimum = this._Chain.coins(ChainInfo.api.consts.treasury.proposalBondMinimum as BalanceOf);
+    this._bountyCuratorDeposit = this._Chain.coins(ChainInfo.api.consts.treasury.bountyCuratorDeposit);
+    this._bountyDepositBase = this._Chain.coins(ChainInfo.api.consts.treasury.bountyDepositBase);
+    this._bountyDepositPayoutDelay = this._Chain.coins(ChainInfo.api.consts.treasury.bountyDepositPayoutDelay);
+    this._bountyValueMinimum = this._Chain.coins(ChainInfo.api.consts.treasury.bountyValueMinimum);
 
-        // kick off subscriptions
-        // const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
+    // kick off subscriptions
+    // const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
 
-        // register new chain-event handlers
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.TreasuryBounty, (entity, event) => {
-            this.updateProposal(entity, event);
-          }
-        );
+    // register new chain-event handlers
+    this.app.chain.chainEntities.registerEntityHandler(
+      SubstrateTypes.EntityKind.TreasuryBounty, (entity, event) => {
+        this.updateProposal(entity, event);
+      }
+    );
 
-        // fetch proposals from chain
-        await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          () => this._Chain.fetcher.fetchBounties(this.app.chain.block.height),
-        );
+    // fetch proposals from chain
+    await this.app.chain.chainEntities.fetchEntities(
+      this.app.chain.id,
+      () => this._Chain.fetcher.fetchBounties(this.app.chain.block.height),
+    );
 
-        this._initialized = true;
-        this._initializing = false;
-        resolve();
-      });
-    });
+    this._initialized = true;
+    this._initializing = false;
   }
 
-  public createBounty(author: SubstrateAccount, description: string, value: string) {
+  public createTx(author: SubstrateAccount, description: string, value: string) {
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => api.tx.bounties.createBounty(author.address, description, value),
+      (api: ApiPromise) => api.tx.bounties.createBounty(author.address, description, value),
       'createBounty',
       `createBounty(${author.address}, ${description}, ${value})`
     );
-  }
-
-  public createTx(...args) {
-    return null;
   }
 }
 
