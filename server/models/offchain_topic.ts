@@ -8,8 +8,9 @@ export interface OffchainTopicAttributes {
   id?: number;
   name: string;
   description?: string;
-  community_id: string;
+  telegram?: string;
   chain_id: string;
+  community_id: string;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -37,14 +38,20 @@ export default (
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
-    community_id: { type: dataTypes.STRING, allowNull: true },
+    telegram: { type: dataTypes.STRING, allowNull: true },
     chain_id: { type: dataTypes.STRING, allowNull: true },
+    community_id: { type: dataTypes.STRING, allowNull: true },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
   }, {
     underscored: true,
     paranoid: true,
+    defaultScope: {
+      attributes: {
+        exclude: [ 'created_at', 'updated_at', 'deleted_at' ],
+      }
+    },
   });
 
   OffchainTopic.associate = (models) => {

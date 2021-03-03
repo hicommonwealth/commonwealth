@@ -7,6 +7,7 @@ import { isSameAccount } from 'helpers';
 
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
+import { PolkadotExtension } from '@magic-ext/polkadot';
 
 import {
   ChainInfo,
@@ -19,6 +20,7 @@ import {
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
 
+const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(account: Account<any>) {
   // TODO: Change to POST /address
@@ -237,10 +239,14 @@ export async function unlinkLogin(account) {
   }
 }
 
-const MAGIC_PUBLISHABLE_KEY = 'pk_test_436D33AFC319E080';
-
 export async function loginWithMagicLink(email: string) {
-  const magic = new Magic(MAGIC_PUBLISHABLE_KEY);
+  const magic = new Magic(MAGIC_PUBLISHABLE_KEY, { extensions: [
+    new PolkadotExtension({
+      // we don't need a real node URL because we're only generating an address,
+      // not doing anything requiring chain connection
+      rpcUrl: 'ws://localhost:9944',
+    })
+  ] });
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,

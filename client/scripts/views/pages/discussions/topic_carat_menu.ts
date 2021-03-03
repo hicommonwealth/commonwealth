@@ -29,6 +29,7 @@ const TopicCaratMenu: m.Component<{ topic: string }, { topicEditorIsOpen: boolea
                   description: topicObject.description,
                   id: topicObject.id,
                   name: topicObject.name,
+                  telegram: topicObject.telegram,
                 }
               });
             }

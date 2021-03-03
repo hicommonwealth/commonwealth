@@ -17,8 +17,10 @@ export const Errors = {
 };
 
 const editComment = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
+  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
+  if (authorError) return next(new Error(authorError));
 
   if (!req.body.id) {
     return next(new Error(Errors.NoId));

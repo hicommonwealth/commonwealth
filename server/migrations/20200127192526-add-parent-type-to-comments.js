@@ -1,24 +1,24 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn(
       'OffchainComments',
       'parent_type',
       {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
         defaultValue: 'proposal'
       }
     );
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn(
       'OffchainComments',
       'parent_type',
       {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
         defaultValue: 'proposal'
       }

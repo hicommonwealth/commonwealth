@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     try {
       await queryInterface.sequelize.query('DROP TYPE "enum_Users_emailNotificationInterval";');
     } catch (e) {
@@ -12,7 +12,7 @@ module.exports = {
       'Users',
       'emailNotificationInterval',
       {
-        type: DataTypes.ENUM,
+        type: Sequelize.ENUM,
         values: ['daily', 'never'],
         allowNull: false,
         defaultValue: 'never',
@@ -20,7 +20,7 @@ module.exports = {
     );
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn('Users', 'emailNotificationInterval');
     await queryInterface.sequelize.query('DROP TYPE "enum_Users_emailNotificationInterval";');
   },

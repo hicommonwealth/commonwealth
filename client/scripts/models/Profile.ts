@@ -14,6 +14,7 @@ class Profile {
   private _lastActive: Date;
   private _isCouncillor: boolean = false;
   private _isValidator: boolean = false;
+  private _isNameInvalid: boolean = false;
   get name() { return this._name; }
   get headline() { return this._headline; }
   get bio() { return this._bio; }
@@ -24,6 +25,7 @@ class Profile {
   get lastActive() { return this._lastActive; }
   get isCouncillor() { return this._isCouncillor; }
   get isValidator() { return this._isValidator; }
+  get isNameInvalid() { return this._isNameInvalid; }
 
   public readonly chain: string;
   public readonly address: string;
@@ -35,6 +37,14 @@ class Profile {
 
   public initializeEmpty() {
     this._initialized = true;
+  }
+
+  // When the user updates their name locally, mark it invalid for the duration
+  // of the session, so we can fall-back to the identity loaded from chain.
+  public invalidateName() {
+    // only applies to onchain names
+    if (!this._isOnchain) return;
+    this._isNameInvalid = true;
   }
 
   public initializeWithChain(name, headline, bio, avatarUrl, judgements, lastActive, isCouncillor = false, isValidator = false) {

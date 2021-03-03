@@ -27,11 +27,11 @@ $cui-headings-font-family: inherit;
 $cui-headings-font-weight: 400;
 $cui-headings-line-height: 1.2;
 
-$cui-font-size:    floor($cui-base-size) * 1.4;
-$cui-font-size-xs: floor($cui-base-size) * 1.2;
-$cui-font-size-sm: floor($cui-base-size) * 1.3;
-$cui-font-size-lg: floor($cui-base-size) * 1.6;
-$cui-font-size-xl: floor($cui-base-size) * 1.8;
+$cui-font-size:    floor($cui-base-size * 1.4);
+$cui-font-size-xs: floor($cui-base-size * 1.1);
+$cui-font-size-sm: floor($cui-base-size * 1.3);
+$cui-font-size-lg: floor($cui-base-size * 1.6);
+$cui-font-size-xl: floor($cui-base-size * 1.8);
 
 $cui-h1-font-size: $cui-font-size * 2.5;
 $cui-h2-font-size: $cui-font-size * 2;
@@ -152,6 +152,15 @@ $cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
 .cui-button.cui-xl .cui-button-sublabel,
 .cui-button.cui-xl .cui-button-label {
     top: 4px;
+}
+.cui-button.cui-sm,
+.cui-button-group.cui-sm .cui-button,
+.cui-menu.cui-sm .cui-button {
+    padding: 0 17px;
+    font-size: 16px;
+    height: 26px;
+    min-height: 26px;
+    line-height: 26px;
 }
 
 
@@ -344,6 +353,12 @@ button, .cui-button {
     .cui-input.cui-#{$size} textarea {
         padding: 22px 15.6px 15.6px !important;
     }
+}
+
+// adjust select height
+.cui-select select {
+    height: 41px;
+    padding-top: 5px;
 }
 
 // adjust card padding

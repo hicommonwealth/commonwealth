@@ -36,6 +36,12 @@
 }
 
 .CannotVote {
+    background-color: $background-color-light;
+    margin-top: 25px;
+    flex-wrap: wrap;
+    border-radius: 3px;
+    padding: 16px 24px;
+
     .proposal-voting-box-text {
     }
     .proposal-voting-box-action button {

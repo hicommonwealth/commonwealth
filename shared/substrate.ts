@@ -1,3 +1,17 @@
+import { RegisteredTypes } from '@polkadot/types/types';
+import { spec as EdgewareSpec } from '@edgeware/node-types';
+import StafiSpec from './adapters/chain/stafi/spec';
+
+export function selectSpec(chain: string): RegisteredTypes {
+  if (chain.includes('edgeware')) {
+    return EdgewareSpec;
+  } else if (chain === 'stafi') {
+    return { types: StafiSpec };
+  } else {
+    return {};
+  }
+}
+
 export function constructSubstrateUrl(url: string): string {
   const secureNodes = [
     'edgewa.re',

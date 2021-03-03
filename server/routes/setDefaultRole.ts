@@ -9,7 +9,8 @@ export const Errors = {
 };
 
 const setDefaultRole = async (models, req, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.address || !req.body.author_chain) return next(new Error(Errors.InvalidAddress));
 

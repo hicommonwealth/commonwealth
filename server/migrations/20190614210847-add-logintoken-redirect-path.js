@@ -1,11 +1,11 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
-    return queryInterface.addColumn('LoginTokens', 'redirect_path', { type: DataTypes.STRING, allowNull: true, });
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.addColumn('LoginTokens', 'redirect_path', { type: Sequelize.STRING, allowNull: true, });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn('LoginTokens', 'redirect_path');
   }
 };

@@ -1,24 +1,24 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn(
       'ChainObjectQueries',
       'has_pagination',
       {
-        type: DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       }
     );
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn(
       'ChainObjectQueries',
       'has_pagination',
       {
-        type: DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       }

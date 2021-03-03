@@ -50,7 +50,10 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
         m('p.card-description', chainInfo.description),
         // if no recently active threads, hide this module altogether
         m('.recent-activity', !!monthlyThreadCount && [
-          m('span.recent-threads', [
+          m('span.recent-threads', monthlyThreadCount > 20 ? [
+            pluralize(Math.floor(monthlyThreadCount / 5), 'thread'),
+            ' / week',
+          ] : [
             pluralize(monthlyThreadCount, 'thread'),
             ' / month',
           ]),
@@ -97,7 +100,10 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
         m('p.card-description', community.description),
         // if no recently active threads, hide this module altogether
         m('.recent-activity', !!monthlyThreadCount && [
-          m('span.recent-threads', [
+          m('span.recent-threads', monthlyThreadCount > 20 ? [
+            pluralize(Math.floor(monthlyThreadCount / 5), 'thread'),
+            ' / week',
+          ] : [
             pluralize(monthlyThreadCount, 'thread'),
             ' / month',
           ]),
@@ -208,9 +214,10 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
 
     return m('.HomepageCommunityCards', [
       m('.communities-list', [
+        sortedChainsAndCommunities.length > 0 && m('h4', 'Live Networks'),
         sortedChainsAndCommunities,
         m('.clear'),
-        betaChainsAndCommunities.length > 0 && m('h4', 'Testnets & New Communities'),
+        betaChainsAndCommunities.length > 0 && m('h4', 'Testnets & Alpha Networks'),
         betaChainsAndCommunities,
         m('.clear'),
       ]),

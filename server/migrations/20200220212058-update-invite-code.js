@@ -1,11 +1,11 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
-    return queryInterface.addColumn('InviteCodes', 'community_name', { type: DataTypes.STRING });
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.addColumn('InviteCodes', 'community_name', { type: Sequelize.STRING });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn('InviteCodes', 'community_name');
   }
 };

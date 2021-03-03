@@ -82,7 +82,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     ].map((m) => m.initialized ? m.deinit() : Promise.resolve()));
     this.accounts.deinit();
     this.chain.deinitMetadata();
-    this.chain.deinitApi();
+    await this.chain.deinitApi();
     console.log('Substrate stopped.');
   }
 }

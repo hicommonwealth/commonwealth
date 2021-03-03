@@ -1,13 +1,13 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('OffchainViewCounts', {
-      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true},
-      chain: { type: DataTypes.STRING },
-      community: { type: DataTypes.STRING },
-      object_id: { type: DataTypes.INTEGER, allowNull: false },
-      view_count: { type: DataTypes.INTEGER, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true},
+      chain: { type: Sequelize.STRING },
+      community: { type: Sequelize.STRING },
+      object_id: { type: Sequelize.INTEGER, allowNull: false },
+      view_count: { type: Sequelize.INTEGER, allowNull: false },
     }, {
       underscored: true,
       timestamps: false,

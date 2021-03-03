@@ -8,6 +8,7 @@ import sleep from 'sleep-promise';
 import { Errors as CreateInviteErrors } from 'server/routes/createInvite';
 import { Errors as AcceptInviteErrors } from 'server/routes/acceptInvite';
 import { Errors as CreateInviteLinkErrors } from 'server/routes/createInviteLink';
+import { ChainCommunityErrors } from 'server/util/lookupCommunityIsVisibleToUser';
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from '../../util/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
@@ -468,7 +469,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community: community,
+          community,
           time: 'none',
           uses: 'none',
           jwt: adminJWT,
@@ -485,7 +486,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community: community,
+          community,
           time: 'none',
           uses: 'none',
           jwt: userJWT,
@@ -507,7 +508,7 @@ describe('Invite Tests', () => {
           jwt: userJWT,
         });
       expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.NoCommunityId);
+      expect(res.body.error).to.be.equal(ChainCommunityErrors.BothChainAndCommunityDNE);
     });
 
     it('should fail to create an invite link without a time', async () => {
@@ -515,7 +516,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community: community,
+          community,
           uses: 'none',
           jwt: userJWT,
         });
@@ -528,7 +529,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community: community,
+          community,
           time: 'none',
           jwt: userJWT,
         });
@@ -541,7 +542,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community: community,
+          community,
           time: 'none',
           uses: 'hello',
           jwt: userJWT,
@@ -555,7 +556,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community: community,
+          community,
           time: 'none',
           uses: 'none',
           jwt: userJWT,
@@ -565,7 +566,7 @@ describe('Invite Tests', () => {
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
         .send({
-          community: community,
+          community,
           time: 'none',
           uses: 'none',
           jwt: userJWT,
@@ -573,6 +574,5 @@ describe('Invite Tests', () => {
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.id).to.be.equal(res2.body.result.id);
     });
-
   });
 });

@@ -1,11 +1,11 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('OffchainProfiles', {
-      address_id: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true,
+      address_id: { type: Sequelize.INTEGER, allowNull: false, primaryKey: true,
                     references: { model: 'Addresses', key: 'id' }  },
-      data: { type: DataTypes.TEXT, allowNull: true },
+      data: { type: Sequelize.TEXT, allowNull: true },
     }, {
       underscored: true,
       indexes: [
@@ -14,7 +14,7 @@ module.exports = {
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('OffchainProfiles');
   }
 };

@@ -96,7 +96,7 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
   }
 };
 
-const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
+const VotingActions: m.Component<{ proposal: AnyProposal }, {
   conviction: number,
   amount: number,
   votingModalOpen: boolean
@@ -105,7 +105,9 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
     const { proposal } = vnode.attrs;
     const { votingModalOpen } = vnode.state;
     if (proposal instanceof SubstrateTreasuryProposal) {
-      return m(CannotVote, { action: 'Send to council or democracy' });
+      return;
+      // TODO: Set up actions to create a council or democracy proposal
+      // return m(CannotVote, { action: 'Send to council or democracy' });
     } else if (!app.isLoggedIn()) {
       return m(CannotVote, { action: 'Log in to vote' });
     } else if (!app.user.activeAccount) {
@@ -507,4 +509,4 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, {
   },
 };
 
-export default ProposalVotingActions;
+export default VotingActions;

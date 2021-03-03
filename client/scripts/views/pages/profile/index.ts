@@ -5,9 +5,10 @@ import moment from 'moment';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
+import Web3 from 'web3';
 
 import app from 'state';
-import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
+import { OffchainThread, OffchainComment, OffchainAttachment, Profile, ChainBase } from 'models';
 
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';
@@ -42,7 +43,7 @@ const commentModelFromServer = (comment) => {
         comment.chain,
         null,
         null,
-        null
+        null,
       );
     } else {
       proposal = {
@@ -95,6 +96,8 @@ const threadModelFromServer = (thread) => {
     thread.url,
     thread.Address.chain,
     thread.pinned,
+    thread.collaborators,
+    thread.chain_entities,
   );
 };
 
@@ -179,86 +182,104 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
         ? m.route.param('base')
         : m.route.param('scope');
       const { address } = vnode.attrs;
-      await $.ajax({
-        url: `${app.serverUrl()}/profile`,
-        type: 'GET',
-        data: {
-          address,
-          chain,
-          jwt: app.user.jwt,
-        },
-        success: (response) => {
-          const { result } = response;
-          vnode.state.loaded = true;
-          vnode.state.loading = false;
-          const a = result.account;
-          const profile = new Profile(a.chain, a.address);
-          if (a.OffchainProfile) {
-            const profileData = JSON.parse(a.OffchainProfile.data);
-            // ignore off-chain name if substrate id exists
-            if (a.OffchainProfile.identity) {
-              profile.initializeWithChain(
-                a.OffchainProfile.identity,
-                profileData?.headline,
-                profileData?.bio,
-                profileData?.avatarUrl,
-                a.OffchainProfile.judgements,
-                a.last_active,
-                a.is_councillor,
-                a.is_validator,
-              );
-            } else {
-              profile.initialize(
-                profileData?.name,
-                profileData?.headline,
-                profileData?.bio,
-                profileData?.avatarUrl,
-                a.last_active,
-                a.is_councillor,
-                a.is_validator
-              );
-            }
+      try {
+        const response = await $.ajax({
+          url: `${app.serverUrl()}/profile`,
+          type: 'GET',
+          data: {
+            address,
+            chain,
+            jwt: app.user.jwt,
+          },
+        });
+
+        const { result } = response;
+        vnode.state.loaded = true;
+        vnode.state.loading = false;
+        const a = result.account;
+        const profile = new Profile(a.chain, a.address);
+        if (a.OffchainProfile) {
+          const profileData = JSON.parse(a.OffchainProfile.data);
+          // ignore off-chain name if substrate id exists
+          if (a.OffchainProfile.identity) {
+            profile.initializeWithChain(
+              a.OffchainProfile.identity,
+              profileData?.headline,
+              profileData?.bio,
+              profileData?.avatarUrl,
+              a.OffchainProfile.judgements,
+              a.last_active,
+              a.is_councillor,
+              a.is_validator,
+            );
           } else {
-            profile.initializeEmpty();
+            profile.initialize(
+              profileData?.name,
+              profileData?.headline,
+              profileData?.bio,
+              profileData?.avatarUrl,
+              a.last_active,
+              a.is_councillor,
+              a.is_validator
+            );
           }
-          const account = {
-            profile,
-            chain: a.chain,
-            address: a.address,
-            id: a.id,
-            name: a.name,
-            user_id: a.user_id,
-          };
-          vnode.state.account = account;
-          vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
-          vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
-          m.redraw();
-        },
-        error: (err) => {
-          console.error(err);
-          // decode address properly
-          if (['kulupu', 'edgeware', 'polkadot', 'kusama'].includes(chain)) {
-            try {
-              decodeAddress(address);
-              vnode.state.account = {
-                profile: null,
-                chain,
-                address,
-                id: null,
-                name: null,
-                user_id: null,
-              };
-            } catch (e) {
-              // do nothing if can't decode
-            }
-          }
-          vnode.state.loaded = true;
-          vnode.state.loading = false;
-          m.redraw();
-          if (!vnode.state.account) throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
-            : 'Failed to find profile');
+        } else {
+          profile.initializeEmpty();
         }
-      });
+        const account = {
+          profile,
+          chain: a.chain,
+          address: a.address,
+          id: a.id,
+          name: a.name,
+          user_id: a.user_id,
+        };
+        vnode.state.account = account;
+        vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
+        vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
+        m.redraw();
+      } catch (err) {
+        console.log(err);
+        // for certain chains, display addresses not in db if formatted properly
+        const chainInfo = app.config.chains.getById(chain);
+        if (chainInfo?.base === ChainBase.Substrate) {
+          try {
+            // TODO: should we enforce specific chain checksums here?
+            decodeAddress(address);
+            vnode.state.account = {
+              profile: null,
+              chain,
+              address,
+              id: null,
+              name: null,
+              user_id: null,
+            };
+          } catch (e) {
+            // do nothing if can't decode
+          }
+        } else if (chainInfo?.base === ChainBase.Ethereum) {
+          // TODO: replace with "isAddress" if we want to support non-checksum i.e. all lower/upper
+          if (Web3.utils.checkAddressChecksum(address)) {
+            vnode.state.account = {
+              profile: null,
+              chain,
+              address,
+              id: null,
+              name: null,
+              user_id: null,
+            };
+          }
+        } else if (chainInfo?.base === ChainBase.CosmosSDK) {
+          // TODO
+        }
+        vnode.state.loaded = true;
+        vnode.state.loading = false;
+        m.redraw();
+        if (!vnode.state.account)
+          throw new Error((err.responseJSON && err.responseJSON.error)
+            ? err.responseJSON.error
+            : 'Failed to find profile');
+      }
     };
 
     const { setIdentity } = vnode.attrs;

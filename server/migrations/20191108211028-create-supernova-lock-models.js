@@ -52,7 +52,6 @@ module.exports = {
           { fields: ['address'] },
         ],
       }, { transaction: t });
-
     });
   },
   down: (queryInterface, Sequelize) => {
