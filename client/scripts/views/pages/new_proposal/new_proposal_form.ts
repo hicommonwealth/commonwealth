@@ -90,8 +90,6 @@ const NewProposalForm = {
         || vnode.state.councilMotionType === 'createTreasuryRejectionMotion';
       hasThreshold = vnode.state.councilMotionType !== 'vetoNextExternal';
       if (hasExternalProposalSelector) dataLoaded = !!(app.chain as Substrate).democracyProposals;
-    } else if (proposalTypeEnum === ProposalType.EdgewareSignalingProposal) {
-      hasTitleAndDescription = true;
     } else if (proposalTypeEnum === ProposalType.OffchainThread) {
       hasTitleAndDescription = true;
       hasTopics = true;
@@ -226,14 +224,6 @@ const NewProposalForm = {
           'Thread Type': 'Proposal',
         });
         return createTXModal(createFunc(args)).then(done);
-      } else if (proposalTypeEnum === ProposalType.EdgewareSignalingProposal) {
-        args = [author, vnode.state.form.title, vnode.state.form.description];
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          'Step' : 'Submit Proposal',
-          'Proposal Type': 'Signaling',
-          'Thread Type': 'Proposal',
-        });
       } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
         if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
         const beneficiary = app.chain.accounts.get(vnode.state.form.beneficiary);

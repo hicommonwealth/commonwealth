@@ -12,7 +12,6 @@ import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateIdentities from './identities';
 import SubstrateChain from './shared';
-import EdgewareSignaling from '../edgeware/signaling';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;
@@ -25,7 +24,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public treasury: SubstrateTreasury;
   public bounties: SubstrateBountyTreasury;
   public identities: SubstrateIdentities;
-  public signaling: EdgewareSignaling;
   public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly chainEntities = new ChainEntityController();
 
@@ -54,7 +52,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.treasury = new SubstrateTreasury(this.app);
     this.bounties = new SubstrateBountyTreasury(this.app);
     this.identities = new SubstrateIdentities(this.app);
-    this.signaling = new EdgewareSignaling(this.app);
   }
 
   public async initApi(additionalOptions?) {

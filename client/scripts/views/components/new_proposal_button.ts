@@ -27,10 +27,6 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
       }),
       label: 'New text proposal'
     }),
-    app.chain?.base === ChainBase.Substrate && app.chain?.class === ChainClass.Edgeware && m(MenuItem, {
-      onclick: () => { m.route.set(`/${app.chain.id}/new/signaling`); },
-      label: 'New signaling proposal'
-    }),
     app.chain?.base === ChainBase.Substrate && app.chain?.class !== ChainClass.Plasm && [
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
