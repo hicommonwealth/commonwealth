@@ -468,7 +468,12 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     ]);
 
     let votingActionObj;
-    if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
+    if (proposal.votingType === VotingType.SimpleYesNoVoting) {
+      votingActionObj = [
+        m('.button-row', [yesButton, noButton]),
+        m(ProposalExtensions, { proposal }),
+      ];
+    } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       votingActionObj = [
         m('.button-row', [yesButton, noButton]),
         m(ProposalExtensions, {
