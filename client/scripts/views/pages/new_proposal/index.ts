@@ -10,19 +10,6 @@ import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'i
 import { ChainBase, ProposalModule } from 'models';
 import NewProposalForm from 'views/pages/new_proposal/new_proposal_form';
 
-async function loadCmd(type: string) {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
-  }
-  const c = proposalSlugToClass().get(type);
-  if (c && c instanceof ProposalModule && !c.disabled) {
-    await c.init(app.chain.chain, app.chain.accounts);
-  }
-}
-
 const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
   view: (vnode) => {
     vnode.state.typeEnum = vnode.attrs.type;
@@ -35,8 +22,8 @@ const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
 
       // check if module is still initializing
       const c = proposalSlugToClass().get(vnode.state.typeEnum) as ProposalModule<any, any, any>;
-      if (!c.disabled && !c.initialized) {
-        if (!c.initializing) loadCmd(vnode.state.typeEnum);
+      if (!c.ready) {
+        app.chain.loadModules([ c ]);
         return m(PageLoading, { narrow: true, showNewProposalButton: true });
       }
     }
