@@ -481,6 +481,7 @@ async function loadCmd(type: string) {
     chain.treasury.init(chain.chain, chain.accounts),
     chain.democracyProposals.init(chain.chain, chain.accounts),
     chain.democracy.init(chain.chain, chain.accounts),
+    chain.bounties.init(chain.chain, chain.accounts),
   ]);
 }
 

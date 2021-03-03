@@ -7,7 +7,7 @@ import {
   VotingType, VotingUnit, ChainEntity, ChainEvent,
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
-import { formatAddressShort } from 'shared/utils';
+import { formatAddressShort } from '../../../../../shared/utils';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateBountyTreasury from './bountyTreasury';
@@ -112,7 +112,7 @@ export class SubstrateBounty
   }
 
   public get votingInterfaceLink() {
-    const rpcUrl = encodeURIComponent(this._Chain.app.user.selectedNode.url);
+    const rpcUrl = encodeURIComponent(this._Chain.app.chain?.meta?.url);
     return `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/treasury`;
   }
 
