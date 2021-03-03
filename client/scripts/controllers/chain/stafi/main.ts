@@ -5,7 +5,7 @@ import Substrate from '../substrate/main';
 
 class Stafi extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
-    super(n, app, ChainClass.Polkadot);
+    super(n, app, ChainClass.Stafi);
   }
 
   public async initApi() {

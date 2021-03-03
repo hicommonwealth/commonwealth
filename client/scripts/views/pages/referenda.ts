@@ -60,19 +60,16 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   }
 };
 
-async function loadCmd() {
+function getModules() {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
+  if (app.chain.base === ChainBase.Substrate) {
+    const chain = (app.chain as Substrate);
+    return [ chain.treasury, chain.democracy, chain.democracyProposals ];
+  } else {
+    throw new Error('invalid chain');
   }
-  const chain = (app.chain as Substrate);
-  await Promise.all([
-    chain.treasury.init(chain.chain, chain.accounts),
-    chain.democracy.init(chain.chain, chain.accounts),
-    chain.democracyProposals.init(chain.chain, chain.accounts),
-  ]);
 }
 
 const ReferendaPage: m.Component<{}> = {
@@ -112,8 +109,9 @@ const ReferendaPage: m.Component<{}> = {
     }
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     if (onSubstrate) {
-      if (!(app.chain as Substrate).democracy.initialized || !(app.chain as Substrate).democracyProposals.initialized) {
-        if (!(app.chain as Substrate).democracy.initializing) loadCmd();
+      const modules = getModules();
+      if (modules.some((mod) => !mod.ready)) {
+        app.chain.loadModules(modules);
         return m(PageLoading, {
           message: 'Connecting to chain',
           title: [
