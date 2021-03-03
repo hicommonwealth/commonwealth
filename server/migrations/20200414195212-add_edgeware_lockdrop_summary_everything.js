@@ -1,19 +1,19 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('EdgewareLockdropEverythings', {
-      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      createdAt: { type: DataTypes.DATE },
-      data: { type: DataTypes.TEXT, allowNull: true },
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      createdAt: { type: Sequelize.DATE },
+      data: { type: Sequelize.TEXT, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     }, {
       underscored: true,
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('EdgewareLockdropEverythings');
   }
 };

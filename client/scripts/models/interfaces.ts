@@ -1,12 +1,11 @@
 import BN from 'bn.js';
 import moment from 'moment-twitter';
-import { Observable } from 'rxjs';
+import { EventEmitter } from 'events';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';
 import { TransactionStatus } from './types';
 import Account from './Account';
 import StorageModule from './StorageModule';
-import { IApp } from '../state';
 
 export interface IBlockInfo {
   height: number;
@@ -26,6 +25,7 @@ export interface IChainModule<C extends Coin, A extends Account<C>> {
   // Signs and submits an on-chain transaction, wrapping it in a modal dialog that tracks its status.
   createTXModalData(
     author: A,
+    // TODO: type txfunc
     txFunc,
     txName: string,
     objName: string,
@@ -62,11 +62,14 @@ export interface ITXModalData {
   author: Account<any>;
   txType: string;
   txData: {
+    // subscribe to transaction events
+    events: EventEmitter,
+
     // get blob of tx data to sign
     unsignedData: () => Promise<ITXData>,
 
     // perform transaction
-    transact: () => Observable<ITransactionResult>
+    transact: (...args) => void,
   };
 
   // callback triggered upon exit

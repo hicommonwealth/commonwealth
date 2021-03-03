@@ -1,24 +1,24 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn(
       'OffchainComments',
       'child_comments',
       {
-        type: DataTypes.ARRAY(DataTypes.INTEGER),
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
         allowNull: false,
         defaultValue: []
       }
     );
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn(
       'OffchainComments',
       'child_comments',
       {
-        type: DataTypes.ARRAY(DataTypes.INTEGER),
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
         allowNull: false,
         defaultValue: []
       }

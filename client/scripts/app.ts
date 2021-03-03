@@ -98,6 +98,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
 }
 
 export async function deinitChainOrCommunity() {
+  app.isAdapterReady = false;
   if (app.chain) {
     app.chain.networkStatus = ApiStatus.Disconnected;
     app.chain.deinitServer();
@@ -367,7 +368,8 @@ export async function initChain(): Promise<void> {
   await app.chain.initData();
 
   // Emit chain as updated
-  app.chainAdapterReady.next(true);
+  app.chainAdapterReady.emit('ready');
+  app.isAdapterReady = true;
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects

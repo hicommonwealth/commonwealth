@@ -5,7 +5,7 @@ import {
   ICommunityAdapter,
   NotificationCategory,
 } from 'models';
-import { ReplaySubject } from 'rxjs';
+import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import RecentActivityController from './controllers/app/recent_activity';
@@ -30,10 +30,6 @@ export const enum LoginState {
   LoggedIn = 'logged_in',
 }
 
-interface IRecentActivity {
-  activeAddresses;
-  activeThreads;
-}
 
 export interface IApp {
   socket: WebsocketController;
@@ -41,8 +37,11 @@ export interface IApp {
   community: ICommunityAdapter<any, any>;
 
   chainPreloading: boolean;
-  chainAdapterReady: ReplaySubject<boolean>;
-  chainModuleReady: ReplaySubject<boolean>;
+  chainAdapterReady: EventEmitter;
+  isAdapterReady: boolean;
+  runWhenReady: (cb: () => any) => void;
+  chainModuleReady: EventEmitter;
+  isModuleReady: boolean;
 
   profiles: ProfilesController;
   comments: CommentsController;
@@ -93,8 +92,15 @@ const app: IApp = {
   community: null,
 
   chainPreloading: false,
-  chainAdapterReady: new ReplaySubject(1),
-  chainModuleReady: new ReplaySubject(1),
+  chainAdapterReady: new EventEmitter(),
+  isAdapterReady: false,
+  runWhenReady: (cb) => {
+    if (app.isAdapterReady) cb();
+    else app.chainAdapterReady.on('ready', cb);
+  },
+  // need many max listeners because every account will wait on this
+  chainModuleReady: new EventEmitter().setMaxListeners(100),
+  isModuleReady: false,
 
   profiles: new ProfilesController(),
   comments: new CommentsController(),

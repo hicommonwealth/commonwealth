@@ -6,13 +6,12 @@
 
 import _ from 'underscore';
 import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
-import { spec } from '@edgeware/node-types';
 
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 
 import { factory, formatFilename } from '../../shared/logging';
-import { constructSubstrateUrl } from '../../shared/substrate';
+import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default async function (models, chain?: string): Promise<void> {
@@ -38,7 +37,7 @@ export default async function (models, chain?: string): Promise<void> {
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain);
 
     const nodeUrl = constructSubstrateUrl(node.url);
-    const api = await SubstrateEvents.createApi(nodeUrl, spec);
+    const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
 
     // fetch all events and run through handlers in sequence then exit
     log.info('Fetching chain events...');

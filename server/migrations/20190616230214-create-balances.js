@@ -1,12 +1,12 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Balances', {
-      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      address: { type: DataTypes.STRING, allowNull: false },
-      balance: { type: DataTypes.STRING, allowNull: false },
-      blocknum: { type: DataTypes.INTEGER, allowNull: false },
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      address: { type: Sequelize.STRING, allowNull: false },
+      balance: { type: Sequelize.STRING, allowNull: false },
+      blocknum: { type: Sequelize.INTEGER, allowNull: false },
     }, {
       timestamps: false,
       underscored: true,
@@ -15,7 +15,7 @@ module.exports = {
       ],
     });
   },
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('Balances');
   }
 };
