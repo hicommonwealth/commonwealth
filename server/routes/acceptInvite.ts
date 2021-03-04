@@ -28,7 +28,7 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
     const rejectedCode = await code.update({
       used: true,
     });
-    return res.json({ status: 'Success', result: rejectedCode });
+    return res.json({ status: 'Success', result: rejectedCode.toJSON() });
   }
 
   const addressObj = await models.Address.findOne({
@@ -74,7 +74,10 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
     is_active: true,
   });
 
-  return res.json({ status: 'Success', result: { updatedCode, role, subscription } });
+  return res.json({
+    status: 'Success',
+    result: { updatedCode: updatedCode.toJSON(), role: role.toJSON(), subscription: subscription.toJSON() }
+  });
 };
 
 export default acceptInvite;

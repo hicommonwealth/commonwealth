@@ -95,6 +95,7 @@ class SubstrateIdentities implements StorageModule {
   }
 
   public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    this._disabled = !ChainInfo.api.query.identity;
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
 

@@ -48,6 +48,7 @@ const setupUserAndEventSubscriptions = async (email, address, chain) => {
     object_id: 'edgeware-slash',
     is_active: true,
   });
+  return user.id;
 };
 
 const setupDbEvent = async (event: CWEvent) => {
@@ -56,16 +57,17 @@ const setupDbEvent = async (event: CWEvent) => {
 };
 
 describe('Event Handler Tests', () => {
+  let aliceId, bobId;
   before('reset database', async () => {
     await resetDatabase();
 
-    await setupUserAndEventSubscriptions(
+    aliceId = await setupUserAndEventSubscriptions(
       'alice@gmail.com',
       '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
       'edgeware',
     );
 
-    await setupUserAndEventSubscriptions(
+    bobId = await setupUserAndEventSubscriptions(
       'bob@gmail.com',
       '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
       'edgeware',
@@ -104,8 +106,8 @@ describe('Event Handler Tests', () => {
         }]
       }]
     });
-    const userEmails = notifications.map((n) => n.Subscription.User.email);
-    assert.sameMembers(userEmails, ['alice@gmail.com', 'bob@gmail.com']);
+    const userIds = notifications.map((n) => n.Subscription.User.id);
+    assert.sameMembers(userIds, [ aliceId, bobId ]);
   });
 
   it('should only include specified users if includeAddresses present', async () => {
@@ -141,8 +143,8 @@ describe('Event Handler Tests', () => {
     });
 
     // should only notify bob
-    const userEmails = notifications.map((n) => n.Subscription.User.email);
-    assert.sameMembers(userEmails, ['bob@gmail.com']);
+    const userIds = notifications.map((n) => n.Subscription.User.id);
+    assert.sameMembers(userIds, [ bobId ]);
   });
 
   it('should only exclude specified users if excludeAddresses present', async () => {
@@ -180,8 +182,8 @@ describe('Event Handler Tests', () => {
     });
 
     // should only notify alice, excluding bob
-    const userEmails = notifications.map((n) => n.Subscription.User.email);
-    assert.sameMembers(userEmails, ['alice@gmail.com']);
+    const userIds = notifications.map((n) => n.Subscription.User.id);
+    assert.sameMembers(userIds, [ aliceId ]);
   });
 
   it('should not emit notifications with unknown db event', async () => {

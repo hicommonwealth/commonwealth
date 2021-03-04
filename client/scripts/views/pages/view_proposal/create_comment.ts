@@ -12,6 +12,7 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
+import Token from 'controllers/chain/ethereum/token/adapter';
 import { GlobalStatus } from './body';
 
 const CreateComment: m.Component<{
@@ -167,8 +168,9 @@ const CreateComment: m.Component<{
                 intent: 'primary',
                 type: 'submit',
                 compact: true,
+                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0
+                  || !app.activeCommunityId() && ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
                 rounded: true,
-                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
                 onclick: submitComment,
                 label: (uploadsInProgress > 0)
                   ? 'Uploading...'

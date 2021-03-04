@@ -62,7 +62,7 @@ const updateTopics = async (models, req, res: Response, next: NextFunction) => {
     thread.topic_id = newTopic.id;
     await thread.save();
   }
-  return res.json({ status: 'Success', result: newTopic });
+  return res.json({ status: 'Success', result: newTopic.toJSON() });
 };
 
 export default updateTopics;
