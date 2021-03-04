@@ -481,7 +481,6 @@ const EdgewareChainEventNotifications: m.Component = {
     return [
       m(ChainEventSubscriptionRow, { title: 'Council events', notificationTypeArray: EdgewareChainNotificationTypes.Council, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, recommended: true }),
-      m(ChainEventSubscriptionRow, { title: 'Signaling events', notificationTypeArray: EdgewareChainNotificationTypes.Signaling, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Treasury events', notificationTypeArray: EdgewareChainNotificationTypes.Treasury, recommended: true }),
       m(ChainEventSubscriptionRow, { title: 'Preimage events', notificationTypeArray: EdgewareChainNotificationTypes.Preimage, }),
       m(ChainEventSubscriptionRow, { title: 'Voting delegation events', notificationTypeArray: EdgewareChainNotificationTypes.VotingDelegation, }),

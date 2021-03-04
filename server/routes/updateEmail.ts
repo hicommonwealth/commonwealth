@@ -37,7 +37,7 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
   });
   if (existingUser) return next(new Error(Errors.EmailInUse));
 
-  const user = await models.User.findOne({
+  const user = await models.User.scope('withPrivateData').findOne({
     where: {
       id: req.user.id,
     },

@@ -66,7 +66,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
             topics.description AS topic_description, topics.chain_id AS topic_chain,
             topics.telegram AS topic_telegram,
-            topics.community_id AS topic_community, collaborators
+            topics.community_id AS topic_community, collaborators, chain_entities
           FROM "Addresses" AS addr
           RIGHT JOIN (
             SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
@@ -76,7 +76,15 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
                 CONCAT(
                   '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
                   )
-                ) AS collaborators
+                ) AS collaborators,
+              ARRAY_AGG(
+                CONCAT(
+                  '{ "id": "', chain_entities.id, '",
+                      "type": "', chain_entities.type, '",
+                     "type_id": "', chain_entities.type_id, '",
+                     "completed": "', chain_entities.completed, '" }'
+                  )
+                ) AS chain_entities
             FROM "OffchainThreads" t
             LEFT JOIN (
               SELECT root_id, MAX(created_at) AS comm_created_at
@@ -91,6 +99,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             ON t.id = collaborations.offchain_thread_id
             LEFT JOIN "Addresses" editors
             ON collaborations.address_id = editors.id
+            LEFT JOIN "ChainEntities" AS chain_entities
+            ON t.id = chain_entities.thread_id
             WHERE t.${communityOptions}
             AND t.deleted_at IS NULL
             AND t.pinned = false
@@ -118,6 +128,9 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           const collaborators = JSON.parse(t.collaborators[0]).address?.length
             ? t.collaborators.map((c) => JSON.parse(c))
             : [];
+          const chain_entities = JSON.parse(t.chain_entities[0]).id
+            ? t.chain_entities.map((c) => JSON.parse(c))
+            : [];
 
           const data = {
             id: t.thread_id,
@@ -133,6 +146,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             chain: t.thread_chain,
             created_at: t.thread_created,
             collaborators,
+            chain_entities,
             Address: {
               id: t.addr_id,
               address: t.addr_address,
@@ -180,7 +194,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         });
         resolve([allThreads, comments, reactions]);
       } catch (e) {
-        reject(new Error('Could not featch threads, comments, or reactions'));
+        console.log(e);
+        reject(new Error('Could not fetch threads, comments, or reactions'));
       }
     }),
     // admins
