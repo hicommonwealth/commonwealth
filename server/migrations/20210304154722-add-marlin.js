@@ -1,29 +1,5 @@
 'use strict';
 
-const SequelizeLib = require('sequelize');
-const Op = SequelizeLib.Op;
-
-const MarlinEventKinds = {
-  // MPond Events
-  Approval: 'approval',
-  DelegateChanged: 'delegate-changed',
-  DelegateVotesChanged: 'delegate-votes-changed',
-  Transfer: 'transfer',
-  // GovernorAlpha Events
-  ProposalExecuted: 'proposal-executed',
-  ProposalCreated: 'proposal-created',
-  ProposalCanceled: 'proposal-canceled',
-  ProposalQueued: 'proposal-queued',
-  VoteCast: 'vote-cast',
-  // Timelock Events
-  CancelTransaction: 'cancel-transaction',
-  ExecuteTransaction: 'execute-transactions',
-  NewAdmin: 'new-admin',
-  NewDelay: 'new-delay',
-  NewPendingAdmin: 'new-pending-admin',
-  QueueTransaction: 'queue-transaction',
-};
-
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
@@ -34,6 +10,7 @@ module.exports = {
         icon_url: '/static/img/protocols/lin.png',
         type: 'dao',
         network: 'marlin',
+        base: 'ethereum',
         active: true,
         collapsed_on_homepage: false,
       }, {
@@ -43,6 +20,7 @@ module.exports = {
         icon_url: '/static/img/protocols/lin.png',
         type: 'dao',
         network: 'marlin-testnet',
+        base: 'ethereum',
         active: false,
         collapsed_on_homepage: true,
       }
@@ -59,22 +37,6 @@ module.exports = {
         address: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // MPOND Contract Address (Not Valid)
       }
       ], { transaction: t });
-
-      const buildObject = (event_name, chain) => ({
-        id: `${chain}-${event_name}`,
-        chain,
-        event_name,
-      });
-      const marlinObjs = Object.values(MarlinEventKinds).map((s) => buildObject(s, 'marlin'));
-
-      // TODO: somehow switch this on for testing purposes?
-      return queryInterface.bulkInsert(
-        'ChainEventTypes',
-        [
-          ...marlinObjs,
-        ],
-        { transaction: t }
-      );
     });
   },
 
