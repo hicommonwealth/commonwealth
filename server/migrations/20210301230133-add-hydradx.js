@@ -4,13 +4,13 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkInsert('Chains', [{
-        base: 'substrate',
         id: 'hydradx',
         symbol: 'HDX',
         name: 'HydraDX',
         icon_url: '/static/img/protocols/hydradx.png',
         type: 'chain',
         network: 'hydradx',
+        base: 'substrate',
         active: true,
         description: 'Cross-chain liquidity protocol built on Substrate.',
         telegram: 'https://t.me/hydradx',
