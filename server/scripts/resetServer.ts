@@ -36,6 +36,7 @@ const nodes = [
   // [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
+  [ 'wss://ropsten.infura.io/ws', 'alex-ropsten', '0xFab46E002BbF0b4509813474841E0716E6730136']
 ];
 const resetServer = (models): Promise<number> => {
   log.debug('Resetting database...');
@@ -334,6 +335,16 @@ const resetServer = (models): Promise<number> => {
           type: 'dao',
           base: 'ethereum',
         }),
+        models.Chain.create({
+          id: 'alex-ropsten',
+          network: 'alex',
+          symbol: 'ALEX',
+          name: 'Alex (ropsten)',
+          icon_url: '/static/img/protocols/eth.png',
+          active: true,
+          type: 'token',
+          base: 'ethereum',
+        }),
       ]);
 
       // Specific chains
@@ -347,6 +358,7 @@ const resetServer = (models): Promise<number> => {
         ethLocal, eth,
         nearLocal, nearTestnet,
         moloch, metacartel, molochLocal,
+        alexRopsten,
       ] = chains;
 
       // Admin roles for specific communities

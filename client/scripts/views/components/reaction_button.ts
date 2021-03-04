@@ -7,6 +7,7 @@ import { Tooltip } from 'construct-ui';
 import app, { LoginState } from 'state';
 import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
+import Token from 'controllers/chain/ethereum/token/adapter';
 import SelectAddressModal from '../modals/select_address_modal';
 import LoginModal from '../modals/login_modal';
 
@@ -32,7 +33,10 @@ const ReactionButton: m.Component<{
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
     if (type === ReactionType.Dislike) dislikes = reactions.filter((r) => r.reaction === 'dislike');
 
-    const disabled = vnode.state.loading;
+    const isCommunity = !!app.activeCommunityId();
+
+    const disabled = vnode.state.loading 
+      || !isCommunity && ((app.chain as Token).isToken && !(app.chain as Token).hasToken);
     const activeAddress = app.user.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;

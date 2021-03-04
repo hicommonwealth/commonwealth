@@ -21,6 +21,7 @@ import WebsocketController from 'controllers/server/socket/index';
 import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
+import Token from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
 // Prefetch commonly used pages
@@ -308,6 +309,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
+  } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
+    const Token = (await import(
+    //   /* webpackMode: "lazy" */
+    //   /* webpackChunkName: "token-main" */
+      './controllers/chain/ethereum/token/adapter'
+    )).default;
+    newChain = new Token(n, app);
   } else if (n.chain.network === ChainNetwork.Commonwealth) {
     const Commonwealth = (await import(
       /* webpackMode: "lazy" */
@@ -499,6 +507,7 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
+      if (app.chain instanceof Token) deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });

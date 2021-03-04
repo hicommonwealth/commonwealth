@@ -28,7 +28,7 @@ export default class extends Base {
       ...options,
     }).then((result) => {
       // handle state updates
-      this.addRole(result.result.newRole);
+      this.addRole(result.result.role);
     });
   }
 
@@ -76,11 +76,16 @@ export default class extends Base {
   public getRoleInCommunity(options: { account?: Account<any>, chain?: string, community?: string }): RoleInfo {
     const account = options.account || this.activeAccount;
     if (!account) return;
+
     const address_id = this.addresses.find((a) => {
       return a.address === account.address && a.chain === account.chain.id;
     })?.id;
 
     return this.roles.find((r) => {
+      console.log('r');
+      console.log(r);
+      console.log('r.address_id');
+      console.log(r.address_id);
       const addressMatches = r.address_id === address_id;
       const communityMatches = options.chain
         ? r.chain_id === options.chain
