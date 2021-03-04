@@ -6,8 +6,6 @@ import Substrate from '../substrate/main';
 class Clover extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
     super(n, app, ChainClass.Clover);
-    this.signaling.disable();
-    this.identities.disable();
   }
 
   public async initApi() {
