@@ -62,6 +62,7 @@ Environment variables used for external services include:
 - SENDGRID_API_KEY: for sending emails, email login, etc.
 - NODE_URL: for server-side proposal archiving (usually ws://testnet2.edgewa.re:9944, may be deprecated soon)
 - DATABASE_URL (set by Heroku)
+- PRODUCTION_APP (Heroku App Name)
 - JWT_SECRET
 - SESSION_SECRET
 
@@ -76,7 +77,7 @@ We also use certain environment variables to configure the application itself:
 To download and restore the production database, and run migrations:
 
 ```
-pg_dump $(heroku config:get DATABASE_URL) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --no-privileges --no-owner -f latest.dump
+pg_dump $(heroku config:get DATABASE_URL --app PRODUCTION_APP) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --no-privileges --no-owner -f latest.dump
 
 npx sequelize db:drop
 npx sequelize db:create
