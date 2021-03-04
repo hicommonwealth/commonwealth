@@ -37,7 +37,7 @@ export default abstract class JobRunner<CacheT> {
   }
 
   // job can be run manually as well, if desired -- will not reset timer
-  protected abstract async _job(c: CacheT): Promise<void>;
+  protected abstract _job(c: CacheT): Promise<void>;
   public async run(): Promise<void> {
     await this._lock.writeLock();
     await this._job(this._cache);

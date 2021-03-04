@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import _, { chain } from 'underscore';
+import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
@@ -43,20 +43,24 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
 const setupChainEventListeners = async (
   models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean
 ): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
+  const queryNode = (c: string): Promise<ChainNodeInstance> => models.ChainNode.findOne({
+    where: { chain: c },
+    include: [{
+      model: models.Chain,
+      where: { active: true },
+      required: true,
+    }],
+  });
   log.info('Fetching node urls...');
   await sequelize.authenticate();
   const nodes: ChainNodeInstance[] = [];
   if (chains === 'all') {
-    const n = (await Promise.all(EventSupportingChains.map((c) => {
-      return models.ChainNode.findOne({ where: { chain: c } });
-    }))).filter((c) => !!c);
+    const n = (await Promise.all(EventSupportingChains.map((c) => queryNode(c)))).filter((c) => !!c);
     nodes.push(...n);
   } else if (chains !== 'none') {
     const n = (await Promise.all(EventSupportingChains
       .filter((c) => chains.includes(c))
-      .map((c) => {
-        return models.ChainNode.findOne({ where: { chain: c } });
-      })))
+      .map((c) => queryNode(c))))
       .filter((c) => !!c);
     nodes.push(...n);
   } else {

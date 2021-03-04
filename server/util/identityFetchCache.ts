@@ -16,10 +16,10 @@ export default class IdentityFetchCache extends JobRunner<CacheT> {
     super({}, _jobTimeS);
   }
 
-  public start(models, fetchers: { [chain: string]: SubstrateEvents.StorageFetcher }) {
+  public async start(models, fetchers: { [chain: string]: SubstrateEvents.StorageFetcher }) {
     this._models = models;
     this._fetchers = fetchers;
-    this.access(async (c) => {
+    await this.access(async (c) => {
       // write empty arrays for all available chains
       Object.keys(fetchers).reduce((res, chain) => Object.assign(c, { [chain]: [] }), c);
     });

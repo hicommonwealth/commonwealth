@@ -257,6 +257,7 @@ export default (
       }
     } else if (chain.network === 'ethereum'
       || chain.network === 'moloch'
+      || chain.network === 'alex'
       || chain.network === 'metacartel'
       || chain.network === 'marlin'
       || chain.network === 'marlin-testnet'
