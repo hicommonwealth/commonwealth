@@ -1,11 +1,11 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
-    return queryInterface.changeColumn('OffchainReactions', 'chain', { type: DataTypes.STRING, allowNull: true });
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.changeColumn('OffchainReactions', 'chain', { type: Sequelize.STRING, allowNull: true });
   },
 
-  down: (queryInterface, DataTypes) => {
-    return queryInterface.changeColumn('OffchainReactions', 'chain', { type: DataTypes.STRING, allowNull: false });
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.changeColumn('OffchainReactions', 'chain', { type: Sequelize.STRING, allowNull: false });
   }
 };

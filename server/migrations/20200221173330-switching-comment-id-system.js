@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.renameColumn(
       'OffchainComments',
       'object_id',
@@ -11,7 +11,7 @@ module.exports = {
       'OffchainComments',
       'root_id',
       {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: true
       },
     );
@@ -19,13 +19,13 @@ module.exports = {
       'OffchainComments',
       'parent_id',
       {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: true
       },
     );
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.renameColumn(
       'OffchainComments',
       'parent_id',
@@ -35,7 +35,7 @@ module.exports = {
       'OffchainComments',
       'root_id',
       {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: true
       }
     );
@@ -43,7 +43,7 @@ module.exports = {
       'OffchainComments',
       'object_id',
       {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
         defaultValue: ''
       }

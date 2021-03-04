@@ -98,6 +98,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
 }
 
 export async function deinitChainOrCommunity() {
+  app.isAdapterReady = false;
   if (app.chain) {
     app.chain.networkStatus = ApiStatus.Disconnected;
     app.chain.deinitServer();
@@ -374,7 +375,8 @@ export async function initChain(): Promise<void> {
   await app.chain.initData();
 
   // Emit chain as updated
-  app.chainAdapterReady.next(true);
+  app.chainAdapterReady.emit('ready');
+  app.isAdapterReady = true;
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
@@ -555,7 +557,6 @@ $(() => {
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
-    '/:scope/new/signaling':     importRoute('views/pages/new_signaling', { scoped: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),

@@ -190,7 +190,7 @@ export const sendBatchedNotificationEmails = async (models): Promise<number> => 
   log.info('Sending daily notification emails');
 
   try {
-    const users = await models.User.findAll({
+    const users = await models.User.scope('withPrivateData').findAll({
       where: { emailNotificationInterval: 'daily' }
     });
 

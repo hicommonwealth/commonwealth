@@ -2,15 +2,15 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
     // add columns
-      await queryInterface.addColumn('Subscriptions', 'chain_id', { type: DataTypes.STRING, allowNull: true }, { transaction: t });
-      await queryInterface.addColumn('Subscriptions', 'community_id', { type: DataTypes.STRING, allowNull: true }, { transaction: t });
-      await queryInterface.addColumn('Subscriptions', 'offchain_thread_id', { type: DataTypes.INTEGER, allowNull: true }, { transaction: t });
-      await queryInterface.addColumn('Subscriptions', 'offchain_comment_id', { type: DataTypes.INTEGER, allowNull: true }, { transaction: t });
-      await queryInterface.addColumn('Subscriptions', 'chain_event_type_id', { type: DataTypes.STRING, allowNull: true }, { transaction: t });
-      await queryInterface.addColumn('Subscriptions', 'chain_entity_id', { type: DataTypes.STRING, allowNull: true }, { transaction: t });
+      await queryInterface.addColumn('Subscriptions', 'chain_id', { type: Sequelize.STRING, allowNull: true }, { transaction: t });
+      await queryInterface.addColumn('Subscriptions', 'community_id', { type: Sequelize.STRING, allowNull: true }, { transaction: t });
+      await queryInterface.addColumn('Subscriptions', 'offchain_thread_id', { type: Sequelize.INTEGER, allowNull: true }, { transaction: t });
+      await queryInterface.addColumn('Subscriptions', 'offchain_comment_id', { type: Sequelize.INTEGER, allowNull: true }, { transaction: t });
+      await queryInterface.addColumn('Subscriptions', 'chain_event_type_id', { type: Sequelize.STRING, allowNull: true }, { transaction: t });
+      await queryInterface.addColumn('Subscriptions', 'chain_entity_id', { type: Sequelize.STRING, allowNull: true }, { transaction: t });
 
 
       // for each subscription, create relevant associations
@@ -108,7 +108,7 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await Promise.all([
         queryInterface.removeColumn('Subscriptions', 'chain_id', { transaction: t }),

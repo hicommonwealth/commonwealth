@@ -76,24 +76,18 @@ We also use certain environment variables to configure the application itself:
 To download and restore the production database, and run migrations:
 
 ```
-nvm use
-heroku pg:backups:capture -a commonwealthapp
-heroku pg:backups:download -a commonwealthapp
-brew services restart postgres     # For Mac OS X restart the database to close any open connections
-npx sequelize db:drop              # Reset the database
-npx sequelize db:create            # Create a new empty database
-pg_restore --verbose --clean --no-acl --no-owner --if-exists -h localhost -U commonwealth -d commonwealth latest.dump
-npx sequelize db:migrate
+pg_dump $(heroku config:get DATABASE_URL) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --no-privileges --no-owner -f latest.dump
+
+npx sequelize db:drop
+npx sequelize db:create
+psql -d commonwealth -U commonwealth -f latest.dump
 ```
 
-At this point you should be ready to go!
+To access the production DB:
 
-The app is compiled into a bundle and pushed to Heroku, which
-serves it at <app>.herokuapp.com. **Migrations are
-automatically executed.** If migrations do not complete successfully,
-the new backend does not get served.
-
-To access the production DB: `heroku pg:psql`
+```
+heroku pg:psql
+```
 
 To run the production server locally:
 

@@ -1,5 +1,4 @@
-import { first } from 'rxjs/operators';
-import { ApiRx } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { BlockNumber } from '@polkadot/types/interfaces';
 import { ISubstrateDemocracyReferendum, SubstrateCoin } from 'adapters/chain/substrate/types';
 import { ITXModalData, ProposalModule } from 'models';
@@ -10,7 +9,7 @@ import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
 
 class SubstrateDemocracy extends ProposalModule<
-  ApiRx,
+  ApiPromise,
   ISubstrateDemocracyReferendum,
   SubstrateDemocracyReferendum
 > {
@@ -37,7 +36,8 @@ class SubstrateDemocracy extends ProposalModule<
   }
 
   // Loads all proposals and referendums currently present in the democracy module
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+  public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    this._disabled = !ChainInfo.api.query.democracy;
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
     this._Chain = ChainInfo;
@@ -45,55 +45,50 @@ class SubstrateDemocracy extends ProposalModule<
 
     // load server referenda
     const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyReferendum);
-    entities.map((e) => this._entityConstructor(e));
+    entities.forEach((e) => this._entityConstructor(e));
 
-    return new Promise((resolve, reject) => {
-      this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
-        // save parameters
-        this._enactmentPeriod = +(api.consts.democracy.enactmentPeriod as BlockNumber);
-        this._cooloffPeriod = +(api.consts.democracy.cooloffPeriod as BlockNumber);
-        this._votingPeriod = +(api.consts.democracy.votingPeriod as BlockNumber);
-        this._emergencyVotingPeriod = +(api.consts.democracy.emergencyVotingPeriod as BlockNumber);
-        this._preimageByteDeposit = this._Chain.coins(api.consts.democracy.preimageByteDeposit);
+    // save parameters
+    this._enactmentPeriod = +(ChainInfo.api.consts.democracy.enactmentPeriod as BlockNumber);
+    this._cooloffPeriod = +(ChainInfo.api.consts.democracy.cooloffPeriod as BlockNumber);
+    this._votingPeriod = +(ChainInfo.api.consts.democracy.votingPeriod as BlockNumber);
+    this._emergencyVotingPeriod = +(ChainInfo.api.consts.democracy.emergencyVotingPeriod as BlockNumber);
+    this._preimageByteDeposit = this._Chain.coins(ChainInfo.api.consts.democracy.preimageByteDeposit);
 
-        // register chain-event handlers
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.DemocracyReferendum, (entity, event) => {
-            this.updateProposal(entity, event);
-          }
-        );
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
-            if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
-              const referendum = this.getByHash(entity.typeId);
-              if (referendum) referendum.update(event);
-            }
-          }
-        );
+    // register chain-event handlers
+    this.app.chain.chainEntities.registerEntityHandler(
+      SubstrateTypes.EntityKind.DemocracyReferendum, (entity, event) => {
+        this.updateProposal(entity, event);
+      }
+    );
+    this.app.chain.chainEntities.registerEntityHandler(
+      SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
+        if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
+          const referendum = this.getByHash(entity.typeId);
+          if (referendum) referendum.update(event);
+        }
+      }
+    );
 
-        // fetch referenda from chain
-        const events = await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          () => this._Chain.fetcher.fetchDemocracyReferenda(this.app.chain.block.height)
-        );
-        const hashes = events.filter((e) => (e.data as any).proposalHash).map((e) => (e.data as any).proposalHash);
-        await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
-        );
+    // fetch referenda from chain
+    const events = await this.app.chain.chainEntities.fetchEntities(
+      this.app.chain.id,
+      () => this._Chain.fetcher.fetchDemocracyReferenda(this.app.chain.block.height)
+    );
+    const hashes = events.filter((e) => (e.data as any).proposalHash).map((e) => (e.data as any).proposalHash);
+    await this.app.chain.chainEntities.fetchEntities(
+      this.app.chain.id,
+      () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
+    );
 
-        this._initialized = true;
-        this._initializing = false;
-        resolve();
-      });
-    });
+    this._initialized = true;
+    this._initializing = false;
   }
 
   public reapPreimage(author: SubstrateAccount, hash: string) {
     // TODO: verify that hash corresponds to an actual preimage & is in a reap-able state
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => (api.tx.democracy.reapPreimage as any)(hash),
+      (api: ApiPromise) => (api.tx.democracy.reapPreimage as any)(hash),
       'reapPreimage',
       `Preimage hash: ${hash}`,
     );
@@ -110,7 +105,7 @@ class SubstrateDemocracy extends ProposalModule<
     }
     return this._Chain.createTXModalData(
       who,
-      (api: ApiRx) => api.tx.democracy.setProxy(proxy.address),
+      (api: ApiPromise) => api.tx.democracy.setProxy(proxy.address),
       'setProxy',
       `${who.address} sets proxy to ${proxy.address}`
     );
@@ -123,7 +118,7 @@ class SubstrateDemocracy extends ProposalModule<
     }
     return this._Chain.createTXModalData(
       who,
-      (api: ApiRx) => api.tx.democracy.resignProxy(),
+      (api: ApiPromise) => api.tx.democracy.resignProxy(),
       'resignProxy',
       `${who.address} resigns as proxy`
     );
@@ -136,7 +131,7 @@ class SubstrateDemocracy extends ProposalModule<
     }
     return this._Chain.createTXModalData(
       who,
-      (api: ApiRx) => api.tx.democracy.removeProxy(proxy.address),
+      (api: ApiPromise) => api.tx.democracy.removeProxy(proxy.address),
       'removeProxy',
       `${who.address} removes proxy ${proxy.address}`
     );
@@ -145,7 +140,7 @@ class SubstrateDemocracy extends ProposalModule<
   public delegateTx(who: SubstrateAccount, toAccount: SubstrateAccount, conviction: Conviction) {
     return this._Chain.createTXModalData(
       who,
-      (api: ApiRx) => api.tx.democracy.delegate(toAccount.address, conviction),
+      (api: ApiPromise) => api.tx.democracy.delegate(toAccount.address, conviction),
       'delegate',
       `${who.address} delegates to ${toAccount.address}`
     );
@@ -157,7 +152,7 @@ class SubstrateDemocracy extends ProposalModule<
     }
     return this._Chain.createTXModalData(
       who,
-      (api: ApiRx) => api.tx.democracy.undelegate(),
+      (api: ApiPromise) => api.tx.democracy.undelegate(),
       'undelegate',
       `undelegating ${who.address}`
     );

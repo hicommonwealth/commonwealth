@@ -86,7 +86,7 @@ $listing-right-flex: 1;
 
 @mixin listing-row-base {
     display: flex;
-    padding: 16px 20px 9px;
+    padding: 15px 20px 9px;
     margin: 0 -20px;
     cursor: pointer;
     &:hover {
@@ -146,19 +146,5 @@ $listing-right-flex: 1;
             width: 50%;
             margin: 10px 0 4px;
         }
-    }
-}
-
-@mixin proposal-topic-inline {
-    .proposal-topic-icon {
-        display: inline-block;
-        background: transparent;
-        border: 1.5px solid $text-color-lightest;
-        border-radius: 99px;
-        width: 7px;
-        height: 7px;
-        margin-right: 6px;
-        position: relative;
-        top: -1px;
     }
 }

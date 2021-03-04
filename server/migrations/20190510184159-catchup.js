@@ -1,54 +1,54 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction((t) => {
       return Promise.all([
         queryInterface.addColumn('Addresses', 'verification_token', {
-          type: DataTypes.STRING, allowNull: false, defaultValue: 'MIGRATED',
+          type: Sequelize.STRING, allowNull: false, defaultValue: 'MIGRATED',
         }, { transaction: t }),
         queryInterface.addColumn('Addresses', 'verification_token_expires', {
-          type: DataTypes.DATE, allowNull: true,
+          type: Sequelize.DATE, allowNull: true,
         }, { transaction: t }),
         queryInterface.addColumn('Addresses', 'verified', {
-          type: DataTypes.DATE, allowNull: true,
+          type: Sequelize.DATE, allowNull: true,
         }, { transaction: t }),
 
         queryInterface.addColumn('OffchainThreads', 'category_id', {
-          type: DataTypes.INTEGER, allowNull: false,
+          type: Sequelize.INTEGER, allowNull: false,
         }, { transaction: t }),
 
         queryInterface.createTable('OffchainThreadCategories', {
-          id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-          name: { type: DataTypes.STRING, allowNull: false },
-          description: { type: DataTypes.TEXT, allowNull: false },
-          color: { type: DataTypes.STRING, allowNull: false },
-          created_at: { type: DataTypes.DATE, allowNull: false },
-          updated_at: { type: DataTypes.DATE, allowNull: false },
-          deleted_at: DataTypes.DATE,
+          id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+          name: { type: Sequelize.STRING, allowNull: false },
+          description: { type: Sequelize.TEXT, allowNull: false },
+          color: { type: Sequelize.STRING, allowNull: false },
+          created_at: { type: Sequelize.DATE, allowNull: false },
+          updated_at: { type: Sequelize.DATE, allowNull: false },
+          deleted_at: Sequelize.DATE,
         }, { transaction: t }),
 
         queryInterface.createTable('Proposals', {
-          id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-          chain: { type: DataTypes.STRING, allowNull: false },
-          identifier: { type: DataTypes.STRING, allowNull: false },
-          type: { type: DataTypes.STRING, allowNull: false },
-          data: { type: DataTypes.JSON, allowNull: false },
-          completed: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-          final_state: { type: DataTypes.JSON, allowNull: true },
-          created_at: { type: DataTypes.DATE, allowNull: false },
-          updated_at: { type: DataTypes.DATE, allowNull: false },
-          deleted_at: DataTypes.DATE,
+          id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+          chain: { type: Sequelize.STRING, allowNull: false },
+          identifier: { type: Sequelize.STRING, allowNull: false },
+          type: { type: Sequelize.STRING, allowNull: false },
+          data: { type: Sequelize.JSON, allowNull: false },
+          completed: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
+          final_state: { type: Sequelize.JSON, allowNull: true },
+          created_at: { type: Sequelize.DATE, allowNull: false },
+          updated_at: { type: Sequelize.DATE, allowNull: false },
+          deleted_at: Sequelize.DATE,
         }, { transaction: t }),
       ]).then(() => {
         queryInterface.changeColumn('Addresses', 'verification_token', {
-          type: DataTypes.STRING, allowNull: false,
+          type: Sequelize.STRING, allowNull: false,
         });
       });
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction((t) => {
       return Promise.all([
         queryInterface.removeColumn('Addresses', 'verification_token', { transaction: t }),

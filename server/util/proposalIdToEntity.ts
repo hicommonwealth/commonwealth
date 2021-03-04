@@ -17,9 +17,6 @@ export default async function (models, chain: string, identifier: string) {
     case 'democracyproposal': {
       return findEntity(SubstrateTypes.EntityKind.DemocracyProposal.toString());
     }
-    case 'signalingproposal': {
-      return findEntity(SubstrateTypes.EntityKind.SignalingProposal.toString());
-    }
     case 'technicalcommitteemotion':
     case 'councilmotion': {
       return findEntity(SubstrateTypes.EntityKind.CollectiveProposal.toString());

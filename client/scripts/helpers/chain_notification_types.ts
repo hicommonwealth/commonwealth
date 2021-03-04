@@ -28,12 +28,6 @@ export const EdgewareChainNotificationTypes = {
     'edgeware-preimage-reaped',
     'edgeware-preimage-used',
   ],
-  Signaling: [
-    'edgeware-signaling-commit-started',
-    'edgeware-signaling-new-proposal',
-    'edgeware-signaling-voting-completed',
-    'edgeware-signaling-voting-started',
-  ],
   Treasury: [
     'edgeware-treasury-awarded',
     'edgeware-treasury-proposed',

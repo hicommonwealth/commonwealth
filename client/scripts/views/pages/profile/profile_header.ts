@@ -3,7 +3,6 @@ import _ from 'lodash';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
 import * as clipboard from 'clipboard-polyfill';
-import { Unsubscribable } from 'rxjs';
 
 import { initChain } from 'app';
 import app from 'state';
@@ -15,7 +14,6 @@ import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import PageLoading from 'views/pages/loading';
 import { formatAddressShort } from '../../../../../shared/utils';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
@@ -70,7 +68,6 @@ export interface IProfileHeaderAttrs {
 }
 
 export interface IProfileHeaderState {
-  subscription: Unsubscribable | null;
   identity: SubstrateIdentity | null;
   copied: boolean;
   loading: boolean;
@@ -110,9 +107,9 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m('.User', [
-              account.profile ? m(User, { user: account, hideAvatar: true, showRole: true }) : account.address,
-            ]),
+            m('.User', account.profile
+              ? m(User, { user: account, hideAvatar: true, showRole: true })
+              : account.address),
           ]),
           m('.info-row', [
             account.profile?.headline && m('span.profile-headline', account.profile.headline),

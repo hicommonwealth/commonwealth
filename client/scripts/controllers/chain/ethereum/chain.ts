@@ -176,7 +176,6 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       console.log('deinitEventLoop');
       console.log(this._eventHandlers);
 
-      // eslint-disable-next-line no-restricted-syntax
       for (const event of Object.keys(this._eventHandlers)) {
         if (this._eventHandlers[event]) {
           this.removeEventHandler(this._eventHandlers[event]);

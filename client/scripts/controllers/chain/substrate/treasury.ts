@@ -1,8 +1,5 @@
-import { BehaviorSubject, Unsubscribable } from 'rxjs';
-import { first, switchMap } from 'rxjs/operators';
-import { ApiRx } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
-import { DeriveBalancesAccount } from '@polkadot/api-derive/types';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { IApp } from 'state';
 import {
@@ -17,13 +14,13 @@ import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
 
 class SubstrateTreasury extends ProposalModule<
-  ApiRx,
+  ApiPromise,
   ISubstrateTreasuryProposal,
   SubstrateTreasuryProposal
 > {
   // TODO: understand Pot behavior
-  private _pot = new BehaviorSubject<SubstrateCoin>(null);
-  get pot() { return this._pot.value; }
+  private _pot: SubstrateCoin = null;
+  get pot() { return this._pot; }
 
   // The minimum bond for a proposal
   private _bondMinimum: SubstrateCoin = null;
@@ -50,14 +47,6 @@ class SubstrateTreasury extends ProposalModule<
     return this.bondMinimum.gt(computed) ? this.bondMinimum : this._Chain.coins(computed);
   }
 
-  private _potSubscription: Unsubscribable;
-  public deinit() {
-    if (this._potSubscription) {
-      this._potSubscription.unsubscribe();
-    }
-    super.deinit();
-  }
-
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
@@ -65,7 +54,8 @@ class SubstrateTreasury extends ProposalModule<
     super(app, (e) => new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, e));
   }
 
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+  public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    this._disabled = !ChainInfo.api.query.treasury;
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
     this._Chain = ChainInfo;
@@ -73,49 +63,40 @@ class SubstrateTreasury extends ProposalModule<
 
     // load server proposals
     const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryProposal);
-    const proposals = entities.map((e) => this._entityConstructor(e));
+    entities.forEach((e) => this._entityConstructor(e));
 
-    return new Promise((resolve, reject) => {
-      this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
-        // save parameters
-        this._bondPct = +(api.consts.treasury.proposalBond as Permill) / 1_000_000;
-        this._bondMinimum = this._Chain.coins(api.consts.treasury.proposalBondMinimum as BalanceOf);
-        this._spendPeriod = +(api.consts.treasury.spendPeriod as BlockNumber);
-        this._burnPct = +(api.consts.treasury.burn as Permill) / 1_000_000;
-        // kick off subscriptions
-        const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
-        await new Promise((innerResolve) => {
-          this._potSubscription = api.derive.balances.account(TREASURY_ACCOUNT)
-            .subscribe((pot: DeriveBalancesAccount) => {
-              this._pot.next(this._Chain.coins(pot.freeBalance));
-              innerResolve();
-            });
-        });
+    // save parameters
+    this._bondPct = +(ChainInfo.api.consts.treasury.proposalBond as Permill) / 1_000_000;
+    this._bondMinimum = this._Chain.coins(ChainInfo.api.consts.treasury.proposalBondMinimum as BalanceOf);
+    this._spendPeriod = +(ChainInfo.api.consts.treasury.spendPeriod as BlockNumber);
+    this._burnPct = +(ChainInfo.api.consts.treasury.burn as Permill) / 1_000_000;
 
-        // register new chain-event handlers
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.TreasuryProposal, (entity, event) => {
-            this.updateProposal(entity, event);
-          }
-        );
 
-        // fetch proposals from chain
-        await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          () => this._Chain.fetcher.fetchTreasuryProposals(this.app.chain.block.height),
-        );
+    const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
+    const pot = await ChainInfo.api.derive.balances.account(TREASURY_ACCOUNT);
+    this._pot = this._Chain.coins(pot.freeBalance);
 
-        this._initialized = true;
-        this._initializing = false;
-        resolve();
-      });
-    });
+    // register new chain-event handlers
+    this.app.chain.chainEntities.registerEntityHandler(
+      SubstrateTypes.EntityKind.TreasuryProposal, (entity, event) => {
+        this.updateProposal(entity, event);
+      }
+    );
+
+    // fetch proposals from chain
+    await this.app.chain.chainEntities.fetchEntities(
+      this.app.chain.id,
+      () => this._Chain.fetcher.fetchTreasuryProposals(this.app.chain.block.height),
+    );
+
+    this._initialized = true;
+    this._initializing = false;
   }
 
   public createTx(author: SubstrateAccount, value: SubstrateCoin, beneficiary: SubstrateAccount) {
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => api.tx.treasury.proposeSpend(value, beneficiary.address),
+      (api: ApiPromise) => api.tx.treasury.proposeSpend(value, beneficiary.address),
       'proposeSpend',
       `proposeSpend(${value.format()}, ${formatAddressShort(beneficiary.address, beneficiary.chain.id)})`
     );

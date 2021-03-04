@@ -1,15 +1,15 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn('OffchainThreads', 'pinned', {
-      type: DataTypes.BOOLEAN,
+      type: Sequelize.BOOLEAN,
       defaultValue: false,
       allowNull: false,
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn('OffchainThreads', 'pinned');
   }
 };

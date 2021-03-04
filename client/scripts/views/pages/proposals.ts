@@ -10,7 +10,7 @@ import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase, ChainNetwork } from 'models';
+import { ChainClass, ChainBase, ChainNetwork, ProposalModule } from 'models';
 
 import Edgeware from 'controllers/chain/edgeware/main';
 import {
@@ -94,27 +94,24 @@ const MarlinProposalStats: m.Component<{}, {}> = {
   }
 };
 
-async function loadCmd() {
+function getModules(): ProposalModule<any, any, any>[] {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
   if (app.chain.base === ChainBase.Substrate) {
     const chain = (app.chain as Substrate);
-    await Promise.all([
-      chain.council.init(chain.chain, chain.accounts),
-      chain.signaling.init(chain.chain, chain.accounts),
-      chain.treasury.init(chain.chain, chain.accounts),
-      chain.democracyProposals.init(chain.chain, chain.accounts),
-      chain.democracy.init(chain.chain, chain.accounts),
-    ]);
+    return [
+      chain.council,
+      chain.technicalCommittee,
+      chain.treasury,
+      chain.democracyProposals,
+      chain.democracy
+    ];
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     const chain = (app.chain as Cosmos);
-    await Promise.all([
-      chain.governance.init(chain.chain, chain.accounts),
-    ]);
-    return;
+    return [ chain.governance ];
   } else {
-    return;
+    throw new Error('invalid chain');
   }
 }
 
@@ -163,11 +160,9 @@ const ProposalsPage: m.Component<{}> = {
     const onMarlin = app.chain && (app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet);
 
     if (onSubstrate) {
-      // Democracy, Council, and Signaling (Edgeware-only) must be loaded to proceed
-      const chain = app.chain as Substrate;
-      if (!chain.democracy.initialized || !chain.council.initialized || !chain.democracyProposals.initialized
-          || (!chain.signaling.disabled && !chain.signaling.initialized)) {
-        if (!chain.democracy.initializing) loadCmd();
+      const modules = getModules();
+      if (modules.some((mod) => !mod.ready)) {
+        app.chain.loadModules(modules);
         return m(PageLoading, {
           message: 'Connecting to chain',
           title: [
@@ -183,9 +178,6 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed);
     const activeCouncilProposals = onSubstrate
       && (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed);
-    const activeSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
-      && (app.chain as Edgeware).signaling.store.getAll()
-        .filter((p) => !p.completed).sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
     const activeCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
       && (app.chain as Cosmos).governance.store.getAll()
         .filter((p) => !p.completed).sort((a, b) => +b.identifier - +a.identifier);
@@ -198,14 +190,12 @@ const ProposalsPage: m.Component<{}> = {
 
     const activeProposalContent = !activeDemocracyProposals?.length
       && !activeCouncilProposals?.length
-      && !activeSignalingProposals?.length
       && !activeCosmosProposals?.length
       && !activeMolochProposals?.length
       && !activeMarlinProposals?.length
       ? [ m('.no-proposals', 'No active proposals') ]
       : (activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((activeCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((activeSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((activeMarlinProposals || []).map((proposal) => m(ProposalRow, { proposal })));
@@ -215,9 +205,6 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => p.completed);
     const inactiveCouncilProposals = onSubstrate
       && (app.chain as Substrate).council.store.getAll().filter((p) => p.completed);
-    const inactiveSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
-      && (app.chain as Edgeware).signaling.store.getAll()
-        .filter((p) => p.completed).sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
     const inactiveCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
       && (app.chain as Cosmos).governance.store.getAll()
         .filter((p) => p.completed).sort((a, b) => +b.identifier - +a.identifier);
@@ -230,14 +217,12 @@ const ProposalsPage: m.Component<{}> = {
 
     const inactiveProposalContent = !inactiveDemocracyProposals?.length
       && !inactiveCouncilProposals?.length
-      && !inactiveSignalingProposals?.length
       && !inactiveCosmosProposals?.length
       && !inactiveMolochProposals?.length
       && !inactiveMarlinProposals?.length
       ? [ m('.no-proposals', 'No past proposals') ]
       : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((inactiveSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })))
         .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalRow, { proposal })));

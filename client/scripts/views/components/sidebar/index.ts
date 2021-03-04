@@ -152,9 +152,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     //     + (app.chain as any).democracyProposals.store.getAll().filter((p) => !p.completed).length
     //     + (app.chain as any).council.store.getAll().filter((p) => !p.completed).length
     //     + (app.chain as any).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
-    // const edgewareSignalingProposals = (app.chain?.loaded && app.chain?.class === ChainClass.Edgeware)
-    //   ? (app.chain as any).signaling.store.getAll().filter((p) => !p.completed).length : 0;
-    // const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
+    // const allSubstrateGovernanceProposals = substrateGovernanceProposals;
     // const cosmosGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.CosmosSDK)
     //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
     // const molochProposals = (app.chain?.loaded && app.chain?.class === ChainClass.Moloch)
@@ -177,10 +175,8 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
-        || p.startsWith(`/${app.activeChainId()}/signaling`)
         || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`));
+        || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`));
     const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
       || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
     const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
