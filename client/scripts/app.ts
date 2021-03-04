@@ -310,11 +310,11 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Moloch(n, app);
   } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
-    // const Token = (await import(
+    const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */
-    //   './controllers/chain/ethereum/token/adapter'
-    // )).default;
+      './controllers/chain/ethereum/token/adapter'
+    )).default;
     newChain = new Token(n, app);
   } else if (n.chain.network === ChainNetwork.Commonwealth) {
     const Commonwealth = (await import(
