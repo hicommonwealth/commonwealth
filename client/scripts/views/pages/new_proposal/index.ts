@@ -21,7 +21,7 @@ const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
       if (app.chain?.failed)
         return m(PageNotFound, {
           title: 'Wrong Ethereum Provider Network!',
-          message: 'Change Metamask to point to Ropsten Testnet',
+          message: 'Change Metamask to point to Ethereum Mainnet',
         });
       if (!app.chain || !app.chain.loaded)
         return m(PageLoading, { narrow: true, showNewProposalButton: true });
