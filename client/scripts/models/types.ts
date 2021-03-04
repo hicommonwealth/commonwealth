@@ -32,6 +32,7 @@ export enum ChainNetwork {
   NEAR = 'near',
   Moloch = 'moloch',
   Metacartel = 'metacartel',
+  ALEX = 'alex',
   Commonwealth = 'commonwealth',
   HydraDX = 'hydradx'
 }
@@ -77,6 +78,7 @@ export enum ChainClass {
   Ethereum = 'ethereum',
   Near = 'near',
   Moloch = 'moloch',
+  ALEX = 'alex',
   Commonwealth = 'commonwealth',
 }
 

@@ -109,7 +109,17 @@ export default (
       { fields: ['address', 'chain'], unique: true },
       { fields: ['user_id'] },
       { fields: ['name'] }
-    ]
+    ],
+    defaultScope: {
+      attributes: {
+        exclude: [ 'verification_token', 'verification_token_expires', 'created_at', 'updated_at' ],
+      }
+    },
+    scopes: {
+      withPrivateData: {
+        attributes: {}
+      }
+    },
   });
 
   Address.createEmpty = (
@@ -250,6 +260,7 @@ export default (
       }
     } else if (chain.network === 'ethereum'
       || chain.network === 'moloch'
+      || chain.network === 'alex'
       || chain.network === 'metacartel'
       || chain.network === 'commonwealth'
     ) {

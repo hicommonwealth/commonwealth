@@ -6,6 +6,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
+import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -17,13 +18,29 @@ export const Errors = {
   NoBodyOrAttachments: 'Forum posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
+  InsufficientTokenBalance: `Users need to hold some of the community's tokens to post`,
 };
 
-const createThread = async (models, req: Request, res: Response, next: NextFunction) => {
+const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
+  if (chain && chain.type === 'token') {
+    // skip check for admins
+    const isAdmin = await models.Role.findAll({
+      where: {
+        address_id: author.id,
+        chain_id: chain.id,
+        permission: ['admin'],
+      },
+    });
+    if (isAdmin.length === 0) {
+      const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
+      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+    }
+  }
+
   const { topic_name, topic_id, title, body, kind, stage, url, readOnly } = req.body;
 
   if (kind === 'forum') {

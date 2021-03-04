@@ -3,12 +3,15 @@ import chai from 'chai';
 import 'chai/register-should';
 import moment from 'moment';
 import wallet from 'ethereumjs-wallet';
+import { bigNumberify } from 'ethers/utils';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { NotificationCategory } from 'models';
+import { Erc20 } from '../../eth/types/Erc20';
 import { factory, formatFilename } from '../../shared/logging';
 import app from '../../server-test';
 import models from '../../server/database';
+import { TokenForumMeta } from '../../server/util/tokenBalanceCache';
 const ethUtil = require('ethereumjs-util');
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -19,7 +22,7 @@ export const generateEthAddress = () => {
 };
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
-  if (chain === 'ethereum') {
+  if (chain === 'ethereum' || chain === 'alex') {
     const { keypair, address } = generateEthAddress();
     let res = await chai.request.agent(app)
       .post('/api/createAddress')
@@ -289,4 +292,19 @@ export const createInvite = async (args: InviteArgs) => {
     .send({ ...args });
   const invite = res.body;
   return invite;
+};
+
+export const createTokenMeta = (
+  balanceCb: (address: string) => Promise<number>
+): TokenForumMeta => {
+  return {
+    id: 'alex',
+    address: '0xFab46E002BbF0b4509813474841E0716E6730136',
+    api: {
+      balanceOf: async (a: string) => {
+        const res = await balanceCb(a);
+        return bigNumberify(res);
+      }
+    } as unknown as Erc20,
+  };
 };

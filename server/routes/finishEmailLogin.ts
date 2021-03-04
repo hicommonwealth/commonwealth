@@ -44,7 +44,7 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
   await tokenObj.save();
 
   // Log in the user associated with the verified email
-  const existingUser = await models.User.findOne({ where: { email } });
+  const existingUser = await models.User.scope('withPrivateData').findOne({ where: { email } });
 
   if (existingUser) {
     req.login(existingUser, async (err) => {

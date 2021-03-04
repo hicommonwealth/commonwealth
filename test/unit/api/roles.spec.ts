@@ -52,14 +52,14 @@ describe('Roles Test', () => {
           address_id: user.address_id,
         });
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.newRole.address_id).to.be.equal(user.address_id);
-      expect(res.body.result.newRole.offchain_community_id).to.be.equal(community);
+      expect(res.body.result.role.address_id).to.be.equal(user.address_id);
+      expect(res.body.result.role.offchain_community_id).to.be.equal(community);
       expect(res.body.result.subscription).to.not.be.null;
-      expect(res.body.result.subscription[0].object_id).to.be.equal(community);
-      expect(res.body.result.subscription[0].category_id).to.be.equal(NotificationCategories.NewThread);
+      expect(res.body.result.subscription.object_id).to.be.equal(community);
+      expect(res.body.result.subscription.category_id).to.be.equal(NotificationCategories.NewThread);
     });
 
-    it('should fail to create duplicate role for a public community a user is a member of', async () => {
+    it('should return existing role for a public community a user is already a member of', async () => {
       const res = await chai.request(app)
         .post('/api/createRole')
         .set('Accept', 'application/json')
@@ -68,8 +68,10 @@ describe('Roles Test', () => {
           community,
           address_id: loggedInAddrId,
         });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(createErrors.RoleAlreadyExists);
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.role.address_id).to.be.equal(loggedInAddrId);
+      expect(res.body.result.role.offchain_community_id).to.be.equal(community);
+      expect(res.body.result.role.permission).to.be.equal('admin');
     });
 
     it('should fail to create a role without address_id', async () => {

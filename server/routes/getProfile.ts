@@ -77,7 +77,12 @@ const getProfile = async (models, req: Request, res: Response, next: NextFunctio
     },
   });
 
-  return res.json({ status: 'Success', result: { account: addressModel, threads, comments } });
+  return res.json({
+    status: 'Success',
+    result: {
+      account: addressModel, threads: threads.map((t) => t.toJSON()), comments: comments.map((c) => c.toJSON())
+    }
+  });
 };
 
 export default getProfile;
