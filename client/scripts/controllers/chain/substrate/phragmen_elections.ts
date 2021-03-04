@@ -49,6 +49,7 @@ class SubstratePhragmenElections extends ProposalModule<
   private _Accounts: SubstrateAccounts;
 
   public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    this._disabled = !ChainInfo.api.query.elections;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
 

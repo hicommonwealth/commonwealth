@@ -313,14 +313,6 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
     }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
-    // TODO: search for signaling proposals ->
-    // Commented-out lines from previous version which included signaling proposals in proposals var:
-    // const discussions = app.threads.store.getAll()
-    // .filter((p) => p instanceof OffchainThread && p.author === account.address);
-    // const signaling = (app.chain as Edgeware).signaling.store.getAll()
-    //   .filter((p) => p instanceof EdgewareSignalingProposal && p.data.author === account.address);
-    // return [].concat(signaling, discussions);
-
     const comments = vnode.state.comments
       .sort((a, b) => +b.createdAt - +a.createdAt);
     const proposals = vnode.state.threads
