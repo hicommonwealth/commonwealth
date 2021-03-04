@@ -129,7 +129,7 @@ const resetServer = (debug=false): Promise<void> => {
         network: 'alex',
         symbol: 'ALEX',
         name: 'Alex',
-        icon_url: '/static/img/protocols/eth.png',
+        icon_url: '/static/img/protocols/alex.png',
         active: true,
         type: 'token',
         base: 'ethereum',

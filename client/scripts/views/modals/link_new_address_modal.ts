@@ -92,7 +92,6 @@ const EthereumLinkAccountItem: m.Component<{
         // Sign with the method on eth_webwallet, because we don't have access to the private key
         const signerAccount = await createUserWithAddress(address) as EthereumAccount;
         const webWalletSignature = await webWallet.signMessage(signerAccount.validationToken);
-        console.log(webWalletSignature);
 
         signerAccount.validate(webWalletSignature)
           .then(() => {
