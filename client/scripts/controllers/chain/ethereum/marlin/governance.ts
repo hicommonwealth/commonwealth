@@ -1,15 +1,9 @@
 import BN from 'bn.js';
-
-import { ProposalModule, ITXModalData, ChainEntity, IChainModule } from 'models';
-
+import { ProposalModule, ITXModalData } from 'models';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
-
-import { MarlinEvents } from '@commonwealth/chain-events';
-
 import { IApp } from 'state';
 
-
-import { BigNumber, BigNumberish } from 'ethers/utils';
+import { BigNumberish } from 'ethers/utils';
 import MarlinAPI from './api';
 import MarlinProposal from './proposal';
 import MarlinHolders from './holders';
@@ -24,9 +18,9 @@ export interface MarlinProposalArgs {
 }
 
 export default class MarlinGovernance extends ProposalModule<
-MarlinAPI,
-IMarlinProposalResponse,
-MarlinProposal
+  MarlinAPI,
+  IMarlinProposalResponse,
+  MarlinProposal
 > {
   // MEMBERS // TODO: Holders anything?
 
@@ -74,10 +68,12 @@ MarlinProposal
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !signatures || !calldatas || !description) return;
     if (!(await this._Holders.isSenderDelegate())) throw new Error('sender must be valid delegate');
-    if (this.proposalThreshold < await this._Holders.get(this._api.userAddress).priorDelegates(this._api.Provider.blockNumber)) {
+    const priorDelegates = await this._Holders.get(this._api.userAddress)
+      .priorDelegates(this._api.Provider.blockNumber);
+    if (this.proposalThreshold < priorDelegates) {
       throw new Error('sender must have requisite delegates');
     }
-    if (parseInt(await this._api.userAddress, 16) === 0) {
+    if (parseInt(this._api.userAddress, 16) === 0) {
       throw new Error('applicant cannot be 0');
     }
 

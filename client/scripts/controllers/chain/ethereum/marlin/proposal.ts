@@ -1,7 +1,6 @@
-import BN from 'bn.js';
 import moment from 'moment';
 
-import { MPond, EthereumCoin } from 'adapters/chain/ethereum/types';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMarlinProposalResponse } from 'adapters/chain/marlin/types';
 
 import { MarlinTypes } from '@commonwealth/chain-events';
@@ -202,7 +201,7 @@ export default class MarlinProposal extends Proposal<
     this._Gov = Gov;
 
     entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
-    this._initialized.next(true);
+    this._initialized = true;
     this._Gov.store.add(this);
   }
 

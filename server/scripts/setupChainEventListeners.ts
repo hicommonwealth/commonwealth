@@ -3,7 +3,7 @@ import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  // MarlinTypes, MarlinEvents,
+  MarlinTypes, MarlinEvents,
 } from '@commonwealth/chain-events';
 
 import EventStorageHandler from '../eventHandlers/storage';

@@ -1,6 +1,4 @@
-import { SubstrateTypes, MolochTypes,
-// MarlinTypes
-} from '@commonwealth/chain-events';
+import { SubstrateTypes, MolochTypes, MarlinTypes } from '@commonwealth/chain-events';
 
 // this function takes an "old style" identifier such as treasuryproposal_4 and attempts
 // fetch the corresponding chain entity from the database
@@ -27,10 +25,9 @@ export default async function (models, chain: string, identifier: string) {
     case 'molochproposal': {
       return findEntity(MolochTypes.EntityKind.Proposal.toString());
     }
-    // TODO: Uncomment when importing MarlinTypes
-    // case 'marlinproposal': {
-    //   return findEntity(MarlinTypes.EntityKind.Proposal.toString());
-    // }
+    case 'marlinproposal': {
+      return findEntity(MarlinTypes.EntityKind.Proposal.toString());
+    }
     // TODO: cosmosproposal
     // ignore council elections -- no commenting on them
     default: {

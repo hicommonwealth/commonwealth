@@ -581,45 +581,6 @@ const resetServer = (models): Promise<number> => {
 
       await Promise.all(nodes.map(([ url, chain, address ]) => (models.ChainNode.create({ chain, url, address }))));
 
-      // initialize chain event types
-      const initChainEventTypes = (chain: string) => {
-        if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
-          return Promise.all(
-            SubstrateTypes.EventKinds.map((event_name) => {
-              return models.ChainEventType.create({
-                id: `${chain}-${event_name}`,
-                chain,
-                event_name,
-              });
-            })
-          );
-        } else if (chainSupportedBy(chain, MolochTypes.EventChains)) {
-          return Promise.all(
-            MolochTypes.EventKinds.map((event_name) => {
-              return models.ChainEventType.create({
-                id: `${chain}-${event_name}`,
-                chain,
-                event_name,
-              });
-            })
-          );
-        // } else if (chainSupportedBy(chain, MarlinTypes.EventChains)) {
-        //   return Promise.all(
-        //     MarlinTypes.EventKinds.map((event_name) => {
-        //       return models.ChainEventType.create({
-        //         id: `${chain}-${event_name}`,
-        //         chain,
-        //         event_name,
-        //       });
-        //     })
-        //   );
-        } else {
-          log.error(`Unknown event chain at reset: ${chain}.`);
-        }
-      };
-
-      await Promise.all(EventSupportingChains.map((chain) => initChainEventTypes(chain)));
-
       log.debug('Reset database and initialized default models');
       resolve(0);
     }).catch((error) => {

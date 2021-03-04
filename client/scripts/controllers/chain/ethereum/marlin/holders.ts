@@ -2,7 +2,6 @@ import { IApp } from 'state';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMarlinHolder } from 'adapters/chain/marlin/types';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import EthereumChain from 'controllers/chain/ethereum/chain';
 import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 import MarlinHolder from './holder';

@@ -1,4 +1,4 @@
-import { Web3Provider, AsyncSendable, JsonRpcSigner, Provider } from 'ethers/providers';
+import { Web3Provider, AsyncSendable, JsonRpcSigner } from 'ethers/providers';
 import { ethers } from 'ethers';
 
 import { Erc20 } from 'Erc20';
@@ -71,7 +71,7 @@ export default class MarlinAPI {
 
   public async init() {
     // perform fetch of approved ERC20 token and set up contract for approval
-    const tokenAddress = await this._MPondContract.address;
+    const tokenAddress = this._MPondContract.address;
     this._tokenContract = Erc20Factory.connect(tokenAddress, this._Provider);
     if (this._userAddress) this._userMPond = await this._MPondContract.balanceOf(this._userAddress);
     this._Symbol = await this._MPondContract.symbol();
