@@ -18,7 +18,7 @@ export const Errors = {
   NoBodyOrAttachments: 'Forum posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
-  InsufficientTokenBalance: 'User does not have sufficient token balance to post',
+  InsufficientTokenBalance: `Users need to hold some of the community's tokens to post`,
 };
 
 const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {

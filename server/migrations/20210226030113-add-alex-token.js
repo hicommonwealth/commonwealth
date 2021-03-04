@@ -8,7 +8,7 @@ module.exports = {
         network: 'alex',
         symbol: 'ALEX',
         name: '$ALEX',
-        icon_url: '/static/img/protocols/eth.png',
+        icon_url: '/static/img/protocols/alex.png',
         active: true,
         type: 'token',
         base: 'ethereum',
