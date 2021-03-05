@@ -36,10 +36,13 @@ export enum ChainNetwork {
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  Clover = 'clover',
+  HydraDX = 'hydradx'
 }
 
 export function networkToBase(n: ChainNetwork): ChainBase {
   switch (n) {
+    case ChainNetwork.Clover: return ChainBase.Substrate;
     case ChainNetwork.Edgeware: return ChainBase.Substrate;
     case ChainNetwork.Kusama: return ChainBase.Substrate;
     case ChainNetwork.Kulupu: return ChainBase.Substrate;
@@ -49,6 +52,7 @@ export function networkToBase(n: ChainNetwork): ChainBase {
     case ChainNetwork.Darwinia: return ChainBase.Substrate;
     case ChainNetwork.Phala: return ChainBase.Substrate;
     case ChainNetwork.Centrifuge: return ChainBase.Substrate;
+    case ChainNetwork.HydraDX: return ChainBase.Substrate;
     case ChainNetwork.Cosmos: return ChainBase.CosmosSDK;
     case ChainNetwork.Straightedge: return ChainBase.CosmosSDK;
     case ChainNetwork.Ethereum: return ChainBase.Ethereum;
@@ -62,7 +66,9 @@ export function networkToBase(n: ChainNetwork): ChainBase {
 
 // TODO: this should be deprecated, and replaced with ChainNetwork in most instances
 export enum ChainClass {
+  Clover = 'clover',
   Edgeware = 'edgeware',
+  HydraDX = 'hydradx',
   Kusama = 'kusama',
   Kulupu = 'kulupu',
   Polkadot = 'polkadot',
