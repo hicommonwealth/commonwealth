@@ -389,7 +389,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       canVote = false;
     } else if (proposal instanceof MolochProposal && proposal.state !== MolochProposalState.Voting) {
       canVote = false;
-    } else if (proposal instanceof MarlinProposal /* && proposal.state() !== MarlinProposalState.Active */) {
+    } else if (proposal instanceof MarlinProposal  /* && (await proposal.state()) !== MarlinProposalState.Active */) {
       canVote = false; // TODO: Fix proposal.state function above to not return promise
     } else if (hasVotedForAnyChoice) {
       // enable re-voting for particular types
