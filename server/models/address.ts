@@ -181,8 +181,7 @@ export default (
     if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot'
         || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi'
         || chain.network === 'darwinia' || chain.network === 'phala' || chain.network === 'centrifuge'
-        || chain.network === 'clover'
-      ) {
+        || chain.network === 'hydradx' || chain.network === 'clover') {
       //
       // substrate address handling
       //
@@ -213,6 +212,8 @@ export default (
         keyringOptions.ss58Format = 30;
       } else if (chain.network === 'centrifuge') {
         keyringOptions.ss58Format = 36;
+      } else if (chain.network === 'hydradx') {
+        keyringOptions.ss58Format = 63;
       } else {
         keyringOptions.ss58Format = 42; // default chain id
       }
