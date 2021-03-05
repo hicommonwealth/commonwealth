@@ -1,5 +1,6 @@
-import { RegisteredTypes } from '@polkadot/types/types';
+import * as CloverSpecTypes from '@clover-network/node-tpye';
 import { spec as EdgewareSpec } from '@edgeware/node-types';
+import { RegisteredTypes } from '@polkadot/types/types';
 import StafiSpec from './adapters/chain/stafi/spec';
 import HydraSpec from './adapters/chain/hydradx/spec';
 
@@ -8,6 +9,8 @@ export function selectSpec(chain: string): RegisteredTypes {
     return EdgewareSpec;
   } else if (chain === 'stafi') {
     return { types: StafiSpec };
+  } else if (chain === 'clover') {
+    return { types: CloverSpecTypes }
   } else if (chain === 'hydradx') {
     return { types: HydraSpec };
   } else {
@@ -26,6 +29,7 @@ export function constructSubstrateUrl(url: string): string {
     'cc1.darwinia.network',
     'fullnode.centrifuge.io',
     'poc3.phala.network',
+    'api.clover.finance',
     'rpc-01.snakenet.hydradx.io',
   ];
   const hasProtocol = url.indexOf('wss://') !== -1 || url.indexOf('ws://') !== -1;
