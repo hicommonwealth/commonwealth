@@ -12,6 +12,7 @@ module.exports = {
         type: 'chain',
         network: 'clover',
         active: true,
+        ss58_prefix: 42,
         description: 'An open cross-chain bridge protocol based on Substrate.',
         telegram: 'https://t.me/clover_en',
         website: 'https://clover.finance/',
