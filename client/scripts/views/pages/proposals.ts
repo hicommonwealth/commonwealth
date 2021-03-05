@@ -160,9 +160,13 @@ const ProposalsPage: m.Component<{}> = {
     const onMarlin = app.chain && (app.chain.network === ChainNetwork.Marlin || app.chain.network === ChainNetwork.MarlinTestnet);
 
     if (onSubstrate) {
-      const modules = getModules();
-      if (modules.some((mod) => !mod.ready)) {
-        app.chain.loadModules(modules);
+      // Democracy, Council, and Signaling (Edgeware-only) must be loaded to proceed
+      const chain = app.chain as Substrate;
+      if ((!chain.democracy.initialized && !chain.democracy.disabled)
+          || (!chain.council.initialized && !chain.council.disabled)
+          || (!chain.democracyProposals.initialized && !chain.democracyProposals.disabled)
+          || (!chain.signaling.disabled && !chain.signaling.initialized)) {
+        if (!chain.democracy.initializing && !chain.council.initializing) loadCmd();
         return m(PageLoading, {
           message: 'Connecting to chain',
           title: [
