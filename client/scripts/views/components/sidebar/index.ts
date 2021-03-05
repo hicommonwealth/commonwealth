@@ -185,7 +185,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     return m('.OnchainNavigationModule.SidebarModule', [
       m('.section-header', 'Vote'),
       // referenda (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia
+      !app.community && app.chain?.base === ChainBase.Substrate
+        && app.chain.network !== ChainNetwork.Darwinia
+        && app.chain.network !== ChainNetwork.HydraDX
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -214,7 +216,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
         }),
       // treasury (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge 
         && m(Button, {
           fluid: true,
           rounded: true,
