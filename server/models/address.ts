@@ -180,7 +180,9 @@ export default (
     let isValid;
     if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot'
         || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi'
-        || chain.network === 'darwinia' || chain.network === 'phala' || chain.network === 'centrifuge') {
+        || chain.network === 'darwinia' || chain.network === 'phala' || chain.network === 'centrifuge'
+        || chain.network === 'clover'
+      ) {
       //
       // substrate address handling
       //

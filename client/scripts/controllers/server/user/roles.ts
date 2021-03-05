@@ -82,10 +82,6 @@ export default class extends Base {
     })?.id;
 
     return this.roles.find((r) => {
-      console.log('r');
-      console.log(r);
-      console.log('r.address_id');
-      console.log(r.address_id);
       const addressMatches = r.address_id === address_id;
       const communityMatches = options.chain
         ? r.chain_id === options.chain
