@@ -956,10 +956,11 @@
   resolved "https://registry.yarnpkg.com/@clover-network/node-tpye/-/node-tpye-1.0.1.tgz#cb61a6ef57c3207ce3baec6f0bdcd23287dc5209"
   integrity sha512-edR5xE6I3DdcNboBTnK9U6cVHPKsvJRD19o+LUelvJnqrH+DHipMZVr8VBLpf9CvLBxHNZffGX6Jf/iJmkR9+g==
 
-"@commonwealth/chain-events@0.5.0-beta.4":
-  version "0.5.0-beta.4"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.5.0-beta.4.tgz#6daf02bd3473fe8025a1e1dbb0b4a1660e03f038"
-  integrity sha512-uejk3ysJAfbPMIHBkpGDn5MNDxmiQzGtJeTizwHmPP3MO524geXw3xFyNWD6ps+S0qqFaXCQ9FoPsBW5AKiXMQ==
+"@commonwealth/chain-events@0.5.0-beta.5":
+  version "0.5.0-beta.5"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.5.0-beta.5.tgz#b8f725c1d337e5bf70257c1000cbcd9c6196fac0"
+  integrity sha512-oUa66Vzvh37P37Pd8nDKe/peWeIpsjdeKr2W5iQCkmG+92ao+uw35qqFoeY7vXzpmUeUWhSXlr6qaPhizcxl4w==
+
   dependencies:
     "@clover-network/node-tpye" "^1.0.1"
     "@edgeware/node-types" "3.3.1"

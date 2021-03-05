@@ -302,6 +302,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Near(n, app);
     initApi = true;
+  } else if (n.chain.network === ChainNetwork.Clover) {
+    const Clover = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "clover-main" */
+      './controllers/chain/clover/main'
+    )).default;
+    newChain = new Clover(n, app);
   } else if (n.chain.network === ChainNetwork.HydraDX) {
     const HydraDX = (await import(
       /* webpackMode: "lazy" */
