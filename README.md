@@ -144,7 +144,7 @@ First, install dependencies for deployment:
 
 ```
 brew update
-brew cask install now
+brew install --cask now
 brew tap heroku/brew && brew install heroku
 ```
 

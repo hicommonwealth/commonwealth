@@ -7,13 +7,15 @@ import { DATABASE_URI } from './config';
 import { factory, formatFilename } from '../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export const sequelize = new Sequelize(DATABASE_URI, {
+export const sequelize = new Sequelize(`${DATABASE_URI}?sslmode=require`, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   operatorsAliases: false,
   logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.trace(msg); },
   dialectOptions: {
     requestTimeout: 10000,
-    ssl: true
+    ssl: {
+      rejectUnauthorized: false,
+    }
   },
   pool: {
     max: 10,
