@@ -122,8 +122,10 @@ FLAG_MIGRATION=true ts-node --log-error --project tsconfig.node.json server.ts
 ```
 
 ## Production Logs
+## Extending Boot Timeout
 
-To view production logs: `heroku addons:open timber-logging`
+Heroku may need more time to boot the production server. If so, you can extend
+the boot timeout here: https://tools.heroku.support/limits/boot_timeout
 
 ## Frontend Code Style
 
@@ -156,7 +158,7 @@ First, install dependencies for deployment:
 
 ```
 brew update
-brew cask install now
+brew install --cask now
 brew tap heroku/brew && brew install heroku
 ```
 

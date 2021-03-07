@@ -12,6 +12,7 @@ module.exports = {
         network: 'hydradx',
         base: 'substrate',
         active: true,
+        ss58_prefix: 63,
         description: 'Cross-chain liquidity protocol built on Substrate.',
         telegram: 'https://t.me/hydradx',
         website: 'https://hydradx.io/',
