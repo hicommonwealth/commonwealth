@@ -18,6 +18,7 @@ const updateThreadLinkedChainEntities = async (models, req: Request, res: Respon
   const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => {
     return !!addr.verified;
   }).map((addr) => addr.id);
+  // Todo: author check
   // if (!userOwnedAddressIds.includes(entity.address_id)) {
   const roles = await models.Role.findAll({
     where: {
@@ -32,7 +33,7 @@ const updateThreadLinkedChainEntities = async (models, req: Request, res: Respon
   // }
 
   entity.title = title;
-  entity.save();
+  await entity.save();
 
   const finalEntity = await models.ChainEntity.findOne({
     where: { id: entity.id },
