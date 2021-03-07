@@ -111,56 +111,86 @@ const send = async (models, content: WebhookContent) => {
       chainOrCommwebhookUrls.push(wh.url);
     }
   });
+
+  const {
+    community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt, notificationPreviewImageUrl, // forum events
+    title, chainEventLink, fulltext // chain events
+  } = getFilteredContent(content, address);
+  const isChainEvent = !!chainEventLink;
+
+  let actorAvatarUrl = null;
+  const actorAccountLink = `${SERVER_URL}/${address.chain}/account/${address.address}`;
+
+  if (address?.id) {
+    const actorProfile = await models.OffchainProfile.findOne({ where: { address_id: address.id } });
+    if (actorProfile?.data) {
+      actorAvatarUrl = JSON.parse(actorProfile.data).avatarUrl;
+    }
+  }
+
+  let previewImageUrl = null; // image url of webhook preview
+  let previewAltText = null; // Alt text of preview image
+
+  // First case
+  if (!isChainEvent) {
+    // if offchain event (thread or comment), need to show embedded image as preview
+    if (notificationPreviewImageUrl) {
+      previewImageUrl = notificationPreviewImageUrl;
+      previewAltText = 'Embedded';
+    }
+  }
+
+  // Second case
+  if (!previewImageUrl) {
+    if (content.chain) {
+      // if the chain has a logo, show it as preview image
+      const chain = await models.Chain.findOne({ where: { id: content.chain } });
+      if (chain) {
+        previewImageUrl = `https://commonwealth.im${chain.icon_url}`;
+        // can't handle the prefix of `previeImageUrl` with SERVER_URL
+        // because social platforms can't access to localhost:8080.
+        previewAltText = chain.name;
+      }
+    } else if (content.community) {
+      // TODO:
+      // if the community has a logo, show it as preview image
+    }
+  }
+
+  // Third case
+  if (!previewImageUrl) {
+    // if no embedded image url or the chain/community doesn't have a logo, show the Commonwealth logo as the preview image
+    previewImageUrl = previewImageUrl || 'https://commonwealth.im/static/img/logo.png';
+    previewAltText = previewAltText || 'CommonWealth';
+  }
+
   await Promise.all(chainOrCommwebhookUrls
     .filter((url) => !!url)
     .map(async (url) => {
-      const {
-        community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt, notificationPreviewImageUrl, // forum events
-        title, chainEventLink, fulltext // chain events
-      } = getFilteredContent(content, address);
-      const isChainEvent = !!chainEventLink;
-
-      let previewImageUrl = null; // image url of webhook preview
-      let previewAltText = null; // Alt text of preview image
-
-      // First case
-      if (!isChainEvent) {
-        // if offchain event (thread or comment), need to show embedded image as preview
-        if (notificationPreviewImageUrl) {
-          previewImageUrl = notificationPreviewImageUrl;
-          previewAltText = 'Embedded';
-        }
-      }
-
-      // Second case
-      if (!previewImageUrl) {
-        if (content.chain) {
-          // if the chain has a logo, show it as preview image
-          const chain = await models.Chain.findOne({ where: { id: content.chain } });
-          if (chain) {
-            previewImageUrl = `https://commonwealth.im${chain.icon_url}`;
-            // can't handle the prefix of `previeImageUrl` with SERVER_URL
-            // because social platforms can't access to localhost:8080.
-            previewAltText = chain.name;
-          }
-        } else if (content.community) {
-          // TODO:
-          // if the community has a logo, show it as preview image
-        }
-      }
-
-      // Third case
-      if (!previewImageUrl) {
-        // if no embedded image url or the chain/community doesn't have a logo, show the Commonwealth logo as the preview image
-        previewImageUrl = previewImageUrl || 'https://commonwealth.im/static/img/logo.png';
-        previewAltText = previewAltText || 'CommonWealth';
-      }
-
       let webhookData;
       if (url.indexOf('slack.com') !== -1) {
         // slack webhook format (stringified JSON)
         webhookData = JSON.stringify({
           blocks: [
+            {
+              type: 'context',
+              elements: actorAvatarUrl?.length ? [
+                {
+                  type: 'image',
+                  image_url: actorAvatarUrl,
+                  alt_text: 'Actor:'
+                },
+                {
+                  type: 'mrkdwn',
+                  text: `<${actorAccountLink}|${actor}>`,
+                }
+              ] : [
+                {
+                  type: 'plain_text',
+                  text: actor,
+                }
+              ]
+            },
             {
               type: 'section',
               text: isChainEvent ? {
@@ -187,14 +217,14 @@ const send = async (models, content: WebhookContent) => {
             author: {
               name: 'New chain event',
               url: chainEventLink,
-              icon_url: 'https://commonwealth.im/static/img/logo.png'
+              icon_url: previewImageUrl
             },
             title,
             url: chainEventLink,
             description: fulltext,
             color: 15258703,
             thumbnail: {
-              'url': 'https://commonwealth.im/static/img/logo.png'
+              'url': previewImageUrl
             },
           }]
         } : {
@@ -203,15 +233,15 @@ const send = async (models, content: WebhookContent) => {
           embeds: [{
             author: {
               name: actor,
-              url: actedOnLink,
-              icon_url: 'https://commonwealth.im/static/img/logo.png'
+              url: actorAccountLink,
+              icon_url: actorAvatarUrl
             },
             title: notificationTitlePrefix + actedOn,
             url: actedOnLink,
             description: notificationExcerpt,
             color: 15258703,
             thumbnail: {
-              'url': 'https://commonwealth.im/static/img/logo.png'
+              'url': previewImageUrl
             },
           }]
         };
