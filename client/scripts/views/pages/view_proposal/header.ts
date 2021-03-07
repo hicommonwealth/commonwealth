@@ -12,8 +12,7 @@ import {
   proposalSlugToFriendlyName,
   chainEntityTypeToProposalSlug,
   chainEntityTypeToProposalName,
-  proposalSlugToStore,
-  proposalSlugToClass
+  ProposalType
 } from 'identifiers';
 
 import {
@@ -21,12 +20,12 @@ import {
   OffchainThreadKind,
   OffchainThreadStage,
   AnyProposal,
-  ChainEntity
 } from 'models';
 
 import { getStatusClass, getStatusText } from 'views/components/proposal_row';
 import { notifySuccess } from 'controllers/app/notifications';
-import { GlobalStatus } from './body';
+import { activeQuillEditorHasText, GlobalStatus } from './body';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -194,6 +193,35 @@ export const ProposalHeaderViewCount: m.Component<{ viewCount: number }> = {
   view: (vnode) => {
     const { viewCount } = vnode.attrs;
     return m('.ViewCountBlock', pluralize(viewCount, 'view'));
+  }
+};
+
+export const ProposalTitleEditMenuItem: m.Component<{
+  item: AnyProposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
+}> = {
+  view: (vnode) => {
+    const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
+    const proposalTitleIsEditable = item.slug === ProposalType.SubstrateDemocracyProposal
+      || item.slug === ProposalType.SubstrateCollectiveProposal
+      || item.slug === ProposalType.SubstrateTreasuryProposal;
+    if (!item || !proposalTitleIsEditable) return;
+
+    return m(MenuItem, {
+      label: 'Edit title',
+      class: 'edit-proposal-title',
+      onclick: async (e) => {
+        e.preventDefault();
+        if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
+          if (activeQuillEditorHasText()) {
+            const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
+            if (!confirmed) return;
+          }
+          getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+        }
+        parentState.editing = true;
+        getSetGlobalEditingStatus(GlobalStatus.Set, true);
+      },
+    });
   }
 };
 

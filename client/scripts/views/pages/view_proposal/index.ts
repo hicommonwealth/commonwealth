@@ -45,6 +45,7 @@ import {
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyMenuItems,
   ProposalTitleEditor,
+  ProposalTitleEditMenuItem,
 } from './header';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
@@ -52,7 +53,6 @@ import {
   ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, EditPermissionsButton,
   ProposalEditorPermissions,
-  ProposalTitleEditMenuItem,
 } from './body';
 import CreateComment from './create_comment';
 
