@@ -38,6 +38,9 @@ import ProposalVotingTreasuryEmbed from 'views/components/proposals/treasury_emb
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderThreadLinkedChainEntity,
@@ -99,6 +102,10 @@ const ProposalHeader: m.Component<{
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
+    const proposalTitleIsEditable = proposal instanceof SubstrateDemocracyProposal
+      || proposal instanceof SubstrateCollectiveProposal
+      || proposal instanceof SubstrateTreasuryProposal;
+
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
@@ -198,19 +205,19 @@ const ProposalHeader: m.Component<{
               app.isLoggedIn()
               && (isAdmin || isAuthor)
               && !getSetGlobalEditingStatus(GlobalStatus.Get)
+              && proposalTitleIsEditable
               && m(PopoverMenu, {
                 transitionDuration: 0,
                 closeOnOutsideClick: true,
                 closeOnContentClick: true,
                 menuAttrs: { size: 'default' },
                 content: [
-                  (isAdmin || isAuthor)
-                    && m(ProposalTitleEditMenuItem, {
-                      item: proposal,
-                      getSetGlobalReplyStatus,
-                      getSetGlobalEditingStatus,
-                      parentState: vnode.state,
-                    }),
+                  m(ProposalTitleEditMenuItem, {
+                    item: proposal,
+                    getSetGlobalReplyStatus,
+                    getSetGlobalEditingStatus,
+                    parentState: vnode.state,
+                  }),
                 ],
                 inline: true,
                 trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),

@@ -201,10 +201,7 @@ export const ProposalTitleEditMenuItem: m.Component<{
 }> = {
   view: (vnode) => {
     const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
-    const proposalTitleIsEditable = item.slug === ProposalType.SubstrateDemocracyProposal
-      || item.slug === ProposalType.SubstrateCollectiveProposal
-      || item.slug === ProposalType.SubstrateTreasuryProposal;
-    if (!item || !proposalTitleIsEditable) return;
+    if (!item) return;
 
     return m(MenuItem, {
       label: 'Edit title',
