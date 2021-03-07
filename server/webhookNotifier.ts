@@ -20,6 +20,8 @@ export interface WebhookContent {
   chainEvent?: any;
 }
 
+const REGEX_IMAGE = /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;
+
 const getFilteredContent = (content, address) => {
   let event;
   if (content.chainEvent && content.chainEventType) {
@@ -49,8 +51,20 @@ const getFilteredContent = (content, address) => {
       : content.notificationCategory === NotificationCategories.NewThread ? 'New thread: '
         : content.notificationCategory === NotificationCategories.NewReaction ? 'Reaction on: '
           : 'Activity on: ';
+
+    // url decoded
+    const bodytext = decodeURIComponent(content.body);
+
+    const notificationPreviewImageUrl = (() => {
+      // retrieves array of matching `bodytext` against REGEX_IMAGE
+      const matches = bodytext.match(REGEX_IMAGE);
+      // in case, it doesn't contain any images
+      if (!matches) return null;
+      // return the first image urleh
+      return matches[0];
+    })();
+
     const notificationExcerpt = (() => {
-      const bodytext = decodeURIComponent(content.body);
       try {
         // parse and use quill document
         const doc = JSON.parse(bodytext);
@@ -63,7 +77,7 @@ const getFilteredContent = (content, address) => {
       }
     })();
 
-    return { community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt };
+    return { community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt, notificationPreviewImageUrl };
   }
 };
 
@@ -101,26 +115,70 @@ const send = async (models, content: WebhookContent) => {
     .filter((url) => !!url)
     .map(async (url) => {
       const {
-        community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt, // forum events
+        community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt, notificationPreviewImageUrl, // forum events
         title, chainEventLink, fulltext // chain events
       } = getFilteredContent(content, address);
       const isChainEvent = !!chainEventLink;
 
+      let previewImageUrl = null; // image url of webhook preview
+      let previewAltText = null; // Alt text of preview image
+
+      // First case
+      if (!isChainEvent) {
+        // if offchain event (thread or comment), need to show embedded image as preview
+        if (notificationPreviewImageUrl) {
+          previewImageUrl = notificationPreviewImageUrl;
+          previewAltText = 'Embedded';
+        }
+      }
+
+      // Second case
+      if (!previewImageUrl) {
+        if (content.chain) {
+          // if the chain has a logo, show it as preview image
+          const chain = await models.Chain.findOne({ where: { id: content.chain } });
+          if (chain) {
+            previewImageUrl = `https://commonwealth.im${chain.icon_url}`;
+            // can't handle the prefix of `previeImageUrl` with SERVER_URL
+            // because social platforms can't access to localhost:8080.
+            previewAltText = chain.name;
+          }
+        } else if (content.community) {
+          // TODO:
+          // if the community has a logo, show it as preview image
+        }
+      }
+
+      // Third case
+      if (!previewImageUrl) {
+        // if no embedded image url or the chain/community doesn't have a logo, show the Commonwealth logo as the preview image
+        previewImageUrl = previewImageUrl || 'https://commonwealth.im/static/img/logo.png';
+        previewAltText = previewAltText || 'CommonWealth';
+      }
+
       let webhookData;
-      if (url.indexOf('slack') !== -1) {
+      if (url.indexOf('slack.com') !== -1) {
         // slack webhook format (stringified JSON)
-        webhookData = JSON.stringify(isChainEvent ? {
-          type: 'section',
-          text: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '') + fulltext,
-          format: 'mrkdwn',
-        } : {
-          type: 'section',
-          text: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '')
-            + `${notificationTitlePrefix}<${actedOnLink}|${actedOn}>`
-            + `\n> ${notificationExcerpt.split('\n').join('\n> ')}`,
-          format: 'mrkdwn',
+        webhookData = JSON.stringify({
+          blocks: [
+            {
+              type: 'section',
+              text: isChainEvent ? {
+                type: 'mrkdwn',
+                text: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '') + fulltext
+              } : {
+                type: 'mrkdwn',
+                text: `*${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''}${notificationTitlePrefix}* <${actedOnLink}|${actedOn}> \n> ${notificationExcerpt.split('\n').join('\n> ')}`
+              },
+              accessory: {
+                type: 'image',
+                image_url: previewImageUrl,
+                alt_text: previewAltText
+              }
+            }
+          ],
         });
-      } else if (url.indexOf('discord') !== -1) {
+      } else if (url.indexOf('discord.com') !== -1) {
         // discord webhook format (raw json, for application/json)
         webhookData = isChainEvent ? {
           username: 'Commonwealth',
@@ -135,6 +193,9 @@ const send = async (models, content: WebhookContent) => {
             url: chainEventLink,
             description: fulltext,
             color: 15258703,
+            thumbnail: {
+              'url': 'https://commonwealth.im/static/img/logo.png'
+            },
           }]
         } : {
           username: 'Commonwealth',
@@ -149,6 +210,9 @@ const send = async (models, content: WebhookContent) => {
             url: actedOnLink,
             description: notificationExcerpt,
             color: 15258703,
+            thumbnail: {
+              'url': 'https://commonwealth.im/static/img/logo.png'
+            },
           }]
         };
       } else if (url.indexOf('matrix') !== -1) {
