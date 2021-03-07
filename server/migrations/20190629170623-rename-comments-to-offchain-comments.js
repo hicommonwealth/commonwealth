@@ -1,11 +1,11 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.renameTable('Comments', 'OffchainComments');
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.renameTable('OffchainComments', 'Comments');
   }
 };

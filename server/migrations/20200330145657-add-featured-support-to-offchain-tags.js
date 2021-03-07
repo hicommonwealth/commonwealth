@@ -1,12 +1,12 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn(
       'OffchainCommunities',
       'featured_tags',
       {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         defaultValue: []
       }
@@ -15,7 +15,7 @@ module.exports = {
       'Chains',
       'featured_tags',
       {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         defaultValue: []
       }
@@ -24,19 +24,19 @@ module.exports = {
       'OffchainTags',
       'description',
       {
-        type: DataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: ''
       }
     );
   },
 
-  down: async (queryInterface, DataTypes) => {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn(
       'OffchainCommunities',
       'featured_tags',
       {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         defaultValue: []
       }
@@ -45,7 +45,7 @@ module.exports = {
       'Chains',
       'featured_tags',
       {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         defaultValue: []
       }
@@ -54,7 +54,7 @@ module.exports = {
       'OffchainTags',
       'description',
       {
-        type: DataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: ''
       }

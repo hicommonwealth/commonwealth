@@ -27,7 +27,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    const query = 'SELECT * FROM "OffchainThreads"';
-    return queryInterface.sequelize.query(query);
+    return new Promise((resolve, reject) => resolve());
   }
 };

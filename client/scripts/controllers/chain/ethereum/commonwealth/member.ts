@@ -1,7 +1,4 @@
-import BN from 'bn.js';
 import { IApp } from 'state';
-import { from, of, Observable, BehaviorSubject } from 'rxjs';
-import { switchMap, first } from 'rxjs/operators';
 
 import { ICommonwealthMember } from 'adapters/chain/commonwealth/types';
 

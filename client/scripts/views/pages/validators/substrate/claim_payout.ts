@@ -1,7 +1,6 @@
 import m from 'mithril';
 import app from 'state';
 import User from 'views/components/widgets/user';
-import { makeDynamicComponent } from 'models/mithril';
 import { StakingLedger } from '@polkadot/types/interfaces';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
@@ -10,9 +9,7 @@ import ActionForm from './action_form';
 
 
 interface IClaimPayoutModalState {
-  dynamic: {
-    stakingLedger?: StakingLedger;
-  };
+  stakingLedger?: StakingLedger;
   sending: boolean;
   error: any;
 }
@@ -22,7 +19,7 @@ interface IClaimPayoutState {
   validators?: any[];
   sending: boolean;
   error: any;
-};
+}
 
 const NominatorForm: m.Component<{}, IClaimPayoutState> = {
   view: (vnode) => {
@@ -44,8 +41,8 @@ const NominatorForm: m.Component<{}, IClaimPayoutState> = {
         onChangeHandler: (validators) => {
           try {
             vnode.state.validators = validators
-            .split(',')
-            .map((v) => (app.chain as Substrate).accounts.fromAddress(v));
+              .split(',')
+              .map((v) => (app.chain as Substrate).accounts.fromAddress(v));
           } catch (error) {
             vnode.state.error = error;
           }
@@ -84,13 +81,15 @@ const ValidatorForm: m.Component<{}, IClaimPayoutState> = {
   }
 };
 
-const ClaimPayoutModal = makeDynamicComponent<{ account }, IClaimPayoutModalState>({
-  getObservables: (attrs) => ({
-    groupKey: attrs.account.address,
-    stakingLedger: attrs.account.stakingLedger,
-  }),
+const ClaimPayoutModal: m.Component<{ account }, IClaimPayoutModalState> = {
+  oninit: (vnode) => {
+    app.runWhenReady(async () => {
+      vnode.state.stakingLedger = await vnode.attrs.account.stakingLedger;
+      m.redraw();
+    });
+  },
   view: (vnode) => {
-    const { stakingLedger } = vnode.state.dynamic;
+    const { stakingLedger } = vnode.state;
     const { account } = vnode.attrs;
     const isValidator = false;
     const payoutsForm = (isValidator) ? ValidatorForm : NominatorForm;
@@ -107,6 +106,6 @@ const ClaimPayoutModal = makeDynamicComponent<{ account }, IClaimPayoutModalStat
       ] : m(payoutsForm)),
     ]);
   },
-});
+};
 
 export default ClaimPayoutModal;

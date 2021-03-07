@@ -8,6 +8,7 @@ import { VersionHistory } from '../controllers/server/threads';
 class OffchainThread implements IUniqueId {
   public readonly author: string;
   public collaborators?: any[];
+  public chainEntities?: any[];
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
@@ -54,6 +55,7 @@ class OffchainThread implements IUniqueId {
     authorChain?: string,
     pinned?: boolean,
     collaborators?: any[],
+    chainEntities?: any[],
     lastEdited?: moment.Moment,
   ) {
     this.author = author;
@@ -75,6 +77,14 @@ class OffchainThread implements IUniqueId {
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];
+    this.chainEntities = chainEntities ? chainEntities.map((ce) => {
+      return {
+        id: +ce.id,
+        type: ce.type,
+        typeId: ce.type_id,
+        completed: ce.completed,
+      };
+    }) : [];
     this.lastEdited = lastEdited;
   }
 }

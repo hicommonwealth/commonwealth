@@ -68,6 +68,10 @@ const User: m.Component<{
       role = adminsAndMods.find((r) => r.address === address && r.address_chain === chainId);
     } else if (vnode.attrs.user instanceof Profile) {
       profile = vnode.attrs.user;
+      // only load account if it's possible to, using the current chain
+      if (app.chain && app.chain.id === profile.chain) {
+        account = app.chain.accounts.get(profile.address);
+      }
       role = adminsAndMods.find((r) => r.address === profile.address && r.address_chain === profile.chain);
     } else {
       account = vnode.attrs.user;
