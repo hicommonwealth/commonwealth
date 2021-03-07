@@ -13,9 +13,6 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.trace(msg); },
   dialectOptions: {
     requestTimeout: 10000,
-    ssl: {
-      rejectUnauthorized: false,
-    }
   },
   pool: {
     max: 10,
