@@ -108,9 +108,10 @@ heroku pg:copy <PRODUCTION_APP>::<PRODUCTION_DB_URL> <STAGING_DB_URL> -a <STAGIN
 heroku maintenance:off -a <STAGING_APP>
 ```
 
-## Production Logs
+## Extending Boot Timeout
 
-To view production logs: `heroku addons:open timber-logging`
+Heroku may need more time to boot the production server. If so, you can extend
+the boot timeout here: https://tools.heroku.support/limits/boot_timeout
 
 ## Frontend Code Style
 
