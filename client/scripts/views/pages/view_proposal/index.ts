@@ -102,9 +102,9 @@ const ProposalHeader: m.Component<{
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
-    const proposalTitleIsEditable = proposal instanceof SubstrateDemocracyProposal
+    const proposalTitleIsEditable = (proposal instanceof SubstrateDemocracyProposal
       || proposal instanceof SubstrateCollectiveProposal
-      || proposal instanceof SubstrateTreasuryProposal;
+      || proposal instanceof SubstrateTreasuryProposal);
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
