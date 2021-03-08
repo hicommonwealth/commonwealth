@@ -20,6 +20,9 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+import MarlinHolder from 'controllers/chain/ethereum/marlin/holder';
+import Marlin from 'controllers/chain/ethereum/marlin/adapter';
+import { MarlinProposalArgs } from 'controllers/chain/ethereum/marlin/governance';
 
 import {
   DropdownFormField,
@@ -63,6 +66,8 @@ const NewProposalForm = {
     let hasThreshold : boolean;
     // moloch proposal
     let hasMolochFields : boolean;
+    // marlin proposal
+    let hasMarlinFields : boolean;
     // data loaded
     let dataLoaded : boolean = true;
 
@@ -104,6 +109,8 @@ const NewProposalForm = {
       dataLoaded = !!(app.chain as Cosmos).governance;
     } else if (proposalTypeEnum === ProposalType.MolochProposal) {
       hasMolochFields = true;
+    } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
+      hasMarlinFields = true;
     } else {
       return m('.NewProposalForm', 'Invalid proposal type');
     }
@@ -265,6 +272,35 @@ const NewProposalForm = {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
         return;
+      } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
+        vnode.state.proposer = app.user?.activeAccount?.address;
+        if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
+        if (!vnode.state.description) throw new Error('Invalid description');
+        if (!vnode.state.targets) throw new Error('No targets');
+        if (!vnode.state.values) throw new Error('No values');
+        if (!vnode.state.signatures) throw new Error('No signatures');
+        if (!vnode.state.calldatas) throw new Error('No calldatas');
+        const targetsArray = vnode.state.targets.split(',');
+        const valuesArray = vnode.state.values.split(',');
+        const calldatasArray = vnode.state.calldatas.split(',');
+        const signaturesArray = vnode.state.signatures.split(',');
+        if (targetsArray.length !== valuesArray.length
+          && valuesArray.length !== calldatasArray.length
+          && calldatasArray.length !== signaturesArray.length)
+          throw new Error('Array lengths do not match');
+        const details: MarlinProposalArgs = {
+          targets: targetsArray.toString(),
+          values: valuesArray.toString(),
+          signatures: signaturesArray.toString(),
+          calldatas: calldatasArray.toString(),
+          description: vnode.state.description,
+        };
+        (app.chain as Marlin).governance.propose(details)
+          .then((result) => done(result))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
+
+        // @TODO: Create Proposal via WebTx
       } else {
         mixpanel.track('Create Thread', {
           'Step No': 2,
@@ -307,6 +343,7 @@ const NewProposalForm = {
     }
 
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
         m(Col, [
@@ -580,6 +617,77 @@ const NewProposalForm = {
                   vnode.state.title = result;
                   m.redraw();
                 },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Description'),
+              m(Input, {
+                name: 'description',
+                placeholder: 'Proposal Description',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ],
+          hasMarlinFields && [
+            m('h2', 'New Marlin Proposal:'),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Targets'),
+              m(Input, {
+                name: 'targets',
+                placeholder: 'Proposal Targets',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.targets = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Values'),
+              m(Input, {
+                name: 'values',
+                placeholder: 'Proposal Values',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.values = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Calldatas'),
+              m(Input, {
+                name: 'calldatas',
+                placeholder: 'Proposal Calldatas',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.calldatas = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Signatures'),
+              m(Input, {
+                name: 'signatures',
+                placeholder: 'Proposal Signatures',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.signatures = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposer (you)'),
+              m(Input, {
+                name: 'proposer',
+                value: `${app.user.activeAccount.address}`,
+                disabled: true,
               }),
             ]),
             m(FormGroup, [

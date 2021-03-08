@@ -12,6 +12,7 @@ export enum ProposalType {
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
+  MarlinProposal = 'marlinproposal',
 }
 
 export const proposalSlugToClass = () => {
@@ -39,6 +40,9 @@ export const proposalSlugToClass = () => {
   if (app.chain.class === ChainClass.Moloch) {
     mmap.set('molochproposal', (app.chain as any).governance);
   }
+  if (app.chain.class === ChainClass.Marlin) {
+    mmap.set('marlinproposal', (app.chain as any).governance);
+  }
   return mmap;
 };
 
@@ -58,6 +62,7 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['phragmenelection', 'Phragmen Council Candidacy'],
   ['treasuryproposal', 'Treasury Proposal'],
   ['discussion', 'Discussion Thread'],
+  ['marlinproposal', 'Proposal'],
   ['cosmosproposal', 'Proposal'],
   ['molochproposal', 'Proposal']
 ]);
