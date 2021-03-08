@@ -21,6 +21,7 @@ export interface WebhookContent {
 }
 
 const REGEX_IMAGE = /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;
+const REGEX_EMOJI = /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g;
 
 const getFilteredContent = (content, address) => {
   let event;
@@ -238,7 +239,7 @@ const send = async (models, content: WebhookContent) => {
             },
             title: notificationTitlePrefix + actedOn,
             url: actedOnLink,
-            description: notificationExcerpt,
+            description: notificationExcerpt.replace(REGEX_EMOJI, ''), // discord webhook description doesn't accept emoji
             color: 15258703,
             thumbnail: {
               'url': previewImageUrl
