@@ -23,7 +23,7 @@ const getDiscussionDrafts = async (models, req: Request, res: Response, next: Ne
     ],
   });
 
-  return res.json({ status: 'Success', result: drafts });
+  return res.json({ status: 'Success', result: drafts.map((d) => d.toJSON()) });
 };
 
 export default getDiscussionDrafts;

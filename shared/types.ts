@@ -19,7 +19,6 @@ export const NotificationCategories = {
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
-  EdgewareSignalingProposal = 'signalingproposal',
   SubstrateCollectiveProposal = 'councilmotion',
   PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',

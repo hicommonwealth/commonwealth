@@ -25,7 +25,7 @@ const getInvites = async (models, req: Request, res: Response, next: NextFunctio
 
   if (!invites) return res.json({ status: 'Failure' }); // No Invites
 
-  return res.json({ status: 'Success', result: invites });
+  return res.json({ status: 'Success', result: invites.map((inv) => inv.toJSON()) });
 };
 
 export default getInvites;

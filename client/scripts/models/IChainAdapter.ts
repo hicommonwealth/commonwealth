@@ -1,7 +1,6 @@
 import moment from 'moment-twitter';
 import { ApiStatus, IApp } from 'state';
 import { Coin } from 'adapters/currency';
-import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
 import m from 'mithril';
@@ -10,7 +9,7 @@ import { CommentRefreshOption } from 'controllers/server/comments';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
-import { Account, NodeInfo, ChainEntity, ChainEvent } from '.';
+import { Account, NodeInfo, ProposalModule } from '.';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -21,6 +20,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
   protected _loaded: boolean = false;
   public get loaded() { return this._loaded; }
+
+  protected _failed: boolean = false;
+  public get failed() { return this._failed; }
 
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
@@ -114,6 +116,16 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this.app.isModuleReady = false;
     this._loaded = false;
     console.log(`Stopping ${this.meta.chain.id}...`);
+  }
+
+  public async loadModules(modules: ProposalModule<any, any, any>[]) {
+    if (!this.loaded) {
+      throw new Error('secondary loading cmd called before chain load');
+    }
+    // TODO: does this need debouncing?
+    if (modules.some((mod) => !mod.initializing && !mod.ready)) {
+      await Promise.all(modules.map((mod) => mod.init(this.chain, this.accounts)));
+    }
   }
 
   public abstract base: ChainBase;
