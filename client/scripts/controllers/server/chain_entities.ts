@@ -70,6 +70,7 @@ class ChainEntityController {
     if (refreshOption === EntityRefreshOption.CompletedEntities) {
       options.completed = true;
     }
+    console.log('COMPLETED? ' + options.completed);
     // TODO: Change to GET /entities
     return get('/bulkEntities', options, (result) => {
       for (const entityJSON of result) {
@@ -125,6 +126,7 @@ class ChainEntityController {
       // update entity against store
       const existingEntity = this.store.get(entity);
       if (!existingEntity) {
+        debugger
         this._store.add(entity);
       } else {
         entity = existingEntity;
@@ -181,6 +183,7 @@ class ChainEntityController {
       return;
     }
     if (eventSortFn) existingEvents.sort(eventSortFn);
+    console.log(existingEvents);
     this._handleEvents(chain, existingEvents);
     return existingEvents;
   }
