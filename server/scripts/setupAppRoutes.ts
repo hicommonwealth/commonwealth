@@ -26,7 +26,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     throw new Error('Template not found, cannot start production server');
   }
 
-  const renderWithMetaTags = (res, title, description, author, image, type = 'website') => {
+  const renderWithMetaTags = (res, title, description, author, image) => {
     const $tmpl = cheerio.load(templateFile);
     $tmpl('meta[name="title"]').attr('content', title);
     $tmpl('meta[name="description"]').attr('content', description);
@@ -38,7 +38,6 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       $tmpl('meta[name="twitter:image:src"]').attr('content', image);
     }
 
-    $tmpl('meta[property="og:type"]').attr('content', type);
     $tmpl('meta[property="og:site_name"]').attr('content', 'Commonwealth');
     $tmpl('meta[property="og:title"]').attr('content', title);
     $tmpl('meta[property="og:description"]').attr('content', description);
@@ -88,7 +87,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       image = '';
       author = '';
     }
-    renderWithMetaTags(res, title, description, author, image, 'profile');
+    renderWithMetaTags(res, title, description, author, image);
   });
 
   app.get('/:scope/proposal/:type/:identifier', async (req, res, next) => {
@@ -147,7 +146,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.iconUrl}` : DEFAULT_COMMONWEALTH_LOGO;
       author = '';
     }
-    renderWithMetaTags(res, title, description, author, image, 'article');
+    renderWithMetaTags(res, title, description, author, image);
   });
 
   app.get('*', (req, res, next) => {
