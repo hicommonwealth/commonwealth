@@ -15,6 +15,8 @@ import {
   IChainEntityKind,
 } from '@commonwealth/chain-events';
 import { notifyError } from '../app/notifications';
+import { ProposalType } from 'client/scripts/identifiers';
+import { EntityKind } from '@commonwealth/chain-events/dist/substrate/types';
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -101,6 +103,13 @@ class ChainEntityController {
     this._handlers = {};
   }
 
+  public async _fetchTitle(chain: string, uniqueId: string) {
+    await $.get(`${app.serverUrl()}/fetchEntityTitle`, {
+      'unique_id': uniqueId,
+      'chain': chain
+    });
+  }
+
   private _handleEvents(chain: string, events: CWEvent[]) {
     for (const cwEvent of events) {
       // immediately return if no entity involved, event unrelated to proposals/etc
@@ -126,7 +135,6 @@ class ChainEntityController {
       // update entity against store
       const existingEntity = this.store.get(entity);
       if (!existingEntity) {
-        debugger
         this._store.add(entity);
       } else {
         entity = existingEntity;

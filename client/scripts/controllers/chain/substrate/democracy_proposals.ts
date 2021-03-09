@@ -84,12 +84,20 @@ class SubstrateDemocracyProposals extends ProposalModule<
       this.app.chain.id,
       () => this._Chain.fetcher.fetchDemocracyProposals(this.app.chain.block.height)
     );
+    // existingEvents.map((event) => {
+    //   if (event.data.kind === 'democracy-proposed') {
+    //     return event.data.
+    //   } else {
+    //     console.log(event);
+    //   }
+    // });
     console.log(events);
     const hashes = events.map((e) => e.data.proposalHash);
-    await this.app.chain.chainEntities.fetchEntities(
+    const entities_ = await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
       () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
     );
+    console.log(entities_);
 
     const lastTabledWasExternal = await ChainInfo.api.query.democracy.lastTabledWasExternal();
     const nextExternal = await ChainInfo.api.query.democracy.nextExternal();

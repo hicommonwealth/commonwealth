@@ -752,6 +752,7 @@ const ViewProposalPage: m.Component<{
     };
 
     const { replyParent } = vnode.state;
+    console.log(proposal);
     return m(Sublayout, { class: 'ViewProposalPage', showNewProposalButton: true, title: headerTitle }, [
       m(ProposalHeader, {
         proposal,

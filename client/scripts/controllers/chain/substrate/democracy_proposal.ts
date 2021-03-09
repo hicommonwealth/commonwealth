@@ -15,6 +15,7 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
+import { chainEntityTypeToProposalSlug } from 'client/scripts/identifiers';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -150,9 +151,18 @@ class SubstrateDemocracyProposal extends Proposal<
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized = true;
-    this.updateVoters();
-    this._Proposals.store.add(this);
+    if (!this._completed) {
+      console.log(entity);
+      const slug = chainEntityTypeToProposalSlug(entity.type);
+      const uniqueId = `${slug}_${entity.typeId}`;
+      this._Proposals.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((result) => {
+        console.log(result);
+      });
+    } else {
+      this._initialized = true;
+      this.updateVoters();
+      this._Proposals.store.add(this);
+    }
   }
 
   protected complete() {
@@ -162,6 +172,8 @@ class SubstrateDemocracyProposal extends Proposal<
   public update(e: ChainEvent) {
     switch (e.data.kind) {
       case SubstrateTypes.EventKind.DemocracyProposed: {
+        console.log('proposed');
+        console.log(e);
         break;
       }
       case SubstrateTypes.EventKind.DemocracySeconded: {
@@ -171,6 +183,7 @@ class SubstrateDemocracyProposal extends Proposal<
         break;
       }
       case SubstrateTypes.EventKind.DemocracyTabled: {
+        console.log('completing');
         this.complete();
         break;
       }
