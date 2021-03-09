@@ -1,37 +1,61 @@
+/* eslint-disable array-callback-return */
 'use strict';
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const selectQuery = 'SELECT * FROM "OffchainThreads"';
     const threads = await queryInterface.sequelize.query(selectQuery);
-    const insertHistoryQueries = threads[0].map((thread) => {
+    let firstFlag = false;
+    let secondFlag = false;
+    const insertHistoryQueries = threads[0].map((thread, idx) => {
       if (!thread.version_history || !thread.version_history.length) {
-        const firstVersion = [{
+        const firstVersionObj = {
           timestamp: thread.created_at,
           body: decodeURIComponent(thread.body)
-        }];
-        return `UPDATE "OffchainThreads" SET version_history=ARRAY${firstVersion} WHERE id='${thread.id}'`;
+        };
+        try {
+          const firstVersionStr = JSON.stringify(firstVersionObj).replaceAll("'", "''");
+          if (!firstFlag) {
+            console.log('FIRST FLAG');
+            console.log(`UPDATE "OffchainThreads" SET version_history=ARRAY['${firstVersionStr}'] WHERE id='${thread.id}'`);
+            firstFlag = true;
+          }
+          return `UPDATE "OffchainThreads" SET version_history=ARRAY['${firstVersionStr}'] WHERE id='${thread.id}'`;
+        } catch (e) {
+          console.log(e);
+        }
       } else {
-        const versionHistoryJSON = thread.version_history.map((version) => {
+        let pseudoArray = '';
+        thread.version_history.map((version_history) => {
           try {
-            return JSON.parse(version);
+            const versionsStr = version_history.replaceAll("'", "''");
+            pseudoArray += versionsStr;
+            pseudoArray += ', ';
           } catch (e) {
             console.log(e);
           }
         });
-        return `UPDATE "OffchainThreads" SET version_history=ARRAY${versionHistoryJSON} WHERE id='${thread.id}'`;
+        if (!secondFlag) {
+          console.log('SECOND FLAG');
+          console.log(pseudoArray);
+          console.log(`UPDATE "OffchainThreads" SET version_history=ARRAY['${pseudoArray}'] WHERE id='${thread.id}'`);
+          secondFlag = true;
+        }
+        if (!pseudoArray.length) {
+          console.log(thread.version_history);
+        }
+        return `UPDATE "OffchainThreads" SET version_history=ARRAY['${pseudoArray}'] WHERE id='${thread.id}'`;
       }
     });
-    console.log(insertHistoryQueries[0]);
-    console.log(insertHistoryQueries[100]);
-    return queryInterface.sequelize.transaction((t) => {
+
+    return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn('OffchainThreads', 'version_history', { transaction: t });
       await queryInterface.addColumn('OffchainThreads', 'version_history', {
-        type: Sequelize.ARRAY(JSON),
+        type: Sequelize.ARRAY(Sequelize.JSON),
         allow_null: false,
         default_value: []
       }, { transaction: t });
-      await Promise.all(insertHistoryQueries.map((insertQuery) => {
+      Promise.all(insertHistoryQueries.map(async (insertQuery) => {
         return queryInterface.sequelize.query(insertQuery, { transaction: t });
       }));
     });
