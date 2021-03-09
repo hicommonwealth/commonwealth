@@ -120,7 +120,7 @@ const send = async (models, content: WebhookContent) => {
   const isChainEvent = !!chainEventLink;
 
   let actorAvatarUrl = null;
-  const actorAccountLink = `${SERVER_URL}/${address.chain}/account/${address.address}`;
+  const actorAccountLink = address ? `${SERVER_URL}/${address.chain}/account/${address.address}` : null;
 
   if (address?.id) {
     const actorProfile = await models.OffchainProfile.findOne({ where: { address_id: address.id } });
