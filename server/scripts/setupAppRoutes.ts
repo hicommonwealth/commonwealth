@@ -43,8 +43,8 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     $tmpl('meta[property="og:description"]').attr('content', description);
     if (image) {
       $tmpl('meta[property="og:image"]').attr('content', image);
-      $tmpl('meta[property="og:image:width"]').attr('content', 707);
-      $tmpl('meta[property="og:image:height"]').attr('content', 1000);
+      // $tmpl('meta[property="og:image:width"]').attr('content', 707);
+      // $tmpl('meta[property="og:image:height"]').attr('content', 1000);
     }
     res.send($tmpl.html());
   };
