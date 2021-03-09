@@ -6,7 +6,7 @@ import { SubstrateEvents } from '@commonwealth/chain-events';
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
 import { getForumNotificationCopy } from '../shared/notificationFormatter';
-import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK } from './config';
+import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from './config';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -161,7 +161,7 @@ const send = async (models, content: WebhookContent) => {
   // Third case
   if (!previewImageUrl) {
     // if no embedded image url or the chain/community doesn't have a logo, show the Commonwealth logo as the preview image
-    previewImageUrl = previewImageUrl || 'https://commonwealth.im/static/img/logo.png';
+    previewImageUrl = previewImageUrl || DEFAULT_COMMONWEALTH_LOGO;
     previewAltText = previewAltText || 'CommonWealth';
   }
 
@@ -213,7 +213,7 @@ const send = async (models, content: WebhookContent) => {
         // discord webhook format (raw json, for application/json)
         webhookData = isChainEvent ? {
           username: 'Commonwealth',
-          avatar_url: 'https://commonwealth.im/static/img/logo.png',
+          avatar_url: DEFAULT_COMMONWEALTH_LOGO,
           embeds: [{
             author: {
               name: 'New chain event',
@@ -230,7 +230,7 @@ const send = async (models, content: WebhookContent) => {
           }]
         } : {
           username: 'Commonwealth',
-          avatar_url: 'https://commonwealth.im/static/img/logo.png',
+          avatar_url: DEFAULT_COMMONWEALTH_LOGO,
           embeds: [{
             author: {
               name: actor,
