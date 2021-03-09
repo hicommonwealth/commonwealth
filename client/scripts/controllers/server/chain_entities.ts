@@ -102,7 +102,7 @@ class ChainEntityController {
   }
 
   public async _fetchTitle(chain: string, unique_id: string) {
-    await $.get(`${app.serverUrl()}/fetchEntityTitle`, {
+    return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
       unique_id, chain
     });
   }
