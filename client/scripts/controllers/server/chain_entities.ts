@@ -70,7 +70,6 @@ class ChainEntityController {
     if (refreshOption === EntityRefreshOption.CompletedEntities) {
       options.completed = true;
     }
-    console.log('COMPLETED? ' + options.completed);
     // TODO: Change to GET /entities
     return get('/bulkEntities', options, (result) => {
       for (const entityJSON of result) {
@@ -151,7 +150,6 @@ class ChainEntityController {
   }
 
   public async updateEntityTitle(uniqueIdentifier: string, title: string) {
-    console.log({ uniqueIdentifier, title });
     return $.ajax({
       url: `${app.serverUrl()}/updateChainEntityTitle`,
       type: 'POST',
@@ -188,7 +186,6 @@ class ChainEntityController {
       return;
     }
     if (eventSortFn) existingEvents.sort(eventSortFn);
-    console.log(existingEvents);
     this._handleEvents(chain, existingEvents);
     return existingEvents;
   }

@@ -46,8 +46,6 @@ const updateThreadLinkedChainEntities = async (models, req: Request, res: Respon
     } ],
   });
 
-  console.log(finalEntity);
-
   return res.json({ status: 'Success', result: finalEntity.toJSON() });
 };
 

@@ -8,10 +8,10 @@ import {
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
-import { chainEntityTypeToProposalSlug } from 'client/scripts/identifiers';
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   constructor(

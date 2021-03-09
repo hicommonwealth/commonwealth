@@ -35,9 +35,6 @@ import ErrorPage from 'views/pages/error';
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
-    const a = app;
-    const store = app.chain.chainEntities.store;
-    const demProps = (app.chain as Substrate).democracyProposals.store;
 
     return m(Grid, {
       align: 'middle',

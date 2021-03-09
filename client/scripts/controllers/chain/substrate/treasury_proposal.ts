@@ -6,11 +6,11 @@ import {
   VotingType, VotingUnit, ChainEntity, ChainEvent
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasury from './treasury';
 import { formatAddressShort } from '../../../../../shared/utils';
-import { chainEntityTypeToProposalSlug } from 'client/scripts/identifiers';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
