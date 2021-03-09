@@ -11,6 +11,7 @@ import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
+import { chainEntityTypeToProposalSlug } from 'client/scripts/identifiers';
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   constructor(
@@ -111,9 +112,22 @@ export class SubstrateCollectiveProposal
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized = true;
-    this.updateVoters();
-    this._Collective.store.add(this);
+    if (!this._completed) {
+      const slug = chainEntityTypeToProposalSlug(entity.type);
+      const uniqueId = `${slug}_${entity.typeId}`;
+      this._Chain.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
+        if (response.status === 'Success' && response.result?.length) {
+          this.title = response.result;
+        }
+      });
+      this._initialized = true;
+      this.updateVoters();
+      this._Collective.store.add(this);
+    } else {
+      this._initialized = true;
+      this.updateVoters();
+      this._Collective.store.add(this);
+    }
   }
 
   protected complete() {
