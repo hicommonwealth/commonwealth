@@ -26,7 +26,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     throw new Error('Template not found, cannot start production server');
   }
 
-  const renderWithMetaTags = (res, title, description, author, image) => {
+  const renderWithMetaTags = (res, title, description, author, image, type = 'website') => {
     const $tmpl = cheerio.load(templateFile);
     $tmpl('meta[name="title"]').attr('content', title);
     $tmpl('meta[name="description"]').attr('content', description);
@@ -38,6 +38,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       $tmpl('meta[name="twitter:image:src"]').attr('content', image);
     }
 
+    $tmpl('meta[property="og:type"]').attr('content', type);
     $tmpl('meta[property="og:site_name"]').attr('content', 'Commonwealth');
     $tmpl('meta[property="og:title"]').attr('content', title);
     $tmpl('meta[property="og:description"]').attr('content', description);
@@ -87,7 +88,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       image = '';
       author = '';
     }
-    renderWithMetaTags(res, title, description, author, image);
+    renderWithMetaTags(res, title, description, author, image, 'profile');
   });
 
   app.get('/:scope/proposal/:type/:identifier', async (req, res, next) => {
@@ -131,9 +132,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       });
       const proposal = chainProposal || communityProposal;
       title = proposal ? decodeURIComponent(proposal.title) : '';
-      description = proposal && (
-        proposal.OffchainCommunity ? proposal.OffchainCommunity.name
-          : proposal.Chain ? proposal.Chain.name : '');
+      description = proposal ? proposal.plaintext : '';
       image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.iconUrl}` : DEFAULT_COMMONWEALTH_LOGO;
       try {
         const profileData = proposal && proposal.Address && proposal.Address.OffchainProfile
@@ -148,7 +147,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.iconUrl}` : DEFAULT_COMMONWEALTH_LOGO;
       author = '';
     }
-    renderWithMetaTags(res, title, description, author, image);
+    renderWithMetaTags(res, title, description, author, image, 'article');
   });
 
   app.get('*', (req, res, next) => {
