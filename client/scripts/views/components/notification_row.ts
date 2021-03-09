@@ -5,7 +5,8 @@ import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment-twitter';
 import {
-  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy
+  SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel, chainSupportedBy,
+  // MarlinEvents
 } from '@commonwealth/chain-events';
 
 import app from 'state';
@@ -249,6 +250,12 @@ const NotificationRow: m.Component<{
           chainId,
           notification.chainEvent.data,
         );
+      // } else if (chainSupportedBy(chainId, MarlinTypes.EventChains)) {
+      //   label = MarlinEvents.Label(
+      //     notification.chainEvent.blockNumber,
+      //     chainId,
+      //     notification.chainEvent.data,
+      //   )
       } else {
         throw new Error(`invalid notification chain: ${chainId}`);
       }

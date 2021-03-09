@@ -80,7 +80,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
       }, [
         m('div', {
           oncreate: (e) => {
-            if (vnode.state.validatedAccount.profile.name !== undefined) {
+            if (vnode.state.validatedAccount.profile.name) {
               redirectToNextPage();
             } else {
               app.modals.create({

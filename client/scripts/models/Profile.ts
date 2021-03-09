@@ -80,7 +80,7 @@ class Profile {
   // or just the address if the user has not set a name.
   get displayName() : string {
     if (!this._initialized) return 'Loading...';
-    return this.name || formatAddressShort(this.address, this.chain);
+    return this.name || 'Anonymous';
   }
 
   get displayNameWithAddress() : string {
