@@ -3,7 +3,6 @@ import proposalIdToEntity from '../util/proposalIdToEntity';
 
 export const Errors = {
   NoEntity: 'Cannot find entity',
-  NotAdminOrOwner: 'Not an admin or owner of this entity',
 };
 
 const fetchEntityTitle = async (models, req: Request, res: Response, next: NextFunction) => {
