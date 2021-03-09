@@ -156,7 +156,7 @@ class SubstrateDemocracyProposal extends Proposal<
       const slug = chainEntityTypeToProposalSlug(entity.type);
       const uniqueId = `${slug}_${entity.typeId}`;
       this._Proposals.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((result) => {
-        console.log(result);
+        console.log({ result });
       });
     } else {
       this._initialized = true;

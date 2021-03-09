@@ -15,8 +15,6 @@ import {
   IChainEntityKind,
 } from '@commonwealth/chain-events';
 import { notifyError } from '../app/notifications';
-import { ProposalType } from 'client/scripts/identifiers';
-import { EntityKind } from '@commonwealth/chain-events/dist/substrate/types';
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -103,10 +101,9 @@ class ChainEntityController {
     this._handlers = {};
   }
 
-  public async _fetchTitle(chain: string, uniqueId: string) {
+  public async _fetchTitle(chain: string, unique_id: string) {
     await $.get(`${app.serverUrl()}/fetchEntityTitle`, {
-      'unique_id': uniqueId,
-      'chain': chain
+      unique_id, chain
     });
   }
 
