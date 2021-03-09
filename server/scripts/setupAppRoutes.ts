@@ -134,7 +134,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       description = proposal && (
         proposal.OffchainCommunity ? proposal.OffchainCommunity.name
           : proposal.Chain ? proposal.Chain.name : '');
-      image = chain ? chain.icon_url : community ? community.iconUrl : DEFAULT_COMMONWEALTH_LOGO;
+      image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.iconUrl}` : DEFAULT_COMMONWEALTH_LOGO;
       try {
         const profileData = proposal && proposal.Address && proposal.Address.OffchainProfile
           ? JSON.parse(proposal.Address.OffchainProfile.data) : '';
@@ -145,7 +145,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     } else {
       title = chain ? chain.name : community ? community.name : 'Commonwealth';
       description = '';
-      image = chain ? chain.icon_url : community ? community.iconUrl : DEFAULT_COMMONWEALTH_LOGO;
+      image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.iconUrl}` : DEFAULT_COMMONWEALTH_LOGO;
       author = '';
     }
     renderWithMetaTags(res, title, description, author, image);
