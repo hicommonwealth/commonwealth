@@ -48,7 +48,7 @@ export class CosmosProposal extends Proposal<
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public get title() { return this._title; }
+  public title: string;
   public get description() { return this.data.description; }
   public get author() { return this.data.proposer ? this._Accounts.fromAddress(this.data.proposer) : null; }
 
@@ -64,7 +64,6 @@ export class CosmosProposal extends Proposal<
   public canVoteFrom(account) {
     return account instanceof CosmosAccount;
   }
-  private readonly _title: string;
   private _tally: ICosmosProposalTally;
   private _status: CosmosProposalState;
   public get status(): CosmosProposalState {
@@ -93,7 +92,7 @@ export class CosmosProposal extends Proposal<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Governance = Governance;
-    this._title = data.title;
+    this.title = data.title;
 
     // workaround to avoid fetching all voters for completed proposals
     if (!data.state.completed) {
