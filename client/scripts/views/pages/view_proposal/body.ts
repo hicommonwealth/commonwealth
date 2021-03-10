@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 import { updateRoute } from 'app';
 import app from 'state';
-import { pluralize } from 'helpers';
+import { pluralize, slugify } from 'helpers';
 import {
   OffchainThread,
   OffchainComment,

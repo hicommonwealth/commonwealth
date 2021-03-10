@@ -12,6 +12,7 @@ import {
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
@@ -40,8 +41,7 @@ class SubstrateDemocracyProposal extends Proposal<
     return `#${this.identifier.toString()}`;
   }
 
-  private _title: string;
-  public get title() { return this._title; }
+  public title: string;
 
   public get description() { return null; }
 
@@ -144,16 +144,29 @@ class SubstrateDemocracyProposal extends Proposal<
       this._method = preimage.method;
       this._section = preimage.section;
       this._preimage = preimage;
-      this._title = formatCall(preimage);
+      this.title = entity.title || formatCall(preimage);
     } else {
-      this._title = `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
+      this.title = entity.title || `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
     }
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized = true;
-    this.updateVoters();
-    this._Proposals.store.add(this);
+    if (!this._completed) {
+      const slug = chainEntityTypeToProposalSlug(entity.type);
+      const uniqueId = `${slug}_${entity.typeId}`;
+      this._Proposals.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
+        if (response.status === 'Success' && response.result?.length) {
+          this.title = response.result;
+        }
+        this._initialized = true;
+        this.updateVoters();
+        this._Proposals.store.add(this);
+      });
+    } else {
+      this._initialized = true;
+      this.updateVoters();
+      this._Proposals.store.add(this);
+    }
   }
 
   protected complete() {
@@ -181,7 +194,7 @@ class SubstrateDemocracyProposal extends Proposal<
           this._method = preimage.method;
           this._section = preimage.section;
           this._preimage = preimage;
-          this._title = formatCall(preimage);
+          this.title = this.title || formatCall(preimage);
         }
         break;
       }
