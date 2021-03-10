@@ -8,7 +8,7 @@ export const Errors = {
   NotAdminOrOwner: 'Not an admin or owner of this entity',
 };
 
-const updateThreadLinkedChainEntities = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateChainEntityTitle = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const { unique_id, title } = req.body;
@@ -49,4 +49,4 @@ const updateThreadLinkedChainEntities = async (models, req: Request, res: Respon
   return res.json({ status: 'Success', result: finalEntity.toJSON() });
 };
 
-export default updateThreadLinkedChainEntities;
+export default updateChainEntityTitle;
