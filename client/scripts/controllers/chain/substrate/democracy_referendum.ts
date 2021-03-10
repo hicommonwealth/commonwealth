@@ -16,6 +16,9 @@ import { Coin } from 'adapters/currency';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracy from './democracy';
+import SubstrateDemocracyProposal from './democracy_proposal';
+import { SubstrateCollectiveProposal } from './collective_proposal';
+import Substrate from './main';
 
 export enum DemocracyConviction {
   None = 0,
@@ -221,6 +224,35 @@ export class SubstrateDemocracyReferendum
 
   protected complete() {
     super.complete(this._Democracy.store);
+  }
+
+  // Attempts to find the Democracy Proposal or Collective Motion that produced this Referendum by
+  //   searching for the same proposal hash.
+  // NOTE: for full functionality, both "democracyProposals" and "council" modules must be loaded
+  //   before this funciton is called!
+  // TODO: This may cause issues if we have the same Call proposed twice, as this will only fetch the
+  //   first one in storage. To fix this, we will need to use some timing heuristics to check that
+  //   this referendum was created approximately when the found proposal concluded.
+  public getProposalOrMotion(): SubstrateDemocracyProposal | SubstrateCollectiveProposal | undefined {
+    // ensure all modules have loaded
+    if (!this._Chain.app.isModuleReady) return;
+
+    // search for same preimage/proposal hash
+    const chain = (this._Chain.app.chain as Substrate);
+    const democracyProposal = chain.democracyProposals?.store.getAll().find((p) => {
+      return p.hash === this.hash;
+    });
+    if (democracyProposal) return democracyProposal;
+
+    const collectiveProposal = chain.council?.store.getAll().find((p) => {
+      return p.data.hash === this.hash;
+    });
+    if (collectiveProposal) return collectiveProposal;
+    console.log('could not find:',
+      this.hash,
+      chain.council?.store.getAll().map((c) => c.data.hash),
+      chain.democracyProposals?.store.getAll().map((c) => c.hash));
+    return undefined;
   }
 
   public update(e: ChainEvent) {
