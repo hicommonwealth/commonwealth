@@ -121,7 +121,6 @@ export class SubstrateDemocracyReferendum
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public get title() { return this._title; }
   public get description() { return null; }
   public get author() { return null; }
   public get preimage() { return this._preimage; }
@@ -135,7 +134,7 @@ export class SubstrateDemocracyReferendum
   public canVoteFrom(account: Account<any>) {
     return account.chainBase === ChainBase.Substrate;
   }
-  private _title: string;
+  public title: string;
   private _preimage;
   private _endBlock: number;
   public readonly hash: string;
@@ -206,9 +205,9 @@ export class SubstrateDemocracyReferendum
     const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
       this._preimage = preimage;
-      this._title = formatCall(preimage);
+      this.title = formatCall(preimage);
     } else {
-      this._title = `Referendum #${this.data.index}`;
+      this.title = `Referendum #${this.data.index}`;
     }
 
     // handle events params for passing, if exists at init time
@@ -271,7 +270,7 @@ export class SubstrateDemocracyReferendum
         const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._preimage = preimage;
-          this._title = formatCall(preimage);
+          this.title = formatCall(preimage);
         }
         break;
       }

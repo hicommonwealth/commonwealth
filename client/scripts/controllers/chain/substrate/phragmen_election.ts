@@ -42,10 +42,9 @@ export class SubstratePhragmenElection extends Proposal<
     return `PELEC-${this.identifier.toString()}`;
   }
 
-  private readonly _title: string;
-  public get title() { return this._title; }
   public get description() { return null; }
   public get author() { return null; }
+  public title: string;
 
   public get support() {
     return null;
@@ -96,7 +95,7 @@ export class SubstratePhragmenElection extends Proposal<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Elections = Elections;
-    this._title = `Set council votes for election ${data.round}`;
+    this.title = `Set council votes for election ${data.round}`;
     this.moduleName = moduleName;
 
     this._initialized = true;
