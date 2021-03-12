@@ -382,12 +382,9 @@ export class SubstrateDemocracyReferendum
   }
 
   // TRANSACTIONS
-  // TODO: allow the user to enter how much balance they want to vote with
   public async submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
     const conviction = convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index;
-
-    // fake the arg to compute balance
-    const balance = await (vote.account as SubstrateAccount).freeBalance;
+    const balance = this._Chain.coins(vote.amount, true);
 
     // "AccountVote" type, for kusama
     // we don't support "Split" votes right now
@@ -401,15 +398,7 @@ export class SubstrateDemocracyReferendum
       }
     };
 
-    // even though voting balance is specifiable, we pre-populate the voting balance as "all funds"
-    //   to align with old voting behavior -- we should change this soon.
-    // TODO: move this computation out into the view as needed, to prepopulate field
-    const fees = await this._Chain.computeFees(
-      vote.account.address,
-      (api: ApiPromise) => api.tx.democracy.vote(this.data.index, srmlVote)
-    );
-
-    srmlVote.Standard.balance = balance.sub(fees).toString();
+    srmlVote.Standard.balance = balance.toString();
 
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
