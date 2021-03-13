@@ -574,6 +574,7 @@ const instantiateEditor = (
           reject(new Error(`Upload failed: ${err}`));
         });
       }).catch((err : any) => {
+        document.getElementsByClassName('spinner-wrap')[0].remove();
         err = err.responseJSON ? err.responseJSON.error : err.responseText;
         reject(new Error(`Failed to get an S3 signed upload URL: ${err}`));
       });
@@ -589,10 +590,11 @@ const instantiateEditor = (
     const indexesToFilter = [];
     contents.ops.forEach((op, index) => {
       if (op.insert?.image?.startsWith('data:image/jpeg;base64')
+          || op.insert?.image?.startsWith('data:image/gif;base64')
           || op.insert?.image?.startsWith('data:image/png;base64')) indexesToFilter.push(index);
     });
     contents.ops = contents.ops.filter((op, index) => indexesToFilter.indexOf(index) === -1);
-    quill.setContents(contents.ops);
+    quill.setContents(contents.ops); // must set contents to contents.ops for some reason
 
     const file = dataURLtoFile(imageDataUrl, type);
     quill.enable(false);
@@ -603,7 +605,7 @@ const instantiateEditor = (
         if (index) quill.insertEmbed(index, 'image', response, 'user');
       }
     }).catch((err) => {
-      notifyError('Failed to upload image');
+      notifyError('Failed to upload image. Was it a valid JPG, PNG, or GIF?');
       console.log(err);
       quill.enable(true);
     });
