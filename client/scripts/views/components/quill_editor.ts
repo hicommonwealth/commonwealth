@@ -584,9 +584,6 @@ const instantiateEditor = (
   const imageHandler = async (imageDataUrl, type) => {
     if (!type) type = 'image/png';
 
-    // // HACK: remove base64 format image, since an uploaded one will be inserted
-    // quill.deleteText(quill.getSelection().index - 1, 1);
-
     // filter out base64 format images from Quill
     const contents = quill.getContents();
     const indexesToFilter = [];
@@ -595,10 +592,12 @@ const instantiateEditor = (
           || op.insert?.image?.startsWith('data:image/png;base64')) indexesToFilter.push(index);
     });
     contents.ops = contents.ops.filter((op, index) => indexesToFilter.indexOf(index) === -1);
-    quill.setContents(contents);
+    quill.setContents(contents.ops);
 
     const file = dataURLtoFile(imageDataUrl, type);
+    quill.enable(false);
     uploadImg(file).then((response) => {
+      quill.enable(true);
       if (typeof response === 'string' && detectURL(response)) {
         const index = (quill.getSelection() || {}).index || quill.getLength();
         if (index) quill.insertEmbed(index, 'image', response, 'user');
@@ -606,6 +605,7 @@ const instantiateEditor = (
     }).catch((err) => {
       notifyError('Failed to upload image');
       console.log(err);
+      quill.enable(true);
     });
   };
 
