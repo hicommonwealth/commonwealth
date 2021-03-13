@@ -515,13 +515,14 @@ const instantiateEditor = (
 
   const createSpinner = () => {
     const ele = document.createElement('div');
+    ele.classList.add('cui-spinner');
+    ele.classList.add('cui-spinner-active');
+    ele.classList.add('cui-spinner-fill');
     ele.classList.add('spinner-wrap');
-    ele.classList.add('img-spinner');
     const firstChild = document.createElement('div');
-    const secondChild = document.createElement('span');
-    firstChild.innerText = 'Uploading';
-    secondChild.classList.add('icon-spinner2');
-    secondChild.classList.add('animate-spin');
+    const secondChild = document.createElement('div');
+    firstChild.classList.add('cui-spinner-content');
+    secondChild.classList.add('cui-spinner-icon');
     firstChild.appendChild(secondChild);
     ele.appendChild(firstChild);
     return ele;
@@ -579,11 +580,22 @@ const instantiateEditor = (
     });
   };
 
+  // handle drag-and-drop and paste events
   const imageHandler = async (imageDataUrl, type) => {
     if (!type) type = 'image/png';
 
-    // HACK: remove base64 format image, since an uploaded one will be inserted
-    quill.deleteText(quill.getSelection().index - 1, 1);
+    // // HACK: remove base64 format image, since an uploaded one will be inserted
+    // quill.deleteText(quill.getSelection().index - 1, 1);
+
+    // filter out base64 format images from Quill
+    const contents = quill.getContents();
+    const indexesToFilter = [];
+    contents.ops.forEach((op, index) => {
+      if (op.insert?.image?.startsWith('data:image/jpeg;base64')
+          || op.insert?.image?.startsWith('data:image/png;base64')) indexesToFilter.push(index);
+    });
+    contents.ops = contents.ops.filter((op, index) => indexesToFilter.indexOf(index) === -1);
+    quill.setContents(contents);
 
     const file = dataURLtoFile(imageDataUrl, type);
     uploadImg(file).then((response) => {
@@ -833,6 +845,7 @@ const instantiateEditor = (
       if (quill.isEnabled()) {
         // Save the entire updated text to localStorage
         const data = JSON.stringify(quill.getContents());
+        console.log(quill.getContents());
         localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, data);
         state.unsavedChanges = new Delta();
       }

@@ -4,6 +4,7 @@
 @import 'client/styles/lib/quill.snow';
 
 //
+// editor
 // 1. editor typography modifications
 // 2. checklist styling
 // 3. ql-snow form input styles, ql-bubble styles
@@ -11,8 +12,10 @@
 // 5. toolbar (markdown mode)
 // 6. preview button
 // 7. mentions container
-// 8. progress bar
-// 9. markdown/rich text switcher tooltip
+// 8. upload spinner
+//
+// - progress bar
+// - markdown/rich text switcher tooltip
 //
 
 .QuillEditor {
@@ -308,16 +311,20 @@
             }
         }
     }
+    // 8. upload spinner
+    .spinner-wrap.cui-spinner {
+        // TODO
+    }
 }
 
-// 8. progress bar
+// progress bar
 .progress-bar {
     height: 3px;
     width: 80%;
     background-color: red;
 }
 
-// 9. markdown/rich text switcher tooltip
+// markdown/rich text switcher tooltip
 .quill-editor-tooltip {
     position: relative;
     top: 3px;
