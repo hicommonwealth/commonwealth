@@ -223,7 +223,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
         }),
       // treasury (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge 
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -249,18 +249,18 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
         }),
       // validators (substrate and cosmos only)
-      // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-      //   m(Button, {
-      //     fluid: true,
-      //     rounded: true,
-      //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
-      //     active: onValidatorsPage(m.route.get()),
-      //     label: 'Validators',
-      //     onclick: (e) => {
-      //       e.preventDefault();
-      //       m.route.set(`/${app.activeChainId()}/validators`),
-      //     },
-      //   }),
+      !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
+        m(Button, {
+          fluid: true,
+          rounded: true,
+          contentLeft: m(Icon, { name: Icons.SHARE_2 }),
+          active: onValidatorsPage(m.route.get()),
+          label: 'Validators',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/validators`);
+          },
+        }),
       showMarlinOptions && m(Button, {
         fluid: true,
         rounded: true,

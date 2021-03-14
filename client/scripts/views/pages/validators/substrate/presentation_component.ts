@@ -5,8 +5,9 @@ import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
 
 const PresentationComponent = (state, chain: Substrate) => {
-  const validators = state.dynamic.validators;
+  const validators = state?.dynamic?.validators;
   if (!validators) return;
+
   return m(Tabs, [{
     name: 'Current Validators',
     content: m('table.validators-table', [

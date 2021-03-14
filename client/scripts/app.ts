@@ -593,7 +593,7 @@ $(() => {
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
+    '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
 
     // NEAR login
     '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),

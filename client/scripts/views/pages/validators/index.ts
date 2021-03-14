@@ -104,11 +104,7 @@ export const Validators: m.Component<IValidatorAttrs, IValidatorPageState> = {
       case ChainClass.Kusama:
       case ChainClass.Polkadot: {
         vComponents = [
-          m(SubstratePreHeader, {
-            sender: app.user.activeAccount as SubstrateAccount,
-            nominations: vnode.state.nominations,
-            nominationsHasChanged: vnode.state.nominationsHasChanged
-          }),
+          m(SubstratePreHeader),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;
