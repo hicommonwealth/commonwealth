@@ -248,9 +248,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             m.route.set(`/${app.activeChainId()}/council`);
           },
         }),
-      // validators (substrate and cosmos only)
-      !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-        m(Button, {
+      // validators (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate
+        && m(Button, {
           fluid: true,
           rounded: true,
           contentLeft: m(Icon, { name: Icons.SHARE_2 }),

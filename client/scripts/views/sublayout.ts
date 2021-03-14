@@ -11,7 +11,6 @@ import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileSidebarHeader from 'views/components/sidebar/mobile';
-import { getCouncilCandidates } from 'views/pages/council/index';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -42,11 +41,6 @@ const Sublayout: m.Component<{
     } = vnode.attrs;
     const chain = app.chain ? app.chain.meta.chain : null;
     const community = app.community ? app.community.meta : null;
-
-    let councilCandidates: Array<[SubstrateAccount, number]>;
-    if (app.chain && showCouncilMenu) {
-      councilCandidates = getCouncilCandidates();
-    }
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
@@ -80,7 +74,7 @@ const Sublayout: m.Component<{
         onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
       }),
       app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
-      showNewProposalButton && m(NewProposalButton, { fluid: false, councilCandidates }),
+      showNewProposalButton && m(NewProposalButton, { fluid: false }),
     ]);
 
     if (vnode.attrs.loadingLayout) return [
