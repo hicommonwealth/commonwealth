@@ -43,16 +43,18 @@ export const modelFromServer = (comment) => {
     });
   }
 
+  const lastEdited = comment.last_edited
+    ? moment(comment.last_edited)
+    : versionHistory
+      ? versionHistory.timestamp
+      : null;
+
   let proposal;
   try {
     proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
   } catch (e) {
     // no proposal
   }
-
-  const last_edited = comment.last_edited
-    ? moment(comment.last_edited)
-    : null;
 
   return new OffchainComment(
     comment.chain,
@@ -69,7 +71,7 @@ export const modelFromServer = (comment) => {
     comment.parent_id,
     comment.community,
     comment?.Address?.chain || comment.authorChain,
-    last_edited
+    lastEdited
   );
 };
 
