@@ -3,17 +3,17 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const selectQuery = 'SELECT * FROM "OffchainThreads"';
-    const threads = await queryInterface.sequelize.query(selectQuery);
-    const insertHistoryQueries = threads[0].map((thread, idx) => {
-      if (!thread.version_history || !thread.version_history.length) {
+    const selectQuery = 'SELECT * FROM "OffchainComments"';
+    const comments = await queryInterface.sequelize.query(selectQuery);
+    const insertHistoryQueries = comments[0].map((comment, idx) => {
+      if (!comment.version_history || !comment.version_history.length) {
         const firstVersionObj = {
-          timestamp: thread.created_at,
-          body: decodeURIComponent(thread.body)
+          timestamp: comment.created_at,
+          body: decodeURIComponent(comment.body)
         };
         try {
           const escapedStr = JSON.stringify(firstVersionObj).replace(/'/g, "''");
-          return `UPDATE "OffchainThreads" SET version_history=ARRAY['${escapedStr}'] WHERE id='${thread.id}'`;
+          return `UPDATE "OffchainComments" SET version_history=ARRAY['${escapedStr}'] WHERE id='${comment.id}'`;
         } catch (e) {
           console.log(e);
         }
