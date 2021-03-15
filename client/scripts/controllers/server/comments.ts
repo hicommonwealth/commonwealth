@@ -45,8 +45,8 @@ export const modelFromServer = (comment) => {
 
   const lastEdited = comment.last_edited
     ? moment(comment.last_edited)
-    : versionHistory
-      ? versionHistory.timestamp
+    : versionHistory && versionHistory?.length > 1
+      ? versionHistory[0].timestamp
       : null;
 
   let proposal;

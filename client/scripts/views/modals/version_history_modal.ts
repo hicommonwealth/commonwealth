@@ -98,7 +98,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
-        (item.versionHistory && item.versionHistory.length)
+        (item.versionHistory && item.versionHistory?.length)
           ? m('.versions', [
             item.versionHistory.map((edit, idx) => {
               const prevEdit = item.versionHistory[idx + 1];

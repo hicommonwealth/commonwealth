@@ -146,51 +146,38 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
     const { item } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
-    const missingVersionHistory = (!item.versionHistory || item.versionHistory.length === 0);
-    let lastEdited;
-    if (item instanceof OffchainThread || item instanceof OffchainComment) {
-      if (item.lastEdited) {
-        lastEdited = item.lastEdited;
-      } else {
-        notifyError('No last-edited');
-        console.log(item);
-        if (missingVersionHistory) return;
-        const lastEdit : VersionHistory = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
-        if (!lastEdit) return;
-        lastEdited = lastEdit.timestamp;
-      }
-      console.log({ lastEdited, isThread, item, missingVersionHistory });
-
-      return m('.ProposalBodyLastEdited', [
-        m('a', {
-          href: '#',
-          onclick: async (e) => {
-            e.preventDefault();
-            let postWithHistory;
-            const grabHistory = isThread && missingVersionHistory;
-            if (grabHistory) {
-              try {
-                console.log('fetching thread');
-                postWithHistory = await app.threads.fetchThread(item.id);
-                console.log(postWithHistory);
-              } catch (err) {
-                notifyError('Version history not found.');
-                return;
-              }
-            }
-            app.modals.create({
-              modal: VersionHistoryModal,
-              data: { item: (grabHistory && postWithHistory) ? postWithHistory : item }
-            });
-          }
-        }, [
-          'Edited ',
-          lastEdited.fromNow()
-        ])
-      ]);
-    } else {
-      return null;
+    if (!item.lastEdited) {
+      return;
     }
+    console.log({ lastEdited: item.lastEdited, isThread, item });
+
+    return m('.ProposalBodyLastEdited', [
+      m('a', {
+        href: '#',
+        onclick: async (e) => {
+          e.preventDefault();
+          let postWithHistory;
+          const grabHistory = isThread && !item.versionHistory?.length;
+          if (grabHistory) {
+            try {
+              postWithHistory = await app.threads.fetchThread(item.id);
+              console.log(postWithHistory);
+            } catch (err) {
+              notifyError('Version history not found.');
+              return;
+            }
+          }
+          app.modals.create({
+            modal: VersionHistoryModal,
+            data: { item: (grabHistory && postWithHistory) ? postWithHistory : item }
+          });
+        }
+      }, [
+        'Edited ',
+        item.lastEdited.fromNow()
+      ])
+    ]);
+  }
   }
 };
 

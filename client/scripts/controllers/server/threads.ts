@@ -50,8 +50,8 @@ export const modelFromServer = (thread) => {
 
   const lastEdited = thread.last_edited
     ? moment(thread.last_edited)
-    : versionHistory
-      ? versionHistory.timestamp
+    : versionHistory && versionHistory?.length > 1
+      ? versionHistory[0].timestamp
       : null;
 
   return new OffchainThread(
