@@ -13,14 +13,13 @@ import { Spinner } from 'construct-ui';
 const Delta = Quill.import('delta');
 
 interface IVersionHistoryAttrs {
-  proposal?: OffchainThread;
-  comment?: OffchainComment<any>;
+  item: OffchainThread | OffchainComment<any>;
 }
 
 const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
   view: (vnode) => {
-    const { proposal, comment } = vnode.attrs;
-    const post = (proposal || comment);
+    const { item } = vnode.attrs;
+    if (!item) return;
 
     const formatDiff = (diff) => {
       for (const op of diff.ops) {
@@ -46,7 +45,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
     const getVersion = (edit: VersionHistory, prevEdit: VersionHistory) => {
       const author = edit.author
         ? app.profiles.getProfile(edit.author.chain, edit.author.address)
-        : app.profiles.getProfile(post.authorChain, post.author);
+        : app.profiles.getProfile(item.authorChain, item.author);
       const timestamp = edit.timestamp.format('dddd, MMMM Do YYYY, h:mm a');
       const userOptions = {
         user: author,
@@ -99,10 +98,10 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
-        (post.versionHistory && post.versionHistory.length)
+        (item.versionHistory && item.versionHistory.length)
           ? m('.versions', [
-            post.versionHistory.map((edit, idx) => {
-              const prevEdit = post.versionHistory[idx + 1];
+            item.versionHistory.map((edit, idx) => {
+              const prevEdit = item.versionHistory[idx + 1];
               if (!edit) return null;
               return getVersion(edit, prevEdit);
             })

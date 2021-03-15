@@ -148,7 +148,6 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
     const isThread = item instanceof OffchainThread;
     const missingVersionHistory = (!item.versionHistory || item.versionHistory.length === 0);
     let lastEdited;
-    console.log({ lE: item.lastEdited, cA: item.createdAt });
     if (item instanceof OffchainThread || item instanceof OffchainComment) {
       if (item.lastEdited) {
         lastEdited = item.lastEdited;
@@ -158,6 +157,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
         if (!lastEdit) return;
         lastEdited = lastEdit.timestamp;
       }
+      console.log({ lastEdited, isThread, item, missingVersionHistory });
 
       return m('.ProposalBodyLastEdited', [
         m('a', {
@@ -167,7 +167,9 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
             let postWithHistory;
             if (isThread && missingVersionHistory) {
               try {
+                console.log('fetching thread');
                 postWithHistory = await app.threads.fetchThread(item.id);
+                console.log(postWithHistory);
               } catch (err) {
                 notifyError('Version history not found.');
                 return;
