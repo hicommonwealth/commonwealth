@@ -69,6 +69,19 @@ export default (
     indexes: [
       { fields: ['email'], unique: true },
     ],
+    defaultScope: {
+      attributes: {
+        exclude: [
+          'email', 'emailVerified', 'emailNotificationInterval', 'isAdmin',
+          'magicIssuer', 'lastMagicLoginAt', 'created_at', 'updated_at'
+        ],
+      }
+    },
+    scopes: {
+      withPrivateData: {
+        attributes: {},
+      }
+    },
   });
 
   User.associate = (models) => {

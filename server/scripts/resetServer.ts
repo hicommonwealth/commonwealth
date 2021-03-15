@@ -36,6 +36,13 @@ const nodes = [
   // [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
+<<<<<<< HEAD
+=======
+  [ 'wss://mainnet.infura.io/ws', 'marlin', '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f'],
+  [ 'ws://127.0.0.1:9545', 'marlin-local', '0xe0D6a92B91B83D5c8A95557f1c966cAFd97f7171'], // TODO: Can't seem to keep this consistent which each local deploy
+  [ 'ws://api.clover.finance', 'clover'],
+  [ 'wss://rpc-01.snakenet.hydradx.io', 'hydradx'],
+>>>>>>> master
   [ 'wss://ropsten.infura.io/ws', 'alex-ropsten', '0xFab46E002BbF0b4509813474841E0716E6730136']
 ];
 const resetServer = (models): Promise<number> => {
@@ -307,7 +314,7 @@ const resetServer = (models): Promise<number> => {
         models.Chain.create({
           id: 'moloch',
           network: 'moloch',
-          symbol: 'Moloch',
+          symbol: 'SHARE',
           name: 'Moloch',
           icon_url: '/static/img/protocols/molochdao.png',
           active: true,
@@ -318,7 +325,7 @@ const resetServer = (models): Promise<number> => {
         models.Chain.create({
           id: 'metacartel',
           network: 'metacartel',
-          symbol: 'Metacartel',
+          symbol: 'SHARE',
           name: 'Metacartel',
           icon_url: '/static/img/protocols/metacartel.png',
           active: true,
@@ -328,7 +335,7 @@ const resetServer = (models): Promise<number> => {
         models.Chain.create({
           id: 'moloch-local',
           network: 'moloch',
-          symbol: 'Moloch',
+          symbol: 'SHARE',
           name: 'Moloch (local)',
           icon_url: '/static/img/protocols/molochdao.png',
           active: true,
@@ -336,6 +343,45 @@ const resetServer = (models): Promise<number> => {
           base: 'ethereum',
         }),
         models.Chain.create({
+<<<<<<< HEAD
+=======
+          id: 'marlin',
+          network: 'marlin',
+          symbol: 'LIN',
+          name: 'Marlin',
+          icon_url: '/static/img/protocols/eth.png',
+          active: true,
+          type: 'dao',
+        }),
+        models.Chain.create({
+          id: 'marlin-local',
+          network: 'marlin',
+          symbol: 'LIN',
+          name: 'Marlin (local)',
+          icon_url: '/static/img/protocols/eth.png',
+          active: true,
+          type: 'dao',
+        }),
+        models.Chain.create({
+          id: 'clover',
+          network: 'clover',
+          symbol: 'CLOV',
+          name: 'Clover',
+          icon_url: '/static/img/protocols/clover.png',
+          active: true,
+          type: 'chain',
+        }),
+        models.Chain.create({
+          id: 'hydradx',
+          network: 'hydradx',
+          symbol: 'HDX',
+          name: 'HydraDX',
+          icon_url: '/static/img/protocols/hydradx.png',
+          active: true,
+          type: 'chain',
+        }),
+        models.Chain.create({
+>>>>>>> master
           id: 'alex-ropsten',
           network: 'alex',
           symbol: 'ALEX',
@@ -358,6 +404,10 @@ const resetServer = (models): Promise<number> => {
         ethLocal, eth,
         nearLocal, nearTestnet,
         moloch, metacartel, molochLocal,
+<<<<<<< HEAD
+=======
+        marlin, marlinLocal,
+>>>>>>> master
         alexRopsten,
       ] = chains;
 
@@ -559,35 +609,6 @@ const resetServer = (models): Promise<number> => {
       ]);
 
       await Promise.all(nodes.map(([ url, chain, address ]) => (models.ChainNode.create({ chain, url, address }))));
-
-      // initialize chain event types
-      const initChainEventTypes = (chain: string) => {
-        if (chainSupportedBy(chain, SubstrateTypes.EventChains)) {
-          return Promise.all(
-            SubstrateTypes.EventKinds.map((event_name) => {
-              return models.ChainEventType.create({
-                id: `${chain}-${event_name}`,
-                chain,
-                event_name,
-              });
-            })
-          );
-        } else if (chainSupportedBy(chain, MolochTypes.EventChains)) {
-          return Promise.all(
-            MolochTypes.EventKinds.map((event_name) => {
-              return models.ChainEventType.create({
-                id: `${chain}-${event_name}`,
-                chain,
-                event_name,
-              });
-            })
-          );
-        } else {
-          log.error(`Unknown event chain at reset: ${chain}.`);
-        }
-      };
-
-      await Promise.all(EventSupportingChains.map((chain) => initChainEventTypes(chain)));
 
       log.debug('Reset database and initialized default models');
       resolve(0);

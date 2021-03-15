@@ -10,6 +10,8 @@ export interface ChainEntityAttributes {
   type: string;
   type_id: string;
   thread_id?: number;
+  title?: string;
+  author?: string;
   completed?: boolean;
   created_at?: Date;
   updated_at?: Date;
@@ -38,6 +40,8 @@ export default (
     type_id: { type: dataTypes.STRING, allowNull: false },
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
     completed: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    title: { type: dataTypes.STRING, allowNull: true },
+    author: { type: dataTypes.STRING, allowNull: true },
 
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },

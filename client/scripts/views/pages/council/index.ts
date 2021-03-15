@@ -200,15 +200,16 @@ export const getCouncilCandidates = () => {
   return candidates;
 };
 
-async function loadCmd() {
+function getModules() {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
+  if (app.chain.base === ChainBase.Substrate) {
+    const chain = (app.chain as Substrate);
+    return [ chain.phragmenElections ];
+  } else {
+    throw new Error('invalid chain');
   }
-  const chain = (app.chain as Substrate);
-  await chain.phragmenElections.init(chain.chain, chain.accounts);
 }
 
 const CouncilPage: m.Component<{}> = {
@@ -238,9 +239,10 @@ const CouncilPage: m.Component<{}> = {
         showNewProposalButton: true
       });
     }
-    const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
-    if (!initialized) {
-      if (!(app.chain as Substrate).phragmenElections.initializing) loadCmd();
+
+    const modules = getModules();
+    if (modules.some((mod) => !mod.ready)) {
+      app.chain.loadModules(modules);
       return m(PageLoading, {
         message: 'Connecting to chain',
         title: [

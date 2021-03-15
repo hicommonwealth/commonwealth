@@ -114,6 +114,8 @@ const resetServer = (debug=false): Promise<void> => {
         icon_url: '/static/img/protocols/edg.png',
         active: true,
         type: 'chain',
+        base: 'substrate',
+        ss58_prefix: '7',
       });
       const eth = await models['Chain'].create({
         id: 'ethereum',
@@ -123,6 +125,17 @@ const resetServer = (debug=false): Promise<void> => {
         icon_url: '/static/img/protocols/eth.png',
         active: true,
         type: 'chain',
+        base: 'ethereum',
+      });
+      const alex = await models['Chain'].create({
+        id: 'alex',
+        network: 'alex',
+        symbol: 'ALEX',
+        name: 'Alex',
+        icon_url: '/static/img/protocols/alex.png',
+        active: true,
+        type: 'token',
+        base: 'ethereum',
       });
       const alex = await models['Chain'].create({
         id: 'alex',

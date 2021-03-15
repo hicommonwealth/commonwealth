@@ -1,0 +1,46 @@
+@import 'client/styles/shared';
+
+.StageEditor {
+}
+
+.StageEditorDialog {
+    h4 {
+        margin: 10px 7px;
+        font-size: 17px;
+        font-weight: 600;
+    }
+    .stage-options {
+        margin-top: 12px;
+        margin-bottom: 30px;
+    }
+    .cui-button.cui-sm {
+        padding-left: 15px;
+        padding-right: 15px;
+        margin: 5px 6px;
+    }
+}
+
+.ChainEntitiesSelector {
+    padding: 22px 22px 0;
+    border: 1px solid #ddd;
+    margin: 10px 8px 20px;
+    border-radius: 5px;
+    .cui-list {
+        min-height: 200px;
+        max-height: 200px;
+        .cui-active {
+            background: initial;
+        }
+    }
+    .cui-query-list-checkmark .cui-list-item-content-left {
+        left: 0;
+    }
+    .chain-entities-selector-placeholder {
+        padding: 112px 0;
+        text-align: center;
+    }
+    .chain-entities-selector-placeholder-text {
+        height: 30px;
+        color: $text-color-medium-dark;
+    }
+}

@@ -28,10 +28,6 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
       }),
       label: 'New text proposal'
     }),
-    app.chain?.base === ChainBase.Substrate && app.chain?.class === ChainClass.Edgeware && m(MenuItem, {
-      onclick: () => { m.route.set(`/${app.chain.id}/new/signaling`); },
-      label: 'New signaling proposal'
-    }),
     app.chain?.base === ChainBase.Substrate && app.chain?.class !== ChainClass.Plasm && [
       m(MenuItem, {
         onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
@@ -77,7 +73,7 @@ export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Arra
         hasArrow: false,
         trigger: m(Button, {
           disabled: !app.user.activeAccount
-            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+            || !app.activeCommunityId() && ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
           label: m(Icon, { name: Icons.PLUS }),
         }),
         inline: true,
@@ -126,6 +122,7 @@ const NewProposalButton: m.Component<{
         hasArrow: false,
         trigger: m(Button, {
           disabled: !app.user.activeAccount
+            // TODO, figure this out and change it back
             ,//|| ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
           label: 'New thread',
         }),

@@ -6,8 +6,6 @@ import Substrate from '../substrate/main';
 class Phala extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
     super(n, app, ChainClass.Phala);
-
-    this.signaling.disable();
   }
 
   public async initApi() {

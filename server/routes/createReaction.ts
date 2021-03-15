@@ -16,7 +16,11 @@ export const Errors = {
   NoReaction: 'Must provide a reaction',
   NoCommentMatch: 'No matching comment found',
   NoProposalMatch: 'No matching proposal found',
+<<<<<<< HEAD
   InsufficientTokenBalance: 'User does not have sufficient token balance to react',
+=======
+  InsufficientTokenBalance: `Users need to hold some of the community's tokens to react`,
+>>>>>>> master
 };
 
 const createReaction = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {

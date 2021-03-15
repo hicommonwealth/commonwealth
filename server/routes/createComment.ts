@@ -23,7 +23,11 @@ export const Errors = {
   ThreadNotFound: 'Cannot comment; thread not found',
   // ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
+<<<<<<< HEAD
   InsufficientTokenBalance: 'User does not have sufficient token balance to comment',
+=======
+  InsufficientTokenBalance: `Users need to hold some of the community's tokens to comment`,
+>>>>>>> master
 };
 
 const createComment = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {

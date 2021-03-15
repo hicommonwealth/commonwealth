@@ -21,7 +21,7 @@
             min-width: calc(50% - 15px);
         }
     }
-    @include sm-max {
+    @include lg-max {
         display: block;
         width: 100%;
         .results-header, .results-cell {
@@ -30,7 +30,7 @@
     }
     .results-column:nth-child(even) {
         border-left: 1px solid $background-color-light-hover;
-        @include sm-max {
+        @include lg-max {
             border-left: none;
             border-top: 1px solid $background-color-light-hover;
         }
