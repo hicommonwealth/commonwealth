@@ -24,7 +24,7 @@ const getWebhooks = async (models, req: Request, res: Response, next: NextFuncti
   if (adminRoles.length === 0) return next(new Error(Errors.NotAdmin));
   // fetch webhooks
   const webhooks = await models.Webhook.findAll({ where: chainOrCommObj });
-  return res.json({ status: 'Success', result: webhooks });
+  return res.json({ status: 'Success', result: webhooks.map((w) => w.toJSON()) });
 };
 
 export default getWebhooks;

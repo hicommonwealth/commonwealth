@@ -7,21 +7,9 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
-import { ChainBase, ProposalModule } from 'models';
+import { ChainBase, ChainNetwork, ProposalModule } from 'models';
 import NewProposalForm from 'views/pages/new_proposal/new_proposal_form';
-
-async function loadCmd(type: string) {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
-  }
-  const c = proposalSlugToClass().get(type);
-  if (c && c instanceof ProposalModule && !c.disabled) {
-    await c.init(app.chain.chain, app.chain.accounts);
-  }
-}
+import PageNotFound from '../404';
 
 const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
   view: (vnode) => {
@@ -30,13 +18,18 @@ const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
 
     // wait for chain if not offchain
     if (vnode.state.typeEnum !== ProposalType.OffchainThread) {
+      if (app.chain?.failed)
+        return m(PageNotFound, {
+          title: 'Wrong Ethereum Provider Network!',
+          message: 'Change Metamask to point to Ethereum Mainnet',
+        });
       if (!app.chain || !app.chain.loaded)
         return m(PageLoading, { narrow: true, showNewProposalButton: true });
 
       // check if module is still initializing
       const c = proposalSlugToClass().get(vnode.state.typeEnum) as ProposalModule<any, any, any>;
-      if (!c.disabled && !c.initialized) {
-        if (!c.initializing) loadCmd(vnode.state.typeEnum);
+      if (!c.ready) {
+        app.chain.loadModules([ c ]);
         return m(PageLoading, { narrow: true, showNewProposalButton: true });
       }
     }

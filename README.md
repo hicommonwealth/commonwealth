@@ -62,6 +62,7 @@ Environment variables used for external services include:
 - SENDGRID_API_KEY: for sending emails, email login, etc.
 - NODE_URL: for server-side proposal archiving (usually ws://testnet2.edgewa.re:9944, may be deprecated soon)
 - DATABASE_URL (set by Heroku)
+- PRODUCTION_APP (Heroku App Name)
 - JWT_SECRET
 - SESSION_SECRET
 
@@ -76,24 +77,18 @@ We also use certain environment variables to configure the application itself:
 To download and restore the production database, and run migrations:
 
 ```
-nvm use
-heroku pg:backups:capture -a commonwealthapp
-heroku pg:backups:download -a commonwealthapp
-brew services restart postgres     # For Mac OS X restart the database to close any open connections
-npx sequelize db:drop              # Reset the database
-npx sequelize db:create            # Create a new empty database
-pg_restore --verbose --clean --no-acl --no-owner --if-exists -h localhost -U commonwealth -d commonwealth latest.dump
-npx sequelize db:migrate
+pg_dump $(heroku config:get DATABASE_URL --app PRODUCTION_APP) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --no-privileges --no-owner -f latest.dump
+
+npx sequelize db:drop
+npx sequelize db:create
+psql -d commonwealth -U commonwealth -f latest.dump
 ```
 
-At this point you should be ready to go!
+To access the production DB:
 
-The app is compiled into a bundle and pushed to Heroku, which
-serves it at <app>.herokuapp.com. **Migrations are
-automatically executed.** If migrations do not complete successfully,
-the new backend does not get served.
-
-To access the production DB: `heroku pg:psql`
+```
+heroku pg:psql
+```
 
 To run the production server locally:
 
@@ -114,9 +109,23 @@ heroku pg:copy <PRODUCTION_APP>::<PRODUCTION_DB_URL> <STAGING_DB_URL> -a <STAGIN
 heroku maintenance:off -a <STAGING_APP>
 ```
 
-## Production Logs
+## Running Migrations
 
-To view production logs: `heroku addons:open timber-logging`
+A number of migrations for loading the latest on-chain data are
+defined in server.ts and package.json. To run these migrations on
+Heroku, some special syntax is needed.
+
+For example, to run the councillor/validator flags migration:
+
+```
+FLAG_MIGRATION=true ts-node --log-error --project tsconfig.node.json server.ts
+```
+
+## Production Logs
+## Extending Boot Timeout
+
+Heroku may need more time to boot the production server. If so, you can extend
+the boot timeout here: https://tools.heroku.support/limits/boot_timeout
 
 ## Frontend Code Style
 
@@ -149,7 +158,7 @@ First, install dependencies for deployment:
 
 ```
 brew update
-brew cask install now
+brew install --cask now
 brew tap heroku/brew && brew install heroku
 ```
 

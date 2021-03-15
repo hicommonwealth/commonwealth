@@ -35,7 +35,7 @@ function setupPassport(models) {
     secretOrKey: JWT_SECRET,
   }, async (jwtPayload, done) => {
     try {
-      models.User.findOne({ where: { id: jwtPayload.id } }).then((user) => {
+      models.User.scope('withPrivateData').findOne({ where: { id: jwtPayload.id } }).then((user) => {
         if (user) {
           // note the return removed with passport JWT - add this return for passport local
           done(null, user);
@@ -76,7 +76,7 @@ function setupPassport(models) {
       }
 
       // check if this is a new signup or a login
-      const existingUser = await models.User.findOne({
+      const existingUser = await models.User.scope('withPrivateData').findOne({
         where: {
           email: userMetadata.email,
         },
@@ -347,6 +347,7 @@ function setupPassport(models) {
 
   passport.deserializeUser((userId, done) => {
     models.User
+      .scope('withPrivateData')
       .findOne({ where: { id: userId } })
       .then((user) => { done(null, user); })
       .catch((err) => { done(err, null); });

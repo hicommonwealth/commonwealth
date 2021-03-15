@@ -43,8 +43,9 @@ const ChainEntitiesSelector: m.Component<{
           const selected = vnode.attrs.chainEntitiesToSet.map((ce_) => ce_.id).indexOf(ce.id) !== -1;
           // TODO: show additional info on the ListItem, like any set proposal title, the creator, or other metadata
           return m(ListItem, {
-            label: chainEntityTypeToProposalName(ce.type) +
-              (ce.typeId.startsWith('0x') ? '' : ` #${ce.typeId}`),
+            label: chainEntityTypeToProposalName(ce.type)
+              + (ce.typeId.startsWith('0x') ? '' : ` #${ce.typeId}`)
+              + (ce.title ? `: ${ce.title}` : ''),
             selected,
             key: ce.id ? ce.id : uuidv4(),
           });
@@ -53,7 +54,9 @@ const ChainEntitiesSelector: m.Component<{
           if (ce.typeId.startsWith('0x')) {
             return false;
           } else {
-            return ce.typeId.toString().toLowerCase().includes(query.toLowerCase());
+            return ce.typeId.toString().toLowerCase().includes(query.toLowerCase())
+              || ce.title?.toString().toLowerCase().includes(query.toLowerCase())
+              || chainEntityTypeToProposalName(ce.type).toLowerCase().includes(query.toLowerCase());
           }
         },
         onSelect: (ce: ChainEntity) => {

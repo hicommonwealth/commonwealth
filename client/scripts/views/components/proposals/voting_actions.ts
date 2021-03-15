@@ -14,9 +14,6 @@ import { SubstrateDemocracyReferendum, convictionToWeight } from 'controllers/ch
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import {
-  EdgewareSignalingProposal, SignalingProposalStage, SignalingVote
-} from 'controllers/chain/edgeware/signaling_proposal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import ConvictionsChooser from 'views/components/proposals/convictions_chooser';
@@ -31,6 +28,11 @@ import MolochProposal, {
   MolochVote,
   MolochProposalState
 } from 'controllers/chain/ethereum/moloch/proposal';
+import MarlinProposal, {
+  MarlinProposalVote,
+  MarlinProposalState,
+  MarlinVote
+} from 'controllers/chain/ethereum/marlin/proposal';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -56,43 +58,7 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
     const proposal = vnode.attrs.proposal;
     const callback = vnode.attrs.callback;
     const user: SubstrateAccount = app.user.activeAccount as SubstrateAccount;
-    if (vnode.attrs.proposal instanceof EdgewareSignalingProposal) {
-      const advanceSignalingProposal = (e) => {
-        e.preventDefault();
-        const acct = app.user.activeAccount as SubstrateAccount;
-        createTXModal((app.chain as Edgeware).signaling.advance(acct, proposal as EdgewareSignalingProposal));
-      };
-
-      let proposalStageMsg;
-      if (proposal.stage === SignalingProposalStage.PreVoting) {
-        proposalStageMsg = 'Turn on signaling';
-      } else if (proposal.stage === SignalingProposalStage.Voting) {
-        proposalStageMsg = 'Signaling open';
-      } else {
-        proposalStageMsg = 'Signaling closed';
-      }
-
-      return m('.ProposalExtensions', [
-        proposal.stage === SignalingProposalStage.PreVoting
-          && 'The proposal creator has not turned on signaling yet.',
-        proposal.stage === SignalingProposalStage.Voting && [
-          `Signaling open through block ${proposal.endTime.blocknum} (`,
-          m(CountdownUntilBlock, { block: proposal.endTime.blocknum }),
-          ')',
-        ],
-        proposal.stage === SignalingProposalStage.Completed
-          && 'Signaling proposal complete.',
-        (proposal.data.author === user.address)
-          && m(Button, {
-            intent: 'positive',
-            disabled: (proposal.stage !== SignalingProposalStage.PreVoting),
-            onclick: advanceSignalingProposal,
-            label: proposalStageMsg,
-            compact: true,
-            rounded: true,
-          }),
-      ]);
-    } else if (vnode.attrs.proposal instanceof SubstrateDemocracyReferendum) {
+    if (vnode.attrs.proposal instanceof SubstrateDemocracyReferendum) {
       if (!vnode.attrs.setDemocracyVoteConviction) return 'Misconfigured';
       if (!vnode.attrs.setDemocracyVoteAmount) return 'Misconfigured';
       if (!app.user.activeAccount) return 'Misconfigured';
@@ -156,8 +122,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     }
 
     let user;
-    if (proposal instanceof EdgewareSignalingProposal
-        || proposal instanceof SubstrateDemocracyProposal
+    if (proposal instanceof SubstrateDemocracyProposal
         || proposal instanceof SubstrateDemocracyReferendum
         || proposal instanceof SubstratePhragmenElection
         || proposal instanceof SubstrateCollectiveProposal) {
@@ -165,6 +130,8 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     } else if (proposal instanceof CosmosProposal) {
       user = app.user.activeAccount as CosmosAccount;
     } else if (proposal instanceof MolochProposal) {
+      user = app.user.activeAccount as EthereumAccount;
+    } else if (proposal instanceof MarlinProposal) {
       user = app.user.activeAccount as EthereumAccount;
     } else {
       return m(CannotVote, { action: 'Unrecognized proposal type' });
@@ -211,6 +178,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
+      } else if (proposal instanceof MarlinProposal) {
+        proposal.submitVoteWebTx(new MarlinProposalVote(user, MarlinVote.YES))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
         vnode.state.votingModalOpen = false;
         return notifyError('Unimplemented proposal type - use election voting modal');
@@ -232,11 +203,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       mixpanel.people.set({
         'Last Vote Created': new Date().toISOString()
       });
-      if (proposal instanceof EdgewareSignalingProposal) {
-        createTXModal(proposal.submitVoteTx(new SignalingVote(proposal, user, [
-          (app.chain.chain as SubstrateChain).createType('VoteOutcome', [0])
-        ], app.chain.chain.coins(0)), onModalClose)); // fake balance, not needed for voting
-      } else if (proposal instanceof SubstrateDemocracyReferendum) {
+      if (proposal instanceof SubstrateDemocracyReferendum) {
         if (vnode.state.conviction === undefined) {
           vnode.state.votingModalOpen = false;
           return notifyError('Must select a conviction'); // TODO: new code, test
@@ -253,6 +220,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.NO), null, onModalClose));
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
+      } else if (proposal instanceof MarlinProposal) {
+        proposal.submitVoteWebTx(new MarlinProposalVote(user, MarlinVote.NO))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else {
         vnode.state.votingModalOpen = false;
         return notifyError('Invalid proposal type');
@@ -273,6 +244,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       });
       if (proposal instanceof MolochProposal) {
         proposal.abortTx()
+          .then(() => { onModalClose(); m.redraw(); })
+          .catch((err) => { onModalClose(); notifyError(err.toString()); });
+      } else if (proposal instanceof MarlinProposal) {
+        proposal.cancelTx()
           .then(() => { onModalClose(); m.redraw(); })
           .catch((err) => { onModalClose(); notifyError(err.toString()); });
       } else {
@@ -373,11 +348,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
         'Scope': app.activeId(),
       });
-      if (proposal instanceof EdgewareSignalingProposal) {
-        createTXModal(proposal.submitVoteTx(new SignalingVote(proposal, user, [
-          (app.chain.chain as SubstrateChain).createType('VoteOutcome', choice)
-        ], app.chain.chain.coins(0)), onModalClose)); // fake balance, not needed for voting
-      }
     };
 
     let hasVotedYes;
@@ -386,27 +356,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     let hasVotedVeto;
     let hasVotedForAnyChoice;
     const hasVotedForChoice = {};
-    if (proposal instanceof EdgewareSignalingProposal) {
-      const choices = proposal.data.choices;
-      choices.forEach((c) => { hasVotedForChoice[c.toHex()] = false; });
-      proposal.getVotes().forEach((vote) => {
-        if (vote.account.address === user.address) {
-          hasVotedForChoice[vote.choices[0].toHex()] = true;
-          hasVotedForAnyChoice = user && true;
-        }
-      });
-
-      const yVote = (app.chain.chain as SubstrateChain).createType('VoteOutcome', [1]);
-      const nVote = (app.chain.chain as SubstrateChain).createType('VoteOutcome', [0]);
-      hasVotedYes = user && proposal
-        .getVotes()
-        .filter((vote) => vote.choices[0].toHex() === yVote.toHex()
-          && vote.account.address === user.address).length > 0;
-      hasVotedNo = user && proposal
-        .getVotes()
-        .filter((vote) => vote.choices[0].toHex() === nVote.toHex()
-          && vote.account.address === user.address).length > 0;
-    } else if (proposal instanceof SubstrateDemocracyProposal) {
+    if (proposal instanceof SubstrateDemocracyProposal) {
       hasVotedYes = proposal.getVotes().filter((vote) => {
         return vote.account.address === user.address;
       }).length > 0;
@@ -425,6 +375,11 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         .filter((vote) => vote.choice === MolochVote.YES && vote.account.address === user.address).length > 0;
       hasVotedNo = user && proposal.getVotes()
         .filter((vote) => vote.choice === MolochVote.NO && vote.account.address === user.address).length > 0;
+    } else if (proposal instanceof MarlinProposal) {
+      hasVotedYes = user && proposal.getVotes()
+        .filter((vote) => vote.choice === MarlinVote.YES && vote.account.address === user.address).length > 0;
+      hasVotedNo = user && proposal.getVotes()
+        .filter((vote) => vote.choice === MarlinVote.NO && vote.account.address === user.address).length > 0;
     }
 
     let canVote = true;
@@ -432,10 +387,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       canVote = false;
     } else if (proposal.isPassing === ProposalStatus.Passed || proposal.isPassing === ProposalStatus.Failed) {
       canVote = false;
-    } else if (proposal instanceof EdgewareSignalingProposal && proposal.stage !== SignalingProposalStage.Voting) {
-      canVote = false;
     } else if (proposal instanceof MolochProposal && proposal.state !== MolochProposalState.Voting) {
       canVote = false;
+    } else if (proposal instanceof MarlinProposal  /* && (await proposal.state()) !== MarlinProposalState.Active */) {
+      canVote = false; // TODO: Fix proposal.state function above to not return promise
     } else if (hasVotedForAnyChoice) {
       // enable re-voting for particular types
       if (proposal instanceof SubstratePhragmenElection
@@ -448,32 +403,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     }
 
     let buttons;
-    if (proposal instanceof EdgewareSignalingProposal) {
-      const { choices } = (proposal as EdgewareSignalingProposal).data;
-      buttons = choices.map((c, inx) => {
-        let cl;
-        if (choices.length > 2) {
-          cl = ['.yes-button', 'positive'];
-        } else if (inx === 1) {
-          cl = ['.no-button', 'negative'];
-        } else {
-          cl = ['.yes-button', 'positive'];
-        }
-
-        return m(`${cl[0]}`, [
-          m(Button, {
-            intent: cl[1],
-            disabled: !canVote || hasVotedForChoice[c.toHex()] || votingModalOpen,
-            onclick: (e) => voteForChoice(e, c),
-            label: hasVotedForChoice[c.toHex()]
-              ? `Voted ${hexToUtf8(c.toHex())}`
-              : `Vote ${hexToUtf8(c.toHex())}`,
-            compact: true,
-            rounded: true,
-          }),
-        ]);
-      });
-    }
     const yesButton = m('.yes-button', [
       m(Button, {
         intent: 'positive',
@@ -528,7 +457,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       }),
     ]);
     // moloch: cancel
-    const cancelButton = (proposal.votingType === VotingType.MolochYesNo) && m('.veto-button', [
+    const cancelButton = (proposal.votingType === VotingType.MolochYesNo) ? m('.veto-button', [
       m(Button, {
         intent: 'negative',
         disabled: !((proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed)
@@ -538,7 +467,16 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         compact: true,
         rounded: true,
       }),
-    ]);
+    ]) : (proposal.votingType === VotingType.MarlinYesNo) ? m('.veto-button', [
+      m(Button, {
+        intent: 'negative',
+        disabled: (proposal as MarlinProposal).isCanceled
+          || votingModalOpen,
+        onclick: cancelProposal,
+        label: (proposal as MarlinProposal).isCanceled ? 'Cancelled' : 'Cancel',
+        compact: true,
+      }),
+    ]) : null;
     // V2 only: moloch: sponsor
     // const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
     //  m(Button, {
@@ -565,7 +503,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     ]);
 
     let votingActionObj;
-    if (proposal.votingType === VotingType.SimpleYesNoVoting && !(proposal instanceof EdgewareSignalingProposal)) {
+    if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       votingActionObj = [
         m('.button-row', [yesButton, noButton]),
         m(ProposalExtensions, { proposal }),
@@ -589,13 +527,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         m('.button-row', [yesButton, noButton, abstainButton, noWithVetoButton]),
         m(ProposalExtensions, { proposal }),
       ];
-    } else if (proposal.votingType === VotingType.SimpleYesNoVoting
-               && (proposal instanceof EdgewareSignalingProposal)
-               && buttons.length === 2) {
-      votingActionObj = [
-        m('button-row', buttons),
-        m(ProposalExtensions, { proposal }),
-      ];
     } else if (proposal.votingType === VotingType.MultiOptionVoting && buttons.length > 0) {
       votingActionObj = [
         m('button-row', buttons),
@@ -606,6 +537,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         [ m('.button-row', [yesButton, noButton, /* sponsorButton, */processButton, cancelButton]),
           m(ProposalExtensions, { proposal }) ]
       ];
+    } else if (proposal.votingType === VotingType.MarlinYesNo) {
+      votingActionObj = [
+        m('.button-row', [yesButton, noButton, /** executeButton, queueButton, */ cancelButton])
+      ]
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
     } else if (proposal.votingType === VotingType.None) {

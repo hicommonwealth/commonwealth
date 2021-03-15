@@ -49,6 +49,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
 
   // Loads all proposals and referendums currently present in the democracy module
   public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    this._disabled = !ChainInfo.api.query.democracy;
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
     this._Chain = ChainInfo;
@@ -83,6 +84,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
       this.app.chain.id,
       () => this._Chain.fetcher.fetchDemocracyProposals(this.app.chain.block.height)
     );
+
     const hashes = events.map((e) => e.data.proposalHash);
     await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,

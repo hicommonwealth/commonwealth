@@ -1,6 +1,6 @@
 @import 'client/styles/shared';
 
-.ProposalsPage, .TreasuryPage, .ReferendaPage {
+.ProposalsPage, .TreasuryPage, .ReferendaPage, .DelegatePage {
     padding-bottom: 36px;
     .sublayout-body {
         flex-direction: column;
@@ -28,6 +28,24 @@
     .no-proposals {
         margin-top: 10px;
         color: $text-color-light;
+    }
+    .DelegateForm {
+        width: 380px;
+        max-width: 85%;
+        textarea {
+            min-height: 200px;
+        }
+        .council-motion-description {
+            margin-top: -12px;
+            margin-bottom: 22px;
+            color: $text-color-light;
+        }
+        .cui-form-label {
+            margin-bottom: 10px;
+        }
+        .cui-input {
+            margin-bottom: 10px;
+        }
     }
     @include sm-max {
         .stats-container {

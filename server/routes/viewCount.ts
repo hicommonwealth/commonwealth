@@ -67,7 +67,7 @@ const viewCount = async (models, cache: ViewCountCache, req: Request, res: Respo
     });
   }
 
-  return res.json({ status: 'Success', result: count });
+  return res.json({ status: 'Success', result: count.toJSON() });
 };
 
 export default viewCount;

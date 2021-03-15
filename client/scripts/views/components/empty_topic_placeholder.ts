@@ -16,7 +16,6 @@ export const EmptyStagePlaceholder: m.Component<{}> = {
 const EmptyTopicPlaceholder: m.Component<{ topicName?: string, communityName?: string }> = {
   view: (vnode) => {
     const { topicName, communityName } = vnode.attrs;
-
     return m('.EmptyTopicPlaceholder', [
       m('.icon-circle', [
         m(Icon, { name: Icons.HASH, size: 'xl' }),

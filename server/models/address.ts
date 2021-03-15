@@ -109,7 +109,17 @@ export default (
       { fields: ['address', 'chain'], unique: true },
       { fields: ['user_id'] },
       { fields: ['name'] }
-    ]
+    ],
+    defaultScope: {
+      attributes: {
+        exclude: [ 'verification_token', 'verification_token_expires', 'created_at', 'updated_at' ],
+      }
+    },
+    scopes: {
+      withPrivateData: {
+        attributes: {}
+      }
+    },
   });
 
   Address.createEmpty = (
@@ -168,9 +178,7 @@ export default (
     }
 
     let isValid;
-    if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot'
-        || chain.network === 'kulupu' || chain.network === 'plasm' || chain.network === 'stafi'
-        || chain.network === 'darwinia' || chain.network === 'phala' || chain.network === 'centrifuge') {
+    if (chain.base === 'substrate') {
       //
       // substrate address handling
       //
@@ -183,27 +191,7 @@ export default (
         }
         keyringOptions.type = addressModel.keytype;
       }
-      if (chain.network === 'kusama') {
-        keyringOptions.ss58Format = 2;
-      } else if (chain.network === 'edgeware') {
-        keyringOptions.ss58Format = 7; // edgeware chain id
-      } else if (chain.network === 'polkadot') {
-        keyringOptions.ss58Format = 0;
-      } else if (chain.network === 'kulupu') {
-        keyringOptions.ss58Format = 16;
-      } else if (chain.network === 'plasm') {
-        keyringOptions.ss58Format = 5;
-      } else if (chain.network === 'stafi') {
-        keyringOptions.ss58Format = 20;
-      } else if (chain.network === 'darwinia') {
-        keyringOptions.ss58Format = 18;
-      } else if (chain.network === 'phala') {
-        keyringOptions.ss58Format = 30;
-      } else if (chain.network === 'centrifuge') {
-        keyringOptions.ss58Format = 36;
-      } else {
-        keyringOptions.ss58Format = 42; // default chain id
-      }
+      keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
       const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
       const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
       const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
@@ -212,7 +200,7 @@ export default (
         : hexToU8a(`0x${signatureString}`);
       isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
         || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
-    } else if (chain.network === 'cosmos' || chain.network === 'straightedge') {
+    } else if (chain.base === 'cosmos') {
       //
       // cosmos-sdk address handling
       //
@@ -245,11 +233,7 @@ export default (
       } else {
         isValid = false;
       }
-    } else if (chain.network === 'ethereum'
-      || chain.network === 'moloch'
-      || chain.network === 'metacartel'
-      || chain.network === 'commonwealth'
-    ) {
+    } else if (chain.base === 'ethereum') {
       //
       // ethereum address handling
       //

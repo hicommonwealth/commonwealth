@@ -214,6 +214,23 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
+    .ProposalTitleEditor {
+        .ProposalTitleSaveEdit {
+            font-size: $discussion-meta-font-size;
+            color: $discussion-meta-color;
+        }
+        .cui-input {
+            margin-right: 10px;
+        }
+        .proposal-title-buttons {
+            display: inline-flex;
+            position: relative;
+            bottom: 5px;
+            .ProposalTitleCancelEdit {
+                margin-left: 5px;
+            }
+        }
+    }
     .ProposalHeaderStage,
     .ProposalHeaderStageEditorButton {
         position: relative;

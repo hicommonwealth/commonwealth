@@ -14,6 +14,7 @@ import {
   SubstrateTypes,
   IChainEntityKind,
 } from '@commonwealth/chain-events';
+import { notifyError } from '../app/notifications';
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -99,6 +100,12 @@ class ChainEntityController {
     this._handlers = {};
   }
 
+  public async _fetchTitle(chain: string, unique_id: string) {
+    return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
+      unique_id, chain
+    });
+  }
+
   private _handleEvents(chain: string, events: CWEvent[]) {
     for (const cwEvent of events) {
       // immediately return if no entity involved, event unrelated to proposals/etc
@@ -140,6 +147,29 @@ class ChainEntityController {
         }
       }
     }
+  }
+
+  public async updateEntityTitle(uniqueIdentifier: string, title: string) {
+    return $.ajax({
+      url: `${app.serverUrl()}/updateChainEntityTitle`,
+      type: 'POST',
+      data: {
+        'jwt': app.user.jwt,
+        'unique_id': uniqueIdentifier,
+        'title': title,
+        'chain': app.activeChainId(),
+      },
+      success: (response) => {
+        const entity = ChainEntity.fromJSON(response.result);
+        this._store.remove(entity);
+        this._store.add(entity);
+        return entity;
+      },
+      error: (err) => {
+        notifyError('Could not set entity title');
+        console.error(err);
+      },
+    });
   }
 
   public async fetchEntities<T extends CWEvent>(

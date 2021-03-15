@@ -121,7 +121,6 @@ export class SubstrateDemocracyReferendum
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public get title() { return this._title; }
   public get description() { return null; }
   public get author() { return null; }
   public get preimage() { return this._preimage; }
@@ -135,7 +134,7 @@ export class SubstrateDemocracyReferendum
   public canVoteFrom(account: Account<any>) {
     return account.chainBase === ChainBase.Substrate;
   }
-  private _title: string;
+  public title: string;
   private _preimage;
   private _endBlock: number;
   public readonly hash: string;
@@ -206,9 +205,9 @@ export class SubstrateDemocracyReferendum
     const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
       this._preimage = preimage;
-      this._title = formatCall(preimage);
+      this.title = formatCall(preimage);
     } else {
-      this._title = `Referendum #${this.data.index}`;
+      this.title = `Referendum #${this.data.index}`;
     }
 
     // handle events params for passing, if exists at init time
@@ -271,7 +270,7 @@ export class SubstrateDemocracyReferendum
         const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._preimage = preimage;
-          this._title = formatCall(preimage);
+          this.title = formatCall(preimage);
         }
         break;
       }
@@ -383,12 +382,9 @@ export class SubstrateDemocracyReferendum
   }
 
   // TRANSACTIONS
-  // TODO: allow the user to enter how much balance they want to vote with
   public async submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
     const conviction = convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index;
-
-    // fake the arg to compute balance
-    const balance = await (vote.account as SubstrateAccount).freeBalance;
+    const balance = this._Chain.coins(vote.amount, true);
 
     // "AccountVote" type, for kusama
     // we don't support "Split" votes right now
@@ -402,15 +398,7 @@ export class SubstrateDemocracyReferendum
       }
     };
 
-    // even though voting balance is specifiable, we pre-populate the voting balance as "all funds"
-    //   to align with old voting behavior -- we should change this soon.
-    // TODO: move this computation out into the view as needed, to prepopulate field
-    const fees = await this._Chain.computeFees(
-      vote.account.address,
-      (api: ApiPromise) => api.tx.democracy.vote(this.data.index, srmlVote)
-    );
-
-    srmlVote.Standard.balance = balance.sub(fees).toString();
+    srmlVote.Standard.balance = balance.toString();
 
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,

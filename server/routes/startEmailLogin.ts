@@ -32,7 +32,7 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.InvalidEmail));
   }
 
-  const previousUser = await models.User.findOne({
+  const previousUser = await models.User.scope('withPrivateData').findOne({
     where: {
       email,
     },
