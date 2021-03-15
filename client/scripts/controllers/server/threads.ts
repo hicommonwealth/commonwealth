@@ -48,9 +48,11 @@ export const modelFromServer = (thread) => {
     });
   }
 
-  const last_edited = thread.last_edited
+  const lastEdited = thread.last_edited
     ? moment(thread.last_edited)
-    : null;
+    : versionHistory
+      ? versionHistory.timestamp
+      : null;
 
   return new OffchainThread(
     thread.Address.address,
@@ -61,7 +63,7 @@ export const modelFromServer = (thread) => {
     thread.topic,
     thread.kind,
     thread.stage,
-    versionHistory || [],
+    versionHistory,
     thread.community,
     thread.chain,
     thread.read_only,
@@ -72,7 +74,7 @@ export const modelFromServer = (thread) => {
     thread.pinned,
     thread.collaborators,
     thread.chain_entities,
-    last_edited,
+    lastEdited,
   );
 };
 

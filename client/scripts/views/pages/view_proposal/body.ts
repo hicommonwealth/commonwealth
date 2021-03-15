@@ -152,6 +152,8 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
       if (item.lastEdited) {
         lastEdited = item.lastEdited;
       } else {
+        notifyError('No last-edited');
+        console.log(item);
         if (missingVersionHistory) return;
         const lastEdit : VersionHistory = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
         if (!lastEdit) return;
@@ -178,7 +180,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
             }
             app.modals.create({
               modal: VersionHistoryModal,
-              data: { item: grabHistory ? postWithHistory : item }
+              data: { item: (grabHistory && postWithHistory) ? postWithHistory : item }
             });
           }
         }, [
