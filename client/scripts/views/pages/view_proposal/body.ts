@@ -178,7 +178,6 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
       ])
     ]);
   }
-  }
 };
 
 export const ProposalBodyReplyMenuItem: m.Component<{
