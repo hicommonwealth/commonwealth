@@ -233,7 +233,6 @@ export default (
       } else {
         isValid = false;
       }
-<<<<<<< HEAD
     } else if (chain.network === 'ethereum'
       || chain.network === 'moloch'
       || chain.network === 'alex'
@@ -241,9 +240,6 @@ export default (
       || chain.network === 'commonwealth'
       || chain.type === "token"
     ) {
-=======
-    } else if (chain.base === 'ethereum') {
->>>>>>> master
       //
       // ethereum address handling
       //
