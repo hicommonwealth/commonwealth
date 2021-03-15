@@ -34,6 +34,7 @@ export enum ChainNetwork {
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  ERC20 = 'erc20',
 }
 
 export function networkToBase(n: ChainNetwork): ChainBase {
@@ -54,6 +55,7 @@ export function networkToBase(n: ChainNetwork): ChainBase {
     case ChainNetwork.Moloch: return ChainBase.Ethereum;
     case ChainNetwork.Metacartel: return ChainBase.Ethereum;
     case ChainNetwork.Commonwealth: return ChainBase.Ethereum;
+    case ChainNetwork.ERC20: return ChainBase.Ethereum;
     default: return null;
   }
 }
@@ -77,6 +79,7 @@ export enum ChainClass {
   Moloch = 'moloch',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
+  ERC20 = 'erc20',
 }
 
 // TODO: this is inconsistently used

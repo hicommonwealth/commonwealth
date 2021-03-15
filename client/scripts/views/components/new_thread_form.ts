@@ -26,6 +26,8 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
 
+import Token from 'controllers/chain/ethereum/token/adapter';
+
 interface IThreadForm {
   topicName?: string;
   topicId?: number;
@@ -150,7 +152,22 @@ const newThread = async (
   const communityId = app.activeCommunityId();
 
   let result;
-  try {
+  try {    
+    // see if app.chain.network is existing in network lists and if app.chain.isToken
+    const chains = {};
+    app.config.nodes.getAll().forEach((n) => {
+      if (chains[n.chain.id]) {
+        chains[n.chain.id].push(n);
+      } else {
+        chains[n.chain.id] = [n];
+      }
+    });
+
+    // TODO 
+    if(!chains[chainId] && (app.chain as Token).isToken) {
+
+    }
+
     result = await app.threads.create(
       author.address,
       kind,
@@ -170,6 +187,7 @@ const newThread = async (
     quillEditorState.editor.enable();
     throw new Error(e);
   }
+
   const activeEntity = app.activeCommunityId() ? app.community : app.chain;
   updateLastVisited(app.activeCommunityId()
     ? (activeEntity.meta as CommunityInfo)
@@ -664,6 +682,8 @@ export const NewThreadForm: m.Component<{
                   );
                 }
                 try {
+                  // TODO here
+                  // ------------
                   await newThread(form, quillEditorState, author);
                   vnode.state.overwriteConfirmationModal = true;
                   vnode.state.saving = false;

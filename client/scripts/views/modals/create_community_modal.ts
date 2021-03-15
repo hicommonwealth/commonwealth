@@ -107,6 +107,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
 
             vnode.state.disabled = true;
             vnode.state.success = false;
+
             // TODO: Change to POST /community
             $.post(`${app.serverUrl()}/createCommunity`, {
               creator_address: vnode.state.selectedAddress,
@@ -135,6 +136,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 result.result.invitesEnabled,
                 result.result.privacyEnabled,
                 true, // collapsedOnHomepage
+                true, // isInitialized
                 result.featured_topics,
                 result.topics,
               );

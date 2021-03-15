@@ -111,7 +111,7 @@ const NewProposalButton: m.Component<{
         label: 'New thread',
         fluid,
         disabled: !app.user.activeAccount
-          || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+       ,//   || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }
@@ -126,7 +126,7 @@ const NewProposalButton: m.Component<{
         hasArrow: false,
         trigger: m(Button, {
           disabled: !app.user.activeAccount
-            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+            ,//|| ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
           label: 'New thread',
         }),
         position: 'bottom-end',

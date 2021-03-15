@@ -24,6 +24,8 @@ import LoginModal from 'views/modals/login_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
+import getTokenLists from 'views/pages/home/token_lists';
+
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/home');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
@@ -178,6 +180,37 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   return true;
 }
 
+export async function createTemporaryCommunity(c?: CommunityInfo): Promise<boolean> {
+  // Check for valid community selection, and that we need to switch
+  if (app.community && c === app.community.meta) return;
+
+  // Shut down old chain if applicable
+  // TODO figure out why deinit
+  await deinitChainOrCommunity();
+
+  // Begin initializing the community
+  const newCommunity = new Community(c, app);
+  /*
+  const finalizeInitialization = await newCommunity.init();
+
+  // If the user is still in the initializing community, finalize the
+  // initialization; otherwise, abort and return false
+  if (!finalizeInitialization) {
+    return false;
+  } else {
+    app.community = newCommunity;
+  }*/
+
+  app.community = newCommunity;
+
+  console.log(`${c.name.toUpperCase()} started.`);
+
+  // Redraw with community fully loaded and return true to indicate
+  // initialization has finalized.
+  m.redraw();
+  return true;
+}
+
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
@@ -198,7 +231,9 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.chain && n === app.chain.meta) {
     return;
   }
-  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1) {
+  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1
+    && n.chain.type !== "token"
+  ) {
     throw new Error('invalid chain');
   }
 
@@ -210,6 +245,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
   let initApi; // required for NEAR
+
   if (n.chain.network === ChainNetwork.Edgeware) {
     const Edgeware = (await import(
       /* webpackMode: "lazy" */
@@ -309,7 +345,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
-  } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
+  } else if (n.chain.type === "token") {
     // const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */
@@ -380,8 +416,12 @@ export async function initChain(): Promise<void> {
   app.isAdapterReady = true;
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
-  // Instantiate (again) to create chain-specific Account<> objects
-  await updateActiveAddresses(n.chain);
+  if (app.community && app.community.isInitialized) {
+    // Instantiate (again) to create chain-specific Account<> objects
+    await updateActiveAddresses(n.chain);
+  } else {
+    app.user.setActiveAccounts([])
+  }
 
   // Finish redraw to remove loading dialog
   m.redraw();
@@ -394,6 +434,30 @@ export function initCommunity(communityId: string): Promise<boolean> {
   } else {
     throw new Error(`No community found for '${communityId}'`);
   }
+}
+
+export async function initTokenCommunity(address: string): Promise<boolean> {
+  // todo token list in localstorage
+  let tokenLists = await getTokenLists()
+  let token = tokenLists.find(o=>{ return o.address === address })
+
+  if(!token) { return false }
+
+  return createTemporaryCommunity(
+    new CommunityInfo(
+      token.symbol, 
+      token.name, 
+      "", 
+      token.logoURI, 
+      "", 
+      "", 
+      "", 
+      "", 
+      "", 
+      "ethereum",
+      false, false, false, false, false, [], []
+    )
+  )
 }
 
 // set up route navigation
@@ -501,12 +565,16 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
+
+
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
+
+      
       if (app.chain instanceof Token) deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },

@@ -149,7 +149,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     const subpage = (topic || stage) ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading, {
+    if (app.community && app.community.isInitialized && !activeEntity?.serverLoaded) return m(PageLoading, {
       title: topic || 'Discussions',
       showNewProposalButton: true,
     });
