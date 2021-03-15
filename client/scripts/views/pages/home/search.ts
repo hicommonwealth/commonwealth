@@ -35,7 +35,7 @@ const Search : m.Component<{ }> = {
         }, 
         onSelect: (item : any) => {
           searchValue = item.name
-          window.location.href = "/erc20-"+item.address
+          window.location.href = "/"+item.address
         },
         inputAttrs: {
           defaultValue: "Search for ERC20 token (name, address, ticker symbol)",

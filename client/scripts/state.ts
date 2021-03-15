@@ -17,6 +17,7 @@ import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -112,7 +113,12 @@ const app: IApp = {
 
   recentActivity: new RecentActivityController(),
 
-  activeChainId: () => app.chain ? app.chain.id : null,
+  activeChainId: () => app.chain 
+    ? 
+      (app.chain as Token).isToken && (app.chain as Token).isUninitialized
+      ? (app.chain as Token).contractAddress 
+      : app.chain.id 
+    : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
   defaultScope: () => app.config.defaultChain,

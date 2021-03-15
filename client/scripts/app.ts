@@ -180,16 +180,15 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   return true;
 }
 
-export async function createTemporaryCommunity(c?: CommunityInfo): Promise<boolean> {
+export async function createTemporaryTokenChain(n: NodeInfo): Promise<boolean> {
   // Check for valid community selection, and that we need to switch
-  if (app.community && c === app.community.meta) return;
+  if (app.chain && n === app.chain.meta) return;
 
   // Shut down old chain if applicable
-  // TODO figure out why deinit
   await deinitChainOrCommunity();
 
   // Begin initializing the community
-  const newCommunity = new Community(c, app);
+  //const newCommunity = new Community(c, app);
   /*
   const finalizeInitialization = await newCommunity.init();
 
@@ -201,9 +200,12 @@ export async function createTemporaryCommunity(c?: CommunityInfo): Promise<boole
     app.community = newCommunity;
   }*/
 
-  app.community = newCommunity;
+  //app.community = newCommunity;
 
-  console.log(`${c.name.toUpperCase()} started.`);
+  const newToken = new Token(n, app)
+  app.chain = newToken;
+
+  console.log(`${n.name.toUpperCase()} started.`);
 
   // Redraw with community fully loaded and return true to indicate
   // initialization has finalized.
@@ -245,7 +247,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
   let initApi; // required for NEAR
-
   if (n.chain.network === ChainNetwork.Edgeware) {
     const Edgeware = (await import(
       /* webpackMode: "lazy" */
@@ -366,7 +367,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
-  } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
+  } else if (n.chain.type === "token") {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */
@@ -437,7 +438,7 @@ export async function initChain(): Promise<void> {
   app.isAdapterReady = true;
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
-  if (app.community && app.community.isInitialized) {
+  if (app.community) {
     // Instantiate (again) to create chain-specific Account<> objects
     await updateActiveAddresses(n.chain);
   } else {
@@ -457,26 +458,36 @@ export function initCommunity(communityId: string): Promise<boolean> {
   }
 }
 
-export async function initTokenCommunity(address: string): Promise<boolean> {
+export async function initTemporaryTokenChain(address: string): Promise<boolean> {
   // todo token list in localstorage
   let tokenLists = await getTokenLists()
   let token = tokenLists.find(o=>{ return o.address === address })
 
   if(!token) { return false }
 
-  return createTemporaryCommunity(
-    new CommunityInfo(
-      token.symbol, 
-      token.name, 
-      "", 
-      token.logoURI, 
-      "", 
-      "", 
-      "", 
-      "", 
-      "", 
-      "ethereum",
-      false, false, false, false, false, [], []
+  // Update active addresses w Ethereum address
+ // updateActiveAddresses(n.chain)
+
+  return createTemporaryTokenChain(
+    new NodeInfo(
+      0,
+      new ChainInfo (
+        token.address,
+        "",
+        token.symbol, 
+        token.name, 
+        token.logoURI, 
+        "",
+        "", 
+        "", 
+        "", 
+        "", 
+        "ethereum",
+        false, false, false, false, false, [], []  
+      ),
+      "",
+      token.address,
+      true
     )
   )
 }

@@ -27,10 +27,6 @@ abstract class ICommunityAdapter<C extends Coin, A extends Account<C>> {
   get id() {
     return this.meta.id;
   }
-
-  get isInitialized() {
-    return this.meta.isInitialized;
-  }
 }
 
 export default ICommunityAdapter;

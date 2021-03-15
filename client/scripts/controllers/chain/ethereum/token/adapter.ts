@@ -19,6 +19,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
   public readonly class;
   public readonly contractAddress;
   public readonly isToken = true;
+  public readonly isUninitialized: boolean = false;
 
   public chain: EthereumTokenChain;
   public accounts: EthereumAccounts;
@@ -33,6 +34,7 @@ export default class Token extends IChainAdapter<EthereumCoin, EthereumAccount> 
     this.accounts = new EthereumAccounts(this.app);
     this.class = meta.chain.network;
     this.contractAddress = meta.address;
+    this.isUninitialized = meta.isUninitialized;
   }
 
   public async initApi() {

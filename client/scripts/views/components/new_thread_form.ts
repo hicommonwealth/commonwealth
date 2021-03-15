@@ -145,27 +145,37 @@ const newThread = async (
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
 
-  const { topicName, topicId, threadTitle, linkTitle, url } = form;
+  let { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
 
+  const chains = {};
+  app.config.nodes.getAll().forEach((n) => {
+    if (chains[n.chain.id]) {
+      chains[n.chain.id].push(n);
+    } else {
+      chains[n.chain.id] = [n];
+    }
+  });
+
+  const isNewChain = !chains[chainId] && (app.chain as Token).isToken 
+  && (app.chain as Token).isUninitialized;
+
   let result;
   try {    
     // see if app.chain.network is existing in network lists and if app.chain.isToken
-    const chains = {};
-    app.config.nodes.getAll().forEach((n) => {
-      if (chains[n.chain.id]) {
-        chains[n.chain.id].push(n);
-      } else {
-        chains[n.chain.id] = [n];
+
+    let newChainInfo = null
+    if(isNewChain) {
+      newChainInfo = {
+        address: app.chain.id,
+        iconUrl: app.chain.meta.chain.iconUrl,
+        name: app.chain.meta.chain.name,
+        symbol: app.chain.meta.chain.symbol,
       }
-    });
-
-    // TODO 
-    if(!chains[chainId] && (app.chain as Token).isToken) {
-
+      topicName = "General"
     }
 
     result = await app.threads.create(
@@ -181,6 +191,8 @@ const newThread = async (
       url,
       attachments,
       readOnly,
+      isNewChain,
+      newChainInfo
     );
   } catch (e) {
     console.error(e);
@@ -188,12 +200,20 @@ const newThread = async (
     throw new Error(e);
   }
 
+  const filteredName = app.chain.meta.chain.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+
   const activeEntity = app.activeCommunityId() ? app.community : app.chain;
   updateLastVisited(app.activeCommunityId()
     ? (activeEntity.meta as CommunityInfo)
     : (activeEntity.meta as NodeInfo).chain, true);
   await app.user.notifications.refresh();
-  m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
+  m.route.set(`/${
+    isNewChain 
+    ?
+    filteredName
+    :
+    app.activeId()
+  }/proposal/discussion/${result.id}`);
 
   if (result.topic) {
     try {

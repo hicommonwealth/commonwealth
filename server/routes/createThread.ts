@@ -18,15 +18,47 @@ export const Errors = {
   NoBodyOrAttachments: 'Forum posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
-<<<<<<< HEAD
-  InsufficientTokenBalance: 'User does not have sufficient token balance to post',
-=======
   InsufficientTokenBalance: `Users need to hold some of the community's tokens to post`,
->>>>>>> master
 };
 
+const createChainForThread = async (models, newChainInfoString) => {
+  try {
+    const newChainInfo = JSON.parse(newChainInfoString)
+    const createdId = newChainInfo.name.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+    const chainContent = {
+      id: createdId,
+      active: true,
+      network: createdId,
+      type: "token",
+      icon_url: newChainInfo.iconUrl,
+      symbol: newChainInfo.symbol, 
+      name: newChainInfo.name,
+      default_chain: 'ethereum',
+      base: 'ethereum',
+    };
+
+    const chainNodeContent = {
+      chain: createdId,
+      url: "wss://mainnet.infura.io/ws",
+      address: newChainInfo.address
+    }
+      const chain = await models.Chain.create(chainContent);
+      await models.ChainNode.create(chainNodeContent);
+
+      return [chain, null, null]
+  } catch(e) {
+    return [null, null, e]
+  }
+}
 const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  let chain, community, error;
+  if(req.body.isNewChain) {
+    [chain, community, error] = await createChainForThread(models, req.body.newChainInfo)
+    chain.topics = []
+  } else {
+    [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  } 
+
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -40,8 +72,10 @@ const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: R
       },
     });
     if (isAdmin.length === 0) {
+      //TODO, figure out how to check to see if the user has the token
+      /*
       const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
-      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));*/
     }
   }
 

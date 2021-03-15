@@ -2,7 +2,7 @@ import 'layout.scss';
 
 import m from 'mithril';
 
-import { initChain, initCommunity, initTokenCommunity, deinitChainOrCommunity, selectNode } from 'app';
+import { initChain, initCommunity, initTemporaryTokenChain, deinitChainOrCommunity, selectNode } from 'app';
 import app from 'state';
 
 import Sublayout from 'views/sublayout';
@@ -39,7 +39,7 @@ export const Layout: m.Component<{
 
     //Is Ethereum Address
     function isEthereumAddress(name : string) {
-      return name.startsWith("erc20-0x") && name.length==48
+      return name.startsWith("0x") && name.length==42
     }
 
     if (app.loadingError) {
@@ -56,7 +56,7 @@ export const Layout: m.Component<{
       return m(LoadingLayout, { hideSidebar });
     } else if (scope && isEthereumAddress(scope) && scope !== vnode.state.loadingScope) {
       vnode.state.loadingScope = scope;
-      initTokenCommunity(scope.substr("erc20-".length));
+      initTemporaryTokenChain(scope);
       return m(LoadingLayout, { hideSidebar });
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity && !isEthereumAddress(scope)) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
