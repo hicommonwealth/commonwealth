@@ -165,7 +165,8 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
           onclick: async (e) => {
             e.preventDefault();
             let postWithHistory;
-            if (isThread && missingVersionHistory) {
+            const grabHistory = isThread && missingVersionHistory;
+            if (grabHistory) {
               try {
                 console.log('fetching thread');
                 postWithHistory = await app.threads.fetchThread(item.id);
@@ -177,7 +178,7 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
             }
             app.modals.create({
               modal: VersionHistoryModal,
-              data: isThread ? { proposal: postWithHistory } : { comment: item }
+              data: { item: grabHistory ? postWithHistory : item }
             });
           }
         }, [
