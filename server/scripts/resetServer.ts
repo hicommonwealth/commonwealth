@@ -311,7 +311,7 @@ const resetServer = (models): Promise<number> => {
         models.Chain.create({
           id: 'moloch',
           network: 'moloch',
-          symbol: 'Moloch',
+          symbol: 'SHARE',
           name: 'Moloch',
           icon_url: '/static/img/protocols/molochdao.png',
           active: true,
@@ -322,7 +322,7 @@ const resetServer = (models): Promise<number> => {
         models.Chain.create({
           id: 'metacartel',
           network: 'metacartel',
-          symbol: 'Metacartel',
+          symbol: 'SHARE',
           name: 'Metacartel',
           icon_url: '/static/img/protocols/metacartel.png',
           active: true,
@@ -332,7 +332,7 @@ const resetServer = (models): Promise<number> => {
         models.Chain.create({
           id: 'moloch-local',
           network: 'moloch',
-          symbol: 'Moloch',
+          symbol: 'SHARE',
           name: 'Moloch (local)',
           icon_url: '/static/img/protocols/molochdao.png',
           active: true,
@@ -342,7 +342,7 @@ const resetServer = (models): Promise<number> => {
         models.Chain.create({
           id: 'marlin',
           network: 'marlin',
-          symbol: 'Marlin',
+          symbol: 'LIN',
           name: 'Marlin',
           icon_url: '/static/img/protocols/eth.png',
           active: true,
@@ -351,11 +351,29 @@ const resetServer = (models): Promise<number> => {
         models.Chain.create({
           id: 'marlin-local',
           network: 'marlin',
-          symbol: 'Marlin',
+          symbol: 'LIN',
           name: 'Marlin (local)',
           icon_url: '/static/img/protocols/eth.png',
           active: true,
           type: 'dao',
+        }),
+        models.Chain.create({
+          id: 'clover',
+          network: 'clover',
+          symbol: 'CLOV',
+          name: 'Clover',
+          icon_url: '/static/img/protocols/clover.png',
+          active: true,
+          type: 'chain',
+        }),
+        models.Chain.create({
+          id: 'hydradx',
+          network: 'hydradx',
+          symbol: 'HDX',
+          name: 'HydraDX',
+          icon_url: '/static/img/protocols/hydradx.png',
+          active: true,
+          type: 'chain',
         }),
         models.Chain.create({
           id: 'alex-ropsten',
