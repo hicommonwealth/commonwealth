@@ -21,7 +21,9 @@ module.exports = {
     });
 
     Promise.all(insertHistoryQueries.map((insertQuery) => {
-      return queryInterface.sequelize.query(insertQuery);
+      if (insertQuery) {
+        return queryInterface.sequelize.query(insertQuery);
+      }
     }));
   },
 
