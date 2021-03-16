@@ -35,14 +35,18 @@ const tokenBalanceCache = new TokenBalanceCache(0, 0);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
+const sessionStore = new SequelizeStore({
+  db: models.sequelize,
+  tableName: 'Sessions',
+  checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
+  expiration: 7 * 24 * 60 * 60 * 1000 // Set session expiration to 7 days
+});
+
+sessionStore.sync();
+
 const sessionParser = session({
   secret: SESSION_SECRET,
-  store: new SequelizeStore({
-    db: models.sequelize,
-    tableName: 'Sessions',
-    checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 7 * 24 * 60 * 60 * 1000 // Set session expiration to 7 days
-  }),
+  store: sessionStore,
   resave: false,
   saveUninitialized: true,
 });
