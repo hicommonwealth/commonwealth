@@ -19,18 +19,18 @@ const updateChainEntityTitle = async (models, req: Request, res: Response, next:
     return !!addr.verified;
   }).map((addr) => addr.id);
   // Todo: author check
-  // if (!userOwnedAddressIds.includes(entity.address_id)) {
-  const roles = await models.Role.findAll({
-    where: {
-      address_id: { [Op.in]: userOwnedAddressIds, },
-      permission: { [Op.in]: ['admin', 'moderator'] },
-    }
-  });
-  const role = roles.find((r) => {
-    return r.offchain_community_id === entity.community || r.chain_id === entity.chain;
-  });
-  if (!role) return next(new Error(Errors.NotAdminOrOwner));
-  // }
+  if (!userOwnedAddressIds.includes(entity.address_id)) {
+    const roles = await models.Role.findAll({
+      where: {
+        address_id: { [Op.in]: userOwnedAddressIds, },
+        permission: { [Op.in]: ['admin', 'moderator'] },
+      }
+    });
+    const role = roles.find((r) => {
+      return r.offchain_community_id === entity.community || r.chain_id === entity.chain;
+    });
+    if (!role) return next(new Error(Errors.NotAdminOrOwner));
+  }
 
   entity.title = title;
   await entity.save();
