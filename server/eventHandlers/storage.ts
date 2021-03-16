@@ -2,10 +2,11 @@
  * Generic handler that stores the event in the database.
  */
 import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/chain-events';
-
+import Sequelize from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
+const { Op } = Sequelize;
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
@@ -29,13 +30,39 @@ export default class extends IEventHandler {
     return event;
   }
 
+  private async _isEventSkipped(event: CWEvent): Promise<boolean> {
+    if (this._excludedEvents.includes(event.data.kind)) return true;
+
+    // if using includeAddresses, check against db to see if addresses exist
+    // TODO: we can eliminate more addresses by searching for held subscriptions rather than
+    //    addresses (see subscription.ts), but this is a good start.
+    // NOTE: this is currently only used by staking events, but may be expanded in the future.
+    //   DO NOT USE INCLUDE ADDRESSES FOR CHAIN ENTITY-RELATED EVENTS.
+    if (event.includeAddresses) {
+      const addressModels = await this._models.Address.findAll({
+        where: {
+          address: {
+            // TODO: we need to ensure the chain prefixes are correct here
+            [Op.in]: event.includeAddresses,
+          },
+          chain: this._chain,
+        },
+      });
+      if (!addressModels?.length) return true;
+    }
+
+    // TODO: special logic for large transfer events even if addresses not found
+    return false;
+  }
+
   /**
    * Handles an event by creating a ChainEvent in the database.
    */
   public async handle(event: CWEvent) {
     event = this.truncateEvent(event);
     log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
-    if (this._excludedEvents.includes(event.data.kind)) {
+    const isSkipped = await this._isEventSkipped(event);
+    if (isSkipped) {
       log.trace('Skipping event!');
       return;
     }
