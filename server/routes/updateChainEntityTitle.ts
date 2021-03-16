@@ -15,11 +15,13 @@ const updateChainEntityTitle = async (models, req: Request, res: Response, next:
 
   const entity = await proposalIdToEntity(models, chain.id, unique_id);
   if (!entity) return next(new Error(Errors.NoEntity));
-  const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => {
-    return !!addr.verified;
-  }).map((addr) => addr.id);
+  const userOwnedAddressObjects = await req.user.getAddresses()
+    .filter((addr) => !!addr.verified);
+  const userOwnedAddresses = userOwnedAddressObjects.map((addr) => addr.address);
+  const userOwnedAddressIds = userOwnedAddressObjects.map((addr) => addr.address);
+
   // Todo: author check
-  if (!userOwnedAddressIds.includes(entity.address_id)) {
+  if (!userOwnedAddresses.includes(entity.author)) {
     const roles = await models.Role.findAll({
       where: {
         address_id: { [Op.in]: userOwnedAddressIds, },
