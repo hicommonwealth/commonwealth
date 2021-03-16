@@ -160,7 +160,6 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
           if (grabHistory) {
             try {
               postWithHistory = await app.threads.fetchThread(item.id);
-              console.log(postWithHistory);
             } catch (err) {
               notifyError('Version history not found.');
               return;
