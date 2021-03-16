@@ -11,24 +11,24 @@ module.exports = {
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn(
         'OffchainThreads', 'private',
-        { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+        { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
         { transaction: t },
       );
       await queryInterface.createTable('read_only_roles_threads', {
-        id: { type: DataTypes.INTEGER, allowNull: false },
-        thread_id: { type: DataTypes.INTEGER, allowNull: false },
-        created_at: { type: DataTypes.DATE, allowNull: false },
-        updated_at: { type: DataTypes.DATE, allowNull: false },
+        id: { type: Sequelize.INTEGER, allowNull: false },
+        thread_id: { type: Sequelize.INTEGER, allowNull: false },
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        updated_at: { type: Sequelize.DATE, allowNull: false },
       }, { transaction: t });
       await queryInterface.createTable('private_threads_roles', {
-        id: { type: DataTypes.INTEGER, allowNull: false },
-        thread_id: { type: DataTypes.INTEGER, allowNull: false },
-        created_at: { type: DataTypes.DATE, allowNull: false },
-        updated_at: { type: DataTypes.DATE, allowNull: false },
+        id: { type: Sequelize.INTEGER, allowNull: false },
+        thread_id: { type: Sequelize.INTEGER, allowNull: false },
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        updated_at: { type: Sequelize.DATE, allowNull: false },
       }, { transaction: t });
     });
   }

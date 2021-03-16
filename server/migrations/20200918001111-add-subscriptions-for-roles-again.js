@@ -2,7 +2,7 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, DataTypes) => {
+  up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
 
       const users = await queryInterface.sequelize.query(`SELECT * FROM "Users";`, { transaction: t, });
@@ -54,7 +54,7 @@ module.exports = {
     });
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await Promise.all([]);
     });

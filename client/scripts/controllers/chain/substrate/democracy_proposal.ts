@@ -1,8 +1,6 @@
 import _ from 'underscore';
-import { takeWhile } from 'rxjs/operators';
-import { Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
-import { ApiRx } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { Vec } from '@polkadot/types';
 import { ITuple } from '@polkadot/types/types';
 import { AccountId, BalanceOf } from '@polkadot/types/interfaces';
@@ -14,6 +12,7 @@ import {
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
@@ -33,7 +32,7 @@ const backportEventToAdapter = (
 };
 
 class SubstrateDemocracyProposal extends Proposal<
-  ApiRx,
+  ApiPromise,
   SubstrateCoin,
   ISubstrateDemocracyProposal,
   DepositVote<SubstrateCoin>
@@ -42,8 +41,7 @@ class SubstrateDemocracyProposal extends Proposal<
     return `#${this.identifier.toString()}`;
   }
 
-  private _title: string;
-  public get title() { return this._title; }
+  public title: string;
 
   public get description() { return null; }
 
@@ -88,8 +86,6 @@ class SubstrateDemocracyProposal extends Proposal<
   private _Accounts: SubstrateAccounts;
   private _Proposals: SubstrateDemocracyProposals;
 
-  private _depositSubscription: Unsubscribable;
-
   public get blockExplorerLink() {
     const chainInfo = this._Chain.app.chain?.meta?.chain;
     const blockExplorerIds = chainInfo?.blockExplorerIds;
@@ -97,6 +93,7 @@ class SubstrateDemocracyProposal extends Proposal<
       const subdomain = blockExplorerIds['subscan'];
       return `https://${subdomain}.subscan.io/democracy_proposal/${this.identifier}`;
     }
+    return undefined;
   }
 
   public get blockExplorerLinkLabel() {
@@ -147,23 +144,33 @@ class SubstrateDemocracyProposal extends Proposal<
       this._method = preimage.method;
       this._section = preimage.section;
       this._preimage = preimage;
-      this._title = formatCall(preimage);
+      this.title = entity.title || formatCall(preimage);
     } else {
-      this._title = `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
+      this.title = entity.title || `Proposal ${formatProposalHashShort(eventData.proposalHash)}`;
     }
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
-    this._depositSubscription = this._subscribeDepositors();
-    this._Proposals.store.add(this);
+    if (!this._completed) {
+      const slug = chainEntityTypeToProposalSlug(entity.type);
+      const uniqueId = `${slug}_${entity.typeId}`;
+      this._Proposals.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
+        if (response.status === 'Success' && response.result?.length) {
+          this.title = response.result;
+        }
+        this._initialized = true;
+        this.updateVoters();
+        this._Proposals.store.add(this);
+      });
+    } else {
+      this._initialized = true;
+      this.updateVoters();
+      this._Proposals.store.add(this);
+    }
   }
 
   protected complete() {
     super.complete(this._Proposals.store);
-    if (this._depositSubscription) {
-      this._depositSubscription.unsubscribe();
-    }
   }
 
   public update(e: ChainEvent) {
@@ -187,7 +194,7 @@ class SubstrateDemocracyProposal extends Proposal<
           this._method = preimage.method;
           this._section = preimage.section;
           this._preimage = preimage;
-          this._title = formatCall(preimage);
+          this.title = this.title || formatCall(preimage);
         }
         break;
       }
@@ -197,30 +204,27 @@ class SubstrateDemocracyProposal extends Proposal<
     }
   }
 
-  private _subscribeDepositors(): Unsubscribable {
-    return this._Chain.query((api) => api.query.democracy.depositOf(this.data.index))
-      .pipe(takeWhile((v) => v.isSome))
-      .subscribe((depositOpt) => {
-        const depositorsTuple: ITuple<[ BalanceOf | Vec<AccountId>, BalanceOf | Vec<AccountId> ]> = depositOpt.unwrap();
-        let depositors: Vec<AccountId>;
-        if (isFunction((depositorsTuple[1] as BalanceOf).mul)) {
-          depositors = depositorsTuple[0] as Vec<AccountId>;
-        } else {
-          depositors = depositorsTuple[1] as Vec<AccountId>;
-        }
-        // eslint-disable-next-line no-restricted-syntax
-        for (const depositor of depositors) {
-          const acct = this._Accounts.fromAddress(depositor.toString());
-          const votes = this.getVotes(acct);
-          if (!votes.length) {
-            this.addOrUpdateVote(new DepositVote(acct, this._Chain.coins(this.data.deposit)));
-          } else {
-            // if they second a proposal multiple times, sum up the vote weight
-            const vote = new DepositVote(acct, this._Chain.coins(votes[0].deposit.add(this.data.deposit)));
-            this.addOrUpdateVote(vote);
-          }
-        }
-      });
+  public updateVoters = async () => {
+    const depositOpt = await this._Chain.api.query.democracy.depositOf(this.data.index);
+    if (!depositOpt.isSome) return;
+    const depositorsTuple: ITuple<[ BalanceOf | Vec<AccountId>, BalanceOf | Vec<AccountId> ]> = depositOpt.unwrap();
+    let depositors: Vec<AccountId>;
+    if (isFunction((depositorsTuple[1] as BalanceOf).mul)) {
+      depositors = depositorsTuple[0] as Vec<AccountId>;
+    } else {
+      depositors = depositorsTuple[1] as Vec<AccountId>;
+    }
+    for (const depositor of depositors) {
+      const acct = this._Accounts.fromAddress(depositor.toString());
+      const votes = this.getVotes(acct);
+      if (!votes.length) {
+        this.addOrUpdateVote(new DepositVote(acct, this._Chain.coins(this.data.deposit)));
+      } else {
+        // if they second a proposal multiple times, sum up the vote weight
+        const vote = new DepositVote(acct, this._Chain.coins(votes[0].deposit.add(this.data.deposit)));
+        this.addOrUpdateVote(vote);
+      }
+    }
   }
 
   // GETTERS AND SETTERS
@@ -253,7 +257,7 @@ class SubstrateDemocracyProposal extends Proposal<
     // deposit parameter is ignored
 
     // handle differing versions of substrate API
-    const txFunc = (api: ApiRx) => {
+    const txFunc = (api: ApiPromise) => {
       if ((api.tx.democracy.second as any).meta.args.length === 2) {
         return api.tx.democracy.second(this.data.index, this.getVoters().length);
       } else {

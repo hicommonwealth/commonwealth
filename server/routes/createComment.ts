@@ -7,6 +7,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
+import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 
 import { SENDGRID_API_KEY } from '../config';
@@ -22,13 +23,29 @@ export const Errors = {
   ThreadNotFound: 'Cannot comment; thread not found',
   // ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
+  InsufficientTokenBalance: `Users need to hold some of the community's tokens to comment`,
 };
 
-const createComment = async (models, req: Request, res: Response, next: NextFunction) => {
+const createComment = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
+  if (chain && chain.type === 'token') {
+    // skip check for admins
+    const isAdmin = await models.Role.findAll({
+      where: {
+        address_id: author.id,
+        chain_id: chain.id,
+        permission: ['admin'],
+      },
+    });
+    if (isAdmin.length === 0) {
+      const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
+      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+    }
+  }
+
   const { parent_id, root_id, text } = req.body;
 
   const plaintext = (() => {

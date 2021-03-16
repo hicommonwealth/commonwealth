@@ -1,34 +1,31 @@
 import m from 'mithril';
-import moment from 'moment';
 import app from 'state';
 
 import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
 
 import {
-  pluralize, link, externalLink, isSameAccount, extractDomain,
-  offchainThreadStageToLabel, offchainThreadStageToIndex,
+  pluralize, link, externalLink, extractDomain,
+  offchainThreadStageToLabel,
+  slugify,
 } from 'helpers';
-import { proposalSlugToFriendlyName } from 'identifiers';
+import {
+  proposalSlugToFriendlyName,
+  chainEntityTypeToProposalSlug,
+  chainEntityTypeToProposalName,
+  ProposalType
+} from 'identifiers';
 
 import {
   OffchainThread,
   OffchainThreadKind,
   OffchainThreadStage,
-  OffchainComment,
-  Proposal,
   AnyProposal,
-  Account,
-  Profile,
-  ChainBase,
 } from 'models';
-import { NotificationCategories } from 'types';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import User from 'views/components/widgets/user';
-import { getStatusClass, getStatusText, getSupportText } from 'views/components/proposal_row';
-import VersionHistoryModal from 'views/modals/version_history_modal';
-import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
-import { GlobalStatus } from './body';
+import { getStatusClass, getStatusText } from 'views/components/proposal_row';
+import { notifySuccess } from 'controllers/app/notifications';
+import { activeQuillEditorHasText, GlobalStatus } from './body';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -71,6 +68,26 @@ export const ProposalHeaderVotingInterfaceLink: m.Component<{ proposal: AnyPropo
   }
 };
 
+export const ProposalHeaderThreadLinkedChainEntity: m.Component<{ proposal: OffchainThread, chainEntity }> = {
+  view: (vnode) => {
+    const { proposal, chainEntity } = vnode.attrs;
+    const slug = chainEntityTypeToProposalSlug(chainEntity.type);
+    if (!slug) return;
+
+    return m('.ProposalHeaderThreadLinkedChainEntity', [
+      link(
+        'a',
+        `/${proposal.chain}/proposal/${slug}/${chainEntity.typeId}`,
+        [
+          `${chainEntityTypeToProposalName(chainEntity.type)} #${chainEntity.typeId}`,
+          chainEntity.completed === 't' ? ' (Completed) ' : ' ',
+          m(Icon, { name: Icons.EXTERNAL_LINK }),
+        ],
+      ),
+    ]);
+  }
+};
+
 export const ProposalHeaderSpacer: m.Component<{}> = {
   view: (vnode) => {
     return m('.ProposalHeaderSpacer', m.trust('&middot;'));
@@ -88,7 +105,6 @@ export const ProposalHeaderTopics: m.Component<{ proposal: AnyProposal | Offchai
 
     return m('.ProposalHeaderTopics', [
       link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
-        m('span.proposal-topic-icon'),
         m('span.proposal-topic-name', `${proposal.topic?.name}`),
       ]),
     ]);
@@ -138,6 +154,22 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
   }
 };
 
+export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
+  view: (vnode) => {
+    const { openStageEditor } = vnode.attrs;
+    return m(Button, {
+      class: 'ProposalHeaderStageEditorButton',
+      rounded: true,
+      size: 'xs',
+      label: 'Select stage',
+      onclick: (e) => {
+        e.preventDefault();
+        openStageEditor();
+      },
+    });
+  }
+};
+
 export const ProposalHeaderOnchainId: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -164,36 +196,130 @@ export const ProposalHeaderViewCount: m.Component<{ viewCount: number }> = {
   }
 };
 
-export const ProposalTitleEditor: m.Component<{ item: OffchainThread | AnyProposal, parentState }> = {
-  oninit: (vnode) => {
-    vnode.attrs.parentState.updatedTitle = vnode.attrs.item.title;
-  },
+export const ProposalTitleEditMenuItem: m.Component<{
+  item: AnyProposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
+}> = {
   view: (vnode) => {
-    const { item, parentState } = vnode.attrs;
+    const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
     if (!item) return;
-    const isThread = item instanceof OffchainThread;
-    const body = item instanceof OffchainComment
-      ? item.text
-      : (item instanceof OffchainThread
-        ? item.body
-        : null);
-    if (!body) return;
 
-    return m(Input, {
-      size: 'lg',
-      name: 'edit-thread-title',
-      autocomplete: 'off',
-      oninput: (e) => {
-        const { value } = (e as any).target;
-        parentState.updatedTitle = value;
+    return m(MenuItem, {
+      label: 'Edit title',
+      class: 'edit-proposal-title',
+      onclick: async (e) => {
+        e.preventDefault();
+        if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
+          if (activeQuillEditorHasText()) {
+            const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
+            if (!confirmed) return;
+          }
+          getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+        }
+        parentState.editing = true;
+        getSetGlobalEditingStatus(GlobalStatus.Set, true);
       },
-      defaultValue: parentState.updatedTitle,
-      tabindex: 1,
     });
   }
 };
 
-export const ProposalHeaderPrivacyButtons: m.Component<{
+// Component for saving chain proposal titles
+export const ProposalTitleSaveEdit: m.Component<{
+  proposal: AnyProposal,
+  getSetGlobalEditingStatus,
+  parentState,
+}> = {
+  view: (vnode) => {
+    const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
+    if (!proposal) return;
+    const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
+      + `-${slugify(proposal.title)}`;
+
+    return m('.ProposalTitleSaveEdit', [
+      m(Button, {
+        class: 'save-editing',
+        label: 'Save',
+        disabled: parentState.saving,
+        intent: 'primary',
+        rounded: true,
+        onclick: (e) => {
+          e.preventDefault();
+          parentState.saving = true;
+          app.chain.chainEntities.updateEntityTitle(proposal.uniqueIdentifier, parentState.updatedTitle).then((response) => {
+            m.route.set(proposalLink);
+            parentState.editing = false;
+            parentState.saving = false;
+            getSetGlobalEditingStatus(GlobalStatus.Set, false);
+            proposal.title = parentState.updatedTitle;
+            m.redraw();
+            notifySuccess('Thread successfully edited');
+          });
+        }
+      }, 'Save'),
+    ]);
+  }
+};
+
+export const ProposalTitleCancelEdit: m.Component<{ proposal, getSetGlobalEditingStatus, parentState }> = {
+  view: (vnode) => {
+    const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
+
+    return m('.ProposalTitleCancelEdit', [
+      m(Button, {
+        class: 'cancel-editing',
+        label: 'Cancel',
+        disabled: parentState.saving,
+        intent: 'none',
+        rounded: true,
+        onclick: async (e) => {
+          e.preventDefault();
+          parentState.editing = false;
+          parentState.saving = false;
+          getSetGlobalEditingStatus(GlobalStatus.Set, false);
+          m.redraw();
+        }
+      }, 'Cancel')
+    ]);
+  }
+};
+
+export const ProposalTitleEditor: m.Component<{
+  item: OffchainThread | AnyProposal,
+  getSetGlobalEditingStatus,
+  parentState
+}> = {
+  oninit: (vnode) => {
+    vnode.attrs.parentState.updatedTitle = vnode.attrs.item.title;
+  },
+  view: (vnode) => {
+    const { item, parentState, getSetGlobalEditingStatus } = vnode.attrs;
+    if (!item) return;
+    const isThread = (item instanceof OffchainThread);
+
+    return m('.ProposalTitleEditor', [
+      m(Input, {
+        size: 'lg',
+        name: 'edit-thread-title',
+        autocomplete: 'off',
+        oninput: (e) => {
+          const { value } = (e as any).target;
+          parentState.updatedTitle = value;
+        },
+        defaultValue: parentState.updatedTitle,
+        tabindex: 1,
+      }),
+      !isThread && m('.proposal-title-buttons', [
+        m(ProposalTitleSaveEdit, {
+          proposal: (item as AnyProposal), getSetGlobalEditingStatus, parentState
+        }),
+        m(ProposalTitleCancelEdit, {
+          proposal: (item as AnyProposal), getSetGlobalEditingStatus, parentState
+        })
+      ])
+    ]);
+  }
+};
+
+export const ProposalHeaderPrivacyMenuItems: m.Component<{
   proposal: AnyProposal | OffchainThread,
   getSetGlobalEditingStatus: CallableFunction
 }> = {

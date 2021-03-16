@@ -37,7 +37,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    await this.webWallet.enable();
+    // await this.webWallet.enable();
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
     const api = new MolochAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
@@ -77,7 +77,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
-    this.chain.deinitApi();
+    await this.chain.deinitApi();
     console.log('Ethereum/Moloch stopped.');
   }
 }

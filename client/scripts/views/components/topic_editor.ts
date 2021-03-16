@@ -83,7 +83,7 @@ const TopicEditor: m.Component<{
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
-            label: 'Close',
+            label: 'Cancel',
             rounded: true,
             onclick: () => {
               if (vnode.attrs.popoverMenu) {

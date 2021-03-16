@@ -3,9 +3,7 @@ import 'pages/admin.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { SubmittableResult, ApiRx } from '@polkadot/api';
 import { ISubmittableResult } from '@polkadot/types/types';
-import { switchMap } from 'rxjs/operators';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -188,9 +186,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
           vnode.state.txProcessing = true;
           vnode.state.resultText = 'Waiting...';
           m.redraw();
-          (app.chain as Substrate).chain.api.pipe(
-            switchMap((api: ApiRx) => api.tx.sudo.sudo(call).signAndSend(keyring))
-          ).subscribe((result: ISubmittableResult) => {
+          (app.chain as Substrate).chain.api.tx.sudo.sudo(call).signAndSend(keyring, (result: ISubmittableResult) => {
             if (result.isCompleted) {
               vnode.state.txProcessing = false;
               if (result.isFinalized) {
@@ -232,7 +228,6 @@ const ChainStats: m.Component<{}> = {
       stat('Total EDG', formatCoin((app.chain as Substrate).chain.totalbalance)),
       stat('Existential deposit', formatCoin((app.chain as Substrate).chain.existentialdeposit)),
       // stat('Transfer fee',        formatCoin((app.chain as Substrate).chain.transferfee)),
-      stat('Creation fee', formatCoin((app.chain as Substrate).chain.creationfee)),
       header('Democracy Proposals'),
       stat('Launch period', formatBlocks((app.chain as Substrate).democracyProposals.launchPeriod)),
       stat('Minimum deposit', formatCoin((app.chain as Substrate).democracyProposals.minimumDeposit)),
@@ -467,7 +462,7 @@ const InviteLinkTable: m.Component<{links}, {links}> = {
       community_id: app.activeCommunityId(),
       jwt: app.user.jwt,
     }).then((res) => {
-      res.data.map((link) => vnode.state.links.push(link));
+      res.result.map((link) => vnode.state.links.push(link));
       m.redraw();
     });
   },

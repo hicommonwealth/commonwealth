@@ -1,6 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
-import { ApiRx } from '@polkadot/api';
-
+import { ApiPromise } from '@polkadot/api';
 import { formatCoin } from 'adapters/currency';
 import { ISubstrateTreasuryProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
@@ -8,6 +6,7 @@ import {
   VotingType, VotingUnit, ChainEntity, ChainEvent
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasury from './treasury';
@@ -28,11 +27,11 @@ const backportEventToAdapter = (
 };
 
 export class SubstrateTreasuryProposal
-  extends Proposal<ApiRx, SubstrateCoin, ISubstrateTreasuryProposal, null> {
+  extends Proposal<ApiPromise, SubstrateCoin, ISubstrateTreasuryProposal, null> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public get title() {
+  public generateTitle() {
     const account = this._Accounts.fromAddress(this.beneficiaryAddress);
     const displayName = account.profile && account.profile.name
       ? `${account.profile.name} (${formatAddressShort(this.beneficiaryAddress, account.chain.id)})`
@@ -44,7 +43,10 @@ export class SubstrateTreasuryProposal
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
 
-  private _awarded: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public title: string;
+
+  private _awarded: boolean = false;
+  get awarded() { return this._awarded; }
 
   public readonly value: SubstrateCoin;
   public readonly bond: SubstrateCoin;
@@ -123,12 +125,26 @@ export class SubstrateTreasuryProposal
     this.bond = this._Chain.coins(this.data.bond);
     this.beneficiaryAddress = this.data.beneficiary;
     this._author = this._Accounts.fromAddress(this.data.proposer);
+    this.title = entity.title || this.generateTitle();
     this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
-    this._Treasury.store.add(this);
+
+    if (!this._completed) {
+      const slug = chainEntityTypeToProposalSlug(entity.type);
+      const uniqueId = `${slug}_${entity.typeId}`;
+      this._Chain.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
+        if (response.status === 'Success' && response.result?.length) {
+          this.title = response.result;
+        }
+      });
+      this._initialized = true;
+      this._Treasury.store.add(this);
+    } else {
+      this._initialized = true;
+      this._Treasury.store.add(this);
+    }
   }
 
   protected complete() {
@@ -144,12 +160,12 @@ export class SubstrateTreasuryProposal
         break;
       }
       case SubstrateTypes.EventKind.TreasuryAwarded: {
-        this._awarded.next(true);
+        this._awarded = true;
         this.complete();
         break;
       }
       case SubstrateTypes.EventKind.TreasuryRejected: {
-        this._awarded.next(false);
+        this._awarded = false;
         this.complete();
         break;
       }
@@ -165,8 +181,5 @@ export class SubstrateTreasuryProposal
   // TRANSACTIONS
   public submitVoteTx(vote: BinaryVote<SubstrateCoin>): ITXModalData {
     throw new Error('Cannot vote on a treasury proposal');
-  }
-  get awarded() {
-    return this._awarded.getValue();
   }
 }

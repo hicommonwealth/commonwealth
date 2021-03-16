@@ -7,11 +7,6 @@ import Substrate from '../substrate/main';
 class Darwinia extends Substrate {
   constructor(n: NodeInfo, app: IApp) {
     super(n, app, ChainClass.Darwinia);
-
-    this.signaling.disable();
-    this.phragmenElections.disable();
-    this.democracyProposals.disable();
-    this.democracy.disable();
   }
 
   public async initApi() {

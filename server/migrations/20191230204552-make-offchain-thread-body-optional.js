@@ -1,23 +1,23 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: (queryInterface, Sequelize) => {
     return queryInterface.changeColumn(
       'OffchainThreads',
       'body',
       {
-        type: DataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: true,
       }
     );
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.changeColumn(
       'OffchainThreads',
       'body',
       {
-        type: DataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: false,
       }
     );

@@ -1,7 +1,5 @@
 import _ from 'underscore';
-import { BehaviorSubject, Unsubscribable } from 'rxjs';
-import { takeWhile } from 'rxjs/operators';
-import { ApiRx } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { Votes } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
 import { ISubstrateCollectiveProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
@@ -10,6 +8,7 @@ import {
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
@@ -35,12 +34,11 @@ const backportEventToAdapter = (event: SubstrateTypes.ICollectiveProposed): ISub
 
 export class SubstrateCollectiveProposal
   extends Proposal<
-  ApiRx, SubstrateCoin, ISubstrateCollectiveProposal, SubstrateCollectiveVote
+  ApiPromise, SubstrateCoin, ISubstrateCollectiveProposal, SubstrateCollectiveVote
 > {
   public get shortIdentifier() {
     return `#${this.data.index.toString()}`;
   }
-  public get title() { return this._title; }
   public get description() { return null; }
   public get author() { return null; }
   public get call() { return this._call; }
@@ -49,9 +47,9 @@ export class SubstrateCollectiveProposal
   public canVoteFrom(account: SubstrateAccount) {
     return this._Collective.isMember(account);
   }
-  private readonly _title: string;
+  public title: string;
   private readonly _call;
-  private _approved: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private _approved: boolean = false;
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
@@ -67,6 +65,8 @@ export class SubstrateCollectiveProposal
     if (blockExplorerIds && blockExplorerIds['subscan']) {
       const subdomain = blockExplorerIds['subscan'];
       return `https://${subdomain}.subscan.io/council/${this.identifier}`;
+    } else {
+      return undefined;
     }
   }
 
@@ -107,14 +107,27 @@ export class SubstrateCollectiveProposal
     this._Accounts = Accounts;
     this._Collective = Collective;
     this._call = eventData.call;
-    this._title = formatCall(eventData.call);
+    this.title = entity.title || formatCall(eventData.call);
     this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
-    this._subscribeVoters();
-    this._Collective.store.add(this);
+    if (!this._completed) {
+      const slug = chainEntityTypeToProposalSlug(entity.type);
+      const uniqueId = `${slug}_${entity.typeId}`;
+      this._Chain.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
+        if (response.status === 'Success' && response.result?.length) {
+          this.title = response.result;
+        }
+      });
+      this._initialized = true;
+      this.updateVoters();
+      this._Collective.store.add(this);
+    } else {
+      this._initialized = true;
+      this.updateVoters();
+      this._Collective.store.add(this);
+    }
   }
 
   protected complete() {
@@ -140,17 +153,17 @@ export class SubstrateCollectiveProposal
         break;
       }
       case SubstrateTypes.EventKind.CollectiveDisapproved: {
-        this._approved.next(false);
+        this._approved = false;
         this.complete();
         break;
       }
       case SubstrateTypes.EventKind.CollectiveApproved: {
-        this._approved.next(true);
+        this._approved = true;
         break;
       }
       case SubstrateTypes.EventKind.CollectiveExecuted: {
-        if (!this._approved.value) {
-          this._approved.next(true);
+        if (!this._approved) {
+          this._approved = true;
         }
         // unfortunately we don't have the vote at this point in time, so unless
         // we see a prior approved event, we wont be able to display it.
@@ -163,23 +176,22 @@ export class SubstrateCollectiveProposal
     }
   }
 
-  private _updateVotes(ayes: SubstrateAccount[], nays: SubstrateAccount[]) {
-    this.clearVotes();
-    ayes.map((who) => this.addOrUpdateVote(new SubstrateCollectiveVote(this, who, true)));
-    nays.map((who) => this.addOrUpdateVote(new SubstrateCollectiveVote(this, who, false)));
-  }
-
-  private _subscribeVoters(): Unsubscribable {
-    return this._Chain.query((api) => api.query[this.collectiveName].voting<Option<Votes>>(this.data.hash))
-      .pipe(
-        takeWhile((v) => v.isSome && this.initialized && !this.approved && !this.completed),
-      )
-      .subscribe((v) => {
-        const votes = v.unwrap();
-        const ayes = votes.ayes.map((who) => this._Accounts.fromAddress(who.toString()));
-        const nays = votes.nays.map((who) => this._Accounts.fromAddress(who.toString()));
-        this._updateVotes(ayes, nays);
-      });
+  public updateVoters = async () => {
+    const v = await this._Chain.api.query[this.collectiveName].voting<Option<Votes>>(this.data.hash);
+    if (v.isSome) {
+      const votes = v.unwrap();
+      this.clearVotes();
+      votes.ayes.map(
+        (who) => this.addOrUpdateVote(
+          new SubstrateCollectiveVote(this, this._Accounts.fromAddress(who.toString()), true)
+        )
+      );
+      votes.nays.map(
+        (who) => this.addOrUpdateVote(
+          new SubstrateCollectiveVote(this, this._Accounts.fromAddress(who.toString()), false)
+        )
+      );
+    }
   }
 
   // GETTERS AND SETTERS
@@ -191,7 +203,7 @@ export class SubstrateCollectiveProposal
   }
   get isPassing() {
     if (this.completed) {
-      return this._approved.getValue()
+      return this._approved
         ? ProposalStatus.Passed
         : ProposalStatus.Failed;
     }
@@ -213,7 +225,7 @@ export class SubstrateCollectiveProposal
   }
 
   get approved() {
-    return this._approved.getValue();
+    return this._approved;
   }
   public get accountsVotedYes() {
     return this.getVotes()
@@ -277,7 +289,7 @@ export class SubstrateCollectiveProposal
     // TODO: check council status
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
-      (api: ApiRx) => api.tx.council.vote(this.data.hash, this.data.index, vote.choice),
+      (api: ApiPromise) => api.tx.council.vote(this.data.hash, this.data.index, vote.choice),
       'voteCouncilMotions',
       this.title,
       cb,

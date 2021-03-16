@@ -1,7 +1,6 @@
 import moment from 'moment-twitter';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { Coin } from 'adapters/currency';
-import { IIdentifiable, ICompletable } from 'adapters/shared';
+import { IIdentifiable } from 'adapters/shared';
 import { IVote, IUniqueId, ITXModalData } from './interfaces';
 import { VotingType, VotingUnit, ProposalEndTime, ProposalStatus } from './types';
 import Account from './Account';
@@ -24,7 +23,7 @@ abstract class Proposal<
     return `${this.slug}_${this.identifier}`;
   }
   public createdAt: moment.Moment; // TODO: unused?
-  public abstract get title(): string;
+  public abstract title: string;
   public abstract get description(): string;
   public abstract get author(): Account<C>;
 
@@ -33,25 +32,21 @@ abstract class Proposal<
   public abstract get votingUnit(): VotingUnit;
   public abstract canVoteFrom(account: Account<C>): boolean;
 
-  protected votes: BehaviorSubject<{ [account: string] : VoteT }> = new BehaviorSubject({});
-  // TODO: these can be observables
+  protected votes: { [account: string] : VoteT } = {};
   public abstract get endTime(): ProposalEndTime;
   public abstract get isPassing() : ProposalStatus;
 
   // display
-  // TODO: these should be observables
   public abstract get support(): Coin | number;
   public abstract get turnout(): number;
 
-  protected _completed: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  get completed() { return this._completed.getValue(); }
-  get completed$() { return this._completed.asObservable(); }
+  protected _completed = false;
+  get completed() { return this._completed; }
   protected _completedAt: moment.Moment; // TODO: fill this out
   get completedAt() { return this._completedAt; }
 
-  protected _initialized: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  public get initialized$(): Observable<boolean> { return this._initialized.asObservable(); }
-  public get initialized(): boolean { return this._initialized.value; }
+  protected _initialized = false;
+  public get initialized() { return this._initialized; }
 
   constructor(slug: string, data: ConstructorT) {
     this.slug = slug;
@@ -60,52 +55,49 @@ abstract class Proposal<
   }
 
   public abstract update(e: ChainEvent): any;
+  public updateVoters?: () => Promise<void>;
 
   protected complete(
     store: ProposalStore<Proposal<ApiT, C, ConstructorT, VoteT>>
   ): void {
-    if (this._completed.getValue() === true) {
+    if (this._completed) {
       throw new Error('cannot update state once marked completed');
     }
-    this._completed.next(true);
-    this._initialized.complete();
+    this._completed = true;
+    this._initialized = true;
   }
 
   public deinit() {
-    this._initialized.next(false);
+    this._initialized = false;
   }
 
   // voting
   public addOrUpdateVote(vote: VoteT) {
-    const votes = this.votes.getValue();
-    votes[vote.account.address] = vote;
-    this.votes.next(votes);
+    this.votes[vote.account.address] = vote;
   }
   public removeVote(account: Account<C>) {
     if (this.hasVoted(account)) {
-      const votes = this.votes.getValue();
-      delete votes[account.address];
-      this.votes.next(votes);
+      delete this.votes[account.address];
     }
   }
   public clearVotes() {
-    this.votes.next({});
+    this.votes = {};
   }
   // TODO: these can be observables, if we want
   public hasVoted(account: Account<C>) {
-    return this.votes.getValue()[account.address] !== undefined;
+    return this.votes[account.address] !== undefined;
   }
   public getVotes(fromAccount?: Account<C>) {
     if (fromAccount) {
-      return this.votes.getValue()[fromAccount.address] !== undefined
-        ? [this.votes.getValue()[fromAccount.address]]
+      return this.votes[fromAccount.address] !== undefined
+        ? [this.votes[fromAccount.address]]
         : [];
     } else {
-      return Object.values(this.votes.getValue());
+      return Object.values(this.votes);
     }
   }
   public getVoters(): string[] {
-    return Object.keys(this.votes.getValue());
+    return Object.keys(this.votes);
   }
   public abstract submitVoteTx(vote: VoteT, ...args): ITXModalData | Promise<ITXModalData>;
 }

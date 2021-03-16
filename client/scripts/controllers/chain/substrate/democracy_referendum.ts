@@ -1,7 +1,5 @@
-import { first, takeWhile, switchMap } from 'rxjs/operators';
-import { ApiRx } from '@polkadot/api';
-import { Call, Conviction, Vote as SrmlVote } from '@polkadot/types/interfaces';
-import { DeriveReferendum, DeriveReferendumVotes } from '@polkadot/api-derive/types';
+import { ApiPromise } from '@polkadot/api';
+import { Call, Conviction } from '@polkadot/types/interfaces';
 import BN from 'bn.js';
 import {
   ISubstrateDemocracyReferendum,
@@ -14,7 +12,6 @@ import {
   ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
-import { BehaviorSubject, Unsubscribable, of } from 'rxjs';
 import { Coin } from 'adapters/currency';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
@@ -119,12 +116,11 @@ const backportEventToAdapter = (event: SubstrateTypes.IDemocracyStarted): ISubst
 
 export class SubstrateDemocracyReferendum
   extends Proposal<
-  ApiRx, SubstrateCoin, ISubstrateDemocracyReferendum, SubstrateDemocracyVote
+  ApiPromise, SubstrateCoin, ISubstrateDemocracyReferendum, SubstrateDemocracyVote
 > {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public get title() { return this._title; }
   public get description() { return null; }
   public get author() { return null; }
   public get preimage() { return this._preimage; }
@@ -138,13 +134,13 @@ export class SubstrateDemocracyReferendum
   public canVoteFrom(account: Account<any>) {
     return account.chainBase === ChainBase.Substrate;
   }
-  private _title: string;
+  public title: string;
   private _preimage;
   private _endBlock: number;
   public readonly hash: string;
 
-  private _passed: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  public get passed() { return this._passed.value; }
+  private _passed: boolean;
+  public get passed() { return this._passed; }
 
   private _executionBlock: number;
   public get executionBlock() { return this._executionBlock; }
@@ -161,6 +157,7 @@ export class SubstrateDemocracyReferendum
       const subdomain = blockExplorerIds['subscan'];
       return `https://${subdomain}.subscan.io/referenda/${this.identifier}`;
     }
+    return undefined;
   }
 
   public get blockExplorerLinkLabel() {
@@ -208,16 +205,16 @@ export class SubstrateDemocracyReferendum
     const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
       this._preimage = preimage;
-      this._title = formatCall(preimage);
+      this.title = formatCall(preimage);
     } else {
-      this._title = `Referendum #${this.data.index}`;
+      this.title = `Referendum #${this.data.index}`;
     }
 
     // handle events params for passing, if exists at init time
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized.next(true);
-    this._subscribeVoters();
+    this._initialized = true;
+    this.updateVoters();
     this._Democracy.store.add(this);
   }
 
@@ -247,12 +244,12 @@ export class SubstrateDemocracyReferendum
       }
       case SubstrateTypes.EventKind.DemocracyCancelled:
       case SubstrateTypes.EventKind.DemocracyNotPassed: {
-        this._passed.next(false);
+        this._passed = false;
         this.complete();
         break;
       }
       case SubstrateTypes.EventKind.DemocracyPassed: {
-        this._passed.next(true);
+        this._passed = true;
         this._executionBlock = e.data.dispatchBlock;
         this._endBlock = e.data.dispatchBlock; // fix timer if in dispatch queue
 
@@ -264,7 +261,7 @@ export class SubstrateDemocracyReferendum
       }
       case SubstrateTypes.EventKind.DemocracyExecuted: {
         if (!this.passed) {
-          this._passed.next(true);
+          this._passed = true;
         }
         this.complete();
         break;
@@ -273,7 +270,7 @@ export class SubstrateDemocracyReferendum
         const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._preimage = preimage;
-          this._title = formatCall(preimage);
+          this.title = formatCall(preimage);
         }
         break;
       }
@@ -283,30 +280,19 @@ export class SubstrateDemocracyReferendum
     }
   }
 
-  private _subscribeVoters(): Unsubscribable {
-    return this._Chain.query((api) => api.derive.democracy.referendumsInfo([ new BN(this.data.index) ])
-      .pipe(
-        switchMap((referenda: DeriveReferendum[]) => {
-          if (referenda.length) {
-            // we can fetch the data, so grab the votes too
-            return api.derive.democracy._referendumVotes(referenda[0]);
-          } else {
-            return of(null);
-          }
-        }),
-        takeWhile((v) => !!v && this.initialized && !this.completed),
-      ))
-      .subscribe((votes: DeriveReferendumVotes) => {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const { accountId, balance, vote } of votes.votes) {
-          const acct = this._Accounts.fromAddress(accountId.toString());
-          if (!this.hasVoted(acct)) {
-            this.addOrUpdateVote(new SubstrateDemocracyVote(
-              this, acct, vote.isAye, this._Chain.coins(balance), convictionToWeight(vote.conviction.index)
-            ));
-          }
+  public updateVoters = async () => {
+    const referenda = await this._Chain.api.derive.democracy.referendumsInfo([ new BN(this.data.index) ]);
+    if (referenda?.length) {
+      const votes = await this._Chain.api.derive.democracy._referendumVotes(referenda[0]);
+      for (const { accountId, balance, vote } of votes.votes) {
+        const acct = this._Accounts.fromAddress(accountId.toString());
+        if (!this.hasVoted(acct)) {
+          this.addOrUpdateVote(new SubstrateDemocracyVote(
+            this, acct, vote.isAye, this._Chain.coins(balance), convictionToWeight(vote.conviction.index)
+          ));
         }
-      });
+      }
+    }
   }
 
   // GETTERS AND SETTERS
@@ -365,8 +351,8 @@ export class SubstrateDemocracyReferendum
   }
 
   get isPassing() {
-    if (this._passed.value === true) return ProposalStatus.Passed;
-    if (this.completed === true && this._passed.value === false) return ProposalStatus.Failed;
+    if (this._passed) return ProposalStatus.Passed;
+    if (this.completed === true && !this._passed) return ProposalStatus.Failed;
     if (this._Chain.totalbalance.eqn(0)) return ProposalStatus.None;
     if (this.edgVoted.eqn(0)) return ProposalStatus.Failing;
 
@@ -396,12 +382,9 @@ export class SubstrateDemocracyReferendum
   }
 
   // TRANSACTIONS
-  // TODO: allow the user to enter how much balance they want to vote with
   public async submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
     const conviction = convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index;
-
-    // fake the arg to compute balance
-    const balance = await (vote.account as SubstrateAccount).freeBalance.pipe(first()).toPromise();
+    const balance = this._Chain.coins(vote.amount, true);
 
     // "AccountVote" type, for kusama
     // we don't support "Split" votes right now
@@ -415,19 +398,11 @@ export class SubstrateDemocracyReferendum
       }
     };
 
-    // even though voting balance is specifiable, we pre-populate the voting balance as "all funds"
-    //   to align with old voting behavior -- we should change this soon.
-    // TODO: move this computation out into the view as needed, to prepopulate field
-    const fees = await this._Chain.computeFees(
-      vote.account.address,
-      (api: ApiRx) => api.tx.democracy.vote(this.data.index, srmlVote)
-    );
-
-    srmlVote.Standard.balance = balance.sub(fees).toString();
+    srmlVote.Standard.balance = balance.toString();
 
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
-      (api: ApiRx) => api.tx.democracy.vote(this.data.index, srmlVote),
+      (api: ApiPromise) => api.tx.democracy.vote(this.data.index, srmlVote),
       'submitDemocracyVote',
       this.title,
       cb
@@ -443,7 +418,7 @@ export class SubstrateDemocracyReferendum
     }
     return this._Chain.createTXModalData(
       who,
-      (api: ApiRx) => api.tx.democracy.removeOtherVote(target.address, this.data.index),
+      (api: ApiPromise) => api.tx.democracy.removeOtherVote(target.address, this.data.index),
       'unvote',
       `${who.address} unvotes for ${target.address} on referendum ${this.data.index}`,
     );
@@ -460,14 +435,14 @@ export class SubstrateDemocracyReferendum
   //   });
   //   return this._Chain.createTXModalData(
   //     vote.account as SubstrateAccount,
-  //     (api: ApiRx) => api.tx.democracy.proxyVote(this.data.index, srmlVote),
+  //     (api: ApiPromise) => api.tx.democracy.proxyVote(this.data.index, srmlVote),
   //     'submitProxyDemocracyVote',
   //     this.title
   //   );
   // }
 
   public async notePreimage(author: SubstrateAccount, action: Call) {
-    const txFunc = (api: ApiRx) => api.tx.democracy.notePreimage(action.toHex());
+    const txFunc = (api: ApiPromise) => api.tx.democracy.notePreimage(action.toHex());
     return this._Chain.createTXModalData(
       author,
       txFunc,
@@ -479,7 +454,7 @@ export class SubstrateDemocracyReferendum
   public noteImminentPreimage(author: SubstrateAccount, action: Call) {
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => api.tx.democracy.noteImminentPreimage(action.toHex()),
+      (api: ApiPromise) => api.tx.democracy.noteImminentPreimage(action.toHex()),
       'noteImminentPreimage',
       this._Chain.methodToTitle(action),
     );

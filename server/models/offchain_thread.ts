@@ -4,6 +4,7 @@ import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
+import { ChainEntityAttributes } from './chain_entity';
 
 export interface OffchainThreadAttributes {
   id?: number;
@@ -30,6 +31,7 @@ export interface OffchainThreadAttributes {
   OffchainCommunity?: OffchainCommunityAttributes;
   Address?: AddressAttributes;
   OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
+  ChainEntity?: ChainEntityAttributes;
 }
 
 export interface OffchainThreadInstance extends Sequelize.Instance<OffchainThreadAttributes>, OffchainThreadAttributes {
@@ -67,6 +69,8 @@ export default (
     paranoid: true,
     indexes: [
       { fields: ['address_id'] },
+      { fields: ['chain'] },
+      { fields: ['community'] },
     ],
   });
 
@@ -75,7 +79,10 @@ export default (
       foreignKey: 'chain',
       targetKey: 'id',
     });
-    models.OffchainThread.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
+    models.OffchainThread.belongsTo(models.OffchainCommunity, {
+      foreignKey: 'community',
+      targetKey: 'id'
+    });
     models.OffchainThread.belongsTo(models.Address, {
       as: 'Address',
       foreignKey: 'address_id',
@@ -101,6 +108,10 @@ export default (
       as: 'collaborators'
     });
     models.OffchainThread.hasMany(models.Collaboration);
+    models.OffchainThread.hasMany(models.ChainEntity, {
+      foreignKey: 'thread_id',
+      constraints: false,
+    });
   };
 
   return OffchainThread;

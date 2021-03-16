@@ -31,9 +31,13 @@ export default class MolochAPI {
   public get Signer(): JsonRpcSigner { return this._Signer; }
   public get tokenContract() { return this._tokenContract; }
 
-  constructor(contractAddress: string, web3Provider: AsyncSendable, userAddress: string) {
+  constructor(contractAddress: string, web3Provider: AsyncSendable, userAddress?: string) {
     this._contractAddress = contractAddress.toLowerCase();
-    this._userAddress = userAddress.toLowerCase();
+    if (userAddress) { 
+      this._userAddress = userAddress.toLowerCase();
+    } else {
+      this._userAddress = '0';
+    }
     this._Provider = new ethers.providers.Web3Provider(web3Provider);
     this._Signer = this._Provider.getSigner(userAddress);
     this._Contract = Moloch1Factory.connect(contractAddress, this._Signer);

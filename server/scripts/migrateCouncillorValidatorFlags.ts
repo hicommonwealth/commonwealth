@@ -4,7 +4,6 @@
 
 import _ from 'underscore';
 import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
-import { spec } from '@edgeware/node-types';
 import { AccountId, Balance } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
@@ -12,7 +11,7 @@ import { Codec } from '@polkadot/types/types';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 
 import { factory, formatFilename } from '../../shared/logging';
-import { constructSubstrateUrl } from '../../shared/substrate';
+import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default async function (models, chain?: string): Promise<void> {
@@ -37,7 +36,7 @@ export default async function (models, chain?: string): Promise<void> {
     const flagsHandler = new UserFlagsHandler(models, node.chain);
 
     const nodeUrl = constructSubstrateUrl(node.url);
-    const api = await SubstrateEvents.createApi(nodeUrl, spec);
+    const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
 
     log.info('Fetching councillor and validator lists...');
     try {

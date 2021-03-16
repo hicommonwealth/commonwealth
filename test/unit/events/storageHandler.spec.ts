@@ -97,10 +97,9 @@ describe('Event Storage Handler Tests', () => {
     assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
   });
 
-  it('should not create chain event for unknown event type', async () => {
+  it('should create chain event and type for unknown event type', async () => {
     const event = {
       blockNumber: 13,
-
       data: {
         kind: 'democracy-exploded',
         whoops: true,
@@ -112,15 +111,22 @@ describe('Event Storage Handler Tests', () => {
     // process event
     const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
 
-    // confirm no event emitted
-    assert.isUndefined(dbEvent);
+    // expect results
+    assert.deepEqual(dbEvent.event_data, event.data);
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
         chain_event_type_id: 'edgeware-democracy-exploded',
-        block_number: 12,
+        block_number: 13,
       }
     });
-    assert.lengthOf(chainEvents, 0);
+    assert.lengthOf(chainEvents, 1);
+    assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
+
+    const dbEventType = await dbEvent.getChainEventType();
+    const chainEventType = await models['ChainEventType'].findOne({
+      where : { id: 'edgeware-democracy-exploded' }
+    });
+    assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
   });
 
   it('should not create chain event for excluded event type', async () => {
