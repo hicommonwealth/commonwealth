@@ -29,6 +29,7 @@ export const modelFromServer = (comment) => {
   let versionHistory;
   if (comment.version_history) {
     versionHistory = comment.version_history.map((v) => {
+      if (!v) return;
       let history;
       try {
         history = JSON.parse(v || '{}');

@@ -15,7 +15,6 @@ module.exports = {
           const escapedStr = JSON.stringify(firstVersionObj).replace(/'/g, "''");
           return `UPDATE "OffchainComments" SET version_history=ARRAY['${escapedStr}'] WHERE id='${comment.id}'`;
         } catch (e) {
-          console.log(comment);
           console.log(e);
         }
       }

@@ -149,7 +149,6 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
     if (!item.lastEdited) {
       return;
     }
-    console.log({ lastEdited: item.lastEdited, isThread, item });
 
     return m('.ProposalBodyLastEdited', [
       m('a', {

@@ -34,9 +34,10 @@ export const modelFromServer = (thread) => {
   let versionHistory;
   if (thread.version_history) {
     versionHistory = thread.version_history.map((v) => {
+      if (!v) return;
       let history;
       try {
-        history = JSON.parse(v || '{}');
+        history = JSON.parse(v);
         history.author = typeof history.author === 'string'
           ? JSON.parse(history.author)
           : typeof history.author === 'object' ? history.author : null;
