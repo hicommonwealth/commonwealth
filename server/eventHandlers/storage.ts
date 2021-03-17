@@ -3,15 +3,22 @@
  */
 import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/chain-events';
 import Sequelize from 'sequelize';
+import BN from 'bn.js';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
+
+export interface StorageFilterConfig {
+  transferSizeThreshold?: BN;
+  excludedEvents?: IChainEventKind[];
+}
+
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _chain: string,
-    private readonly _excludedEvents: IChainEventKind[] = [],
+    private readonly _filterConfig: StorageFilterConfig = {},
   ) {
     super();
   }
@@ -30,8 +37,20 @@ export default class extends IEventHandler {
     return event;
   }
 
-  private async _isEventSkipped(event: CWEvent): Promise<boolean> {
-    if (this._excludedEvents.includes(event.data.kind)) return true;
+  private async _filter(event: CWEvent): Promise<CWEvent> {
+    if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return null;
+    const addressesExist = async (addresses: string[]) => {
+      const addressModels = await this._models.Address.findAll({
+        where: {
+          address: {
+            // TODO: we need to ensure the chain prefixes are correct here
+            [Op.in]: addresses,
+          },
+          chain: this._chain,
+        },
+      });
+      return !!addressModels?.length;
+    };
 
     // if using includeAddresses, check against db to see if addresses exist
     // TODO: we can eliminate more addresses by searching for held subscriptions rather than
@@ -39,20 +58,29 @@ export default class extends IEventHandler {
     // NOTE: this is currently only used by staking events, but may be expanded in the future.
     //   DO NOT USE INCLUDE ADDRESSES FOR CHAIN ENTITY-RELATED EVENTS.
     if (event.includeAddresses) {
-      const addressModels = await this._models.Address.findAll({
-        where: {
-          address: {
-            // TODO: we need to ensure the chain prefixes are correct here
-            [Op.in]: event.includeAddresses,
-          },
-          chain: this._chain,
-        },
-      });
-      if (!addressModels?.length) return true;
+      const shouldSend = await addressesExist(event.includeAddresses);
+      if (!shouldSend) return null;
     }
 
-    // TODO: special logic for large transfer events even if addresses not found
-    return false;
+    // special logic for transfer events
+    if (event.data.kind === SubstrateTypes.EventKind.BalanceTransfer) {
+      // do not emit small transfers below threshold
+      if (this._filterConfig.transferSizeThreshold !== undefined) {
+        if (this._filterConfig.transferSizeThreshold.gt(new BN(event.data.value))) {
+          return null;
+        }
+      }
+
+      // if transfer is for registered addresses, emit event for them
+      const addresses = [ event.data.sender, event.data.dest ];
+      const shouldSend = await addressesExist(addresses);
+      if (!shouldSend) return null;
+
+      // modify include addresses so event only goes to them
+      event.includeAddresses = addresses;
+      return event;
+    }
+    return event;
   }
 
   /**
@@ -61,8 +89,8 @@ export default class extends IEventHandler {
   public async handle(event: CWEvent) {
     event = this.truncateEvent(event);
     log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
-    const isSkipped = await this._isEventSkipped(event);
-    if (isSkipped) {
+    event = await this._filter(event);
+    if (!event) {
       log.trace('Skipping event!');
       return;
     }
