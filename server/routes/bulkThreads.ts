@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+import { getLastEdited } from '../util/getLastEdited';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -114,13 +115,14 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       const chain_entities = JSON.parse(t.chain_entities[0]).id
         ? t.chain_entities.map((c) => JSON.parse(c))
         : [];
+      const last_edited = getLastEdited(t);
 
       const data = {
         id: t.thread_id,
         title: t.thread_title,
         url: t.url,
         body: t.body,
-        version_history: t.version_history,
+        last_edited,
         kind: t.kind,
         stage: t.stage,
         read_only: t.read_only,
@@ -155,6 +157,12 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       },
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
+    }).map((c, idx) => {
+      const row = c.toJSON();
+      const last_edited = getLastEdited(row);
+      delete row['version_history'];
+      row['last_edited'] = last_edited;
+      return row;
     });
   } else {
     const whereOptions = (community)
@@ -179,12 +187,24 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         }
       ],
       order: [['created_at', 'DESC']],
+    }).map((t, idx) => {
+      const row = t.toJSON();
+      const last_edited = getLastEdited(row);
+      delete row['version_history'];
+      row['last_edited'] = last_edited;
+      return row;
     });
 
     comments = await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
+    }).map((c, idx) => {
+      const row = c.toJSON();
+      const last_edited = getLastEdited(row);
+      delete row['version_history'];
+      row['last_edited'] = last_edited;
+      return row;
     });
   }
 
@@ -216,7 +236,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       numPrevotingThreads,
       numVotingThreads,
       threads: cutoff_date ? threads : threads.map((t) => t.toJSON()),
-      comments: comments.map((c) => c.toJSON()),
+      comments, // already converted to JSON earlier
       reactions: reactions.map((r) => r.toJSON()),
     }
   });
