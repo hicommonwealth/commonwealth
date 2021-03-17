@@ -20,7 +20,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance
 // TODO: config this
-const TRANSFER_THRESHOLD_PPM: number = 10_000;
+const BALANCE_TRANSFER_THRESHOLD_PERMILL: number = 10_000;
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
@@ -136,6 +136,9 @@ const setupChainEventListeners = async (
         skipCatchup,
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
+        enricherConfig: {
+          balanceTransferThresholdPermill: BALANCE_TRANSFER_THRESHOLD_PERMILL,
+        }
       });
     } else if (chainSupportedBy(node.chain, MolochTypes.EventChains)) {
       const contractVersion = 1;
