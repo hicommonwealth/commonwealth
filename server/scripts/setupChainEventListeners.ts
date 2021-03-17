@@ -123,17 +123,13 @@ const setupChainEventListeners = async (
     if (chainSupportedBy(node.chain, SubstrateTypes.EventChains)) {
       const nodeUrl = constructSubstrateUrl(node.url);
       const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
-      const totalIssuance = await api.query.balances.totalIssuance();
-
-      // balance xfer threshold = totalIssuance * (ppm / 1_000_000)
-      const transferSizeThreshold = totalIssuance.muln(TRANSFER_THRESHOLD_PPM).divn(1_000_000);
       const excludedEvents = [
         SubstrateTypes.EventKind.Reward,
         SubstrateTypes.EventKind.TreasuryRewardMinting,
         SubstrateTypes.EventKind.TreasuryRewardMintingV2,
       ];
 
-      const handlers = generateHandlers(node, { excludedEvents, transferSizeThreshold });
+      const handlers = generateHandlers(node, { excludedEvents });
       subscriber = await SubstrateEvents.subscribeEvents({
         chain: node.chain,
         handlers,

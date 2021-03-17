@@ -3,6 +3,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
+import BN from 'bn.js';
 
 import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
 
@@ -143,7 +144,7 @@ describe('Event Storage Handler Tests', () => {
         amount: '10000',
       }
     };
-    const eventHandler = new StorageHandler(models, chain, [ SubstrateTypes.EventKind.Reward ]);
+    const eventHandler = new StorageHandler(models, chain, { excludedEvents: [ SubstrateTypes.EventKind.Reward ] });
 
     // process event
     const dbEvent = await eventHandler.handle(event as unknown as CWEvent);

@@ -3,14 +3,12 @@
  */
 import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/chain-events';
 import Sequelize from 'sequelize';
-import BN from 'bn.js';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 
 export interface StorageFilterConfig {
-  transferSizeThreshold?: BN;
   excludedEvents?: IChainEventKind[];
 }
 
@@ -37,8 +35,8 @@ export default class extends IEventHandler {
     return event;
   }
 
-  private async _filter(event: CWEvent): Promise<CWEvent> {
-    if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return null;
+  private async _shouldSkip(event: CWEvent): Promise<boolean> {
+    if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return true;
     const addressesExist = async (addresses: string[]) => {
       const addressModels = await this._models.Address.findAll({
         where: {
@@ -53,44 +51,25 @@ export default class extends IEventHandler {
     };
 
     // if using includeAddresses, check against db to see if addresses exist
-    // TODO: we can eliminate more addresses by searching for held subscriptions rather than
-    //    addresses (see subscription.ts), but this is a good start.
-    // NOTE: this is currently only used by staking events, but may be expanded in the future.
+    // TODO: we can unify this with notifications.ts to save us some fetches and filter better
+    // NOTE: this is currently only used by staking and transfer events.
     //   DO NOT USE INCLUDE ADDRESSES FOR CHAIN ENTITY-RELATED EVENTS.
     if (event.includeAddresses) {
       const shouldSend = await addressesExist(event.includeAddresses);
-      if (!shouldSend) return null;
+      if (!shouldSend) return true;
     }
-
-    // special logic for transfer events
-    if (event.data.kind === SubstrateTypes.EventKind.BalanceTransfer) {
-      // do not emit small transfers below threshold
-      if (this._filterConfig.transferSizeThreshold !== undefined) {
-        if (this._filterConfig.transferSizeThreshold.gt(new BN(event.data.value))) {
-          return null;
-        }
-      }
-
-      // if transfer is for registered addresses, emit event for them
-      const addresses = [ event.data.sender, event.data.dest ];
-      const shouldSend = await addressesExist(addresses);
-      if (!shouldSend) return null;
-
-      // modify include addresses so event only goes to them
-      event.includeAddresses = addresses;
-      return event;
-    }
-    return event;
+    return false;
   }
 
   /**
    * Handles an event by creating a ChainEvent in the database.
+   * NOTE: this may modify the event.
    */
   public async handle(event: CWEvent) {
     event = this.truncateEvent(event);
     log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
-    event = await this._filter(event);
-    if (!event) {
+    const shouldSkip = await this._shouldSkip(event);
+    if (shouldSkip) {
       log.trace('Skipping event!');
       return;
     }
