@@ -83,10 +83,10 @@ const User: m.Component<{
     }
     const getRoleTags = (long?) => [
       // 'long' makes role tags show as full length text
-      profile.isCouncillor && m('.role-icon.role-icon-councillor', {
+      profile.isCouncillor && m('span.role-icon.role-icon-councillor', {
         class: long ? 'long' : ''
       }, long ? `${friendlyChainName} Councillor` : 'C'),
-      profile.isValidator && m('.role-icon.role-icon-validator', {
+      profile.isValidator && m('span.role-icon.role-icon-validator', {
         class: long ? 'long' : ''
       }, long ? `${friendlyChainName} Validator` : 'V'),
       // offchain role in commonwealth forum
@@ -122,15 +122,18 @@ const User: m.Component<{
             // non-substrate name
             linkify
               ? link('a.user-display-name.username',
-                profile
+                (profile
                   ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
-                  : 'javascript:',
-                profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort)
+                  : 'javascript:'
+                ), [
+                  profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort,
+                  getRoleTags(false),
+                ])
               : m('a.user-display-name.username', [
-                profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort
+                profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort,
+                getRoleTags(false),
               ])
           ],
-        getRoleTags(false),
       ]);
 
     const userPopover = m('.UserPopover', {
