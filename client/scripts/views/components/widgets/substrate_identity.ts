@@ -16,7 +16,7 @@ export interface ISubstrateIdentityAttrs {
   account: Account<any>;
   linkify: boolean;
   profile: Profile;
-  hideIdentityIcon: boolean; // only applies to substrate identities, also hides councillor icon
+  hideIdentityIcon: boolean; // only applies to substrate identities
   showAddressWithDisplayName?: boolean;
   addrShort: string;
 }
