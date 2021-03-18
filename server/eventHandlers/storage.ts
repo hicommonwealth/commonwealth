@@ -40,16 +40,23 @@ export default class extends IEventHandler {
       return;
     }
 
-    // locate event type and add event to database
-    const dbEventType = await this._models.ChainEventType.findOne({ where: {
-      chain: this._chain,
-      event_name: event.data.kind.toString(),
-    } });
+    // locate event type and add event (and event type if needed) to database
+    const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
+      where: {
+        id: `${this._chain}-${event.data.kind.toString()}`,
+        chain: this._chain,
+        event_name: event.data.kind.toString(),
+      }
+    });
     if (!dbEventType) {
       log.error(`unknown event type: ${event.data.kind}`);
       return;
     } else {
-      log.trace(`found chain event type: ${dbEventType.id}`);
+      if (created) {
+        log.info(`Created new ChainEventType: ${dbEventType.id}`);
+      } else {
+        log.trace(`found chain event type: ${dbEventType.id}`);
+      }
     }
 
     // create event in db

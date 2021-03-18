@@ -20,6 +20,7 @@ import setupWebsocketServer from './server/socket';
 import { NotificationCategories } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
+import TokenBalanceCache from './server/util/tokenBalanceCache';
 
 require('express-async-errors');
 
@@ -28,17 +29,24 @@ const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
 const identityFetchCache = new IdentityFetchCache(0);
+
+// always prune both token and non-token holders asap
+const tokenBalanceCache = new TokenBalanceCache(0, 0);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
+const sessionStore = new SequelizeStore({
+  db: models.sequelize,
+  tableName: 'Sessions',
+  checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
+  expiration: 7 * 24 * 60 * 60 * 1000 // Set session expiration to 7 days
+});
+
+sessionStore.sync();
+
 const sessionParser = session({
   secret: SESSION_SECRET,
-  store: new SequelizeStore({
-    db: models.sequelize,
-    tableName: 'Sessions',
-    checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 7 * 24 * 60 * 60 * 1000 // Set session expiration to 7 days
-  }),
+  store: sessionStore,
   resave: false,
   saveUninitialized: true,
 });
@@ -110,6 +118,8 @@ const resetServer = (debug=false): Promise<void> => {
         icon_url: '/static/img/protocols/edg.png',
         active: true,
         type: 'chain',
+        base: 'substrate',
+        ss58_prefix: '7',
       });
       const eth = await models['Chain'].create({
         id: 'ethereum',
@@ -119,6 +129,17 @@ const resetServer = (debug=false): Promise<void> => {
         icon_url: '/static/img/protocols/eth.png',
         active: true,
         type: 'chain',
+        base: 'ethereum',
+      });
+      const alex = await models['Chain'].create({
+        id: 'alex',
+        network: 'alex',
+        symbol: 'ALEX',
+        name: 'Alex',
+        icon_url: '/static/img/protocols/alex.png',
+        active: true,
+        type: 'token',
+        base: 'ethereum',
       });
 
       // Admin roles for specific communities
@@ -214,6 +235,7 @@ const resetServer = (debug=false): Promise<void> => {
       const nodes = [
         [ 'mainnet1.edgewa.re', 'edgeware' ],
         [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
+        [ 'wss://ropsten.infura.io/ws', 'alex', '0xFab46E002BbF0b4509813474841E0716E6730136'],
       ];
       await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
 
@@ -277,11 +299,12 @@ const setupServer = () => {
 };
 
 setupPassport(models);
-setupAPI(app, models, viewCountCache, identityFetchCache);
+setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
 setupErrorHandlers();
 setupServer();
 
 export const resetDatabase = () => resetServer();
 export const getIdentityFetchCache = () => identityFetchCache;
+export const getTokenBalanceCache = () => tokenBalanceCache;
 
 export default app;

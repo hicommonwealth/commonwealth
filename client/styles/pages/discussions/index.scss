@@ -38,6 +38,20 @@
     }
     .cui-button.discussions-topic {
         margin-right: 6px;
+        .cui-icon {
+            margin-left: 1px;
+        }
+        .cui-icon svg {
+            $size: 13px;
+            min-height: $size;
+            min-width: $size;
+            height: $size;
+            width: $size;
+            stroke: tint(#2480cc, 25%);
+        }
+        .cui-icon:hover svg {
+            stroke: tint(#2480cc, 10%);
+        }
     }
     .cui-button.discussions-topic,
     .cui-button.discussions-stage {

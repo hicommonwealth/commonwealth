@@ -21,6 +21,7 @@ import WebsocketController from 'controllers/server/socket/index';
 import { Layout, LoadingLayout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
+import Token from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
 // Prefetch commonly used pages
@@ -98,6 +99,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
 }
 
 export async function deinitChainOrCommunity() {
+  app.isAdapterReady = false;
   if (app.chain) {
     app.chain.networkStatus = ApiStatus.Disconnected;
     app.chain.deinitServer();
@@ -300,6 +302,20 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Near(n, app);
     initApi = true;
+  } else if (n.chain.network === ChainNetwork.Clover) {
+    const Clover = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "clover-main" */
+      './controllers/chain/clover/main'
+    )).default;
+    newChain = new Clover(n, app);
+  } else if (n.chain.network === ChainNetwork.HydraDX) {
+    const HydraDX = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "hydradx-main" */
+      './controllers/chain/hydradx/main'
+    )).default;
+    newChain = new HydraDX(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
@@ -307,6 +323,20 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
+  } else if (n.chain.network === ChainNetwork.Marlin || n.chain.network === ChainNetwork.MarlinTestnet) {
+    const Marlin = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "marlin-main" */
+      './controllers/chain/ethereum/marlin/adapter'
+    )).default;
+    newChain = new Marlin(n, app);
+  } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
+    const Token = (await import(
+    //   /* webpackMode: "lazy" */
+    //   /* webpackChunkName: "token-main" */
+      './controllers/chain/ethereum/token/adapter'
+    )).default;
+    newChain = new Token(n, app);
   } else if (n.chain.network === ChainNetwork.Commonwealth) {
     const Commonwealth = (await import(
       /* webpackMode: "lazy" */
@@ -367,7 +397,8 @@ export async function initChain(): Promise<void> {
   await app.chain.initData();
 
   // Emit chain as updated
-  app.chainAdapterReady.next(true);
+  app.chainAdapterReady.emit('ready');
+  app.isAdapterReady = true;
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
@@ -497,6 +528,7 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
+      if (app.chain instanceof Token) deferChain = false;
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
     },
   });
@@ -545,9 +577,9 @@ $(() => {
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
     '/:scope/council':           importRoute('views/pages/council/index', { scoped: true }),
+    '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
-    '/:scope/new/signaling':     importRoute('views/pages/new_signaling', { scoped: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),

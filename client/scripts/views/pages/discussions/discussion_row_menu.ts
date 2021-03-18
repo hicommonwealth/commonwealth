@@ -12,7 +12,7 @@ import StageEditor from 'views/components/stage_editor';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
-export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }> = {
+export const ThreadSubscriptionMenuItem: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
 
@@ -47,7 +47,7 @@ export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }>
   },
 };
 
-export const ThreadDeletionButton: m.Component<{ proposal: OffchainThread }> = {
+export const ThreadDeletionMenuItem: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     return m(MenuItem, {
@@ -66,10 +66,10 @@ export const ThreadDeletionButton: m.Component<{ proposal: OffchainThread }> = {
   }
 };
 
-export const TopicEditorButton: m.Component<{ openTopicEditor: Function }, { isOpen: boolean }> = {
+export const TopicEditorMenuItem: m.Component<{ openTopicEditor: Function }, { isOpen: boolean }> = {
   view: (vnode) => {
     const { openTopicEditor } = vnode.attrs;
-    return m('.TopicEditorButton', [
+    return m('.TopicEditorMenuItem', [
       m(MenuItem, {
         fluid: true,
         label: 'Edit topic',
@@ -82,10 +82,10 @@ export const TopicEditorButton: m.Component<{ openTopicEditor: Function }, { isO
   }
 };
 
-export const StageEditorButton: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
+export const StageEditorMenuItem: m.Component<{ openStageEditor: Function }, { isOpen: boolean }> = {
   view: (vnode) => {
     const { openStageEditor } = vnode.attrs;
-    return m('.StageEditorButton', [
+    return m('.StageEditorMenuItem', [
       m(MenuItem, {
         fluid: true,
         label: 'Edit stage',
@@ -134,7 +134,7 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, {
         closeOnContentClick: true,
         menuAttrs: {},
         content: [
-          m(ThreadSubscriptionButton, { proposal }),
+          m(ThreadSubscriptionMenuItem, { proposal }),
           hasAdminPermissions && m(MenuDivider),
           hasAdminPermissions && m(MenuItem, {
             class: 'pin-thread-toggle',
@@ -155,13 +155,13 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, {
             },
             label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
           }),
-          hasAdminPermissions && m(TopicEditorButton, {
+          hasAdminPermissions && m(TopicEditorMenuItem, {
             openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; }
           }),
-          (isAuthor || hasAdminPermissions) && m(StageEditorButton, {
+          (isAuthor || hasAdminPermissions) && m(StageEditorMenuItem, {
             openStageEditor: () => { vnode.state.stageEditorIsOpen = true; }
           }),
-          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
+          (isAuthor || hasAdminPermissions) && m(ThreadDeletionMenuItem, { proposal }),
         ],
         inline: true,
         trigger: m(Icon, {

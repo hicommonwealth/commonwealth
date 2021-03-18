@@ -23,6 +23,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
+import TokenBalanceCache from './server/util/tokenBalanceCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
@@ -70,6 +71,7 @@ async function main() {
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
 
   const identityFetchCache = new IdentityFetchCache(10 * 60);
+  const tokenBalanceCache = new TokenBalanceCache();
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
@@ -88,7 +90,7 @@ async function main() {
           fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
         }
       }
-      identityFetchCache.start(models, fetchers);
+      await identityFetchCache.start(models, fetchers);
       return 0;
     } catch (e) {
       console.error(`Chain event listener setup failed: ${e.message}`);
@@ -196,14 +198,18 @@ async function main() {
     }
   };
 
+  const sessionStore = new SequelizeStore({
+    db: models.sequelize,
+    tableName: 'Sessions',
+    checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
+    expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
+  });
+
+  sessionStore.sync();
+
   const sessionParser = session({
     secret: SESSION_SECRET,
-    store: new SequelizeStore({
-      db: models.sequelize,
-      tableName: 'Sessions',
-      checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-      expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
-    }),
+    store: sessionStore,
     resave: false,
     saveUninitialized: true,
   });
@@ -272,7 +278,10 @@ async function main() {
 
   setupMiddleware();
   setupPassport(models);
-  setupAPI(app, models, viewCountCache, identityFetchCache);
+
+  const tokenMeta = await TokenBalanceCache.connectTokens(models, DEV ? 'mainnet' : 'mainnet');
+  await tokenBalanceCache.start(tokenMeta);
+  setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
   setupErrorHandlers(app, rollbar);
 

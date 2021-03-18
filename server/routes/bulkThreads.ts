@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+import { getLastEdited } from '../util/getLastEdited';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -44,7 +45,8 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         threads.version_history, threads.read_only, threads.body, threads.stage,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
-        topics.community_id AS topic_community, collaborators
+        topics.telegram AS topic_telegram,
+        topics.community_id AS topic_community, collaborators, chain_entities
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
@@ -54,7 +56,15 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
             CONCAT(
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
               )
-            ) AS collaborators
+            ) AS collaborators,
+          ARRAY_AGG(
+            CONCAT(
+              '{ "id": "', chain_entities.id, '",
+                  "type": "', chain_entities.type, '",
+                 "type_id": "', chain_entities.type_id, '",
+                 "completed": "', chain_entities.completed, '" }'
+              )
+            ) AS chain_entities
         FROM "OffchainThreads" t
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS comm_created_at
@@ -70,6 +80,8 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         ON t.id = collaborations.offchain_thread_id
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
+        LEFT JOIN "ChainEntities" AS chain_entities
+        ON t.id = chain_entities.thread_id
         WHERE t.deleted_at IS NULL
           AND t.${communityOptions}
           ${topicOptions}
@@ -100,13 +112,17 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];
+      const chain_entities = JSON.parse(t.chain_entities[0]).id
+        ? t.chain_entities.map((c) => JSON.parse(c))
+        : [];
+      const last_edited = getLastEdited(t);
 
       const data = {
         id: t.thread_id,
         title: t.thread_title,
         url: t.url,
         body: t.body,
-        version_history: t.version_history,
+        last_edited,
         kind: t.kind,
         stage: t.stage,
         read_only: t.read_only,
@@ -115,6 +131,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         chain: t.thread_chain,
         created_at: t.thread_created,
         collaborators,
+        chain_entities,
         Address: {
           id: t.addr_id,
           address: t.addr_address,
@@ -127,7 +144,8 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           name: t.topic_name,
           description: t.topic_description,
           communityId: t.topic_community,
-          chainId: t.topic_chain
+          chainId: t.topic_chain,
+          telegram: t.telegram,
         };
       }
       return data;
@@ -139,6 +157,12 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       },
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
+    }).map((c, idx) => {
+      const row = c.toJSON();
+      const last_edited = getLastEdited(row);
+      delete row['version_history'];
+      row['last_edited'] = last_edited;
+      return row;
     });
   } else {
     const whereOptions = (community)
@@ -163,12 +187,24 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
         }
       ],
       order: [['created_at', 'DESC']],
+    }).map((t, idx) => {
+      const row = t.toJSON();
+      const last_edited = getLastEdited(row);
+      delete row['version_history'];
+      row['last_edited'] = last_edited;
+      return row;
     });
 
     comments = await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],
       order: [['created_at', 'DESC']],
+    }).map((c, idx) => {
+      const row = c.toJSON();
+      const last_edited = getLastEdited(row);
+      delete row['version_history'];
+      row['last_edited'] = last_edited;
+      return row;
     });
   }
 
@@ -200,7 +236,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       numPrevotingThreads,
       numVotingThreads,
       threads: cutoff_date ? threads : threads.map((t) => t.toJSON()),
-      comments: comments.map((c) => c.toJSON()),
+      comments, // already converted to JSON earlier
       reactions: reactions.map((r) => r.toJSON()),
     }
   });

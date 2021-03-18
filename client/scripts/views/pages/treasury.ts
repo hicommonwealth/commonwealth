@@ -78,20 +78,16 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   }
 };
 
-async function loadCmd() {
+function getModules() {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base !== ChainBase.Substrate) {
-    return;
+  if (app.chain.base === ChainBase.Substrate) {
+    const chain = (app.chain as Substrate);
+    return [ chain.council, chain.treasury, chain.democracyProposals, chain.democracy ];
+  } else {
+    throw new Error('invalid chain');
   }
-  const chain = (app.chain as Substrate);
-  await Promise.all([
-    chain.council.init(chain.chain, chain.accounts),
-    chain.treasury.init(chain.chain, chain.accounts),
-    chain.democracyProposals.init(chain.chain, chain.accounts),
-    chain.democracy.init(chain.chain, chain.accounts),
-  ]);
 }
 
 const TreasuryPage: m.Component<{}> = {
@@ -130,16 +126,19 @@ const TreasuryPage: m.Component<{}> = {
       });
     }
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-    if (onSubstrate && !(app.chain as Substrate).treasury.initialized) {
-      if (!(app.chain as Substrate).treasury.initializing) loadCmd();
-      return m(PageLoading, {
-        message: 'Connecting to chain',
-        title: [
-          'Treasury',
-          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-        ],
-        showNewProposalButton: true,
-      });
+    if (onSubstrate) {
+      const modules = getModules();
+      if (modules.some((mod) => !mod.ready)) {
+        app.chain.loadModules(modules);
+        return m(PageLoading, {
+          message: 'Connecting to chain',
+          title: [
+            'Treasury',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
+          showNewProposalButton: true,
+        });
+      }
     }
 
     const activeTreasuryProposals = onSubstrate

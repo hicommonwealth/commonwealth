@@ -13,7 +13,8 @@ import {
   CommunityInfo,
   NodeInfo,
   OffchainTopic,
-  Profile
+  Profile,
+  ChainEntity,
 } from 'models';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -30,19 +31,29 @@ export const modelFromServer = (thread) => {
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
-  const versionHistory = thread.version_history.map((v) => {
-    let history;
-    try {
-      history = JSON.parse(v || '{}');
-      history.author = typeof history.author === 'string'
-        ? JSON.parse(history.author)
-        : typeof history.author === 'object' ? history.author : null;
-      history.timestamp = moment(history.timestamp);
-    } catch (e) {
-      console.log(e);
-    }
-    return history;
-  });
+  let versionHistory;
+  if (thread.version_history) {
+    versionHistory = thread.version_history.map((v) => {
+      if (!v) return;
+      let history;
+      try {
+        history = JSON.parse(v);
+        history.author = typeof history.author === 'string'
+          ? JSON.parse(history.author)
+          : typeof history.author === 'object' ? history.author : null;
+        history.timestamp = moment(history.timestamp);
+      } catch (e) {
+        console.log(e);
+      }
+      return history;
+    });
+  }
+
+  const lastEdited = thread.last_edited
+    ? moment(thread.last_edited)
+    : versionHistory && versionHistory?.length > 1
+      ? versionHistory[0].timestamp
+      : null;
 
   return new OffchainThread(
     thread.Address.address,
@@ -62,7 +73,9 @@ export const modelFromServer = (thread) => {
     thread.url,
     thread.Address.chain,
     thread.pinned,
-    thread.collaborators
+    thread.collaborators,
+    thread.chain_entities,
+    lastEdited,
   );
 };
 
@@ -317,6 +330,35 @@ class ThreadsController {
       error: (err) => {
         notifyError('Could not update pinned state');
         console.error(err);
+      }
+    });
+  }
+
+  public async setLinkedChainEntities(args: { threadId: number, entities: ChainEntity[] }) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
+      type: 'POST',
+      data: {
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
+        'thread_id': args.threadId,
+        'chain_entity_id': args.entities.map((ce) => ce.id),
+        'jwt': app.user.jwt
+      },
+      success: (response) => {
+        const thread = this._store.getByIdentifier(args.threadId);
+        thread.chainEntities.splice(0);
+        args.entities.forEach((ce) => thread.chainEntities.push({
+          id: ce.id,
+          type: ce.type,
+          typeId: ce.typeId,
+        }));
+        return thread;
+      },
+      error: (err) => {
+        console.log('Failed to update linked proposals');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to update linked proposals');
       }
     });
   }

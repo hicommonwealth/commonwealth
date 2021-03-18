@@ -1,22 +1,19 @@
-import { first } from 'rxjs/operators';
-import { ApiRx } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { Call, AccountId } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
 import { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { ProposalModule } from 'models';
-import { Unsubscribable } from 'rxjs';
 import { IApp } from 'state';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateCollectiveProposal } from './collective_proposal';
 
 class SubstrateCollective extends ProposalModule<
-  ApiRx,
+  ApiPromise,
   ISubstrateCollectiveProposal,
   SubstrateCollectiveProposal
 > {
-  private _memberSubscription: Unsubscribable; // init in each overriden init() call
   private _members: SubstrateAccount[];
   public get members() { return this._members; }
   public isMember(account: SubstrateAccount): boolean {
@@ -31,7 +28,8 @@ class SubstrateCollective extends ProposalModule<
   private _Accounts: SubstrateAccounts;
 
   // TODO: we may want to track membership here as well as in elections
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+  public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+    this._disabled = !ChainInfo.api.query[this.moduleName];
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
     this._Chain = ChainInfo;
@@ -39,42 +37,33 @@ class SubstrateCollective extends ProposalModule<
 
     // load server proposals
     const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.CollectiveProposal);
-    entities.map((e) => {
+    entities.forEach((e) => {
       const event = e.chainEvents[0];
       if (event && (event.data as any).collectiveName === this.moduleName) {
         return this._entityConstructor(e);
       }
     });
 
-    return new Promise((resolve, reject) => {
-      this._Chain.api.pipe(first()).subscribe(async (api: ApiRx) => {
-        // register new chain-event handlers
-        this.app.chain.chainEntities.registerEntityHandler(
-          SubstrateTypes.EntityKind.CollectiveProposal, (entity, event) => {
-            if ((event.data as any).collectiveName === this.moduleName) {
-              this.updateProposal(entity, event);
-            }
-          }
-        );
+    // register new chain-event handlers
+    this.app.chain.chainEntities.registerEntityHandler(
+      SubstrateTypes.EntityKind.CollectiveProposal, (entity, event) => {
+        if ((event.data as any).collectiveName === this.moduleName) {
+          this.updateProposal(entity, event);
+        }
+      }
+    );
 
-        // fetch proposals from chain
-        await this.app.chain.chainEntities.fetchEntities(
-          this.app.chain.id,
-          () => this._Chain.fetcher.fetchCollectiveProposals(this.moduleName, this.app.chain.block.height)
-        );
+    // fetch proposals from chain
+    await this.app.chain.chainEntities.fetchEntities(
+      this.app.chain.id,
+      () => this._Chain.fetcher.fetchCollectiveProposals(this.moduleName, this.app.chain.block.height)
+    );
 
-        await new Promise<void>((memberResolve) => {
-          this._memberSubscription = api.query[this.moduleName].members().subscribe((members: Vec<AccountId>) => {
-            this._members = members.toArray().map((v) => this._Accounts.fromAddress(v.toString()));
-            memberResolve();
-          });
-        });
+    const members = await ChainInfo.api.query[this.moduleName].members() as Vec<AccountId>;
+    this._members = members.toArray().map((v) => this._Accounts.fromAddress(v.toString()));
 
-        this._initialized = true;
-        this._initializing = false;
-        resolve();
-      });
-    });
+    this._initialized = true;
+    this._initializing = false;
   }
 
   public createEmergencyCancellation(author: SubstrateAccount, threshold: number, referendumId: number) {
@@ -137,10 +126,10 @@ class SubstrateCollective extends ProposalModule<
 
     // handle differing versions of substrate API
     const txFunc = fromTechnicalCommittee
-      ? ((api: ApiRx) => api.tx.technicalCommittee.propose.meta.args.length === 3
+      ? ((api: ApiPromise) => api.tx.technicalCommittee.propose.meta.args.length === 3
         ? api.tx.technicalCommittee.propose(threshold, action, length)
         : api.tx.technicalCommittee.propose(threshold, action))
-      : ((api: ApiRx) => api.tx.council.propose.meta.args.length === 3
+      : ((api: ApiPromise) => api.tx.council.propose.meta.args.length === 3
         ? api.tx.council.propose(threshold, action, length)
         : (api.tx.council.propose as any)(threshold, action, null));
     return this._Chain.createTXModalData(
@@ -149,13 +138,6 @@ class SubstrateCollective extends ProposalModule<
       'createCouncilMotion',
       title
     );
-  }
-
-  public deinit() {
-    if (this._memberSubscription) {
-      this._memberSubscription.unsubscribe();
-    }
-    super.deinit();
   }
 }
 

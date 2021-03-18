@@ -86,7 +86,7 @@ $listing-right-flex: 1;
 
 @mixin listing-row-base {
     display: flex;
-    padding: 16px 20px 9px;
+    padding: 15px 20px 9px;
     margin: 0 -20px;
     cursor: pointer;
     &:hover {

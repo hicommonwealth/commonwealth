@@ -5,13 +5,13 @@ import $ from 'jquery';
 import { Button, Input, Form, FormGroup, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { ChainBase } from 'models';
+import { ChainBase, ChainInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
 // TODO: store ChainBase in the database, and check for substrate/cosmos chains instead
 const CHAINS_WITH_CLI = [
   'edgeware', 'kulupu', 'kusama', 'cosmos', 'edgeware-local', 'edgeware-testnet',
-  'darwinia', 'phala', 'plasm', 'polkadot', 'centrifuge',
+  'darwinia', 'phala', 'plasm', 'polkadot', 'centrifuge', 'clover',
 ];
 
 const LoginWithWalletDropdown: m.Component<{
@@ -49,7 +49,7 @@ const LoginWithWalletDropdown: m.Component<{
     });
     const sortedChainsWithCLI = sortedChains.filter((chain) => CHAINS_WITH_CLI.indexOf(chain.id) !== -1);
 
-    const getMenuItemForChain = (chain, cli?: boolean) => m(MenuItem, {
+    const getMenuItemForChain = (chain: ChainInfo, cli?: boolean) => m(MenuItem, {
       label: m('.chain-login-label', [
         m(ChainIcon, { chain, size: 20 }),
         m('.chain-login-label-name', [

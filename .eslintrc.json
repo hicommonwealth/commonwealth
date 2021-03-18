@@ -57,6 +57,7 @@
     "no-lonely-if": 0,
     "no-multi-spaces": 0,
     "strict": 0,
-    "no-await-in-loop": 0
+    "no-await-in-loop": 0,
+    "no-async-promise-executor": 0
   }
 }

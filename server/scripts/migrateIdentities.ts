@@ -7,10 +7,9 @@
 
 import _ from 'underscore';
 import { SubstrateTypes, SubstrateEvents, chainSupportedBy } from '@commonwealth/chain-events';
-import { spec } from '@edgeware/node-types';
 import { OffchainProfileInstance } from '../models/offchain_profile';
 import IdentityEventHandler from '../eventHandlers/identity';
-import { constructSubstrateUrl } from '../../shared/substrate';
+import { constructSubstrateUrl, selectSpec } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -48,7 +47,7 @@ export default async function (models, chain?: string): Promise<void> {
     // 2b. connect to chain and query all identities of found addresses
     log.info(`Fetching identities on chain ${node.chain} at url ${node.url}...`);
     const nodeUrl = constructSubstrateUrl(node.url);
-    const api = await SubstrateEvents.createApi(nodeUrl, spec);
+    const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     const identityEvents = await fetcher.fetchIdentities(addresses);
 

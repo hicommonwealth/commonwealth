@@ -7,22 +7,14 @@ import { u8aToString } from '@polkadot/util';
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
-import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling_proposal';
-import { first } from 'rxjs/operators';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
+import { MarlinProposalVote, MarlinVote } from 'controllers/chain/ethereum/marlin/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
-
-const signalingVoteToString = (v: VoteOutcome): string => {
-  const outcomeArray = v.toU8a();
-  // cut off trailing 0s
-  const sliceEnd = outcomeArray.indexOf(0);
-  return u8aToString(outcomeArray.slice(0, sliceEnd));
-};
 
 const VoteListing: m.Component<{
   proposal: AnyProposal,
@@ -61,7 +53,7 @@ const VoteListing: m.Component<{
               } else {
                 // fetch balance and store in cache
                 vnode.state.balancesCacheInitialized[vote.account.address] = true;
-                vote.account.balance.pipe(first()).toPromise().then((b) => {
+                vote.account.balance.then((b) => {
                   balance = b;
                   vnode.state.balancesCache[vote.account.address] = formatCoin(b, true);
                   m.redraw();
@@ -70,12 +62,6 @@ const VoteListing: m.Component<{
               }
             }
             switch (true) {
-              case (vote instanceof SignalingVote):
-                return m('.vote', [
-                  m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
-                  m('.vote-choice', signalingVoteToString((vote as SignalingVote).choices[0])),
-                  (balanceWeighted && balance) && m('.vote-balance', balance),
-                ]);
               case (vote instanceof BinaryVote):
                 switch (true) {
                   case (vote instanceof SubstrateDemocracyVote):
@@ -113,6 +99,12 @@ const VoteListing: m.Component<{
                   m('.vote-choice', (vote as MolochProposalVote).choice.toString()),
                   balance && m('.vote-balance', balance),
                 ]);
+              case (vote instanceof MarlinProposalVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  m('.vote-choice', (vote as MarlinProposalVote).choice.toString()),
+                  balance && m('.vote-balance', balance),
+                ]);
               default:
                 return m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
@@ -139,21 +131,7 @@ const VotingResults: m.Component<{ proposal }> = {
     const votes = proposal.getVotes();
 
     // TODO: fix up this function for cosmos votes
-    if (proposal instanceof EdgewareSignalingProposal) {
-      return m('.VotingResults', [
-        proposal.data.choices.map((outcome) => {
-          return m('.results-column', [
-            m('.results-header', signalingVoteToString(outcome)),
-            m('.results-cell', [
-              m(VoteListing, {
-                proposal,
-                votes: votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))
-              })
-            ])
-          ]);
-        }),
-      ]);
-    } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
+    if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.VotingResults', [
         m('.results-column', [
           m('.results-header', `Voted yes (${votes.filter((v) => v.choice === true).length})`),
@@ -191,6 +169,27 @@ const VotingResults: m.Component<{ proposal }> = {
             m(VoteListing, {
               proposal,
               votes: votes.filter((v) => v.choice === MolochVote.NO)
+            })
+          ]),
+        ])
+      ]);
+    } else if (proposal.votingType === VotingType.MarlinYesNo) {
+      return m('.ProposalVotingResults', [
+        m('.results-column', [
+          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === MarlinVote.YES).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === MarlinVote.YES)
+            })
+          ]),
+        ]),
+        m('.results-column', [
+          m('.results-header', `Voted no (${votes.filter((v) => v.choice === MarlinVote.NO).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === MarlinVote.NO)
             })
           ]),
         ])

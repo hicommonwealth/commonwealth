@@ -33,7 +33,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.InvalidChain));
   }
 
-  const existingAddress = await models.Address.findOne({
+  const existingAddress = await models.Address.scope('withPrivateData').findOne({
     where: { chain: req.body.chain, address: req.body.address }
   });
   if (!existingAddress) {
@@ -62,7 +62,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
     // has been transferred to someone else
     if (isAddressTransfer) {
       try {
-        const user = await models.User.findOne({ where: { id: oldId } });
+        const user = await models.User.scope('withPrivateData').findOne({ where: { id: oldId } });
         if (!user.email) {
           // users who register thru github don't have emails by default
           throw new Error(Errors.NoEmail);
@@ -91,7 +91,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
       const newAddress = await models.Address.findOne({
         where: { chain: req.body.chain, address: req.body.address },
       });
-      const user = await models.User.findOne({
+      const user = await models.User.scope('withPrivateData').findOne({
         where: { id: newAddress.user_id },
       });
       req.login(user, (err) => {

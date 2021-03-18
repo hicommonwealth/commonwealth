@@ -19,6 +19,7 @@ class OffchainComment<T extends IUniqueId> {
   public readonly rootProposal: number;
   public readonly childComments: number[];
   public readonly versionHistory: VersionHistory[];
+  public readonly lastEdited: moment.Moment;
 
   constructor(
     chain,
@@ -34,7 +35,8 @@ class OffchainComment<T extends IUniqueId> {
     rootProposal,
     parentComment?,
     community?,
-    authorChain?
+    authorChain?,
+    lastEdited?: moment.Moment,
   ) {
     this.chain = chain;
     this.author = author;
@@ -50,6 +52,7 @@ class OffchainComment<T extends IUniqueId> {
     this.rootProposal = rootProposal;
     this.community = community;
     this.authorChain = authorChain;
+    this.lastEdited = lastEdited;
   }
 }
 

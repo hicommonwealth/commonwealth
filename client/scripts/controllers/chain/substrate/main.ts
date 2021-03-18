@@ -11,7 +11,6 @@ import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateIdentities from './identities';
 import SubstrateChain from './shared';
-import EdgewareSignaling from '../edgeware/signaling';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;
@@ -23,7 +22,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public democracy: SubstrateDemocracy;
   public treasury: SubstrateTreasury;
   public identities: SubstrateIdentities;
-  public signaling: EdgewareSignaling;
   public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly chainEntities = new ChainEntityController();
 
@@ -51,7 +49,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.democracy = new SubstrateDemocracy(this.app);
     this.treasury = new SubstrateTreasury(this.app);
     this.identities = new SubstrateIdentities(this.app);
-    this.signaling = new EdgewareSignaling(this.app);
   }
 
   public async initApi(additionalOptions?) {
@@ -85,7 +82,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     ].map((m) => m.initialized ? m.deinit() : Promise.resolve()));
     this.accounts.deinit();
     this.chain.deinitMetadata();
-    this.chain.deinitApi();
+    await this.chain.deinitApi();
     console.log('Substrate stopped.');
   }
 }

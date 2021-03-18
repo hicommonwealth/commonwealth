@@ -6,13 +6,13 @@ import ThreadsController from './controllers/server/threads';
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
-  EdgewareSignalingProposal = 'signalingproposal',
   SubstrateCollectiveProposal = 'councilmotion',
   PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
+  MarlinProposal = 'marlinproposal',
 }
 
 export const proposalSlugToClass = () => {
@@ -37,11 +37,11 @@ export const proposalSlugToClass = () => {
   if (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot) {
     mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
   }
-  if (app.chain.class === ChainClass.Edgeware) {
-    mmap.set('signalingproposal', (app.chain as any).signaling);
-  }
   if (app.chain.class === ChainClass.Moloch) {
     mmap.set('molochproposal', (app.chain as any).governance);
+  }
+  if (app.chain.class === ChainClass.Marlin) {
+    mmap.set('marlinproposal', (app.chain as any).governance);
   }
   return mmap;
 };
@@ -58,11 +58,11 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['democracyproposal', 'Democracy Proposal'],
   ['democracypreimage', 'Democracy Preimage'],
   ['democracyimminent', 'Democracy Imminent Preimage'],
-  ['signalingproposal', 'Signaling Proposal'],
   ['councilmotion', 'Council Motion'],
   ['phragmenelection', 'Phragmen Council Candidacy'],
   ['treasuryproposal', 'Treasury Proposal'],
   ['discussion', 'Discussion Thread'],
+  ['marlinproposal', 'Proposal'],
   ['cosmosproposal', 'Proposal'],
   ['molochproposal', 'Proposal']
 ]);
@@ -80,4 +80,25 @@ export const idToProposal = (slug, id) => {
 export const uniqueIdToProposal = (uid) => {
   const [ slug, id ] = uid.split('_');
   return idToProposal(slug, id);
+};
+
+export const chainEntityTypeToProposalSlug = (t: string) => {
+  if (t === 'treasury-proposal') return ProposalType.SubstrateTreasuryProposal;
+  else if (t === 'democracy-referendum') return ProposalType.SubstrateDemocracyReferendum;
+  else if (t === 'democracy-proposal') return ProposalType.SubstrateDemocracyProposal;
+  else if (t === 'collective-proposal') return ProposalType.SubstrateCollectiveProposal;
+};
+
+export const chainEntityTypeToProposalName = (t: string) => {
+  if (t === 'treasury-proposal') return 'Treasury Proposal';
+  else if (t === 'democracy-referendum') return 'Referendum';
+  else if (t === 'democracy-proposal') return 'Democracy Proposal';
+  else if (t === 'collective-proposal') return 'Council Motion';
+};
+
+export const chainEntityTypeToProposalShortName = (t: string) => {
+  if (t === 'treasury-proposal') return 'TRES';
+  else if (t === 'democracy-referendum') return 'REF';
+  else if (t === 'democracy-proposal') return 'PROP';
+  else if (t === 'collective-proposal') return 'MOT';
 };
