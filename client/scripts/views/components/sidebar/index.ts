@@ -188,7 +188,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     if (onNotificationsPage(m.route.get())) return;
 
     return m('.OnchainNavigationModule.SidebarModule', [
-      m('.section-header', 'Vote'),
+      m('.sidebar-spacer'),
       // referenda (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
         && app.chain.network !== ChainNetwork.Darwinia
@@ -235,6 +235,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             m.route.set(`/${app.activeChainId()}/treasury`);
           },
         }),
+      m('.sidebar-spacer'),
       // council (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
         && m(Button, {
