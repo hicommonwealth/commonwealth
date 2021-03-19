@@ -133,9 +133,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               }
             }, 'Copy address'),
             vnode.state.copied && m('span.copy-done', 'Copied'),
-            // TODO: have "copied" and "copy address" occupy the same width,
-            //   so "claim address" does not move
-            // TODO: make dropdown reasonably styled/width
+            m('.space'),
             isClaimable && m(LoginWithWalletDropdown, {
               prepopulateAddress: account.address,
               loggingInWithAddress: !app.isLoggedIn(),

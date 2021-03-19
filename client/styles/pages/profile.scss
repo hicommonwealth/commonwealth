@@ -329,6 +329,9 @@
             text-decoration: none;
             color: $text-color-light;
         }
+        .space {
+            flex: 1;
+        }
     }
     .profile-headline {
         .no-headline {
