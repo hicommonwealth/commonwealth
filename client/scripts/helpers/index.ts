@@ -99,22 +99,6 @@ export function removeUrlPrefix(url) {
 /*
  * icons
  */
-export function featherIcon(icon, size, stroke, color) {
-  return m('svg.feather-icon', {
-    'width': size,
-    'height': size,
-    'fill': 'none',
-    'stroke': color,
-    'stroke-width': stroke,
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
-  }, [
-    m('use', {
-      'xlink:href': `/static/img/feather-sprite.svg#${icon}`
-    }),
-  ]);
-}
-
 export const SwitchIcon = {
   view: (vnode) => {
     return m('svg.SwitchIcon', {
@@ -138,19 +122,6 @@ export const SwitchIcon = {
       ]),
     ]);
   }
-};
-
-export const symbols = {
-  times: '\u00d7',
-  middot: '\u00b7',
-  checkmark: '\u2714',
-  rsaquo: '\u203a',
-  lsaquo: '\u2039',
-  raquo: '\u00bb',
-  laquo: '\u00ab',
-  copy: '\u00a9',
-  exclamation: '\u26a0\ufe0f',
-  triangle: '\u25be',
 };
 
 /*
