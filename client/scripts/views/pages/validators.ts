@@ -7,7 +7,7 @@ import { Grid, Col, Button, MenuItem, Tag } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
-import { formatNumberLong, pluralize, link } from 'helpers';
+import { formatNumberLong, pluralize, externalLink, link } from 'helpers';
 import { formatCoin } from 'adapters/currency';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { AddressInfo, ChainBase, ChainClass, IVote } from 'models';
@@ -31,6 +31,7 @@ const Validator: m.Component<{ info }> = {
   view: (vnode) => {
     if (!vnode.attrs.info) return;
     const { info } = vnode.attrs;
+    const rpcUrl = encodeURIComponent(app.chain?.meta?.url);
 
     return m('.Validator', [
       m(User, {
@@ -38,14 +39,14 @@ const Validator: m.Component<{ info }> = {
         popover: true,
         hideIdentityIcon: true
       }),
-      m(User, {
-        user: new AddressInfo(null, info.controller, info.chain, null),
-        popover: true,
-        hideIdentityIcon: true
-      }),
-      m('.validator-stat', info.total),
-      m('.validator-stat', info.own),
+      m('.validator-stat', info.total?.format(true)),
+      m('.validator-stat', info.commission),
       m('.validator-stat', pluralize(info.nominators, 'nominator')),
+      m('.validator-stat', [
+        externalLink('a', `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/staking`, 'Nominate'),
+        ' · ',
+        externalLink('a', `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/staking/query/${info.stash}`, 'Stats'),
+      ]),
     ]);
   }
 };
@@ -73,26 +74,32 @@ const ValidatorsPage: m.Component<{}, { validators, validatorsInitialized: boole
     }
 
     if (app.chain?.base === ChainBase.Substrate && app.chain.apiInitialized && !vnode.state.validatorsInitialized) {
-      vnode.state.validatorsInitialized = true;
-      (app.chain as Substrate).accounts.validators.then((results) => {
-        vnode.state.validators = Object.entries(results).map(([address, info]) => ({
-          chain: app.chain.meta.chain.id,
-          stash: address,
-          controller: info.controller,
-          isElected: info.isElected,
-          total: info.exposure.total, // TODO: convert to Coins
-          own: info.exposure.own, // TODO: convert to Coins
-          nominators: info.exposure.others.length,
-        }));
+      (app.chain as Substrate).accounts.getValidators().then((result) => {
+        vnode.state.validators = result;
       });
+      vnode.state.validatorsInitialized = true;
       // TODO: handle error fetching vals
     }
     const validators = vnode.state.validators;
 
+    if (!validators) {
+      return m(PageLoading, {
+        message: 'Loading validators',
+        title: [
+          'Validators',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
+        showNewProposalButton: true
+      });
+    }
+
+    const sort = 'amount';
+    // also: nominators, return
+
     return m(Sublayout, {
       class: 'ValidatorsPage',
       title: [
-        'Validator',
+        'Validators',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,
@@ -128,7 +135,12 @@ const ValidatorsPage: m.Component<{}, { validators, validatorsInitialized: boole
       ]),
       // validators
       m('h3', 'Validators'),
-      validators?.map((info) => m(Validator, { info })),
+      (sort === 'amount'
+        ? validators?.sort((a, b) => b.total?.toString() - a.total?.toString())
+        : sort === 'nominators'
+          ? validators?.sort((a, b) => b.nominators - a.nominators)
+          : validators?.sort((a, b) => b.expectedReturn - a.expectedReturn)
+      ).map((info) => m(Validator, { info })),
       m('.clear'),
     ]);
   },
