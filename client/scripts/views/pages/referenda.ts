@@ -1,4 +1,4 @@
-import 'pages/proposals.scss';
+import 'pages/referenda.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';

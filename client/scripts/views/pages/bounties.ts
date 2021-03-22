@@ -1,4 +1,4 @@
-import 'pages/proposals.scss';
+import 'pages/bounties.scss';
 
 import m from 'mithril';
 import app from 'state';
@@ -77,7 +77,7 @@ const BountyPage: m.Component<{}> = {
       : [ m('.no-proposals', 'None') ];
 
     return m(Sublayout, {
-      class: 'BountiesPage TreasuryPage',
+      class: 'BountiesPage',
       title: [
         'Bounties',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })

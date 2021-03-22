@@ -148,3 +148,47 @@ $listing-right-flex: 1;
         }
     }
 }
+
+@mixin gov-explainer {
+    .stats-box {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding: 24px 20px 18px;
+        border-radius: 10px;
+        background-color: #f8f8f8;
+        display: flex;
+        .stats-box-left {
+            font-size: 28px;
+            margin-right: 16px;
+        }
+        .stats-box-right {
+        }
+
+        .stats-box-stat {
+            margin: 6px 0 0;
+        }
+        .stats-box-action {
+        }
+    }
+    @include sm-max {
+        .stats-box {
+            padding-bottom: 0;
+        }
+        .stats-box-left {
+            display: none;
+        }
+    }
+
+    h3 {
+        margin-bottom: 0;
+        clear: both;
+    }
+    .clear + h3 {
+        margin-top: 40px;
+    }
+
+    .no-proposals {
+        margin-top: 10px;
+        color: $text-color-light;
+    }
+}
