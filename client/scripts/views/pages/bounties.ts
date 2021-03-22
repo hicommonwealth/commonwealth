@@ -28,7 +28,7 @@ function getModules() {
   }
 }
 
-const BountyPage: m.Component<{}> = {
+const BountiesPage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
@@ -84,16 +84,22 @@ const BountyPage: m.Component<{}> = {
       ],
       showNewProposalButton: true,
     }, [
-      m(Grid, {
-        align: 'middle',
-        class: 'stats-container',
-        gutter: 5,
-        justify: 'space-between'
-      }, [
-        m(Col, { span: { xs: 6, md: 3 } }, [
-          m('.stats-tile', [
-            m('.stats-heading', 'Treasury balance'),
-            app.chain && formatCoin((app.chain as Substrate).treasury.pot),
+      // stats
+      m('.stats-box', [
+        m('.stats-box-left', '💭'),
+        m('.stats-box-right', [
+          m('', [
+            m('strong', 'Bounties'),
+            m('span', [
+              ' are requests for treasury funding that are managed by a curator. ',
+              'A majority of councillors can approve a bounty, and then the curator can award the bounty to a recipient.' // TODO numbers
+            ]),
+          ]),
+          m('', [
+            m('.stats-box-stat', [
+              'Treasury balance: ',
+              app.chain && formatCoin((app.chain as Substrate).treasury.pot),
+            ]),
           ]),
         ]),
       ]),
@@ -109,4 +115,4 @@ const BountyPage: m.Component<{}> = {
   }
 };
 
-export default BountyPage;
+export default BountiesPage;

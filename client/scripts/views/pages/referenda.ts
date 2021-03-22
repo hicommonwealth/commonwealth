@@ -37,14 +37,14 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
           m('strong', 'Referenda'),
           m('span', [
             ' are final votes required to enact most governance actions. ',
-            'A referendum can approve/reject a treasury proposal, upgrade the chain, change technical parameters, or perform a batch of actions.',
-            'Referendum voters may elect to lock their coins for 8 days to 196 days, for 1x to 6x weight. Only the winning side’s coins will be locked.'
+            'A referendum can approve/reject a treasury proposal, upgrade the chain, or change technical parameters. ',
+            'Voters may lock their coins for up to 196 days, for 6x weight. Only the winning side’s coins are locked. '
             // TODO fix numbers
           ]),
         ]),
         m('', [
           m('.stats-box-stat', [
-            'Next referendum launches: ',
+            'Next referendum launch: ',
             (app.chain as Substrate).democracyProposals.nextLaunchBlock
               ? m(CountdownUntilBlock, {
                 block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,

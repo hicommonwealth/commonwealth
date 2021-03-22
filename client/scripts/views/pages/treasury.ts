@@ -1,4 +1,4 @@
-import 'pages/proposals.scss';
+import 'pages/treasury.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
@@ -46,7 +46,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
               'Treasury balance: ', formatCoin((app.chain as Substrate).treasury.pot),
             ]),
             m('.stats-box-stat', [
-              'Next treasury spend:' ,
+              'Next treasury spend: ',
               (app.chain as Substrate).treasury.nextSpendBlock
                 ? m(CountdownUntilBlock, {
                   block: (app.chain as Substrate).treasury.nextSpendBlock,
