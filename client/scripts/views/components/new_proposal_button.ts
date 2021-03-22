@@ -11,7 +11,7 @@ import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import Token from 'controllers/chain/ethereum/token/adapter';
-import { CandidacyButton, CollectiveVotingButton, getCouncilCandidates } from '../pages/council';
+import { CandidacyButton, CollectiveVotingButton } from '../pages/council';
 
 const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
   const activeAccount = app.user.activeAccount;
@@ -59,11 +59,6 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
 };
 
 export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
-  oninit: (vnode) => {
-    if (app.chain && m.route.get().includes('council')) {
-      vnode.state.councilCandidates = getCouncilCandidates();
-    }
-  },
   view: (vnode) => {
     return m('.NewProposalButton.MobileNewProposalButton', [
       m(PopoverMenu, {

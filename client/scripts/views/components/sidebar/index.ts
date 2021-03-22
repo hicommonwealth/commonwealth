@@ -188,7 +188,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     if (onNotificationsPage(m.route.get())) return;
 
     return m('.OnchainNavigationModule.SidebarModule', [
-      m('.section-header', 'Vote'),
+      m('.sidebar-spacer'),
       // referenda (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
         && app.chain.network !== ChainNetwork.Darwinia
@@ -223,7 +223,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
         }),
       // treasury (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge 
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -235,6 +235,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             m.route.set(`/${app.activeChainId()}/treasury`);
           },
         }),
+      m('.sidebar-spacer'),
       // council (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
         && m(Button, {
@@ -248,19 +249,19 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             m.route.set(`/${app.activeChainId()}/council`);
           },
         }),
-      // validators (substrate and cosmos only)
-      // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-      //   m(Button, {
-      //     fluid: true,
-      //     rounded: true,
-      //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
-      //     active: onValidatorsPage(m.route.get()),
-      //     label: 'Validators',
-      //     onclick: (e) => {
-      //       e.preventDefault();
-      //       m.route.set(`/${app.activeChainId()}/validators`),
-      //     },
-      //   }),
+      // validators (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          contentLeft: m(Icon, { name: Icons.SHARE_2 }),
+          active: onValidatorsPage(m.route.get()),
+          label: 'Validators',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/validators`);
+          },
+        }),
       showMarlinOptions && m(Button, {
         fluid: true,
         rounded: true,

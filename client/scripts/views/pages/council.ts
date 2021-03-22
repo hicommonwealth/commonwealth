@@ -24,15 +24,34 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import PageLoading from 'views/pages/loading';
 import ViewVotersModal from 'views/modals/view_voters_modal';
-import CouncilRow from 'views/pages/council/council_row';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 
-interface ICouncilElectionVoterAttrs {
-  vote: PhragmenElectionVote;
-}
+const Councillor: m.Component<{ account }> = {
+  view: (vnode) => {
+    if (!vnode.attrs.account) return;
+    const { account } = vnode.attrs;
 
-const CouncilElectionVoter: m.Component<ICouncilElectionVoterAttrs> = {
+    // TODO: refactor this logic to the top level
+    const election = (app.chain as Substrate).phragmenElections;
+    const votes: PhragmenElectionVote[] = (app.chain as Substrate).phragmenElections.activeElection.getVotes()
+      .filter((v) => v.votes.includes(account.address));
+    const hasMyVote = app.user.activeAccount && votes.filter((v) => v.account === app.user.activeAccount);
+
+    return m('.Councillor', [
+      m(User, { user: account, popover: true, hideIdentityIcon: true }),
+      m('.councillor-status', [
+        election.isMember(account)
+          ? `${election.backing(account).format(true)} from ${pluralize(votes.length, 'voter')}`
+          : `??? from ${pluralize(votes.length, 'voter')}`
+      ]),
+    ]);
+  }
+};
+
+const CouncilElectionVoter: m.Component<{
+  vote: PhragmenElectionVote;
+}> = {
   view: (vnode) => {
     const myAccount = app.user.activeAccount as SubstrateAccount;
     const voter = vnode.attrs.vote as PhragmenElectionVote;
@@ -244,7 +263,7 @@ const CouncilPage: m.Component<{}> = {
     if (modules.some((mod) => !mod.ready)) {
       app.chain.loadModules(modules);
       return m(PageLoading, {
-        message: 'Connecting to chain',
+        message: 'Loading council',
         title: [
           'Council',
           m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -281,23 +300,19 @@ const CouncilPage: m.Component<{}> = {
         gutter: 5,
         justify: 'space-between'
       }, [
-        m(Col, { span: { xs: 6, md: 3 } }, [
+        m(Col, { span: { xs: 6, md: 4 } }, [
           m('.stats-heading', 'Councillors'),
           m('.stats-tile', `${councillors?.length} / ${nSeats}`),
         ]),
-        m(Col, { span: { xs: 6, md: 3 } }, [
+        m(Col, { span: { xs: 6, md: 4 } }, [
           m('.stats-heading', 'Runners-up'),
           m('.stats-tile', [
             `${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)} / ${nRunnersUpSeats}`
           ]),
         ]),
-        m(Col, { span: { xs: 6, md: 3 } }, [
+        m(Col, { span: { xs: 6, md: 4 } }, [
           m('.stats-heading', 'Next council'),
           m('.stats-tile', m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false })),
-        ]),
-        m(Col, { span: { xs: 6, md: 3 } }, [
-          m('.stats-heading', 'Candidacy bond'),
-          m('.stats-tile', candidacyBond),
         ]),
       ]),
       m('.button-wrap', {
@@ -307,28 +322,15 @@ const CouncilPage: m.Component<{}> = {
         m(CandidacyButton, { buttonStyle: true, candidates }),
       ]),
       // councillors
-      m(Listing, {
-        content: councillors.length === 0
-          ? [ m('.no-proposals', 'None') ]
-          : [m('.councillors', [
-            councillors.map(
-              (account) => m(CouncilRow, { account })
-            ),
-            m('.clear'),
-          ])],
-        columnHeader: 'Councillors',
-      }),
-      // candidates
-      m(Listing, {
-        content: candidates.length === 0
-          ? [ m('.no-proposals', 'None') ]
-          : [
-            candidates.filter(([ account ]) => !councillors.includes(account))
-              .map(([account, slot]) => m(CouncilRow, { account })),
-            m('.clear'),
-          ],
-        columnHeader: 'Runners-up',
-      })
+      m('h3', 'Councillors'),
+      councillors.map(
+        (account) => m(Councillor, { account })
+      ),
+      m('.clear'),
+      m('h3', 'Runners-up'),
+      candidates.filter(([ account ]) => !councillors.includes(account))
+        .map(([account, slot]) => m(Councillor, { account })),
+      m('.clear'),
     ]);
   },
 };
