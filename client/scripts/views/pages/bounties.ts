@@ -2,8 +2,13 @@ import 'pages/proposals.scss';
 
 import m from 'mithril';
 import app from 'state';
+import { Grid, Col, List, Tag } from 'construct-ui';
+
+import { formatCoin } from 'adapters/currency';
+import { formatDuration, blockperiodToDuration } from 'helpers';
 
 import { ChainBase } from 'models';
+import { CountdownUntilBlock } from 'views/components/countdown';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import ProposalRow from 'views/components/proposal_row';
@@ -17,7 +22,7 @@ function getModules() {
   }
   if (app.chain.base === ChainBase.Substrate) {
     const chain = (app.chain as Substrate);
-    return [ chain.bounties ];
+    return [ chain.bounties, chain.treasury ];
   } else {
     throw new Error('invalid chain');
   }
@@ -67,6 +72,19 @@ const BountyPage: m.Component<{}> = {
       title: 'Bounties',
       showNewProposalButton: true,
     }, [
+      m(Grid, {
+        align: 'middle',
+        class: 'stats-container',
+        gutter: 5,
+        justify: 'space-between'
+      }, [
+        m(Col, { span: { xs: 6, md: 3 } }, [
+          m('.stats-tile', [
+            m('.stats-heading', 'Treasury balance'),
+            app.chain && formatCoin((app.chain as Substrate).treasury.pot),
+          ]),
+        ]),
+      ]),
       m(Listing, {
         content: activeBountyContent,
         columnHeader: 'Active Bounties',

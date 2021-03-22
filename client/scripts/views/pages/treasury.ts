@@ -50,7 +50,6 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
         ]),
       ]),
       m(Col, { span: { xs: 6, md: 3 } }, [
-        // TODO: Pot is under construction
         m('.stats-tile', [
           m('.stats-heading', 'Treasury balance'),
           app.chain && formatCoin((app.chain as Substrate).treasury.pot),

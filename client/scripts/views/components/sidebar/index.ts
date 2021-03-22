@@ -236,6 +236,19 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
             m.route.set(`/${app.activeChainId()}/treasury`);
           },
         }),
+      // bounties (substrate only)
+      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
+        && m(Button, {
+          fluid: true,
+          rounded: true,
+          contentLeft: m(Icon, { name: Icons.PAPERCLIP }),
+          active: onBountiesPage(m.route.get()),
+          label: 'Bounties',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeChainId()}/bounties`);
+          },
+        }),
       m('.sidebar-spacer'),
       // council (substrate only)
       !app.community && app.chain?.base === ChainBase.Substrate
@@ -261,19 +274,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/validators`);
-          },
-        }),
-      // bounties (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          contentLeft: m(Icon, { name: Icons.PAPERCLIP }),
-          active: onBountiesPage(m.route.get()),
-          label: 'Bounties',
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set(`/${app.activeChainId()}/bounties`);
           },
         }),
       showMarlinOptions && m(Button, {
