@@ -34,7 +34,6 @@ import {
 } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
-import ProposalVotingTreasuryEmbed from 'views/components/proposals/treasury_embed';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
@@ -58,6 +57,7 @@ import {
   ProposalEditorPermissions,
 } from './body';
 import CreateComment from './create_comment';
+import LinkedProposalsEmbed from './linked_proposals_embed';
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -761,7 +761,7 @@ const ViewProposalPage: m.Component<{
         getSetGlobalReplyStatus
       }),
       !(proposal instanceof OffchainThread)
-        && m(ProposalVotingTreasuryEmbed, { proposal }),
+        && m(LinkedProposalsEmbed, { proposal }),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingResults, { proposal }),
       !(proposal instanceof OffchainThread)
