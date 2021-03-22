@@ -18,7 +18,7 @@ const updateChainEntityTitle = async (models, req: Request, res: Response, next:
   const userOwnedAddressObjects = await req.user.getAddresses()
     .filter((addr) => !!addr.verified);
   const userOwnedAddresses = userOwnedAddressObjects.map((addr) => addr.address);
-  const userOwnedAddressIds = userOwnedAddressObjects.map((addr) => addr.address);
+  const userOwnedAddressIds = userOwnedAddressObjects.map((addr) => addr.id);
 
   // Todo: author check
   if (!userOwnedAddresses.includes(entity.author)) {
