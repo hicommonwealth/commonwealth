@@ -157,19 +157,20 @@ const LoginSelector: m.Component<{
       (app.chain || app.community) && !app.chainPreloading && vnode.state.profileLoadComplete && !app.user.activeAccount && m(Button, {
         class: 'login-selector-left',
         onclick: async (e) => {
+          const joiningChain = app.activeChainId();
+          const joiningCommunity = app.activeCommunityId();
+
           const activeAccountsFiltered = app.user.activeAccounts.reduce((arr, current) => {
-            if (!arr.find((item) => item.address === current.address)) {
+            if (!arr.find((item) => item.address === current.address && item.chainBase === networkToBase(joiningChain))) {
               return [...arr, current];
             }
             return arr;
           }, []);
+
           if (activeAccountsFiltered.length === 1) {
             const address = activeAccountsFiltered[0].address;
-            const joiningChain = app.activeChainId();
-            const joiningCommunity = app.activeCommunityId();
 
-            const originAddressInfo = app.user.addresses
-              .find((a) => a.address === address && networkToBase(a.chain) === networkToBase(joiningChain));
+            const originAddressInfo = app.user.addresses.find((a) => a.address === address && networkToBase(a.chain) === networkToBase(joiningChain));
 
             if (originAddressInfo) {
               try {
