@@ -42,13 +42,13 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
         m('', [
           m('strong', 'Democracy Proposals'),
           m('span', [
-            ' can be introduced by anyone to approve/reject treasury proposals, upgrade the chain, or change technical parameters. ',
+            ' can be introduced by anyone. ',
             'At a regular interval, the top ranked proposal will become a supermajority-required referendum.',
           ]),
           m('p', [
             m('strong', 'Council Motions'),
             m('span', [
-              ' can be introduced by councillors. They can be used to directly approve/reject treasury proposals, ',
+              ' can be introduced by councillors. They can directly approve/reject treasury proposals, ',
               'propose simple-majority referenda, or create fast-track referenda.',
             ]),
           ]),
