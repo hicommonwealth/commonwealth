@@ -45,7 +45,6 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         vnode.state.disabled = false;
         if (result.status === 'Success') {
           vnode.state.success = true;
-          notifySuccess('Webhook saved!');
           const newWebhook = Webhook.fromJSON(result.result);
           vnode.attrs.webhooks.push(newWebhook);
           app.modals.create({
