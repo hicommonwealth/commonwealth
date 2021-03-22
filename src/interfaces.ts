@@ -183,6 +183,7 @@ export function eventToEntity(event: IChainEventKind): [ IChainEntityKind, Entit
     case SubstrateTypes.EventKind.DemocracyStarted: {
       return [ SubstrateTypes.EntityKind.DemocracyReferendum, EntityEventKind.Create ];
     }
+    case SubstrateTypes.EventKind.DemocracyVoted:
     case SubstrateTypes.EventKind.DemocracyPassed: {
       return [ SubstrateTypes.EntityKind.DemocracyReferendum, EntityEventKind.Update ];
     }
