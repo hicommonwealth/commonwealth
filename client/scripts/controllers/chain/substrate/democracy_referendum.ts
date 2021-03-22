@@ -17,6 +17,7 @@ import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracy from './democracy';
 import SubstrateDemocracyProposal from './democracy_proposal';
+import { SubstrateTreasuryProposal } from './treasury_proposal';
 import { SubstrateCollectiveProposal } from './collective_proposal';
 import Substrate from './main';
 
@@ -205,11 +206,11 @@ export class SubstrateDemocracyReferendum
     this.createdAt = entity.createdAt;
 
     // see if associated entity title exists, otherwise try to populate title with preimage
-    const associatedProposalOrMotion = this.getProposalOrMotion();
+    const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
+    const associatedProposalOrMotion = this.getProposalOrMotion(preimage);
     if (associatedProposalOrMotion) {
       this.title = associatedProposalOrMotion.title;
     } else {
-      const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
       if (preimage) {
         this._preimage = preimage;
         this.title = formatCall(preimage);
@@ -237,7 +238,8 @@ export class SubstrateDemocracyReferendum
   // TODO: This may cause issues if we have the same Call proposed twice, as this will only fetch the
   //   first one in storage. To fix this, we will need to use some timing heuristics to check that
   //   this referendum was created approximately when the found proposal concluded.
-  public getProposalOrMotion(): SubstrateDemocracyProposal | SubstrateCollectiveProposal | undefined {
+  public getProposalOrMotion(preimage): SubstrateDemocracyProposal | SubstrateCollectiveProposal
+    | SubstrateTreasuryProposal | undefined {
     // ensure all modules have loaded
     if (!this._Chain.app.isModuleReady) return;
 
@@ -252,6 +254,12 @@ export class SubstrateDemocracyReferendum
       return p.data.hash === this.hash;
     });
     if (collectiveProposal) return collectiveProposal;
+
+    // search for treasury proposal for approveProposal only (not rejectProposal)
+    if (preimage.section === 'treasury' && preimage.method === 'approveProposal') {
+      return chain.treasury?.store.getByIdentifier(preimage.args[0]);
+    }
+
     console.log('could not find:',
       this.hash,
       chain.council?.store.getAll().map((c) => c.data.hash),
@@ -307,7 +315,9 @@ export class SubstrateDemocracyReferendum
         const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._preimage = preimage;
-          this.title = formatCall(preimage);
+          if (!this.title) {
+            this.title = formatCall(preimage);
+          }
         }
         break;
       }
