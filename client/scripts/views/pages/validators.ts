@@ -31,7 +31,6 @@ const Validator: m.Component<{ info }> = {
   view: (vnode) => {
     if (!vnode.attrs.info) return;
     const { info } = vnode.attrs;
-    const rpcUrl = encodeURIComponent(app.chain?.meta?.url);
 
     return m('.Validator', [
       m(User, {
@@ -39,19 +38,20 @@ const Validator: m.Component<{ info }> = {
         popover: true,
         hideIdentityIcon: true
       }),
-      m('.validator-stat', info.total?.format(true)),
-      m('.validator-stat', info.commission),
-      m('.validator-stat', pluralize(info.nominators, 'nominator')),
       m('.validator-stat', [
-        externalLink('a', `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/staking`, 'Nominate'),
-        ' · ',
-        externalLink('a', `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/staking/query/${info.stash}`, 'Stats'),
+        info.total?.format(true),
+        ' from ',
+        pluralize(info.nominators, 'nominator'),
+      ]),
+      m('.validator-stat', { style: 'color: #999' }, [
+        info.commission,
+        ' commission',
       ]),
     ]);
   }
 };
 
-const ValidatorsPage: m.Component<{}, { validators, validatorsInitialized: boolean }> = {
+const ValidatorsPage: m.Component<{}, { validators, totalStaked, validatorsInitialized: boolean }> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
@@ -76,9 +76,16 @@ const ValidatorsPage: m.Component<{}, { validators, validatorsInitialized: boole
     if (app.chain?.base === ChainBase.Substrate && app.chain.apiInitialized && !vnode.state.validatorsInitialized) {
       (app.chain as Substrate).accounts.getValidators().then((result) => {
         vnode.state.validators = result;
+
+        // calculate total staked
+        vnode.state.totalStaked = (app.chain as Substrate).chain.coins(0);
+        (result as any).forEach((va) => {
+          vnode.state.totalStaked = (app.chain as Substrate).chain
+            .coins(vnode.state.totalStaked.asBN.add(va.total.asBN));
+        });
       });
-      vnode.state.validatorsInitialized = true;
       // TODO: handle error fetching vals
+      vnode.state.validatorsInitialized = true;
     }
     const validators = vnode.state.validators;
 
@@ -114,24 +121,29 @@ const ValidatorsPage: m.Component<{}, { validators, validatorsInitialized: boole
         m(Col, { span: { xs: 6, md: 4 } }, [
           m('.stats-heading', 'Validators'),
           m('.stats-tile', `${validators?.length}`),
-//           -
-// -    let totalStaked = (app.chain as Substrate).chain.coins(0);
-// -    Object.entries(validators).forEach(([_stash, { exposure }]) => {
-// -      const valStake = (app.chain as Substrate).chain.coins(exposure.total.toBn());
-// -      totalStaked = (app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));
-// -    });
-// -
-// -    return m('.validators-preheader', [
-// -      m('.validators-preheader-item', [
-// -        m('h3', 'Total Supply'),
-// -        m('.preheader-item-text', (app.chain as Substrate).chain.totalbalance.format(true)),
-// -      ]),
-// -      m('.validators-preheader-item', [
-// -        m('h3', 'Total Staked'),
-// -        m('.preheader-item-text', totalStaked.format(true)),
-// -      ]),
-// -    ]);
         ]),
+        m(Col, { span: { xs: 6, md: 4 } }, [
+          m('.stats-heading', 'Total Staked'),
+          m('.stats-tile', [
+            vnode.state.totalStaked.format(true),
+            ' / ',
+            (app.chain as Substrate).chain.totalbalance.format(true),
+          ]),
+        ]),
+      ]),
+      m('.button-wrap', {
+        style: 'margin: 15px 0 0; text-align: end'
+      }, [
+        m(Button, {
+          intent: 'primary',
+          label: 'Nominate on polkadot-js',
+          rounded: true,
+          disabled: !app.chain?.meta?.url,
+          onclick: (e) => {
+            e.preventDefault();
+            window.open(`https://polkadot.js.org/apps/?rpc=${encodeURIComponent(app.chain?.meta?.url)}#/staking`);
+          },
+        }),
       ]),
       // validators
       m('h3', 'Validators'),

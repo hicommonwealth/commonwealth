@@ -42,8 +42,8 @@ const Councillor: m.Component<{ account }> = {
       m(User, { user: account, popover: true, hideIdentityIcon: true }),
       m('.councillor-status', [
         election.isMember(account)
-          ? `${election.backing(account).format(true)} from ${pluralize(votes.length, 'account')}`
-          : `${votes.length} votes`
+          ? `${election.backing(account).format(true)} from ${pluralize(votes.length, 'voter')}`
+          : `??? from ${pluralize(votes.length, 'voter')}`
       ]),
     ]);
   }
