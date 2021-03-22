@@ -13,6 +13,7 @@ import Sidebar from 'views/components/sidebar';
 import MobileSidebarHeader from 'views/components/sidebar/mobile';
 import { getCouncilCandidates } from 'views/pages/council/index';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
@@ -112,7 +113,12 @@ const Sublayout: m.Component<{
               sublayoutHeaderRight,
             ]),
           ]),
-          hero && m('.sublayout-hero', hero),
+          hero
+            ? m('.sublayout-hero', hero)
+            : ((app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken && app.isLoggedIn())
+              ? m('.sublayout-hero.token-banner', [
+                m('.token-banner-content', `Link ${app.chain.meta.chain.symbol} address to participate in this community`),
+              ]) : '',
           m('.sublayout-body', [
             m('.sublayout-grid', [
               !hideSidebar && m('.sublayout-sidebar-col', [
