@@ -41,7 +41,7 @@ const BountyPage: m.Component<{}> = {
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 10s)...',
+        message: 'Connecting to chain',
         title: [
           'Bounties',
           m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -56,7 +56,7 @@ const BountyPage: m.Component<{}> = {
       if (modules.some((mod) => !mod.ready)) {
         app.chain.loadModules(modules);
         return m(PageLoading, {
-          message: 'Connecting to chain (may take up to 10s)...',
+          message: 'Connecting to chain',
           title: [
             'Bounties',
             m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })

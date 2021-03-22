@@ -37,7 +37,7 @@ export class SubstrateBounty
     const displayName = account.profile && account.profile.name
       ? `${account.profile.name} (${formatAddressShort(this.author.address, account.chain.id)})`
       : formatAddressShort(this.author.address, account.chain.id);
-    return `Bounty: ${formatCoin(this._value)} to ${displayName}`;
+    return `${(this.completed || this.active) ? '' : 'Proposed '} Bounty: ${formatCoin(this._value)} to ${displayName}`;
   }
   public get description() { return null; }
 
