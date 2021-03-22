@@ -31,6 +31,8 @@ export enum ChainNetwork {
   Ethereum = 'ethereum',
   NEAR = 'near',
   Moloch = 'moloch',
+  Marlin = 'marlin',
+  MarlinTestnet = 'marlin-testnet',
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
@@ -81,6 +83,8 @@ export enum ChainClass {
   Ethereum = 'ethereum',
   Near = 'near',
   Moloch = 'moloch',
+  Marlin = 'marlin',
+  MarlinTestnet = 'marlin-testnet',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
 }
@@ -112,10 +116,21 @@ export enum TransactionStatus {
 export enum ProposalStatus {
   Passing = 'pass',
   Failing = 'fail',
+  Canceled = 'canceled',
   Passed = 'passed',
   Failed = 'failed',
   None = 'none',
 }
+
+export enum BountyStatus {
+  Proposed = 'proposed',
+  Approved = 'approved',
+  Funded = 'funded',
+  CuratorProposed = 'curator_proposed',
+  Active = 'active',
+  PendingPayout = 'pending_payout',
+}
+
 export enum VotingType {
   SimpleYesNoVoting = 'binary',
   ConvictionYesNoVoting = 'binary_conviction',
@@ -125,6 +140,7 @@ export enum VotingType {
   MultiOptionVoting = 'multioption',
   None = 'none',
   MolochYesNo = 'moloch',
+  MarlinYesNo = 'marlin',
 }
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',

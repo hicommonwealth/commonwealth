@@ -35,14 +35,18 @@ const tokenBalanceCache = new TokenBalanceCache(0, 0);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
+const sessionStore = new SequelizeStore({
+  db: models.sequelize,
+  tableName: 'Sessions',
+  checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
+  expiration: 7 * 24 * 60 * 60 * 1000 // Set session expiration to 7 days
+});
+
+sessionStore.sync();
+
 const sessionParser = session({
   secret: SESSION_SECRET,
-  store: new SequelizeStore({
-    db: models.sequelize,
-    tableName: 'Sessions',
-    checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 7 * 24 * 60 * 60 * 1000 // Set session expiration to 7 days
-  }),
+  store: sessionStore,
   resave: false,
   saveUninitialized: true,
 });
@@ -114,6 +118,8 @@ const resetServer = (debug=false): Promise<void> => {
         icon_url: '/static/img/protocols/edg.png',
         active: true,
         type: 'chain',
+        base: 'substrate',
+        ss58_prefix: '7',
       });
       const eth = await models['Chain'].create({
         id: 'ethereum',
@@ -123,6 +129,7 @@ const resetServer = (debug=false): Promise<void> => {
         icon_url: '/static/img/protocols/eth.png',
         active: true,
         type: 'chain',
+        base: 'ethereum',
       });
       const alex = await models['Chain'].create({
         id: 'alex',
@@ -231,21 +238,6 @@ const resetServer = (debug=false): Promise<void> => {
         [ 'wss://ropsten.infura.io/ws', 'alex', '0xFab46E002BbF0b4509813474841E0716E6730136'],
       ];
       await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
-
-      // initialize chain event types
-      const initChainEventTypes = (chain) => {
-        return Promise.all(
-          SubstrateTypes.EventKinds.map((event_name) => {
-            return models['ChainEventType'].create({
-              id: `${chain}-${event_name}`,
-              chain,
-              event_name,
-            });
-          })
-        );
-      };
-
-      await initChainEventTypes('edgeware');
 
       if (debug) console.log('Database reset!');
       resolve();

@@ -6,12 +6,14 @@ import ThreadsController from './controllers/server/threads';
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
+  SubstrateBountyProposal = 'bountyproposal',
   SubstrateCollectiveProposal = 'councilmotion',
   PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
+  MarlinProposal = 'marlinproposal',
 }
 
 export const proposalSlugToClass = () => {
@@ -30,6 +32,7 @@ export const proposalSlugToClass = () => {
     mmap.set('councilmotion', (app.chain as any).council);
     mmap.set('phragmenelection', (app.chain as any).phragmenElections);
     mmap.set('treasuryproposal', (app.chain as any).treasury);
+    mmap.set('bountyproposal', (app.chain as any).bounties);
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     mmap.set('cosmosproposal', (app.chain as any).governance);
   }
@@ -38,6 +41,9 @@ export const proposalSlugToClass = () => {
   }
   if (app.chain.class === ChainClass.Moloch) {
     mmap.set('molochproposal', (app.chain as any).governance);
+  }
+  if (app.chain.class === ChainClass.Marlin) {
+    mmap.set('marlinproposal', (app.chain as any).governance);
   }
   return mmap;
 };
@@ -53,11 +59,13 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['referendum', 'Democracy Referendum'],
   ['democracyproposal', 'Democracy Proposal'],
   ['democracypreimage', 'Democracy Preimage'],
+  ['bountyproposal', 'Bounty Proposal'],
   ['democracyimminent', 'Democracy Imminent Preimage'],
   ['councilmotion', 'Council Motion'],
   ['phragmenelection', 'Phragmen Council Candidacy'],
   ['treasuryproposal', 'Treasury Proposal'],
   ['discussion', 'Discussion Thread'],
+  ['marlinproposal', 'Proposal'],
   ['cosmosproposal', 'Proposal'],
   ['molochproposal', 'Proposal']
 ]);

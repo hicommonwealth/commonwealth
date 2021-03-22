@@ -10,6 +10,7 @@ import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } f
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
+import { MarlinProposalVote, MarlinVote } from 'controllers/chain/ethereum/marlin/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 
@@ -98,6 +99,12 @@ const VoteListing: m.Component<{
                   m('.vote-choice', (vote as MolochProposalVote).choice.toString()),
                   balance && m('.vote-balance', balance),
                 ]);
+              case (vote instanceof MarlinProposalVote):
+                return m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                  m('.vote-choice', (vote as MarlinProposalVote).choice.toString()),
+                  balance && m('.vote-balance', balance),
+                ]);
               default:
                 return m('.vote', [
                   m('.vote-voter', m(User, { user: vote.account, linkify: true, popover: true })),
@@ -162,6 +169,27 @@ const VotingResults: m.Component<{ proposal }> = {
             m(VoteListing, {
               proposal,
               votes: votes.filter((v) => v.choice === MolochVote.NO)
+            })
+          ]),
+        ])
+      ]);
+    } else if (proposal.votingType === VotingType.MarlinYesNo) {
+      return m('.ProposalVotingResults', [
+        m('.results-column', [
+          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === MarlinVote.YES).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === MarlinVote.YES)
+            })
+          ]),
+        ]),
+        m('.results-column', [
+          m('.results-header', `Voted no (${votes.filter((v) => v.choice === MarlinVote.NO).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === MarlinVote.NO)
             })
           ]),
         ])

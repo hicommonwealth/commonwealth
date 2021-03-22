@@ -1,40 +1,6 @@
 @import 'client/styles/shared';
 
-.ProposalsPage, .TreasuryPage, .ReferendaPage {
-    padding-bottom: 36px;
-    .sublayout-body {
-        flex-direction: column;
-        .cui-list {
-            overflow-y: visible;
-            max-height: max-content;
-        }
-    }
-    .stats-container {
-        display: flex;
-        align-items: flex-start;
-        margin-top: 20px;
-        padding: 18px 20px 12px;
-        background-color: $background-color-light;
-        border-radius: 5px;
-        .stats-heading {
-            font-weight: 500;
-            line-height: 1.1;
-            margin-bottom: 2px;
-        }
-    }
-    .Listing {
-        margin-top: 20px;
-    }
-    .no-proposals {
-        margin-top: 10px;
-        color: $text-color-light;
-    }
-    @include sm-max {
-        .stats-container {
-            padding-bottom: 0;
-        }
-        .cui-col-xs-6 {
-            margin-bottom: 18px;
-        }
-    }
+.ProposalsPage {
+    padding-bottom: 60px;
+    @include gov-explainer;
 }

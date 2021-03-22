@@ -4,6 +4,7 @@ import { Codec } from '@polkadot/types/types';
 import { Call } from '@polkadot/types/interfaces';
 import { IIdentifiable, ICompletable } from '../../shared';
 import { Coin } from '../../currency';
+import { BountyStatus } from 'client/scripts/models/types';
 
 export function formatCall(c: Call | { section: string, method: string, args: string[] }): string {
   // build args string
@@ -63,6 +64,16 @@ export interface ISubstrateTreasuryProposal extends IIdentifiable {
   beneficiary: string;
   bond: u128;
   proposer: string;
+}
+
+export interface ISubstrateBounty extends IIdentifiable {
+  index: number;
+  proposer: string;
+  value: u128;
+  fee: u128;
+  curator_deposit: u128;
+  bond: u128;
+  status?: BountyStatus;
 }
 
 export interface ISubstrateCollectiveProposal extends IIdentifiable {
