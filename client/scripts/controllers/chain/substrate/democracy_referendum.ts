@@ -204,13 +204,18 @@ export class SubstrateDemocracyReferendum
     this.hash = eventData.proposalHash;
     this.createdAt = entity.createdAt;
 
-    // see if preimage exists and populate data if it does
-    const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
-    if (preimage) {
-      this._preimage = preimage;
-      this.title = formatCall(preimage);
+    // see if associated entity title exists, otherwise try to populate title with preimage
+    const associatedProposalOrMotion = this.getProposalOrMotion();
+    if (associatedProposalOrMotion) {
+      this.title = associatedProposalOrMotion.title;
     } else {
-      this.title = `Referendum #${this.data.index}`;
+      const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
+      if (preimage) {
+        this._preimage = preimage;
+        this.title = formatCall(preimage);
+      } else {
+        this.title = `Referendum #${this.data.index}`;
+      }
     }
 
     // handle events params for passing, if exists at init time
