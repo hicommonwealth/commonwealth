@@ -24,7 +24,7 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
-import { createUserWithAddress, setActiveAccount } from 'controllers/app/login';
+import { createUserWithAddress, linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
 import { networkToBase } from 'models/types';
 import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -161,54 +161,21 @@ const LoginSelector: m.Component<{
             const address = app.user.activeAccounts[0].address;
             const joiningChain = app.activeChainId();
             const joiningCommunity = app.activeCommunityId();
-            let account;
 
-            // TODO: when joining community
-            const base = networkToBase(joiningChain);
+            const originAddressInfo = app.user.addresses
+              .find((a) => a.address === address && networkToBase(a.chain) === networkToBase(joiningChain));
 
-            if (base === ChainBase.Substrate) {
-              // TODO: should check if the address is already linked to other account or this account
-              account = await createUserWithAddress(address) as SubstrateAccount;
-              const signer = await (app.chain as Substrate).webWallet.getSigner(address);
-              const token = account.validationToken;
-              const payload: SignerPayloadRaw = {
-                address: account.address,
-                data: stringToHex(token),
-                type: 'bytes',
-              };
-              const signature = (await signer.signRaw(payload)).signature;
-              await account.validate(signature);
-            } else if (base === ChainBase.Ethereum) {
-              const api = (app.chain as Ethereum);
-              const webWallet = api.webWallet;
-
-              account = await createUserWithAddress(address) as EthereumAccount;
-              const webWalletSignature = await webWallet.signMessage(account.validationToken);
-
-              await account.validate(webWalletSignature);
-            } else if (base === ChainBase.CosmosSDK) {
-              // TODO
-            } else if (base === ChainBase.NEAR) {
-              // TODO
-            }
-
-            let addressInfo = app.user.addresses
-              .find((a) => a.address === account.address && a.chain === account.chain.id);
-
-            console.log('account: ', account, addressInfo);
-
-            if (!addressInfo && account.addressId) {
-              addressInfo = new AddressInfo(account.addressId, account.address, account.chain.id, undefined);
-            }
-
-            if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
-              await app.user.createRole({ address: addressInfo, chain: joiningChain });
-            } else if (joiningCommunity && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
-              await app.user.createRole({ address: addressInfo, community: joiningCommunity });
-            }
-            await setActiveAccount(account);
-            if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
-              app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+            if (originAddressInfo) {
+              try {
+                await linkExistingAddressToChainOrCommunity(address, joiningChain, originAddressInfo.chain);
+                const account = app.chain ? app.chain.accounts.get(originAddressInfo.address, originAddressInfo.keytype) : app.community.accounts.get(originAddressInfo.address, joiningChain);
+                await setActiveAccount(account);
+                if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+                  app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+                }
+              } catch (e) {
+                console.error(e);
+              }
             }
           } else {
             app.modals.create({

@@ -34,6 +34,16 @@ function createAccount(account: Account<any>) {
   });
 }
 
+export function linkExistingAddressToChainOrCommunity(address: string, chain: string, originChain: string) {
+  console.log(address, chain, originChain);
+  return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
+    address,
+    chain,
+    originChain,
+    jwt: app.user.jwt,
+  });
+}
+
 export async function setActiveAccount(account: Account<any>): Promise<void> {
   const chain = app.activeChainId();
   const community = app.activeCommunityId();

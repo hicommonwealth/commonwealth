@@ -43,7 +43,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   }
 
   try {
-    const newObj = models.Address.create({
+    const newObj = await models.Address.create({
       user_id: existingAddress.user_id,
       address: existingAddress.address,
       chain: req.body.chain,
