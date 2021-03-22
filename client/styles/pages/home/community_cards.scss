@@ -67,6 +67,14 @@
                 white-space: nowrap;
                 text-overflow: ellipse;
                 overflow: hidden;
+                .cui-icon {
+                    position: relative;
+                    top: -2px;
+                    &::before {
+                        content: ' ';
+                        width: 4px;
+                    }
+                }
             }
             .chain-new {
                 margin: -4px 0;
