@@ -115,9 +115,10 @@ const Sublayout: m.Component<{
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : ((app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken) ? m('.sublayout-hero.token-banner', [
-              m('.token-banner-content', 'This is an ETH token forum'),
-            ]) : '',
+            : ((app.chain as Token)?.isToken && !(app.chain as Token)?.hasToken && app.isLoggedIn())
+              ? m('.sublayout-hero.token-banner', [
+                m('.token-banner-content', `Link ${app.chain.meta.chain.symbol} address to participate in this community`),
+              ]) : '',
           m('.sublayout-body', [
             m('.sublayout-grid', [
               !hideSidebar && m('.sublayout-sidebar-col', [
