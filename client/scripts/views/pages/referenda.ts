@@ -99,7 +99,7 @@ const ReferendaPage: m.Component<{}> = {
         });
       }
       return m(PageLoading, {
-        message: 'Connecting to chain',
+        message: 'Loading referenda',
         title: [
           'Referenda',
           m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })

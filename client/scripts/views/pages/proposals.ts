@@ -146,7 +146,7 @@ const ProposalsPage: m.Component<{}> = {
         message: 'Change Metamask to point to Ethereum Mainnet',
       });
       return m(PageLoading, {
-        message: 'Connecting to chain',
+        message: 'Loading proposals',
         title: [
           'Proposals',
           m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
