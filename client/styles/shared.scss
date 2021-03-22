@@ -165,9 +165,22 @@ $listing-right-flex: 1;
         }
 
         .stats-box-stat {
+            display: inline-block;
             margin: 6px 0 0;
+            color: #888;
+            &::after {
+                content: ' ';
+                margin: 0 12px;
+            }
         }
         .stats-box-action {
+            display: inline-block;
+            margin: 6px 0 0;
+            color: #888;
+            &::after {
+                content: ' ';
+                margin: 0 6px;
+            }
         }
     }
     @include sm-max {

@@ -306,16 +306,19 @@ const CouncilPage: m.Component<{}> = {
             ]),
           ]),
           m('', [
-            m('.stats-box-stat', `Councillors: ${councillors?.length} / ${nSeats}`),
+            m('.stats-box-stat', `Councillors: ${councillors?.length}`),
             m('.stats-box-stat', [
-              `Runners-up: ${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)} / ${nRunnersUpSeats}`
+              `Runners-up: ${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)} (max ${nRunnersUpSeats})`
             ]),
             m('.stats-box-stat', [
               'Next election finishes: ',
               m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false }),
             ]),
+            m('.clear'),
             m('.stats-box-action', [
               m(CollectiveVotingButton, { buttonStyle: true, candidates }),
+            ]),
+            m('.stats-box-action', [
               m(CandidacyButton, { buttonStyle: true, candidates }),
             ]),
           ]),
