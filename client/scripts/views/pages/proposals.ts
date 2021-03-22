@@ -36,30 +36,33 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
 
-    return m(Grid, {
-      align: 'middle',
-      class: 'stats-container',
-      gutter: 5,
-      justify: 'space-between'
-    }, [
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Next referendum'),
-          (app.chain as Substrate).democracyProposals.nextLaunchBlock
-            ? m(CountdownUntilBlock, {
-              block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
-              includeSeconds: false
-            })
-            : '--',
+    return m('.stats-box', [
+      m('.stats-box-left', '💭'),
+      m('.stats-box-right', [
+        m('', [
+          m('strong', 'Democracy Proposals'),
+          m('span', [
+            ' can be introduced by anyone. ',
+            'At a regular interval, the top ranked proposal will become a supermajority-required referendum.',
+          ]),
+          m('p', [
+            m('strong', 'Council Motions'),
+            m('span', [
+              ' can be introduced by councillors. They can directly approve/reject treasury proposals, ',
+              'propose simple-majority referenda, or create fast-track referenda.',
+            ]),
+          ]),
         ]),
-      ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Enactment delay'),
-          (app.chain as Substrate).democracy.enactmentPeriod
-            ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
-            : '--',
-          ' days'
+        m('', [
+          m('.stats-box-stat', [
+            'Next proposal becomes a referendum: ',
+            (app.chain as Substrate).democracyProposals.nextLaunchBlock
+              ? m(CountdownUntilBlock, {
+                block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
+                includeSeconds: false
+              })
+              : '--',
+          ]),
         ]),
       ]),
     ]);

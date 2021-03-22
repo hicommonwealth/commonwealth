@@ -1,4 +1,4 @@
-import 'pages/proposals.scss';
+import 'pages/delegate.scss';
 
 import m from 'mithril';
 import app from 'state';

@@ -1,4 +1,4 @@
-import 'pages/proposals.scss';
+import 'pages/treasury.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
@@ -32,27 +32,28 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
 
-    return m(Grid, {
-      align: 'middle',
-      class: 'stats-container',
-      gutter: 5,
-      justify: 'space-between'
-    }, [
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Next treasury spend'),
-          (app.chain as Substrate).treasury.nextSpendBlock
-            ? m(CountdownUntilBlock, {
-              block: (app.chain as Substrate).treasury.nextSpendBlock,
-              includeSeconds: false
-            })
-            : '--',
-        ]),
-      ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Treasury balance'),
-          app.chain && formatCoin((app.chain as Substrate).treasury.pot),
+    return m('.stats-box', [
+      m('.stats-box-left', '💭'),
+      m('.stats-box-right', [
+        m('', [
+          m('strong', 'Treasury Proposals'),
+          m('span', [
+            ' are used to request funds from the on-chain treasury. They are approved/rejected by referendum or council.',
+          ]),
+          m('', [
+            m('.stats-box-stat', [
+              'Treasury: ', formatCoin((app.chain as Substrate).treasury.pot),
+            ]),
+            m('.stats-box-stat', [
+              'Next treasury spend: ',
+              (app.chain as Substrate).treasury.nextSpendBlock
+                ? m(CountdownUntilBlock, {
+                  block: (app.chain as Substrate).treasury.nextSpendBlock,
+                  includeSeconds: false
+                })
+                : '--',
+            ]),
+          ]),
         ]),
       ]),
     ]);

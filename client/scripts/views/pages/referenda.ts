@@ -1,4 +1,4 @@
-import 'pages/proposals.scss';
+import 'pages/referenda.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
@@ -30,30 +30,32 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
 
-    return m(Grid, {
-      align: 'middle',
-      class: 'stats-container',
-      gutter: 5,
-      justify: 'space-between'
-    }, [
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Next referendum'),
-          (app.chain as Substrate).democracyProposals.nextLaunchBlock
-            ? m(CountdownUntilBlock, {
-              block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
-              includeSeconds: false
-            })
-            : '--',
+    return m('.stats-box', [
+      m('.stats-box-left', '💭'),
+      m('.stats-box-right', [
+        m('', [
+          m('strong', 'Referenda'),
+          m('span', [
+            ' are final votes to approve/reject treasury proposals, upgrade the chain, or change technical parameters.',
+          ]),
         ]),
-      ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Enactment delay'),
-          (app.chain as Substrate).democracy.enactmentPeriod
-            ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
-            : '--',
-          ' days'
+        m('', [
+          m('.stats-box-stat', [
+            'Next proposal becomes a referendum: ',
+            (app.chain as Substrate).democracyProposals.nextLaunchBlock
+              ? m(CountdownUntilBlock, {
+                block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
+                includeSeconds: false
+              })
+              : '--',
+          ]),
+          m('.stats-box-stat', [
+            'Enactment delay for passed referenda: ',
+            (app.chain as Substrate).democracy.enactmentPeriod
+              ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
+              : '--',
+            ' days'
+          ]),
         ]),
       ]),
     ]);

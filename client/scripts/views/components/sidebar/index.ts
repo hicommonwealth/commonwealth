@@ -256,7 +256,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           fluid: true,
           rounded: true,
           active: onCouncilPage(m.route.get()),
-          label: 'Council',
+          label: 'Councillors',
           contentLeft: m(Icon, { name: Icons.AWARD }),
           onclick: (e) => {
             e.preventDefault();

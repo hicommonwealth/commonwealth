@@ -1,4 +1,4 @@
-import 'pages/proposals.scss';
+import 'pages/bounties.scss';
 
 import m from 'mithril';
 import app from 'state';
@@ -28,7 +28,7 @@ function getModules() {
   }
 }
 
-const BountyPage: m.Component<{}> = {
+const BountiesPage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
@@ -77,23 +77,28 @@ const BountyPage: m.Component<{}> = {
       : [ m('.no-proposals', 'None') ];
 
     return m(Sublayout, {
-      class: 'BountiesPage TreasuryPage',
+      class: 'BountiesPage',
       title: [
         'Bounties',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,
     }, [
-      m(Grid, {
-        align: 'middle',
-        class: 'stats-container',
-        gutter: 5,
-        justify: 'space-between'
-      }, [
-        m(Col, { span: { xs: 6, md: 3 } }, [
-          m('.stats-tile', [
-            m('.stats-heading', 'Treasury balance'),
-            app.chain && formatCoin((app.chain as Substrate).treasury.pot),
+      // stats
+      m('.stats-box', [
+        m('.stats-box-left', '💭'),
+        m('.stats-box-right', [
+          m('', [
+            m('strong', 'Bounties'),
+            m('span', [
+              ' are requests for treasury funding that are managed by a curator, and must be first approved by the council.',
+            ]),
+          ]),
+          m('', [
+            m('.stats-box-stat', [
+              'Treasury: ',
+              app.chain && formatCoin((app.chain as Substrate).treasury.pot),
+            ]),
           ]),
         ]),
       ]),
@@ -109,4 +114,4 @@ const BountyPage: m.Component<{}> = {
   }
 };
 
-export default BountyPage;
+export default BountiesPage;

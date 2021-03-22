@@ -2,37 +2,8 @@
 
 .ValidatorsPage {
     padding-bottom: 60px;
-    .stats-container {
-        display: flex;
-        align-items: flex-start;
-        margin-top: 20px;
-        padding: 18px 20px 12px;
-        background-color: $background-color-light;
-        border-radius: 5px;
-        .stats-heading {
-            font-weight: 500;
-            line-height: 1.1;
-            margin-bottom: 2px;
-        }
-    }
-    .button-wrap > :first-child {
-        margin-right: 5px;
-    }
-    @include sm-max {
-        .stats-container {
-            padding-bottom: 0;
-        }
-        .cui-col-xs-6 {
-            margin-bottom: 18px;
-        }
-    }
-    h3 {
-        margin-bottom: 0;
-        clear: both;
-    }
-    .clear + h3 {
-        margin-top: 40px;
-    }
+    @include gov-explainer;
+
     .Validator {
         float: left;
         // sizing
