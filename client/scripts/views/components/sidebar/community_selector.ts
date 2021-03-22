@@ -48,8 +48,8 @@ export const CommunityLabel: m.Component<{
         m('.community-name-row', [
           m('span.community-name', community.name),
           showStatus === true && [
-            community.privacyEnabled && m('span.icon-lock'),
-            !community.privacyEnabled && m('span.icon-globe'),
+            community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
+            !community.privacyEnabled && m(Icon, { name: Icons.GLOBE, size: 'xs' }),
           ],
         ]),
       ]),
