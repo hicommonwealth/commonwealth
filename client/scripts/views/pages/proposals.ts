@@ -36,30 +36,34 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
 
-    return m(Grid, {
-      align: 'middle',
-      class: 'stats-container',
-      gutter: 5,
-      justify: 'space-between'
-    }, [
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Next referendum'),
-          (app.chain as Substrate).democracyProposals.nextLaunchBlock
-            ? m(CountdownUntilBlock, {
-              block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
-              includeSeconds: false
-            })
-            : '--',
+    return m('.stats-box', [
+      m('.stats-box-left', '💭'),
+      m('.stats-box-right', [
+        m('', [
+          m('strong', 'Councillors'),
+          m('span', [
+            ' are representatives of the network elected by coin weighted vote. ',
+            'A majority of councillors can approve/reject treasury proposals, propose referenda ',
+            'that only require a simple majority, or create fast-track referenda.'
+          ]),
         ]),
-      ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Enactment delay'),
-          (app.chain as Substrate).democracy.enactmentPeriod
-            ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
-            : '--',
-          ' days'
+        m('', [
+          m('.stats-box-stat', [
+            'Next referendum: ',
+            (app.chain as Substrate).democracyProposals.nextLaunchBlock
+              ? m(CountdownUntilBlock, {
+                block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
+                includeSeconds: false
+              })
+              : '--',
+          ]),
+          m('.stats-box-stat', [
+            'Enactment delay: ',
+            (app.chain as Substrate).democracy.enactmentPeriod
+              ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
+              : '--',
+            ' days'
+          ]),
         ]),
       ]),
     ]);

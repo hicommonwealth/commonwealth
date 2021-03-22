@@ -30,30 +30,35 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
 
-    return m(Grid, {
-      align: 'middle',
-      class: 'stats-container',
-      gutter: 5,
-      justify: 'space-between'
-    }, [
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Next referendum'),
-          (app.chain as Substrate).democracyProposals.nextLaunchBlock
-            ? m(CountdownUntilBlock, {
-              block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
-              includeSeconds: false
-            })
-            : '--',
+    return m('.stats-box', [
+      m('.stats-box-left', '💭'),
+      m('.stats-box-right', [
+        m('', [
+          m('strong', 'Referenda'),
+          m('span', [
+            ' are final votes required to enact most governance actions. ',
+            'A referendum can approve/reject a treasury proposal, upgrade the chain, change technical parameters, or perform a batch of actions.',
+            'Referendum voters may elect to lock their coins for 8 days to 196 days, for 1x to 6x weight. Only the winning side’s coins will be locked.'
+            // TODO fix numbers
+          ]),
         ]),
-      ]),
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Enactment delay'),
-          (app.chain as Substrate).democracy.enactmentPeriod
-            ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
-            : '--',
-          ' days'
+        m('', [
+          m('.stats-box-stat', [
+            'Next referendum launches: ',
+            (app.chain as Substrate).democracyProposals.nextLaunchBlock
+              ? m(CountdownUntilBlock, {
+                block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
+                includeSeconds: false
+              })
+              : '--',
+          ]),
+          m('.stats-box-stat', [
+            'Enactment delay: ',
+            (app.chain as Substrate).democracy.enactmentPeriod
+              ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
+              : '--',
+            ' days'
+          ]),
         ]),
       ]),
     ]);

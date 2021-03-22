@@ -294,32 +294,32 @@ const CouncilPage: m.Component<{}> = {
       showCouncilMenu: true,
     }, [
       // stats
-      m(Grid, {
-        align: 'middle',
-        class: 'stats-container',
-        gutter: 5,
-        justify: 'space-between'
-      }, [
-        m(Col, { span: { xs: 6, md: 4 } }, [
-          m('.stats-heading', 'Councillors'),
-          m('.stats-tile', `${councillors?.length} / ${nSeats}`),
-        ]),
-        m(Col, { span: { xs: 6, md: 4 } }, [
-          m('.stats-heading', 'Runners-up'),
-          m('.stats-tile', [
-            `${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)} / ${nRunnersUpSeats}`
+      m('.stats-box', [
+        m('.stats-box-left', '💭'),
+        m('.stats-box-right', [
+          m('', [
+            m('strong', 'Councillors'),
+            m('span', [
+              ' are representatives of the network elected by coin weighted vote. ',
+              'A majority of councillors can approve/reject treasury proposals, propose referenda ',
+              'that only require a simple majority, or create fast-track referenda.'
+            ]),
+          ]),
+          m('', [
+            m('.stats-box-stat', `Councillors: ${councillors?.length} / ${nSeats}`),
+            m('.stats-box-stat', [
+              `Runners-up: ${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)} / ${nRunnersUpSeats}`
+            ]),
+            m('.stats-box-stat', [
+              'Next election finishes: ',
+              m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false }),
+            ]),
+            m('.stats-box-action', [
+              m(CollectiveVotingButton, { buttonStyle: true, candidates }),
+              m(CandidacyButton, { buttonStyle: true, candidates }),
+            ]),
           ]),
         ]),
-        m(Col, { span: { xs: 6, md: 4 } }, [
-          m('.stats-heading', 'Next council'),
-          m('.stats-tile', m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false })),
-        ]),
-      ]),
-      m('.button-wrap', {
-        style: 'margin: 15px 0 0; text-align: end'
-      }, [
-        m(CollectiveVotingButton, { buttonStyle: true, candidates }),
-        m(CandidacyButton, { buttonStyle: true, candidates }),
       ]),
       // councillors
       m('h3', 'Councillors'),
