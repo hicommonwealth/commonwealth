@@ -91,8 +91,7 @@ const BountiesPage: m.Component<{}> = {
           m('', [
             m('strong', 'Bounties'),
             m('span', [
-              ' are requests for treasury funding that are managed by a curator. ',
-              'A majority of councillors can approve a bounty, and then the curator can award the bounty to a recipient.' // TODO numbers
+              ' are requests for treasury funding that are managed by a curator, and must be first approved by the council.',
             ]),
           ]),
           m('', [
