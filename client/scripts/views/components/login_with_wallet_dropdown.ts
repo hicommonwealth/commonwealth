@@ -2,16 +2,15 @@ import 'components/login_with_wallet_dropdown.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, Input, Form, FormGroup, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'construct-ui';
+import { Button, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { ChainBase, ChainInfo } from 'models';
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { ChainBase } from 'models';
+import { ChainBaseIcon } from 'views/components/chain_icon';
+import { baseToNetwork } from 'models/types';
 
-// TODO: store ChainBase in the database, and check for substrate/cosmos chains instead
-const CHAINS_WITH_CLI = [
-  'edgeware', 'kulupu', 'kusama', 'cosmos', 'edgeware-local', 'edgeware-testnet',
-  'darwinia', 'phala', 'plasm', 'polkadot', 'centrifuge', 'clover',
+const CHAINBASE_WITH_CLI = [
+  ChainBase.CosmosSDK, ChainBase.Substrate
 ];
 
 const LoginWithWalletDropdown: m.Component<{
@@ -41,23 +40,21 @@ const LoginWithWalletDropdown: m.Component<{
     const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress } : joiningChain
       ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
 
-    const sortedChains = app.config.chains.getAll().filter((chain) => {
-      return app.config.nodes.getByChain(chain.id) && app.config.nodes.getByChain(chain.id).length > 0;
-    }).sort((a, b) => {
-      return a.name.localeCompare(b.name);
-    });
-    const sortedChainsWithCLI = sortedChains.filter((chain) => CHAINS_WITH_CLI.indexOf(chain.id) !== -1);
+    const allChains = app.config.chains.getAll();
+    const sortedChainBases = [ChainBase.CosmosSDK, ChainBase.Ethereum, ChainBase.NEAR, ChainBase.Substrate].filter((base) => allChains.find((chain) => chain.base === base));
+    const sortedChainBasesWithCLI = sortedChainBases.filter((base) => CHAINBASE_WITH_CLI.indexOf(base) !== -1);
 
-    const getMenuItemForChain = (chain: ChainInfo, cli?: boolean) => m(MenuItem, {
+    const getMenuItemForChainBase = (base: ChainBase, cli?: boolean) => m(MenuItem, {
       label: m('.chain-login-label', [
-        m(ChainIcon, { chain, size: 20 }),
+        m(ChainBaseIcon, { chainbase: base, size: 20 }),
         m('.chain-login-label-name', [
-          cli ? `${chain.name} (command line)` : chain.name
+          cli ? `${base} (command line)` : base
         ]),
       ]),
       onclick: (e) => {
         $('.Login').trigger('modalexit');
-        m.route.set(`/${chain.id}/web3login`, web3loginParams);
+        const defaultChainId = baseToNetwork(base);
+        m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
         app.modals.lazyCreate('link_new_address_modal', {
           loggingInWithAddress,
           joiningChain,
@@ -65,7 +62,7 @@ const LoginWithWalletDropdown: m.Component<{
           useCommandLineWallet: !!cli,
           successCallback: () => {
             if (next === '/?') {
-              m.route.set(`/${chain.id}`);
+              m.route.set(`/${app.chain?.id || defaultChainId}`);
             } else {
               m.route.set(next);
             }
@@ -78,15 +75,16 @@ const LoginWithWalletDropdown: m.Component<{
         });
       }
     });
-    const menuItems = (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== -1)
+    const chainbase = app.chain?.meta?.chain?.base;
+    const menuItems = (chainbase && CHAINBASE_WITH_CLI.indexOf(chainbase) !== -1)
       ? [
-        getMenuItemForChain(app.chain.meta.chain),
-        getMenuItemForChain(app.chain.meta.chain, true)
+        getMenuItemForChainBase(chainbase),
+        getMenuItemForChainBase(chainbase, true)
       ] : app.chain ? [
-        getMenuItemForChain(app.chain.meta.chain)
-      ] : sortedChains.map((chain) => getMenuItemForChain(chain))
-        .concat(sortedChainsWithCLI.length > 0 ? m(MenuDivider) : null)
-        .concat(sortedChainsWithCLI.map((chain) => getMenuItemForChain(chain, true)));
+        getMenuItemForChainBase(chainbase)
+      ] : sortedChainBases.map((base) => getMenuItemForChainBase(base))
+        .concat(sortedChainBasesWithCLI.length > 0 ? m(MenuDivider) : null)
+        .concat(sortedChainBasesWithCLI.map((base) => getMenuItemForChainBase(base, true)));
 
     return m(PopoverMenu, {
       trigger: m(Button, {

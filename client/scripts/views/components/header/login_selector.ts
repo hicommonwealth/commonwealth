@@ -8,21 +8,33 @@ import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider,
   Popover } from 'construct-ui';
 
 import app from 'state';
-import { ChainInfo, CommunityInfo } from 'models';
+import { AddressInfo, ChainBase, ChainInfo, CommunityInfo } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
+import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
+import { stringToHex } from '@polkadot/util';
+import Substrate from 'controllers/chain/substrate/main';
+import Ethereum from 'controllers/chain/ethereum/main';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from 'views/components/widgets/user';
-import CreateInviteModal from 'views/modals/create_invite_modal';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
-import ManageCommunityModal from 'views/modals/manage_community_modal';
-import { setActiveAccount } from 'controllers/app/login';
+import { createUserWithAddress, setActiveAccount } from 'controllers/app/login';
+import { networkToBase } from 'models/types';
+import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
+import EthereumAccount from 'controllers/chain/ethereum/account';
+
+export const CHAINBASE_SHORT = {
+  [ChainBase.CosmosSDK]: 'Cosmos',
+  [ChainBase.Ethereum]: 'ETH',
+  [ChainBase.NEAR]: 'NEAR',
+  [ChainBase.Substrate]: 'Substrate',
+};
 
 const CommunityLabel: m.Component<{
   chain?: ChainInfo,
@@ -142,7 +154,77 @@ const LoginSelector: m.Component<{
     }
 
     return m(ButtonGroup, { class: 'LoginSelector' }, [
-      (app.chain || app.community) && !app.chainPreloading && vnode.state.profileLoadComplete && m(Popover, {
+      (app.chain || app.community) && !app.chainPreloading && vnode.state.profileLoadComplete && !app.user.activeAccount && m(Button, {
+        class: 'login-selector-left',
+        onclick: async (e) => {
+          if (app.user.activeAccounts.length === 1) {
+            const address = app.user.activeAccounts[0].address;
+            const joiningChain = app.activeChainId();
+            const joiningCommunity = app.activeCommunityId();
+            let account;
+
+            // TODO: when joining community
+            const base = networkToBase(joiningChain);
+
+            if (base === ChainBase.Substrate) {
+              // TODO: should check if the address is already linked to other account or this account
+              account = await createUserWithAddress(address) as SubstrateAccount;
+              const signer = await (app.chain as Substrate).webWallet.getSigner(address);
+              const token = account.validationToken;
+              const payload: SignerPayloadRaw = {
+                address: account.address,
+                data: stringToHex(token),
+                type: 'bytes',
+              };
+              const signature = (await signer.signRaw(payload)).signature;
+              await account.validate(signature);
+            } else if (base === ChainBase.Ethereum) {
+              const api = (app.chain as Ethereum);
+              const webWallet = api.webWallet;
+
+              account = await createUserWithAddress(address) as EthereumAccount;
+              const webWalletSignature = await webWallet.signMessage(account.validationToken);
+
+              await account.validate(webWalletSignature);
+            } else if (base === ChainBase.CosmosSDK) {
+              // TODO
+            } else if (base === ChainBase.NEAR) {
+              // TODO
+            }
+
+            let addressInfo = app.user.addresses
+              .find((a) => a.address === account.address && a.chain === account.chain.id);
+
+            console.log('account: ', account, addressInfo);
+
+            if (!addressInfo && account.addressId) {
+              addressInfo = new AddressInfo(account.addressId, account.address, account.chain.id, undefined);
+            }
+
+            if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
+              await app.user.createRole({ address: addressInfo, chain: joiningChain });
+            } else if (joiningCommunity && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
+              await app.user.createRole({ address: addressInfo, community: joiningCommunity });
+            }
+            await setActiveAccount(account);
+            if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+              app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+            }
+          } else {
+            app.modals.create({
+              modal: SelectAddressModal,
+            });
+          }
+        },
+        label: [
+          m('span.hidden-sm', [
+            app.user.activeAccounts.length === 0
+              ? `No ${CHAINBASE_SHORT[app.chain?.meta?.chain.base] || ''} address`
+              : 'Join'
+          ]),
+        ],
+      }),
+      (app.chain || app.community) && !app.chainPreloading && vnode.state.profileLoadComplete && app.user.activeAccount && m(Popover, {
         hasArrow: false,
         class: 'login-selector-popover',
         closeOnContentClick: true,
@@ -153,16 +235,10 @@ const LoginSelector: m.Component<{
         trigger: m(Button, {
           class: 'login-selector-left',
           label: [
-            app.user.activeAccount ? m(User, {
+            m(User, {
               user: app.user.activeAccount,
               hideIdentityIcon: true,
-            }) : [
-              m('span.hidden-sm', [
-                app.user.activeAccounts.length === 0
-                  ? `No ${app.chain?.meta?.chain.name || ''} address`
-                  : 'Select address'
-              ]),
-            ],
+            })
           ],
         }),
         content: m(Menu, { class: 'LoginSelectorMenu' }, [
@@ -190,7 +266,7 @@ const LoginSelector: m.Component<{
               ],
             })),
             activeAddressesWithRole.length > 0 && m(MenuDivider),
-            activeAddressesWithRole.length > 0 && app.user.activeAccount && app.activeId() && m(MenuItem, {
+            activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
               onclick: () => {
                 const pf = app.user.activeAccount.profile;
                 if (pf) {
@@ -202,7 +278,7 @@ const LoginSelector: m.Component<{
               },
               label: 'View profile',
             }),
-            activeAddressesWithRole.length > 0 && app.user.activeAccount && app.activeId() && m(MenuItem, {
+            activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
               onclick: (e) => {
                 e.preventDefault();
                 app.modals.create({

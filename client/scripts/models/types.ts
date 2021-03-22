@@ -40,7 +40,18 @@ export enum ChainNetwork {
   HydraDX = 'hydradx'
 }
 
-export function networkToBase(n: ChainNetwork): ChainBase {
+// This function returns a default chain for a chainbase
+export function baseToNetwork(n: ChainBase): ChainNetwork {
+  switch (n) {
+    case ChainBase.CosmosSDK: return ChainNetwork.Cosmos;
+    case ChainBase.Substrate: return ChainNetwork.Edgeware;
+    case ChainBase.Ethereum: return ChainNetwork.Ethereum;
+    case ChainBase.NEAR: return ChainNetwork.NEAR;
+    default: return null;
+  }
+}
+
+export function networkToBase(n: ChainNetwork | string): ChainBase {
   switch (n) {
     case ChainNetwork.Clover: return ChainBase.Substrate;
     case ChainNetwork.Edgeware: return ChainBase.Substrate;

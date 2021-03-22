@@ -602,7 +602,7 @@ const LinkNewAddressModal: m.Component<{
             fluid: true,
             autocomplete: 'off',
             placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
-                : 'Paste the address here',
+              : 'Paste the address here',
             oninput: async (e) => {
               const address = (e.target as any).value;
               vnode.state.error = null;
