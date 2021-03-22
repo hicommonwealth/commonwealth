@@ -157,8 +157,14 @@ const LoginSelector: m.Component<{
       (app.chain || app.community) && !app.chainPreloading && vnode.state.profileLoadComplete && !app.user.activeAccount && m(Button, {
         class: 'login-selector-left',
         onclick: async (e) => {
-          if (app.user.activeAccounts.length === 1) {
-            const address = app.user.activeAccounts[0].address;
+          const activeAccountsFiltered = app.user.activeAccounts.reduce((arr, current) => {
+            if (!arr.find((item) => item.address === current.address)) {
+              return [...arr, current];
+            }
+            return arr;
+          }, []);
+          if (activeAccountsFiltered.length === 1) {
+            const address = activeAccountsFiltered[0].address;
             const joiningChain = app.activeChainId();
             const joiningCommunity = app.activeCommunityId();
 
@@ -167,8 +173,18 @@ const LoginSelector: m.Component<{
 
             if (originAddressInfo) {
               try {
-                await linkExistingAddressToChainOrCommunity(address, joiningChain, originAddressInfo.chain);
-                const account = app.chain ? app.chain.accounts.get(originAddressInfo.address, originAddressInfo.keytype) : app.community.accounts.get(originAddressInfo.address, joiningChain);
+                const res = await linkExistingAddressToChainOrCommunity(address, joiningChain, originAddressInfo.chain);
+                const account = app.chain ? app.chain.accounts.get(address, originAddressInfo.keytype) : app.community.accounts.get(address, joiningChain);
+                console.log(account);
+
+                const addressInfo = new AddressInfo(res.result.id, address, joiningChain || joiningCommunity, undefined);
+
+                if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
+                  await app.user.createRole({ address: addressInfo, chain: joiningChain });
+                } else if (joiningCommunity && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
+                  await app.user.createRole({ address: addressInfo, community: joiningCommunity });
+                }
+
                 await setActiveAccount(account);
                 if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
                   app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
