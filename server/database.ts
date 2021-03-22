@@ -11,8 +11,12 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   operatorsAliases: false,
   logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.trace(msg); },
-  dialectOptions: {
-    requestTimeout: 10000
+  dialectOptions: (process.env.NODE_ENV !== 'production') ? {
+    requestTimeout: 10000,
+  } : {
+    requestTimeout: 10000,
+    ssl: true,
+    rejectUnauthorized: false,
   },
   pool: {
     max: 10,

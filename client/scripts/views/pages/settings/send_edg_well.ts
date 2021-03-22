@@ -2,10 +2,9 @@ import 'pages/settings/send_edg_well.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { Button } from 'construct-ui';
+import { Button, Icon, Icons } from 'construct-ui';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { featherIcon } from 'helpers';
 import { formatCoin } from 'adapters/currency';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { Account, ChainBase } from 'models';
@@ -25,23 +24,23 @@ const getBalanceTransferChecks = (
   let canTransfer: boolean = true;
   if (senderAddress === recipientAddress) {
     checks.push([
-      featherIcon('slash', 14, 2, '#444'),
+      m(Icon, { name: Icons.X, size: 'sm' }),
       'You cannot send balance to yourself']);
     canTransfer = false;
   } else if (senderBalance.lt(amount)) {
     checks.push([
-      featherIcon('slash', 14, 2, '#444'),
+      m(Icon, { name: Icons.X, size: 'sm' }),
       'You do not have the required balance for this transaction.']);
     canTransfer = false;
   } else if (senderBalance.sub(amount).lt((app.chain as Substrate).chain.existentialdeposit)) {
     checks.push([
-      featherIcon('info', 14, 2, '#444'),
+      m(Icon, { name: Icons.INFO, size: 'sm' }),
       'Your balance will drop below the minimum, and any remaining balance may be lost.'
     ]);
   }
   if (canTransfer && txFee.gtn(0)) {
     checks.push([
-      featherIcon('info', 14, 2, '#444'),
+      m(Icon, { name: Icons.INFO, size: 'sm' }),
       `Transfer fee: ${formatCoin(txFee)}`
     ]);
   }
@@ -49,18 +48,18 @@ const getBalanceTransferChecks = (
   const resultingBalance = app.chain.chain.coins(recipientBalance.add(amount.sub(txFee)));
   if (recipientBalance.eqn(0) && resultingBalance.lt((app.chain as Substrate).chain.existentialdeposit)) {
     checks.push([
-      featherIcon('slash', 14, 2, '#444'),
+      m(Icon, { name: Icons.X, size: 'sm' }),
       'The recipient\'s balance must be above the minimum after fees: '
         + `${formatCoin((app.chain as Substrate).chain.existentialdeposit)}`]);
     canTransfer = false;
   } else if (amount.lte(txFee)) {
     checks.push([
-      featherIcon('slash', 14, 2, '#444'),
+      m(Icon, { name: Icons.X, size: 'sm' }),
       'Amount sent must be greater than the transfer fee.']);
     canTransfer = false;
   } else if (canTransfer) {
     checks.push([
-      featherIcon('info', 14, 2, '#444'),
+      m(Icon, { name: Icons.INFO, size: 'sm' }),
       `Recipient's balance after this transfer: ${formatCoin(resultingBalance)}`]);
   }
   return [canTransfer, checks];
@@ -152,7 +151,7 @@ const SendEDGWell: m.Component<IAttrs, IState> = {
       ]),
       !vnode.attrs.sender && m('.send-edg-checks', [
         m('.send-edg-check', [
-          featherIcon('slash', 14, 2, '#444'),
+          m(Icon, { name: Icons.X, size: 'sm' }),
           `No ${app.chain && app.chain.chain && app.chain.chain.denom} address to send from`,
         ]),
       ]),
@@ -161,7 +160,7 @@ const SendEDGWell: m.Component<IAttrs, IState> = {
       && vnode.state.amount !== undefined
       && m('.send-edg-checks', [
         m('.send-edg-check', [
-          featherIcon('info', 14, 2, '#444'),
+          m(Icon, { name: Icons.INFO, size: 'sm' }),
           `Sending: ${formatCoin(vnode.state.amount)}`
         ]),
         checks.map((check) => m('.send-edg-check', check)),

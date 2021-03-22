@@ -4,7 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 import mixpanel from 'mixpanel-browser';
-import { Button } from 'construct-ui';
+import { Button, Icon, Icons } from 'construct-ui';
 
 import { orderAccountsByAddress } from 'helpers';
 import { notifyError } from 'controllers/app/notifications';
@@ -93,7 +93,7 @@ const ConfirmInviteModal: m.Component<{}, {
           m('p', 'You\'ve been invited to a community on Commonwealth:'),
           m('.CommunityBlock', [
             m('.community-block-top', `${invites[vnode.state.location].community_name}`),
-            m('span.icon-lock.community-block-top'),
+            m(Icon, { name: Icons.LOCK, size: 'xs' }),
             m('.community-block-bottom', `commonwealth.im/${invites[vnode.state.location].community_id}`)
           ]),
           vnode.state.accepted.includes(vnode.state.location) ? m('h4', 'You\'ve accepted this invite!')

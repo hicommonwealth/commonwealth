@@ -62,8 +62,8 @@ const CommunityLabel: m.Component<{
         m('.community-name-row', [
           m('span.community-name', community.name),
           showStatus === true && [
-            community.privacyEnabled && m('span.icon-lock'),
-            !community.privacyEnabled && m('span.icon-globe'),
+            community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
+            !community.privacyEnabled && m(Icon, { name: Icons.GLOBE, size: 'xs' }),
           ],
         ]),
       ]),
@@ -177,12 +177,17 @@ const LoginSelector: m.Component<{
                 await setActiveAccount(account);
                 m.redraw();
               },
-              label: m(UserBlock, {
-                user: account,
-                selected: isSameAccount(account, app.user.activeAccount),
-                showRole: true,
-                compact: true
-              }),
+              label: [
+                m(UserBlock, {
+                  user: account,
+                  selected: isSameAccount(account, app.user.activeAccount),
+                  showRole: true,
+                  compact: true
+                }),
+                // !account.profile?.name && m('.edit-profile-callout', [
+                //   'Set a display name'
+                // ]),
+              ],
             })),
             activeAddressesWithRole.length > 0 && m(MenuDivider),
             activeAddressesWithRole.length > 0 && app.user.activeAccount && app.activeId() && m(MenuItem, {

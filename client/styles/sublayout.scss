@@ -120,6 +120,14 @@
                     line-height: 1.1;
                     margin: -1px 0;
                 }
+                .cui-icon {
+                    position: relative;
+                    top: -1px;
+                    &::before {
+                        content: ' ';
+                        width: 5px;
+                    }
+                }
             }
         }
         .sublayout-header-right {
