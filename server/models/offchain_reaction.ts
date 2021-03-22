@@ -49,6 +49,10 @@ export default (
       { fields: ['chain', 'thread_id', 'proposal_id', 'comment_id'] },
       { fields: ['address_id'] },
       { fields: ['chain', 'address_id', 'thread_id', 'proposal_id', 'comment_id', 'reaction'], unique: true },
+      { fields: ['chain', 'thread_id'] },
+      { fields: ['community', 'thread_id'] },
+      { fields: ['chain', 'comment_id'] },
+      { fields: ['community', 'comment_id'] },
     ],
   });
 

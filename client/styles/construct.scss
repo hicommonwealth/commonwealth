@@ -417,7 +417,7 @@ button, .cui-button {
                 map-get($cui-padding-map, $size),
                 map-get($cui-font-size-map, $size)
             );
-            padding-top: 0.3em;
+            padding-top: 0.35em;
             padding-bottom: 0;
         }
         &.cui-#{$size} {
