@@ -26,16 +26,29 @@ export const modelFromServer = (comment) => {
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
-  const versionHistory = comment.version_history.map((v) => {
-    let history;
-    try {
-      history = JSON.parse(v || '{}');
-      history.timestamp = moment(history.timestamp);
-    } catch (e) {
-      console.log(e);
-    }
-    return history;
-  });
+  let versionHistory;
+  if (comment.version_history) {
+    versionHistory = comment.version_history.map((v) => {
+      if (!v) return;
+      let history;
+      try {
+        history = JSON.parse(v || '{}');
+        history.author = typeof history.author === 'string'
+          ? JSON.parse(history.author)
+          : typeof history.author === 'object' ? history.author : null;
+        history.timestamp = moment(history.timestamp);
+      } catch (e) {
+        console.log(e);
+      }
+      return history;
+    });
+  }
+
+  const lastEdited = comment.last_edited
+    ? moment(comment.last_edited)
+    : versionHistory && versionHistory?.length > 1
+      ? versionHistory[0].timestamp
+      : null;
 
   let proposal;
   try {
@@ -59,6 +72,7 @@ export const modelFromServer = (comment) => {
     comment.parent_id,
     comment.community,
     comment?.Address?.chain || comment.authorChain,
+    lastEdited
   );
 };
 

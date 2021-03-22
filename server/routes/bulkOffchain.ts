@@ -8,6 +8,7 @@ import { QueryTypes } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+import { getLastEdited } from '../util/getLastEdited';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -131,13 +132,14 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           const chain_entities = JSON.parse(t.chain_entities[0]).id
             ? t.chain_entities.map((c) => JSON.parse(c))
             : [];
+          const last_edited = getLastEdited(t);
 
           const data = {
             id: t.thread_id,
             title: t.thread_title,
             url: t.url,
             body: t.body,
-            version_history: t.version_history,
+            last_edited,
             kind: t.kind,
             stage: t.stage,
             read_only: t.read_only,
@@ -178,6 +180,12 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           },
           include: [models.Address, models.OffchainAttachment],
           order: [['created_at', 'DESC']],
+        }).map((c, idx) => {
+          const row = c.toJSON();
+          const last_edited = getLastEdited(row);
+          delete row['version_history'];
+          row['last_edited'] = last_edited;
+          return row;
         });
 
         // Reactions
@@ -263,7 +271,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       numPrevotingThreads,
       numVotingThreads,
       threads, // already converted to JSON earlier
-      comments: comments.map((c) => c.toJSON()),
+      comments, // already converted to JSON earlier
       reactions: reactions.map((r) => r.toJSON()),
       //
       admins: admins.map((a) => a.toJSON()),

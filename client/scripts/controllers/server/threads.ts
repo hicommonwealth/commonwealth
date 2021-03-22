@@ -31,19 +31,29 @@ export const modelFromServer = (thread) => {
     ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
 
-  const versionHistory = thread.version_history.map((v) => {
-    let history;
-    try {
-      history = JSON.parse(v || '{}');
-      history.author = typeof history.author === 'string'
-        ? JSON.parse(history.author)
-        : typeof history.author === 'object' ? history.author : null;
-      history.timestamp = moment(history.timestamp);
-    } catch (e) {
-      console.log(e);
-    }
-    return history;
-  });
+  let versionHistory;
+  if (thread.version_history) {
+    versionHistory = thread.version_history.map((v) => {
+      if (!v) return;
+      let history;
+      try {
+        history = JSON.parse(v);
+        history.author = typeof history.author === 'string'
+          ? JSON.parse(history.author)
+          : typeof history.author === 'object' ? history.author : null;
+        history.timestamp = moment(history.timestamp);
+      } catch (e) {
+        console.log(e);
+      }
+      return history;
+    });
+  }
+
+  const lastEdited = thread.last_edited
+    ? moment(thread.last_edited)
+    : versionHistory && versionHistory?.length > 1
+      ? versionHistory[0].timestamp
+      : null;
 
   return new OffchainThread(
     thread.Address.address,
@@ -65,6 +75,7 @@ export const modelFromServer = (thread) => {
     thread.pinned,
     thread.collaborators,
     thread.chain_entities,
+    lastEdited,
   );
 };
 

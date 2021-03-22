@@ -29,6 +29,7 @@ import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
 import { VersionHistory } from 'client/scripts/controllers/server/threads';
+import moment from 'moment';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -140,35 +141,40 @@ export const ProposalBodyCreated: m.Component<{
   }
 };
 
-export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainThread | OffchainComment<any> }> = {
+export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
-
-    if (item instanceof OffchainThread || item instanceof OffchainComment) {
-      if (!item.versionHistory || item.versionHistory.length === 0) return;
-      const isThread = item instanceof OffchainThread;
-      const lastEdit : VersionHistory = item.versionHistory?.length > 1 ? item.versionHistory[0] : null;
-      if (!lastEdit) return;
-
-      return m('.ProposalBodyLastEdited', [
-        m('a', {
-          href: '#',
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.create({
-              modal: VersionHistoryModal,
-              data: isThread ? { proposal: item } : { comment: item }
-            });
-          }
-        }, [
-          'Edited ',
-          lastEdit.timestamp.fromNow()
-        ])
-      ]);
-    } else {
-      return null;
+    const isThread = item instanceof OffchainThread;
+    if (!item.lastEdited) {
+      return;
     }
+
+    return m('.ProposalBodyLastEdited', [
+      m('a', {
+        href: '#',
+        onclick: async (e) => {
+          e.preventDefault();
+          let postWithHistory;
+          const grabHistory = isThread && !item.versionHistory?.length;
+          if (grabHistory) {
+            try {
+              postWithHistory = await app.threads.fetchThread(item.id);
+            } catch (err) {
+              notifyError('Version history not found.');
+              return;
+            }
+          }
+          app.modals.create({
+            modal: VersionHistoryModal,
+            data: { item: (grabHistory && postWithHistory) ? postWithHistory : item }
+          });
+        }
+      }, [
+        'Edited ',
+        item.lastEdited.fromNow()
+      ])
+    ]);
   }
 };
 
