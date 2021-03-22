@@ -94,7 +94,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
         m('.card-right-top', [
           m('h3', [
             community.name,
-            community.privacyEnabled && m('span.icon-lock'),
+            community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           ]),
         ]),
         m('p.card-description', community.description),

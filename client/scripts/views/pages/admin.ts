@@ -462,7 +462,7 @@ const InviteLinkTable: m.Component<{links}, {links}> = {
       community_id: app.activeCommunityId(),
       jwt: app.user.jwt,
     }).then((res) => {
-      res.data.map((link) => vnode.state.links.push(link));
+      res.result.map((link) => vnode.state.links.push(link));
       m.redraw();
     });
   },

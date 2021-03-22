@@ -6,6 +6,7 @@ import {
   VotingType, VotingUnit, ChainEntity, ChainEvent
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
+import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasury from './treasury';
@@ -30,7 +31,7 @@ export class SubstrateTreasuryProposal
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public get title() {
+  public generateTitle() {
     const account = this._Accounts.fromAddress(this.beneficiaryAddress);
     const displayName = account.profile && account.profile.name
       ? `${account.profile.name} (${formatAddressShort(this.beneficiaryAddress, account.chain.id)})`
@@ -41,6 +42,8 @@ export class SubstrateTreasuryProposal
 
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
+
+  public title: string;
 
   private _awarded: boolean = false;
   get awarded() { return this._awarded; }
@@ -122,12 +125,26 @@ export class SubstrateTreasuryProposal
     this.bond = this._Chain.coins(this.data.bond);
     this.beneficiaryAddress = this.data.beneficiary;
     this._author = this._Accounts.fromAddress(this.data.proposer);
+    this.title = entity.title || this.generateTitle();
     this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized = true;
-    this._Treasury.store.add(this);
+
+    if (!this._completed) {
+      const slug = chainEntityTypeToProposalSlug(entity.type);
+      const uniqueId = `${slug}_${entity.typeId}`;
+      this._Chain.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
+        if (response.status === 'Success' && response.result?.length) {
+          this.title = response.result;
+        }
+      });
+      this._initialized = true;
+      this._Treasury.store.add(this);
+    } else {
+      this._initialized = true;
+      this._Treasury.store.add(this);
+    }
   }
 
   protected complete() {

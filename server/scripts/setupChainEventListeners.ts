@@ -1,8 +1,9 @@
 import WebSocket from 'ws';
-import _, { chain } from 'underscore';
+import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
-  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy
+  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
+  MarlinTypes, MarlinEvents,
 } from '@commonwealth/chain-events';
 
 import EventStorageHandler from '../eventHandlers/storage';
@@ -42,20 +43,24 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
 const setupChainEventListeners = async (
   models, wss: WebSocket.Server, chains: string[] | 'all' | 'none', skipCatchup?: boolean
 ): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
+  const queryNode = (c: string): Promise<ChainNodeInstance> => models.ChainNode.findOne({
+    where: { chain: c },
+    include: [{
+      model: models.Chain,
+      where: { active: true },
+      required: true,
+    }],
+  });
   log.info('Fetching node urls...');
   await sequelize.authenticate();
   const nodes: ChainNodeInstance[] = [];
   if (chains === 'all') {
-    const n = (await Promise.all(EventSupportingChains.map((c) => {
-      return models.ChainNode.findOne({ where: { chain: c } });
-    }))).filter((c) => !!c);
+    const n = (await Promise.all(EventSupportingChains.map((c) => queryNode(c)))).filter((c) => !!c);
     nodes.push(...n);
   } else if (chains !== 'none') {
     const n = (await Promise.all(EventSupportingChains
       .filter((c) => chains.includes(c))
-      .map((c) => {
-        return models.ChainNode.findOne({ where: { chain: c } });
-      })))
+      .map((c) => queryNode(c))))
       .filter((c) => !!c);
     nodes.push(...n);
   } else {
@@ -130,6 +135,23 @@ const setupChainEventListeners = async (
         discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
         api,
         contractVersion,
+      });
+    } else if (chainSupportedBy(node.chain, MarlinTypes.EventChains)) {
+      const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
+      const timelockContractAddress = '0x42Bf58AD084595e9B6C5bb2aA04050B0C291264b';
+      const api = await MarlinEvents.createApi(
+        node.url, {
+          comp: node.address,
+          governorAlpha: governorAlphaContractAddress,
+          timelock: timelockContractAddress,
+        }
+      );
+      subscriber = await MarlinEvents.subscribeEvents({
+        chain: node.chain,
+        handlers,
+        skipCatchup,
+        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+        api,
       });
     }
 

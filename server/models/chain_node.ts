@@ -5,7 +5,7 @@ export interface ChainNodeAttributes {
   id?: number;
   chain: string;
   url: string;
-  address: string;
+  address?: string;
 
   // associations
   Chain?: ChainAttributes;

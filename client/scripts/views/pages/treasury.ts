@@ -131,7 +131,7 @@ const TreasuryPage: m.Component<{}> = {
       if (modules.some((mod) => !mod.ready)) {
         app.chain.loadModules(modules);
         return m(PageLoading, {
-          message: 'Connecting to chain',
+          message: 'Loading treasury',
           title: [
             'Treasury',
             m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })

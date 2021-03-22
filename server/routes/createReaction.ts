@@ -6,6 +6,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
+import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -14,14 +15,30 @@ export const Errors = {
   NoPostId: 'Must provide a comment or thread ID',
   NoReaction: 'Must provide a reaction',
   NoCommentMatch: 'No matching comment found',
-  NoProposalMatch: 'No matching proposal found'
+  NoProposalMatch: 'No matching proposal found',
+  InsufficientTokenBalance: `Users need to hold some of the community's tokens to react`,
 };
 
-const createReaction = async (models, req: Request, res: Response, next: NextFunction) => {
+const createReaction = async (models, tokenBalanceCache: TokenBalanceCache, req: Request, res: Response, next: NextFunction) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
+  if (chain && chain.type === 'token') {
+    // skip check for admins
+    const isAdmin = await models.Role.findAll({
+      where: {
+        address_id: author.id,
+        chain_id: chain.id,
+        permission: ['admin'],
+      },
+    });
+    if (isAdmin.length === 0) {
+      const userHasBalance = await tokenBalanceCache.hasToken(chain.id, req.body.address);
+      if (!userHasBalance) return next(new Error(Errors.InsufficientTokenBalance));
+    }
+  }
+
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
   let proposal;
   let root_type;

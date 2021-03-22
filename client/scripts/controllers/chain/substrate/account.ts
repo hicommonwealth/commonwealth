@@ -33,6 +33,7 @@ export interface IValidators {
     exposure: Exposure,
     controller: string,
     isElected: boolean,
+    prefs, // TODO
   };
 }
 
@@ -377,6 +378,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
 }
 class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccount> {
   private _initialized: boolean = false;
+  private cachedValidators;
 
   public get initialized() { return this._initialized; }
 
@@ -439,6 +441,28 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
     return acct;
   }
 
+  public getValidators() {
+    return new Promise(async (resolve) => {
+      if (this.cachedValidators) {
+        resolve(this.cachedValidators);
+      }
+
+      this.validators.then((results) => {
+        this.cachedValidators = Object.entries(results).map(([address, info]) => ({
+          chain: this._Chain.app.chain?.meta?.id,
+          stash: address,
+          controller: info.controller,
+          isElected: info.isElected,
+          total: this._Chain.coins(info.exposure.total.toBn()),
+          own: this._Chain.coins(info.exposure.own.toBn()),
+          commission: info.prefs.commission.toHuman(),
+          nominators: info.exposure.others.length,
+        }));
+        resolve(this.cachedValidators);
+      });
+    });
+  }
+
   public get validators(): Promise<IValidators> {
     return new Promise(async (resolve) => {
       const { nextElected, validators: currentSet } = await this._Chain.api.derive.staking.validators();
@@ -459,9 +483,14 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
         .multi(currentSet.map((elt) => elt.toString()));
       const exposures: Exposure[] = await stakersCall
         .multi(currentSet.map((elt) => stakersCallArgs(elt.toString())));
+      const validatorPrefs = await this._Chain.api.query.staking.erasValidatorPrefs
+        .multi(currentSet.map((elt) => stakersCallArgs(elt.toString())));
+
       const nextUpControllers = await this._Chain.api.query.staking.bonded
         .multi(toBeElected.map((elt) => elt.toString()));
       const nextUpExposures: Exposure[] = await stakersCall
+        .multi(toBeElected.map((elt) => stakersCallArgs(elt.toString())));
+      const nextUpValidatorPrefs = await this._Chain.api.query.staking.erasValidatorPrefs
         .multi(toBeElected.map((elt) => stakersCallArgs(elt.toString())));
 
       const result: IValidators = {};
@@ -469,6 +498,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
         result[currentSet[i].toString()] = {
           exposure: exposures[i],
           controller: controllers[i].toString(),
+          prefs: validatorPrefs[i],
           isElected: true,
         };
       }
@@ -478,6 +508,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
         result[toBeElected[i].toString()] = {
           exposure: nextUpExposures[i],
           controller: nextUpControllers[i].toString(),
+          prefs: nextUpValidatorPrefs[i],
           isElected: false,
         };
       }

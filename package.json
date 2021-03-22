@@ -23,7 +23,10 @@
     "migrate-flags": "NO_CLIENT=true NO_PRERENDER=true FLAG_MIGRATION=true ts-node --project tsconfig.node.json server.ts",
     "reset-server": "NO_CLIENT=true NO_PRERENDER=true RESET_DB=true ts-node --project tsconfig.node.json server.ts",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.node.json server.ts",
-    "psql": "psql -h localhost commonwealth -U commonwealth"
+    "psql": "psql -h localhost commonwealth -U commonwealth",
+    "dump-db": "pg_dump $(heroku config:get DATABASE_URL) --verbose --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --no-privileges --no-owner -f latest.dump",
+    "reset-db": "sh -c \"npx sequelize db:drop && npx sequelize db:create\"",
+    "load-db": "psql -d commonwealth -U commonwealth -f latest.dump"
   },
   "engines": {
     "node": "12.3.1"
@@ -42,6 +45,7 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@babel/register": "^7.4.0",
+    "@clover-network/node-tpye": "^1.0.1",
     "@commonwealth/chain-events": "0.5.0-beta.5",
     "@cosmjs/launchpad": "^0.24.0-alpha.13",
     "@edgeware/node-types": "3.3.1-newyork.0",
