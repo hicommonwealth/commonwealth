@@ -2,7 +2,7 @@ import 'sublayout.scss';
 
 import m, { Vnode } from 'mithril';
 import app from 'state';
-import { EmptyState, Button, Icons, Grid, Col, Spinner } from 'construct-ui';
+import { EmptyState, Button, Icon, Icons, Grid, Col, Spinner } from 'construct-ui';
 import { link } from 'helpers';
 
 import NewProposalButton from 'views/components/new_proposal_button';
@@ -63,7 +63,7 @@ const Sublayout: m.Component<{
         m(CommunityIcon, { size: ICON_SIZE, community }),
         m('h4.sublayout-header-heading', [
           link('a', `/${app.activeId()}`, community.name),
-          community.privacyEnabled && m('span.icon-lock'),
+          community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),

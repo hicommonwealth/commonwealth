@@ -10,7 +10,6 @@ import {
   EdgewareChainNotificationTypes, KusamaChainNotificationTypes,
   KulupuChainNotificationTypes, PolkadotChainNotificationTypes
 } from 'helpers/chain_notification_types';
-import { symbols } from 'helpers';
 import { notifyError } from 'controllers/app/notifications';
 
 interface IAttrs {
@@ -71,7 +70,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
           e.preventDefault();
           $(e.target).trigger('modalexit');
         }
-      }, symbols.times),
+      }, m.trust('&times;')),
       m('.title-section', [
         m('h4', 'Webhook Settings'),
         m('p', 'Which events should trigger this webhook?'),

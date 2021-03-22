@@ -39,8 +39,8 @@ import 'modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 
+import { Icon, Icons } from 'construct-ui';
 import app from 'state';
-import { featherIcon, symbols } from 'helpers';
 
 // When the user exits a modal, we delay the exit callback by calling
 // setTimeout(exitCallback, 0) so the modal can be removed before
@@ -119,7 +119,7 @@ export const CompactModalExitButton: m.Component<{}> = {
         e.preventDefault();
         $(e.target).trigger('modalexit');
       }
-    }, symbols.times);
+    }, m.trust('&times;'));
   }
 };
 
