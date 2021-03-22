@@ -121,6 +121,16 @@ export enum ProposalStatus {
   Failed = 'failed',
   None = 'none',
 }
+
+export enum BountyStatus {
+  Proposed = 'proposed',
+  Approved = 'approved',
+  Funded = 'funded',
+  CuratorProposed = 'curator_proposed',
+  Active = 'active',
+  PendingPayout = 'pending_payout',
+}
+
 export enum VotingType {
   SimpleYesNoVoting = 'binary',
   ConvictionYesNoVoting = 'binary_conviction',

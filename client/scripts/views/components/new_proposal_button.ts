@@ -48,6 +48,12 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
         }),
         label: 'New council motion'
       }),
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          type: ProposalType.SubstrateBountyProposal,
+        }),
+        label: 'New bounty proposal'
+      }),
       candidates
         && [
           m(MenuDivider),

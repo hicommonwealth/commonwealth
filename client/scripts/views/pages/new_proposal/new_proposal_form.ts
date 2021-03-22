@@ -32,6 +32,7 @@ import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import TopicSelector from 'views/components/topic_selector';
 import ErrorPage from 'views/pages/error';
+import SubstrateBountyTreasury from 'client/scripts/controllers/chain/substrate/bountyTreasury';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -58,6 +59,8 @@ const NewProposalForm = {
     let hasBeneficiaryAndAmount : boolean;
     let hasPhragmenInfo : boolean;
     let hasDepositChooser : boolean;
+    // bounty proposal
+    let hasValue : boolean;
     // council motion
     let hasVotingPeriodAndDelaySelector : boolean;
     let hasReferendumSelector : boolean;
@@ -76,7 +79,7 @@ const NewProposalForm = {
       hasToggle = true;
       hasDepositChooser = (vnode.state.toggleValue === 'proposal');
       if (hasDepositChooser) {
-        dataLoaded = !!(app.chain as Substrate).democracyProposals?.minimumDeposit;
+        dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
       }
     } else if (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal) {
       hasCouncilMotionChooser = true;
@@ -91,22 +94,27 @@ const NewProposalForm = {
       hasTreasuryProposalSelector = vnode.state.councilMotionType === 'createTreasuryApprovalMotion'
         || vnode.state.councilMotionType === 'createTreasuryRejectionMotion';
       hasThreshold = vnode.state.councilMotionType !== 'vetoNextExternal';
-      if (hasExternalProposalSelector) dataLoaded = !!(app.chain as Substrate).democracyProposals;
+      if (hasExternalProposalSelector) dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
     } else if (proposalTypeEnum === ProposalType.OffchainThread) {
       hasTitleAndDescription = true;
       hasTopics = true;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
       hasBeneficiaryAndAmount = true;
       const treasury = (app.chain as Substrate).treasury;
-      dataLoaded = !!treasury.bondMinimum && !!treasury.bondPct;
+      dataLoaded = !!treasury.initialized;
+    } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
+      hasTitleAndDescription = true;
+      hasValue = true;
+      const bountyTreasury = (app.chain as Substrate).bounties;
+      dataLoaded = !!bountyTreasury.initialized;
     } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
       hasPhragmenInfo = true;
       const elections = (app.chain as Substrate).phragmenElections;
-      dataLoaded = !!elections.candidacyBond && !!elections.desiredRunnersUp;
+      dataLoaded = !!elections.initialized;
     } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
       hasTitleAndDescription = true;
       hasDepositChooser = true;
-      dataLoaded = !!(app.chain as Cosmos).governance;
+      dataLoaded = !!(app.chain as Cosmos).governance.initialized;
     } else if (proposalTypeEnum === ProposalType.MolochProposal) {
       hasMolochFields = true;
     } else if (proposalTypeEnum === ProposalType.MarlinProposal) {
@@ -233,6 +241,14 @@ const NewProposalForm = {
           'Proposal Type': 'Treasury',
           'Thread Type': 'Proposal',
         });
+      } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
+        // TODO: fix these lines
+        if (!vnode.state.form.title) throw new Error('Invalid title');
+        if (!vnode.state.form.description) throw new Error('Invalid description');
+        if (!vnode.state.value) throw new Error('Invalid value');
+        args = [author, `${vnode.state.form.title}: ${vnode.state.form.description}`, vnode.state.value];
+        createFunc = ([a, d, v]) => (app.chain as Substrate).bounties.createTx(a, d, v);
+        return createTXModal(createFunc(args)).then(done);
       } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
         args = [author];
         createFunc = ([a]) => (app.chain as Substrate).phragmenElections.activeElection.submitCandidacyTx(a);
@@ -474,6 +490,21 @@ const NewProposalForm = {
               ],
               name: 'democracy-tx-switcher',
             }),
+          ],
+          hasValue && [
+            m(FormGroup, [
+              m(FormLabel, 'Value'),
+              m(Input, {
+                name: 'value',
+                placeholder: 'Min: 0',
+                oncreate: (vvnode) => $(vvnode.dom).val('0'),
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.value = parseFloat(result);
+                  m.redraw();
+                },
+              }),
+            ]),
           ],
           hasDepositChooser && [
             m(FormGroup, [
