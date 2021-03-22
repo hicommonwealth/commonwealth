@@ -97,7 +97,7 @@ const BountiesPage: m.Component<{}> = {
           ]),
           m('', [
             m('.stats-box-stat', [
-              'Treasury balance: ',
+              'Treasury: ',
               app.chain && formatCoin((app.chain as Substrate).treasury.pot),
             ]),
           ]),

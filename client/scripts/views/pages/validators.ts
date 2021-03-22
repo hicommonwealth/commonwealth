@@ -118,7 +118,7 @@ const ValidatorsPage: m.Component<{}, { validators, totalStaked, validatorsIniti
           m('', [
             m('strong', 'Validators'),
             m('span', [
-              ' are responsible for producing blocks and securing the network.'
+              ' are responsible for producing blocks and securing the network. Nominate validators to receive staking rewards.'
             ]),
           ]),
           m('', [

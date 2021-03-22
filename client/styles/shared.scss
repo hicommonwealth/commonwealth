@@ -153,7 +153,7 @@ $listing-right-flex: 1;
     .stats-box {
         margin-top: 20px;
         margin-bottom: 20px;
-        padding: 24px 20px 18px;
+        padding: 24px 20px 20px;
         border-radius: 10px;
         background-color: #f8f8f8;
         display: flex;
@@ -162,6 +162,10 @@ $listing-right-flex: 1;
             margin-right: 16px;
         }
         .stats-box-right {
+            line-height: 1.25;
+            p {
+                margin: 4px 0 0;
+            }
         }
 
         .stats-box-stat {
@@ -181,12 +185,12 @@ $listing-right-flex: 1;
                 content: ' ';
                 margin: 0 6px;
             }
+            .cui-button {
+                margin-top: 6px;
+            }
         }
     }
     @include sm-max {
-        .stats-box {
-            padding-bottom: 0;
-        }
         .stats-box-left {
             display: none;
         }

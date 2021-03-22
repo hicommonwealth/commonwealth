@@ -40,29 +40,28 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
       m('.stats-box-left', '💭'),
       m('.stats-box-right', [
         m('', [
-          m('strong', 'Councillors'),
+          m('strong', 'Democracy Proposals'),
           m('span', [
-            ' are representatives of the network elected by coin weighted vote. ',
-            'A majority of councillors can approve/reject treasury proposals, propose referenda ',
-            'that only require a simple majority, or create fast-track referenda.'
+            ' can be introduced by anyone to approve/reject treasury proposals, upgrade the chain, or change technical parameters. ',
+            'At a regular interval, the top ranked proposal will become a supermajority-required referendum.',
+          ]),
+          m('p', [
+            m('strong', 'Council Motions'),
+            m('span', [
+              ' can be introduced by councillors. They can be used to directly approve/reject treasury proposals, ',
+              'propose simple-majority referenda, or create fast-track referenda.',
+            ]),
           ]),
         ]),
         m('', [
           m('.stats-box-stat', [
-            'Next referendum: ',
+            'Next proposal becomes a referendum: ',
             (app.chain as Substrate).democracyProposals.nextLaunchBlock
               ? m(CountdownUntilBlock, {
                 block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
                 includeSeconds: false
               })
               : '--',
-          ]),
-          m('.stats-box-stat', [
-            'Enactment delay: ',
-            (app.chain as Substrate).democracy.enactmentPeriod
-              ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
-              : '--',
-            ' days'
           ]),
         ]),
       ]),

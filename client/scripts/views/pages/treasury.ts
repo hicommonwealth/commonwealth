@@ -39,11 +39,10 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
           m('strong', 'Treasury Proposals'),
           m('span', [
             ' are used to request funds from the on-chain treasury. They are approved/rejected by referendum or council.',
-            'A deposit of 5% of the proposed amount (minimum 4500 EDG) is required to create a treasury proposal.' // TODO fix numbers
           ]),
           m('', [
             m('.stats-box-stat', [
-              'Treasury balance: ', formatCoin((app.chain as Substrate).treasury.pot),
+              'Treasury: ', formatCoin((app.chain as Substrate).treasury.pot),
             ]),
             m('.stats-box-stat', [
               'Next treasury spend: ',

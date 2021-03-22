@@ -300,9 +300,9 @@ const CouncilPage: m.Component<{}> = {
           m('', [
             m('strong', 'Councillors'),
             m('span', [
-              ' are representatives of the network elected by coin weighted vote. ',
-              'A majority of councillors can approve/reject treasury proposals, propose referenda ',
-              'that only require a simple majority, or create fast-track referenda.'
+              ' are elected by coin holders to govern the network. ',
+              'The council can approve/reject treasury proposals, propose simple-majority referenda, ',
+              'or create fast-track referenda.'
             ]),
           ]),
           m('', [
