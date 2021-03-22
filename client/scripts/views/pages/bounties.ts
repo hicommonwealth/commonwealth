@@ -34,12 +34,18 @@ const BountyPage: m.Component<{}> = {
       if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
         return m(ErrorPage, {
           message: 'Chain connection timed out.',
-          title: 'Bounties',
+          title: [
+            'Bounties',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
         });
       }
       return m(PageLoading, {
         message: 'Connecting to chain (may take up to 10s)...',
-        title: 'Bounties',
+        title: [
+          'Bounties',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
         showNewProposalButton: true,
       });
     }
@@ -51,7 +57,10 @@ const BountyPage: m.Component<{}> = {
         app.chain.loadModules(modules);
         return m(PageLoading, {
           message: 'Connecting to chain (may take up to 10s)...',
-          title: 'Bounties',
+          title: [
+            'Bounties',
+            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          ],
           showNewProposalButton: true,
         });
       }
@@ -69,7 +78,10 @@ const BountyPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'BountiesPage TreasuryPage',
-      title: 'Bounties',
+      title: [
+        'Bounties',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
       showNewProposalButton: true,
     }, [
       m(Grid, {
