@@ -55,6 +55,9 @@ const SearchPage : m.Component<{
       return LoadingPage;
     }
 
+    // TODO: Add a Construct UI Tabs component for content types; use filtering
+    // TODO: Sync up page result size, think through "all" results size vs type-sorted results size
+    // (or re-querying)
 
     return m(Sublayout, {
       class: 'SearchPage',
