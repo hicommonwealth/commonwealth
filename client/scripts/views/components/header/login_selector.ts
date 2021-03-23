@@ -183,8 +183,6 @@ const LoginSelector: m.Component<{
                   app.user.setAddresses(addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic)));
                   const addressInfo = app.user.addresses.find((a) => a.address === address && a.chain === targetChain);
 
-                  console.log(addressInfo);
-
                   const account = app.chain ? app.chain.accounts.get(address, addressInfo.keytype) : app.community.accounts.get(address, addressInfo.chain);
                   if (app.chain) {
                     account.setValidationToken(verification_token);

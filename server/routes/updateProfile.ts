@@ -1,15 +1,15 @@
 import { SubstrateTypes, chainSupportedBy } from '@commonwealth/chain-events';
 import { Request, Response, NextFunction } from 'express';
+import Sequelize from 'sequelize';
 import {
   PROFILE_BIO_MAX_CHARS,
   PROFILE_HEADLINE_MAX_CHARS,
   PROFILE_NAME_MAX_CHARS,
   PROFILE_NAME_MIN_CHARS
 } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
 import IdentityFetchCache from '../util/identityFetchCache';
 
-const log = factory.getLogger(formatFilename(__filename));
+const { Op } = Sequelize;
 
 export const Errors = {
   MissingParams: 'Must specify chain, address, and data',
@@ -65,22 +65,55 @@ const updateProfile = async (
     return next(new Error(Errors.BioTooLong));
   }
 
-  // try to find existing profile
-  let profile = await models.OffchainProfile.findOne({
+  const chain = await models.Chain.findOne({
+    where: { id: address.chain }
+  });
+
+  const chains = await models.Chain.findAll({
+    where: { base: chain.base }
+  });
+
+  const addressesInSameChainbase = await models.Address.findAll({
     where: {
-      address_id: address.id,
+      user_id: address.user_id,
+      address: address.address,
+      chain: { [Op.in]: chains.map((ch) => ch.id) }
     }
   });
 
+  // try to find existing profile
+  const profiles = await models.OffchainProfile.findAll({
+    where: {
+      address_id: { [Op.in]: addressesInSameChainbase.map((_) => _.id) },
+    }
+  });
+  let profile = profiles.find((pro) => pro.address_id === address.id);
+
   if (unpackedData.name) {
-    address.name = unpackedData.name;
-    await address.save();
+    await models.Address.update({
+      name: unpackedData.name
+    }, {
+      where: {
+        user_id: address.user_id,
+        address: address.address,
+        chain: { [Op.in]: chains.map((ch) => ch.id) }
+      }
+    });
   }
 
   // create if exists, update otherwise
   if (profile) {
-    profile = await profile.update({
-      data: req.body.data,
+    await models.OffchainProfile.update({
+      data: req.body.data
+    }, {
+      where: {
+        address_id: { [Op.in]: addressesInSameChainbase.map((addr) => addr.id) },
+      }
+    });
+    profile = await models.OffchainProfile.findOne({
+      where: {
+        address_id: address.id
+      }
     });
   } else {
     profile = await models.OffchainProfile.create({
