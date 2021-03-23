@@ -48,6 +48,7 @@ const instantiateEditor = (
   hasFormats: boolean = true,
   imageUploader: boolean = true,
   placeholder: string,
+  searchOperators: boolean = false,
   editorNamespace: string,
   state: any,
   onkeyboardSubmit: () => void,
@@ -89,7 +90,7 @@ const instantiateEditor = (
     return true;
   };
 
-  const insertEmbeds = (text) => {
+  const insertBlockEmbeds = (text) => {
     const twitterRe = /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
     const videoRe = /^(?:http[s]?:\/\/)?(?:www[.])?((?:vimeo\.com|youtu\.be|youtube\.com)\/[^\s]+)$/;
     const embeddableTweet = twitterRe.test(text);
@@ -164,6 +165,33 @@ const instantiateEditor = (
       }
     }
   }
+
+  // Inline embeds for search bar
+  const InlineEmbed = Quill.import('blots/embed');
+
+  class SearchOperatorBlot extends InlineEmbed {
+    public static blotName: string = 'searchOperator';
+    public static className: string = 'search-operator';
+    public static tagName: string = 'span';
+
+    static create(data) {
+      debugger
+      const node = super.create(data.value);
+      node.setAttribute('data-value', data.value);
+      const denotationChar = document.createElement('span');
+      denotationChar.className = 'ql-search-operator-char';
+      denotationChar.innerHTML = data.denotationChar;
+      node.appendChild(denotationChar);
+      node.innerHTML += data.value;
+      return node;
+    }
+
+    static value(domNode) {
+      return domNode.getAttribute('data-value');
+    }
+  }
+
+  Quill.register(SearchOperatorBlot, true);
 
   // preemptively load Twitter Widgets, so users won't be confused by loading lag &
   // abandon an embed attempt
@@ -376,7 +404,7 @@ const instantiateEditor = (
         if (isMarkdownMode()) return true;
         const [line, offset] = quill.getLine(range.index);
         const { textContent } = line.domNode;
-        const isEmbed = insertEmbeds(textContent);
+        const isEmbed = insertBlockEmbeds(textContent);
         // if embed, stopPropogation; otherwise continue
         return !isEmbed;
       }
@@ -660,7 +688,7 @@ const instantiateEditor = (
       'bold', 'italic', 'strike', 'code',
       'link', 'image', 'blockquote', 'code-block',
       'header', 'list', 'twitter', 'video', 'mention',
-    ] : [],
+    ] : searchOperators ? 'search-operator' : [],
     theme,
   });
 
@@ -942,8 +970,8 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
       oncreate: (childVnode) => {
         const $editor = $(childVnode.dom).find('.quill-editor');
         vnode.state.editor = instantiateEditor(
-          $editor, theme, true, imageUploader, placeholder, editorNamespace,
-          vnode.state, onkeyboardSubmit
+          $editor, theme, true, imageUploader, placeholder,
+          false, editorNamespace, vnode.state, onkeyboardSubmit
         );
         // once editor is instantiated, it can be updated with a tabindex
         $(childVnode.dom).find('.ql-editor').attr('tabindex', tabindex);
@@ -972,8 +1000,8 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                 const $editor = $(e.target).closest('.QuillEditor').find('.quill-editor');
                 vnode.state.editor.container.tabIndex = tabindex;
                 vnode.state.editor = instantiateEditor(
-                  $editor, theme, true, imageUploader, placeholder, editorNamespace,
-                  vnode.state, onkeyboardSubmit
+                  $editor, theme, true, imageUploader, placeholder,
+                  false, editorNamespace, vnode.state, onkeyboardSubmit
                 );
                 // once editor is instantiated, it can be updated with a tabindex
                 $(e.target).closest('.QuillEditor').find('.ql-editor').attr('tabindex', tabindex);
@@ -1018,8 +1046,8 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                 vnode.state.markdownMode = true;
                 const $editor = $(e.target).closest('.QuillEditor').find('.quill-editor');
                 vnode.state.editor = instantiateEditor(
-                  $editor, theme, true, imageUploader, placeholder, editorNamespace,
-                  vnode.state, onkeyboardSubmit
+                  $editor, theme, true, imageUploader, placeholder,
+                  false, editorNamespace, vnode.state, onkeyboardSubmit
                 );
                 // once editor is instantiated, it can be updated with a tabindex
                 $(e.target).closest('.QuillEditor').find('.ql-editor').attr('tabindex', tabindex);
