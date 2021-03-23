@@ -95,7 +95,7 @@ const ProposalHeader: m.Component<{
     // merely have access to the body and title
     const { activeAccount } = app.user;
     const authorChain = (proposal instanceof OffchainThread) ? proposal.authorChain : app.activeId();
-    const authorAddress = (proposal instanceof OffchainThread) ? proposal.author : proposal.author.address;
+    const authorAddress = (proposal instanceof OffchainThread) ? proposal.author : proposal.author?.address;
     const isAuthor = (activeAccount?.address === authorAddress && activeAccount?.chain.id === authorChain);
     const isEditor = (proposal as OffchainThread).collaborators?.filter((c) => {
       return (c.address === activeAccount?.address && c.chain === activeAccount?.chain.id);
