@@ -17,7 +17,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 
 const SEARCH_DELAY = 750;
-const SEARCH_PAGE_SIZE = 10;
+const SEARCH_RESULTS_SIZE = 10;
 
 export enum SearchPrefixes {
   COMMUNITY = 'comm:',
@@ -38,7 +38,7 @@ export const search = _.debounce((searchTerm, vnode) => {
     community: communityId,
     cutoff_date: null, // cutoffDate.toISOString(),
     search: searchTerm,
-    page_size: SEARCH_PAGE_SIZE,
+    results_size: SEARCH_RESULTS_SIZE,
   };
   $.get(`${app.serverUrl()}/search`, params).then((response) => {
     if (response.status !== 'Success') {
@@ -104,7 +104,123 @@ const SearchBar : m.Component<{}, {
         }
         // on enter
         // m.route.set(`/${app.activeId()}/search?q=${encodeURIComponent(searchTerm.toString().trim())}`);
-      })
+      }),
+      m('.search-results-wrap', [
+        vnode.state.searchLoading ? m('.search-loading', [
+          m(Spinner, {
+            active: true,
+            fill: true,
+            size: 'xl',
+          }),
+        ]) : vnode.state.errorText ? m('.search-error', [
+          m('.error-text', vnode.state.errorText),
+        ]) : !vnode.state.results ? m('.search-loading', [
+          // TODO: prompt to start searching
+        ]) : m('.search-results', [
+          m('.search-results-caption', [
+            vnode.state.results.length === SEARCH_RESULTS_SIZE
+              ? `${vnode.state.results.length}+ results`
+              : pluralize(vnode.state.results.length, 'result'),
+            ' for \'',
+            vnode.state.searchTerm,
+            '\'',
+            m('a.search-results-clear', {
+              href: '#',
+              onclick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                vnode.state.results = null;
+                $('.search-page-input input').val('')
+                  .select()
+                  .focus();
+              }
+            }, 'Clear'),
+          ]),
+          m('.search-results-list', [
+            vnode.state.results.map((result) => {
+              const activeId = app.activeId();
+              const proposalType = result.proposalType;
+              const proposalId = result.proposalid;
+              return m('a.search-results-item', {
+                href: (result.type === 'thread')
+                  ? `/${activeId}/proposal/discussion/${proposalId}`
+                  : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`,
+                onclick: (e) => {
+                  e.preventDefault();
+                  m.route.set(
+                    result.type === 'thread'
+                      ? `/${activeId}/proposal/discussion/${proposalId}`
+                      : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`
+                  );
+                }
+              }, [
+                result.type === 'thread' ? [
+                  m('.search-results-thread-title', [
+                    decodeURIComponent(result.title),
+                  ]),
+                  m('.search-results-thread-subtitle', [
+                    m('span.created-at', moment(result.created_at).fromNow()),
+                    m(User, { user: new AddressInfo(result.address_id, result.address, result.address_chain, null) }),
+                  ]),
+                  m('.search-results-thread-body', [
+                    (() => {
+                      try {
+                        const doc = JSON.parse(decodeURIComponent(result.body));
+                        if (!doc.ops) throw new Error();
+                        return m(QuillFormattedText, {
+                          doc,
+                          hideFormatting: true,
+                          collapse: true,
+                          searchTerm: vnode.state.searchTerm,
+                        });
+                      } catch (e) {
+                        const doc = decodeURIComponent(result.body);
+                        return m(MarkdownFormattedText, {
+                          doc,
+                          hideFormatting: true,
+                          collapse: true,
+                          searchTerm: vnode.state.searchTerm,
+                        });
+                      }
+                    })(),
+                  ])
+                ] : [
+                  m('.search-results-thread-title', [
+                    'Comment on ',
+                    decodeURIComponent(result.title),
+                  ]),
+                  m('.search-results-thread-subtitle', [
+                    m('span.created-at', moment(result.created_at).fromNow()),
+                    m(User, { user: new AddressInfo(result.address_id, result.address, result.address_chain, null) }),
+                  ]),
+                  m('.search-results-comment', [
+                    (() => {
+                      try {
+                        const doc = JSON.parse(decodeURIComponent(result.body));
+                        if (!doc.ops) throw new Error();
+                        return m(QuillFormattedText, {
+                          doc,
+                          hideFormatting: true,
+                          collapse: true,
+                          searchTerm: vnode.state.searchTerm,
+                        });
+                      } catch (e) {
+                        const doc = decodeURIComponent(result.body);
+                        return m(MarkdownFormattedText, {
+                          doc,
+                          hideFormatting: true,
+                          collapse: true,
+                          searchTerm: vnode.state.searchTerm,
+                        });
+                      }
+                    })(),
+                  ]),
+                ]
+              ]);
+            })
+          ]),
+        ]),
+      ])
     ]);
   }
 };
