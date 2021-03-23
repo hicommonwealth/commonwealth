@@ -74,6 +74,9 @@
                 position: relative;
                 font-size: 17px;
             }
+            > .created-at {
+                margin-left: 12px;
+            }
             > .User {
                 display: inline-flex;
                 > .role-icon {
@@ -92,9 +95,6 @@
                 > a.user-display-name {
                     color: $primary-bg-color;
                 }
-            }
-            > .created-at {
-                margin-right: 14px;
             }
         }
     }
