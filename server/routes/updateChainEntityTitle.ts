@@ -20,7 +20,6 @@ const updateChainEntityTitle = async (models, req: Request, res: Response, next:
   const userOwnedAddresses = userOwnedAddressObjects.map((addr) => addr.address);
   const userOwnedAddressIds = userOwnedAddressObjects.map((addr) => addr.id);
 
-  // Todo: author check
   if (!userOwnedAddresses.includes(entity.author)) {
     const roles = await models.Role.findAll({
       where: {
@@ -28,8 +27,9 @@ const updateChainEntityTitle = async (models, req: Request, res: Response, next:
         permission: { [Op.in]: ['admin', 'moderator'] },
       }
     });
+    // If address does not belong to entity chain, return error
     const role = roles.find((r) => {
-      return r.offchain_community_id === entity.community || r.chain_id === entity.chain;
+      return r.chain_id === entity.chain;
     });
     if (!role) return next(new Error(Errors.NotAdminOrOwner));
   }
