@@ -45,7 +45,6 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         vnode.state.disabled = false;
         if (result.status === 'Success') {
           vnode.state.success = true;
-          notifySuccess('Webhook saved!');
           const newWebhook = Webhook.fromJSON(result.result);
           vnode.attrs.webhooks.push(newWebhook);
           app.modals.create({
@@ -87,12 +86,12 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                 : null;
             return m(ListItem, {
               contentLeft: [
-                m('.top', { style: `display: 'block';`}, webhook.url),
+                m('.top', { style: 'display: block;' }, webhook.url),
                 m('.bottom', [
-                  label && m(Tag, { label }),
+                  label && m(Tag, { size: 'xs', label }),
                   m(Button, {
                     class: 'settings-button',
-                    label: m(Icon, { name: Icons.SETTINGS, size: 'xs' }),
+                    iconRight: Icons.SETTINGS,
                     rounded: true,
                     onclick: (e) => {
                       e.preventDefault();
@@ -100,16 +99,15 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                         modal: WebhookSettingsModal,
                         data: {
                           webhook,
-                          updateSuccessCallback: (webhook) => {
-                            const idx = vnode.attrs.webhooks.findIndex((wh) => wh.id === webhook.id);
-                            vnode.attrs.webhooks[idx].categories = webhook.categories;
+                          updateSuccessCallback: (wh) => {
+                            const idx = vnode.attrs.webhooks.findIndex((wh2) => wh2.id === wh.id);
+                            vnode.attrs.webhooks[idx].categories = wh.categories;
                           }
                         }
                       });
-                      return;
                     }
                   }),
-                  m(Tag, { label: pluralize(webhook.categories.length, 'event') }),
+                  m(Tag, { size: 'xs', label: pluralize(webhook.categories.length, 'event') }),
                 ])],
               contentRight: m(Icon, {
                 name: Icons.X,

@@ -1,141 +1,19 @@
 @import 'client/styles/shared';
 
-@mixin small-gray {
-    font-size: 13px;
-    font-weight: 500;
-    text-transform: uppercase;
-    color: $text-color-light;
-    letter-spacing: 0.2px;
-}
+.ValidatorsPage {
+    padding-bottom: 60px;
+    @include gov-explainer;
 
-.NewStashForm {
-    margin: 16px 0 10px;
-    .form-group {
-        margin-bottom: 16px;
-    }
-    button {
-        margin: 6px 0;
-    }
-}
-
-.ViewNominatorsModal {
-    max-width: 600px;
-}
-
-.ManageStakingModal {
-    min-width: 780px;
-    .compact-modal-title h3 .User .user-avatar {
-        margin-left: 4px;
-    }
-    .compact-modal-title h3 .User a.user-display-name {
-        color: $background-color-white;
-        font-weight: 500;
-        margin-right: 10px;
-    }
-    h4 {
-        font-weight: 500;
-        font-size: 18px;
-        margin: 40px 0 8px;
-    }
-    h4:first-child {
-        margin-top: 12px;
-    }
-    p {
-        margin: 4px 0 20px;
-    }
-    h5 {
-        font-size: 13px;
-        text-transform: uppercase;
-        color: $text-color-light;
-        letter-spacing: 0.3px;
-        margin: 0 0 5px;
-    }
-    .well {
-        margin: 12px 0;
-        padding: 18px 24px;
-        background: $background-color-white-hover;
-        &.not-available {
-            color: $text-color-light;
-        }
-    }
-    .stash-stat {
+    .Validator {
         float: left;
-        margin-right: 42px;
-        .stash-stat-text {
-            font-size: 17px;
-        }
-        .stash-balance {
-            font-family: iA Writer Quattro;
-        }
-    }
-    // .stash-actions {
-    //    float: right;
-    //     padding-top: 16px;
-    //     a.btn {
-    //         display: inline-block;
-    //         padding: 4px 14px;
-    //         margin-left: 12px;
-    //         min-width: 115px;
-    //     }
-    // }
-    .chill-button {
-        display: inline-block;
-        margin-top: 6px;
-    }
-}
-
-.Validators {
-    width: 100%;
-    th {
-        @include small-gray;
-        text-align: left;
-        border-bottom: none;
-    }
-    td {
-        font-size: 15px;
-        border-bottom: none;
-        padding-top: 0;
-        padding-bottom: 5px;
-        overflow: hidden;
-    }
-    td .User a.user-display-name {
-        font-size: 15px;
-    }
-    .val-name {
-        font-weight: 500;
-    }
-    .val-action {
-        text-align: right;
-    }
-    @include sm-max {
-        .val-nominated {
-            display: none;
-        }
-    }
-    a.view-nominators {
-        color: $text-color-light;
-        float: right;
-    }
-    button.nominate-validator {
-        padding: 3px 10px;
-    }
-}
-
-.ValidatorPage {
-    .validators-preheader {
-        display: flex;
-        margin-bottom: 40px;
-        .validators-preheader-item {
-            flex: 1;
-            max-width: 200px;
-            margin-right: 30px;
-        }
-        .validators-preheader-item h3 {
-            @include small-gray;
-            margin: 0 0 6px;
-        }
-        .validators-preheader-item .validators-preheader-item-text {
-            font-size: 17px;
-        }
+        // sizing
+        width: 31%;
+        margin-right: 2%;
+        margin-top: 1.66%;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        // padding
+        padding: 16px 24px 12px;
+        box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
     }
 }

@@ -24,15 +24,34 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import PageLoading from 'views/pages/loading';
 import ViewVotersModal from 'views/modals/view_voters_modal';
-import CouncilRow from 'views/pages/council/council_row';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 
-interface ICouncilElectionVoterAttrs {
-  vote: PhragmenElectionVote;
-}
+const Councillor: m.Component<{ account }> = {
+  view: (vnode) => {
+    if (!vnode.attrs.account) return;
+    const { account } = vnode.attrs;
 
-const CouncilElectionVoter: m.Component<ICouncilElectionVoterAttrs> = {
+    // TODO: refactor this logic to the top level
+    const election = (app.chain as Substrate).phragmenElections;
+    const votes: PhragmenElectionVote[] = (app.chain as Substrate).phragmenElections.activeElection.getVotes()
+      .filter((v) => v.votes.includes(account.address));
+    const hasMyVote = app.user.activeAccount && votes.filter((v) => v.account === app.user.activeAccount);
+
+    return m('.Councillor', [
+      m(User, { user: account, popover: true, hideIdentityIcon: true }),
+      m('.councillor-status', [
+        election.isMember(account)
+          ? `${election.backing(account).format(true)} from ${pluralize(votes.length, 'voter')}`
+          : `??? from ${pluralize(votes.length, 'voter')}`
+      ]),
+    ]);
+  }
+};
+
+const CouncilElectionVoter: m.Component<{
+  vote: PhragmenElectionVote;
+}> = {
   view: (vnode) => {
     const myAccount = app.user.activeAccount as SubstrateAccount;
     const voter = vnode.attrs.vote as PhragmenElectionVote;
@@ -68,103 +87,6 @@ const CouncilElectionVoter: m.Component<ICouncilElectionVoterAttrs> = {
         ]),
       ]),
     ]);
-  }
-};
-
-export const CollectiveVotingButton: m.Component<{
-  candidates: Array<[SubstrateAccount, number]>,
-  menuStyle?: boolean,
-  buttonStyle?: boolean
-}> = {
-  view: (vnode) => {
-    const { buttonStyle, candidates, menuStyle } = vnode.attrs;
-    return menuStyle
-      ? m(MenuItem, {
-        disabled: !app.user.activeAccount,
-        label: 'Set council vote',
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.create({
-            modal: CouncilVotingModal,
-            data: { candidates },
-          });
-        }
-      })
-      : buttonStyle
-        ? m(Button, {
-          disabled: !app.user.activeAccount,
-          intent: 'primary',
-          label: 'Set council vote',
-          rounded: true,
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.create({
-              modal: CouncilVotingModal,
-              data: { candidates },
-            });
-          },
-        })
-        : m('a.proposals-action.CollectiveVotingButton', {
-          class: !app.user.activeAccount ? 'disabled' : '',
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.create({
-              modal: CouncilVotingModal,
-              data: { candidates },
-            });
-          }
-        }, 'Set council vote');
-  }
-};
-
-export const CandidacyButton: m.Component<{
-  candidates: Array<[SubstrateAccount, number]>,
-  buttonStyle?: boolean,
-  menuStyle?: boolean
-}> = {
-  view: (vnode) => {
-    const { buttonStyle, menuStyle, candidates } = vnode.attrs;
-
-    const activeAccountIsCandidate = app.chain
-      && app.user.activeAccount
-      && app.user.activeAccount.chainBase === ChainBase.Substrate
-      && !!candidates.find(([ who ]) => who.address === app.user.activeAccount.address);
-
-    // TODO: Retract candidacy buttons
-    return menuStyle
-      ? m(MenuItem, {
-        disabled: (!app.user.activeAccount || activeAccountIsCandidate
-          || app.chain.networkStatus !== ApiStatus.Connected),
-        label: activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council',
-        onclick: (e) => {
-          e.preventDefault();
-          if (app.modals.getList().length > 0) return;
-          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
-        },
-      })
-      : buttonStyle
-        ? m(Button, {
-          class: '.CandidacyButton',
-          disabled: (!app.user.activeAccount || activeAccountIsCandidate
-                    || app.chain.networkStatus !== ApiStatus.Connected),
-          intent: 'primary',
-          rounded: true,
-          label: activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council',
-          onclick: (e) => {
-            e.preventDefault();
-            if (app.modals.getList().length > 0) return;
-            m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
-          },
-        })
-        : m('a.proposals-action.CandidacyButton', {
-          class: (!app.user.activeAccount || activeAccountIsCandidate
-                  || app.chain.networkStatus !== ApiStatus.Connected) ? 'disabled' : '',
-          onclick: (e) => {
-            e.preventDefault();
-            if (app.modals.getList().length > 0) return;
-            m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
-          },
-        }, activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council');
   }
 };
 
@@ -244,7 +166,7 @@ const CouncilPage: m.Component<{}> = {
     if (modules.some((mod) => !mod.ready)) {
       app.chain.loadModules(modules);
       return m(PageLoading, {
-        message: 'Connecting to chain',
+        message: 'Loading council',
         title: [
           'Council',
           m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -255,6 +177,11 @@ const CouncilPage: m.Component<{}> = {
 
     const candidates = getCouncilCandidates();
     const councillors = getCouncillors();
+
+    const activeAccountIsCandidate = app.chain
+      && app.user.activeAccount
+      && app.user.activeAccount.chainBase === ChainBase.Substrate
+      && !!candidates.find(([ who ]) => who.address === app.user.activeAccount.address);
 
     const nSeats = (app.chain as Substrate).phragmenElections.desiredMembers;
     const nRunnersUpSeats = (app.chain as Substrate).phragmenElections.desiredRunnersUp;
@@ -275,60 +202,61 @@ const CouncilPage: m.Component<{}> = {
       showCouncilMenu: true,
     }, [
       // stats
-      m(Grid, {
-        align: 'middle',
-        class: 'stats-container',
-        gutter: 5,
-        justify: 'space-between'
-      }, [
-        m(Col, { span: { xs: 6, md: 3 } }, [
-          m('.stats-heading', 'Councillors'),
-          m('.stats-tile', `${councillors?.length} / ${nSeats}`),
-        ]),
-        m(Col, { span: { xs: 6, md: 3 } }, [
-          m('.stats-heading', 'Runners-up'),
-          m('.stats-tile', [
-            `${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)} / ${nRunnersUpSeats}`
+      m('.stats-box', [
+        m('.stats-box-left', '💭'),
+        m('.stats-box-right', [
+          m('', [
+            m('strong', 'Councillors'),
+            m('span', [
+              ' are elected by coin holders to govern the network. ',
+              'The council can approve/reject treasury proposals, propose simple-majority referenda, ',
+              'or create fast-track referenda.'
+            ]),
+          ]),
+          m('', [
+            m('.stats-box-stat', `Councillors: ${councillors?.length}`),
+            m('.stats-box-stat', [
+              `Runners-up: ${Math.min((candidates?.length - councillors?.length), nRunnersUpSeats)}`
+            ]),
+            m('.stats-box-stat', [
+              'Next election finishes: ',
+              m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false }),
+            ]),
+            app.user.activeAccount && app.chain.networkStatus === ApiStatus.Connected && m('.stats-box-action', [
+              m('a', {
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: CouncilVotingModal,
+                    data: { candidates },
+                  });
+                }
+              }, 'Vote'),
+            ]),
+            app.user.activeAccount && app.chain.networkStatus === ApiStatus.Connected && m('.stats-box-action', [
+              m('a', {
+                onclick: (e) => {
+                  e.preventDefault();
+                  if (activeAccountIsCandidate) {
+                    return;
+                  }
+                  m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
+                },
+              }, activeAccountIsCandidate ? 'Already a council candidate' : 'Run for council'),
+            ]),
           ]),
         ]),
-        m(Col, { span: { xs: 6, md: 3 } }, [
-          m('.stats-heading', 'Next council'),
-          m('.stats-tile', m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false })),
-        ]),
-        m(Col, { span: { xs: 6, md: 3 } }, [
-          m('.stats-heading', 'Candidacy bond'),
-          m('.stats-tile', candidacyBond),
-        ]),
-      ]),
-      m('.button-wrap', {
-        style: 'margin: 15px 0 0; text-align: end'
-      }, [
-        m(CollectiveVotingButton, { buttonStyle: true, candidates }),
-        m(CandidacyButton, { buttonStyle: true, candidates }),
       ]),
       // councillors
-      m(Listing, {
-        content: councillors.length === 0
-          ? [ m('.no-proposals', 'None') ]
-          : [m('.councillors', [
-            councillors.map(
-              (account) => m(CouncilRow, { account })
-            ),
-            m('.clear'),
-          ])],
-        columnHeader: 'Councillors',
-      }),
-      // candidates
-      m(Listing, {
-        content: candidates.length === 0
-          ? [ m('.no-proposals', 'None') ]
-          : [
-            candidates.filter(([ account ]) => !councillors.includes(account))
-              .map(([account, slot]) => m(CouncilRow, { account })),
-            m('.clear'),
-          ],
-        columnHeader: 'Runners-up',
-      })
+      m('h3', 'Councillors'),
+      councillors.map(
+        (account) => m(Councillor, { account })
+      ),
+      m('.clear'),
+      m('h3', 'Runners-up'),
+      candidates.filter(([ account ]) => !councillors.includes(account))
+        .map(([account, slot]) => m(Councillor, { account })),
+      m('.clear'),
     ]);
   },
 };
