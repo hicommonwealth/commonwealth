@@ -7,6 +7,19 @@
         margin-top: 30px;
         .search-prefix {
             cursor: pointer;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            padding: 0px 0px 0px 2px;
+
+            position: static;
+            width: 38.95px;
+            height: 14px;
+            left: 0px;
+            top: 2px;
+
+            background: linear-gradient(270deg, #CDDEFE 7.21%, #E7D8E9 91.08%);
+            border-radius: 2px;
         }
     }
     .search-loading {

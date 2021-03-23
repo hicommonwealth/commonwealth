@@ -14,7 +14,7 @@ import MobileSidebarHeader from 'views/components/sidebar/mobile';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import Token from 'controllers/chain/ethereum/token/adapter';
 
-import Search from './components/search';
+import SearchBar from './components/search_bar';
 
 const Sublayout: m.Component<{
   // overrides
@@ -103,7 +103,7 @@ const Sublayout: m.Component<{
           m('.sublayout-header', { class: !title ? 'no-title' : '' }, [
             m('.sublayout-header-inner', [
               sublayoutHeaderLeft,
-              m(Search),
+              m(SearchBar),
               sublayoutHeaderRight,
             ]),
           ]),
