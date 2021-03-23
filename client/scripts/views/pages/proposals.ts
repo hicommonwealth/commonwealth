@@ -55,7 +55,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
         ]),
         m('', [
           m('.stats-box-stat', [
-            'Next proposal becomes a referendum: ',
+            'Next proposal or motion becomes a referendum: ',
             (app.chain as Substrate).democracyProposals.nextLaunchBlock
               ? m(CountdownUntilBlock, {
                 block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
