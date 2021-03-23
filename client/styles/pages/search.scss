@@ -5,6 +5,9 @@
 
     .search-page-input {
         margin-top: 30px;
+        .search-prefix {
+            cursor: pointer;
+        }
     }
     .search-loading {
     }

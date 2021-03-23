@@ -21,6 +21,13 @@ import PageLoading from 'views/pages/loading';
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 const SEARCH_DELAY = 750;
 
+enum SearchPrefixes {
+  COMMUNITY = 'comm;',
+  MENTION = 'mention;',
+  TOKEN = 'token:',
+  USER = 'user:'
+}
+
 const searchCache = {}; // only used to restore search results when returning to the page
 
 const search = _.debounce((searchTerm, vnode) => {
@@ -52,7 +59,14 @@ const search = _.debounce((searchTerm, vnode) => {
   });
 }, SEARCH_DELAY);
 
-const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorText: string }> = {
+const SearchPage : m.Component<{}, {
+  results,
+  searchLoading: boolean,
+  searchTerm: string,
+  searchPrefix: string,
+  overridePrefix: boolean,
+  errorText: string
+}> = {
   view: (vnode) => {
     if (!app.chain && !app.community) {
       return m(PageLoading, {
@@ -79,7 +93,16 @@ const SearchPage : m.Component<{}, { results, searchLoading, searchTerm, errorTe
         fluid: true,
         class: 'search-page-input',
         defaultValue: m.route.param('q'),
+        onclick: (e) => {
+          if (!vnode.state.overridePrefix) {
+            vnode.state.searchPrefix = SearchPrefixes.COMMUNITY;
+          }
+        },
+        contentLeft: vnode.state.searchPrefix?.length
+          && !vnode.state.overridePrefix
+          && m('span.search-prefix', vnode.state.searchPrefix),
         oncreate: (vvnode) => {
+          console.log('created');
           const $input = $(vvnode.dom).find('input').focus();
           // wait for defaultValue to be applied, then try to load the search request for ?q=
           setTimeout(() => {
