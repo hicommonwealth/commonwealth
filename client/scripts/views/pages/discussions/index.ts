@@ -376,7 +376,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
                 e.preventDefault();
                 window.open(telegram);
               },
-              label: 'Open Telegram chat',
+              label: `Open ${name} Telegram chat`,
             }),
           ],
           trigger: m('a.topic-telegram', [ ' ', m(Icon, { name: Icons.MORE_HORIZONTAL }) ]),
