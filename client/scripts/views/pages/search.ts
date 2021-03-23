@@ -44,6 +44,13 @@ const SearchPage : m.Component<{
       });
     }
 
+    const searchTerm = m.route.param('q');
+
+    if (app.searchCache[searchTerm]?.length) {
+      vnode.state.results = app.searchCache[searchTerm];
+    }
+
+
     return m(Sublayout, {
       class: 'SearchPage',
       title: [
@@ -52,54 +59,6 @@ const SearchPage : m.Component<{
       ],
       showNewProposalButton: true,
     }, [
-      m(Input, {
-        placeholder: 'Type to search...',
-        autofocus: true,
-        fluid: true,
-        class: 'search-page-input',
-        defaultValue: m.route.param('q'),
-        onclick: (e) => {
-          if (!vnode.state.overridePrefix) {
-            vnode.state.searchPrefix = SearchPrefixes.COMMUNITY;
-          }
-        },
-        contentLeft: vnode.state.searchPrefix?.length
-          && !vnode.state.overridePrefix
-          && m('span.search-prefix', vnode.state.searchPrefix),
-        oncreate: (vvnode) => {
-          console.log('created');
-          const $input = $(vvnode.dom).find('input').focus();
-          // wait for defaultValue to be applied, then try to load the search request for ?q=
-          setTimeout(() => {
-            if ($input.val() !== '' && $input.val().toString().length >= 3) {
-              const searchTerm = $input.val().toString();
-              if (searchCache[searchTerm]) {
-                vnode.state.results = searchCache[searchTerm];
-                vnode.state.searchLoading = false;
-                vnode.state.searchTerm = searchTerm;
-                m.redraw();
-              } else {
-                search(searchTerm, vnode);
-              }
-            }
-          }, 0);
-        },
-        oninput: (e) => {
-          const searchTerm = e.target.value;
-          if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
-            vnode.state.errorText = 'Enter a valid search term';
-            vnode.state.searchLoading = false;
-            return;
-          }
-          vnode.state.errorText = null;
-          if (searchTerm.length < 3) {
-            return;
-          }
-          vnode.state.searchLoading = true;
-          search(e.target.value, vnode);
-          m.route.set(`/${app.activeId()}/search?q=${encodeURIComponent(searchTerm.toString().trim())}`);
-        }
-      }),
       vnode.state.searchLoading ? m('.search-loading', [
         m(Spinner, {
           active: true,
