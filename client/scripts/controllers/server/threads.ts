@@ -23,8 +23,8 @@ import { modelFromServer as modelCommentFromServer } from 'controllers/server/co
 import { Moment } from 'moment';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 
+export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
-export const MAX_PAGE_SIZE = 50;
 
 export const modelFromServer = (thread) => {
   const attachments = thread.OffchainAttachments
@@ -385,20 +385,14 @@ class ThreadsController {
     chainId: string,
     communityId: string,
     cutoffDate: moment.Moment,
-    pageSize?: number,
     topicId?: OffchainTopic
     stage?: string,
   }) : Promise<boolean> {
     const { chainId, communityId, cutoffDate, topicId, stage } = options;
-    // pageSize can not exceed 50
-    const pageSize = options.pageSize
-      ? Math.min(options.pageSize, MAX_PAGE_SIZE)
-      : DEFAULT_PAGE_SIZE;
     const params = {
       chain: chainId,
       community: communityId,
       cutoff_date: cutoffDate.toISOString(),
-      page_size: pageSize,
     };
     if (topicId) params['topic_id'] = topicId;
     if (stage) params['stage'] = stage;
@@ -452,7 +446,7 @@ class ThreadsController {
     // the call's params. By returning a boolean, the discussion listing can determine whether
     // it should continue calling the loadNextPage fn on scroll, or else notify the user that all
     // relevant listing threads have been exhausted.
-    return !(threads.length < pageSize);
+    return !(threads.length < DEFAULT_PAGE_SIZE);
   }
 
   public refreshAll(chainId: string, communityId: string, reset = false) {
