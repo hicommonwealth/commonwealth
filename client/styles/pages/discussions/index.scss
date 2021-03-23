@@ -93,7 +93,9 @@
         hr {
             height: 1px;
             border: none;
-            border-bottom: 1px solid #e5e5e5;
+            border-bottom: 1px solid $border-color-off-white;
+            margin-left: 4px;
+            margin-right: 4px;
             width: -webkit-fill-available;
         }
     }
