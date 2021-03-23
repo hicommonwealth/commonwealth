@@ -15,22 +15,24 @@ const updateChainEntityTitle = async (models, req: Request, res: Response, next:
 
   const entity = await proposalIdToEntity(models, chain.id, unique_id);
   if (!entity) return next(new Error(Errors.NoEntity));
-  const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => {
-    return !!addr.verified;
-  }).map((addr) => addr.id);
-  // Todo: author check
-  // if (!userOwnedAddressIds.includes(entity.address_id)) {
-  const roles = await models.Role.findAll({
-    where: {
-      address_id: { [Op.in]: userOwnedAddressIds, },
-      permission: { [Op.in]: ['admin', 'moderator'] },
-    }
-  });
-  const role = roles.find((r) => {
-    return r.offchain_community_id === entity.community || r.chain_id === entity.chain;
-  });
-  if (!role) return next(new Error(Errors.NotAdminOrOwner));
-  // }
+  const userOwnedAddressObjects = await req.user.getAddresses()
+    .filter((addr) => !!addr.verified);
+  const userOwnedAddresses = userOwnedAddressObjects.map((addr) => addr.address);
+  const userOwnedAddressIds = userOwnedAddressObjects.map((addr) => addr.id);
+
+  if (!userOwnedAddresses.includes(entity.author)) {
+    const roles = await models.Role.findAll({
+      where: {
+        address_id: { [Op.in]: userOwnedAddressIds, },
+        permission: { [Op.in]: ['admin', 'moderator'] },
+      }
+    });
+    // If address does not belong to entity chain, return error
+    const role = roles.find((r) => {
+      return r.chain_id === entity.chain;
+    });
+    if (!role) return next(new Error(Errors.NotAdminOrOwner));
+  }
 
   entity.title = title;
   await entity.save();
