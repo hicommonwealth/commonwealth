@@ -361,14 +361,26 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       },
       label: [
         name,
-        telegram && m('a.topic-telegram', {
-          href: telegram,
-          onclick: (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            window.open(telegram);
-          }
-        }, [ ' ', m(Icon, { name: Icons.SEND }) ])
+        telegram && m(PopoverMenu, {
+          inline: true,
+          transitionDuration: 0,
+          closeOnContentClick: true,
+          closeOnOutsideClick: true,
+          hasArrow: false,
+          content: [
+            m(MenuItem, {
+              href: telegram,
+              size: 'sm',
+              onclick: (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                window.open(telegram);
+              },
+              label: 'Open Telegram chat',
+            }),
+          ],
+          trigger: m('a.topic-telegram', [ ' ', m(Icon, { name: Icons.MORE_HORIZONTAL }) ]),
+        }),
       ],
       size: 'sm',
     });
