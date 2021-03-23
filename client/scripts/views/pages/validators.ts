@@ -112,38 +112,26 @@ const ValidatorsPage: m.Component<{}, { validators, totalStaked, validatorsIniti
       showNewProposalButton: true,
     }, [
       // stats
-      m(Grid, {
-        align: 'middle',
-        class: 'stats-container',
-        gutter: 5,
-        justify: 'space-between'
-      }, [
-        m(Col, { span: { xs: 6, md: 4 } }, [
-          m('.stats-heading', 'Validators'),
-          m('.stats-tile', `${validators?.length}`),
-        ]),
-        m(Col, { span: { xs: 6, md: 4 } }, [
-          m('.stats-heading', 'Total Staked'),
-          m('.stats-tile', [
-            vnode.state.totalStaked.format(true),
-            ' / ',
-            (app.chain as Substrate).chain.totalbalance.format(true),
+      m('.stats-box', [
+        m('.stats-box-left', '💭'),
+        m('.stats-box-right', [
+          m('', [
+            m('strong', 'Validators'),
+            m('span', [
+              ' are responsible for producing blocks and securing the network. Nominate validators to receive staking rewards.'
+            ]),
+          ]),
+          m('', [
+            m('.stats-box-stat', `Validators: ${validators?.length}`),
+            m('.stats-box-stat', [
+              `Total Staked: ${vnode.state.totalStaked.format(true)} / `,
+              `${(app.chain as Substrate).chain.totalbalance.format(true)}`
+            ]),
+            app.chain?.meta?.url && m('.stats-box-action', [
+              externalLink('a', `https://polkadot.js.org/apps/?rpc=${encodeURIComponent(app.chain?.meta?.url)}#/staking`, 'Nominate on polkadot-js'),
+            ]),
           ]),
         ]),
-      ]),
-      m('.button-wrap', {
-        style: 'margin: 15px 0 0; text-align: end'
-      }, [
-        m(Button, {
-          intent: 'primary',
-          label: 'Nominate on polkadot-js',
-          rounded: true,
-          disabled: !app.chain?.meta?.url,
-          onclick: (e) => {
-            e.preventDefault();
-            window.open(`https://polkadot.js.org/apps/?rpc=${encodeURIComponent(app.chain?.meta?.url)}#/staking`);
-          },
-        }),
       ]),
       // validators
       m('h3', 'Validators'),

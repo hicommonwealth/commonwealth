@@ -16,6 +16,10 @@ import { Coin } from 'adapters/currency';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracy from './democracy';
+import SubstrateDemocracyProposal from './democracy_proposal';
+import { SubstrateTreasuryProposal } from './treasury_proposal';
+import { SubstrateCollectiveProposal } from './collective_proposal';
+import Substrate from './main';
 
 export enum DemocracyConviction {
   None = 0,
@@ -201,13 +205,18 @@ export class SubstrateDemocracyReferendum
     this.hash = eventData.proposalHash;
     this.createdAt = entity.createdAt;
 
-    // see if preimage exists and populate data if it does
+    // see if associated entity title exists, otherwise try to populate title with preimage
     const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
-    if (preimage) {
-      this._preimage = preimage;
-      this.title = formatCall(preimage);
+    const associatedProposalOrMotion = this.getProposalOrMotion(preimage);
+    if (associatedProposalOrMotion) {
+      this.title = associatedProposalOrMotion.title;
     } else {
-      this.title = `Referendum #${this.data.index}`;
+      if (preimage) {
+        this._preimage = preimage;
+        this.title = formatCall(preimage);
+      } else {
+        this.title = `Referendum #${this.data.index}`;
+      }
     }
 
     // handle events params for passing, if exists at init time
@@ -220,6 +229,42 @@ export class SubstrateDemocracyReferendum
 
   protected complete() {
     super.complete(this._Democracy.store);
+  }
+
+  // Attempts to find the Democracy Proposal or Collective Motion that produced this Referendum by
+  //   searching for the same proposal hash.
+  // NOTE: for full functionality, both "democracyProposals" and "council" modules must be loaded
+  //   before this funciton is called!
+  // TODO: This may cause issues if we have the same Call proposed twice, as this will only fetch the
+  //   first one in storage. To fix this, we will need to use some timing heuristics to check that
+  //   this referendum was created approximately when the found proposal concluded.
+  public getProposalOrMotion(preimage): SubstrateDemocracyProposal | SubstrateCollectiveProposal
+    | SubstrateTreasuryProposal | undefined {
+    // ensure all modules have loaded
+    if (!this._Chain.app.isModuleReady) return;
+
+    // search for same preimage/proposal hash
+    const chain = (this._Chain.app.chain as Substrate);
+    const democracyProposal = chain.democracyProposals?.store.getAll().find((p) => {
+      return p.hash === this.hash;
+    });
+    if (democracyProposal) return democracyProposal;
+
+    const collectiveProposal = chain.council?.store.getAll().find((p) => {
+      return p.data.hash === this.hash;
+    });
+    if (collectiveProposal) return collectiveProposal;
+
+    // search for treasury proposal for approveProposal only (not rejectProposal)
+    if (preimage.section === 'treasury' && preimage.method === 'approveProposal') {
+      return chain.treasury?.store.getByIdentifier(preimage.args[0]);
+    }
+
+    console.log('could not find:',
+      this.hash,
+      chain.council?.store.getAll().map((c) => c.data.hash),
+      chain.democracyProposals?.store.getAll().map((c) => c.hash));
+    return undefined;
   }
 
   public update(e: ChainEvent) {
@@ -270,7 +315,9 @@ export class SubstrateDemocracyReferendum
         const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._preimage = preimage;
-          this.title = formatCall(preimage);
+          if (!this.title) {
+            this.title = formatCall(preimage);
+          }
         }
         break;
       }

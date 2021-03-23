@@ -1,5 +1,4 @@
-
-import 'pages/proposals.scss';
+import 'pages/delegate.scss';
 
 import m from 'mithril';
 import app from 'state';
@@ -151,7 +150,7 @@ const DelegatePage: m.Component<{}> = {
       }
       // chain loading
       return m(PageLoading, {
-        message: 'Connecting to chain (may take up to 10s)...',
+        message: 'Connecting to chain',
         title: 'Delegate',
       });
     }

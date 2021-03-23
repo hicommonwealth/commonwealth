@@ -1,66 +1,79 @@
 import { ApiPromise } from '@polkadot/api';
+
 import { formatCoin } from 'adapters/currency';
-import { ISubstrateTreasuryProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
+import { ISubstrateBounty, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
-  VotingType, VotingUnit, ChainEntity, ChainEvent
+  VotingType, VotingUnit, ChainEntity, ChainEvent,
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
-import { chainEntityTypeToProposalSlug } from 'identifiers';
+import { formatAddressShort } from '../../../../../shared/utils';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
-import SubstrateTreasury from './treasury';
-import { formatAddressShort } from '../../../../../shared/utils';
+import SubstrateBountyTreasury from './bountyTreasury';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
-  event: SubstrateTypes.ITreasuryProposed
-): ISubstrateTreasuryProposal => {
+  event: SubstrateTypes.ITreasuryBountyProposed
+): ISubstrateBounty => {
   return {
-    identifier: event.proposalIndex.toString(),
-    index: event.proposalIndex,
+    identifier: event.bountyIndex.toString(),
+    index: event.bountyIndex,
     value: ChainInfo.createType('u128', event.value),
-    beneficiary: event.beneficiary,
+    fee: ChainInfo.createType('u128', event.fee),
+    curator_deposit: ChainInfo.createType('u128', event.curatorDeposit),
     bond: ChainInfo.createType('u128', event.bond),
     proposer: event.proposer,
   };
 };
 
-export class SubstrateTreasuryProposal
-  extends Proposal<ApiPromise, SubstrateCoin, ISubstrateTreasuryProposal, null> {
+export class SubstrateBounty
+  extends Proposal<ApiPromise, SubstrateCoin, ISubstrateBounty, null> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public generateTitle() {
-    const account = this._Accounts.fromAddress(this.beneficiaryAddress);
+  public get title() {
+    const account = this._Accounts.fromAddress(this.author.address);
     const displayName = account.profile && account.profile.name
-      ? `${account.profile.name} (${formatAddressShort(this.beneficiaryAddress, account.chain.id)})`
-      : formatAddressShort(this.beneficiaryAddress, account.chain.id);
-    return `Proposed spend: ${formatCoin(this.value)} to ${displayName}`;
+      ? `${account.profile.name} (${formatAddressShort(this.author.address, account.chain.id)})`
+      : formatAddressShort(this.author.address, account.chain.id);
+    return `${(this.completed || this.active) ? '' : 'Proposed '} Bounty: ${formatCoin(this._value)} to ${displayName}`;
   }
   public get description() { return null; }
 
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
 
-  public title: string;
-
   private _awarded: boolean = false;
   get awarded() { return this._awarded; }
 
-  public readonly value: SubstrateCoin;
-  public readonly bond: SubstrateCoin;
-  public readonly beneficiaryAddress: string;
+  private _active: boolean = false;
+  get active() { return this._active; }
+
+  public readonly _value: SubstrateCoin;
+  public get value() { return this._value; }
+
+  public readonly _bond: SubstrateCoin;
+  public get bond() { return this._bond; }
+
+  public readonly _fee: SubstrateCoin;
+  public get fee() { return this._fee; }
+
+  public readonly _curatorDeposit: SubstrateCoin;
+  public get curatorDeposit() { return this._curatorDeposit; }
 
   public get votingType() {
     return VotingType.None;
   }
+
   public get votingUnit() {
     return VotingUnit.None;
   }
+
   public canVoteFrom(account) {
     return false;
   }
+
   public get support() {
     return null;
   }
@@ -72,13 +85,14 @@ export class SubstrateTreasuryProposal
     if (this.awarded) return ProposalStatus.Passed;
     return ProposalStatus.None;
   }
+
   get endTime() : ProposalEndTime {
     return { kind: 'unavailable' };
   }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
-  private _Treasury: SubstrateTreasury;
+  private _Treasury: SubstrateBountyTreasury;
 
   public get blockExplorerLink() {
     const chainInfo = this._Chain.app.chain?.meta?.chain;
@@ -109,42 +123,30 @@ export class SubstrateTreasuryProposal
   constructor(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
-    Treasury: SubstrateTreasury,
+    Treasury: SubstrateBountyTreasury,
     entity: ChainEntity,
   ) {
-    super('treasuryproposal', backportEventToAdapter(
+    super('bountyproposal', backportEventToAdapter( // TODO: check if this is the right backport string
       ChainInfo,
       entity.chainEvents
-        .find((e) => e.data.kind === SubstrateTypes.EventKind.TreasuryProposed).data as SubstrateTypes.ITreasuryProposed
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.TreasuryBountyProposed
+        ).data as SubstrateTypes.ITreasuryBountyProposed
     ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Treasury = Treasury;
 
-    this.value = this._Chain.coins(this.data.value);
-    this.bond = this._Chain.coins(this.data.bond);
-    this.beneficiaryAddress = this.data.beneficiary;
-    this._author = this._Accounts.fromAddress(this.data.proposer || entity.author);
-    this.title = entity.title || this.generateTitle();
+    this._value = this._Chain.coins(this.data.value);
+    this._bond = this._Chain.coins(this.data.bond);
+    this._curatorDeposit = this._Chain.coins(this.data.curator_deposit);
+    this._author = this._Accounts.fromAddress(this.data.proposer);
     this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-
-    if (!this._completed) {
-      const slug = chainEntityTypeToProposalSlug(entity.type);
-      const uniqueId = `${slug}_${entity.typeId}`;
-      this._Chain.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
-        if (response.status === 'Success' && response.result?.length) {
-          this.title = response.result;
-        }
-      });
-      this._initialized = true;
-      this._Treasury.store.add(this);
-    } else {
-      this._initialized = true;
-      this._Treasury.store.add(this);
-    }
+    this._initialized = true;
+    this._Treasury.store.add(this);
   }
 
   protected complete() {
@@ -156,16 +158,34 @@ export class SubstrateTreasuryProposal
       return;
     }
     switch (e.data.kind) {
-      case SubstrateTypes.EventKind.TreasuryProposed: {
+      case SubstrateTypes.EventKind.TreasuryBountyProposed: {
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryAwarded: {
-        this._awarded = true;
+      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
+        this._active = true;
+        break;
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
+        this._active = false;
         this.complete();
         break;
       }
-      case SubstrateTypes.EventKind.TreasuryRejected: {
-        this._awarded = false;
+      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
+        break;
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
+        this._awarded = true;
+        this._active = false;
+        break;
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
+        this.complete();
+        this._active = false;
+        break;
+      }
+      case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
+        this._awarded = true;
+        this._active = false;
         this.complete();
         break;
       }
@@ -174,9 +194,6 @@ export class SubstrateTreasuryProposal
       }
     }
   }
-
-  // GETTERS AND SETTERS
-  // none
 
   // TRANSACTIONS
   public submitVoteTx(vote: BinaryVote<SubstrateCoin>): ITXModalData {

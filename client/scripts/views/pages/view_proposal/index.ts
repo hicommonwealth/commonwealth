@@ -34,7 +34,6 @@ import {
 } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
-import ProposalVotingTreasuryEmbed from 'views/components/proposals/treasury_embed';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
@@ -58,6 +57,7 @@ import {
   ProposalEditorPermissions,
 } from './body';
 import CreateComment from './create_comment';
+import LinkedProposalsEmbed from './linked_proposals_embed';
 
 const ProposalHeader: m.Component<{
   commentCount: number;
@@ -93,10 +93,12 @@ const ProposalHeader: m.Component<{
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
-    const isAuthor = (app.user.activeAccount?.address === proposal.author
-          && app.user.activeAccount?.chain.id === (proposal as OffchainThread).authorChain);
+    const { activeAccount } = app.user;
+    const authorChain = (proposal instanceof OffchainThread) ? proposal.authorChain : app.activeId();
+    const authorAddress = (proposal instanceof OffchainThread) ? proposal.author : proposal.author?.address;
+    const isAuthor = (activeAccount?.address === authorAddress && activeAccount?.chain.id === authorChain);
     const isEditor = (proposal as OffchainThread).collaborators?.filter((c) => {
-      return (c.address === app.user.activeAccount?.address && c.chain === app.user.activeAccount?.chain.id);
+      return (c.address === activeAccount?.address && c.chain === activeAccount?.chain.id);
     }).length > 0;
 
     const attachments = (proposal instanceof OffchainThread) ? (proposal as OffchainThread).attachments : false;
@@ -761,7 +763,7 @@ const ViewProposalPage: m.Component<{
         getSetGlobalReplyStatus
       }),
       !(proposal instanceof OffchainThread)
-        && m(ProposalVotingTreasuryEmbed, { proposal }),
+        && m(LinkedProposalsEmbed, { proposal }),
       !(proposal instanceof OffchainThread)
         && m(ProposalVotingResults, { proposal }),
       !(proposal instanceof OffchainThread)
