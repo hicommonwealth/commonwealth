@@ -1,8 +1,14 @@
+export const slugify = (str) => {
+  // remove any character that isn't a alphanumeric character or a
+  // space, and then replace any sequence of spaces with dashes
+  return str.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+};
+
 /* eslint-disable import/prefer-default-export */
 export const getProposalUrl = (type, proposal, comment?) => {
   const aId = (proposal.community) ? proposal.community : proposal.chain;
   const tId = proposal.type_id || proposal.id;
-  const tTitle = proposal.title ? `-${proposal.title}` : '';
+  const tTitle = proposal.title ? `-${slugify(proposal.title)}` : '';
   const cId = comment ? `?comment=${comment.id}` : '';
 
   return (process.env.NODE_ENV === 'production')

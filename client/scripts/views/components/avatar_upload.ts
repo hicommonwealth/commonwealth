@@ -4,8 +4,8 @@ import $ from 'jquery';
 import m from 'mithril';
 import Dropzone from 'dropzone';
 
+import { Icon, Icons } from 'construct-ui';
 import User from 'views/components/widgets/user';
-import { featherIcon } from 'helpers';
 import app from 'state';
 
 interface IAttrs {
@@ -81,7 +81,7 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
         class: (vnode.state.uploaded) ? 'hidden' : ''
       }, [
         m('div.attach-button', [
-          m('span.icon-plus')
+          m(Icon, { name: Icons.PLUS, size: 'xs' }),
         ])
       ]),
       !vnode.state.uploaded && m(User, {

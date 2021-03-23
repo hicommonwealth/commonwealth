@@ -1,4 +1,4 @@
-import 'components/proposals/treasury_embed.scss';
+import 'pages/view_proposal/linked_proposals_embed.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
@@ -15,7 +15,7 @@ import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_
 import User from 'views/components/widgets/user';
 import Substrate from 'controllers/chain/substrate/main';
 
-const TreasuryEmbed: m.Component<{ proposal }> = {
+const LinkedProposalsEmbed: m.Component<{ proposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
 
@@ -23,11 +23,11 @@ const TreasuryEmbed: m.Component<{ proposal }> = {
     if ((proposal instanceof SubstrateDemocracyProposal
          || proposal instanceof SubstrateDemocracyReferendum
          || proposal instanceof SubstrateCollectiveProposal)) {
-
       let treasuryProposalIndex;
+
       const call = proposal instanceof SubstrateDemocracyProposal ? proposal.preimage
         : proposal instanceof SubstrateDemocracyReferendum ? proposal.preimage
-          : proposal instanceof SubstrateCollectiveProposal ? proposal.call : null;
+        : proposal instanceof SubstrateCollectiveProposal ? proposal.call : null;
 
       if (call?.section === 'treasury' && (call.method === 'approveProposal' || call.method === 'rejectProposal')) {
         treasuryProposalIndex = call.args[0];
@@ -43,7 +43,7 @@ const TreasuryEmbed: m.Component<{ proposal }> = {
       }
       if (!treasuryProposal) return;
 
-      return m('.TreasuryEmbed', [
+      return m('.LinkedProposalsEmbed', [
         m('.treasury-embed-section', [
           m('strong', [
             `Treasury Proposal ${treasuryProposalIndex}`,
@@ -84,7 +84,7 @@ const TreasuryEmbed: m.Component<{ proposal }> = {
                 && (mo.call.method === 'approveProposal' || mo.call.method === 'rejectProposal')
                 && mo.call.args[0] === proposal.identifier);
 
-      return m('.TreasuryEmbed', [
+      return m('.LinkedProposalsEmbed', [
         democracyProposals.map((p) => m('.treasury-embed-section', [
           m('strong', [
             `Democracy Proposal ${p.shortIdentifier}`,
@@ -150,4 +150,4 @@ const TreasuryEmbed: m.Component<{ proposal }> = {
   }
 };
 
-export default TreasuryEmbed;
+export default LinkedProposalsEmbed;

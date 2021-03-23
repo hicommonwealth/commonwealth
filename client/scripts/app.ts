@@ -575,8 +575,9 @@ $(() => {
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
+    '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-    '/:scope/council':           importRoute('views/pages/council/index', { scoped: true }),
+    '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
@@ -593,7 +594,7 @@ $(() => {
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
+    '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
 
     // NEAR login
     '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),
