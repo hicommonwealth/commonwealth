@@ -8,14 +8,16 @@ import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider,
   Popover } from 'construct-ui';
 
 import app from 'state';
-import { AddressInfo, ChainBase, ChainInfo, CommunityInfo } from 'models';
+import { Account, AddressInfo, ChainBase, ChainInfo, CommunityInfo } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 import { initAppState } from 'app';
-import { notifySuccess } from 'controllers/app/notifications';
+import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { stringToHex } from '@polkadot/util';
 import Substrate from 'controllers/chain/substrate/main';
 import Ethereum from 'controllers/chain/ethereum/main';
+import { SigningCosmosClient } from '@cosmjs/launchpad';
+import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
@@ -24,10 +26,8 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
-import { createUserWithAddress, linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
+import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
 import { networkToBase } from 'models/types';
-import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
-import EthereumAccount from 'controllers/chain/ethereum/account';
 
 export const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -106,6 +106,73 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
+const CosmosValidate = async (account: Account<any>) => {
+  const offlineSigner = app.chain.webWallet?.offlineSigner;
+  if (!offlineSigner) return notifyError('Missing or misconfigured web wallet');
+  const client = new SigningCosmosClient(
+    // TODO: Figure out our own nodes, these are ported from the Keplr example code.
+    app.chain.meta.chain.network === 'cosmos'
+      ? 'https://node-cosmoshub-3.keplr.app/rest'
+      : app.chain.meta.chain.network === 'straightedge'
+        ? 'https://node-straightedge-2.keplr.app/rest'
+        : '',
+    account.address,
+    offlineSigner,
+  );
+  const signDoc = await validationTokenToSignDoc(account.address, account.validationToken);
+
+  // TODO: should handle error
+  const signature = await ((client as any).signer.signAmino
+    ? (client as any).signer.signAmino(account.address, signDoc)
+    : (client as any).signer.sign(account.address, signDoc)
+  );
+
+  await account.validate(JSON.stringify(signature));
+};
+
+const EthereumValidate = async (account: Account<any>) => {
+  const api = (app.chain as Ethereum);
+  const webWallet = api.webWallet;
+
+  // Sign with the method on eth_webwallet, because we don't have access to the private key
+  const webWalletSignature = await webWallet.signMessage(account.validationToken);
+
+  await account.validate(webWalletSignature);
+};
+
+const NEARValidate = async (account: Account<any>) => {
+  // TODO: not sure
+};
+
+const SubstrateValidate = async (account: Account<any>) => {
+  const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
+
+  const token = account.validationToken;
+  const payload: SignerPayloadRaw = {
+    address: account.address,
+    data: stringToHex(token),
+    type: 'bytes',
+  };
+  const signature = (await signer.signRaw(payload)).signature;
+  await account.validate(signature);
+};
+
+const reverifyAddress = async (account: Account<any>, joiningChain: string, joiningCommunity: string) => {
+  // TODO: should handle differently if it's community
+  // TODO: this is completely duplicated code with `link_new_address_modal.ts`
+
+  const base = networkToBase(joiningChain);
+  if (base === ChainBase.CosmosSDK) {
+    await CosmosValidate(account);
+  } else if (base === ChainBase.Ethereum) {
+    await EthereumValidate(account);
+  } else if (base === ChainBase.NEAR) {
+    // await NEARValidate(account);
+  } else if (base === ChainBase.Substrate) {
+    await SubstrateValidate(account);
+  }
+};
+
 const LoginSelector: m.Component<{
   small?: boolean
 }, {
@@ -133,7 +200,12 @@ const LoginSelector: m.Component<{
         chain: app.activeChainId(),
         community: app.activeCommunityId()
       });
-    });
+    }).reduce((arr, account) => {
+      if (!arr.find((item) => item.address === account.address && item.chainBase === account.chainBase)) {
+        return [...arr, account];
+      }
+      return arr;
+    }, []);
     const isPrivateCommunity = app.community?.meta.privacyEnabled;
     const isAdmin = app.user.isRoleOfCommunity({
       role: 'admin',
@@ -174,22 +246,37 @@ const LoginSelector: m.Component<{
 
             if (originAddressInfo) {
               try {
+                // TODO: should handle differently if it's community
                 const res = await linkExistingAddressToChainOrCommunity(address, joiningChain, originAddressInfo.chain);
-                const account = app.chain ? app.chain.accounts.get(address, originAddressInfo.keytype) : app.community.accounts.get(address, joiningChain);
-                console.log(account);
 
-                const addressInfo = new AddressInfo(res.result.id, address, joiningChain || joiningCommunity, undefined);
+                if (res && res.result) {
+                  const { tokenExpired, verification_token, addressId, addresses } = res.result;
+                  app.user.setAddresses(addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic)));
+                  const addressInfo = app.user.addresses.find((a) => a.address === address && a.chain === joiningChain);
 
-                if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
-                  await app.user.createRole({ address: addressInfo, chain: joiningChain });
-                } else if (joiningCommunity && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
-                  await app.user.createRole({ address: addressInfo, community: joiningCommunity });
+                  const account = app.chain ? app.chain.accounts.get(address, addressInfo.keytype) : app.community.accounts.get(address, addressInfo.chain);
+                  account.setValidationToken(verification_token);
+                  account.setAddressId(addressId);
+
+                  if (tokenExpired) {
+                    await reverifyAddress(account, joiningChain, joiningCommunity);
+                  }
+
+                  if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
+                    await app.user.createRole({ address: addressInfo, chain: joiningChain });
+                  } else if (joiningCommunity && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
+                    await app.user.createRole({ address: addressInfo, community: joiningCommunity });
+                  }
+
+                  await setActiveAccount(account);
+                  if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+                    app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+                  }
+                } else {
+                  // Todo: handle error
                 }
 
-                await setActiveAccount(account);
-                if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
-                  app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
-                }
+                m.redraw();
               } catch (e) {
                 console.error(e);
               }

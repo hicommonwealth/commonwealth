@@ -74,6 +74,14 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
     keytype?: string
   ) => Promise<AddressInstance>;
 
+  updateWithTokenProvided?: (
+    address: AddressInstance,
+    user_id: number,
+    keytype?: string,
+    verification_token?: string,
+    verification_token_expires?: Date
+  ) => Promise<AddressInstance>;
+
   verifySignature?: (
     models: Sequelize.Models,
     chain: ChainInstance,
@@ -154,6 +162,23 @@ export default (
     if (user_id) {
       address.user_id = user_id;
     }
+    address.keytype = keytype;
+    address.verification_token = verification_token;
+    address.verification_token_expires = verification_token_expires;
+    address.last_active = new Date();
+
+    return address.save();
+  };
+
+  // Update an existing address' verification token with provided one
+  Address.updateWithTokenProvided = (
+    address: AddressInstance,
+    user_id: number,
+    keytype?: string,
+    verification_token?: string,
+    verification_token_expires?: Date
+  ): Promise<AddressInstance> => {
+    address.user_id = user_id;
     address.keytype = keytype;
     address.verification_token = verification_token;
     address.verification_token_expires = verification_token_expires;
