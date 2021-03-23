@@ -106,73 +106,6 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const CosmosValidate = async (account: Account<any>) => {
-  const offlineSigner = app.chain.webWallet?.offlineSigner;
-  if (!offlineSigner) return notifyError('Missing or misconfigured web wallet');
-  const client = new SigningCosmosClient(
-    // TODO: Figure out our own nodes, these are ported from the Keplr example code.
-    app.chain.meta.chain.network === 'cosmos'
-      ? 'https://node-cosmoshub-3.keplr.app/rest'
-      : app.chain.meta.chain.network === 'straightedge'
-        ? 'https://node-straightedge-2.keplr.app/rest'
-        : '',
-    account.address,
-    offlineSigner,
-  );
-  const signDoc = await validationTokenToSignDoc(account.address, account.validationToken);
-
-  // TODO: should handle error
-  const signature = await ((client as any).signer.signAmino
-    ? (client as any).signer.signAmino(account.address, signDoc)
-    : (client as any).signer.sign(account.address, signDoc)
-  );
-
-  await account.validate(JSON.stringify(signature));
-};
-
-const EthereumValidate = async (account: Account<any>) => {
-  const api = (app.chain as Ethereum);
-  const webWallet = api.webWallet;
-
-  // Sign with the method on eth_webwallet, because we don't have access to the private key
-  const webWalletSignature = await webWallet.signMessage(account.validationToken);
-
-  await account.validate(webWalletSignature);
-};
-
-const NEARValidate = async (account: Account<any>) => {
-  // TODO: not sure
-};
-
-const SubstrateValidate = async (account: Account<any>) => {
-  const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
-
-  const token = account.validationToken;
-  const payload: SignerPayloadRaw = {
-    address: account.address,
-    data: stringToHex(token),
-    type: 'bytes',
-  };
-  const signature = (await signer.signRaw(payload)).signature;
-  await account.validate(signature);
-};
-
-const reverifyAddress = async (account: Account<any>, joiningChain: string, joiningCommunity: string) => {
-  // TODO: should handle differently if it's community
-  // TODO: this is completely duplicated code with `link_new_address_modal.ts`
-
-  const base = networkToBase(joiningChain);
-  if (base === ChainBase.CosmosSDK) {
-    await CosmosValidate(account);
-  } else if (base === ChainBase.Ethereum) {
-    await EthereumValidate(account);
-  } else if (base === ChainBase.NEAR) {
-    // await NEARValidate(account);
-  } else if (base === ChainBase.Substrate) {
-    await SubstrateValidate(account);
-  }
-};
-
 const LoginSelector: m.Component<{
   small?: boolean
 }, {
@@ -242,12 +175,11 @@ const LoginSelector: m.Component<{
               try {
                 const address = originAddressInfo.address;
 
-                // TODO: should handle differently if it's community
                 const targetChain = joiningChain || originAddressInfo.chain;
                 const res = await linkExistingAddressToChainOrCommunity(address, targetChain, originAddressInfo.chain, joiningCommunity);
 
                 if (res && res.result) {
-                  const { tokenExpired, verification_token, addressId, addresses } = res.result;
+                  const { verification_token, addressId, addresses } = res.result;
                   app.user.setAddresses(addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic)));
                   const addressInfo = app.user.addresses.find((a) => a.address === address && a.chain === targetChain);
 
@@ -256,11 +188,6 @@ const LoginSelector: m.Component<{
                   const account = app.chain ? app.chain.accounts.get(address, addressInfo.keytype) : app.community.accounts.get(address, addressInfo.chain);
                   if (app.chain) {
                     account.setValidationToken(verification_token);
-                  }
-                  account.setAddressId(addressId);
-
-                  if (tokenExpired) {
-                    await reverifyAddress(account, joiningChain, joiningCommunity);
                   }
 
                   if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {

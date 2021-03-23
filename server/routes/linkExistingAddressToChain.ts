@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
+import crypto from 'crypto';
+import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 
 const { Op } = Sequelize;
 
@@ -22,8 +24,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
       his address again. To do so, we should create a new address (chain `edgeware`) marked as verified.
     - edge cases:
       1) in case, the original chain address's token is expired
-        We can't mark as verified and let the user to verify his address again.
-        Once the user verify his address again, we should update the `verification_token_expires` & `verified` for
+        At first time, I tried to let users to reverify his address but for simplicity, just update expiration time for
         all same chainbase addresses.
       2) in case, the target chain address is existed
         (1) the existing address is owned by this user
@@ -64,8 +65,29 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   }
 
   // check if the original address's token is expired. refer edge case 1)
-  const originalExpiration = originalAddress.verification_token_expires;
-  const isOriginalExpired = originalExpiration && +originalExpiration <= +(new Date());
+  let verificationToken = originalAddress.verification_token;
+  let verificationTokenExpires = originalAddress.verification_token_expires;
+  const isOriginalExpired = verificationTokenExpires && +verificationTokenExpires <= +(new Date());
+
+  if (!isOriginalExpired) {
+    const chains = await models.Chain.findAll({
+      where: { base: chain.base }
+    });
+
+    verificationToken = crypto.randomBytes(18).toString('hex');
+    verificationTokenExpires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
+
+    await models.Address.update({
+      verification_token: verificationToken,
+      verification_token_expires: verificationTokenExpires
+    }, {
+      where: {
+        user_id: originalAddress.user_id,
+        address: req.body.address,
+        chain: { [Op.in]: chains.map((ch) => ch.id) }
+      }
+    });
+  }
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
     where: { chain: req.body.chain, address: req.body.address }
@@ -80,8 +102,8 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
         existingAddress,
         userId,
         req.body.keytype,
-        originalAddress.verification_token,
-        originalAddress.verification_token_expires
+        verificationToken,
+        verificationTokenExpires
       );
       addressId = updatedObj.id;
     } else {
@@ -89,8 +111,8 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
         user_id: originalAddress.user_id,
         address: originalAddress.address,
         chain: req.body.chain,
-        verification_token: originalAddress.verification_token,
-        verification_token_expires: originalAddress.verification_token_expires,
+        verification_token: verificationToken,
+        verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,
         keytype: originalAddress.keytype,
         name: originalAddress.name,
@@ -117,8 +139,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
     return res.json({
       status: 'Success',
       result: {
-        tokenExpired: isOriginalExpired,
-        verification_token: originalAddress.verification_token,
+        verification_token: verificationToken,
         addressId,
         addresses: ownedAddresses
       }
