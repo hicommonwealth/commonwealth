@@ -15,15 +15,17 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import search from '../components/search_bar';
+import { search, SearchPrefixes } from '../components/search_bar';
 
 const SEARCH_DELAY = 750;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
 const searchCache = {}; // only used to restore search results when returning to the page
 
-const SearchPage : m.Component<{}, {
-  results,
+const SearchPage : m.Component<{
+  results: any[]
+}, {
+  results: any[],
   searchLoading: boolean,
   searchTerm: string,
   searchPrefix: string,
