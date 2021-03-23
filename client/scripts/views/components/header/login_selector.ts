@@ -8,7 +8,7 @@ import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider,
   Popover } from 'construct-ui';
 
 import app from 'state';
-import { Account, AddressInfo, ChainBase, ChainInfo, CommunityInfo } from 'models';
+import { Account, AddressInfo, ChainBase, ChainInfo, CommunityInfo, RoleInfo, RolePermission } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
