@@ -218,8 +218,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       vnode.state.lookback[subpage] = moment(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
 
       if (allThreads.length > sortedThreads.length) {
-        if (firstThread && getLastUpdate(firstThread) > lastVisited) {
-          listing.push(getLastSeenDivider(false));
+        if (firstThread) {
+          if (getLastUpdate(firstThread) > lastVisited) {
+            listing.push(getLastSeenDivider(false));
+          } else {
+            listing.push(m('.PinnedDivider', m('hr')));
+          }
         }
       }
 

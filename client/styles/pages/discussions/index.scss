@@ -89,6 +89,14 @@
     }
 
     // content
+    .PinnedDivider {
+        hr {
+            height: 1px;
+            border: none;
+            border-bottom: 1px solid #e5e5e5;
+            width: -webkit-fill-available;
+        }
+    }
     .LastSeenDivider {
         display: flex;
         padding: 0 0 3px;
