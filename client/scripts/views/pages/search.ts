@@ -33,21 +33,26 @@ const SearchPage : m.Component<{
   errorText: string
 }> = {
   view: (vnode) => {
+    const LoadingPage = m(PageLoading, {
+      narrow: true,
+      showNewProposalButton: true,
+      title: [
+        'Search Discussions ',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
+    });
+
     if (!app.chain && !app.community) {
-      return m(PageLoading, {
-        narrow: true,
-        showNewProposalButton: true,
-        title: [
-          'Search Discussions ',
-          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-        ],
-      });
+      return LoadingPage;
     }
 
     const searchTerm = m.route.param('q');
 
     if (app.searchCache[searchTerm]?.length) {
       vnode.state.results = app.searchCache[searchTerm];
+      console.log(vnode.state.results);
+    } else {
+      return LoadingPage;
     }
 
 

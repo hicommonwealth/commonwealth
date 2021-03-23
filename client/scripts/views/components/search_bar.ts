@@ -3,18 +3,9 @@ import 'pages/search.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
-import moment from 'moment-twitter';
-import { Input, Spinner, Tag } from 'construct-ui';
+import { Input} from 'construct-ui';
 
-import { pluralize } from 'helpers';
 import app from 'state';
-import { AddressInfo } from 'models';
-
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-import User from 'views/components/widgets/user';
-import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
 
 const SEARCH_DELAY = 750;
 const SEARCH_RESULTS_SIZE = 10;
