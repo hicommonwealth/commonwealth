@@ -34,12 +34,12 @@ function createAccount(account: Account<any>) {
   });
 }
 
-export function linkExistingAddressToChainOrCommunity(address: string, chain: string, originChain: string) {
-  console.log(address, chain, originChain);
+export function linkExistingAddressToChainOrCommunity(address: string, chain: string, originChain: string, community: string) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     address,
     chain,
     originChain,
+    community,
     jwt: app.user.jwt,
   });
 }
@@ -116,7 +116,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   app.user.setActiveAccounts(
     chain
       ? app.user.addresses
-        .filter((a) => networkToBase(a.chain) === chain.base)
+        .filter((a) => a.chain === chain.id)
         .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
         .filter((addr) => addr)
       : app.user.addresses

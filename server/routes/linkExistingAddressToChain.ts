@@ -124,6 +124,7 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
       }
     });
   } catch (e) {
+    console.log(e);
     return next(e);
   }
 };

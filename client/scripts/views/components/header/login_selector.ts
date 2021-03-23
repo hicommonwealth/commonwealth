@@ -200,12 +200,7 @@ const LoginSelector: m.Component<{
         chain: app.activeChainId(),
         community: app.activeCommunityId()
       });
-    }).reduce((arr, account) => {
-      if (!arr.find((item) => item.address === account.address && item.chainBase === account.chainBase)) {
-        return [...arr, account];
-      }
-      return arr;
-    }, []);
+    });
     const isPrivateCommunity = app.community?.meta.privacyEnabled;
     const isAdmin = app.user.isRoleOfCommunity({
       role: 'admin',
@@ -224,38 +219,44 @@ const LoginSelector: m.Component<{
     if (!vnode.state.profileLoadComplete && app.profiles.allLoaded()) {
       vnode.state.profileLoadComplete = true;
     }
+    const joiningChain = app.activeChainId();
+    const joiningCommunity = app.activeCommunityId();
+    const samebaseAddresses = app.user.addresses.filter((addr) => joiningChain ? networkToBase(addr.chain) === networkToBase(joiningChain) : true);
 
+    const samebaseAddressesFiltered = samebaseAddresses.reduce((arr, current) => {
+      if (!arr.find((item) => item.address === current.address && networkToBase(item.chain) === networkToBase(current.chain))) {
+        return [...arr, current];
+      }
+      return arr;
+    }, []);
+
+    console.log(app.user.addresses);
     return m(ButtonGroup, { class: 'LoginSelector' }, [
       (app.chain || app.community) && !app.chainPreloading && vnode.state.profileLoadComplete && !app.user.activeAccount && m(Button, {
         class: 'login-selector-left',
         onclick: async (e) => {
-          const joiningChain = app.activeChainId();
-          const joiningCommunity = app.activeCommunityId();
-
-          const activeAccountsFiltered = app.user.activeAccounts.reduce((arr, current) => {
-            if (!arr.find((item) => item.address === current.address && item.chainBase === networkToBase(joiningChain))) {
-              return [...arr, current];
-            }
-            return arr;
-          }, []);
-
-          if (activeAccountsFiltered.length === 1) {
-            const address = activeAccountsFiltered[0].address;
-
-            const originAddressInfo = app.user.addresses.find((a) => a.address === address && networkToBase(a.chain) === networkToBase(joiningChain));
+          if (samebaseAddressesFiltered.length === 1) {
+            const originAddressInfo = samebaseAddressesFiltered[0];
 
             if (originAddressInfo) {
               try {
+                const address = originAddressInfo.address;
+
                 // TODO: should handle differently if it's community
-                const res = await linkExistingAddressToChainOrCommunity(address, joiningChain, originAddressInfo.chain);
+                const targetChain = joiningChain || originAddressInfo.chain;
+                const res = await linkExistingAddressToChainOrCommunity(address, targetChain, originAddressInfo.chain, joiningCommunity);
 
                 if (res && res.result) {
                   const { tokenExpired, verification_token, addressId, addresses } = res.result;
                   app.user.setAddresses(addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic)));
-                  const addressInfo = app.user.addresses.find((a) => a.address === address && a.chain === joiningChain);
+                  const addressInfo = app.user.addresses.find((a) => a.address === address && a.chain === targetChain);
+
+                  console.log(addressInfo);
 
                   const account = app.chain ? app.chain.accounts.get(address, addressInfo.keytype) : app.community.accounts.get(address, addressInfo.chain);
-                  account.setValidationToken(verification_token);
+                  if (app.chain) {
+                    account.setValidationToken(verification_token);
+                  }
                   account.setAddressId(addressId);
 
                   if (tokenExpired) {
@@ -289,7 +290,7 @@ const LoginSelector: m.Component<{
         },
         label: [
           m('span.hidden-sm', [
-            app.user.activeAccounts.length === 0
+            samebaseAddressesFiltered.length === 0
               ? `No ${CHAINBASE_SHORT[app.chain?.meta?.chain.base] || ''} address`
               : 'Join'
           ]),
