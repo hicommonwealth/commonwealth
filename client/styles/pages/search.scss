@@ -75,6 +75,8 @@
         border-radius: 17px;
     }
     .cui-input {
+        display: flex;
+        align-items: center;
         height: 34px;
         background: #EFEFEF;
         box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
@@ -86,16 +88,20 @@
             border: none;
             font-size: inherit;
             color: inherit;
+            padding: 0;
+            top: 2px;
         }
         .search-prefix {
             cursor: pointer;
             padding: 0px 2px 0px 2px;
-    
             position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            margin: 0;
+            z-index: 1;
             width: min-content;
             height: 14px;
             left: 10px;
-            top: 12px;
     
             background: linear-gradient(270deg, #CDDEFE 7.21%, #E7D8E9 91.08%);
             border-radius: 2px;
