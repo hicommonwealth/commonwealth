@@ -103,7 +103,6 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           e.preventDefault();
           m.route.set(`/${app.activeId()}`);
         },
-        contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
       }),
       m(Button, {
         rounded: true,
@@ -115,7 +114,6 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           e.preventDefault();
           m.route.set(`/${app.activeId()}/search`);
         },
-        contentLeft: m(Icon, { name: Icons.SEARCH }),
       }),
       m(Button, {
         rounded: true,
@@ -127,7 +125,6 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           e.preventDefault();
           m.route.set(`/${app.activeId()}/members`);
         },
-        contentLeft: m(Icon, { name: Icons.USERS }),
       }),
       // m(Button, {
       //   rounded: true,
@@ -138,7 +135,6 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       //     e.preventDefault();
       //     m.route.set(`/${app.activeId()}/chat`);
       //   },
-      //   contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
       // }),
     ]);
   }
@@ -199,7 +195,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           rounded: true,
           active: onReferendaPage(m.route.get()),
           label: 'Referenda',
-          contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/referenda`);
@@ -216,8 +211,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           fluid: true,
           rounded: true,
           active: onProposalPage(m.route.get()),
-          label: 'Proposals',
-          contentLeft: m(Icon, { name: Icons.SEND }),
+          label: app.chain?.base === ChainBase.Substrate ? 'Proposals & Motions' : 'Proposals',
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/proposals`);
@@ -230,7 +224,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           rounded: true,
           active: onTreasuryPage(m.route.get()),
           label: 'Treasury',
-          contentLeft: m(Icon, { name: Icons.TRUCK }),
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/treasury`);
@@ -241,7 +234,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         && m(Button, {
           fluid: true,
           rounded: true,
-          contentLeft: m(Icon, { name: Icons.PAPERCLIP }),
           active: onBountiesPage(m.route.get()),
           label: 'Bounties',
           onclick: (e) => {
@@ -257,7 +249,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           rounded: true,
           active: onCouncilPage(m.route.get()),
           label: 'Councillors',
-          contentLeft: m(Icon, { name: Icons.AWARD }),
           onclick: (e) => {
             e.preventDefault();
             m.route.set(`/${app.activeChainId()}/council`);
@@ -268,7 +259,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         && m(Button, {
           fluid: true,
           rounded: true,
-          contentLeft: m(Icon, { name: Icons.SHARE_2 }),
           active: onValidatorsPage(m.route.get()),
           label: 'Validators',
           onclick: (e) => {
@@ -304,7 +294,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
         },
         label: 'New proposal',
-        contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
       }),
       showMolochMemberOptions && m(Button, {
         fluid: true,
@@ -317,7 +306,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           });
         },
         label: 'Update delegate key',
-        contentLeft: m(Icon, { name: Icons.KEY }),
       }),
       showMolochMemberOptions && m(Button, {
         fluid: true,
@@ -327,7 +315,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
         },
         label: 'Rage quit',
-        contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
       }),
       showMolochMenuOptions && m(Button, {
         fluid: true,
@@ -342,7 +329,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           });
         },
         label: 'Approve tokens',
-        contentLeft: m(Icon, { name: Icons.POWER }),
       }),
       showCommonwealthMenuOptions && m(Button, {
         fluid: true,
