@@ -140,11 +140,6 @@ const LoginSelector: m.Component<{
       chain: app.activeChainId(),
       community: app.activeCommunityId()
     });
-    const isAdminOrMod = isAdmin || app.user.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId()
-    });
 
     const activeAccountsByRole = app.user.getActiveAccountsByRole();
     const nAccountsWithoutRole = activeAccountsByRole.filter(([account, role], index) => !role).length;
