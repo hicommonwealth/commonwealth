@@ -1,3 +1,4 @@
+import { QueryTypes } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
@@ -51,13 +52,20 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
 
   if (!user) {
     const threadCount = {};
-    await Promise.all(publicCommunities.concat(chains).map(async (c) => {
-      const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
-      if (c.default_chain) where['community'] = c.id;
-      else where['chain'] = c.id;
-      const { count, threads } = await models.OffchainThread.findAndCountAll({ where });
-      threadCount[c.id] = count;
-    }));
+    const threadCountQueryData = await models.sequelize.query(`
+SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
+  FROM "OffchainThreads"
+  LEFT JOIN "OffchainCommunities"
+    ON "OffchainThreads".community = "OffchainCommunities".id
+WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
+  AND "OffchainThreads".deleted_at IS NULL
+  AND NOT "OffchainThreads".pinned
+  AND ("OffchainThreads".chain IS NOT NULL
+       OR NOT "OffchainCommunities"."privacyEnabled")
+GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
+`, { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT });
+    threadCountQueryData.forEach((ct) => threadCount[ct.concat] = ct.count);
+
     return res.json({
       chains,
       nodes,
@@ -99,12 +107,13 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     ]
   });
 
-  const visiblePrivateCommunityIds = Array.from(roles.map((role) => role.offchain_community_id));
+  const visiblePrivateCommunityIds = Array.from(roles.map((role) => role.offchain_community_id)); // both private and public
   const privateCommunities = await models.OffchainCommunity.findAll({
     where: {
       id: {
         [Op.in]: visiblePrivateCommunityIds,
       },
+      privacyEnabled: true,
     },
     include: [{
       model: models.OffchainTopic,
@@ -114,13 +123,23 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   const allCommunities : any = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
   const threadCount = {};
-  await Promise.all(allCommunities.concat(chains).map(async (c) => {
-    const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
-    if (c.default_chain) where['community'] = c.id;
-    else where['chain'] = c.id;
-    const { count, threads } = await models.OffchainThread.findAndCountAll({ where });
-    threadCount[c.id] = count;
-  }));
+    const threadCountQueryData = await models.sequelize.query(`
+SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
+  FROM "OffchainThreads"
+  LEFT JOIN "OffchainCommunities"
+    ON "OffchainThreads".community = "OffchainCommunities".id
+WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
+  AND "OffchainThreads".deleted_at IS NULL
+  AND NOT "OffchainThreads".pinned
+  AND ("OffchainThreads".chain IS NOT NULL
+    OR NOT "OffchainCommunities"."privacyEnabled"
+    OR "OffchainCommunities".id IN(:visiblePrivateCommunityIds))
+GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
+`, { replacements: {
+  thirtyDaysAgo,
+  visiblePrivateCommunityIds: privateCommunities.map((c) => c.id),
+}, type: QueryTypes.SELECT });
+  threadCountQueryData.forEach((ct) => threadCount[ct.concat] = ct.count);
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
