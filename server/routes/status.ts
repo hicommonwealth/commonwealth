@@ -134,7 +134,7 @@ WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
 GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
 `, { replacements: {
   thirtyDaysAgo,
-  visiblePrivateCommunityIds: privateCommunities.map((c) => c.id),
+  visiblePrivateCommunityIds: privateCommunities.length > 0 ? privateCommunities.map((c) => c.id) : ['NO_COMMUNITY'],
 }, type: QueryTypes.SELECT });
   threadCountQueryData.forEach((ct) => threadCount[ct.concat] = ct.count);
 
