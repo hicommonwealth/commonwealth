@@ -14,7 +14,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     chains,
     nodes,
     publicCommunities,
-    offchainTopics,
     contractCategories,
     notificationCategories
   ] = await Promise.all([
@@ -42,7 +41,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
         as: 'topics',
       }
     }),
-    models.OffchainTopic.findAll(),
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
@@ -69,7 +67,6 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
     return res.json({
       chains,
       nodes,
-      offchainTopics,
       contractCategories,
       communities: publicCommunities,
       notificationCategories,
@@ -204,7 +201,6 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
     chains,
     nodes,
     communities: allCommunities,
-    offchainTopics,
     contractCategories,
     notificationCategories,
     recentThreads: threadCount,
