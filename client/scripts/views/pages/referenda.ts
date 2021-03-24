@@ -41,7 +41,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
         ]),
         m('', [
           m('.stats-box-stat', [
-            'Next proposal becomes a referendum: ',
+            'Next referendum: ',
             (app.chain as Substrate).democracyProposals.nextLaunchBlock
               ? m(CountdownUntilBlock, {
                 block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
@@ -50,7 +50,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
               : '--',
           ]),
           m('.stats-box-stat', [
-            'Enactment delay for passed referenda: ',
+            'Passed referenda are enacted after: ',
             (app.chain as Substrate).democracy.enactmentPeriod
               ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
               : '--',

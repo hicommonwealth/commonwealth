@@ -77,7 +77,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       // add recentActivity
       const { recentThreads } = data;
       Object.entries(recentThreads).forEach(([comm, count]) => {
-        app.recentActivity.setCommunityThreadCounts(comm, count as number);
+        app.recentActivity.setCommunityThreadCounts(comm, count);
       });
 
       // update the login status

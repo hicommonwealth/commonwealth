@@ -23,7 +23,7 @@ import EditTopicModal from 'views/modals/edit_topic_modal';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
 
-import { DEFAULT_PAGE_SIZE } from 'controllers/server/threads';
+import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
@@ -218,8 +218,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       vnode.state.lookback[subpage] = moment(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
 
       if (allThreads.length > sortedThreads.length) {
-        if (firstThread && getLastUpdate(firstThread) > lastVisited) {
-          listing.push(getLastSeenDivider(false));
+        if (firstThread) {
+          if (getLastUpdate(firstThread) > lastVisited) {
+            listing.push(getLastSeenDivider(false));
+          } else {
+            listing.push(m('.PinnedDivider', m('hr')));
+          }
         }
       }
 
@@ -294,7 +298,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
           m.redraw();
         });
         vnode.state.topicInitialized[subpage] = true;
-      } else if (allThreads.length < DEFAULT_PAGE_SIZE && subpage === ALL_PROPOSALS_KEY) {
+      } else if (allThreads.length < INITIAL_PAGE_SIZE && subpage === ALL_PROPOSALS_KEY) {
         vnode.state.postsDepleted[subpage] = true;
       }
 

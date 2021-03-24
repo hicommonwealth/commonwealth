@@ -37,14 +37,14 @@ const NotificationButtons: m.Component<{ showingChainNotifications: boolean }> =
           e.stopPropagation();
           const confirmed = await confirmationModalWithText('Clear all chain notifications?')();
           if (chainEventNotifications.length < 1) return;
-          app.user.notifications.clear(chainEventNotifications).then(() => m.redraw());
+          app.user.notifications.clear(chainEventNotifications)?.then(() => m.redraw());
         },
       }) : m(Button, {
         label: 'Mark all read',
         onclick: (e) => {
           e.preventDefault();
           if (notifications.length < 1) return;
-          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
+          app.user.notifications.markAsRead(notifications)?.then(() => m.redraw());
         },
       }),
     ]);
