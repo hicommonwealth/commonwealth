@@ -37,7 +37,15 @@ const LoginWithWalletDropdown: m.Component<{
                 : '/?';
     // only redirect to home as an absolute last resort
 
-    const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress } : joiningChain
+    console.log(loggingInWithAddress, 'loggingInWithAddress', joiningChain, joiningCommunity);
+
+    // I introduce one more parameter in web3loginParams because of the following case
+    // When user log into a community, we let the user to select one of the chainbase wallet to sign (new flow)
+    // But with the old flow, it only creates a role between the default chain vs address.
+    // We should create a role between the community vs address. To indicate which community it is, `targetCommunity`
+    const targetCommunity = app.community?.id;
+
+    const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress, targetCommunity } : joiningChain
       ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
 
     const allChains = app.config.chains.getAll();
@@ -59,6 +67,7 @@ const LoginWithWalletDropdown: m.Component<{
           loggingInWithAddress,
           joiningChain,
           joiningCommunity,
+          targetCommunity,
           useCommandLineWallet: !!cli,
           successCallback: () => {
             if (next === '/?') {
@@ -71,7 +80,7 @@ const LoginWithWalletDropdown: m.Component<{
               m.redraw();
               if (onSuccess) onSuccess();
             }, 1); // necessary because address linking may be deferred
-          }
+          },
         });
       }
     });

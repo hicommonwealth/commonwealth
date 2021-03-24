@@ -23,13 +23,14 @@ import { networkToBase } from 'models/types';
 
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
-function createAccount(account: Account<any>) {
+function createAccount(account: Account<any>, community?: string) {
   // TODO: Change to POST /address
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
     keytype: account.chainBase === ChainBase.Substrate
       && (account as any).isEd25519 ? 'ed25519' : undefined,
     chain: account.chain.id,
+    community,
     jwt: app.user.jwt,
   });
 }
@@ -218,9 +219,9 @@ export async function createUserWithMnemonic(mnemonic: string): Promise<Account<
   return account;
 }
 
-export async function createUserWithAddress(address: string, keytype?: string): Promise<Account<any>> {
+export async function createUserWithAddress(address: string, keytype?: string, community?: string): Promise<Account<any>> {
   const account = app.chain.accounts.get(address, keytype);
-  const response = await createAccount(account);
+  const response = await createAccount(account, community);
   const token = response.result.verification_token;
   account.setValidationToken(token);
   account.setAddressId(response.result.id);

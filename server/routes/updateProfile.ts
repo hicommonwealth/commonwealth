@@ -73,6 +73,7 @@ const updateProfile = async (
     where: { base: chain.base }
   });
 
+
   const addressesInSameChainbase = await models.Address.findAll({
     where: {
       user_id: address.user_id,
@@ -100,16 +101,16 @@ const updateProfile = async (
       }
     });
   }
+  await models.OffchainProfile.update({
+    data: req.body.data
+  }, {
+    where: {
+      address_id: { [Op.in]: addressesInSameChainbase.map((addr) => addr.id) },
+    }
+  });
 
   // create if exists, update otherwise
   if (profile) {
-    await models.OffchainProfile.update({
-      data: req.body.data
-    }, {
-      where: {
-        address_id: { [Op.in]: addressesInSameChainbase.map((addr) => addr.id) },
-      }
-    });
     profile = await models.OffchainProfile.findOne({
       where: {
         address_id: address.id

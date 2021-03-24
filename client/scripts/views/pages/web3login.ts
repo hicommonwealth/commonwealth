@@ -12,6 +12,7 @@ const Web3LoginPage: m.Component<{}> = {
     const loggingInWithAddress = m.route.param('loggingInWithAddress');
     const joiningCommunity = m.route.param('joiningCommunity');
     const joiningChain = m.route.param('joiningChain');
+    const targetCommunity = m.route.param('targetCommunity');
     // oops! = address linking interrupted
     const loginCopy = loggingInWithAddress ? 'Login interrupted' : (joiningCommunity || joiningChain)
       ? 'Oops! An error occurred' : app.isLoggedIn() ? 'Oops! An error occurred' : 'Login interrupted';
@@ -31,11 +32,12 @@ const Web3LoginPage: m.Component<{}> = {
               loggingInWithAddress,
               joiningCommunity,
               joiningChain,
+              targetCommunity,
               successCallback: () => {
                 m.route.set(
                   m.route.param('prev') ? m.route.param('prev') : app.activeId() ? `/${app.activeId()}` : '/'
                 );
-              }
+              },
             });
           },
         }),
