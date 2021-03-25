@@ -162,14 +162,17 @@ const TreasuryPage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
+      m('.clear'),
       m(Listing, {
         content: activeTreasuryContent,
         columnHeader: 'Active Treasury Proposals',
       }),
+      m('.clear'),
       m(Listing, {
         content: inactiveTreasuryContent,
         columnHeader: 'Inactive Treasury Proposals',
-      })
+      }),
+      m('.clear'),
     ]);
   }
 };

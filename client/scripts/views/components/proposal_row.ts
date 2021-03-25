@@ -42,7 +42,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
           : proposal.endTime.kind === 'not_started'
             ? 'not yet started'
             : proposal.endTime.kind === 'queued'
-              ? 'in proposal queue'
+              ? 'in queue'
               : proposal.endTime.kind === 'unavailable'
                 ? '' : '';
   return (proposal instanceof MolochProposal && proposal.state === MolochProposalState.NotStarted)
@@ -87,7 +87,6 @@ const ProposalRow: m.Component<{ proposal: AnyProposal }> = {
     const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
 
-    debugger;
     return m('.ProposalCard', {
       onclick: (e) => {
         e.stopPropagation();
@@ -108,10 +107,11 @@ const ProposalRow: m.Component<{ proposal: AnyProposal }> = {
         size: 'xs',
       }),
       // title
-      link('a.proposal-title', proposalLink, proposal.title),
-      slug === ProposalType.SubstrateTreasuryProposal && (proposal as SubstrateTreasuryProposal).value.format(true),
+      m('.proposal-title', proposal.title),
+      slug === ProposalType.SubstrateTreasuryProposal
+        && m('.proposal-amount', (proposal as SubstrateTreasuryProposal).value.format(true)),
+      m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
       m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
-      pluralize(app.comments.nComments(proposal), 'comment'),
     ]);
   }
 };

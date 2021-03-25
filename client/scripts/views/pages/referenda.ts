@@ -148,14 +148,17 @@ const ReferendaPage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
+      m('.clear'),
       m(Listing, {
         content: activeProposalContent,
         columnHeader: 'Active Referenda',
       }),
+      m('.clear'),
       m(Listing, {
         content: inactiveProposalContent,
         columnHeader: 'Inactive Referenda',
       }),
+      m('.clear'),
     ]);
   }
 };

@@ -1,28 +1,51 @@
 @import 'client/styles/shared';
 
 .ProposalCard {
+    position: relative;
     float: left;
-    max-width: 300px;
-    min-height: 200px;
+    width: calc(50% - 24px);
+    @include xs-max {
+        width: 100%;
+    }
+    @include lg-min {
+        width: calc(33% - 24px);
+    }
+    max-width: 320px;
+    height: 220px;
     // padding
     padding: 24px 24px;
     border-radius: 15px;
     border: 1px solid #eee;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
-    margin-right: 20px;
-    margin-bottom: 20px;
+    margin-right: 24px;
+    margin-bottom: 22px;
+    cursor: pointer;
+    &:hover {
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+    }
+    // text
+    overflow-wrap: break-word;
 
     .cui-tag {
-        font-weight: bold;
+        font-weight: 600;
+        min-height: none;
+        height: 21px;
     }
-    a.proposal-title {
-        display: block;
+    .proposal-title {
         font-weight: bold;
-        line-height: 1.2;
-        margin: 9px 0 3px;
+        line-height: 1.1;
+        margin: 9px 0 6px;
+    }
+    .proposal-amount,
+    .proposal-comments {
     }
     .proposal-status {
+        position: absolute;
+        bottom: 14px;
+        // styling
         font-weight: bold;
+        line-height: 1.1;
+        margin-bottom: 4px;
         &.pass {
             color: $positive-bg-color;
         }
