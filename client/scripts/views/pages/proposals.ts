@@ -247,9 +247,15 @@ const ProposalsPage: m.Component<{}> = {
       onSubstrate && m(SubstrateProposalStats),
       onMarlin && m(MarlinProposalStats),
       m('.clear'),
-      m(Listing, { content: activeProposalContent }),
+      m(Listing, {
+        content: activeProposalContent,
+        columnHeader: 'Active Proposals',
+      }),
       m('.clear'),
-      m(Listing, { content: inactiveProposalContent }),
+      m(Listing, {
+        content: inactiveProposalContent,
+        columnHeader: 'Inactive Proposals',
+      }),
       m('.clear'),
     ]);
   }
