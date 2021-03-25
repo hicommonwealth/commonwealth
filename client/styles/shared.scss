@@ -206,3 +206,31 @@ $listing-right-flex: 1;
         color: $text-color-light;
     }
 }
+
+@mixin card {
+    position: relative;
+    float: left;
+    height: 220px;
+    width: calc(50% - 24px);
+    max-width: 320px;
+    @include xs-max {
+        width: 100%;
+        max-width: none;
+    }
+    @include lg-min {
+        width: calc(33% - 24px);
+    }
+    // padding
+    padding: 24px 24px;
+    border-radius: 15px;
+    border: 1px solid $border-color-off-white;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
+    margin-right: 24px;
+    margin-bottom: 22px;
+    cursor: pointer;
+    &:hover {
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+    }
+    // text
+    overflow-wrap: break-word;
+}
