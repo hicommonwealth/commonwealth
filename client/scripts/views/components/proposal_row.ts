@@ -76,77 +76,45 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
   }
 };
 
-export const getSecondaryStatusText = (proposal: AnyProposal): string | null => {
-  if (proposal instanceof MolochProposal) {
-    if (proposal.state === MolochProposalState.NotStarted) {
-      return 'Waiting for voting to start...';
-    } else if (proposal.state === MolochProposalState.Voting) {
-      return 'Voting Phase.';
-    } else if (proposal.state === MolochProposalState.GracePeriod) {
-      return 'Voting completed. Proposal in grace period.';
-    } else if (proposal.state === MolochProposalState.InProcessingQueue) {
-      return 'Voting completed. Waiting for prior proposals to process.';
-    } else if (proposal.state === MolochProposalState.ReadyToProcess) {
-      return 'Voting completed. Proposal ready for processing.';
-    } else {
-      return null;
-    }
-  } else {
-    return null;
-  }
-};
+// export const getSecondaryStatusText = (proposal: AnyProposal): string | null => {
+//   if (proposal instanceof MolochProposal) {
+//     if (proposal.state === MolochProposalState.NotStarted) {
+//       return 'Waiting for voting to start...';
+//     } else if (proposal.state === MolochProposalState.Voting) {
+//       return 'Voting Phase.';
+//     } else if (proposal.state === MolochProposalState.GracePeriod) {
+//       return 'Voting completed. Proposal in grace period.';
+//     } else if (proposal.state === MolochProposalState.InProcessingQueue) {
+//       return 'Voting completed. Waiting for prior proposals to process.';
+//     } else if (proposal.state === MolochProposalState.ReadyToProcess) {
+//       return 'Voting completed. Proposal ready for processing.';
+//     } else {
+//       return null;
+//     }
+//   } else {
+//     return null;
+//   }
+// };
 
 const ProposalRow: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
-    const proposal = vnode.attrs.proposal;
+    const { proposal } = vnode.attrs;
     const { author, createdAt, slug, identifier, title } = proposal;
-    const nComments = app.comments.nComments(proposal);
-
-    // TODO XXX: Show requirement for referenda
-    const hasRequirement = false;
-    const requirementText = '';
-    const requirementExplanation = '';
-    let statusClass;
-    let statusText;
-    try {
-      statusClass = getStatusClass(proposal);
-      statusText = getStatusText(proposal, true);
-    } catch (e) {
-      statusClass = '';
-      statusText = 'Loading...';
-    }
-
     const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
 
-    const rowHeader = link('a', proposalLink, proposal.title);
-
-    const rowSubheader = (
-      slug !== ProposalType.SubstrateTreasuryProposal
-      && slug !== ProposalType.SubstrateDemocracyProposal
-      && slug !== ProposalType.SubstrateCollectiveProposal)
-      ? m('.proposal-row-metadata', [
-        m('span.proposal-id', getProposalId(proposal)),
-        !!statusText && m('span.metadata-divider', ' · '),
-        !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
-      ])
-      : (slug === ProposalType.SubstrateDemocracyProposal)
-        ?  m('.proposal-row-metadata', [
-          m('span.proposal-id', getProposalId(proposal)),
-          !!statusText && m('span.metadata-divider', ' · '),
-          !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
-          m('span.metadata-divider', ' · '),
-          m('span.proposal-votes', `${(proposal as SubstrateDemocracyProposal).getVoters().length} votes`),
-        ])
-        : (slug === ProposalType.SubstrateCollectiveProposal)
-          ? m('.proposal-row-metadata', [
-            m('span.proposal-id', getProposalId(proposal)),
-            !!statusText && m('span.metadata-divider', ' · '),
-            !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
-          ])
-          : null;
-
-    const rowMetadata = [
+    return m('.ProposalCard', {
+      onclick: (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
+        m.route.set(proposalLink);
+      },
+    }, slug !== ProposalType.SubstrateTreasuryProposal ? [
+      link('a', proposalLink, proposal.title),
+      m('span.proposal-id', getProposalId(proposal)),
+      getStatusClass(proposal),
+      getStatusText(proposal, true),
       m(UserGallery, {
         popover: true,
         avatarSize: 24,
@@ -156,78 +124,22 @@ const ProposalRow: m.Component<{ proposal: AnyProposal }> = {
         ? m('.last-updated', 'Active')
         : createdAt && createdAt instanceof moment
           ? m('.last-updated', formatLastUpdated(proposal.createdAt))
-          : null
-    ];
-
-    const regularProposal = (slug !== ProposalType.SubstrateTreasuryProposal)
-      ? m(ListingRow, {
-        class: 'ProposalRow',
-        contentLeft: {
-          header: rowHeader,
-          subheader: rowSubheader,
-        },
-        contentRight: rowMetadata,
-        rightColSpacing: [6, 6],
-        onclick: (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-          m.route.set(proposalLink);
-        },
-      })
-      : null;
-
-    const treasuryProposal = (slug === ProposalType.SubstrateTreasuryProposal)
-      ? m('.TreasuryRow', {
-        onclick: (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-          m.route.set(proposalLink);
-        },
-      }, [
-        m('.treasury-row-title', proposal.title),
-        m(Grid, [
-          m(Col, { span: 3 }, [
-            m('.treasury-row-subheading', 'Value'),
-            m('.treasury-row-metadata', (proposal as SubstrateTreasuryProposal).value.format(true)),
-          ]),
-          m(Col, { span: 3 }, [
-            m('.treasury-row-subheading', 'Bond'),
-            m('.treasury-row-metadata', (proposal as SubstrateTreasuryProposal).bond.format(true))
-          ]),
-          m(Col, { span: 3 }, [
-            m('.treasury-row-subheading', 'Author'),
-            m('.treasury-row-metadata .treasury-user', [
-              m(User, {
-                user: new AddressInfo(
-                  null,
-                  (proposal as SubstrateTreasuryProposal).beneficiaryAddress,
-                  app.chain.id,
-                  null
-                ),
-                hideAvatar: true,
-                popover: true,
-              }),
-            ]),
-            m('.treasury-row-metadata .treasury-user-mobile', [
-              m(User, {
-                user: new AddressInfo(
-                  null,
-                  (proposal as SubstrateTreasuryProposal).beneficiaryAddress,
-                  app.chain.id,
-                  null
-                ),
-                hideAvatar: true,
-                popover: true,
-              }),
-            ]),
-          ])
-        ])
-      ])
-      : null;
-
-    return regularProposal || treasuryProposal;
+          : null,
+      app.comments.nComments(proposal),
+    ] : [
+      m('.treasury-row-title', proposal.title),
+      app.comments.nComments(proposal),
+      // value:
+      // (proposal as SubstrateTreasuryProposal).value.format(true))
+      // bond:
+      // (proposal as SubstrateTreasuryProposal).bond.format(true))
+      // beneficiary:
+      // m(User, {
+      //   user: new AddressInfo(null, (proposal as SubstrateTreasuryProposal).beneficiaryAddress, app.chain.id, null),
+      //   hideAvatar: true,
+      //   popover: true,
+      // }),
+    ]);
   }
 };
 
