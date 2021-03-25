@@ -25,7 +25,20 @@ export const getStatusClass = (proposal: AnyProposal) => proposal.isPassing === 
       : proposal.isPassing === ProposalStatus.Failed ? 'fail' : '';
 
 export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => {
-  if (proposal.completed) {
+  if (proposal.completed && proposal instanceof SubstrateDemocracyProposal) {
+    if (proposal.isPassing === ProposalStatus.Passed) return 'Passed, moved to referendum';
+    return 'Cancelled';
+  } else if (proposal.completed && proposal instanceof SubstrateCollectiveProposal) {
+    if (proposal.isPassing === ProposalStatus.Passed
+        && proposal.call.section === 'treasury' && proposal.call.method === 'approveProposal')
+      return 'Passed, treasury spend approved';
+    if (proposal.isPassing === ProposalStatus.Passed
+        && proposal.call.section === 'democracy' && proposal.call.method.startsWith('externalPropose'))
+      return 'Passed, moved to referendum';
+    if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
+    if (proposal.isPassing === ProposalStatus.Failed) return 'Motion closed';
+    return 'Completed';
+  } else if (proposal.completed) {
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
     if (proposal.isPassing === ProposalStatus.Failed) return 'Did not pass';
     return 'Completed';
@@ -45,19 +58,23 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
               ? 'in queue'
               : proposal.endTime.kind === 'unavailable'
                 ? '' : '';
+
   return (proposal instanceof MolochProposal && proposal.state === MolochProposalState.NotStarted)
     ? 'Waiting to start'
     : (proposal instanceof MolochProposal && proposal.state === MolochProposalState.GracePeriod)
-      ? [ (proposal.isPassing === ProposalStatus.Passed ? 'Passed, in grace period, ' : 'Failed, in grace period, '),
-          countdown ]
+      ? [ (proposal.isPassing === ProposalStatus.Passed ? 'Passed, ' : 'Failed, '), countdown, ' in grace period' ]
       : (proposal instanceof MolochProposal && proposal.state === MolochProposalState.InProcessingQueue)
         ? 'In processing queue'
         : (proposal instanceof MolochProposal && proposal.state === MolochProposalState.ReadyToProcess)
           ? 'Ready to process'
-          : proposal.isPassing === ProposalStatus.Passed ? 'Passed, awaiting enactment'
+          : proposal.isPassing === ProposalStatus.Passed
+            ? [ 'Passed, enacting in ', countdown.length === 2 ? countdown[0] : '???' ]
             : proposal.isPassing === ProposalStatus.Failed ? 'Did not pass'
-              : proposal.isPassing === ProposalStatus.Passing ? [ 'Passing, ', countdown ]
-                : proposal.isPassing === ProposalStatus.Failing ? [ 'Needs more votes, ', countdown ] : '';
+              : (proposal.isPassing === ProposalStatus.Passing && proposal instanceof SubstrateDemocracyProposal)
+                ? [ 'Expected to pass and move to referendum, ', countdown ]
+                : proposal.isPassing === ProposalStatus.Passing ? [ 'Expected to pass, ', countdown ]
+                  : proposal.isPassing === ProposalStatus.Failing ? [ 'Needs more votes, ', countdown ]
+                    : proposal.isPassing === ProposalStatus.None ? [ 'To be decided' ] : '';
 };
 
 // export const getSecondaryStatusText = (proposal: AnyProposal): string | null => {

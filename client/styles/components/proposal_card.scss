@@ -3,19 +3,20 @@
 .ProposalCard {
     position: relative;
     float: left;
+    height: 220px;
     width: calc(50% - 24px);
+    max-width: 320px;
     @include xs-max {
         width: 100%;
+        max-width: none;
     }
     @include lg-min {
         width: calc(33% - 24px);
     }
-    max-width: 320px;
-    height: 220px;
     // padding
     padding: 24px 24px;
     border-radius: 15px;
-    border: 1px solid #eee;
+    border: 1px solid $border-color-off-white;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
     margin-right: 24px;
     margin-bottom: 22px;
@@ -38,6 +39,7 @@
     }
     .proposal-amount,
     .proposal-comments {
+        color: $text-color-light;
     }
     .proposal-status {
         position: absolute;
@@ -46,6 +48,7 @@
         font-weight: bold;
         line-height: 1.1;
         margin-bottom: 4px;
+        color: $text-color-black;
         &.pass {
             color: $positive-bg-color;
         }
