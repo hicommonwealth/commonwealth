@@ -42,7 +42,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       SELECT addr.id AS addr_id, addr.address AS addr_address,
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_community, thread_chain, thread_created, threads.kind,
-        threads.version_history, threads.read_only, threads.body, threads.stage,
+        threads.read_only, threads.body, threads.stage,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
@@ -51,7 +51,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
           t.created_at AS thread_created, t.community AS thread_community,
-          t.chain AS thread_chain, t.version_history, t.read_only, t.body,
+          t.chain AS thread_chain, t.read_only, t.body,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(
             CONCAT(
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
@@ -160,7 +160,6 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     }).map((c, idx) => {
       const row = c.toJSON();
       const last_edited = getLastEdited(row);
-      delete row['version_history'];
       row['last_edited'] = last_edited;
       return row;
     });
@@ -186,11 +185,11 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
           as: 'topic'
         }
       ],
+      exclude: [ 'version_history' ],
       order: [['created_at', 'DESC']],
     }).map((t, idx) => {
       const row = t.toJSON();
       const last_edited = getLastEdited(row);
-      delete row['version_history'];
       row['last_edited'] = last_edited;
       return row;
     });
@@ -198,11 +197,11 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     comments = await models.OffchainComment.findAll({
       where: whereOptions,
       include: [models.Address, models.OffchainAttachment],
+      exclude: [ 'version_history' ],
       order: [['created_at', 'DESC']],
     }).map((c, idx) => {
       const row = c.toJSON();
       const last_edited = getLastEdited(row);
-      delete row['version_history'];
       row['last_edited'] = last_edited;
       return row;
     });
