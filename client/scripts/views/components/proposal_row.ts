@@ -1,23 +1,13 @@
 import 'components/proposal_row.scss';
 
 import m from 'mithril';
-import Chart from 'chart.js';
 import moment from 'moment-twitter';
 
 import app from 'state';
 import { Coin } from 'adapters/currency';
-import {
-  formatLastUpdated,
-  slugify,
-  formatPercentShort,
-  blocknumToDuration,
-  byAscendingCreationDate,
-  link
-} from 'helpers';
+import { blocknumToDuration, formatLastUpdated, formatPercentShort, slugify, link } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
 
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
 import User from 'views/components/widgets/user';
@@ -72,7 +62,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
         ? 'In processing queue'
         : proposal instanceof MolochProposal && proposal.state === MolochProposalState.ReadyToProcess
           ? 'Ready to process'
-          : proposal.isPassing === ProposalStatus.Passed ? 'Passed'
+          : proposal.isPassing === ProposalStatus.Passed ? 'Awaiting enactment'
             : proposal.isPassing === ProposalStatus.Failed ? 'Did not pass'
               : proposal.isPassing === ProposalStatus.Passing ? 'Passing'
                 : proposal.isPassing === ProposalStatus.Failing ? 'Needs more votes' : '';
@@ -106,120 +96,11 @@ export const getSecondaryStatusText = (proposal: AnyProposal): string | null => 
   }
 };
 
-export const getSupportText = (proposal: AnyProposal) => {
-  if (typeof proposal.support === 'number') {
-    return `${formatPercentShort(proposal.support)} voted yes`;
-  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesNoVoting) {
-    return `${proposal.support.format()} voted yes`;
-  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.ConvictionYesNoVoting) {
-    return `${proposal.support.format()} voted yes`;
-  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesApprovalVoting) {
-    return `${proposal.support.format()} locked`;
-  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.RankedChoiceVoting) {
-    return `${proposal.support.format()} voted`;
-  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.None) {
-    return '';
-  } else {
-    return '';
-  }
-};
-
-interface IPieChartAttrs {
-  id?: string;
-  getData: () => {
-    chartValues: number[];
-    chartLabels: string[];
-    chartColors: string[];
-    formatter: (d: number, index) => string[];
-  };
-}
-
-interface IPieChartState {
-  chart: Chart;
-}
-
-const ProposalPieChart: m.Component<IPieChartAttrs, IPieChartState> = {
-  view: (vnode: m.VnodeDOM<IPieChartAttrs, IPieChartState>) => {
-    if (!vnode.attrs.getData || !vnode.attrs.id) return;
-    return m('.proposal-pie-chart', [
-      m('canvas', {
-        id: vnode.attrs.id,
-        oncreate: (canvas) => {
-          const { chartValues, chartLabels, chartColors, formatter } = vnode.attrs.getData();
-          const data = {
-            datasets: [{
-              data: chartValues,
-              backgroundColor: chartColors,
-              borderWidth: 0,
-              formatter,
-            }],
-            labels: chartLabels
-          };
-          // tslint:disable-next-line:no-string-literal
-          const ctx = canvas.dom['getContext']('2d');
-          vnode.state.chart = new Chart(ctx, {
-            type: 'doughnut',
-            data,
-            options: {
-              aspectRatio: 1,
-              cutoutPercentage: 67,
-              animation: { duration: 0 },
-              responsive: true,
-              legend: false,
-              title: false,
-              layout: { left: 0, right: 0, top: 0, bottom: 0 },
-              tooltips: {
-                callbacks: {
-                  label: (tooltipItem, data2) => {
-                    const dataset = data2.datasets[tooltipItem.datasetIndex];
-                    const item = dataset.data[tooltipItem.index];
-                    return dataset.formatter ? dataset.formatter(item, tooltipItem.index) : item.toString();
-                  }
-                }
-              }
-            }
-          });
-        }
-      })
-    ]);
-  }
-};
-
-export const getProposalPieChart = (proposal) => typeof proposal.support === 'number'
-  ? m(ProposalPieChart, {
-    id: `CHART_${proposal.shortIdentifier}`,
-    getData: () => ({
-      chartValues: [ proposal.support, 1 - proposal.support ].reverse(),
-      chartLabels: [ 'Yes', 'No' ].reverse(),
-      chartColors: [ '#1db955', '#d0021b' ].reverse(),
-      formatter: (d, index) => [formatPercentShort(d)],
-    })
-  })
-  : m(ProposalPieChart, {
-    id: `CHART_${proposal.shortIdentifier}`,
-    getData: () => ({
-      chartValues: [
-        // add a small amount so the voted slice always shows up
-        proposal.support.inDollars / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
-        ((app.chain as Substrate).chain.totalbalance.inDollars - proposal.support.inDollars)
-            / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
-      ].reverse(),
-      chartLabels: [ 'Voted', 'Not yet voted' ].reverse(),
-      chartColors: [ '#0088cc', '#dddddd' ].reverse(),
-      formatter: (d, index) => [ `${Math.round((d - 0.004) * 10000000) / 100000}%` ],
-    })
-  });
-
-interface IRowAttrs {
-  proposal: AnyProposal;
-}
-
-const ProposalRow: m.Component<IRowAttrs> = {
+const ProposalRow: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
     const { author, createdAt, slug, identifier, title } = proposal;
     const nComments = app.comments.nComments(proposal);
-    const firstComment = app.comments.getByProposal(proposal).sort(byAscendingCreationDate)[0];
 
     // TODO XXX: Show requirement for referenda
     const hasRequirement = false;
@@ -227,15 +108,12 @@ const ProposalRow: m.Component<IRowAttrs> = {
     const requirementExplanation = '';
     let statusClass;
     let statusText;
-    let supportText;
     try {
       statusClass = getStatusClass(proposal);
       statusText = getStatusText(proposal, true);
-      supportText = getSupportText(proposal);
     } catch (e) {
       statusClass = '';
       statusText = 'Loading...';
-      supportText = null;
     }
 
     const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
@@ -268,25 +146,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
           ])
           : null;
 
-    const rowComments = m('.proposal-row-comments', !firstComment ? [
-      'No comments yet'
-    ] : [
-      m(User, {
-        hideIdentityIcon: true,
-        user: new AddressInfo(null, firstComment.author, firstComment.authorChain, null)
-      }),
-      ':',
-      (() => {
-        try {
-          const doc = JSON.parse(firstComment.text);
-          if (!doc.ops) throw new Error();
-          return m(QuillFormattedText, { doc, collapse: true, hideFormatting: true });
-        } catch (e) {
-          return m(MarkdownFormattedText, { doc: firstComment.text, collapse: true, hideFormatting: true });
-        }
-      })(),
-    ]);
-
     const rowMetadata = [
       m(UserGallery, {
         popover: true,
@@ -305,7 +164,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         class: 'ProposalRow',
         contentLeft: {
           header: rowHeader,
-          subheader: m('.proposal-row-sub', [rowSubheader, rowComments]),
+          subheader: rowSubheader,
         },
         contentRight: rowMetadata,
         rightColSpacing: [6, 6],
