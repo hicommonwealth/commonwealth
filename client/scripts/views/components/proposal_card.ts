@@ -14,6 +14,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 import MarlinProposal, { MarlinProposalState, MarlinProposalVote } from 'controllers/chain/ethereum/marlin/proposal';
 
@@ -125,9 +126,11 @@ const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
       }),
       // title
       m('.proposal-title', proposal.title),
-      slug === ProposalType.SubstrateTreasuryProposal
-        && m('.proposal-amount', (proposal as SubstrateTreasuryProposal).value.format(true)),
+      // metadata
+      proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value.format(true)),
+      proposal instanceof SubstrateDemocracyReferendum && m('.proposal-amount', proposal.threshold),
       m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
+      // status
       m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
     ]);
   }
