@@ -14,6 +14,65 @@ const CHAINS_WITH_CLI = [
   'darwinia', 'phala', 'plasm', 'polkadot', 'centrifuge', 'clover',
 ];
 
+const LoginWithWalletModal: m.Component<{
+  onSuccess, next, web3loginParams, joiningChain, joiningCommunity, loggingInWithAddress
+}, {}> = {
+  view: (vnode) => {
+    const { onSuccess, next, web3loginParams, joiningChain, joiningCommunity, loggingInWithAddress } = vnode.attrs;
+    const sortedChains = app.config.chains.getAll().filter((chain) => {
+      return app.config.nodes.getByChain(chain.id) && app.config.nodes.getByChain(chain.id).length > 0;
+    }).sort((a, b) => {
+      return a.name.localeCompare(b.name);
+    });
+    const sortedChainsWithCLI = sortedChains.filter((chain) => CHAINS_WITH_CLI.indexOf(chain.id) !== -1);
+
+    const getMenuItemForChain = (chain: ChainInfo, cli?: boolean) => m('.modal-item', {
+      onclick: (e) => {
+        $('.LoginWithWalletModal').trigger('modalexit');
+        $('.Login').trigger('modalexit');
+        m.route.set(`/${chain.id}/web3login`, web3loginParams);
+        app.modals.lazyCreate('link_new_address_modal', {
+          loggingInWithAddress,
+          joiningChain,
+          joiningCommunity,
+          useCommandLineWallet: !!cli,
+          successCallback: () => {
+            if (next === '/?') {
+              m.route.set(`/${chain.id}`);
+            } else {
+              m.route.set(next);
+            }
+            m.redraw();
+            setTimeout(() => {
+              m.redraw();
+              if (onSuccess) onSuccess();
+            }, 1); // necessary because address linking may be deferred
+          }
+        });
+      },
+    }, [
+      m('.chain-login-label', [
+        m(ChainIcon, { chain, size: 20 }),
+        m('.chain-login-label-name', [
+          cli ? `${chain.name} (command line)` : chain.name
+        ]),
+      ]),
+    ]);
+
+    return m('.LoginWithWalletModal', [
+      (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== -1)
+        ? [
+          getMenuItemForChain(app.chain.meta.chain),
+          getMenuItemForChain(app.chain.meta.chain, true)
+        ] : app.chain ? [
+          getMenuItemForChain(app.chain.meta.chain)
+        ] : sortedChains.map((chain) => getMenuItemForChain(chain))
+          .concat(sortedChainsWithCLI.length > 0 ? m(MenuDivider) : null)
+          .concat(sortedChainsWithCLI.map((chain) => getMenuItemForChain(chain, true)))
+    ]);
+  }
+};
+
 const LoginWithWalletDropdown: m.Component<{
   label,
   loggingInWithAddress,
@@ -41,69 +100,21 @@ const LoginWithWalletDropdown: m.Component<{
     const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress } : joiningChain
       ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
 
-    const sortedChains = app.config.chains.getAll().filter((chain) => {
-      return app.config.nodes.getByChain(chain.id) && app.config.nodes.getByChain(chain.id).length > 0;
-    }).sort((a, b) => {
-      return a.name.localeCompare(b.name);
-    });
-    const sortedChainsWithCLI = sortedChains.filter((chain) => CHAINS_WITH_CLI.indexOf(chain.id) !== -1);
-
-    const getMenuItemForChain = (chain: ChainInfo, cli?: boolean) => m(MenuItem, {
-      label: m('.chain-login-label', [
-        m(ChainIcon, { chain, size: 20 }),
-        m('.chain-login-label-name', [
-          cli ? `${chain.name} (command line)` : chain.name
-        ]),
-      ]),
+    return m(Button, {
+      intent: 'primary',
+      fluid: true,
+      class: 'login-with-web3',
+      rounded: true,
+      label: [
+        label,
+        m(Icon, { name: Icons.CHEVRON_DOWN }),
+      ],
       onclick: (e) => {
-        $('.Login').trigger('modalexit');
-        m.route.set(`/${chain.id}/web3login`, web3loginParams);
-        app.modals.lazyCreate('link_new_address_modal', {
-          loggingInWithAddress,
-          joiningChain,
-          joiningCommunity,
-          useCommandLineWallet: !!cli,
-          successCallback: () => {
-            if (next === '/?') {
-              m.route.set(`/${chain.id}`);
-            } else {
-              m.route.set(next);
-            }
-            m.redraw();
-            setTimeout(() => {
-              m.redraw();
-              if (onSuccess) onSuccess();
-            }, 1); // necessary because address linking may be deferred
-          }
+        app.modals.create({
+          modal: LoginWithWalletModal,
+          data: { onSuccess, next, web3loginParams, joiningChain, joiningCommunity, loggingInWithAddress }
         });
-      }
-    });
-    const menuItems = (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== -1)
-      ? [
-        getMenuItemForChain(app.chain.meta.chain),
-        getMenuItemForChain(app.chain.meta.chain, true)
-      ] : app.chain ? [
-        getMenuItemForChain(app.chain.meta.chain)
-      ] : sortedChains.map((chain) => getMenuItemForChain(chain))
-        .concat(sortedChainsWithCLI.length > 0 ? m(MenuDivider) : null)
-        .concat(sortedChainsWithCLI.map((chain) => getMenuItemForChain(chain, true)));
-
-    return m(PopoverMenu, {
-      trigger: m(Button, {
-        intent: 'primary',
-        fluid: true,
-        class: 'login-with-web3',
-        rounded: true,
-        label: [
-          label,
-          m(Icon, { name: Icons.CHEVRON_DOWN }),
-        ]
-      }),
-      addToStack: true,
-      closeOnContentClick: true,
-      class: 'LoginWithWalletDropdownPopoverMenu',
-      transitionDuration: 0,
-      content: menuItems,
+      },
     });
   }
 };
