@@ -114,7 +114,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     if (returningFromThread && localStorage[`${app.activeId()}-discussions-scrollY`]) {
       setTimeout(() => {
         window.scrollTo(0, Number(localStorage[`${app.activeId()}-discussions-scrollY`]));
-      }, 1);
+      }, 100);
     }
 
     if (app.user.unseenPosts[app.activeId()]) {

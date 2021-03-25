@@ -52,6 +52,14 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
         });
         vnode.state.membersLoaded = membersActive.concat(membersInactive).sort((a, b) => b.count - a.count);
         m.redraw();
+
+        // restore scroll position
+        if (app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
+            && localStorage[`${app.activeId()}-members-scrollY`]) {
+          setTimeout(() => {
+            window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
+          }, 100);
+        }
       });
     }
     if (!vnode.state.membersLoaded) return m(PageLoading, {
@@ -73,7 +81,14 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
       // m('.members-caption', `Showing ${pluralize(activeAddresses.length, 'active member')}`),
       m('.members-list', vnode.state.membersLoaded.map((info) => {
         const profile = app.profiles.getProfile(info.chain, info.address);
-        return link('a.members-item', `/${app.activeId()}/account/${info.address}?base=${info.chain}`, [
+        return m('a.members-item', {
+          href: `/${app.activeId()}/account/${info.address}?base=${info.chain}`,
+          onclick: (e) => {
+            e.preventDefault();
+            localStorage[`${app.activeId()}-members-scrollY`] = window.scrollY;
+            m.route.set(`/${app.activeId()}/account/${info.address}?base=${info.chain}`);
+          }
+        }, [
           m('.members-item-icon', [
             m(User, { user: profile, avatarSize: 36, avatarOnly: true }),
           ]),

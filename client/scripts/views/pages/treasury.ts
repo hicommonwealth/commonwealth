@@ -102,7 +102,7 @@ const TreasuryPage: m.Component<{}> = {
     if (returningFromThread && localStorage[`${app.activeId()}-proposals-scrollY`]) {
       setTimeout(() => {
         window.scrollTo(0, Number(localStorage[`${app.activeId()}-proposals-scrollY`]));
-      }, 1);
+      }, 100);
     }
   },
   view: (vnode) => {
