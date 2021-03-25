@@ -11,7 +11,7 @@ import { ChainBase } from 'models';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import ProposalRow from 'views/components/proposal_row';
+import ProposalCard from 'views/components/proposal_card';
 import Substrate from 'controllers/chain/substrate/main';
 import Listing from './listing';
 import ErrorPage from './error';
@@ -69,11 +69,11 @@ const BountiesPage: m.Component<{}> = {
     const activeBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => !p.completed);
     const inactiveBounties = (app.chain as Substrate).bounties.store.getAll().filter((p) => p.completed);
     const activeBountyContent = activeBounties.length
-      ? activeBounties.map((bounty) => m(ProposalRow, { proposal: bounty }))
+      ? activeBounties.map((bounty) => m(ProposalCard, { proposal: bounty }))
       : [ m('.no-proposals', 'None') ];
 
     const inactiveBountyContent = inactiveBounties.length
-      ? inactiveBounties.map((bounty) => m(ProposalRow, { proposal: bounty }))
+      ? inactiveBounties.map((bounty) => m(ProposalCard, { proposal: bounty }))
       : [ m('.no-proposals', 'None') ];
 
     return m(Sublayout, {
@@ -102,14 +102,17 @@ const BountiesPage: m.Component<{}> = {
           ]),
         ]),
       ]),
+      m('.clear'),
       m(Listing, {
         content: activeBountyContent,
         columnHeader: 'Active Bounties',
       }),
+      m('.clear'),
       m(Listing, {
         content: inactiveBountyContent,
         columnHeader: 'Inactive Bounties',
-      })
+      }),
+      m('.clear'),
     ]);
   }
 };

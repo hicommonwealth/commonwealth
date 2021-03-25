@@ -15,7 +15,7 @@ import {
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import LoadingRow from 'views/components/loading_row';
-import ProposalRow from 'views/components/proposal_row';
+import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
@@ -130,14 +130,14 @@ const ReferendaPage: m.Component<{}> = {
       && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed);
     const activeProposalContent = !activeDemocracyReferenda?.length
       ? [ m('.no-proposals', 'None') ]
-      : (activeDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }));
+      : (activeDemocracyReferenda || []).map((proposal) => m(ProposalCard, { proposal }));
 
     // inactive proposals
     const inactiveDemocracyReferenda = onSubstrate
       && (app.chain as Substrate).democracy.store.getAll().filter((p) => p.completed);
     const inactiveProposalContent = !inactiveDemocracyReferenda?.length
       ? [ m('.no-proposals', 'None') ]
-      : (inactiveDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }));
+      : (inactiveDemocracyReferenda || []).map((proposal) => m(ProposalCard, { proposal }));
 
     return m(Sublayout, {
       class: 'ReferendaPage',

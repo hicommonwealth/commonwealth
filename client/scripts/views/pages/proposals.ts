@@ -24,7 +24,7 @@ import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import LoadingRow from 'views/components/loading_row';
-import ProposalRow from 'views/components/proposal_row';
+import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 
 import NewProposalPage from 'views/pages/new_proposal/index';
@@ -197,11 +197,11 @@ const ProposalsPage: m.Component<{}> = {
       && !activeMolochProposals?.length
       && !activeMarlinProposals?.length
       ? [ m('.no-proposals', 'No active proposals') ]
-      : (activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
-        .concat((activeCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((activeCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((activeMarlinProposals || []).map((proposal) => m(ProposalRow, { proposal })));
+      : (activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+        .concat((activeCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })));
 
     // inactive proposals
     const inactiveDemocracyProposals = onSubstrate
@@ -224,11 +224,11 @@ const ProposalsPage: m.Component<{}> = {
       && !inactiveMolochProposals?.length
       && !inactiveMarlinProposals?.length
       ? [ m('.no-proposals', 'No past proposals') ]
-      : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
-        .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalRow, { proposal })));
+      : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+        .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })));
 
 
     // XXX: display these

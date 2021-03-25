@@ -1,4 +1,4 @@
-import 'components/proposal_row.scss';
+import 'components/proposal_card.scss';
 
 import m from 'mithril';
 import moment from 'moment-twitter';
@@ -80,7 +80,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
 //   }
 // };
 
-const ProposalRow: m.Component<{ proposal: AnyProposal }> = {
+const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const { author, createdAt, slug, identifier, title } = proposal;
@@ -116,4 +116,4 @@ const ProposalRow: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-export default ProposalRow;
+export default ProposalCard;
