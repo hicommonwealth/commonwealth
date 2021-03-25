@@ -1,4 +1,33 @@
 @import 'client/styles/shared';
 
-.ProposalRow {
+.ProposalCard {
+    float: left;
+    max-width: 300px;
+    min-height: 200px;
+    // padding
+    padding: 24px 24px;
+    border-radius: 15px;
+    border: 1px solid #eee;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
+    margin-right: 20px;
+    margin-bottom: 20px;
+
+    .cui-tag {
+        font-weight: bold;
+    }
+    a.proposal-title {
+        display: block;
+        font-weight: bold;
+        line-height: 1.2;
+        margin: 9px 0 3px;
+    }
+    .proposal-status {
+        font-weight: bold;
+        &.pass {
+            color: $positive-bg-color;
+        }
+        &.fail {
+            color: $negative-bg-color;
+        }
+    }
 }

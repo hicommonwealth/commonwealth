@@ -2,43 +2,34 @@ import 'components/proposal_row.scss';
 
 import m from 'mithril';
 import moment from 'moment-twitter';
+import { Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
 import { Coin } from 'adapters/currency';
-import { blocknumToDuration, formatLastUpdated, formatPercentShort, slugify, link } from 'helpers';
+import { blocknumToDuration, formatLastUpdated, formatPercentShort, slugify, link, pluralize } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
+import { ProposalType, proposalSlugToChainEntityType, chainEntityTypeToProposalShortName } from 'identifiers';
 
-import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
-import User from 'views/components/widgets/user';
-import { ProposalType, proposalSlugToFriendlyName } from 'identifiers';
-import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/substrate/treasury_proposal';
-import { SubstrateCollectiveProposal } from 'client/scripts/controllers/chain/substrate/collective_proposal';
-import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substrate/democracy_proposal';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 import MarlinProposal, { MarlinProposalState, MarlinProposalVote } from 'controllers/chain/ethereum/marlin/proposal';
 
-import { Icon, Icons, Grid, Col } from 'construct-ui';
-import ListingRow from './listing_row';
-import UserGallery from './widgets/user_gallery';
-
-export const formatProposalHashShort = (pHash : string) => {
-  if (!pHash) return;
-  if (pHash.length < 16) return pHash;
-  return `${pHash.slice(0, 16)}…${pHash.slice(pHash.length - 3)}`;
-};
+import Countdown from 'views/components/countdown';
 
 export const getStatusClass = (proposal: AnyProposal) => proposal.isPassing === ProposalStatus.Passing ? 'pass'
   : proposal.isPassing === ProposalStatus.Passed ? 'pass'
     : proposal.isPassing === ProposalStatus.Failing ? 'fail'
       : proposal.isPassing === ProposalStatus.Failed ? 'fail' : '';
 
-export const getProposalId = (proposal: AnyProposal) => {
-  return `${proposalSlugToFriendlyName.get(proposal.slug)} ${proposal.shortIdentifier}`;
-};
-
 export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => {
-  if (proposal.completed) return 'Completed';
+  if (proposal.completed) {
+    if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
+    if (proposal.isPassing === ProposalStatus.Failed) return 'Did not pass';
+    return 'Completed';
+  }
 
   const countdown = proposal.endTime.kind === 'fixed'
     ? [ m(Countdown, { duration: moment.duration(proposal.endTime.time.diff(moment())) }), ' left' ]
@@ -47,33 +38,26 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
       : proposal.endTime.kind === 'dynamic'
         ? [ m(Countdown, { duration: blocknumToDuration(proposal.endTime.getBlocknum()) }), ' left' ]
         : proposal.endTime.kind === 'threshold'
-          ? `Waiting for ${proposal.endTime.threshold} yes votes`
+          ? `waiting for ${proposal.endTime.threshold} votes`
           : proposal.endTime.kind === 'not_started'
-            ? 'Not yet started'
+            ? 'not yet started'
             : proposal.endTime.kind === 'queued'
-              ? 'Queued'
+              ? 'in proposal queue'
               : proposal.endTime.kind === 'unavailable'
                 ? '' : '';
-  const status = proposal instanceof MolochProposal && proposal.state === MolochProposalState.NotStarted
+  return (proposal instanceof MolochProposal && proposal.state === MolochProposalState.NotStarted)
     ? 'Waiting to start'
-    : proposal instanceof MolochProposal && proposal.state === MolochProposalState.GracePeriod
-      ? (proposal.isPassing === ProposalStatus.Passed ? 'Passed · In grace period' : 'Failed · In grace period')
-      : proposal instanceof MolochProposal && proposal.state === MolochProposalState.InProcessingQueue
+    : (proposal instanceof MolochProposal && proposal.state === MolochProposalState.GracePeriod)
+      ? [ (proposal.isPassing === ProposalStatus.Passed ? 'Passed, in grace period, ' : 'Failed, in grace period, '),
+          countdown ]
+      : (proposal instanceof MolochProposal && proposal.state === MolochProposalState.InProcessingQueue)
         ? 'In processing queue'
-        : proposal instanceof MolochProposal && proposal.state === MolochProposalState.ReadyToProcess
+        : (proposal instanceof MolochProposal && proposal.state === MolochProposalState.ReadyToProcess)
           ? 'Ready to process'
-          : proposal.isPassing === ProposalStatus.Passed ? 'Awaiting enactment'
+          : proposal.isPassing === ProposalStatus.Passed ? 'Passed, awaiting enactment'
             : proposal.isPassing === ProposalStatus.Failed ? 'Did not pass'
-              : proposal.isPassing === ProposalStatus.Passing ? 'Passing'
-                : proposal.isPassing === ProposalStatus.Failing ? 'Needs more votes' : '';
-  if (proposal.isPassing === ProposalStatus.Passing
-      || proposal.isPassing === ProposalStatus.Failing
-      || (proposal instanceof MolochProposal
-        && (proposal as MolochProposal).state === MolochProposalState.GracePeriod)) {
-    return [ countdown, ` · ${status}` ];
-  } else {
-    return status;
-  }
+              : proposal.isPassing === ProposalStatus.Passing ? [ 'Passing, ', countdown ]
+                : proposal.isPassing === ProposalStatus.Failing ? [ 'Needs more votes, ', countdown ] : '';
 };
 
 // export const getSecondaryStatusText = (proposal: AnyProposal): string | null => {
@@ -103,6 +87,7 @@ const ProposalRow: m.Component<{ proposal: AnyProposal }> = {
     const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
 
+    debugger;
     return m('.ProposalCard', {
       onclick: (e) => {
         e.stopPropagation();
@@ -110,35 +95,23 @@ const ProposalRow: m.Component<{ proposal: AnyProposal }> = {
         localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
         m.route.set(proposalLink);
       },
-    }, slug !== ProposalType.SubstrateTreasuryProposal ? [
-      link('a', proposalLink, proposal.title),
-      m('span.proposal-id', getProposalId(proposal)),
-      getStatusClass(proposal),
-      getStatusText(proposal, true),
-      m(UserGallery, {
-        popover: true,
-        avatarSize: 24,
-        users: app.comments.uniqueCommenters(proposal)
+    }, [
+      // tag
+      m(Tag, {
+        label: [
+          chainEntityTypeToProposalShortName(proposalSlugToChainEntityType(proposal.slug)),
+          ' ',
+          proposal.shortIdentifier,
+        ],
+        intent: 'primary',
+        rounded: true,
+        size: 'xs',
       }),
-      !proposal.completed
-        ? m('.last-updated', 'Active')
-        : createdAt && createdAt instanceof moment
-          ? m('.last-updated', formatLastUpdated(proposal.createdAt))
-          : null,
-      app.comments.nComments(proposal),
-    ] : [
-      m('.treasury-row-title', proposal.title),
-      app.comments.nComments(proposal),
-      // value:
-      // (proposal as SubstrateTreasuryProposal).value.format(true))
-      // bond:
-      // (proposal as SubstrateTreasuryProposal).bond.format(true))
-      // beneficiary:
-      // m(User, {
-      //   user: new AddressInfo(null, (proposal as SubstrateTreasuryProposal).beneficiaryAddress, app.chain.id, null),
-      //   hideAvatar: true,
-      //   popover: true,
-      // }),
+      // title
+      link('a.proposal-title', proposalLink, proposal.title),
+      slug === ProposalType.SubstrateTreasuryProposal && (proposal as SubstrateTreasuryProposal).value.format(true),
+      m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
+      pluralize(app.comments.nComments(proposal), 'comment'),
     ]);
   }
 };
