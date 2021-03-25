@@ -23,7 +23,7 @@ import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import ProposalsLoadingRow from 'views/components/proposals_loading_row';
+import LoadingRow from 'views/components/loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { CountdownUntilBlock } from 'views/components/countdown';
 
@@ -246,8 +246,11 @@ const ProposalsPage: m.Component<{}> = {
     }, [
       onSubstrate && m(SubstrateProposalStats),
       onMarlin && m(MarlinProposalStats),
+      m('.clear'),
       m(Listing, { content: activeProposalContent }),
+      m('.clear'),
       m(Listing, { content: inactiveProposalContent }),
+      m('.clear'),
     ]);
   }
 };

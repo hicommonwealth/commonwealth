@@ -16,7 +16,7 @@ import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/empty_topic_placeholder';
-import ProposalsLoadingRow from 'views/components/proposals_loading_row';
+import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
@@ -532,7 +532,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
           m(DiscussionStagesBar, { topic: topicName, stage }),
           (!activeEntity || !activeEntity.serverLoaded || stillFetching)
             ? m('.discussions-main', [
-              m(ProposalsLoadingRow),
+              m(LoadingRow),
             ])
             : emptyTopic
               ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })

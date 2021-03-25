@@ -14,7 +14,7 @@ import {
 } from 'controllers/chain/substrate/democracy_referendum';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import ProposalsLoadingRow from 'views/components/proposals_loading_row';
+import LoadingRow from 'views/components/loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
@@ -148,14 +148,17 @@ const ReferendaPage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
+      m('.clear'),
       m(Listing, {
         content: activeProposalContent,
         columnHeader: 'Active Referenda',
       }),
+      m('.clear'),
       m(Listing, {
         content: inactiveProposalContent,
         columnHeader: 'Inactive Referenda',
       }),
+      m('.clear'),
     ]);
   }
 };
