@@ -21,6 +21,8 @@ import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 
+import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
+
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
     const { item, size } = vnode.attrs;
@@ -447,50 +449,35 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
     if (!website && !discord && !telegram && !github) return;
 
     return m('.ExternalLinksModule.SidebarModule', [
-      m('.section-header', 'External Links'),
       discord && m(Button, {
-        fluid: true,
         rounded: true,
         onclick: () => window.open(discord),
-        label: 'Discord',
-        iconRight: Icons.EXTERNAL_LINK,
+        label: m.trust(discordIcon),
         class: 'discord-button',
       }),
       element && m(Button, {
-        fluid: true,
         rounded: true,
         onclick: () => window.open(element),
-        label: 'Element',
-        iconRight: Icons.EXTERNAL_LINK,
+        label: m.trust(elementIcon),
         class: 'element-button',
       }),
       telegram && m(Button, {
-        fluid: true,
         rounded: true,
         onclick: () => window.open(telegram),
-        label: 'Telegram',
-        iconRight: Icons.EXTERNAL_LINK,
+        label: m.trust(telegramIcon),
         class: 'telegram-button',
       }),
-      (github || website) && m(PopoverMenu, {
-        closeOnContentClick: true,
-        transitionDuration: 0,
-        inline: true,
-        content: [
-          github && m(MenuItem, {
-            label: 'Github',
-            onclick: () => window.open(github),
-          }),
-          website && m(MenuItem, {
-            onclick: () => window.open(website),
-            label: 'Project homepage',
-          }),
-        ],
-        trigger: m(Button, {
-          fluid: true,
-          rounded: true,
-          label: 'More...',
-        }),
+      github && m(Button, {
+        rounded: true,
+        onclick: () => window.open(github),
+        label: m.trust(githubIcon),
+        class: 'github-button',
+      }),
+      website && m(Button, {
+        rounded: true,
+        onclick: () => window.open(website),
+        label: m.trust(websiteIcon),
+        class: 'website-button',
       }),
     ]);
   }
