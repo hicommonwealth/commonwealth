@@ -395,7 +395,7 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
 
     return m('.ChainStatusModule', [
       app.chain.deferred ? m(Button, {
-        label: 'Connect to chain',
+        label: vnode.state.initializing ? 'Connecting...' : 'Connect to chain',
         rounded: true,
         fluid: true,
         disabled: vnode.state.initializing,
