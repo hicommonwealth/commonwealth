@@ -64,14 +64,20 @@ export function externalLink(selector, target, children) {
   }, children);
 }
 
-export function link(selector: string, target: string, children, extraAttrs?: object) {
+export function link(selector: string, target: string, children, extraAttrs?: object, saveScrollPositionAs?: string) {
   const attrs = {
     href: target,
     onclick: (e) => {
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
       if (e.target.target === '_blank') return;
+
       e.preventDefault();
       e.stopPropagation();
+
+      if (saveScrollPositionAs) {
+        localStorage[saveScrollPositionAs] = window.scrollY;
+      }
+
       if (window.location.href.split('?')[0] === target.split('?')[0]) {
         m.route.set(target, {}, { replace: true });
       } else {
