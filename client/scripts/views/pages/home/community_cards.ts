@@ -37,6 +37,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
       class: 'home-card',
       onclick: (e) => {
         e.preventDefault();
+        localStorage['home-scrollY'] = window.scrollY;
         m.route.set(`/${chain}`);
       },
     }, [
@@ -84,6 +85,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
       class: 'home-card',
       onclick: (e) => {
         e.preventDefault();
+        localStorage['home-scrollY'] = window.scrollY;
         m.route.set(`/${community.id}`);
       },
     }, [
@@ -134,6 +136,7 @@ const LockdropToolsCard: m.Component<{}> = {
           intent: 'primary',
           onclick: (e) => {
             e.preventDefault();
+            localStorage['home-scrollY'] = window.scrollY;
             m.route.set('/edgeware/stats');
           },
           label: [ 'Lockdrop stats ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
@@ -146,6 +149,7 @@ const LockdropToolsCard: m.Component<{}> = {
           intent: 'primary',
           onclick: (e) => {
             e.preventDefault();
+            localStorage['home-scrollY'] = window.scrollY;
             m.route.set('/edgeware/unlock');
           },
           label: [ 'Unlock ETH ', m(Icon, { name: Icons.ARROW_RIGHT }) ],

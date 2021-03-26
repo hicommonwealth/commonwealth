@@ -2,10 +2,18 @@ import 'pages/home/index.scss';
 
 import m from 'mithril';
 
+import app from 'state';
 import Sublayout from 'views/sublayout';
 import CommunityCards from './community_cards';
 
 const Homepage: m.Component<{}, {}> = {
+  oncreate: (vnode) => {
+    if (app.lastNavigatedBack() && localStorage['home-scrollY']) {
+      setTimeout(() => {
+        window.scrollTo(0, Number(localStorage['home-scrollY']));
+      }, 1);
+    }
+  },
   view: (vnode: m.VnodeDOM) => {
     return m(Sublayout, {
       class: 'Homepage',
