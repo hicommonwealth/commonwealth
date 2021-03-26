@@ -26,6 +26,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
+      message: 'Loading members',
       title: [
         'Members',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -63,6 +64,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
       });
     }
     if (!vnode.state.membersLoaded) return m(PageLoading, {
+      message: 'Loading members',
       title: [
         'Members',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })

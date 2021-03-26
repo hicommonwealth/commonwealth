@@ -149,7 +149,7 @@ const ProposalsPage: m.Component<{}> = {
         message: 'Change Metamask to point to Ethereum Mainnet',
       });
       return m(PageLoading, {
-        message: 'Loading proposals',
+        message: 'Connecting to chain',
         title: [
           'Proposals',
           m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -167,7 +167,7 @@ const ProposalsPage: m.Component<{}> = {
       if (modules.some((mod) => !mod.ready)) {
         app.chain.loadModules(modules);
         return m(PageLoading, {
-          message: 'Connecting to chain',
+          message: 'Loading proposals',
           title: [
             'Proposals',
             m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })

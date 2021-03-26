@@ -101,7 +101,7 @@ const ReferendaPage: m.Component<{}> = {
         });
       }
       return m(PageLoading, {
-        message: 'Loading referenda',
+        message: 'Connecting to chain',
         title: [
           'Referenda',
           m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -115,7 +115,7 @@ const ReferendaPage: m.Component<{}> = {
       if (modules.some((mod) => !mod.ready)) {
         app.chain.loadModules(modules);
         return m(PageLoading, {
-          message: 'Connecting to chain',
+          message: 'Loading referenda',
           title: [
             'Referenda',
             m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
