@@ -114,7 +114,7 @@ const StatsPage: m.Component<{}, { requested: boolean, error: string, data }> = 
     if (!vnode.state.requested || (!vnode.state.error && !vnode.state.data)) return m(PageLoading, {
       message: 'Loading analytics',
       title: [
-        'Community Analytics',
+        'Analytics',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
     });
@@ -122,7 +122,7 @@ const StatsPage: m.Component<{}, { requested: boolean, error: string, data }> = 
     if (vnode.state.error) return m(ErrorPage, {
       message: vnode.state.error,
       title: [
-        'Community Analytics',
+        'Analytics',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
     });
@@ -130,7 +130,7 @@ const StatsPage: m.Component<{}, { requested: boolean, error: string, data }> = 
     return m(Sublayout, {
       class: 'StatsPage',
       title: [
-        'Community Analytics',
+        'Analytics',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
     }, [

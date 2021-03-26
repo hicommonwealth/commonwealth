@@ -2,27 +2,29 @@ import 'pages/referenda.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { Grid, Col, List, Tag } from 'construct-ui';
+import moment from 'moment';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
-import Edgeware from 'controllers/chain/edgeware/main';
+
 import {
   convictionToWeight, convictionToLocktime, convictions
 } from 'controllers/chain/substrate/democracy_referendum';
+import Substrate from 'controllers/chain/substrate/main';
+import Cosmos from 'controllers/chain/cosmos/main';
+import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import LoadingRow from 'views/components/loading_row';
 import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import Substrate from 'controllers/chain/substrate/main';
-import Cosmos from 'controllers/chain/cosmos/main';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
-import { Grid, Col, List, Tag } from 'construct-ui';
-import moment from 'moment';
+
 import Listing from './listing';
 import ErrorPage from './error';
 

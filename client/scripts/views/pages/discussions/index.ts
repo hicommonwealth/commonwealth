@@ -498,9 +498,9 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
                   app.modals.create({ modal: ManageCommunityModal });
                 }
               }),
-              (isAdmin || isMod) && m(MenuItem, {
-                label: 'Community analytics',
-                onclick: (e) => m.route.set(`/${app.activeId() || 'edgeware'}/communityStats`),
+              (isAdmin || isMod) && app.activeId() && m(MenuItem, {
+                label: 'Analytics',
+                onclick: (e) => m.route.set(`/${app.activeId()}/analytics`),
               }),
             ],
           }),
