@@ -91,7 +91,7 @@ const BountiesPage: m.Component<{}> = {
           m('', [
             m('strong', 'Bounties'),
             m('span', [
-              ' are requests for treasury funding that are managed by a curator, and must be first approved by the council.',
+              ' are requests for treasury funding that are assigned by the council to be managed by a curator.',
             ]),
           ]),
           m('', [
