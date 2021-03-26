@@ -129,6 +129,27 @@ const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
       // metadata
       proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value.format(true)),
       proposal instanceof SubstrateDemocracyReferendum && m('.proposal-amount', proposal.threshold),
+      // // linked treasury proposals
+      // proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
+      //   && proposal.preimage?.method === 'approveProposal'
+      //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+      // proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
+      //   && proposal.preimage?.method === 'approveProposal'
+      //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+      // proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
+      //   && proposal.call?.method === 'approveProposal'
+      //   && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
+      // linked referenda
+      proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
+        && (() => {
+          const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
+          if (originatingProposalOrMotion instanceof SubstrateDemocracyProposal) {
+            return m('.proposal-action', [ 'Via PROP-', originatingProposalOrMotion.identifier ]);
+          } else if (originatingProposalOrMotion instanceof SubstrateCollectiveProposal) {
+            return m('.proposal-action', [ 'Via MOT-', originatingProposalOrMotion.identifier ]);
+          }
+        })(),
+      // comments
       m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
       // status
       m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),

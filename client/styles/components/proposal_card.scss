@@ -17,6 +17,13 @@
     .proposal-comments {
         color: $text-color-light;
     }
+    .proposal-action {
+        display: inline-block;
+        color: $text-color-light;
+        font-weight: 600;
+        font-size: 80%;
+        text-transform: uppercase;
+    }
     .proposal-status {
         position: absolute;
         bottom: 14px;
