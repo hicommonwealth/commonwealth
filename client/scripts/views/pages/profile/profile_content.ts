@@ -51,13 +51,14 @@ const ProfileContent: m.Component<{
       if (!vnode.state.count) {
         vnode.state.count = 10;
       }
+      const thisUrl = m.route.get();
       vnode.state.onscroll = _.debounce(async () => {
         if (!postsRemaining(content.length, vnode.state.count)) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
           vnode.state.count += 20;
-          window.location.hash = vnode.state.count.toString();
+          if (m.route.get() === thisUrl) window.location.hash = vnode.state.count.toString();
           m.redraw();
         }
       }, 400);
