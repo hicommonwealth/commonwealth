@@ -72,24 +72,27 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
 const MarlinProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
+    if (!(app.chain instanceof Marlin)) return;
 
-    return m(Grid, {
-      align: 'middle',
-      class: 'stats-container',
-      gutter: 5,
-      justify: 'space-between'
-    }, [
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Marlin Basics'),
-          m('.stats-tile-figure-major', [
-            `Quorum Votes: ${(app.chain as Marlin).governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} MPOND`
+    return m('.stats-box', [
+      m('.stats-box-left', '💭'),
+      m('.stats-box-right', [
+        m('', [
+          m('strong', 'Marlin Proposals'),
+          m('span', [
+            '', // TODO: fill in
           ]),
-          m('.stats-tile-figure-minor', [
-            `Proposal Threshold: ${(app.chain as Marlin).governance?.proposalThreshold.div(new BN('1000000000000000000')).toString()} MPOND`
+        ]),
+        m('', [
+          // TODO: We shouldn't be hardcoding these figures
+          m('.stats-box-stat', [
+            `Quorum: ${app.chain.governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} MPOND`
           ]),
-          m('.stats-tile-figure-minor', [
-            `Voting Period Length: ${(app.chain as Marlin).governance.votingPeriod.toString(10)}`,
+          m('.stats-box-stat', [
+            `Proposal Threshold: ${app.chain.governance?.proposalThreshold.div(new BN('1000000000000000000')).toString()} MPOND`
+          ]),
+          m('.stats-box-stat', [
+            `Voting Period Length: ${app.chain.governance.votingPeriod.toString(10)}`,
           ]),
         ]),
       ]),

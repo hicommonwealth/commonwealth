@@ -146,7 +146,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
             });
           }),
           webhooks.length === 0 && m(ListItem, {
-            contentLeft: 'No webhooks yet.'
+            contentLeft: 'No webhooks yet. Slack and Discord webhooks are supported.'
           }),
         ]),
       ]),

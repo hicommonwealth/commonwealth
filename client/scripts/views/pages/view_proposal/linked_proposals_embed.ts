@@ -27,7 +27,7 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
 
       const call = proposal instanceof SubstrateDemocracyProposal ? proposal.preimage
         : proposal instanceof SubstrateDemocracyReferendum ? proposal.preimage
-        : proposal instanceof SubstrateCollectiveProposal ? proposal.call : null;
+          : proposal instanceof SubstrateCollectiveProposal ? proposal.call : null;
 
       if (call?.section === 'treasury' && (call.method === 'approveProposal' || call.method === 'rejectProposal')) {
         treasuryProposalIndex = call.args[0];
