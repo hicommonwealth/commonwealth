@@ -234,7 +234,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
     result: {
       numPrevotingThreads,
       numVotingThreads,
-      threads: cutoff_date ? threads : threads.map((t) => t.toJSON()),
+      threads,
       comments, // already converted to JSON earlier
       reactions: reactions.map((r) => r.toJSON()),
     }
