@@ -29,46 +29,54 @@ const LinkedProposalsEmbed: m.Component<{ proposal }> = {
         : proposal instanceof SubstrateDemocracyReferendum ? proposal.preimage
           : proposal instanceof SubstrateCollectiveProposal ? proposal.call : null;
 
+      let treasuryProposal;
       if (call?.section === 'treasury' && (call.method === 'approveProposal' || call.method === 'rejectProposal')) {
         treasuryProposalIndex = call.args[0];
-      } else {
-        return;
+        try {
+          treasuryProposal = idToProposal('treasuryproposal', +treasuryProposalIndex);
+        } catch (e) {
+          // do nothing if treasury proposal was not indexed
+        }
       }
-
-      let treasuryProposal;
-      try {
-        treasuryProposal = idToProposal('treasuryproposal', +treasuryProposalIndex);
-      } catch (e) {
-        return;
-      }
-      if (!treasuryProposal) return;
 
       return m('.LinkedProposalsEmbed', [
-        m('.treasury-embed-section', [
-          m('strong', [
-            `Treasury Proposal ${treasuryProposalIndex}`,
-          ]),
-          m('p', [
-            'Awards ',
-            formatCoin(treasuryProposal.value),
-            ' to ',
-            m(User, {
-              user: new AddressInfo(null, treasuryProposal.beneficiaryAddress, app.activeChainId(), null),
-              linkify: true,
+        (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
+          && proposal.getReferendum()
+          && m('.treasury-embed-section', [
+            m('p', [
+              `Became referendum ${proposal.getReferendum().identifier}`,
+            ]),
+            app.activeChainId() && m(Button, {
+              href: `/${app.activeChainId()}/proposal/referendum/${proposal.getReferendum().identifier}`,
+              onclick: (e) => {
+                e.preventDefault();
+                m.route.set(`/${app.activeChainId()}/proposal/referendum/${proposal.getReferendum().identifier}`);
+              },
+              intent: 'primary',
+              label: 'Go to referendum',
+              fluid: true,
+              rounded: true,
             }),
           ]),
-          app.activeChainId() && m(Button, {
-            href: `/${app.activeChainId()}/proposal/treasuryproposal/${treasuryProposalIndex}`,
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set(`/${app.activeChainId()}/proposal/treasuryproposal/${treasuryProposalIndex}`);
-            },
-            intent: 'primary',
-            label: 'Go to proposal',
-            fluid: true,
-            rounded: true,
-          }),
-        ]),
+        proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
+          && proposal.getProposalOrMotion(proposal.preimage)
+          && m('.treasury-embed-section', [
+            m('p', [
+              `Via ${proposal.getProposalOrMotion(proposal.preimage).slug}`,
+              ` ${proposal.getProposalOrMotion(proposal.preimage).identifier}`,
+            ]),
+            app.activeChainId() && m(Button, {
+              href: `/${app.activeChainId()}/proposal/${proposal.getProposalOrMotion(proposal.preimage).slug}/${proposal.getProposalOrMotion(proposal.preimage).identifier}`,
+              onclick: (e) => {
+                e.preventDefault();
+                m.route.set(`/${app.activeChainId()}/proposal/${proposal.getProposalOrMotion(proposal.preimage).slug}/${proposal.getProposalOrMotion(proposal.preimage).identifier}`);
+              },
+              intent: 'primary',
+              label: 'Go to proposal',
+              fluid: true,
+              rounded: true,
+            }),
+          ]),
       ]);
     } else if (proposal instanceof SubstrateTreasuryProposal) {
       const democracyProposals = ((app.chain as Substrate).democracyProposals?.store?.getAll() || [])
