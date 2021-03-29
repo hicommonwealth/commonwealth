@@ -205,7 +205,7 @@ export async function createTemporaryTokenChain(n: NodeInfo): Promise<boolean> {
   const newToken = new Token(n, app)
   app.chain = newToken;
 
-  console.log(`${n.name.toUpperCase()} started.`);
+  console.log(`${(n as any).name.toUpperCase()} started.`);
 
   // Redraw with community fully loaded and return true to indicate
   // initialization has finalized.

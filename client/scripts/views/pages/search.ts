@@ -15,6 +15,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
+import getTokenLists from './home/token_lists';
 
 const SEARCH_DELAY = 750;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
@@ -44,6 +45,7 @@ export const search = _.debounce((searchTerm, vnode) => {
     vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
     m.redraw();
   });
+
   searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE).then((addrs) => {
     vnode.state.results = vnode.state.results.concat(addrs.map((addr) => {
       addr.type = SearchType.Member;
@@ -56,6 +58,14 @@ export const search = _.debounce((searchTerm, vnode) => {
     vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
     m.redraw();
   });
+
+  getTokenLists().then((unfilteredTokens) => {
+    const tokens = unfilteredTokens.filter((token) => token.name.includes(searchTerm));
+    vnode.state.results = vnode.state.results.concat(tokens.map((token) => {
+      token.type = SearchType.Community;
+      return token;
+    }));
+  });
 }, SEARCH_DELAY);
 
 const getUserResult = (addr, searchTerm) => {
@@ -65,6 +75,17 @@ const getUserResult = (addr, searchTerm) => {
       user: profile,
       linkify: true,
     })
+  ]);
+};
+
+const getTokenResult = (token) => {
+  return m('a.search-results-item', [
+    m('img', {
+      src: token.logoURI,
+      height: '15px',
+      width: '15px'
+    }),
+    m('span', token.name)
   ]);
 };
 
@@ -158,7 +179,9 @@ const getListing = (results: any, searchTerm: string, type?: SearchType) => {
         ? getDiscussionResult(res, searchTerm)
         : res.type === SearchType.Member
           ? getUserResult(res, searchTerm)
-          : null;
+          : res.type === SearchType.Community
+            ? getTokenResult(res)
+            : null;
     });
 };
 
