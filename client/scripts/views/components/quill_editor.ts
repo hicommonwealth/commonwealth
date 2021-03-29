@@ -12,7 +12,7 @@ import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import QuillMention from 'quill-mention';
 
 import app from 'state';
-import { loadScript } from 'helpers';
+import { loadScript, searchMentionableAddresses } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
@@ -255,20 +255,6 @@ const instantiateEditor = (
   Quill.register('formats/twitter', TwitterBlot, true);
   Quill.register('formats/video', VideoBlot, true);
 
-  const searchMentionableAddresses = async (searchTerm: string) => {
-    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-      limit: 6,
-      searchTerm,
-      order: ['name', 'ASC']
-    });
-    if (response.status !== 'Success') {
-      throw new Error(`got unsuccessful status: ${response.status}`);
-    }
-    return response.result;
-  };
-
   const queryMentions = async (searchTerm, renderList, mentionChar) => {
     if (mentionChar !== '@') return;
     // Optional code for tagging roles:
@@ -290,7 +276,7 @@ const instantiateEditor = (
       }];
       renderList(formattedMatches, searchTerm);
     } else if (searchTerm.length > 0) {
-      members = await searchMentionableAddresses(searchTerm);
+      members = await searchMentionableAddresses(searchTerm, 6);
       formattedMatches = members.map((addr) => {
         const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
         const node = document.createElement('div');

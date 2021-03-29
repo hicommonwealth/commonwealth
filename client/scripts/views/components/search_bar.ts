@@ -6,9 +6,8 @@ import _ from 'lodash';
 import { Input} from 'construct-ui';
 
 import app from 'state';
-
-const SEARCH_DELAY = 750;
-const SEARCH_RESULTS_SIZE = 10;
+import { searchMentionableAddresses } from 'helpers';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
 
 export enum SearchPrefixes {
   COMMUNITY = 'comm:',
@@ -16,36 +15,6 @@ export enum SearchPrefixes {
   TOKEN = 'token:',
   USER = 'user:'
 }
-
-const searchCache = {}; // only used to restore search results when returning to the page
-
-export const search = _.debounce((searchTerm, vnode) => {
-  vnode.state.searchTerm = searchTerm;
-
-  const chainId = app.activeChainId();
-  const communityId = app.activeCommunityId();
-  const params = {
-    chain: chainId,
-    community: communityId,
-    cutoff_date: null, // cutoffDate.toISOString(),
-    search: searchTerm,
-    results_size: SEARCH_RESULTS_SIZE,
-  };
-  $.get(`${app.serverUrl()}/search`, params).then((response) => {
-    if (response.status !== 'Success') {
-      vnode.state.searchLoading = false;
-      m.redraw();
-      return;
-    }
-    app.searchCache[searchTerm] = response.response;
-    vnode.state.searchLoading = false;
-    m.redraw();
-  }).catch((err: any) => {
-    vnode.state.searchLoading = false;
-    vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
-    m.redraw();
-  });
-}, SEARCH_DELAY);
 
 const SearchBar : m.Component<{}, {
   results: any[],
@@ -85,23 +54,16 @@ const SearchBar : m.Component<{}, {
         contentLeft,
         onkeyup: (e) => {
           if (e.key === 'Enter') {
+            const { searchTerm } = vnode.state;
+            if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
+              notifyError('Enter a valid search term');
+              return;
+            }
             m.route.set(`/${app.activeId()}/search?q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`);
           }
         },
         oninput: (e) => {
           vnode.state.searchTerm = e.target.value;
-          const { searchTerm } = vnode.state;
-          if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
-            vnode.state.errorText = 'Enter a valid search term';
-            vnode.state.searchLoading = false;
-            return;
-          }
-          vnode.state.errorText = null;
-          if (searchTerm.length < 3) {
-            return;
-          }
-          vnode.state.searchLoading = true;
-          search(e.target.value, vnode);
         }
       })
     ]);

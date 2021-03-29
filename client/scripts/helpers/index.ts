@@ -242,6 +242,22 @@ export function renderMultilineText(text: string) {
     .map((p) => m('p', p));
 }
 
+// Search addresses
+
+export const searchMentionableAddresses = async (searchTerm: string, limit: number = 6) => {
+  const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+    chain: app.activeChainId(),
+    community: app.activeCommunityId(),
+    limit,
+    searchTerm,
+    order: ['name', 'ASC']
+  });
+  if (response.status !== 'Success') {
+    throw new Error(`got unsuccessful status: ${response.status}`);
+  }
+  return response.result;
+};
+
 /*
  * blocknum helpers
  */
