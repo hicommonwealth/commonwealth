@@ -70,7 +70,7 @@ function getModules() {
   }
   if (app.chain.base === ChainBase.Substrate) {
     const chain = (app.chain as Substrate);
-    return [ chain.treasury, chain.democracy, chain.democracyProposals, chain.council ];
+    return [ chain.democracy, chain.democracyProposals ];
   } else {
     throw new Error('invalid chain');
   }
