@@ -1,17 +1,22 @@
 import _ from 'underscore';
+
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import { ApiPromise } from '@polkadot/api';
 import { Votes } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
+
 import { ISubstrateCollectiveProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType,
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
-import { SubstrateTypes } from '@commonwealth/chain-events';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
+
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
+import { SubstrateDemocracyReferendum } from './democracy_referendum';
+import Substrate from './main';
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   constructor(
@@ -132,6 +137,26 @@ export class SubstrateCollectiveProposal
 
   protected complete() {
     super.complete(this._Collective.store);
+  }
+
+  // Attempts to find the Referendum produced by this Collective Proposal by
+  //   searching for the same proposal hash.
+  // NOTE: for full functionality, "referendum" module must be loaded.
+  // TODO: This may cause issues if we have the same Call proposed twice, as this will only fetch the
+  //   first one in storage. To fix this, we will need to use some timing heuristics to check that
+  //   this referendum was created approximately when the found proposal concluded.
+  public getReferendum(): SubstrateDemocracyReferendum | undefined {
+    // ensure all modules have loaded
+    if (!this._Chain.app.isModuleReady) return;
+
+    // search for same preimage/proposal hash
+    const chain = (this._Chain.app.chain as Substrate);
+    const referendum = chain.democracy?.store.getAll().find((p) => {
+      return p.hash === this.data.hash;
+    });
+    if (referendum) return referendum;
+
+    return undefined;
   }
 
   public update(e: ChainEvent) {

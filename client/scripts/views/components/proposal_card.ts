@@ -149,6 +149,9 @@ const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
             return m('.proposal-action', [ 'Via MOT-', originatingProposalOrMotion.identifier ]);
           }
         })(),
+      (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
+        && proposal.getReferendum()
+        && m('.proposal-action', [ 'Became REF-', proposal.getReferendum().identifier ]),
       // comments
       m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
       // status
