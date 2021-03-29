@@ -21,9 +21,15 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 
 const searchCache = {}; // only used to restore search results when returning to the page
 
+export enum SearchType {
+  Discussion = 'discussions',
+  Community = 'communities',
+  Member = 'members',
+  Top = 'top',
+}
+
 export const search = _.debounce((searchTerm, vnode) => {
   vnode.state.searchLoading = true;
-  app.searchCache[searchTerm] = {};
 
   const chainId = app.activeChainId();
   const communityId = app.activeCommunityId();
@@ -34,13 +40,14 @@ export const search = _.debounce((searchTerm, vnode) => {
     search: searchTerm,
     results_size: SEARCH_PAGE_SIZE,
   };
-  $.get(`${app.serverUrl()}/search`, params).then((response) => {
-    if (response.status !== 'Success') {
+  $.get(`${app.serverUrl()}/search`, params).then((result) => {
+    if (result.status !== 'Success') {
       vnode.state.searchLoading = false;
       m.redraw();
       return;
     }
-    app.searchCache[searchTerm]['discussion'] = response.result;
+    console.log(result);
+    vnode.state.results.concat(result.response);
     vnode.state.searchLoading = false;
     m.redraw();
   }).catch((err: any) => {
@@ -48,13 +55,14 @@ export const search = _.debounce((searchTerm, vnode) => {
     vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
     m.redraw();
   });
-  searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE).then((response) => {
-    if (response.status !== 'Success') {
+  searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE).then((result) => {
+    if (result.status !== 'Success') {
       vnode.state.searchLoading = false;
       m.redraw();
       return;
     }
-    app.searchCache[searchTerm]['users'] = response.result;
+    console.log(result);
+    vnode.state.results.concat(result.response);
     vnode.state.searchLoading = false;
     m.redraw();
   }).catch((err: any) => {
@@ -64,113 +72,114 @@ export const search = _.debounce((searchTerm, vnode) => {
   });
 }, SEARCH_DELAY);
 
-const getUserListing = (users, searchTerm) => {
-  return users.map((addr) => {
-    const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
-    return m('a.search-results-item', [
-      m(User, {
-        user: profile,
-        linkify: true,
-      })
-    ]);
-  });
+const getUserResult = (addr, searchTerm) => {
+  const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
+  return m('a.search-results-item', [
+    m(User, {
+      user: profile,
+      linkify: true,
+    })
+  ]);
 };
 
-const getDiscussionListing = (threads, searchTerm) => {
-  return threads.map((result) => {
-    const activeId = app.activeId();
-    const proposalType = result.proposalType;
-    const proposalId = result.proposalid;
-    return m('a.search-results-item', {
-      href: (result.type === 'thread')
-        ? `/${activeId}/proposal/discussion/${proposalId}`
-        : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`,
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(
-          result.type === 'thread'
-            ? `/${activeId}/proposal/discussion/${proposalId}`
-            : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`
-        );
-      }
-    }, [
-      result.type === 'thread' ? [
-        m('.search-results-thread-title', [
-          decodeURIComponent(result.title),
-        ]),
-        m('.search-results-thread-subtitle', [
-          m('span.created-at', moment(result.created_at).fromNow()),
-          m(User, { user: new AddressInfo(result.address_id, result.address, result.address_chain, null) }),
-        ]),
-        m('.search-results-thread-body', [
-          (() => {
-            try {
-              const doc = JSON.parse(decodeURIComponent(result.body));
-              if (!doc.ops) throw new Error();
-              return m(QuillFormattedText, {
-                doc,
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            } catch (e) {
-              const doc = decodeURIComponent(result.body);
-              return m(MarkdownFormattedText, {
-                doc,
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            }
-          })(),
-        ])
-      ] : [
-        m('.search-results-thread-title', [
-          'Comment on ',
-          decodeURIComponent(result.title),
-        ]),
-        m('.search-results-thread-subtitle', [
-          m('span.created-at', moment(result.created_at).fromNow()),
-          m(User, { user: new AddressInfo(result.address_id, result.address, result.address_chain, null) }),
-        ]),
-        m('.search-results-comment', [
-          (() => {
-            try {
-              const doc = JSON.parse(decodeURIComponent(result.body));
-              if (!doc.ops) throw new Error();
-              return m(QuillFormattedText, {
-                doc,
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            } catch (e) {
-              const doc = decodeURIComponent(result.body);
-              return m(MarkdownFormattedText, {
-                doc,
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            }
-          })(),
-        ]),
-      ]
-    ]);
-  });
+const getDiscussionResult = (thread, searchTerm) => {
+  const activeId = app.activeId();
+  const proposalType = thread.proposalType;
+  const proposalId = thread.proposalid;
+  return m('a.search-results-item', {
+    href: (thread.type === 'thread')
+      ? `/${activeId}/proposal/discussion/${proposalId}`
+      : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`,
+    onclick: (e) => {
+      e.preventDefault();
+      m.route.set(
+        thread.type === 'thread'
+          ? `/${activeId}/proposal/discussion/${proposalId}`
+          : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`
+      );
+    }
+  }, [
+    thread.type === 'thread' ? [
+      m('.search-results-thread-title', [
+        decodeURIComponent(thread.title),
+      ]),
+      m('.search-results-thread-subtitle', [
+        m('span.created-at', moment(thread.created_at).fromNow()),
+        m(User, { user: new AddressInfo(thread.address_id, thread.address, thread.address_chain, null) }),
+      ]),
+      m('.search-results-thread-body', [
+        (() => {
+          try {
+            const doc = JSON.parse(decodeURIComponent(thread.body));
+            if (!doc.ops) throw new Error();
+            return m(QuillFormattedText, {
+              doc,
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            });
+          } catch (e) {
+            const doc = decodeURIComponent(thread.body);
+            return m(MarkdownFormattedText, {
+              doc,
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            });
+          }
+        })(),
+      ])
+    ] : [
+      m('.search-results-thread-title', [
+        'Comment on ',
+        decodeURIComponent(thread.title),
+      ]),
+      m('.search-results-thread-subtitle', [
+        m('span.created-at', moment(thread.created_at).fromNow()),
+        m(User, { user: new AddressInfo(thread.address_id, thread.address, thread.address_chain, null) }),
+      ]),
+      m('.search-results-comment', [
+        (() => {
+          try {
+            const doc = JSON.parse(decodeURIComponent(thread.body));
+            if (!doc.ops) throw new Error();
+            return m(QuillFormattedText, {
+              doc,
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            });
+          } catch (e) {
+            const doc = decodeURIComponent(thread.body);
+            return m(MarkdownFormattedText, {
+              doc,
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            });
+          }
+        })(),
+      ]),
+    ]
+  ]);
 };
 
-export enum SearchTypes {
-  Discussion = 'discussions',
-  Community = 'communities',
-  Member = 'members',
-  Top = 'top',
-}
+const getListing = (results: any, searchTerm: string, type?: SearchType) => {
+  const filter = type === SearchType.Top ? null : type;
+  return (filter ? results.filter((res) => res.type === type) : results)
+    .map((res) => {
+      return res.type === SearchType.Discussion
+        ? getDiscussionResult(res, searchTerm)
+        : res.type === SearchType.Member
+          ? getUserResult(res, searchTerm)
+          : null;
+    });
+};
 
 const SearchPage : m.Component<{
   results: any[]
 }, {
-  activeTab: SearchTypes,
+  activeTab: SearchType,
   results: any[],
   searchLoading: boolean,
   searchTerm: string,
@@ -194,14 +203,25 @@ const SearchPage : m.Component<{
 
     const searchTerm = m.route.param('q');
 
-    if (vnode.state.searchLoading) {
+    // re-fetch results for new search
+    if (searchTerm !== vnode.state.searchTerm) {
+      vnode.state.searchTerm = searchTerm;
+      vnode.state.results = [];
+      search(searchTerm, vnode);
+      console.log('loading 1');
       return LoadingPage;
-    } else if (!app.searchCache[searchTerm] && vnode.state.searchLoading) {
+    }
+
+    if (vnode.state.searchLoading) {
+      console.log('loading 2');
+      return LoadingPage;
+    } else if (!vnode.state.results) {
+      console.log({ results: vnode.state.results });
       search(searchTerm, vnode);
       return;
     }
 
-    vnode.state.results = app.searchCache[searchTerm];
+    console.log({ results: vnode.state.results });
 
     // TODO: Add a Construct UI Tabs component for content types; use filtering
     // TODO: Sync up page result size, think through "all" results size vs type-sorted results size
@@ -216,24 +236,24 @@ const SearchPage : m.Component<{
       showNewProposalButton: true,
     }, m(Tabs, [
       m(TabItem, {
-        label: capitalize(SearchTypes.Top) || 'test',
-        active: vnode.state.activeTab === SearchTypes.Top,
-        onclick: () => { vnode.state.activeTab = SearchTypes.Top; },
+        label: capitalize(SearchType.Top) || 'test',
+        active: vnode.state.activeTab === SearchType.Top,
+        onclick: () => { vnode.state.activeTab = SearchType.Top; },
       }),
       m(TabItem, {
-        label: capitalize(SearchTypes.Community) || 'test',
-        active: vnode.state.activeTab === SearchTypes.Community,
-        onclick: () => { vnode.state.activeTab = SearchTypes.Community; },
+        label: capitalize(SearchType.Community) || 'test',
+        active: vnode.state.activeTab === SearchType.Community,
+        onclick: () => { vnode.state.activeTab = SearchType.Community; },
       }),
       m(TabItem, {
-        label: capitalize(SearchTypes.Discussion) || 'test',
-        active: vnode.state.activeTab === SearchTypes.Discussion,
-        onclick: () => { vnode.state.activeTab = SearchTypes.Discussion; },
+        label: capitalize(SearchType.Discussion) || 'test',
+        active: vnode.state.activeTab === SearchType.Discussion,
+        onclick: () => { vnode.state.activeTab = SearchType.Discussion; },
       }),
       m(TabItem, {
-        label: capitalize(SearchTypes.Member) || 'test',
-        active: vnode.state.activeTab === SearchTypes.Member,
-        onclick: () => { vnode.state.activeTab = SearchTypes.Member; },
+        label: capitalize(SearchType.Member) || 'test',
+        active: vnode.state.activeTab === SearchType.Member,
+        onclick: () => { vnode.state.activeTab = SearchType.Member; },
       }),
     ],
     m('.search-results', [
@@ -268,9 +288,11 @@ const SearchPage : m.Component<{
               }
             }, 'Clear'),
           ]),
-          // m('.search-results-list', getDiscussionListing(
-          //   vnode.state.results[SearchTypes.Discussion], vnode.state.searchTerm
-          // )),
+          m('.search-results-list', getListing(
+            vnode.state.results,
+            vnode.state.searchTerm,
+            vnode.state.activeTab
+          )),
         ]),
       ]
     ])));

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment-twitter';
 
