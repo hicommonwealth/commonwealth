@@ -4,7 +4,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment-twitter';
-import { Input, Spinner, TabItem, Tag } from 'construct-ui';
+import { Tabs, Spinner, TabItem, Tag } from 'construct-ui';
 
 import { pluralize, searchMentionableAddresses } from 'helpers';
 import app from 'state';
@@ -15,14 +15,14 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import Tabs from '../components/widgets/tabs';
 
 const SEARCH_DELAY = 750;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
 const searchCache = {}; // only used to restore search results when returning to the page
 
-export const search = _.debounce((searchTerm, vnode?) => {
+export const search = _.debounce((searchTerm, vnode) => {
+  vnode.state.searchLoading = true;
   app.searchCache[searchTerm] = {};
 
   const chainId = app.activeChainId();
@@ -36,30 +36,30 @@ export const search = _.debounce((searchTerm, vnode?) => {
   };
   $.get(`${app.serverUrl()}/search`, params).then((response) => {
     if (response.status !== 'Success') {
-      if (vnode) vnode.state.searchLoading = false;
+      vnode.state.searchLoading = false;
       m.redraw();
       return;
     }
     app.searchCache[searchTerm]['discussion'] = response.result;
-    if (vnode) vnode.state.searchLoading = false;
+    vnode.state.searchLoading = false;
     m.redraw();
   }).catch((err: any) => {
-    if (vnode) vnode.state.searchLoading = false;
-    if (vnode) vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
+    vnode.state.searchLoading = false;
+    vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
     m.redraw();
   });
   searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE).then((response) => {
     if (response.status !== 'Success') {
-      if (vnode) vnode.state.searchLoading = false;
+      vnode.state.searchLoading = false;
       m.redraw();
       return;
     }
     app.searchCache[searchTerm]['users'] = response.result;
-    if (vnode) vnode.state.searchLoading = false;
+    vnode.state.searchLoading = false;
     m.redraw();
   }).catch((err: any) => {
-    if (vnode) vnode.state.searchLoading = false;
-    if (vnode) vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
+    vnode.state.searchLoading = false;
+    vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
     m.redraw();
   });
 }, SEARCH_DELAY);
@@ -158,13 +158,13 @@ const getDiscussionListing = (threads, searchTerm) => {
       ]
     ]);
   });
-}
+};
 
 export enum SearchTypes {
-  DISCUSSION = 'discussions',
-  COMMUNITY = 'communities',
-  USER = 'users',
-  TOKEN = 'tokens',
+  Discussion = 'discussions',
+  Community = 'communities',
+  Member = 'members',
+  Top = 'top',
 }
 
 const SearchPage : m.Component<{
@@ -194,16 +194,14 @@ const SearchPage : m.Component<{
 
     const searchTerm = m.route.param('q');
 
-    if (!app.searchCache[searchTerm]) {
+    if (vnode.state.searchLoading) {
+      return LoadingPage;
+    } else if (!app.searchCache[searchTerm] && vnode.state.searchLoading) {
       search(searchTerm, vnode);
+      return;
     }
 
-    if (app.searchCache[searchTerm]) {
-      console.log(app.searchCache[searchTerm]);
-      vnode.state.results = app.searchCache[searchTerm];
-    } else {
-      return LoadingPage;
-    }
+    vnode.state.results = app.searchCache[searchTerm];
 
     // TODO: Add a Construct UI Tabs component for content types; use filtering
     // TODO: Sync up page result size, think through "all" results size vs type-sorted results size
@@ -218,50 +216,28 @@ const SearchPage : m.Component<{
       showNewProposalButton: true,
     }, m(Tabs, [
       m(TabItem, {
-        label: capitalize(SearchTypes.DISCUSSION),
-        active: vnode.state.activeTab === SearchTypes.DISCUSSION,
-        loading: false
-      }, [
-        vnode.state.searchLoading ? m('.search-loading', [
-          m(Spinner, {
-            active: true,
-            fill: true,
-            size: 'xl',
-          }),
-        ]) : vnode.state.errorText ? m('.search-error', [
-          m('.error-text', vnode.state.errorText),
-        ]) : !vnode.state.results ? m('.search-loading', [
-          // TODO: prompt to start searching
-        ]) : m('.search-results', [
-          m('.search-results-caption', [
-            vnode.state.results.length === SEARCH_PAGE_SIZE
-              ? `${vnode.state.results.length}+ results`
-              : pluralize(vnode.state.results.length, 'result'),
-            ' for \'',
-            vnode.state.searchTerm,
-            '\'',
-            m('a.search-results-clear', {
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                vnode.state.results = null;
-                $('.search-page-input input').val('')
-                  .select()
-                  .focus();
-              }
-            }, 'Clear'),
-          ]),
-          m('.search-results-list', getDiscussionListing(
-            vnode.state.results[SearchTypes.DISCUSSION], vnode.state.searchTerm
-          )),
-        ]),
-      ]),
+        label: capitalize(SearchTypes.Top) || 'test',
+        active: vnode.state.activeTab === SearchTypes.Top,
+        onclick: () => { vnode.state.activeTab = SearchTypes.Top; },
+      }),
       m(TabItem, {
-        label: capitalize(SearchTypes.USER),
-        active: vnode.state.activeTab === SearchTypes.USER,
-        loading: false
-      }, [
+        label: capitalize(SearchTypes.Community) || 'test',
+        active: vnode.state.activeTab === SearchTypes.Community,
+        onclick: () => { vnode.state.activeTab = SearchTypes.Community; },
+      }),
+      m(TabItem, {
+        label: capitalize(SearchTypes.Discussion) || 'test',
+        active: vnode.state.activeTab === SearchTypes.Discussion,
+        onclick: () => { vnode.state.activeTab = SearchTypes.Discussion; },
+      }),
+      m(TabItem, {
+        label: capitalize(SearchTypes.Member) || 'test',
+        active: vnode.state.activeTab === SearchTypes.Member,
+        onclick: () => { vnode.state.activeTab = SearchTypes.Member; },
+      }),
+    ],
+    m('.search-results', [
+      [
         vnode.state.searchLoading ? m('.search-loading', [
           m(Spinner, {
             active: true,
@@ -292,12 +268,12 @@ const SearchPage : m.Component<{
               }
             }, 'Clear'),
           ]),
-          m('.search-results-list', getUserListing(
-            vnode.state.results[SearchTypes.USER], vnode.state.searchTerm
-          )),
+          // m('.search-results-list', getDiscussionListing(
+          //   vnode.state.results[SearchTypes.Discussion], vnode.state.searchTerm
+          // )),
         ]),
-      ])
-    ]));
+      ]
+    ])));
   }
 };
 

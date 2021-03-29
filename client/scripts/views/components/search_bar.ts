@@ -3,11 +3,10 @@ import 'pages/search.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
-import { Input} from 'construct-ui';
+import { Input } from 'construct-ui';
 
 import app from 'state';
-import { searchMentionableAddresses } from 'helpers';
-import { notifyError } from 'client/scripts/controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 
 export enum SearchPrefixes {
   COMMUNITY = 'comm:',
