@@ -545,6 +545,7 @@ $(() => {
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
+    '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
 
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
