@@ -80,7 +80,7 @@ ORDER BY created_at DESC LIMIT :limit;
 
   return res.json({
     status: 'Success',
-    response: threadsAndComments,
+    result: threadsAndComments,
   });
 };
 

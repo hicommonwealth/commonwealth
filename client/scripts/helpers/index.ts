@@ -243,7 +243,21 @@ export function renderMultilineText(text: string) {
     .map((p) => m('p', p));
 }
 
-// Search addresses
+// Search
+
+export const searchThreads = async (searchTerm: string, limit: number = 50) => {
+  const response = await $.get(`${app.serverUrl()}/search`, {
+    chain: app.activeChainId(),
+    community: app.activeCommunityId(),
+    cutoff_date: null, // cutoffDate.toISOString(),
+    search: searchTerm,
+    results_size: limit,
+  });
+  if (response.status !== 'Success') {
+    throw new Error(`got unsuccessful status: ${response.status}`);
+  }
+  return response.result;
+};
 
 export const searchMentionableAddresses = async (searchTerm: string, limit: number = 6) => {
   const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {

@@ -6,7 +6,7 @@ import _, { capitalize } from 'lodash';
 import moment from 'moment-twitter';
 import { Tabs, Spinner, TabItem, Tag } from 'construct-ui';
 
-import { pluralize, searchMentionableAddresses } from 'helpers';
+import { pluralize, searchMentionableAddresses, searchThreads } from 'helpers';
 import app from 'state';
 import { AddressInfo, Profile } from 'models';
 
@@ -31,23 +31,12 @@ export enum SearchType {
 export const search = _.debounce((searchTerm, vnode) => {
   vnode.state.searchLoading = true;
 
-  const chainId = app.activeChainId();
-  const communityId = app.activeCommunityId();
-  const params = {
-    chain: chainId,
-    community: communityId,
-    cutoff_date: null, // cutoffDate.toISOString(),
-    search: searchTerm,
-    results_size: SEARCH_PAGE_SIZE,
-  };
-  $.get(`${app.serverUrl()}/search`, params).then((result) => {
-    if (result.status !== 'Success') {
-      vnode.state.searchLoading = false;
-      m.redraw();
-      return;
-    }
-    console.log(result);
-    vnode.state.results.concat(result.response);
+  searchThreads(searchTerm, SEARCH_PAGE_SIZE).then((threads) => {
+    console.log(threads);
+    vnode.state.results = vnode.state.results.concat(threads.map((thread) => {
+      thread.type = SearchType.Discussion;
+      return thread;
+    }));
     vnode.state.searchLoading = false;
     m.redraw();
   }).catch((err: any) => {
@@ -55,14 +44,11 @@ export const search = _.debounce((searchTerm, vnode) => {
     vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
     m.redraw();
   });
-  searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE).then((result) => {
-    if (result.status !== 'Success') {
-      vnode.state.searchLoading = false;
-      m.redraw();
-      return;
-    }
-    console.log(result);
-    vnode.state.results.concat(result.response);
+  searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE).then((addrs) => {
+    vnode.state.results = vnode.state.results.concat(addrs.map((addr) => {
+      addr.type = SearchType.Member;
+      return addr;
+    }));
     vnode.state.searchLoading = false;
     m.redraw();
   }).catch((err: any) => {
@@ -255,47 +241,45 @@ const SearchPage : m.Component<{
         active: vnode.state.activeTab === SearchType.Member,
         onclick: () => { vnode.state.activeTab = SearchType.Member; },
       }),
-    ],
+    ]),
     m('.search-results', [
-      [
-        vnode.state.searchLoading ? m('.search-loading', [
-          m(Spinner, {
-            active: true,
-            fill: true,
-            size: 'xl',
-          }),
-        ]) : vnode.state.errorText ? m('.search-error', [
-          m('.error-text', vnode.state.errorText),
-        ]) : !vnode.state.results ? m('.search-loading', [
-          // TODO: prompt to start searching
-        ]) : m('.search-results', [
-          m('.search-results-caption', [
-            vnode.state.results.length === SEARCH_PAGE_SIZE
-              ? `${vnode.state.results.length}+ results`
-              : pluralize(vnode.state.results.length, 'result'),
-            ' for \'',
-            vnode.state.searchTerm,
-            '\'',
-            m('a.search-results-clear', {
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                vnode.state.results = null;
-                $('.search-page-input input').val('')
-                  .select()
-                  .focus();
-              }
-            }, 'Clear'),
-          ]),
-          m('.search-results-list', getListing(
-            vnode.state.results,
-            vnode.state.searchTerm,
-            vnode.state.activeTab
-          )),
+      vnode.state.searchLoading ? m('.search-loading', [
+        m(Spinner, {
+          active: true,
+          fill: true,
+          size: 'xl',
+        }),
+      ]) : vnode.state.errorText ? m('.search-error', [
+        m('.error-text', vnode.state.errorText),
+      ]) : m('.search-results', [
+        m('.search-results-caption', [
+          vnode.state.results.length === SEARCH_PAGE_SIZE
+            ? `${vnode.state.results.length}+ results`
+            : pluralize(vnode.state.results.length, 'result'),
+          ' for \'',
+          vnode.state.searchTerm,
+          vnode.state.activeTab !== SearchType.Top && ' in ',
+          vnode.state.activeTab !== SearchType.Top && capitalize(vnode.state.activeTab),
+          '\'',
+          m('a.search-results-clear', {
+            href: '#',
+            onclick: (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              vnode.state.results = null;
+              $('.search-page-input input').val('')
+                .select()
+                .focus();
+            }
+          }, 'Clear'),
         ]),
-      ]
-    ])));
+        m('.search-results-list', getListing(
+          vnode.state.results,
+          vnode.state.searchTerm,
+          vnode.state.activeTab
+        )),
+      ]),
+    ]));
   }
 };
 
