@@ -33,9 +33,6 @@ const nodes = [
   [ 'wss://cc1.darwinia.network/ws', 'darwinia'],
   [ 'wss://poc3.phala.com/ws', 'phala'],
   [ 'wss://fullnode.centrifuge.io', 'centrifuge'],
-  // [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
-  // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
-  // [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
   [ 'wss://mainnet.infura.io/ws', 'marlin', '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f'],
   [ 'ws://127.0.0.1:9545', 'marlin-local', '0xe0D6a92B91B83D5c8A95557f1c966cAFd97f7171'], // TODO: Can't seem to keep this consistent which each local deploy
   [ 'ws://api.clover.finance', 'clover'],

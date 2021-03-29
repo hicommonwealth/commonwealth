@@ -19,15 +19,17 @@ const createAddress = async (models, req: Request, res: Response, next: NextFunc
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
   }
+  const chainName = req.body.chain.startsWith("0x") ? "ethereum" : req.body.chain;
+
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
+    where: { id: chainName }
   });
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: req.body.address }
+    where: { chain: chainName, address: req.body.address }
   });
   if (existingAddress) {
     // address already exists on another user, only take ownership if

@@ -150,6 +150,8 @@ class ThreadsController {
     url?: string,
     attachments?: string[],
     readOnly?: boolean,
+    isNewChain?: boolean,
+    newChainInfo?: any
   ) {
     try {
       // TODO: Change to POST /thread
@@ -169,6 +171,8 @@ class ThreadsController {
         'url': url,
         'readOnly': readOnly,
         'jwt': app.user.jwt,
+        'isNewChain': isNewChain,
+        'newChainInfo': JSON.stringify(newChainInfo)
       });
       const result = modelFromServer(response.result);
       this._store.add(result);

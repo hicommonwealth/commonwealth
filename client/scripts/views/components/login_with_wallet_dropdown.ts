@@ -8,6 +8,8 @@ import app from 'state';
 import { ChainBase, ChainInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 
+import Token from 'controllers/chain/ethereum/token/adapter';
+
 // TODO: store ChainBase in the database, and check for substrate/cosmos chains instead
 const CHAINS_WITH_CLI = [
   'edgeware', 'kulupu', 'kusama', 'cosmos', 'edgeware-local', 'edgeware-testnet',
@@ -46,6 +48,7 @@ const LoginWithWalletDropdown: m.Component<{
     }).sort((a, b) => {
       return a.name.localeCompare(b.name);
     });
+
     const sortedChainsWithCLI = sortedChains.filter((chain) => CHAINS_WITH_CLI.indexOf(chain.id) !== -1);
 
     const getMenuItemForChain = (chain: ChainInfo, cli?: boolean) => m(MenuItem, {
@@ -78,7 +81,7 @@ const LoginWithWalletDropdown: m.Component<{
         });
       }
     });
-    const menuItems = (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== -1)
+    let menuItems = (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== -1)
       ? [
         getMenuItemForChain(app.chain.meta.chain),
         getMenuItemForChain(app.chain.meta.chain, true)

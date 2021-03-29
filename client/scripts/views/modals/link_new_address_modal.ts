@@ -33,6 +33,7 @@ import User, { UserBlock } from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
 import { formatAddressShort } from '../../../../shared/utils';
 import AddressSwapper from '../components/addresses/address_swapper';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithCLI,
@@ -69,18 +70,20 @@ const EthereumLinkAccountItem: m.Component<{
             jwt: app.user.jwt,
           });
 
-          if (result.exists) {
-            if (result.belongsToUser) {
-              notifyInfo('This address is already linked to your current account.');
-              vnode.state.linking = false;
-              return;
-            } else {
-              const modalMsg = 'This address is currently linked to another account. '
-                + 'Remove it from that account and transfer to yours?';
-              const confirmed = await confirmationModalWithText(modalMsg)();
-              if (!confirmed) {
+          if(!(app.chain && (app.chain as Token).isToken && (app.chain as Token).isUninitialized)) {
+            if (result.exists) {
+              if (result.belongsToUser) {
+                notifyInfo('This address is already linked to your current account.');
                 vnode.state.linking = false;
                 return;
+              } else {
+                const modalMsg = 'This address is currently linked to another account. '
+                  + 'Remove it from that account and transfer to yours?';
+                const confirmed = await confirmationModalWithText(modalMsg)();
+                if (!confirmed) {
+                  vnode.state.linking = false;
+                  return;
+                }
               }
             }
           }

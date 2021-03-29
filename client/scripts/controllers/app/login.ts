@@ -19,6 +19,7 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
@@ -99,19 +100,24 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
 }
 
 export async function updateActiveAddresses(chain?: ChainInfo) {
-  // update addresses for a chain (if provided) or for offchain communities (if null)
-  // for offchain communities, addresses on all chains are available by default
-  app.user.setActiveAccounts(
-    chain
-      ? app.user.addresses
-        .filter((a) => a.chain === chain.id)
-        .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
-        .filter((addr) => addr)
-      : app.user.addresses
-        .filter((addr) => app.config.chains.getById(addr.chain))
-        .map((addr) => app.community?.accounts.get(addr.address, addr.chain))
-        .filter((addr) => addr)
-  );
+  /*
+  if((chain as Token).isToken && (chain as Token).isUninitialized) {
+
+  } else {*/
+    // update addresses for a chain (if provided) or for offchain communities (if null)
+    // for offchain communities, addresses on all chains are available by default
+    app.user.setActiveAccounts(
+      chain
+        ? app.user.addresses
+          .filter((a) => a.chain === chain.id)
+          .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
+          .filter((addr) => addr)
+        : app.user.addresses
+          .filter((addr) => app.config.chains.getById(addr.chain))
+          .map((addr) => app.community?.accounts.get(addr.address, addr.chain))
+          .filter((addr) => addr)
+    );
+//  }
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {

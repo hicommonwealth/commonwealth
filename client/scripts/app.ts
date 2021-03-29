@@ -24,6 +24,8 @@ import LoginModal from 'views/modals/login_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
+import getTokenLists from 'views/pages/home/token_lists';
+
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/home');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
@@ -178,6 +180,39 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
   return true;
 }
 
+export async function createTemporaryTokenChain(n: NodeInfo): Promise<boolean> {
+  // Check for valid community selection, and that we need to switch
+  if (app.chain && n === app.chain.meta) return;
+
+  // Shut down old chain if applicable
+  await deinitChainOrCommunity();
+
+  // Begin initializing the community
+  //const newCommunity = new Community(c, app);
+  /*
+  const finalizeInitialization = await newCommunity.init();
+
+  // If the user is still in the initializing community, finalize the
+  // initialization; otherwise, abort and return false
+  if (!finalizeInitialization) {
+    return false;
+  } else {
+    app.community = newCommunity;
+  }*/
+
+  //app.community = newCommunity;
+
+  const newToken = new Token(n, app)
+  app.chain = newToken;
+
+  console.log(`${n.name.toUpperCase()} started.`);
+
+  // Redraw with community fully loaded and return true to indicate
+  // initialization has finalized.
+  m.redraw();
+  return true;
+}
+
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
@@ -198,7 +233,9 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   if (app.chain && n === app.chain.meta) {
     return;
   }
-  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1) {
+  if ((Object.values(ChainNetwork) as any).indexOf(n.chain.network) === -1
+    && n.chain.type !== "token"
+  ) {
     throw new Error('invalid chain');
   }
 
@@ -330,7 +367,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
-  } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
+  } else if (n.chain.type === "token") {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */
@@ -401,8 +438,12 @@ export async function initChain(): Promise<void> {
   app.isAdapterReady = true;
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
-  // Instantiate (again) to create chain-specific Account<> objects
-  await updateActiveAddresses(n.chain);
+  if (app.community) {
+    // Instantiate (again) to create chain-specific Account<> objects
+    await updateActiveAddresses(n.chain);
+  } else {
+    app.user.setActiveAccounts([])
+  }
 
   // Finish redraw to remove loading dialog
   m.redraw();
@@ -415,6 +456,40 @@ export function initCommunity(communityId: string): Promise<boolean> {
   } else {
     throw new Error(`No community found for '${communityId}'`);
   }
+}
+
+export async function initTemporaryTokenChain(address: string): Promise<boolean> {
+  // todo token list in localstorage
+  let tokenLists = await getTokenLists()
+  let token = tokenLists.find(o=>{ return o.address === address })
+
+  if(!token) { return false }
+
+  // Update active addresses w Ethereum address
+ // updateActiveAddresses(n.chain)
+
+  return createTemporaryTokenChain(
+    new NodeInfo(
+      0,
+      new ChainInfo (
+        token.address,
+        "",
+        token.symbol, 
+        token.name, 
+        token.logoURI, 
+        "",
+        "", 
+        "", 
+        "", 
+        "", 
+        "ethereum",
+        false, false, false, false, false, [], []  
+      ),
+      "",
+      token.address,
+      true
+    )
+  )
 }
 
 // set up route navigation
@@ -522,6 +597,8 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
+
+
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.

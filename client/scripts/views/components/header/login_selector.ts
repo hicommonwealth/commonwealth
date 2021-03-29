@@ -23,6 +23,7 @@ import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 import { setActiveAccount } from 'controllers/app/login';
+import Token from 'controllers/chain/ethereum/token/adapter';
 
 const CommunityLabel: m.Component<{
   chain?: ChainInfo,
@@ -101,7 +102,6 @@ const LoginSelector: m.Component<{
 }> = {
   view: (vnode) => {
     const { small } = vnode.attrs;
-
     if (!app.isLoggedIn()) return m('.LoginSelector', [
       m('.login-selector-user', [
         m(Button, {
@@ -115,10 +115,12 @@ const LoginSelector: m.Component<{
       ]),
     ]);
 
+    // TODO: figure out where this gets populated when page is loaded
     const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
       return app.user.getRoleInCommunity({
         account,
-        chain: app.activeChainId(),
+        chain: (app.chain as Token).isToken && (app.chain as Token).isUninitialized ?
+          "ethereum" : app.activeChainId(),
         community: app.activeCommunityId()
       });
     });
