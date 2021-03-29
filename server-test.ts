@@ -239,6 +239,24 @@ const resetServer = (debug=false): Promise<void> => {
       ];
       await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
 
+      // initialize chain event types
+      // we don't need to do this on regular reset, because incoming
+      // chain events create their own types, but for testing purposes
+      // we should have these pre-populated.
+      const initChainEventTypes = (chain) => {
+        return Promise.all(
+          SubstrateTypes.EventKinds.map((event_name) => {
+            return models['ChainEventType'].create({
+              id: `${chain}-${event_name}`,
+              chain,
+              event_name,
+            });
+          })
+        );
+      };
+
+      await initChainEventTypes('edgeware');
+
       if (debug) console.log('Database reset!');
       resolve();
     });
