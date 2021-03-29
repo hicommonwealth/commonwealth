@@ -143,6 +143,9 @@ export class SubstrateDemocracyReferendum
   private _endBlock: number;
   public readonly hash: string;
 
+  private _threshold;
+  public get threshold() { return this._threshold; }
+
   private _passed: boolean;
   public get passed() { return this._passed; }
 
@@ -202,6 +205,7 @@ export class SubstrateDemocracyReferendum
     this._Accounts = Accounts;
     this._Democracy = Democracy;
     this._endBlock = this.data.endBlock;
+    this._threshold = this.data.threshold;
     this.hash = eventData.proposalHash;
     this.createdAt = entity.createdAt;
 

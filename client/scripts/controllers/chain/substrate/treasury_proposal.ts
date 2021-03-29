@@ -124,7 +124,7 @@ export class SubstrateTreasuryProposal
     this.value = this._Chain.coins(this.data.value);
     this.bond = this._Chain.coins(this.data.bond);
     this.beneficiaryAddress = this.data.beneficiary;
-    this._author = this._Accounts.fromAddress(this.data.proposer);
+    this._author = this._Accounts.fromAddress(this.data.proposer || entity.author);
     this.title = entity.title || this.generateTitle();
     this.createdAt = entity.createdAt;
 

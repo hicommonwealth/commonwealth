@@ -23,8 +23,8 @@ import Marlin from 'controllers/chain/ethereum/marlin/adapter';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import ProposalsLoadingRow from 'views/components/proposals_loading_row';
-import ProposalRow from 'views/components/proposal_row';
+import LoadingRow from 'views/components/loading_row';
+import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 
 import NewProposalPage from 'views/pages/new_proposal/index';
@@ -55,7 +55,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
         ]),
         m('', [
           m('.stats-box-stat', [
-            'Next proposal becomes a referendum: ',
+            'Next proposal or motion becomes a referendum: ',
             (app.chain as Substrate).democracyProposals.nextLaunchBlock
               ? m(CountdownUntilBlock, {
                 block: (app.chain as Substrate).democracyProposals.nextLaunchBlock,
@@ -72,24 +72,27 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
 const MarlinProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
+    if (!(app.chain instanceof Marlin)) return;
 
-    return m(Grid, {
-      align: 'middle',
-      class: 'stats-container',
-      gutter: 5,
-      justify: 'space-between'
-    }, [
-      m(Col, { span: { xs: 6, md: 3 } }, [
-        m('.stats-tile', [
-          m('.stats-heading', 'Marlin Basics'),
-          m('.stats-tile-figure-major', [
-            `Quorum Votes: ${(app.chain as Marlin).governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} MPOND`
+    return m('.stats-box', [
+      m('.stats-box-left', '💭'),
+      m('.stats-box-right', [
+        m('', [
+          m('strong', 'Marlin Proposals'),
+          m('span', [
+            '', // TODO: fill in
           ]),
-          m('.stats-tile-figure-minor', [
-            `Proposal Threshold: ${(app.chain as Marlin).governance?.proposalThreshold.div(new BN('1000000000000000000')).toString()} MPOND`
+        ]),
+        m('', [
+          // TODO: We shouldn't be hardcoding these figures
+          m('.stats-box-stat', [
+            `Quorum: ${app.chain.governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} MPOND`
           ]),
-          m('.stats-tile-figure-minor', [
-            `Voting Period Length: ${(app.chain as Marlin).governance.votingPeriod.toString(10)}`,
+          m('.stats-box-stat', [
+            `Proposal Threshold: ${app.chain.governance?.proposalThreshold.div(new BN('1000000000000000000')).toString()} MPOND`
+          ]),
+          m('.stats-box-stat', [
+            `Voting Period Length: ${app.chain.governance.votingPeriod.toString(10)}`,
           ]),
         ]),
       ]),
@@ -130,7 +133,7 @@ const ProposalsPage: m.Component<{}> = {
     if (returningFromThread && localStorage[`${app.activeId()}-proposals-scrollY`]) {
       setTimeout(() => {
         window.scrollTo(0, Number(localStorage[`${app.activeId()}-proposals-scrollY`]));
-      }, 1);
+      }, 100);
     }
   },
   view: (vnode) => {
@@ -149,7 +152,7 @@ const ProposalsPage: m.Component<{}> = {
         message: 'Change Metamask to point to Ethereum Mainnet',
       });
       return m(PageLoading, {
-        message: 'Loading proposals',
+        message: 'Connecting to chain',
         title: [
           'Proposals',
           m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -167,7 +170,7 @@ const ProposalsPage: m.Component<{}> = {
       if (modules.some((mod) => !mod.ready)) {
         app.chain.loadModules(modules);
         return m(PageLoading, {
-          message: 'Connecting to chain',
+          message: 'Loading proposals',
           title: [
             'Proposals',
             m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -197,11 +200,11 @@ const ProposalsPage: m.Component<{}> = {
       && !activeMolochProposals?.length
       && !activeMarlinProposals?.length
       ? [ m('.no-proposals', 'No active proposals') ]
-      : (activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
-        .concat((activeCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((activeCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((activeMarlinProposals || []).map((proposal) => m(ProposalRow, { proposal })));
+      : (activeDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+        .concat((activeCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((activeMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })));
 
     // inactive proposals
     const inactiveDemocracyProposals = onSubstrate
@@ -224,11 +227,11 @@ const ProposalsPage: m.Component<{}> = {
       && !inactiveMolochProposals?.length
       && !inactiveMarlinProposals?.length
       ? [ m('.no-proposals', 'No past proposals') ]
-      : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal }))
-        .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })))
-        .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalRow, { proposal })));
+      : (inactiveDemocracyProposals || []).map((proposal) => m(ProposalCard, { proposal }))
+        .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalCard, { proposal })))
+        .concat((inactiveMarlinProposals || []).map((proposal) => m(ProposalCard, { proposal })));
 
 
     // XXX: display these
@@ -246,8 +249,17 @@ const ProposalsPage: m.Component<{}> = {
     }, [
       onSubstrate && m(SubstrateProposalStats),
       onMarlin && m(MarlinProposalStats),
-      m(Listing, { content: activeProposalContent }),
-      m(Listing, { content: inactiveProposalContent }),
+      m('.clear'),
+      m(Listing, {
+        content: activeProposalContent,
+        columnHeader: 'Active Proposals',
+      }),
+      m('.clear'),
+      m(Listing, {
+        content: inactiveProposalContent,
+        columnHeader: 'Inactive Proposals',
+      }),
+      m('.clear'),
     ]);
   }
 };

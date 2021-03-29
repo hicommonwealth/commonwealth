@@ -1,9 +1,12 @@
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import { pluralize } from 'helpers';
 import { Spinner } from 'construct-ui';
+
+import app from 'state';
+import { pluralize } from 'helpers';
 import { OffchainThread, Account } from 'models';
+
 import { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
 import ProfileProposal from './profile_proposal';
@@ -16,12 +19,28 @@ const ProfileContent: m.Component<{
   account: Account<any>,
   type: UserContent,
   content: any[],
+  localStorageScrollYKey: string,
 }, {
   count: number
   previousContent: any,
   onscroll;
 }> = {
   // TODO: Add typeguards to ProposalComments so we can avoid the dirty indexing here
+  oncreate: (vnode) => {
+    if (window.location.hash) {
+      const matches = window.location.hash.match(/#([0-9]+)/);
+      if (!matches || isNaN(+matches[1])) return;
+
+      vnode.state.count = +matches[1];
+      m.redraw();
+      const scrollY = localStorage[vnode.attrs.localStorageScrollYKey];
+      setTimeout(() => {
+        if (app.lastNavigatedBack() && Number(scrollY)) {
+          window.scrollTo(0, Number(scrollY));
+        }
+      }, 10);
+    }
+  },
   view: (vnode) => {
     const { account, type, content } = vnode.attrs;
 
@@ -29,13 +48,17 @@ const ProfileContent: m.Component<{
 
     if (newContent) {
       $(window).off('scroll');
-      vnode.state.count = 10;
+      if (!vnode.state.count) {
+        vnode.state.count = 10;
+      }
+      const thisUrl = m.route.get();
       vnode.state.onscroll = _.debounce(async () => {
         if (!postsRemaining(content.length, vnode.state.count)) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
-          vnode.state.count += 10;
+          vnode.state.count += 20;
+          if (m.route.get() === thisUrl) window.location.hash = vnode.state.count.toString();
           m.redraw();
         }
       }, 400);

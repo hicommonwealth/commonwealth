@@ -68,6 +68,7 @@
 }
 
 .login-selector-popover {
+    top: 1px !important;
     .cui-popover-content {
         padding: 0;
         .cui-menu.LoginSelectorMenu {

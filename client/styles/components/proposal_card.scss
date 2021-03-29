@@ -1,0 +1,42 @@
+@import 'client/styles/shared';
+
+.ProposalCard {
+    @include card;
+
+    .cui-tag {
+        font-weight: 600;
+        min-height: none;
+        height: 21px;
+    }
+    .proposal-title {
+        font-weight: 600;
+        line-height: 1.1;
+        margin: 9px 0 6px;
+    }
+    .proposal-amount,
+    .proposal-comments {
+        color: $text-color-light;
+    }
+    .proposal-action {
+        display: inline-block;
+        color: $text-color-light;
+        font-weight: 600;
+        font-size: 80%;
+        text-transform: uppercase;
+    }
+    .proposal-status {
+        position: absolute;
+        bottom: 14px;
+        // styling
+        font-weight: 600;
+        line-height: 1.1;
+        margin-bottom: 4px;
+        color: $text-color-black;
+        &.pass {
+            color: $positive-bg-color;
+        }
+        &.fail {
+            color: $negative-bg-color;
+        }
+    }
+}

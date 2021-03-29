@@ -22,7 +22,7 @@ import {
   AnyProposal,
 } from 'models';
 
-import { getStatusClass, getStatusText } from 'views/components/proposal_row';
+import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 import { notifySuccess } from 'controllers/app/notifications';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { confirmationModalWithText } from '../../modals/confirm_modal';

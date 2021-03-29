@@ -297,7 +297,6 @@ const QuillFormattedText : m.Component<{
             chunks.length <= 1 ? {} : index === 0 ? { position: 0 } : index === chunks.length - 1
               ? {} : { position: middle }
           );
-          console.log(text);
           return highlight ? m('mark', text) : m('span', text);
         });
       }

@@ -19,7 +19,6 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import ConvictionsChooser from 'views/components/proposals/convictions_chooser';
 import BalanceInfo from 'views/components/proposals/balance_info';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import Edgeware from 'controllers/chain/edgeware/main';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';

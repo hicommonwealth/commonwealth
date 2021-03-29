@@ -368,7 +368,7 @@ const LinkNewAddressModal: m.Component<{
             class: 'account-adder-placeholder',
             key: 'placeholder',
             intent: 'primary',
-            label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain' ],
+            label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ],
             disabled: true,
           }),
         ])
@@ -510,7 +510,7 @@ const LinkNewAddressModal: m.Component<{
                   : (vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected)
                     ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ]
                     : app.chain.networkStatus === ApiStatus.Disconnected
-                      ? 'Connecting to chain...'
+                      ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ]
                       : 'Connect to wallet'
             }),
           !app.chain.webWallet?.available && m('.get-wallet-text', [

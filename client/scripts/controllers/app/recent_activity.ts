@@ -47,13 +47,13 @@ class RecentActivityController {
 
   public get initialized() { return this._initialized; }
 
-  public setCommunityThreadCounts(community: string, count: number) {
-    if (Number.isNaN(count)) count = 0;
-    this._communityThreadCount[community] = count;
+  public setCommunityThreadCounts(community: string, count) {
+    if (Number.isNaN(+count) || !count) count = 0;
+    this._communityThreadCount[community] = +count;
   }
 
   public getCommunityThreadCount(community: string) {
-    return this._communityThreadCount[community];
+    return this._communityThreadCount[community] || 0;
   }
 
   public setMostActiveUsers(users) {
