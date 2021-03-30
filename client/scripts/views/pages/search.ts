@@ -33,7 +33,6 @@ export const search = _.debounce((searchTerm, vnode) => {
   vnode.state.searchLoading = true;
 
   searchThreads(searchTerm, SEARCH_PAGE_SIZE).then((threads) => {
-    console.log(threads);
     vnode.state.results = vnode.state.results.concat(threads.map((thread) => {
       thread.type = SearchType.Discussion;
       return thread;
@@ -46,7 +45,7 @@ export const search = _.debounce((searchTerm, vnode) => {
     m.redraw();
   });
 
-  searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE).then((addrs) => {
+  searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE, ['created_at', 'DESC']).then((addrs) => {
     vnode.state.results = vnode.state.results.concat(addrs.map((addr) => {
       addr.type = SearchType.Member;
       return addr;
@@ -62,6 +61,7 @@ export const search = _.debounce((searchTerm, vnode) => {
   getTokenLists().then((unfilteredTokens) => {
     const tokens = unfilteredTokens.filter((token) => token.name.includes(searchTerm));
     vnode.state.results = vnode.state.results.concat(tokens.map((token) => {
+      debugger
       token.type = SearchType.Community;
       return token;
     }));
@@ -174,6 +174,12 @@ const getDiscussionResult = (thread, searchTerm) => {
 const getListing = (state: any, results: any, searchTerm: string, type?: SearchType) => {
   const filter = type === SearchType.Top ? null : type;
   const tabScopedResults = (filter ? results.filter((res) => res.type === type) : results)
+    .sort((a, b) => {
+      const aCreatedAt = a.created_at || a.createdAt || a.verified;
+      const bCreatedAt = b.created_at || b.createdAt || b.verified;
+      if (!aCreatedAt) debugger
+      else return (bCreatedAt - aCreatedAt);
+    })
     .map((res) => {
       return res.type === SearchType.Discussion
         ? getDiscussionResult(res, searchTerm)
@@ -182,7 +188,8 @@ const getListing = (state: any, results: any, searchTerm: string, type?: SearchT
           : res.type === SearchType.Community
             ? getTokenResult(res)
             : null;
-    });
+    })
+    .slice(0, state.pageCount * 50);
   state.tabScopedResultCount = tabScopedResults.length;
   return tabScopedResults;
 };
@@ -197,6 +204,7 @@ const SearchPage : m.Component<{
   searchTerm: string,
   searchPrefix: string,
   overridePrefix: boolean,
+  pageCount: number,
   errorText: string
 }> = {
   view: (vnode) => {
@@ -220,20 +228,15 @@ const SearchPage : m.Component<{
       vnode.state.searchTerm = searchTerm;
       vnode.state.results = [];
       search(searchTerm, vnode);
-      console.log('loading 1');
       return LoadingPage;
     }
 
     if (vnode.state.searchLoading) {
-      console.log('loading 2');
       return LoadingPage;
     } else if (!vnode.state.results) {
-      console.log({ results: vnode.state.results });
       search(searchTerm, vnode);
       return;
     }
-
-    console.log({ results: vnode.state.results });
 
     // TODO: Add a Construct UI Tabs component for content types; use filtering
     // TODO: Sync up page result size, think through "all" results size vs type-sorted results size
@@ -241,6 +244,9 @@ const SearchPage : m.Component<{
 
     if (!vnode.state.activeTab) {
       vnode.state.activeTab = SearchType.Top;
+    }
+    if (!vnode.state.pageCount) {
+      vnode.state.pageCount = 1;
     }
 
     return m(Sublayout, {

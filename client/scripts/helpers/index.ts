@@ -245,7 +245,10 @@ export function renderMultilineText(text: string) {
 
 // Search
 
-export const searchThreads = async (searchTerm: string, limit: number = 50) => {
+export const searchThreads = async (
+  searchTerm: string,
+  limit: number = 50
+) => {
   const response = await $.get(`${app.serverUrl()}/search`, {
     chain: app.activeChainId(),
     community: app.activeCommunityId(),
@@ -254,21 +257,41 @@ export const searchThreads = async (searchTerm: string, limit: number = 50) => {
     results_size: limit,
   });
   if (response.status !== 'Success') {
-    throw new Error(`got unsuccessful status: ${response.status}`);
+    throw new Error(`Got unsuccessful status: ${response.status}`);
   }
   return response.result;
 };
 
-export const searchMentionableAddresses = async (searchTerm: string, limit: number = 6) => {
+export const searchMentionableAddresses = async (
+  searchTerm: string,
+  limit: number = 6,
+  order: string[] = ['name', 'ASC']
+) => {
   const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
     chain: app.activeChainId(),
     community: app.activeCommunityId(),
     limit,
     searchTerm,
-    order: ['name', 'ASC']
+    order,
   });
   if (response.status !== 'Success') {
-    throw new Error(`got unsuccessful status: ${response.status}`);
+    throw new Error(`Got unsuccessful status: ${response.status}`);
+  }
+  return response.result;
+};
+
+export const searchChainsAndCommunities = async (
+  searchTerm: string,
+  limit: number = 50,
+  order: string[] = ['created_at', 'DESC']
+) => {
+  const response = await $.get(`${app.serverUrl()}/searchChainsAndCommunities`, {
+    searchTerm,
+    limit,
+    order,
+  });
+  if (response.status !== 'Success') {
+    throw new Error(`Got unsuccessful status: ${response.status}`);
   }
   return response.result;
 };

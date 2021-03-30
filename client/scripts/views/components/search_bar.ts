@@ -35,7 +35,6 @@ const SearchBar : m.Component<{}, {
     }
 
     const { searchPrefix, overridePrefix, focused, searchTerm } = vnode.state;
-    console.log({ searchPrefix, overridePrefix });
     const contentLeft = (searchPrefix?.length && !overridePrefix)
       ? m('.search-prefix', searchPrefix) : null;
     const klass = vnode.state.focused ? '.SearchBar.focused' : '.SearchBar';
