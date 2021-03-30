@@ -171,9 +171,9 @@ const getDiscussionResult = (thread, searchTerm) => {
   ]);
 };
 
-const getListing = (results: any, searchTerm: string, type?: SearchType) => {
+const getListing = (state: any, results: any, searchTerm: string, type?: SearchType) => {
   const filter = type === SearchType.Top ? null : type;
-  return (filter ? results.filter((res) => res.type === type) : results)
+  const tabScopedResults = (filter ? results.filter((res) => res.type === type) : results)
     .map((res) => {
       return res.type === SearchType.Discussion
         ? getDiscussionResult(res, searchTerm)
@@ -183,12 +183,15 @@ const getListing = (results: any, searchTerm: string, type?: SearchType) => {
             ? getTokenResult(res)
             : null;
     });
+  state.tabScopedResultCount = tabScopedResults.length;
+  return tabScopedResults;
 };
 
 const SearchPage : m.Component<{
   results: any[]
 }, {
   activeTab: SearchType,
+  tabScopedResultCount: number,
   results: any[],
   searchLoading: boolean,
   searchTerm: string,
@@ -236,6 +239,10 @@ const SearchPage : m.Component<{
     // TODO: Sync up page result size, think through "all" results size vs type-sorted results size
     // (or re-querying)
 
+    if (!vnode.state.activeTab) {
+      vnode.state.activeTab = SearchType.Top;
+    }
+
     return m(Sublayout, {
       class: 'SearchPage',
       title: [
@@ -276,27 +283,27 @@ const SearchPage : m.Component<{
         m('.error-text', vnode.state.errorText),
       ]) : m('.search-results', [
         m('.search-results-caption', [
-          vnode.state.results.length === SEARCH_PAGE_SIZE
-            ? `${vnode.state.results.length}+ results`
-            : pluralize(vnode.state.results.length, 'result'),
+          vnode.state.tabScopedResultCount === SEARCH_PAGE_SIZE
+            ? `${vnode.state.tabScopedResultCount}+ results`
+            : pluralize(vnode.state.tabScopedResultCount, 'result'),
           ' for \'',
           vnode.state.searchTerm,
-          vnode.state.activeTab !== SearchType.Top && ' in ',
-          vnode.state.activeTab !== SearchType.Top && capitalize(vnode.state.activeTab),
           '\'',
+          ' in ',
+          vnode.state.activeTab === SearchType.Top
+            ? capitalize(app.activeId())
+            : capitalize(vnode.state.activeTab),
           m('a.search-results-clear', {
             href: '#',
             onclick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               vnode.state.results = null;
-              $('.search-page-input input').val('')
-                .select()
-                .focus();
             }
           }, 'Clear'),
         ]),
         m('.search-results-list', getListing(
+          vnode.state,
           vnode.state.results,
           vnode.state.searchTerm,
           vnode.state.activeTab

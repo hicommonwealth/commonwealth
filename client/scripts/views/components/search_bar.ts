@@ -1,6 +1,5 @@
 import 'pages/search.scss';
 
-import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
 import { Input } from 'construct-ui';
@@ -8,7 +7,7 @@ import { Input } from 'construct-ui';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 
-export enum SearchPrefixes {
+export enum SearchPrefix {
   COMMUNITY = 'comm:',
   MENTION = 'mention:',
   TOKEN = 'token:',
@@ -19,6 +18,7 @@ const SearchBar : m.Component<{}, {
   results: any[],
   searchLoading: boolean,
   searchTerm: string,
+  searchModified: boolean,
   searchPrefix: string,
   overridePrefix: boolean,
   errorText: string,
@@ -29,8 +29,15 @@ const SearchBar : m.Component<{}, {
       return;
     }
 
-    const contentLeft = (vnode.state.searchPrefix?.length && !vnode.state.overridePrefix)
-      ? m('.search-prefix', vnode.state.searchPrefix) : null;
+    if (m.route.param('q') && !vnode.state.searchModified) {
+      vnode.state.searchTerm = m.route.param('q');
+      vnode.state.searchPrefix = SearchPrefix.COMMUNITY;
+    }
+
+    const { searchPrefix, overridePrefix, focused, searchTerm } = vnode.state;
+    console.log({ searchPrefix, overridePrefix });
+    const contentLeft = (searchPrefix?.length && !overridePrefix)
+      ? m('.search-prefix', searchPrefix) : null;
     const klass = vnode.state.focused ? '.SearchBar.focused' : '.SearchBar';
 
     return m(klass, [
@@ -46,22 +53,25 @@ const SearchBar : m.Component<{}, {
         },
         onclick: (e) => {
           vnode.state.focused = true;
-          if (!vnode.state.overridePrefix) {
-            vnode.state.searchPrefix = SearchPrefixes.COMMUNITY;
+          if (!overridePrefix) {
+            vnode.state.searchPrefix = SearchPrefix.COMMUNITY;
           }
         },
         contentLeft,
         onkeyup: (e) => {
           if (e.key === 'Enter') {
-            const { searchTerm } = vnode.state;
             if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
               notifyError('Enter a valid search term');
               return;
             }
+            vnode.state.searchModified = false;
             m.route.set(`/${app.activeId()}/search?q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`);
           }
         },
         oninput: (e) => {
+          if (!vnode.state.searchModified) {
+            vnode.state.searchModified = true;
+          }
           vnode.state.searchTerm = e.target.value;
         }
       })
