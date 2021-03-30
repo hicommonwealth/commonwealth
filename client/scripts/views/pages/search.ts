@@ -175,10 +175,11 @@ const getListing = (state: any, results: any, searchTerm: string, type?: SearchT
   const filter = type === SearchType.Top ? null : type;
   const tabScopedResults = (filter ? results.filter((res) => res.type === type) : results)
     .sort((a, b) => {
-      const aCreatedAt = a.created_at || a.createdAt || a.verified;
-      const bCreatedAt = b.created_at || b.createdAt || b.verified;
-      if (!aCreatedAt) debugger
-      else return (bCreatedAt - aCreatedAt);
+      // TODO: Token-sorting approach
+      // Some users are not verified; we give them a default date of 1900
+      const aCreatedAt = moment(a.created_at || a.createdAt || a.verified || '1900-01-01T:00:00:00Z');
+      const bCreatedAt = moment(b.created_at || b.createdAt || b.verified || '1900-01-01T:00:00:00Z');
+      return bCreatedAt.diff(aCreatedAt);
     })
     .map((res) => {
       return res.type === SearchType.Discussion
@@ -190,7 +191,6 @@ const getListing = (state: any, results: any, searchTerm: string, type?: SearchT
             : null;
     })
     .slice(0, state.pageCount * 50);
-  state.tabScopedResultCount = tabScopedResults.length;
   return tabScopedResults;
 };
 
@@ -198,7 +198,6 @@ const SearchPage : m.Component<{
   results: any[]
 }, {
   activeTab: SearchType,
-  tabScopedResultCount: number,
   results: any[],
   searchLoading: boolean,
   searchTerm: string,
@@ -238,16 +237,19 @@ const SearchPage : m.Component<{
       return;
     }
 
-    // TODO: Add a Construct UI Tabs component for content types; use filtering
-    // TODO: Sync up page result size, think through "all" results size vs type-sorted results size
-    // (or re-querying)
-
     if (!vnode.state.activeTab) {
       vnode.state.activeTab = SearchType.Top;
     }
     if (!vnode.state.pageCount) {
       vnode.state.pageCount = 1;
     }
+
+    const tabScopedListing = getListing(
+      vnode.state,
+      vnode.state.results,
+      vnode.state.searchTerm,
+      vnode.state.activeTab
+    );
 
     return m(Sublayout, {
       class: 'SearchPage',
@@ -289,9 +291,9 @@ const SearchPage : m.Component<{
         m('.error-text', vnode.state.errorText),
       ]) : m('.search-results', [
         m('.search-results-caption', [
-          vnode.state.tabScopedResultCount === SEARCH_PAGE_SIZE
-            ? `${vnode.state.tabScopedResultCount}+ results`
-            : pluralize(vnode.state.tabScopedResultCount, 'result'),
+          tabScopedListing.length === SEARCH_PAGE_SIZE
+            ? `${tabScopedListing.length}+ results`
+            : pluralize(tabScopedListing.length, 'result'),
           ' for \'',
           vnode.state.searchTerm,
           '\'',
@@ -308,12 +310,7 @@ const SearchPage : m.Component<{
             }
           }, 'Clear'),
         ]),
-        m('.search-results-list', getListing(
-          vnode.state,
-          vnode.state.results,
-          vnode.state.searchTerm,
-          vnode.state.activeTab
-        )),
+        m('.search-results-list', tabScopedListing),
       ]),
     ]));
   }
