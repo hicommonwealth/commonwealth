@@ -105,57 +105,70 @@ const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
     const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
 
-    return m('.ProposalCard', {
-      onclick: (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-        m.route.set(proposalLink);
-      },
-    }, [
-      // tag
-      m(Tag, {
-        label: [
-          chainEntityTypeToProposalShortName(proposalSlugToChainEntityType(proposal.slug)),
-          ' ',
-          proposal.shortIdentifier,
-        ],
-        intent: 'primary',
-        rounded: true,
-        size: 'xs',
-      }),
-      // title
-      m('.proposal-title', proposal.title),
-      // metadata
-      proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value.format(true)),
-      proposal instanceof SubstrateDemocracyReferendum && m('.proposal-amount', proposal.threshold),
-      // // linked treasury proposals
-      // proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
-      //   && proposal.preimage?.method === 'approveProposal'
-      //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
-      // proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
-      //   && proposal.preimage?.method === 'approveProposal'
-      //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
-      // proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
-      //   && proposal.call?.method === 'approveProposal'
-      //   && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
-      // linked referenda
-      proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
-        && (() => {
-          const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
-          if (originatingProposalOrMotion instanceof SubstrateDemocracyProposal) {
-            return m('.proposal-action', [ 'Via PROP-', originatingProposalOrMotion.identifier ]);
-          } else if (originatingProposalOrMotion instanceof SubstrateCollectiveProposal) {
-            return m('.proposal-action', [ 'Via MOT-', originatingProposalOrMotion.identifier ]);
-          }
-        })(),
-      (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
-        && proposal.getReferendum()
-        && m('.proposal-action', [ 'Became REF-', proposal.getReferendum().identifier ]),
-      // comments
-      m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
-      // status
-      m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
+    return m('.ProposalCard', [
+      m('.proposal-card-top', {
+        onclick: (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
+          m.route.set(proposalLink);
+        },
+      }, [
+        // tag
+        m(Tag, {
+          label: [
+            chainEntityTypeToProposalShortName(proposalSlugToChainEntityType(proposal.slug)),
+            ' ',
+            proposal.shortIdentifier,
+          ],
+          intent: 'primary',
+          rounded: true,
+          size: 'xs',
+        }),
+        // title
+        m('.proposal-title', proposal.title),
+        // metadata
+        proposal instanceof SubstrateTreasuryProposal && m('.proposal-amount', proposal.value.format(true)),
+        proposal instanceof SubstrateDemocracyReferendum && m('.proposal-amount', proposal.threshold),
+        // // linked treasury proposals
+        // proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
+        //   && proposal.preimage?.method === 'approveProposal'
+        //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+        // proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
+        //   && proposal.preimage?.method === 'approveProposal'
+        //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+        // proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
+        //   && proposal.call?.method === 'approveProposal'
+        //   && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
+        // linked referenda
+        proposal instanceof SubstrateDemocracyReferendum && proposal.preimage
+          && (() => {
+            const originatingProposalOrMotion = proposal.getProposalOrMotion(proposal.preimage);
+            if (originatingProposalOrMotion instanceof SubstrateDemocracyProposal) {
+              return m('.proposal-action', [ 'Via PROP-', originatingProposalOrMotion.identifier ]);
+            } else if (originatingProposalOrMotion instanceof SubstrateCollectiveProposal) {
+              return m('.proposal-action', [ 'Via MOT-', originatingProposalOrMotion.identifier ]);
+            }
+          })(),
+        (proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateCollectiveProposal)
+          && proposal.getReferendum()
+          && m('.proposal-action', [ 'Became REF-', proposal.getReferendum().identifier ]),
+        // comments
+        m('.proposal-comments', pluralize(app.comments.nComments(proposal), 'comment')),
+        // status
+        m('.proposal-status', { class: getStatusClass(proposal) }, getStatusText(proposal, true)),
+      ]),
+      m('.proposal-card-bottom', {
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${app.activeId()}/proposal/discussion/${proposal.threadId}`);
+        }
+      }, [
+        // thread link
+        proposal.threadId ? m('.proposal-thread-link', [
+          m('a', { href: `/${app.activeId()}/proposal/discussion/${proposal.threadId}` }, 'Go to thread'),
+        ]) : m('.no-linked-thread', 'No linked thread'),
+      ]),
     ]);
   }
 };

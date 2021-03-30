@@ -208,6 +208,7 @@ export class SubstrateDemocracyReferendum
     this._threshold = this.data.threshold;
     this.hash = eventData.proposalHash;
     this.createdAt = entity.createdAt;
+    this.threadId = entity.threadId;
 
     // see if associated entity title exists, otherwise try to populate title with preimage
     const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
