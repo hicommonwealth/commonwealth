@@ -154,9 +154,9 @@ const User: m.Component<{
             profile
               ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
-              profile ? [
-                (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
-              ] : addrShort)
+            profile ? [
+              (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
+            ] : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
       friendlyChainName && m('.user-chain', friendlyChainName),
@@ -179,31 +179,47 @@ const User: m.Component<{
 };
 
 export const UserBlock: m.Component<{
-  user: Account<any> | AddressInfo,
+  user: Account<any> | AddressInfo | Profile,
   hideIdentityIcon?: boolean,
   popover?: boolean,
   showRole?: boolean,
   showAddressWithDisplayName?: boolean,
+  searchTerm?: string,
   hideOnchainRole?: boolean,
   selected?: boolean,
   compact?: boolean,
+  linkify?: boolean,
 }> = {
   view: (vnode) => {
     const {
-      user, hideIdentityIcon, popover, showRole, hideOnchainRole, showAddressWithDisplayName, selected, compact
+      user, hideIdentityIcon, popover, showRole, linkify,
+      showAddressWithDisplayName, searchTerm, selected, compact
     } = vnode.attrs;
 
     let profile;
     if (user instanceof AddressInfo) {
       if (!user.chain || !user.address) return;
       profile = app.profiles.getProfile(user.chain, user.address);
+    } else if (user instanceof Profile) {
+      profile = user;
     } else {
       profile = app.profiles.getProfile(user.chain.id, user.address);
     }
 
-    return m('.UserBlock', {
-      class: compact ? 'compact' : ''
-    }, [
+    const highlightSearchTerm = profile?.address
+      && searchTerm
+      && profile.address.includes(searchTerm);
+    const highlightedAddress = highlightSearchTerm ? (() => {
+      const sliceStart = profile.address.indexOf(searchTerm);
+      const sliceEnd = sliceStart + searchTerm.length;
+      return ([
+        m('span', profile.address.slice(0, sliceStart)),
+        m('b', profile.address.slice(sliceStart, sliceEnd)),
+        m('span', profile.address.slice(sliceEnd))
+      ]);
+    })() : null;
+
+    const children = [
       m('.user-block-left', [
         m(User, {
           user,
@@ -228,13 +244,23 @@ export const UserBlock: m.Component<{
         m('.user-block-address', {
           class: profile?.address ? '' : 'no-address',
         }, [
-          profile?.address && formatAddressShort(profile.address, profile.chain),
+          highlightSearchTerm ? highlightedAddress : formatAddressShort(profile.address, profile.chain),
         ]),
       ]),
       m('.user-block-right', [
         m('.user-block-selected', selected ? m(Icon, { name: Icons.CHECK }) : ''),
       ]),
-    ]);
+    ];
+
+    const userLink = profile
+      ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
+      : 'javascript:';
+
+    return linkify
+      ? link('.UserBlock', userLink, children)
+      : m('.UserBlock', {
+        class: compact ? 'compact' : ''
+      }, children);
   }
 };
 

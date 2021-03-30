@@ -106,17 +106,17 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           m.route.set(`/${app.activeId()}`);
         },
       }),
-      m(Button, {
-        rounded: true,
-        fluid: true,
-        active: onSearchPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-        label: 'Search',
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${app.activeId()}/search`);
-        },
-      }),
+      // m(Button, {
+      //   rounded: true,
+      //   fluid: true,
+      //   active: onSearchPage(m.route.get())
+      //     && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+      //   label: 'Search',
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     m.route.set(`/${app.activeId()}/search`);
+      //   },
+      // }),
       m(Button, {
         rounded: true,
         fluid: true,

@@ -63,6 +63,9 @@ const SearchBar : m.Component<{}, {
               notifyError('Enter a valid search term');
               return;
             }
+            if (searchTerm.length < 3) {
+              notifyError('Query must be at least 3 characters');
+            }
             vnode.state.searchModified = false;
             m.route.set(`/${app.activeId()}/search?q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`);
           }

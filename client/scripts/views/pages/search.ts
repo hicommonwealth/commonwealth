@@ -17,6 +17,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import getTokenLists from './home/token_lists';
 import { CommunityLabel } from '../components/sidebar/community_selector';
+import PageNotFound from './404';
 
 const SEARCH_DELAY = 750;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
@@ -64,7 +65,7 @@ export const search = async (searchTerm, vnode) => {
       });
 
       await getTokenLists().then((unfilteredTokens) => {
-        const tokens = unfilteredTokens.filter((token) => token.name.toLowerCase().includes(searchTerm));
+        const tokens = unfilteredTokens.filter((token) => token.name?.toLowerCase().includes(searchTerm));
         vnode.state.results = vnode.state.results.concat(tokens.map((token) => {
           token.contentType = ContentType.Token;
           token.searchType = SearchType.Community;
@@ -85,6 +86,7 @@ export const search = async (searchTerm, vnode) => {
       vnode.state.errorText = null;
       m.redraw();
     } catch (err) {
+      console.log('FETCHING ERROR');
       // TODO: Ensure error-catching operational
       vnode.state.searchLoading = false;
       vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
@@ -97,9 +99,10 @@ export const search = async (searchTerm, vnode) => {
 const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   return m('a.search-results-item', [
-    m(User, {
+    m(UserBlock, {
       user: profile,
       linkify: true,
+      searchTerm,
     })
   ]);
 };
@@ -252,7 +255,14 @@ const SearchPage : m.Component<{
       return LoadingPage;
     }
 
-    const searchTerm = m.route.param('q').toLowerCase();
+    const searchTerm = m.route.param('q')?.toLowerCase();
+    if (!searchTerm) {
+      vnode.state.errorText = 'Must enter query to begin searching';
+      return m(PageNotFound, {
+        title: 'Search',
+        message: 'Please enter query to begin searching'
+      });
+    }
 
     // re-fetch results for new search
     if (searchTerm !== vnode.state.searchTerm) {
@@ -264,7 +274,7 @@ const SearchPage : m.Component<{
 
     if (vnode.state.searchLoading) {
       return LoadingPage;
-    } else if (!vnode.state.results) {
+    } else if (!vnode.state.results && !vnode.state.errorText) {
       search(searchTerm, vnode);
       return;
     }
@@ -283,6 +293,7 @@ const SearchPage : m.Component<{
       vnode.state.activeTab
     );
 
+
     return m(Sublayout, {
       class: 'SearchPage',
       title: [
@@ -294,22 +305,34 @@ const SearchPage : m.Component<{
       m(TabItem, {
         label: capitalize(SearchType.Top) || 'test',
         active: vnode.state.activeTab === SearchType.Top,
-        onclick: () => { vnode.state.activeTab = SearchType.Top; },
+        onclick: () => {
+          vnode.state.pageCount = 1;
+          vnode.state.activeTab = SearchType.Top;
+        },
       }),
       m(TabItem, {
         label: capitalize(SearchType.Community) || 'test',
         active: vnode.state.activeTab === SearchType.Community,
-        onclick: () => { vnode.state.activeTab = SearchType.Community; },
+        onclick: () => {
+          vnode.state.pageCount = 1;
+          vnode.state.activeTab = SearchType.Community;
+        },
       }),
       m(TabItem, {
         label: capitalize(SearchType.Discussion) || 'test',
         active: vnode.state.activeTab === SearchType.Discussion,
-        onclick: () => { vnode.state.activeTab = SearchType.Discussion; },
+        onclick: () => {
+          vnode.state.pageCount = 1;
+          vnode.state.activeTab = SearchType.Discussion;
+        },
       }),
       m(TabItem, {
         label: capitalize(SearchType.Member) || 'test',
         active: vnode.state.activeTab === SearchType.Member,
-        onclick: () => { vnode.state.activeTab = SearchType.Member; },
+        onclick: () => {
+          vnode.state.pageCount = 1;
+          vnode.state.activeTab = SearchType.Member;
+        },
       }),
     ]),
     m('.search-results', [
@@ -333,14 +356,6 @@ const SearchPage : m.Component<{
           vnode.state.activeTab === SearchType.Top
             ? capitalize(app.activeId())
             : capitalize(vnode.state.activeTab),
-          m('a.search-results-clear', {
-            href: '#',
-            onclick: (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              vnode.state.results = null;
-            }
-          }, 'Clear'),
         ]),
         m('.search-results-list', tabScopedListing),
       ]),

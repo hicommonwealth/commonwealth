@@ -8,6 +8,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
+  QueryMissing: 'Must enter query to begin searching',
   QueryTooShort: 'Query must be at least 3 characters',
 };
 
@@ -29,6 +30,9 @@ const search = async (models, req: Request, res: Response, next: NextFunction) =
   replacements['searchTerm'] = req.query.search;
   replacements['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
 
+  if (!req.query.search) {
+    return next(new Error(Errors.QueryMissing));
+  }
   if (req.query.search.length < 3) {
     return next(new Error(Errors.QueryTooShort));
   }
