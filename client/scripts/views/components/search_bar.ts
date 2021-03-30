@@ -30,7 +30,7 @@ const SearchBar : m.Component<{}, {
     }
 
     if (m.route.param('q') && !vnode.state.searchModified) {
-      vnode.state.searchTerm = m.route.param('q');
+      vnode.state.searchTerm = m.route.param('q').toLowerCase();
       vnode.state.searchPrefix = SearchPrefix.COMMUNITY;
     }
 
@@ -47,7 +47,7 @@ const SearchBar : m.Component<{}, {
         defaultValue: m.route.param('q'),
         oncreate: (e) => {
           if ((e.dom?.children[0] as HTMLInputElement)?.value) {
-            vnode.state.searchTerm = (e.dom.children[0] as HTMLInputElement).value;
+            vnode.state.searchTerm = (e.dom.children[0] as HTMLInputElement).value.toLowerCase();
           }
         },
         onclick: (e) => {
@@ -71,7 +71,7 @@ const SearchBar : m.Component<{}, {
           if (!vnode.state.searchModified) {
             vnode.state.searchModified = true;
           }
-          vnode.state.searchTerm = e.target.value;
+          vnode.state.searchTerm = e.target.value?.toLowerCase();
         }
       })
     ]);

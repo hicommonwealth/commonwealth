@@ -3,11 +3,9 @@ import Sequelize from 'sequelize';
 const { Op } = Sequelize;
 
 const DEFAULT_SEARCH_LIMIT = 50;
-const DEFAULT_ORDER = ['created_at', 'DESC'];
 
 const getCommunitiesAndChains = async (models, req: Request, res: Response, next: NextFunction) => {
   const params = {
-    order: req.query.order ? [req.query.order] : [DEFAULT_ORDER],
     limit: req.query.limit ? req.query.limit : DEFAULT_SEARCH_LIMIT
   };
   if (req.query.searchTerm) {

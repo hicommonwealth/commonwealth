@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
 
-export const searchThreads = async (
+export const searchDiscussions = async (
   searchTerm: string,
   limit: number = 50
 ) => {
@@ -39,12 +39,10 @@ export const searchMentionableAddresses = async (
 export const searchChainsAndCommunities = async (
   searchTerm: string,
   limit: number = 50,
-  order: string[] = ['created_at', 'DESC']
 ) => {
   const response = await $.get(`${app.serverUrl()}/getCommunitiesAndChains`, {
     searchTerm,
     limit,
-    order,
   });
   if (response.status !== 'Success') {
     throw new Error(`Got unsuccessful status: ${response.status}`);

@@ -3,10 +3,10 @@ import 'pages/search.scss';
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment-twitter';
-import { Tabs, Spinner, TabItem, Tag } from 'construct-ui';
+import { Tabs, Spinner, TabItem, Tag, ListItem } from 'construct-ui';
 
 import { pluralize } from 'helpers';
-import { searchMentionableAddresses, searchThreads, searchChainsAndCommunities } from 'helpers/search';
+import { searchMentionableAddresses, searchDiscussions, searchChainsAndCommunities } from 'helpers/search';
 import app from 'state';
 import { AddressInfo, Profile } from 'models';
 
@@ -16,10 +16,12 @@ import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import getTokenLists from './home/token_lists';
+import { CommunityLabel } from '../components/sidebar/community_selector';
 
 const SEARCH_DELAY = 750;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
+// TODO
 const searchCache = {}; // only used to restore search results when returning to the page
 
 export enum SearchType {
@@ -29,47 +31,57 @@ export enum SearchType {
   Top = 'top',
 }
 
+export enum ContentType {
+  Thread = 'thread',
+  Comment = 'comment',
+  Community = 'community',
+  Chain = 'chain',
+  Token = 'token',
+  Member = 'member'
+}
+
 export const search = async (searchTerm, vnode) => {
   vnode.state.searchLoading = true;
 
   (async () => {
     try {
-      await searchThreads(searchTerm, SEARCH_PAGE_SIZE).then((threads) => {
-        vnode.state.results = vnode.state.results.concat(threads.map((thread) => {
-          thread.type = SearchType.Discussion;
-          return thread;
+      await searchDiscussions(searchTerm, SEARCH_PAGE_SIZE).then((discussions) => {
+        vnode.state.results = vnode.state.results.concat(discussions.map((discussion) => {
+          discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
+          discussion.searchType = SearchType.Discussion;
+          return discussion;
         }));
-        vnode.state.searchLoading = false;
         m.redraw();
       });
 
       await searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE, ['created_at', 'DESC']).then((addrs) => {
         vnode.state.results = vnode.state.results.concat(addrs.map((addr) => {
-          addr.type = SearchType.Member;
+          addr.contentType = ContentType.Member;
+          addr.searchType = SearchType.Member;
           return addr;
         }));
-        vnode.state.searchLoading = false;
-        m.redraw();
-      }).catch((err: any) => {
-        vnode.state.searchLoading = false;
-        vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
         m.redraw();
       });
 
       await getTokenLists().then((unfilteredTokens) => {
-        const tokens = unfilteredTokens.filter((token) => token.name.includes(searchTerm));
+        const tokens = unfilteredTokens.filter((token) => token.name.toLowerCase().includes(searchTerm));
         vnode.state.results = vnode.state.results.concat(tokens.map((token) => {
-          token.type = SearchType.Community;
+          token.contentType = ContentType.Token;
+          token.searchType = SearchType.Community;
           return token;
         }));
       });
 
       await searchChainsAndCommunities(searchTerm, SEARCH_PAGE_SIZE).then((comms) => {
-        vnode.state.results = vnode.state.results.concat(comms.map((comm) => {
-          comm.type = SearchType.Community;
-          return comm;
+        vnode.state.results = vnode.state.results.concat(comms.map((commOrChain) => {
+          commOrChain.contentType = commOrChain.created_at ? ContentType.Community : ContentType.Chain;
+          commOrChain.searchType = SearchType.Community;
+          return commOrChain;
         }));
       });
+
+      vnode.state.searchLoading = false;
+      vnode.state.errorText = null;
     } catch (err) {
       // TODO: Ensure error-catching operational
       vnode.state.searchLoading = false;
@@ -79,7 +91,8 @@ export const search = async (searchTerm, vnode) => {
   })();
 };
 
-const getUserResult = (addr, searchTerm) => {
+// TODO: Linkification of users, tokens, comms results
+const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   return m('a.search-results-item', [
     m(User, {
@@ -89,20 +102,34 @@ const getUserResult = (addr, searchTerm) => {
   ]);
 };
 
-const getTokenResult = (token) => {
-  return m('a.search-results-item', [
-    m('img', {
-      src: token.logoURI,
-      height: '15px',
-      width: '15px'
-    }),
-    m('span', token.name)
-  ]);
+const getCommunityResult = (community) => {
+  if (community.contentType === ContentType.Token) {
+    return m('a.search-results-item', [
+      m('img', {
+        src: community.logoURI,
+        height: '15px',
+        width: '15px'
+      }),
+      m('span', community.name)
+    ]);
+  } else if (community.contentType === ContentType.Chain
+    || community.contentType === ContentType.Community) {
+    return m('a.search-results-item', {
+      href: '#',
+      onclick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        m.route.set(community.id ? `/${community.id}` : '/');
+      }
+    }, [
+      m(CommunityLabel, { community })
+    ]);
+  }
 };
 
 const getDiscussionResult = (thread, searchTerm) => {
+  // TODO: Separate threads, proposals, and comments
   const activeId = app.activeId();
-  const proposalType = thread.proposalType;
   const proposalId = thread.proposalid;
   return m('a.search-results-item', {
     href: (thread.type === 'thread')
@@ -182,9 +209,9 @@ const getDiscussionResult = (thread, searchTerm) => {
   ]);
 };
 
-const getListing = (state: any, results: any, searchTerm: string, type?: SearchType) => {
-  const filter = type === SearchType.Top ? null : type;
-  const tabScopedResults = (filter ? results.filter((res) => res.type === type) : results)
+const getListing = (state: any, results: any, searchTerm: string, searchType?: SearchType) => {
+  const filter = searchType === SearchType.Top ? null : searchType;
+  const tabScopedResults = (filter ? results.filter((res) => res.searchType === searchType) : results)
     .sort((a, b) => {
       // TODO: Token-sorting approach
       // Some users are not verified; we give them a default date of 1900
@@ -193,12 +220,12 @@ const getListing = (state: any, results: any, searchTerm: string, type?: SearchT
       return bCreatedAt.diff(aCreatedAt);
     })
     .map((res) => {
-      return res.type === SearchType.Discussion
+      return res.searchType === SearchType.Discussion
         ? getDiscussionResult(res, searchTerm)
-        : res.type === SearchType.Member
-          ? getUserResult(res, searchTerm)
-          : res.type === SearchType.Community
-            ? getTokenResult(res)
+        : res.searchType === SearchType.Member
+          ? getMemberResult(res, searchTerm)
+          : res.searchType === SearchType.Community
+            ? getCommunityResult(res)
             : null;
     })
     .slice(0, state.pageCount * 50);
@@ -231,7 +258,7 @@ const SearchPage : m.Component<{
       return LoadingPage;
     }
 
-    const searchTerm = m.route.param('q');
+    const searchTerm = m.route.param('q').toLowerCase();
 
     // re-fetch results for new search
     if (searchTerm !== vnode.state.searchTerm) {
