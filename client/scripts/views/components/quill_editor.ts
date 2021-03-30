@@ -1,6 +1,6 @@
 import 'components/quill_editor.scss';
 
-import m, { VnodeDOM } from 'mithril';
+import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment-twitter';
@@ -12,12 +12,12 @@ import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import QuillMention from 'quill-mention';
 
 import app from 'state';
-import { loadScript, searchMentionableAddresses } from 'helpers';
+import { loadScript } from 'helpers';
+import { searchMentionableAddresses } from 'helpers/search';
 import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
-import { Profile, RolePermission } from 'models';
-import User from 'views/components/widgets/user';
+import { Profile } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PreviewModal from 'views/modals/preview_modal';
 

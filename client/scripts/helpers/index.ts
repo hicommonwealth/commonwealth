@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment-twitter';
 
@@ -242,59 +241,6 @@ export function renderMultilineText(text: string) {
   return paragraphs
     .map((p) => m('p', p));
 }
-
-// Search
-
-export const searchThreads = async (
-  searchTerm: string,
-  limit: number = 50
-) => {
-  const response = await $.get(`${app.serverUrl()}/search`, {
-    chain: app.activeChainId(),
-    community: app.activeCommunityId(),
-    cutoff_date: null, // cutoffDate.toISOString(),
-    search: searchTerm,
-    results_size: limit,
-  });
-  if (response.status !== 'Success') {
-    throw new Error(`Got unsuccessful status: ${response.status}`);
-  }
-  return response.result;
-};
-
-export const searchMentionableAddresses = async (
-  searchTerm: string,
-  limit: number = 6,
-  order: string[] = ['name', 'ASC']
-) => {
-  const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-    chain: app.activeChainId(),
-    community: app.activeCommunityId(),
-    limit,
-    searchTerm,
-    order,
-  });
-  if (response.status !== 'Success') {
-    throw new Error(`Got unsuccessful status: ${response.status}`);
-  }
-  return response.result;
-};
-
-export const searchChainsAndCommunities = async (
-  searchTerm: string,
-  limit: number = 50,
-  order: string[] = ['created_at', 'DESC']
-) => {
-  const response = await $.get(`${app.serverUrl()}/searchChainsAndCommunities`, {
-    searchTerm,
-    limit,
-    order,
-  });
-  if (response.status !== 'Success') {
-    throw new Error(`Got unsuccessful status: ${response.status}`);
-  }
-  return response.result;
-};
 
 /*
  * blocknum helpers

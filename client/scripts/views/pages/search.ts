@@ -1,12 +1,12 @@
 import 'pages/search.scss';
 
-import $ from 'jquery';
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment-twitter';
 import { Tabs, Spinner, TabItem, Tag } from 'construct-ui';
 
-import { pluralize, searchMentionableAddresses, searchThreads } from 'helpers';
+import { pluralize } from 'helpers';
+import { searchMentionableAddresses, searchThreads, searchChainsAndCommunities } from 'helpers/search';
 import app from 'state';
 import { AddressInfo, Profile } from 'models';
 
@@ -29,44 +29,55 @@ export enum SearchType {
   Top = 'top',
 }
 
-export const search = _.debounce((searchTerm, vnode) => {
+export const search = async (searchTerm, vnode) => {
   vnode.state.searchLoading = true;
 
-  searchThreads(searchTerm, SEARCH_PAGE_SIZE).then((threads) => {
-    vnode.state.results = vnode.state.results.concat(threads.map((thread) => {
-      thread.type = SearchType.Discussion;
-      return thread;
-    }));
-    vnode.state.searchLoading = false;
-    m.redraw();
-  }).catch((err: any) => {
-    vnode.state.searchLoading = false;
-    vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
-    m.redraw();
-  });
+  (async () => {
+    try {
+      await searchThreads(searchTerm, SEARCH_PAGE_SIZE).then((threads) => {
+        vnode.state.results = vnode.state.results.concat(threads.map((thread) => {
+          thread.type = SearchType.Discussion;
+          return thread;
+        }));
+        vnode.state.searchLoading = false;
+        m.redraw();
+      });
 
-  searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE, ['created_at', 'DESC']).then((addrs) => {
-    vnode.state.results = vnode.state.results.concat(addrs.map((addr) => {
-      addr.type = SearchType.Member;
-      return addr;
-    }));
-    vnode.state.searchLoading = false;
-    m.redraw();
-  }).catch((err: any) => {
-    vnode.state.searchLoading = false;
-    vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
-    m.redraw();
-  });
+      await searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE, ['created_at', 'DESC']).then((addrs) => {
+        vnode.state.results = vnode.state.results.concat(addrs.map((addr) => {
+          addr.type = SearchType.Member;
+          return addr;
+        }));
+        vnode.state.searchLoading = false;
+        m.redraw();
+      }).catch((err: any) => {
+        vnode.state.searchLoading = false;
+        vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
+        m.redraw();
+      });
 
-  getTokenLists().then((unfilteredTokens) => {
-    const tokens = unfilteredTokens.filter((token) => token.name.includes(searchTerm));
-    vnode.state.results = vnode.state.results.concat(tokens.map((token) => {
-      debugger
-      token.type = SearchType.Community;
-      return token;
-    }));
-  });
-}, SEARCH_DELAY);
+      await getTokenLists().then((unfilteredTokens) => {
+        const tokens = unfilteredTokens.filter((token) => token.name.includes(searchTerm));
+        vnode.state.results = vnode.state.results.concat(tokens.map((token) => {
+          token.type = SearchType.Community;
+          return token;
+        }));
+      });
+
+      await searchChainsAndCommunities(searchTerm, SEARCH_PAGE_SIZE).then((comms) => {
+        vnode.state.results = vnode.state.results.concat(comms.map((comm) => {
+          comm.type = SearchType.Community;
+          return comm;
+        }));
+      });
+    } catch (err) {
+      // TODO: Ensure error-catching operational
+      vnode.state.searchLoading = false;
+      vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
+      m.redraw();
+    }
+  })();
+};
 
 const getUserResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
