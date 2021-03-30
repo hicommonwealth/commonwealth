@@ -208,14 +208,20 @@ export const UserBlock: m.Component<{
 
     const highlightSearchTerm = profile?.address
       && searchTerm
-      && profile.address.includes(searchTerm);
+      && profile.address.toLowerCase().includes(searchTerm);
     const highlightedAddress = highlightSearchTerm ? (() => {
-      const sliceStart = profile.address.indexOf(searchTerm);
-      const sliceEnd = sliceStart + searchTerm.length;
+      const isNear = profile.address.chain === 'near';
+      const queryStart = profile.address.toLowerCase().indexOf(searchTerm);
+      const queryEnd = queryStart + searchTerm.length;
+      const addrStart = isNear ? 0 : Math.max(queryStart - 3, 0);
+      const addrEnd = isNear ? profile.address.length : Math.min(profile.address.length, queryEnd + 3);
+      console.log({ addr: profile.address, searchTerm });
       return ([
-        m('span', profile.address.slice(0, sliceStart)),
-        m('b', profile.address.slice(sliceStart, sliceEnd)),
-        m('span', profile.address.slice(sliceEnd))
+        !isNear && addrStart !== 0 &&  m('span', '…'),
+        m('span', profile.address.slice(addrStart, queryStart)),
+        m('b', profile.address.slice(queryStart, queryEnd)),
+        m('span', profile.address.slice(queryEnd, addrEnd)),
+        !isNear && addrEnd !== profile.address.length &&  m('span', '…'),
       ]);
     })() : null;
 
