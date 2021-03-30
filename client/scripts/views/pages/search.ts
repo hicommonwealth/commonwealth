@@ -5,7 +5,7 @@ import _, { capitalize } from 'lodash';
 import moment from 'moment-twitter';
 import { Tabs, Spinner, TabItem, Tag, ListItem } from 'construct-ui';
 
-import { pluralize } from 'helpers';
+import { link, pluralize } from 'helpers';
 import { searchMentionableAddresses, searchDiscussions, searchChainsAndCommunities } from 'helpers/search';
 import app from 'state';
 import { AddressInfo, Profile } from 'models';
@@ -80,8 +80,10 @@ export const search = async (searchTerm, vnode) => {
         }));
       });
 
+      console.log('loading over');
       vnode.state.searchLoading = false;
       vnode.state.errorText = null;
+      m.redraw();
     } catch (err) {
       // TODO: Ensure error-catching operational
       vnode.state.searchLoading = false;
@@ -104,26 +106,26 @@ const getMemberResult = (addr, searchTerm) => {
 
 const getCommunityResult = (community) => {
   if (community.contentType === ContentType.Token) {
-    return m('a.search-results-item', [
-      m('img', {
-        src: community.logoURI,
-        height: '15px',
-        width: '15px'
-      }),
-      m('span', community.name)
-    ]);
+    // TODO: Linkification of tokens
+    return link(
+      'a.search-results-item',
+      '#',
+      [
+        m('img', {
+          src: community.logoURI,
+          height: '15px',
+          width: '15px'
+        }),
+        m('span', community.name)
+      ]
+    );
   } else if (community.contentType === ContentType.Chain
     || community.contentType === ContentType.Community) {
-    return m('a.search-results-item', {
-      href: '#',
-      onclick: (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        m.route.set(community.id ? `/${community.id}` : '/');
-      }
-    }, [
+    return link(
+      'a.search-results-item',
+      community.id ? `/${community.id}` : '/',
       m(CommunityLabel, { community })
-    ]);
+    );
   }
 };
 
@@ -131,82 +133,74 @@ const getDiscussionResult = (thread, searchTerm) => {
   // TODO: Separate threads, proposals, and comments
   const activeId = app.activeId();
   const proposalId = thread.proposalid;
-  return m('a.search-results-item', {
-    href: (thread.type === 'thread')
+  return link('a.search-results-item',
+    (thread.type === 'thread')
       ? `/${activeId}/proposal/discussion/${proposalId}`
-      : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`,
-    onclick: (e) => {
-      e.preventDefault();
-      m.route.set(
-        thread.type === 'thread'
-          ? `/${activeId}/proposal/discussion/${proposalId}`
-          : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`
-      );
-    }
-  }, [
-    thread.type === 'thread' ? [
-      m('.search-results-thread-title', [
-        decodeURIComponent(thread.title),
-      ]),
-      m('.search-results-thread-subtitle', [
-        m('span.created-at', moment(thread.created_at).fromNow()),
-        m(User, { user: new AddressInfo(thread.address_id, thread.address, thread.address_chain, null) }),
-      ]),
-      m('.search-results-thread-body', [
-        (() => {
-          try {
-            const doc = JSON.parse(decodeURIComponent(thread.body));
-            if (!doc.ops) throw new Error();
-            return m(QuillFormattedText, {
-              doc,
-              hideFormatting: true,
-              collapse: true,
-              searchTerm,
-            });
-          } catch (e) {
-            const doc = decodeURIComponent(thread.body);
-            return m(MarkdownFormattedText, {
-              doc,
-              hideFormatting: true,
-              collapse: true,
-              searchTerm,
-            });
-          }
-        })(),
-      ])
-    ] : [
-      m('.search-results-thread-title', [
-        'Comment on ',
-        decodeURIComponent(thread.title),
-      ]),
-      m('.search-results-thread-subtitle', [
-        m('span.created-at', moment(thread.created_at).fromNow()),
-        m(User, { user: new AddressInfo(thread.address_id, thread.address, thread.address_chain, null) }),
-      ]),
-      m('.search-results-comment', [
-        (() => {
-          try {
-            const doc = JSON.parse(decodeURIComponent(thread.body));
-            if (!doc.ops) throw new Error();
-            return m(QuillFormattedText, {
-              doc,
-              hideFormatting: true,
-              collapse: true,
-              searchTerm,
-            });
-          } catch (e) {
-            const doc = decodeURIComponent(thread.body);
-            return m(MarkdownFormattedText, {
-              doc,
-              hideFormatting: true,
-              collapse: true,
-              searchTerm,
-            });
-          }
-        })(),
-      ]),
-    ]
-  ]);
+      : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`, 
+    [
+      thread.type === 'thread' ? [
+        m('.search-results-thread-title', [
+          decodeURIComponent(thread.title),
+        ]),
+        m('.search-results-thread-subtitle', [
+          m('span.created-at', moment(thread.created_at).fromNow()),
+          m(User, { user: new AddressInfo(thread.address_id, thread.address, thread.address_chain, null) }),
+        ]),
+        m('.search-results-thread-body', [
+          (() => {
+            try {
+              const doc = JSON.parse(decodeURIComponent(thread.body));
+              if (!doc.ops) throw new Error();
+              return m(QuillFormattedText, {
+                doc,
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
+            } catch (e) {
+              const doc = decodeURIComponent(thread.body);
+              return m(MarkdownFormattedText, {
+                doc,
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
+            }
+          })(),
+        ])
+      ] : [
+        m('.search-results-thread-title', [
+          'Comment on ',
+          decodeURIComponent(thread.title),
+        ]),
+        m('.search-results-thread-subtitle', [
+          m('span.created-at', moment(thread.created_at).fromNow()),
+          m(User, { user: new AddressInfo(thread.address_id, thread.address, thread.address_chain, null) }),
+        ]),
+        m('.search-results-comment', [
+          (() => {
+            try {
+              const doc = JSON.parse(decodeURIComponent(thread.body));
+              if (!doc.ops) throw new Error();
+              return m(QuillFormattedText, {
+                doc,
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
+            } catch (e) {
+              const doc = decodeURIComponent(thread.body);
+              return m(MarkdownFormattedText, {
+                doc,
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
+            }
+          })(),
+        ]),
+      ]
+    ]);
 };
 
 const getListing = (state: any, results: any, searchTerm: string, searchType?: SearchType) => {
@@ -249,7 +243,7 @@ const SearchPage : m.Component<{
       narrow: true,
       showNewProposalButton: true,
       title: [
-        'Search Discussions ',
+        'Search ',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
     });
@@ -292,7 +286,7 @@ const SearchPage : m.Component<{
     return m(Sublayout, {
       class: 'SearchPage',
       title: [
-        'Search Discussions ',
+        'Search ',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,
