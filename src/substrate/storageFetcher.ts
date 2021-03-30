@@ -277,7 +277,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   }
 
   public async fetchBounties(blockNumber: number): Promise<CWEvent<ITreasuryBountyEvents>[]> { // TODO: List all relevant events explicitly?
-    if (!this._api.query.treasury) {
+    if (!this._api.query.treasury?.bountyCount && !this._api.query.bounties?.bountyCount) {
       log.info('Bounties module not detected.');
       return [];
     }
