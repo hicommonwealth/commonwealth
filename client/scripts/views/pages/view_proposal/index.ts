@@ -42,7 +42,7 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
-  ProposalHeaderThreadLinkedChainEntity,
+  ProposalHeaderThreadLink, ProposalHeaderThreadLinkedChainEntity,
   ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage, ProposalHeaderStageEditorButton,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyMenuItems,
@@ -234,12 +234,13 @@ const ProposalHeader: m.Component<{
               && proposal.chainEntities.map((chainEntity) => {
                 return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
               }),
-            (proposal['blockExplorerLink'] || proposal['votingInterfaceLink']) && m('.proposal-body-link', [
-              proposal['blockExplorerLink']
-                && m(ProposalHeaderBlockExplorerLink, { proposal }),
-              proposal['votingInterfaceLink']
-                && m(ProposalHeaderVotingInterfaceLink, { proposal }),
-            ]),
+            !(proposal instanceof OffchainThread)
+              && (proposal['blockExplorerLink'] || proposal['votingInterfaceLink'] || proposal.threadId)
+              && m('.proposal-body-link', [
+                proposal.threadId && m(ProposalHeaderThreadLink, { proposal }),
+                proposal['blockExplorerLink'] && m(ProposalHeaderBlockExplorerLink, { proposal }),
+                proposal['votingInterfaceLink'] && m(ProposalHeaderVotingInterfaceLink, { proposal }),
+              ]),
           ]),
         ]),
       ]),
