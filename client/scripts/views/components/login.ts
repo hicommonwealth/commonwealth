@@ -6,7 +6,7 @@ import { Button, Input, Form, FormGroup } from 'construct-ui';
 import app from 'state';
 import { loginWithMagicLink } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
-import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
+import LoginWeb3Buttons from 'views/components/login_web3_buttons';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
 const exitWithMagicLoginComplete = () => {
@@ -212,7 +212,7 @@ const Login: m.Component<{}, {
         ]),
         m(Form, { gutter: 10 }, [
           m(FormGroup, { span: 12 }, [
-            m(LoginWithWalletDropdown, {
+            m(LoginWeb3Buttons, {
               label: 'Continue with wallet',
               joiningChain: null,
               joiningCommunity: null,

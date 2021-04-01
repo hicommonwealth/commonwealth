@@ -11,7 +11,7 @@ import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
+import LoginWeb3Buttons from 'views/components/login_web3_buttons';
 import { formatAddressShort } from '../../../../shared/utils';
 
 const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean }> = {
@@ -134,7 +134,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           disabled: vnode.state.selectedIndex === undefined || vnode.state.loading,
           onclick: createRole.bind(this),
         }),
-        m(LoginWithWalletDropdown, {
+        m(LoginWeb3Buttons, {
           loggingInWithAddress: false,
           joiningCommunity: app.activeCommunityId(),
           joiningChain: app.activeChainId(),
