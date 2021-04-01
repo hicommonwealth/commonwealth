@@ -111,7 +111,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
           e.stopPropagation();
           e.preventDefault();
           localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-          m.route.set(proposalLink);
+          m.route.set(proposalLink); // avoid resetting scroll point
         },
       }, [
         // tag
@@ -161,7 +161,9 @@ const ProposalCard: m.Component<{ proposal: AnyProposal }> = {
       m('.proposal-card-bottom', {
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeId()}/proposal/discussion/${proposal.threadId}`);
+          if (proposal?.threadId) {
+            m.route.set(`/${app.activeId()}/proposal/discussion/${proposal.threadId}`);
+          }
         }
       }, [
         // thread link
