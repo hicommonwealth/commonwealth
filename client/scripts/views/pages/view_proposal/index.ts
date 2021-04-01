@@ -582,13 +582,16 @@ const ViewProposalPage: m.Component<{
           }
           // check if module is still initializing
           const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
+          if (!c) {
+            return m(PageNotFound, { message: 'Invalid proposal type' });
+          }
           if (!c.ready) {
             app.chain.loadModules([ c ]);
             return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
           }
         }
         // proposal does not exist, 404
-        return m(PageNotFound);
+        return m(PageNotFound, { message: 'Proposal not found' });
       }
     }
     const { proposal } = vnode.state;
