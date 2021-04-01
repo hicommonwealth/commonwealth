@@ -213,7 +213,6 @@ const Login: m.Component<{}, {
         m(Form, { gutter: 10 }, [
           m(FormGroup, { span: 12 }, [
             m(LoginWeb3Buttons, {
-              label: 'Continue with wallet',
               joiningChain: null,
               joiningCommunity: null,
               loggingInWithAddress: true,

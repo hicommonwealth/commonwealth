@@ -138,7 +138,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           loggingInWithAddress: false,
           joiningCommunity: app.activeCommunityId(),
           joiningChain: app.activeChainId(),
-          label: 'Connect a new address',
           onSuccess: () => {
             $('.SelectAddressModal').trigger('modalexit');
             notifySuccess('New address connected!');

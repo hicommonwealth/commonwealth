@@ -15,7 +15,6 @@ const CHAINS_WITH_CLI = [
 ];
 
 const LoginWeb3Buttons: m.Component<{
-  label,
   loggingInWithAddress,
   joiningChain,
   joiningCommunity,
@@ -44,7 +43,7 @@ const LoginWeb3Buttons: m.Component<{
       ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
   },
   view: (vnode) => {
-    const { label, loggingInWithAddress, joiningChain, joiningCommunity, onSuccess } = vnode.attrs;
+    const { loggingInWithAddress, joiningChain, joiningCommunity, onSuccess } = vnode.attrs;
     const { next, web3loginParams } = vnode.state;
     const sortedChains = app.config.chains.getAll().filter((chain) => {
       return app.config.nodes.getByChain(chain.id) && app.config.nodes.getByChain(chain.id).length > 0;
@@ -60,10 +59,11 @@ const LoginWeb3Buttons: m.Component<{
       rounded: true,
       label: [
         m(ChainIcon, { chain, size: 20 }),
-        label,
-        ' ',
-        cli ? `for ${chain.name} (command line)` : `for ${chain.name}`,
-        m(Icon, { name: Icons.CHEVRON_DOWN }),
+        m('span', [
+          loggingInWithAddress
+            ? `Use ${chain.name} ${cli ? 'command line' : 'wallet'}`
+            : `Add ${chain.name} address ${cli ? 'from command line' : 'from wallet'}`
+        ]),
       ],
       onclick: (e) => {
         $('.LoginWithWalletModal').trigger('modalexit');
@@ -90,7 +90,7 @@ const LoginWeb3Buttons: m.Component<{
       },
     });
 
-    return [
+    return m('.LoginWeb3Buttons', [
       (app.chain && CHAINS_WITH_CLI.indexOf(app.chain.meta.chain.id) !== -1)
         ? [
           getLoginButton(app.chain.meta.chain),
@@ -100,7 +100,7 @@ const LoginWeb3Buttons: m.Component<{
         ] : sortedChains.map((chain) => getLoginButton(chain))
           .concat(sortedChainsWithCLI.length > 0 ? m(MenuDivider) : null)
           .concat(sortedChainsWithCLI.map((chain) => getLoginButton(chain, true)))
-    ];
+    ]);
   }
 };
 
