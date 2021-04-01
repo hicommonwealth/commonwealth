@@ -19,7 +19,7 @@ export const Errors = {
   NoBodyOrAttachments: 'Forum posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
-  InsufficientTokenBalance: `Users need to hold some of the community's tokens to post`,
+  InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to post',
 };
 
 const createThread = async (
@@ -125,7 +125,7 @@ const createThread = async (
   };
 
   // New Topic table entries created
-  let thread;
+  let thread_id;
   try {
     await sequelize.transaction(async (t) => {
       if (topic_id) {
@@ -146,7 +146,8 @@ const createThread = async (
         }
       }
 
-      thread = await models.OffchainThread.create(threadContent, { transaction: t });
+      const thread = await models.OffchainThread.create(threadContent, { transaction: t });
+      thread_id = thread.id;
 
       // initialize view count store
       await models.OffchainViewCount.create({
@@ -322,7 +323,7 @@ const createThread = async (
 
   // fetch final thread for return
   const finalThread = await models.OffchainThread.findOne({
-    where: { id: thread.id },
+    where: { id: thread_id },
     include: [
       { model: models.Address, as: 'Address' },
       models.OffchainAttachment,
