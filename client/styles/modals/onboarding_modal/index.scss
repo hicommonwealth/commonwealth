@@ -1,0 +1,61 @@
+@import "client/styles/shared";
+
+.OnboardingModal {
+  width: calc(100vw - 300px);
+  max-width: 1271px;
+
+  .onboarding-modal-content {
+    width: 600px;
+    margin: 60px auto 100px auto;
+
+    .Tabs {
+      .tab-bar {
+        display: flex;
+        justify-content: space-between;
+
+        .clear {
+          position: absolute;
+        }
+      }
+    }
+
+    form {
+      .cui-form-group {
+        label {
+          margin-top: 30px;
+          color: #999999;
+        }
+
+        .cui-input {
+          input {
+            background: #eeeeee;
+          }
+        }
+
+        button[type="submit"] {
+          background-color: white;
+          border-radius: 8px;
+          color: #999;
+        }
+      }
+    }
+
+    .footerL {
+      svg {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        z-index: -1;
+      }
+    }
+
+    .footerR {
+      svg {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+      }
+    }
+  }
+}

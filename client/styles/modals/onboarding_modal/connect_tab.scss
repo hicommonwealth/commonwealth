@@ -1,0 +1,37 @@
+.OnboardingModalConnectTab {
+  padding: 25px 0;
+
+  .title {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    h2 {
+      margin: 17px 0;
+    }
+  }
+
+  .options {
+    .option-row {
+      display: flex;
+      align-items: center;
+      margin-top: 40px;
+
+      .icon {
+        min-width: 80px;
+      }
+
+      .description {
+        min-width: 288px;
+        max-width: 288px;
+        margin: 0 20px;
+      }
+
+      button {
+        background: linear-gradient(274.37deg, #333239 0%, #1a191f 81.48%);
+        color: white;
+        border-radius: 8px;
+      }
+    }
+  }
+}

@@ -15,6 +15,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { formatAddressShort } from '../../../../../shared/utils';
+import OnboardingModal from '../../modals/onboarding_modal/index';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);
@@ -77,6 +78,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
+    const isClaimable = !account || !account.profile || account.profile.isEmpty;
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
@@ -134,6 +136,15 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-actions-breakpoint'),
         m('.bio-actions', [
+          isClaimable && m(Button, {
+            intent: 'primary',
+            rounded: true,
+            class: '',
+            onclick: () => {
+              app.modals.create({ modal: OnboardingModal });
+            },
+            label: 'Claim Address'
+          }),
           onOwnProfile ? [
             editIdentityAction(account, vnode.state.identity, vnode),
             m(Button, {

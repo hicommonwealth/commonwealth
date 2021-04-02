@@ -679,7 +679,7 @@ const LinkNewAddressModal: m.Component<{
             app.chain.base === ChainBase.Substrate && [
               m('p', 'Use the secret phrase to sign this message:'),
               m(CodeBlock, { clickToSelect: true }, [
-                `echo "${vnode.state.newAddress.validationToken}" | subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : ''}--suri "`,
+                `echo "${vnode.state.newAddress.validationToken}" | subkey sign ${vnode.state.isEd25519 ? '--scheme ed25519 ' : ''} "`,
                 m('span.no-select', 'secret phrase'),
                 '"',
               ]),

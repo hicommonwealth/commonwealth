@@ -1,0 +1,23 @@
+.OnboardingModalSetupProfileTab {
+  padding: 25px 0;
+  width: 360px;
+  margin: auto;
+
+  .title {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    h2 {
+      margin: 17px 0;
+    }
+  }
+
+  .OnboardingProfileForm {
+    position: relative;
+    button[type="submit"] {
+      position: absolute;
+      right: -200px;
+    }
+  }
+}
