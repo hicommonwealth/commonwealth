@@ -207,10 +207,10 @@
   resolved "https://registry.yarnpkg.com/@clover-network/node-tpye/-/node-tpye-1.0.1.tgz#cb61a6ef57c3207ce3baec6f0bdcd23287dc5209"
   integrity sha512-edR5xE6I3DdcNboBTnK9U6cVHPKsvJRD19o+LUelvJnqrH+DHipMZVr8VBLpf9CvLBxHNZffGX6Jf/iJmkR9+g==
 
-"@edgeware/node-types@3.3.1":
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.3.1.tgz#e98e3ebf63319c497020c1b14105f148d927eaae"
-  integrity sha512-vD8kChXW4qapj5qmeAl7f1P1dOVPwC2FxLJZODxH+ifYjl//mfknaaZ4ApjHTtxT7UrF/MJJ6XtnlkyMaTPEOg==
+"@edgeware/node-types@^3.3.3":
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.3.3.tgz#0a1f11698203c8056722e4c1b218f04f6eec55ed"
+  integrity sha512-RDdTjLRZD36MOQGA9g1MXvJpogg08J/0PwJXCEe8tZGlwoHXHw0PT8ieIQMTe2DCKegafHtDYufX36iePngzng==
 
 "@ethersproject/abi@5.0.7":
   version "5.0.7"
