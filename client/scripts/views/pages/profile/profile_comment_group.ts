@@ -33,7 +33,10 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
         (proposal.chain || proposal.community) && [
           ' on a ',
           link('a', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`,
-            (proposal instanceof OffchainThread) ? 'thread' : 'proposal')
+            (proposal instanceof OffchainThread) ? 'thread' : 'proposal'),
+          ' in ',
+          link('a', `/${proposal.chain || proposal.community}`,
+            ` ${ proposal.chain || proposal.community }`),
         ],
         comments[0] && comments[0].createdAt && [
           m.trust(' &middot; '),

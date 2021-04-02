@@ -19,6 +19,8 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
             : [
               ' created a new ',
               link('a', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread'),
+              ' in',
+              link('a', `/${chain || community}`, ` ${chain || community}`),
             ],
         createdAt && [
           m.trust(' &middot; '),
