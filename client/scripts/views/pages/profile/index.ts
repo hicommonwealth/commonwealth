@@ -348,21 +348,24 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
               content: m(ProfileContent, {
                 account,
                 type: UserContent.All,
-                content: allContent
+                content: allContent,
+                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
               })
             }, {
               name: threadsTabTitle,
               content: m(ProfileContent, {
                 account,
                 type: UserContent.Threads,
-                content: proposals
+                content: proposals,
+                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
               }),
             }, {
               name: commentsTabTitle,
               content: m(ProfileContent, {
                 account,
                 type: UserContent.Comments,
-                content: comments
+                content: comments,
+                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
               }),
             }]),
           ]),

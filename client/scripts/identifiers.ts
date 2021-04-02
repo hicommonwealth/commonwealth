@@ -92,6 +92,13 @@ export const chainEntityTypeToProposalSlug = (t: string) => {
   else if (t === 'collective-proposal') return ProposalType.SubstrateCollectiveProposal;
 };
 
+export const proposalSlugToChainEntityType = (t) => {
+  if (t === ProposalType.SubstrateTreasuryProposal) return 'treasury-proposal';
+  else if (t === ProposalType.SubstrateDemocracyReferendum) return 'democracy-referendum';
+  else if (t === ProposalType.SubstrateDemocracyProposal) return 'democracy-proposal';
+  else if (t === ProposalType.SubstrateCollectiveProposal) return 'collective-proposal';
+};
+
 export const chainEntityTypeToProposalName = (t: string) => {
   if (t === 'treasury-proposal') return 'Treasury Proposal';
   else if (t === 'democracy-referendum') return 'Referendum';

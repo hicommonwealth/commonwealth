@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
+  Button, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner, Select
 } from 'construct-ui';
 
 import { selectNode, initChain } from 'app';
@@ -20,6 +20,8 @@ import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
+
+import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -393,7 +395,7 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
 
     return m('.ChainStatusModule', [
       app.chain.deferred ? m(Button, {
-        label: 'Connect to chain',
+        label: vnode.state.initializing ? 'Connecting...' : 'Connect to chain',
         rounded: true,
         fluid: true,
         disabled: vnode.state.initializing,
@@ -447,49 +449,54 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
     if (!website && !discord && !telegram && !github) return;
 
     return m('.ExternalLinksModule.SidebarModule', [
-      m('.section-header', 'External Links'),
-      discord && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: () => window.open(discord),
-        label: 'Discord',
-        iconRight: Icons.EXTERNAL_LINK,
-        class: 'discord-button',
-      }),
-      element && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: () => window.open(element),
-        label: 'Element',
-        iconRight: Icons.EXTERNAL_LINK,
-        class: 'element-button',
-      }),
-      telegram && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: () => window.open(telegram),
-        label: 'Telegram',
-        iconRight: Icons.EXTERNAL_LINK,
-        class: 'telegram-button',
-      }),
-      (github || website) && m(PopoverMenu, {
-        closeOnContentClick: true,
-        transitionDuration: 0,
-        inline: true,
-        content: [
-          github && m(MenuItem, {
-            label: 'Github',
-            onclick: () => window.open(github),
-          }),
-          website && m(MenuItem, {
-            onclick: () => window.open(website),
-            label: 'Project homepage',
-          }),
-        ],
+      discord && m(Tooltip, {
+        transitionDuration: 100,
+        content: 'Discord',
         trigger: m(Button, {
-          fluid: true,
           rounded: true,
-          label: 'More...',
+          onclick: () => window.open(discord),
+          label: m.trust(discordIcon),
+          class: 'discord-button',
+        }),
+      }),
+      element && m(Tooltip, {
+        transitionDuration: 100,
+        content: 'Element',
+        trigger: m(Button, {
+          rounded: true,
+          onclick: () => window.open(element),
+          label: m.trust(elementIcon),
+          class: 'element-button',
+        }),
+      }),
+      telegram && m(Tooltip, {
+        transitionDuration: 100,
+        content: 'Telegram',
+        trigger: m(Button, {
+          rounded: true,
+          onclick: () => window.open(telegram),
+          label: m.trust(telegramIcon),
+          class: 'telegram-button',
+        }),
+      }),
+      github && m(Tooltip, {
+        transitionDuration: 100,
+        content: 'Github',
+        trigger: m(Button, {
+          rounded: true,
+          onclick: () => window.open(github),
+          label: m.trust(githubIcon),
+          class: 'github-button',
+        }),
+      }),
+      website && m(Tooltip, {
+        transitionDuration: 100,
+        content: 'Homepage',
+        trigger: m(Button, {
+          rounded: true,
+          onclick: () => window.open(website),
+          label: m.trust(websiteIcon),
+          class: 'website-button',
         }),
       }),
     ]);

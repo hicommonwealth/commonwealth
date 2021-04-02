@@ -40,7 +40,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
       data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
-      data.nodes.map((node) => {
+      data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
           url: node.url,
@@ -48,7 +48,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           address: node.address,
         }));
       });
-      data.communities.map((community) => {
+      data.communities.sort((a, b) => a.id - b.id).map((community) => {
         return app.config.communities.add(CommunityInfo.fromJSON({
           id: community.id,
           name: community.name,
@@ -545,6 +545,7 @@ $(() => {
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
+    '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
 
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
@@ -584,7 +585,7 @@ $(() => {
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
-    '/:scope/communityStats':    importRoute('views/pages/stats', { scoped: true, deferChain: true }),
+    '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
 
     '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),

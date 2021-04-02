@@ -163,6 +163,9 @@ $cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
     line-height: 26px;
 }
 
+.cui-tooltip .cui-popover-content {
+    padding: 12px 12px 5px 12px !important;
+}
 
 .cui-popover-content {
     border-color: $cui-popover-arrow-border-color;
@@ -514,7 +517,7 @@ button, .cui-button {
 }
 
 // make spinner slower
-$spinner-animation-duration: 1000ms;
+$spinner-animation-duration: 1700ms;
 .cui-spinner-icon {
     animation: loading $spinner-animation-duration infinite linear;
 }
@@ -529,7 +532,7 @@ $spinner-animation-duration: 1000ms;
 .cui-xl .cui-spinner .cui-spinner-icon {
     height: 40px;
     width: 40px;
-    border-width: 3px;
+    border-width: 4px;
 }
 
 // the declarative construct-ui toaster doesn't allow position to be set by default, so we override it here

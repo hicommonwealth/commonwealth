@@ -5,15 +5,13 @@
     @include gov-explainer;
 
     .Councillor {
-        float: left;
-        // sizing
-        width: 31%;
-        margin-right: 2%;
-        margin-top: 1.66%;
-        border: 1px solid #eee;
-        border-radius: 6px;
-        // padding
-        padding: 16px 24px 12px;
-        box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
+        @include card;
+        height: initial;
+        .User {
+            font-weight: 600;
+        }
+        .councillor-status {
+            color: $text-color-light;
+        }
     }
 }

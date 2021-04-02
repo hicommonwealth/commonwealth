@@ -21,8 +21,8 @@ import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import ProposalsLoadingRow from 'views/components/proposals_loading_row';
-import ProposalRow from 'views/components/proposal_row';
+import LoadingRow from 'views/components/loading_row';
+import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import Listing from 'views/pages/listing';
@@ -102,7 +102,7 @@ const TreasuryPage: m.Component<{}> = {
     if (returningFromThread && localStorage[`${app.activeId()}-proposals-scrollY`]) {
       setTimeout(() => {
         window.scrollTo(0, Number(localStorage[`${app.activeId()}-proposals-scrollY`]));
-      }, 1);
+      }, 100);
     }
   },
   view: (vnode) => {
@@ -144,13 +144,13 @@ const TreasuryPage: m.Component<{}> = {
     const activeTreasuryProposals = onSubstrate
       && (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed);
     const activeTreasuryContent = activeTreasuryProposals.length
-      ? activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
+      ? activeTreasuryProposals.map((proposal) => m(ProposalCard, { proposal }))
       : [ m('.no-proposals', 'None') ];
 
     const inactiveTreasuryProposals = onSubstrate
       && (app.chain as Substrate).treasury.store.getAll().filter((p) => p.completed);
     const inactiveTreasuryContent = inactiveTreasuryProposals.length
-      ? inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
+      ? inactiveTreasuryProposals.map((proposal) => m(ProposalCard, { proposal }))
       : [ m('.no-proposals', 'None') ];
 
     return m(Sublayout, {
@@ -162,14 +162,17 @@ const TreasuryPage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
+      m('.clear'),
       m(Listing, {
         content: activeTreasuryContent,
         columnHeader: 'Active Treasury Proposals',
       }),
+      m('.clear'),
       m(Listing, {
         content: inactiveTreasuryContent,
         columnHeader: 'Inactive Treasury Proposals',
-      })
+      }),
+      m('.clear'),
     ]);
   }
 };

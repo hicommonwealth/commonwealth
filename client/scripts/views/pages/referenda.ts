@@ -2,27 +2,29 @@ import 'pages/referenda.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { Grid, Col, List, Tag } from 'construct-ui';
+import moment from 'moment';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
-import Edgeware from 'controllers/chain/edgeware/main';
+
 import {
   convictionToWeight, convictionToLocktime, convictions
 } from 'controllers/chain/substrate/democracy_referendum';
-import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
-import ProposalsLoadingRow from 'views/components/proposals_loading_row';
-import ProposalRow from 'views/components/proposal_row';
-import { CountdownUntilBlock } from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+
+import Sublayout from 'views/sublayout';
+import PageLoading from 'views/pages/loading';
+import LoadingRow from 'views/components/loading_row';
+import ProposalCard from 'views/components/proposal_card';
+import { CountdownUntilBlock } from 'views/components/countdown';
 import NewProposalPage from 'views/pages/new_proposal/index';
-import { Grid, Col, List, Tag } from 'construct-ui';
-import moment from 'moment';
+
 import Listing from './listing';
 import ErrorPage from './error';
 
@@ -86,7 +88,7 @@ const ReferendaPage: m.Component<{}> = {
     if (returningFromThread && localStorage[`${app.activeId()}-proposals-scrollY`]) {
       setTimeout(() => {
         window.scrollTo(0, Number(localStorage[`${app.activeId()}-proposals-scrollY`]));
-      }, 1);
+      }, 100);
     }
   },
   view: (vnode) => {
@@ -101,7 +103,7 @@ const ReferendaPage: m.Component<{}> = {
         });
       }
       return m(PageLoading, {
-        message: 'Loading referenda',
+        message: 'Connecting to chain',
         title: [
           'Referenda',
           m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -115,7 +117,7 @@ const ReferendaPage: m.Component<{}> = {
       if (modules.some((mod) => !mod.ready)) {
         app.chain.loadModules(modules);
         return m(PageLoading, {
-          message: 'Connecting to chain',
+          message: 'Loading referenda',
           title: [
             'Referenda',
             m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -130,14 +132,14 @@ const ReferendaPage: m.Component<{}> = {
       && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed);
     const activeProposalContent = !activeDemocracyReferenda?.length
       ? [ m('.no-proposals', 'None') ]
-      : (activeDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }));
+      : (activeDemocracyReferenda || []).map((proposal) => m(ProposalCard, { proposal }));
 
     // inactive proposals
     const inactiveDemocracyReferenda = onSubstrate
       && (app.chain as Substrate).democracy.store.getAll().filter((p) => p.completed);
     const inactiveProposalContent = !inactiveDemocracyReferenda?.length
       ? [ m('.no-proposals', 'None') ]
-      : (inactiveDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }));
+      : (inactiveDemocracyReferenda || []).map((proposal) => m(ProposalCard, { proposal }));
 
     return m(Sublayout, {
       class: 'ReferendaPage',
@@ -148,14 +150,17 @@ const ReferendaPage: m.Component<{}> = {
       showNewProposalButton: true,
     }, [
       onSubstrate && m(SubstrateProposalStats),
+      m('.clear'),
       m(Listing, {
         content: activeProposalContent,
         columnHeader: 'Active Referenda',
       }),
+      m('.clear'),
       m(Listing, {
         content: inactiveProposalContent,
         columnHeader: 'Inactive Referenda',
       }),
+      m('.clear'),
     ]);
   }
 };

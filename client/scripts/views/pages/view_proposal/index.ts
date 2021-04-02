@@ -42,7 +42,7 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
-  ProposalHeaderThreadLinkedChainEntity,
+  ProposalHeaderThreadLink, ProposalHeaderThreadLinkedChainEntity,
   ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage, ProposalHeaderStageEditorButton,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyMenuItems,
@@ -234,12 +234,13 @@ const ProposalHeader: m.Component<{
               && proposal.chainEntities.map((chainEntity) => {
                 return m(ProposalHeaderThreadLinkedChainEntity, { proposal, chainEntity });
               }),
-            (proposal['blockExplorerLink'] || proposal['votingInterfaceLink']) && m('.proposal-body-link', [
-              proposal['blockExplorerLink']
-                && m(ProposalHeaderBlockExplorerLink, { proposal }),
-              proposal['votingInterfaceLink']
-                && m(ProposalHeaderVotingInterfaceLink, { proposal }),
-            ]),
+            !(proposal instanceof OffchainThread)
+              && (proposal['blockExplorerLink'] || proposal['votingInterfaceLink'] || proposal.threadId)
+              && m('.proposal-body-link', [
+                proposal.threadId && m(ProposalHeaderThreadLink, { proposal }),
+                proposal['blockExplorerLink'] && m(ProposalHeaderBlockExplorerLink, { proposal }),
+                proposal['votingInterfaceLink'] && m(ProposalHeaderVotingInterfaceLink, { proposal }),
+              ]),
           ]),
         ]),
       ]),
@@ -530,20 +531,23 @@ const ViewProposalPage: m.Component<{
   },
   view: (vnode) => {
     const { identifier, type } = vnode.attrs;
+
     const headerTitle = m.route.param('type') === 'discussion' ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string') return m(PageNotFound, { title: headerTitle });
+    const proposalId = identifier.split('-')[0];
+    const proposalType = type;
+    const proposalIdAndType = `${proposalId}-${proposalType}`;
+
     // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
-    if (!vnode.state.prefetch || !vnode.state.prefetch[identifier]) {
+    if (!vnode.state.prefetch || !vnode.state.prefetch[proposalIdAndType]) {
       vnode.state.prefetch = {};
-      vnode.state.prefetch[identifier] = {
+      vnode.state.prefetch[proposalIdAndType] = {
         commentsStarted: false,
         viewCountStarted: false,
         profilesStarted: false,
         profilesFinished: false,
       };
     }
-    const proposalId = identifier.split('-')[0];
-    const proposalType = type;
 
     if (vnode.state.threadFetchFailed) {
       return m(PageNotFound, { title: headerTitle });
@@ -558,8 +562,13 @@ const ViewProposalPage: m.Component<{
     const proposalDoesNotMatch = vnode.state.proposal
       && (+vnode.state.proposal.identifier !== +proposalId
           || vnode.state.proposal.slug !== proposalType);
+    if (proposalDoesNotMatch) {
+      vnode.state.proposal = undefined;
+      vnode.state.recentlyEdited = false;
+      vnode.state.threadFetched = false;
+    }
     // load proposal, and return m(PageLoading)
-    if (!vnode.state.proposal || proposalRecentlyEdited || proposalDoesNotMatch) {
+    if (!vnode.state.proposal || proposalRecentlyEdited) {
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
       } catch (e) {
@@ -582,13 +591,16 @@ const ViewProposalPage: m.Component<{
           }
           // check if module is still initializing
           const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
+          if (!c) {
+            return m(PageNotFound, { message: 'Invalid proposal type' });
+          }
           if (!c.ready) {
             app.chain.loadModules([ c ]);
             return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
           }
         }
         // proposal does not exist, 404
-        return m(PageNotFound);
+        return m(PageNotFound, { message: 'Proposal not found' });
       }
     }
     const { proposal } = vnode.state;
@@ -599,7 +611,7 @@ const ViewProposalPage: m.Component<{
     }
 
     // load comments
-    if (!vnode.state.prefetch[identifier]['commentsStarted']) {
+    if (!vnode.state.prefetch[proposalIdAndType]['commentsStarted']) {
       (app.activeCommunityId()
         ? app.comments.refresh(proposal, null, app.activeCommunityId())
         : app.comments.refresh(proposal, app.activeChainId(), null))
@@ -611,15 +623,15 @@ const ViewProposalPage: m.Component<{
           vnode.state.comments = [];
           m.redraw();
         });
-      vnode.state.prefetch[identifier]['commentsStarted'] = true;
+      vnode.state.prefetch[proposalIdAndType]['commentsStarted'] = true;
     }
 
     if (vnode.state.comments?.length) {
       const mismatchedComments = vnode.state.comments.filter((c) => {
-        return c.rootProposal !== `${vnode.attrs.type}_${vnode.attrs.identifier.split('-')[0]}`;
+        return c.rootProposal !== `${vnode.attrs.type}_${proposalId}`;
       });
       if (mismatchedComments.length) {
-        vnode.state.prefetch[identifier]['commentsStarted'] = false;
+        vnode.state.prefetch[proposalIdAndType]['commentsStarted'] = false;
       }
     }
 
@@ -629,7 +641,7 @@ const ViewProposalPage: m.Component<{
     };
 
     // load view count
-    if (!vnode.state.prefetch[identifier]['viewCountStarted'] && proposal instanceof OffchainThread) {
+    if (!vnode.state.prefetch[proposalIdAndType]['viewCountStarted'] && proposal instanceof OffchainThread) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
         community: app.activeCommunityId(),
@@ -646,10 +658,10 @@ const ViewProposalPage: m.Component<{
         vnode.state.viewCount = 0;
         throw new Error('could not load view count');
       });
-      vnode.state.prefetch[identifier]['viewCountStarted'] = true;
-    } else if (!vnode.state.prefetch[identifier]['viewCountStarted']) {
+      vnode.state.prefetch[proposalIdAndType]['viewCountStarted'] = true;
+    } else if (!vnode.state.prefetch[proposalIdAndType]['viewCountStarted']) {
       // view counts currently not supported for proposals
-      vnode.state.prefetch[identifier]['viewCountStarted'] = true;
+      vnode.state.prefetch[proposalIdAndType]['viewCountStarted'] = true;
       vnode.state.viewCount = 0;
     }
 
@@ -662,7 +674,7 @@ const ViewProposalPage: m.Component<{
 
     // load profiles
     // TODO: recursively fetch child comments as well (prevent reloading flash for threads with child comments)
-    if (vnode.state.prefetch[identifier]['profilesStarted'] === undefined) {
+    if (vnode.state.prefetch[proposalIdAndType]['profilesStarted'] === undefined) {
       if (proposal instanceof OffchainThread) {
         app.profiles.getProfile(proposal.authorChain, proposal.author);
       } else if (proposal.author instanceof Account) { // AnyProposal
@@ -671,12 +683,12 @@ const ViewProposalPage: m.Component<{
       vnode.state.comments.forEach((comment) => {
         app.profiles.getProfile(comment.authorChain, comment.author);
       });
-      vnode.state.prefetch[identifier]['profilesStarted'] = true;
+      vnode.state.prefetch[proposalIdAndType]['profilesStarted'] = true;
     }
-    if (!app.profiles.allLoaded() && !vnode.state.prefetch[identifier]['profilesFinished']) {
+    if (!app.profiles.allLoaded() && !vnode.state.prefetch[proposalIdAndType]['profilesFinished']) {
       return m(PageLoading, { narrow: true, showNewProposalButton: true, title: headerTitle });
     }
-    vnode.state.prefetch[identifier]['profilesFinished'] = true;
+    vnode.state.prefetch[proposalIdAndType]['profilesFinished'] = true;
 
     const windowListener = (e) => {
       if (vnode.state.editing || activeQuillEditorHasText()) {

@@ -1,29 +1,21 @@
 @import 'client/styles/shared';
 
 .MembersPage {
-    padding-bottom: 40px;
+    padding-bottom: 60px;
 
     .members-list {
-        margin: 20px -16px;
+        margin-top: 36px;
     }
     a.members-item {
-        display: flex;
-        color: #111;
+        @include card;
+        color: $text-color-black;
         text-decoration: none;
-        padding: 10px 16px 4px;
-        margin-bottom: 6px;
-        border-radius: 4px;
-        &:hover {
-            background: $background-color-white-hover;
-        }
     }
     .members-item-icon {
         width: 52px;
-        padding-top: 3px;
+        margin-bottom: 5px;
     }
-
-    // content
-    .members-item-left {
+    .members-item-info {
         .User {
             font-weight: 600;
             font-size: 19px;
