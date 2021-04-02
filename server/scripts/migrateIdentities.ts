@@ -47,22 +47,26 @@ export default async function (models, chain?: string): Promise<void> {
     // 2b. connect to chain and query all identities of found addresses
     log.info(`Fetching identities on chain ${node.chain} at url ${node.url}...`);
     const nodeUrl = constructSubstrateUrl(node.url);
-    const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
-    const fetcher = new SubstrateEvents.StorageFetcher(api);
-    const identityEvents = await fetcher.fetchIdentities(addresses);
+    try {
+      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
+      const fetcher = new SubstrateEvents.StorageFetcher(api);
+      const identityEvents = await fetcher.fetchIdentities(addresses);
 
-    // 2c. remove all existing identities from profiles
-    await Promise.all(profiles.map(async (p) => {
-      if (p.identity || p.judgements) {
-        p.identity = null;
-        p.judgements = null;
-        await p.save();
-      }
-    }));
+      // 2c. remove all existing identities from profiles
+      await Promise.all(profiles.map(async (p) => {
+        if (p.identity || p.judgements) {
+          p.identity = null;
+          p.judgements = null;
+          await p.save();
+        }
+      }));
 
-    // 2d. write the found identities back to db using the event handler
-    log.info(`Writing identities for chain ${node.chain} back to db... (count: ${identityEvents.length})`);
-    const handler = new IdentityEventHandler(models, node.chain);
-    await Promise.all(identityEvents.map((e) => handler.handle(e, null)));
+      // 2d. write the found identities back to db using the event handler
+      log.info(`Writing identities for chain ${node.chain} back to db... (count: ${identityEvents.length})`);
+      const handler = new IdentityEventHandler(models, node.chain);
+      await Promise.all(identityEvents.map((e) => handler.handle(e, null)));
+    } catch (e) {
+      log.error(`Failed to fetch identities from ${node.chain}: ${e.message}`);
+    }
   }
 }
