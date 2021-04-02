@@ -16,21 +16,31 @@ const log = factory.getLogger(formatFilename(__filename));
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
 export async function createApi(
-  url: string, typeOverrides: RegisteredTypes = {},
+  url: string, typeOverrides: RegisteredTypes = {}, timeoutMs = 30000,
 ): Promise<ApiPromise> {
   // construct provider
   const provider = new WsProvider(url);
   let unsubscribe: () => void;
-  await new Promise<void>((resolve) => {
-    unsubscribe = provider.on('connected', () => resolve());
+  let timeoutHandle: NodeJS.Timeout;
+  const success = await new Promise<boolean>((resolve) => {
+    unsubscribe = provider.on('connected', () => resolve(true));
+    timeoutHandle = setTimeout(() => {
+      provider.disconnect();
+      resolve(false);
+    }, timeoutMs);
   });
   if (unsubscribe) unsubscribe();
+  clearTimeout(timeoutHandle);
 
   // construct API using provider
-  return ApiPromise.create({
-    provider,
-    ...typeOverrides
-  });
+  if (success) {
+    return ApiPromise.create({
+      provider,
+      ...typeOverrides
+    });
+  } else {
+    throw new Error('Failed to connect to API endpoint.');
+  }
 }
 
 /**

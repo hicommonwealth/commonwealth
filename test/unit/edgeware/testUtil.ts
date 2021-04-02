@@ -175,6 +175,9 @@ export function constructFakeApi(
         currentEraPointsEarned,
         payee,
       },
+      bounties: {
+        bountyCount: callOverrides['bountyCount'],
+      },
       democracy: {
         referendumInfoOf: callOverrides['referendumInfoOf'],
         publicProps: callOverrides['publicProps'],
