@@ -185,7 +185,6 @@ export default class extends Base {
       return [account, role];
     });
     const filteredActiveAccountsByRole = activeAccountsByRole.reduce((arr: [Account<any>, RoleInfo][], current: [Account<any>, RoleInfo]) => {
-      console.log(arr, current);
       const index = arr.findIndex((item) => item[0].address === current[0].address);
       if (index < 0) {
         return [...arr, current];
