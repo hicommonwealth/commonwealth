@@ -11,10 +11,10 @@ import { Account, AddressInfo, ChainInfo, ChainBase, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 
 export const CHAINBASE_SHORT_FOR_AVATAR = {
-  [ChainBase.CosmosSDK]: 'COS',
-  [ChainBase.Ethereum]: 'ETH',
-  [ChainBase.NEAR]: 'NEAR',
-  [ChainBase.Substrate]: 'SUB',
+  [ChainBase.CosmosSDK]: 'Cos',
+  [ChainBase.Ethereum]: 'Eth',
+  [ChainBase.NEAR]: 'Near',
+  [ChainBase.Substrate]: 'Sub',
 };
 
 const User: m.Component<{
