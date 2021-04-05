@@ -25,7 +25,7 @@
                 border-bottom: none;
                 min-height: 100px;
                 &:hover {
-                    background-color: inherit;
+                    background-color: $background-color-white-hover;
                 }
                 .cui-list-item-content-left {
                     height: 100px;
@@ -41,9 +41,26 @@
                     padding: 20px;
                     color: $text-color-black;
                     text-decoration: none;
-                    &:hover {
-                        background-color: $background-color-white-hover;
+                    width: 100%;
+                    overflow: hidden;
+                    /* Member results */
+                    .user-block-name {
+                        opacity: 1;
+                        font-weight: 500;
+                        margin-bottom: 2px;
                     }
+                    .user-block-address {
+                        font-size: 18px;
+                        margin-top: 2px;
+                        opacity: 1;
+                        color: $text-color-light;
+                        mark {
+                            background: $background-color-light;
+                            border-radius: 5px;
+                            color: black !important;
+                        }
+                    }
+                    /* Thread results */
                     .search-results-thread-title {
                         font-weight: 500;
                     }

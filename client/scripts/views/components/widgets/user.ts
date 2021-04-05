@@ -189,6 +189,7 @@ export const UserBlock: m.Component<{
   selected?: boolean,
   compact?: boolean,
   linkify?: boolean,
+  avatarSize?: number,
 }> = {
   view: (vnode) => {
     const {
@@ -219,7 +220,7 @@ export const UserBlock: m.Component<{
       return ([
         !isNear && addrStart !== 0 &&  m('span', '…'),
         m('span', profile.address.slice(addrStart, queryStart)),
-        m('b', profile.address.slice(queryStart, queryEnd)),
+        m('mark', profile.address.slice(queryStart, queryEnd)),
         m('span', profile.address.slice(queryEnd, addrEnd)),
         !isNear && addrEnd !== profile.address.length &&  m('span', '…'),
       ]);
@@ -230,7 +231,7 @@ export const UserBlock: m.Component<{
         m(User, {
           user,
           avatarOnly: true,
-          avatarSize: 28,
+          avatarSize: vnode.attrs.avatarSize || 28,
           popover,
         }),
         // TODO: this is weird...symbol display should not depend on user being an Account

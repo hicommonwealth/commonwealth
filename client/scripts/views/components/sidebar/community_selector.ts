@@ -16,6 +16,7 @@ export const CommunityLabel: m.Component<{
   community?: CommunityInfo,
   showStatus?: boolean,
   link?: boolean,
+  size?: number,
 }> = {
   view: (vnode) => {
     const { chain, community, showStatus, link } = vnode.attrs;
@@ -23,7 +24,7 @@ export const CommunityLabel: m.Component<{
     if (chain) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(ChainIcon, {
-          size: 18,
+          size: vnode.attrs.size || 18,
           chain,
           onclick: link ? (() => m.route.set(`/${chain.id}`)) : null
         }),
@@ -39,7 +40,7 @@ export const CommunityLabel: m.Component<{
     if (community) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(CommunityIcon, {
-          size: 18,
+          size: vnode.attrs.size || 18,
           community,
           onclick: link ? (() => m.route.set(`/${community.id}`)) : null
         }),

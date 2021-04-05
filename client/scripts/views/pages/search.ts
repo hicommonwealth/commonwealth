@@ -110,12 +110,14 @@ const getMemberResult = (addr, searchTerm) => {
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Linkification of full ListItem
   return m(ListItem, {
-    class: 'a.search-results-item',
     contentLeft: m(MemberIcon),
-    label: m(UserBlock, {
-      user: profile,
-      searchTerm,
-    }),
+    label: m('a.search-results-item', [
+      m(UserBlock, {
+        user: profile,
+        searchTerm,
+        avatarSize: 36,
+      }),
+    ]),
     onclick: (e) => {
       m.route.set(userLink);
     }
@@ -129,8 +131,8 @@ const getCommunityResult = (community) => {
       label: m('a.search-results-item', [
         m('img', {
           src: community.logoURI,
-          height: '15px',
-          width: '15px'
+          height: '36px',
+          width: '36px'
         }),
         m('span', community.name)
       ]),
@@ -143,7 +145,12 @@ const getCommunityResult = (community) => {
     || community.contentType === ContentType.Community) {
     return m(ListItem, {
       contentLeft: m(CommunityIcon),
-      label: m('a.search-results-item', [ m(CommunityLabel, { community }) ]),
+      label: m('a.search-results-item', [
+        m(CommunityLabel, {
+          community,
+          size: 36,
+        })
+      ]),
       onclick: (e) => {
         m.route.set(community.id ? `/${community.id}` : '/');
       }
