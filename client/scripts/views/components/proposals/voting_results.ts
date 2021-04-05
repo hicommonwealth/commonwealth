@@ -22,7 +22,6 @@ const VoteListing: m.Component<{
   amount?: boolean,
   weight?: boolean
 }, {
-  expanded?: boolean,
   balancesCache,
   balancesCacheInitialized,
 }> = {
@@ -30,17 +29,14 @@ const VoteListing: m.Component<{
     const { proposal, votes, amount, weight } = vnode.attrs;
     const balanceWeighted = proposal.votingUnit === VotingUnit.CoinVote
       || proposal.votingUnit === VotingUnit.ConvictionCoinVote;
-    const displayedVotes = vnode.state.expanded
-      ? votes
-      : votes.slice(0, COLLAPSE_VOTERS_AFTER);
 
     if (!vnode.state.balancesCache) vnode.state.balancesCache = {};
     if (!vnode.state.balancesCacheInitialized) vnode.state.balancesCacheInitialized = {};
 
     return m('.VoteListing', [
-      (displayedVotes.length === 0)
+      votes.length === 0
         ? m('.no-votes', 'No votes')
-        : displayedVotes.map(
+        : votes.map(
           (vote) => {
             let balance;
             if (balanceWeighted && !(vote instanceof CosmosVote)) {
@@ -112,15 +108,6 @@ const VoteListing: m.Component<{
             }
           }
         ),
-      !vnode.state.expanded
-      && votes.length > COLLAPSE_VOTERS_AFTER
-      && m('a.expand-listing-button', {
-        href: '#',
-        onclick: (e) => {
-          e.preventDefault();
-          vnode.state.expanded = true;
-        }
-      }, `${votes.length - COLLAPSE_VOTERS_AFTER} more`)
     ]);
   }
 };

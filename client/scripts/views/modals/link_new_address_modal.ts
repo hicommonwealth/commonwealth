@@ -686,7 +686,7 @@ const LinkNewAddressModal: m.Component<{
               fluid: true,
               autocomplete: 'off',
               style: 'display: block; margin-bottom: 18px;',
-              placeholder: 'Paste the signature here',
+              placeholder: 'Paste the signature here (e.g. 84e34b...)',
               oninput: async (e) => {
                 const signature = (e.target as any).value;
                 const unverifiedAcct = vnode.state.newAddress;
@@ -697,6 +697,8 @@ const LinkNewAddressModal: m.Component<{
               },
             }),
             vnode.state.error && vnode.state.newAddress && m('.error-message', vnode.state.error),
+            app.chain.base === ChainBase.Substrate
+              && m('p', 'Do NOT paste your secret phrase.'),
             app.chain.base === ChainBase.Substrate && m(Checkbox, {
               name: 'secret-phrase-saved',
               label: 'My secret phrase is saved somewhere safe',

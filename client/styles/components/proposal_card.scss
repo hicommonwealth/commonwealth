@@ -2,6 +2,28 @@
 
 .ProposalCard {
     @include card;
+    padding: 0;
+    height: initial;
+    height: 280px;
+    .proposal-card-top {
+        position: relative;
+        padding: 24px 24px 22px;
+        height: 228px;
+        width: 100%;
+    }
+    .proposal-card-bottom {
+        position: relative;
+        padding: 16px 24px 12px;
+        border-top: 1px solid #eee;
+        user-select: none;
+        cursor: initial;
+        &:hover a {
+            text-decoration: underline;
+        }
+        .no-linked-thread {
+            color: $text-color-lightest;
+        }
+    }
 
     .cui-tag {
         font-weight: 600;

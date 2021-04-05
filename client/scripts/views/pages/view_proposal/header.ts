@@ -42,7 +42,7 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
   }
 };
 
-export const ProposalHeaderBlockExplorerLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
+export const ProposalHeaderBlockExplorerLink: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal || !proposal['blockExplorerLink']) return;
@@ -55,13 +55,26 @@ export const ProposalHeaderBlockExplorerLink: m.Component<{ proposal: AnyProposa
   }
 };
 
-export const ProposalHeaderVotingInterfaceLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
+export const ProposalHeaderVotingInterfaceLink: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal || !proposal['votingInterfaceLink']) return;
     return m('.ProposalHeaderVotingInterfaceLink', [
       externalLink('a.voting-link', proposal['votingInterfaceLink'], [
         proposal['votingInterfaceLinkLabel'] || extractDomain(proposal['votingInterfaceLink']),
+        m(Icon, { name: Icons.EXTERNAL_LINK }),
+      ]),
+    ]);
+  }
+};
+
+export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (!proposal || !proposal.threadId) return;
+    return m('.ProposalHeaderThreadLink', [
+      link('a.thread-link', `/${proposal['chain'] || app.activeId()}/proposal/discussion/${proposal.threadId}`, [
+        'Go to discussion',
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
     ]);

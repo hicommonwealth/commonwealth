@@ -163,6 +163,9 @@ $cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
     line-height: 26px;
 }
 
+.cui-tooltip .cui-popover-content {
+    padding: 12px 12px 5px 12px !important;
+}
 
 .cui-popover-content {
     border-color: $cui-popover-arrow-border-color;
