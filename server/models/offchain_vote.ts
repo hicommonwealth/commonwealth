@@ -1,16 +1,16 @@
 import * as Sequelize from 'sequelize';
 
-import { OffchainPollAttributes } from './offchain_poll';
+import { OffchainThreadAttributes } from './offchain_thread';
 
 export interface OffchainVoteAttributes {
   id?: number;
-  poll_id: number;
+  thread_id: number;
   choice: string;
   created_at?: Date;
   updated_at?: Date;
 
   // associations
-  poll?: OffchainPollAttributes | OffchainPollAttributes['id'];
+  thread?: OffchainThreadAttributes | OffchainThreadAttributes['id'];
 }
 
 export interface OffchainVoteInstance
@@ -29,23 +29,23 @@ export default (
   const OffchainVote = sequelize.define<OffchainVoteInstance, OffchainVoteAttributes>(
     'OffchainVote', {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      poll_id: { type: dataTypes.INTEGER, allowNull: false },
+      thread_id: { type: dataTypes.INTEGER, allowNull: false },
       choice: { type: dataTypes.STRING, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     }, {
       underscored: true,
       indexes: [
-        { fields: ['poll_id'] },
+        { fields: ['thread_id'] },
       ],
     }
   );
 
   OffchainVote.associate = (models) => {
-    models.OffchainVote.belongsTo(models.OffchainPoll, {
-      foreignKey: 'poll_id',
+    models.OffchainVote.belongsTo(models.OffchainThread, {
+      foreignKey: 'thread_id',
       constraints: false,
-      as: 'poll',
+      as: 'thread',
     });
   };
 

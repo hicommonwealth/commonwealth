@@ -118,6 +118,10 @@ export default (
       foreignKey: 'thread_id',
       constraints: false,
     });
+    models.OffchainThread.hasMany(models.OffchainPoll, {
+      foreignKey: 'thread_id',
+      constraints: false,
+    });
   };
 
   return OffchainThread;
