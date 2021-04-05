@@ -6,7 +6,7 @@ import moment from 'moment-twitter';
 import { Tabs, Spinner, TabItem, Tag, ListItem } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
-import { searchMentionableAddresses, searchDiscussions, searchChainsAndCommunities } from 'helpers/search';
+import { searchMentionableAddresses, searchDiscussions, searchChainsAndCommunities, DiscussionIcon } from 'helpers/search';
 import app from 'state';
 import { AddressInfo, Profile } from 'models';
 
@@ -100,13 +100,15 @@ export const search = async (searchTerm, communityScope, vnode) => {
 // TODO: Linkification of users, tokens, comms results
 const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
-  return m('a.search-results-item', [
-    m(UserBlock, {
+  return m(ListItem, {
+    class: 'search-results-item',
+    contentLeft: m(DiscussionIcon),
+    label: m(UserBlock, {
       user: profile,
       linkify: true,
       searchTerm,
     })
-  ]);
+  });
 };
 
 const getCommunityResult = (community) => {

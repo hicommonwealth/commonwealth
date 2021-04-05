@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import app from 'state';
+import m from 'mithril';
 
 export const searchDiscussions = async (
   searchTerm: string,
@@ -49,4 +50,22 @@ export const searchChainsAndCommunities = async (
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
   return response.result;
+};
+
+export const DiscussionIcon = {
+  view: (vnode) => {
+    return m('svg.SwitchIcon', {
+      width: '29px',
+      height: '25px',
+      viewBox: '0 0 29 25',
+      fill: 'none'
+    }, [
+      m('path', {
+        'stroke-linecap': 'round',
+        'stroke-width': '5',
+        'stroke': '#DADADA',
+        'd': 'M3 11.5L10.8036 21L26 3'
+      }),
+    ]);
+  }
 };
