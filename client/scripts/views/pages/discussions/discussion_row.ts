@@ -21,6 +21,13 @@ import ListingRow from 'views/components/listing_row';
 
 import DiscussionRowMenu from './discussion_row_menu';
 
+const getLastUpdated = (proposal) => {
+  const lastComment = Number(app.comments.lastCommented(proposal));
+  const createdAt = Number(proposal.createdAt.utc());
+  const lastUpdate = Math.max(createdAt, lastComment);
+  return moment(lastUpdate);
+};
+
 const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boolean }, { expanded: boolean }> = {
   view: (vnode) => {
     const { proposal, showExcerpt } = vnode.attrs;
@@ -66,7 +73,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       proposal.topic && link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
         m('span.proposal-topic-name', `${proposal.topic.name}`),
       ]),
-      m('.created-at', link('a', discussionLink, formatLastUpdated(proposal.createdAt))),
       m(User, {
         user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
         linkify: true,
@@ -76,6 +82,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread, showExcerpt?: boole
       }),
       proposal instanceof OffchainThread && proposal.collaborators && proposal.collaborators.length > 0
         && m('span.proposal-collaborators', [ ' +', proposal.collaborators.length ]),
+      m('.created-at', link('a', discussionLink, `Last active ${formatLastUpdated(getLastUpdated(proposal))}`)),
       m('.mobile-comment-count', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         app.comments.nComments(proposal),

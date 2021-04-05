@@ -4,6 +4,9 @@ import _ from 'lodash';
 import { Table, Tag } from 'construct-ui';
 
 import app from 'state';
+
+import PageLoading from 'views/pages/loading';
+import ErrorPage from 'views/pages/error';
 import Sublayout from 'views/sublayout';
 
 const StatsTable: m.Component<{ data }, {}> = {
@@ -102,25 +105,38 @@ const StatsPage: m.Component<{}, { requested: boolean, error: string, data }> = 
         } else if (error.responseText) {
           vnode.state.error = error.responseText;
         } else {
-          vnode.state.error = 'Error loading stats';
+          vnode.state.error = 'Error loading analytics';
         }
         m.redraw();
       });
     }
 
+    if (!vnode.state.requested || (!vnode.state.error && !vnode.state.data)) return m(PageLoading, {
+      message: 'Loading analytics',
+      title: [
+        'Analytics',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
+    });
+
+    if (vnode.state.error) return m(ErrorPage, {
+      message: vnode.state.error,
+      title: [
+        'Analytics',
+        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+      ],
+    });
+
     return m(Sublayout, {
       class: 'StatsPage',
       title: [
-        'Community Analytics',
+        'Analytics',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
     }, [
-      vnode.state.error
-        ? m('.error', vnode.state.error)
-        : vnode.state.data
-          ? m('.stats-data', [
-            m(StatsTable, { data: vnode.state.data }),
-          ]) : vnode.state.requested ? m('.loading', 'Loading...') : 'Not available'
+      m('.stats-data', [
+        m(StatsTable, { data: vnode.state.data }),
+      ])
     ]);
   }
 };

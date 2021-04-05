@@ -89,6 +89,16 @@
     }
 
     // content
+    .PinnedDivider {
+        hr {
+            height: 1px;
+            border: none;
+            border-bottom: 1px solid $border-color-off-white;
+            margin-left: 4px;
+            margin-right: 4px;
+            width: -webkit-fill-available;
+        }
+    }
     .LastSeenDivider {
         display: flex;
         padding: 0 0 3px;

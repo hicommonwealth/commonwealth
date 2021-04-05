@@ -16,14 +16,14 @@ import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyTopicPlaceholder, { EmptyStagePlaceholder } from 'views/components/empty_topic_placeholder';
-import ProposalsLoadingRow from 'views/components/proposals_loading_row';
+import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
 
-import { DEFAULT_PAGE_SIZE } from 'controllers/server/threads';
+import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 
@@ -114,7 +114,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
     if (returningFromThread && localStorage[`${app.activeId()}-discussions-scrollY`]) {
       setTimeout(() => {
         window.scrollTo(0, Number(localStorage[`${app.activeId()}-discussions-scrollY`]));
-      }, 1);
+      }, 100);
     }
 
     if (app.user.unseenPosts[app.activeId()]) {
@@ -218,8 +218,12 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
       vnode.state.lookback[subpage] = moment(getLastUpdate(sortedThreads[sortedThreads.length - 1]));
 
       if (allThreads.length > sortedThreads.length) {
-        if (firstThread && getLastUpdate(firstThread) > lastVisited) {
-          listing.push(getLastSeenDivider(false));
+        if (firstThread) {
+          if (getLastUpdate(firstThread) > lastVisited) {
+            listing.push(getLastSeenDivider(false));
+          } else {
+            listing.push(m('.PinnedDivider', m('hr')));
+          }
         }
       }
 
@@ -294,7 +298,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
           m.redraw();
         });
         vnode.state.topicInitialized[subpage] = true;
-      } else if (allThreads.length < DEFAULT_PAGE_SIZE && subpage === ALL_PROPOSALS_KEY) {
+      } else if (allThreads.length < INITIAL_PAGE_SIZE && subpage === ALL_PROPOSALS_KEY) {
         vnode.state.postsDepleted[subpage] = true;
       }
 
@@ -494,9 +498,9 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
                   app.modals.create({ modal: ManageCommunityModal });
                 }
               }),
-              (isAdmin || isMod) && m(MenuItem, {
-                label: 'Community analytics',
-                onclick: (e) => m.route.set(`/${app.activeId() || 'edgeware'}/communityStats`),
+              (isAdmin || isMod) && app.activeId() && m(MenuItem, {
+                label: 'Analytics',
+                onclick: (e) => m.route.set(`/${app.activeId()}/analytics`),
               }),
             ],
           }),
@@ -528,7 +532,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, {
           m(DiscussionStagesBar, { topic: topicName, stage }),
           (!activeEntity || !activeEntity.serverLoaded || stillFetching)
             ? m('.discussions-main', [
-              m(ProposalsLoadingRow),
+              m(LoadingRow),
             ])
             : emptyTopic
               ? m(EmptyTopicPlaceholder, { communityName, topicName: topic })

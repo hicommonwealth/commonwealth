@@ -22,6 +22,9 @@ out.dump.*
 redacted.dump
 redacted.dump.*
 
+# Bundle analyzer
+out.png
+
 # Cosmos TX
 tx.json
 

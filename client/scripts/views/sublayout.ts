@@ -30,6 +30,7 @@ const Sublayout: m.Component<{
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
   hideSidebar?: boolean,
+  alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
 }> = {
   view: (vnode) => {
     const {
@@ -39,6 +40,7 @@ const Sublayout: m.Component<{
       showNewProposalButton,
       showCouncilMenu,
       hideSidebar,
+      alwaysShowTitle,
     } = vnode.attrs;
     const chain = app.chain ? app.chain.meta.chain : null;
     const community = app.community ? app.community.meta : null;
@@ -62,6 +64,8 @@ const Sublayout: m.Component<{
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
+      ] : alwaysShowTitle ? [
+        m('h4.sublayout-header-heading.no-chain-or-community', title)
       ] : [
         // empty since a chain or community is loading
       ],

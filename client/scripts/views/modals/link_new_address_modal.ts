@@ -375,7 +375,7 @@ const LinkNewAddressModal: m.Component<{
             class: 'account-adder-placeholder',
             key: 'placeholder',
             intent: 'primary',
-            label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain' ],
+            label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ],
             disabled: true,
           }),
         ])
@@ -560,7 +560,7 @@ const LinkNewAddressModal: m.Component<{
                   : (vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected)
                     ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ]
                     : app.chain.networkStatus === ApiStatus.Disconnected
-                      ? 'Connecting to chain...'
+                      ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ]
                       : 'Connect to wallet'
             }),
           !app.chain.webWallet?.available && m('.get-wallet-text', [
@@ -704,7 +704,7 @@ const LinkNewAddressModal: m.Component<{
               fluid: true,
               autocomplete: 'off',
               style: 'display: block; margin-bottom: 18px;',
-              placeholder: 'Paste the signature here',
+              placeholder: 'Paste the signature here (e.g. 84e34b...)',
               oninput: async (e) => {
                 const signature = (e.target as any).value;
                 const unverifiedAcct = vnode.state.newAddress;
@@ -715,6 +715,8 @@ const LinkNewAddressModal: m.Component<{
               },
             }),
             vnode.state.error && vnode.state.newAddress && m('.error-message', vnode.state.error),
+            app.chain.base === ChainBase.Substrate
+              && m('p', 'Do NOT paste your secret phrase.'),
             app.chain.base === ChainBase.Substrate && m(Checkbox, {
               name: 'secret-phrase-saved',
               label: 'My secret phrase is saved somewhere safe',

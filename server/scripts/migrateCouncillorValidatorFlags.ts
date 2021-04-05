@@ -36,10 +36,10 @@ export default async function (models, chain?: string): Promise<void> {
     const flagsHandler = new UserFlagsHandler(models, node.chain);
 
     const nodeUrl = constructSubstrateUrl(node.url);
-    const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
-
-    log.info('Fetching councillor and validator lists...');
     try {
+      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
+
+      log.info('Fetching councillor and validator lists...');
       const validators = await api.derive.staking?.validators();
       const section = api.query.electionsPhragmen ? 'electionsPhragmen' : 'elections';
       const councillors = await api.query[section].members<Vec<[ AccountId, Balance ] & Codec>>();
@@ -48,7 +48,7 @@ export default async function (models, chain?: string): Promise<void> {
         validators ? validators.validators.map((v) => v.toString()) : [],
       );
     } catch (e) {
-      log.error(`Failed to sync flags: ${e.message}.`);
+      log.error(`Failed to migrate flags for ${node.chain}: ${e.message}`);
     }
   }
 }

@@ -64,14 +64,20 @@ export function externalLink(selector, target, children) {
   }, children);
 }
 
-export function link(selector: string, target: string, children, extraAttrs?: object) {
+export function link(selector: string, target: string, children, extraAttrs?: object, saveScrollPositionAs?: string) {
   const attrs = {
     href: target,
     onclick: (e) => {
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
       if (e.target.target === '_blank') return;
+
       e.preventDefault();
       e.stopPropagation();
+
+      if (saveScrollPositionAs) {
+        localStorage[saveScrollPositionAs] = window.scrollY;
+      }
+
       if (window.location.href.split('?')[0] === target.split('?')[0]) {
         m.route.set(target, {}, { replace: true });
       } else {
@@ -187,17 +193,12 @@ export function formatAsTitleCase(str: string) {
 
 export function formatLastUpdated(timestamp) {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
-  if (timestamp.isBefore(moment().subtract(30, 'days'))) return timestamp.format('MMM D');
   const formatted = timestamp.fromNow(true);
-  if (formatted.indexOf(' month') !== -1) {
-    return timestamp.format('MMM D');
-  } else {
-    return `${formatted
+  return `${formatted
       .replace(' days', 'd')
       .replace(' day', 'd')
       .replace(' hours', 'h')
       .replace(' hour', 'h')} ago`;
-  }
 }
 
 // duplicated in adapters/currency.ts
