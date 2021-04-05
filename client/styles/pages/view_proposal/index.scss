@@ -233,12 +233,14 @@ $discussion-title-font-size: 1.45rem;
         }
     }
     .ProposalHeaderStage,
-    .ProposalHeaderStageEditorButton {
+    .ProposalHeaderStageEditorButton,
+    .ProposalHeaderPollEditorButton {
         position: relative;
         top: -4px;
         margin-right: 7px;
     }
-    .ProposalHeaderStageEditorButton.cui-button {
+    .ProposalHeaderStageEditorButton.cui-button,
+    .ProposalHeaderPollEditorButton.cui-button {
         height: 22px;
         min-height: 22px;
         padding: 0 10px;

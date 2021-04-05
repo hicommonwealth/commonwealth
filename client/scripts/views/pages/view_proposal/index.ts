@@ -29,8 +29,9 @@ import {
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import TopicEditor from 'views/components/topic_editor';
 import StageEditor from 'views/components/stage_editor';
+import PollEditor from 'views/components/poll_editor';
 import {
-  TopicEditorMenuItem, StageEditorMenuItem, ThreadSubscriptionMenuItem
+  TopicEditorMenuItem, ThreadSubscriptionMenuItem
 } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
@@ -44,6 +45,7 @@ import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
   ProposalHeaderThreadLink, ProposalHeaderThreadLinkedChainEntity,
   ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage, ProposalHeaderStageEditorButton,
+  ProposalHeaderPollEditorButton,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyMenuItems,
   ProposalTitleEditor,
@@ -76,6 +78,7 @@ const ProposalHeader: m.Component<{
   currentText: any;
   topicEditorIsOpen: boolean;
   stageEditorIsOpen: boolean;
+  pollEditorIsOpen: boolean;
   editPermissionsIsOpen: boolean;
 }> = {
   view: (vnode) => {
@@ -121,6 +124,11 @@ const ProposalHeader: m.Component<{
               (isAuthor || isAdmin) && proposal instanceof OffchainThread && m(ProposalHeaderStageEditorButton, {
                 openStageEditor: () => {
                   vnode.state.stageEditorIsOpen = true;
+                }
+              }),
+              isAuthor && proposal instanceof OffchainThread && m(ProposalHeaderPollEditorButton, {
+                openPollEditor: () => {
+                  vnode.state.pollEditorIsOpen = true;
                 }
               }),
             ]),
@@ -198,6 +206,16 @@ const ProposalHeader: m.Component<{
                     m.redraw();
                   },
                   openStateHandler: (v) => { vnode.state.stageEditorIsOpen = v; m.redraw(); },
+                }),
+              vnode.state.pollEditorIsOpen
+                && proposal instanceof OffchainThread
+                && m(PollEditor, {
+                  thread: vnode.attrs.proposal as OffchainThread,
+                  onChangeHandler: () => {
+                    // TODO
+                    vnode.state.pollEditorIsOpen = false;
+                    m.redraw();
+                  },
                 }),
             ]
             : [

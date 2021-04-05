@@ -42,6 +42,32 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
   }
 };
 
+export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread }> = {
+  view: (vnode) => {
+    return m('.ProposalHeaderOffchainPoll', [
+      m('.offchain-poll-option', [
+        m('.offchain-poll-option-left', [
+          poll[option].title,
+        ]),
+        m('.offchain-poll-option-right', [
+          m('.offchain-poll-voters', poll[option].length),
+          m('.offchain-poll-voters-bar', [
+            m('.offchain-poll-voters-bar-inner', { style: `${poll[option].length / totalLength * 100}%` }),
+          ]),
+          m(Button, {
+            class: 'offchain-poll-voters-action',
+            label: 'Select',
+            disabled: !canVote || !alreadyVoted,
+            onclick: (e) => {
+              // TODO
+            }
+          }),
+        ]),
+      ]),
+    ]);
+  }
+};
+
 export const ProposalHeaderBlockExplorerLink: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
@@ -178,6 +204,22 @@ export const ProposalHeaderStageEditorButton: m.Component<{ openStageEditor: Fun
       onclick: (e) => {
         e.preventDefault();
         openStageEditor();
+      },
+    });
+  }
+};
+
+export const ProposalHeaderPollEditorButton: m.Component<{ openPollEditor: Function }, { isOpen: boolean }> = {
+  view: (vnode) => {
+    const { openPollEditor } = vnode.attrs;
+    return m(Button, {
+      class: 'ProposalHeaderPollEditorButton',
+      rounded: true,
+      size: 'xs',
+      label: 'Select poll',
+      onclick: (e) => {
+        e.preventDefault();
+        openPollEditor();
       },
     });
   }
