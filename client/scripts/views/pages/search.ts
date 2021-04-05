@@ -41,8 +41,10 @@ export enum ContentType {
   Member = 'member'
 }
 
-export const search = async (searchTerm, vnode) => {
+export const search = async (searchTerm, communityScope, vnode) => {
   vnode.state.searchLoading = true;
+
+  // if !communityScope search only...
 
   (async () => {
     try {
@@ -251,7 +253,8 @@ const SearchPage : m.Component<{
       ],
     });
 
-    if (!app.chain && !app.community) {
+    const communityScope = m.route.param('scope');
+    if (communityScope && (!app.chain && !app.community)) {
       return LoadingPage;
     }
 
@@ -268,14 +271,14 @@ const SearchPage : m.Component<{
     if (searchTerm !== vnode.state.searchTerm) {
       vnode.state.searchTerm = searchTerm;
       vnode.state.results = [];
-      search(searchTerm, vnode);
+      search(searchTerm, communityScope, vnode);
       return LoadingPage;
     }
 
     if (vnode.state.searchLoading) {
       return LoadingPage;
     } else if (!vnode.state.results && !vnode.state.errorText) {
-      search(searchTerm, vnode);
+      search(searchTerm, communityScope, vnode);
       return;
     }
 

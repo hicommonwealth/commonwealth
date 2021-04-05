@@ -14,15 +14,17 @@ const log = factory.getLogger(formatFilename(__filename));
 // Otherwise, it defaults to returning them in order of ['created_at', 'DESC'] (following to /bulkMembers).
 
 const bulkAddresses = async (models, req, res, next) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
-  if (error) return next(new Error(error));
-
   const options = {
     order: req.query.order ? [req.query.order] : [['created_at', 'DESC']],
   };
 
   if (req.query.limit) options['limit'] = req.query.limit;
-  if (chain) options['where'] = { chain: req.query.chain };
+  if (req.query.chain) {
+    const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+    if (error) return next(new Error(error));
+    else options['where'] = { chain: req.query.chain };
+  }
+
   const subStr = {
     [Op.or]: [
       { name: { [Op.iLike]: `%${req.query.searchTerm}%` } },

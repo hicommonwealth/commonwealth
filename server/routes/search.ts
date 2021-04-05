@@ -13,20 +13,28 @@ const Errors = {
 };
 
 const search = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
-  if (error) return next(new Error(error));
+  let replacements = {};
+
+  // Community-scoped search
+  let communityOptions = ''; let communityOptions2 = '';
+  if (req.query.chain || req.query.community) {
+    const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+    if (error) return next(new Error(error));
+
+    // set up query parameters
+    communityOptions = community
+      ? `"OffchainThreads".community = :community AND `
+      : `"OffchainThreads".chain = :chain AND `;
+    communityOptions2 = community
+      ? `"OffchainComments".community = :community AND `
+      : `"OffchainComments".chain = :chain AND `;
+    replacements = community
+      ? { community: community.id }
+      : { chain: chain.id };
+  }
+
   const { cutoff_date } = req.query;
 
-  // set up query parameters
-  const communityOptions = community
-    ? `"OffchainThreads".community = :community `
-    : `"OffchainThreads".chain = :chain `;
-  const communityOptions2 = community
-    ? `"OffchainComments".community = :community `
-    : `"OffchainComments".chain = :chain `;
-  const replacements = community
-    ? { community: community.id }
-    : { chain: chain.id };
   replacements['searchTerm'] = req.query.search;
   replacements['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
 
@@ -53,7 +61,7 @@ SELECT * FROM (
       "OffchainThreads".created_at
     FROM "OffchainThreads"
     JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id
-    WHERE ${communityOptions} AND "OffchainThreads"._search @@ plainto_tsquery('english', :searchTerm)
+    WHERE ${communityOptions} "OffchainThreads"._search @@ plainto_tsquery('english', :searchTerm)
     ORDER BY "OffchainThreads".created_at DESC LIMIT :limit)
   UNION ALL
   (SELECT
@@ -69,7 +77,7 @@ SELECT * FROM (
     JOIN "OffchainThreads" ON "OffchainThreads".id =
         CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END
     JOIN "Addresses" ON "OffchainComments".address_id = "Addresses".id
-    WHERE ${communityOptions2} AND "OffchainComments"._search @@ plainto_tsquery('english', :searchTerm)
+    WHERE ${communityOptions2} "OffchainComments"._search @@ plainto_tsquery('english', :searchTerm)
     ORDER BY "OffchainComments".created_at DESC LIMIT :limit)
 ) s
 ORDER BY created_at DESC LIMIT :limit;
