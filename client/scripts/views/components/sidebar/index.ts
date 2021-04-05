@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 import {
-  Button, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner, Select
+  Button, Popover, PopoverMenu, MenuItem, Icon, Icons, Tag, Tooltip, Spinner, Select
 } from 'construct-ui';
 
 import { selectNode, initChain } from 'app';
@@ -449,35 +449,55 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
     if (!website && !discord && !telegram && !github) return;
 
     return m('.ExternalLinksModule.SidebarModule', [
-      discord && m(Button, {
-        rounded: true,
-        onclick: () => window.open(discord),
-        label: m.trust(discordIcon),
-        class: 'discord-button',
+      discord && m(Tooltip, {
+        transitionDuration: 100,
+        content: 'Discord',
+        trigger: m(Button, {
+          rounded: true,
+          onclick: () => window.open(discord),
+          label: m.trust(discordIcon),
+          class: 'discord-button',
+        }),
       }),
-      element && m(Button, {
-        rounded: true,
-        onclick: () => window.open(element),
-        label: m.trust(elementIcon),
-        class: 'element-button',
+      element && m(Tooltip, {
+        transitionDuration: 100,
+        content: 'Element',
+        trigger: m(Button, {
+          rounded: true,
+          onclick: () => window.open(element),
+          label: m.trust(elementIcon),
+          class: 'element-button',
+        }),
       }),
-      telegram && m(Button, {
-        rounded: true,
-        onclick: () => window.open(telegram),
-        label: m.trust(telegramIcon),
-        class: 'telegram-button',
+      telegram && m(Tooltip, {
+        transitionDuration: 100,
+        content: 'Telegram',
+        trigger: m(Button, {
+          rounded: true,
+          onclick: () => window.open(telegram),
+          label: m.trust(telegramIcon),
+          class: 'telegram-button',
+        }),
       }),
-      github && m(Button, {
-        rounded: true,
-        onclick: () => window.open(github),
-        label: m.trust(githubIcon),
-        class: 'github-button',
+      github && m(Tooltip, {
+        transitionDuration: 100,
+        content: 'Github',
+        trigger: m(Button, {
+          rounded: true,
+          onclick: () => window.open(github),
+          label: m.trust(githubIcon),
+          class: 'github-button',
+        }),
       }),
-      website && m(Button, {
-        rounded: true,
-        onclick: () => window.open(website),
-        label: m.trust(websiteIcon),
-        class: 'website-button',
+      website && m(Tooltip, {
+        transitionDuration: 100,
+        content: 'Homepage',
+        trigger: m(Button, {
+          rounded: true,
+          onclick: () => window.open(website),
+          label: m.trust(websiteIcon),
+          class: 'website-button',
+        }),
       }),
     ]);
   }

@@ -127,6 +127,7 @@ export class SubstrateTreasuryProposal
     this._author = this._Accounts.fromAddress(this.data.proposer || entity.author);
     this.title = entity.title || this.generateTitle();
     this.createdAt = entity.createdAt;
+    this.threadId = entity.threadId;
 
     entity.chainEvents.forEach((e) => this.update(e));
 
