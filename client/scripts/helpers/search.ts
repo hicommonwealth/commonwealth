@@ -54,7 +54,7 @@ export const searchChainsAndCommunities = async (
 
 export const ProposalIcon = {
   view: (vnode) => {
-    return m('svg.SwitchIcon', {
+    return m('svg.ProposalIcon', {
       width: '29px',
       height: '25px',
       viewBox: '0 0 29 25',
@@ -72,18 +72,18 @@ export const ProposalIcon = {
 
 export const DiscussionIcon = {
   view: (vnode) => {
-    return m('svg.SwitchIcon', {
+    return m('svg.DiscussionIcon', {
       width: '42px',
       height: '33px',
       viewBox: '0 0 42 33',
       fill: 'none'
     }, [
       m('path', {
-        stroke: '#DADADA',
+        fill: '#DADADA',
         d: 'M20 0C16.6863 0 14 2.68629 14 6C14 9.31371 16.6863 12 20 12H34V16.5C34 16.5 42 11.3995 42 6C42 2.68629 39.3137 0 36 0H20Z'
       }),
       m('path', {
-        stroke: '#DADADA',
+        fill: '#DADADA',
         d: 'M22 16C25.3137 16 28 18.6863 28 22C28 25.3137 25.3137 28 22 28H8V32.5C8 32.5 0 27.3995 0 22C0 18.6863 2.68629 16 6 16H22Z'
       }),
     ]);
@@ -92,7 +92,7 @@ export const DiscussionIcon = {
 
 export const MemberIcon = {
   view: (vnode) => {
-    return m('svg.SwitchIcon', {
+    return m('svg.MemberIcon', {
       width: '42px',
       height: '33px',
       viewBox: '0 0 42 33',
@@ -108,7 +108,7 @@ export const MemberIcon = {
 
 export const CommunityIcon = {
   view: (vnode) => {
-    return m('svg.SwitchIcon', {
+    return m('svg.CommunityIcon', {
       width: '42px',
       height: '33px',
       viewBox: '0 0 42 33',

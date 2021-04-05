@@ -6,7 +6,14 @@ import moment from 'moment-twitter';
 import { Tabs, Spinner, TabItem, Tag, ListItem } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
-import { searchMentionableAddresses, searchDiscussions, searchChainsAndCommunities, DiscussionIcon, CommunityIcon, MemberIcon } from 'helpers/search';
+import {
+  searchMentionableAddresses,
+  searchDiscussions,
+  searchChainsAndCommunities,
+  DiscussionIcon,
+  CommunityIcon,
+  MemberIcon
+} from 'helpers/search';
 import app from 'state';
 import { AddressInfo, Profile } from 'models';
 
@@ -103,7 +110,7 @@ const getMemberResult = (addr, searchTerm) => {
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Linkification of full ListItem
   return m(ListItem, {
-    class: 'search-results-item',
+    class: 'a.search-results-item',
     contentLeft: m(MemberIcon),
     label: m(UserBlock, {
       user: profile,
@@ -118,16 +125,15 @@ const getMemberResult = (addr, searchTerm) => {
 const getCommunityResult = (community) => {
   if (community.contentType === ContentType.Token) {
     return m(ListItem, {
-      class: 'search-results-item',
       contentLeft: m(CommunityIcon),
-      label: [
+      label: m('a.search-results-item', [
         m('img', {
           src: community.logoURI,
           height: '15px',
           width: '15px'
         }),
         m('span', community.name)
-      ],
+      ]),
       onclick: (e) => {
         // TODO: Linkification of tokens
         m.route.set('/');
@@ -136,8 +142,8 @@ const getCommunityResult = (community) => {
   } else if (community.contentType === ContentType.Chain
     || community.contentType === ContentType.Community) {
     return m(ListItem, {
-      class: 'search-results-item',
       contentLeft: m(CommunityIcon),
+      label: m('a.search-results-item', [ m(CommunityLabel, { community }) ]),
       onclick: (e) => {
         m.route.set(community.id ? `/${community.id}` : '/');
       }
@@ -149,11 +155,13 @@ const getDiscussionResult = (thread, searchTerm) => {
   // TODO: Separate threads, proposals, and comments
   const activeId = app.activeId();
   const proposalId = thread.proposalid;
-  return link('a.search-results-item',
-    (thread.type === 'thread')
-      ? `/${activeId}/proposal/discussion/${proposalId}`
-      : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`,
-    [
+  return m(ListItem, {
+    onclick: (e) => {
+      m.route.set((thread.type === 'thread')
+        ? `/${activeId}/proposal/discussion/${proposalId}`
+        : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+    },
+    label: m('a.search-results-item', [
       thread.type === 'thread' ? [
         m('.search-results-thread-title', [
           decodeURIComponent(thread.title),
@@ -216,7 +224,9 @@ const getDiscussionResult = (thread, searchTerm) => {
           })(),
         ]),
       ]
-    ]);
+    ]),
+    contentLeft: m(DiscussionIcon)
+  });
 };
 
 const getListing = (state: any, results: any, searchTerm: string, searchType?: SearchType) => {
