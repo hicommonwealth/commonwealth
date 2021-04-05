@@ -1,33 +1,25 @@
-@import 'client/styles/shared';
+@import "client/styles/shared";
 
 .LoginWithWalletDropdown {
 }
 
 .login-with-web3 {
-    .cui-icon {
-        position: relative;
-        top: -2px;
-        margin-left: 4px;
-        svg polyline {
-            stroke-width: 2.25px;
-        }
+  .cui-icon {
+    position: relative;
+    top: -2px;
+    margin-left: 4px;
+    svg polyline {
+      stroke-width: 2.25px;
     }
-    &.cui-button.cui-fluid {
-        width: fit-content;
-        border-radius: 6px;
-        background-image: linear-gradient(to bottom left, #6086D1, #B37DBA);
-        span {
-            padding-right: 0px;
-        }
-    }
+  }
 }
 
 .LoginWithWalletDropdownPopoverMenu {
-    .chain-login-label {
-        display: flex;
-        .chain-login-label-name {
-            margin: 3px 0;
-            margin-left: 10px;
-        }
+  .chain-login-label {
+    display: flex;
+    .chain-login-label-name {
+      margin: 3px 0;
+      margin-left: 10px;
     }
+  }
 }
