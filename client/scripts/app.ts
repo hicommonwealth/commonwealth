@@ -624,6 +624,10 @@ $(() => {
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
 
+    // Search
+    '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
+
+
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),

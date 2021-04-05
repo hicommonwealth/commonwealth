@@ -26,9 +26,9 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 const searchCache = {}; // only used to restore search results when returning to the page
 
 export enum SearchType {
-  Discussion = 'discussions',
-  Community = 'communities',
-  Member = 'members',
+  Discussion = 'discussion',
+  Community = 'community',
+  Member = 'member',
   Top = 'top',
 }
 
@@ -139,7 +139,7 @@ const getDiscussionResult = (thread, searchTerm) => {
   return link('a.search-results-item',
     (thread.type === 'thread')
       ? `/${activeId}/proposal/discussion/${proposalId}`
-      : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`, 
+      : `/${activeId}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`,
     [
       thread.type === 'thread' ? [
         m('.search-results-thread-title', [
@@ -293,6 +293,13 @@ const SearchPage : m.Component<{
       vnode.state.activeTab
     );
 
+    const resultCount = vnode.state.activeTab === SearchType.Top
+      ? tabScopedListing.length === SEARCH_PAGE_SIZE
+        ? `${tabScopedListing.length}+ results`
+        : pluralize(tabScopedListing.length, 'result')
+      : tabScopedListing.length === SEARCH_PAGE_SIZE
+        ? `${tabScopedListing.length}+ ${capitalize(vnode.state.activeTab)} results`
+        : pluralize(tabScopedListing.length, `${capitalize(vnode.state.activeTab)} result`);
 
     return m(Sublayout, {
       class: 'SearchPage',
@@ -303,7 +310,7 @@ const SearchPage : m.Component<{
       showNewProposalButton: true,
     }, m(Tabs, [
       m(TabItem, {
-        label: capitalize(SearchType.Top) || 'test',
+        label: 'Top',
         active: vnode.state.activeTab === SearchType.Top,
         onclick: () => {
           vnode.state.pageCount = 1;
@@ -311,7 +318,7 @@ const SearchPage : m.Component<{
         },
       }),
       m(TabItem, {
-        label: capitalize(SearchType.Community) || 'test',
+        label: 'Communities',
         active: vnode.state.activeTab === SearchType.Community,
         onclick: () => {
           vnode.state.pageCount = 1;
@@ -319,7 +326,7 @@ const SearchPage : m.Component<{
         },
       }),
       m(TabItem, {
-        label: capitalize(SearchType.Discussion) || 'test',
+        label: 'Discussion',
         active: vnode.state.activeTab === SearchType.Discussion,
         onclick: () => {
           vnode.state.pageCount = 1;
@@ -327,7 +334,7 @@ const SearchPage : m.Component<{
         },
       }),
       m(TabItem, {
-        label: capitalize(SearchType.Member) || 'test',
+        label: 'Members',
         active: vnode.state.activeTab === SearchType.Member,
         onclick: () => {
           vnode.state.pageCount = 1;
@@ -346,16 +353,21 @@ const SearchPage : m.Component<{
         m('.error-text', vnode.state.errorText),
       ]) : m('.search-results', [
         m('.search-results-caption', [
-          tabScopedListing.length === SEARCH_PAGE_SIZE
-            ? `${tabScopedListing.length}+ results`
-            : pluralize(tabScopedListing.length, 'result'),
+          resultCount,
           ' for \'',
           vnode.state.searchTerm,
           '\'',
-          ' in ',
           vnode.state.activeTab === SearchType.Top
-            ? capitalize(app.activeId())
-            : capitalize(vnode.state.activeTab),
+            && ` in ${capitalize(app.activeId())}`,
+          capitalize(app.activeId())
+            && [
+              '. ',
+              link(
+                'a.search-all-communities',
+                `/search?q=${searchTerm}`,
+                'Search all communities?'
+              )
+            ]
         ]),
         m('.search-results-list', tabScopedListing),
       ]),
