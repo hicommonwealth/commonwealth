@@ -6,7 +6,7 @@ import moment from 'moment-twitter';
 import { Tabs, Spinner, TabItem, Tag, ListItem } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
-import { searchMentionableAddresses, searchDiscussions, searchChainsAndCommunities, DiscussionIcon } from 'helpers/search';
+import { searchMentionableAddresses, searchDiscussions, searchChainsAndCommunities, DiscussionIcon, CommunityIcon, MemberIcon } from 'helpers/search';
 import app from 'state';
 import { AddressInfo, Profile } from 'models';
 
@@ -100,39 +100,48 @@ export const search = async (searchTerm, communityScope, vnode) => {
 // TODO: Linkification of users, tokens, comms results
 const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
+  const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
+  // TODO: Linkification of full ListItem
   return m(ListItem, {
     class: 'search-results-item',
-    contentLeft: m(DiscussionIcon),
+    contentLeft: m(MemberIcon),
     label: m(UserBlock, {
       user: profile,
-      linkify: true,
       searchTerm,
-    })
+    }),
+    onclick: (e) => {
+      m.route.set(userLink);
+    }
   });
 };
 
 const getCommunityResult = (community) => {
   if (community.contentType === ContentType.Token) {
-    // TODO: Linkification of tokens
-    return link(
-      'a.search-results-item',
-      '#',
-      [
+    return m(ListItem, {
+      class: 'search-results-item',
+      contentLeft: m(CommunityIcon),
+      label: [
         m('img', {
           src: community.logoURI,
           height: '15px',
           width: '15px'
         }),
         m('span', community.name)
-      ]
-    );
+      ],
+      onclick: (e) => {
+        // TODO: Linkification of tokens
+        m.route.set('/');
+      }
+    });
   } else if (community.contentType === ContentType.Chain
     || community.contentType === ContentType.Community) {
-    return link(
-      'a.search-results-item',
-      community.id ? `/${community.id}` : '/',
-      m(CommunityLabel, { community })
-    );
+    return m(ListItem, {
+      class: 'search-results-item',
+      contentLeft: m(CommunityIcon),
+      onclick: (e) => {
+        m.route.set(community.id ? `/${community.id}` : '/');
+      }
+    });
   }
 };
 
