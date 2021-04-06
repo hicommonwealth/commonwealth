@@ -228,7 +228,7 @@ export const ProposalHeaderPollEditorButton: m.Component<{ openPollEditor: Funct
       class: 'ProposalHeaderPollEditorButton',
       rounded: true,
       size: 'xs',
-      label: 'Select poll',
+      label: 'Create poll',
       onclick: (e) => {
         e.preventDefault();
         openPollEditor();

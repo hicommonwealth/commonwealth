@@ -1,6 +1,8 @@
+import 'components/poll_editor.scss';
+
 import m from 'mithril';
 import $ from 'jquery';
-import { QueryList, ListItem, Button, Classes, Dialog, InputSelect, Icon, Icons, MenuItem } from 'construct-ui';
+import { Switch, Button, Classes, Dialog } from 'construct-ui';
 
 import app from 'state';
 import { OffchainThread } from 'models';
@@ -19,9 +21,12 @@ const PollEditor: m.Component<{
         closeOnOutsideClick: true,
         class: 'PollEditorDialog',
         content: [
-          m('h4', 'Select a poll'),
-          m('.poll-options', [
-            'poll options',
+          m(Switch, {
+            intent: 'positive',
+            label: 'Turn on polling',
+          }),
+          m('p', [
+            'Once turned on, this poll will run for 7 days.',
           ]),
         ],
         hasBackdrop: true,
@@ -30,7 +35,7 @@ const PollEditor: m.Component<{
         onClose: () => {
           vnode.attrs.onChangeHandler();
         },
-        title: 'Edit poll',
+        title: 'Create offchain poll',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
