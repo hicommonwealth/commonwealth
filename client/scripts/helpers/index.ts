@@ -2,7 +2,7 @@ import m from 'mithril';
 import moment from 'moment-twitter';
 
 import app from 'state';
-import { OffchainThreadStage } from 'models/types';
+import { OffchainThreadStage, OffchainVoteOptions } from 'models';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -41,6 +41,18 @@ export function offchainThreadStageToIndex(stage: OffchainThreadStage) {
     return 6;
   } else {
     return 7;
+  }
+}
+
+export function offchainVoteToLabel(option) {
+  switch (option) {
+    case OffchainVoteOptions.APPROVE: return 'Approve';
+    case OffchainVoteOptions.LEAN_APPROVE: return 'Undecided, leaning approve';
+    case OffchainVoteOptions.UNDECIDED_INFO: return 'Undecided, need more information';
+    case OffchainVoteOptions.UNDECIDED_CHANGES: return 'Undecided, changes requested';
+    case OffchainVoteOptions.LEAN_DISAPPROVE: return 'Undecided, leaning disapprove';
+    case OffchainVoteOptions.DISAPPROVE: return 'Disapprove';
+    default: // invalid
   }
 }
 

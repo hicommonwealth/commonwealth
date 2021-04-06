@@ -106,6 +106,15 @@ export enum OffchainThreadStage {
   Abandoned = 'abandoned',
 }
 
+export enum OffchainVoteOptions {
+  APPROVE,
+  LEAN_APPROVE,
+  UNDECIDED_INFO,
+  UNDECIDED_CHANGES,
+  LEAN_DISAPPROVE,
+  DISAPPROVE,
+}
+
 export enum TransactionStatus {
   'Ready',
   'Success',

@@ -43,6 +43,7 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import {
   ProposalHeaderExternalLink, ProposalHeaderBlockExplorerLink, ProposalHeaderVotingInterfaceLink,
+  ProposalHeaderOffchainPoll,
   ProposalHeaderThreadLink, ProposalHeaderThreadLinkedChainEntity,
   ProposalHeaderTopics, ProposalHeaderTitle, ProposalHeaderStage, ProposalHeaderStageEditorButton,
   ProposalHeaderPollEditorButton,
@@ -260,6 +261,8 @@ const ProposalHeader: m.Component<{
                 proposal['votingInterfaceLink'] && m(ProposalHeaderVotingInterfaceLink, { proposal }),
               ]),
           ]),
+          proposal instanceof OffchainThread
+            && m(ProposalHeaderOffchainPoll), // TODO: only show this if the thread has a poll
         ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-content', [

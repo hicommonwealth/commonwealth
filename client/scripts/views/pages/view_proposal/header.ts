@@ -6,6 +6,7 @@ import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
 import {
   pluralize, link, externalLink, extractDomain,
   offchainThreadStageToLabel,
+  offchainVoteToLabel,
   slugify,
 } from 'helpers';
 import {
@@ -19,6 +20,7 @@ import {
   OffchainThread,
   OffchainThreadKind,
   OffchainThreadStage,
+  OffchainVoteOptions,
   AnyProposal,
 } from 'models';
 
@@ -45,25 +47,35 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
 export const ProposalHeaderOffchainPoll: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     return m('.ProposalHeaderOffchainPoll', [
-      m('.offchain-poll-option', [
+      m('.offchain-poll-header', 'Poll'),
+      [
+        OffchainVoteOptions.APPROVE,
+        OffchainVoteOptions.LEAN_APPROVE,
+        OffchainVoteOptions.UNDECIDED_INFO,
+        OffchainVoteOptions.UNDECIDED_CHANGES,
+        OffchainVoteOptions.LEAN_DISAPPROVE,
+        OffchainVoteOptions.DISAPPROVE,
+      ].map((option) => m('.offchain-poll-option', [
         m('.offchain-poll-option-left', [
-          poll[option].title,
+          offchainVoteToLabel(option),
         ]),
-        m('.offchain-poll-option-right', [
-          m('.offchain-poll-voters', poll[option].length),
-          m('.offchain-poll-voters-bar', [
-            m('.offchain-poll-voters-bar-inner', { style: `${poll[option].length / totalLength * 100}%` }),
-          ]),
+        m('.offchain-poll-option-action', [
           m(Button, {
-            class: 'offchain-poll-voters-action',
-            label: 'Select',
-            disabled: !canVote || !alreadyVoted,
-            onclick: (e) => {
+            rounded: true,
+            compact: true,
+            size: 'sm',
+            intent: 'primary', // TODO
+            label: 'Vote', // TODO
+            disabled: false, // !canVote || !alreadyVoted, // TODO
+            onclick: () => {
               // TODO
             }
           }),
         ]),
-      ]),
+        m('.offchain-poll-option-right', [
+          // m(UserGallery)
+        ]),
+      ])),
     ]);
   }
 };
