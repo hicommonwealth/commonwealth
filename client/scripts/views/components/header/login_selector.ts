@@ -260,11 +260,11 @@ const LoginSelector: m.Component<{
             activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
               onclick: () => {
                 const pf = app.user.activeAccount.profile;
-                if (pf) {
-                  m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain}`);
-                } else {
+                if (app.chain) {
+                  m.route.set(`/${app.activeId()}/account/${pf.address}`);
+                } else if (app.community) {
                   const a = app.user.activeAccount;
-                  m.route.set(`/${app.activeId()}/account/${a.address}?base=${a.chain}`);
+                  m.route.set(`/${app.activeId()}/account/${pf.address}?base=${pf.chain || a.chain.id}`);
                 }
               },
               label: 'View profile',
