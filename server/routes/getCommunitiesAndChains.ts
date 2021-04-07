@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 const { Op } = Sequelize;
 
-const DEFAULT_SEARCH_LIMIT = 50;
+const DEFAULT_SEARCH_LIMIT = 100;
 
 const getCommunitiesAndChains = async (models, req: Request, res: Response, next: NextFunction) => {
   const params = {

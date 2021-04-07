@@ -39,8 +39,8 @@ export const searchMentionableAddresses = async (
 };
 
 export const searchChainsAndCommunities = async (
-  searchTerm: string,
-  limit: number = 50,
+  searchTerm?: string,
+  limit?: number,
 ) => {
   const response = await $.get(`${app.serverUrl()}/getCommunitiesAndChains`, {
     searchTerm,
