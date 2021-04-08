@@ -10,10 +10,28 @@
  */
 
 const newChainRecords = [{
-  id: 'edgeware-local',
+  id: 'edgeware',
   network: 'edgeware',
   symbol: 'EDG',
+  name: 'Edgeware',
+  active: true,
+}, {
+  id: 'edgeware-testnet',
+  network: 'edgeware',
+  symbol: 'testEDG',
+  name: 'Edgeware Testnet',
+  active: true,
+}, {
+  id: 'edgeware-local',
+  network: 'edgeware',
+  symbol: 'testEDG',
   name: 'Edgeware Local',
+  active: true,
+}, {
+  id: 'kusama',
+  network: 'kusama',
+  symbol: 'KSM',
+  name: 'Kusama',
   active: true,
 }, {
   id: 'cosmos',

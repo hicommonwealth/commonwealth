@@ -41,11 +41,15 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date(),
         }));
-      }
+      };
 
       await Promise.all([
-        queryInterface.bulkInsert('Roles', update(addressChainAssociations[0]), { transaction: t }),
-        queryInterface.bulkInsert('Roles', update(addressPublicCommunityAssociations[0]), { transaction: t }),
+        addressChainAssociations[0].length > 0
+          ? queryInterface.bulkInsert('Roles', update(addressChainAssociations[0]), { transaction: t })
+          : null,
+        addressPublicCommunityAssociations[0].length > 0
+          ? queryInterface.bulkInsert('Roles', update(addressPublicCommunityAssociations[0]), { transaction: t })
+          : null,
       ]);
 
       // we can drop the memberships table now
