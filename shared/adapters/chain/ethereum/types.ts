@@ -49,3 +49,16 @@ export class MPond extends EthereumCoin {
     return this.format();
   }
 }
+
+export class Uni extends EthereumCoin {
+  public readonly contractAddress: string;
+
+  constructor(contractAddress: string, n: number | BN | Uni) {
+    super('Uni', n, false);
+    this.contractAddress = contractAddress;
+  }
+
+  public toString() {
+    return this.format();
+  }
+}

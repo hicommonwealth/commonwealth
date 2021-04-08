@@ -141,6 +141,7 @@ export enum VotingType {
   None = 'none',
   MolochYesNo = 'moloch',
   MarlinYesNo = 'marlin',
+  CompoundalphaYesNo = 'compoundalpha',
 }
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',
