@@ -8,12 +8,14 @@ module.exports = {
           id: 'ethereum',
           network: 'ethereum',
           symbol: 'ETH',
+          icon_url: '/static/img/protocols/eth.png',
           name: 'Ethereum',
           active: true,
         }, {
           id: 'ethereum-local',
           network: 'ethereum',
           symbol: 'ETH',
+          icon_url: '/static/img/protocols/eth.png',
           name: 'Ethereum Local Testnet',
           active: true,
         }], { transaction: t });
@@ -29,9 +31,7 @@ module.exports = {
         console.log('Could not insert Ethereum nodes, maybe they already exist!');
       }
     });
-
   },
-
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       try {
