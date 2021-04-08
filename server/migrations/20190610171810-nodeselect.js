@@ -13,36 +13,42 @@ const newChainRecords = [{
   id: 'edgeware',
   network: 'edgeware',
   symbol: 'EDG',
+  icon_url: '/static/img/protocols/edg.png',
   name: 'Edgeware',
   active: true,
 }, {
   id: 'edgeware-testnet',
   network: 'edgeware',
   symbol: 'testEDG',
+  icon_url: '/static/img/protocols/edg.png',
   name: 'Edgeware Testnet',
   active: true,
 }, {
   id: 'edgeware-local',
   network: 'edgeware',
   symbol: 'testEDG',
+  icon_url: '/static/img/protocols/edg.png',
   name: 'Edgeware Local',
   active: true,
 }, {
   id: 'kusama',
   network: 'kusama',
   symbol: 'KSM',
+  icon_url: '/static/img/protocols/ksm.png',
   name: 'Kusama',
   active: true,
 }, {
   id: 'cosmos',
   network: 'cosmos',
   symbol: 'ATOM',
+  icon_url: '/static/img/protocols/atom.png',
   name: 'Cosmos Hub',
   active: false,
 }, {
   id: 'cosmos-local',
   network: 'cosmos',
   symbol: 'ATOM',
+  icon_url: '/static/img/protocols/atom.png',
   name: 'Cosmos Local',
   active: false,
 }];
@@ -51,11 +57,15 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       // clean up old chains
-      await queryInterface.bulkDelete('Chains', { id: [ 'cosmos', 'maker', 'tezos', 'polkadot', 'ethereum', ] },
-                                      { transaction: t });
+      await queryInterface.bulkDelete('Chains', {
+        id: [ 'cosmos', 'maker', 'tezos', 'polkadot', 'ethereum', ]
+      }, { transaction: t });
+
       // convert old 'edgeware' to new 'edgeware-testnet'
-      await queryInterface.bulkUpdate('Chains', { id: 'edgeware-testnet', name: 'Edgeware Testnet' }, { id: 'edgeware' },
-                                      { transaction: t });
+      await queryInterface.bulkUpdate('Chains', {
+        id: 'edgeware-testnet',
+        name: 'Edgeware Testnet'
+      }, { id: 'edgeware' }, { transaction: t });
 
       // update other columns to support node selection
       await Promise.all([
@@ -88,8 +98,11 @@ module.exports = {
       await queryInterface.bulkDelete('ChainNodes', { }, { transaction: t });
 
       await queryInterface.bulkInsert('ChainNodes', [
-        { chain: 'edgeware-local', url: 'localhost:9944', },
-        //{ chain: 'edgeware-testnet', url: 'testnode.edgewa.re', },
+        { chain: 'edgeware-local', url: 'localhost:9944' },
+        { chain: 'edgeware', url: 'mainnet1.edgewa.re' },
+        { chain: 'edgeware', url: 'mainnet2.edgewa.re' },
+        { chain: 'edgeware', url: 'mainnet3.edgewa.re' },
+        { chain: 'edgeware', url: 'mainnet4.edgewa.re' },
       ], { transaction: t });
     });
   },
@@ -101,14 +114,15 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 9944,
         allowNull: false,
-      }, { transaction: t }),
+      }, { transaction: t });
 
       // remove new chains
-      await queryInterface.bulkDelete('Chains', { id: newChainRecords.map(r => r.id) }, { transaction: t });
+      await queryInterface.bulkDelete('Chains', { id: newChainRecords.map((r) => r.id) }, { transaction: t });
 
       // convert 'edgeware' back to 'edgeware-testnet'
-      await queryInterface.bulkUpdate('Chains', { id: 'edgeware', name: 'Edgeware' }, { id: 'edgeware-testnet' },
-                                      { transaction: t });
+      await queryInterface.bulkUpdate('Chains', { id: 'edgeware', name: 'Edgeware' }, {
+        id: 'edgeware-testnet'
+      }, { transaction: t });
 
       await Promise.all([
         queryInterface.removeColumn('Chains', 'network', { transaction: t }),
@@ -117,4 +131,4 @@ module.exports = {
       ]);
     });
   }
-}
+};
