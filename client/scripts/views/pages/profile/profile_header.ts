@@ -78,6 +78,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
+    console.log(account);
     const isClaimable = !account || !account.profile || account.profile.isEmpty;
 
     const joinCommunity = async () => {

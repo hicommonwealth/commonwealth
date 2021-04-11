@@ -1,37 +1,66 @@
-.OnboardingModalConnectTab {
+.OnboardingConnect {
   padding: 25px 0;
+  text-align: center;
 
   .title {
     display: flex;
     align-items: center;
     flex-direction: column;
+    width: 360px;
+    margin: auto;
+
+    .icons {
+      display: flex;
+      align-items: center;
+      svg:nth-child(2) {
+        margin: 0 45px;
+      }
+    }
 
     h2 {
-      margin: 17px 0;
+      font-size: 32px;
+      line-height: 38.4px;
+      margin: 34px 0 8px 0;
+    }
+
+    span {
+      text-align: center;
+      font-size: 18px;
+      line-height: 21.6px;
     }
   }
 
-  .options {
-    .option-row {
-      display: flex;
-      align-items: center;
-      margin-top: 40px;
+  .address {
+    background: #ffffe8;
+    padding: 10px 20px;
+    margin: 25px auto;
+    line-height: 1;
+    width: fit-content;
+  }
 
-      .icon {
-        min-width: 80px;
-      }
+  button {
+    background: linear-gradient(274.37deg, #333239 0%, #1a191f 81.48%);
+    color: white;
+    border-radius: 8px;
+    margin: 10px 0;
+    padding: 20px;
+    width: 200px;
+  }
 
-      .description {
-        min-width: 288px;
-        max-width: 288px;
-        margin: 0 20px;
-      }
+  .or {
+    font-size: 18px;
+    line-height: 21.6px;
+    color: #999999;
+    margin: 35px 0;
+  }
 
-      button {
-        background: linear-gradient(274.37deg, #333239 0%, #1a191f 81.48%);
-        color: white;
-        border-radius: 8px;
-      }
-    }
+  .cli {
+    color: #140994;
+    font-size: 14px;
+    line-height: 17px;
+    border-bottom: 1px dashed #140994;
+    cursor: pointer;
+    width: fit-content;
+    margin: auto;
   }
 }

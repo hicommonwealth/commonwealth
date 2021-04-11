@@ -2,60 +2,106 @@
 
 .OnboardingModal {
   width: calc(100vw - 300px);
-  max-width: 1271px;
+  max-width: 960px;
 
   .onboarding-modal-content {
     width: 600px;
-    margin: 60px auto 100px auto;
+    margin: 60px auto 75px auto;
+  }
 
-    .Tabs {
-      .tab-bar {
-        display: flex;
-        justify-content: space-between;
+  form {
+    .cui-form-group {
+      label {
+        margin-top: 30px;
+        color: #999999;
+      }
 
-        .clear {
-          position: absolute;
+      .cui-input {
+        input {
+          background: #eeeeee;
         }
       }
     }
+  }
 
-    form {
-      .cui-form-group {
-        label {
-          margin-top: 30px;
-          color: #999999;
+  .OnboardingFooterActions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 30px;
+
+    button {
+      background-color: white;
+      padding: 6px 15px;
+      border-radius: 8px;
+      width: 180px;
+      border: 2px solid #999;
+
+      span {
+        color: #999;
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 22px;
+      }
+
+      &:first-child {
+        svg {
+          margin-right: 16px;
         }
+      }
 
-        .cui-input {
-          input {
-            background: #eeeeee;
+      &:last-child {
+        span {
+          background: -webkit-linear-gradient(#6086d1, #b37dba);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        svg {
+          margin-left: 16px;
+        }
+      }
+
+      &.disabled {
+        border: 2px solid #dddddd;
+        span {
+          color: #ddd;
+          background: unset;
+          -webkit-background-clip: unset;
+          -webkit-text-fill-color: unset;
+        }
+        svg {
+          path {
+            fill: #ddd;
           }
         }
-
-        button[type="submit"] {
-          background-color: white;
-          border-radius: 8px;
-          color: #999;
-        }
+        pointer-events: none;
       }
     }
+  }
 
-    .footerL {
-      svg {
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        z-index: -1;
-      }
-    }
+  .footerL {
+    position: absolute;
+    width: 80%;
+    height: 150px;
+    left: 0;
+    bottom: 0;
+    z-index: -1;
+    background: #7edade;
+    opacity: 0.3;
+    filter: blur(100px);
+    transform: matrix(-1, 0, 0, 1, 0, 0);
+  }
 
-    .footerR {
-      svg {
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        z-index: -1;
-      }
-    }
+  .footerR {
+    display: none;
+    position: absolute;
+    width: 40%;
+    height: 400px;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: linear-gradient(230.54deg, rgba(121, 224, 232, 0.1) 20.32%, rgba(191, 142, 96, 0.1) 38.38%, rgba(214, 159, 204, 0.1) 54.5%, rgba(179, 125, 186, 0.1) 73.68%);
+    filter: blur(80px);
+    border-radius: 230.704px;
   }
 }

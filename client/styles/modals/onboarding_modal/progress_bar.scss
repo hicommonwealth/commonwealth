@@ -1,0 +1,37 @@
+.OnboardingProgressBar {
+  width: 600px;
+  margin: 60px auto 30px auto;
+
+  .titles {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    span {
+      width: 130px;
+
+      &:nth-child(2) {
+        text-align: center;
+      }
+    }
+  }
+
+  .bar {
+    width: 100%;
+    height: 5px;
+    background-color: #eeeeee;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 12px;
+
+    .passed {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 60px;
+      background: linear-gradient(to right, #b37dba, #6086d1);
+    }
+  }
+}

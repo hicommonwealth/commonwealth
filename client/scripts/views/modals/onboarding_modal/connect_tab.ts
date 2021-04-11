@@ -3,58 +3,36 @@ import 'modals/onboarding_modal/connect_tab.scss';
 import { Button } from 'construct-ui';
 import m from 'mithril';
 
-import { onboardingCWIcon, onboardingEmailIcon, onboardingGithubIcon, onboardingWalletIcon } from '../../components/sidebar/icons';
+import { onboardingCWIcon, onboardingArrowRightIcon, onboardingWalletIcon } from '../../components/sidebar/icons';
 
-const OnboardingModalConnectTab: m.Component<{}, {}> = {
+interface IOnboardingConnectAttr {
+  onUseWallet: () => void;
+  onUseCLI: () => void;
+}
+
+const OnboardingConnect: m.Component<IOnboardingConnectAttr, {}> = {
   view: (vnode) => {
-    return m('.OnboardingModalConnectTab', [
+    return m('.OnboardingConnect', [
       m('div.title', [
-        m.trust(onboardingCWIcon),
-        m('h2', 'Connect to Commonwealth'),
-      ]),
-      m('div.options', [
-        m('div.option-row', [
-          m('div.icon', [
-            m.trust(onboardingWalletIcon),
-          ]),
-          m('span.description', [
-            'Connect a ',
-            m('strong', 'wallet address'),
-            ' to start participating and receiving notifications.'
-          ]),
-          m(Button, {
-            label: 'Connect Wallet'
-          })
+        m('div.icons', [
+          m.trust(onboardingWalletIcon),
+          m.trust(onboardingArrowRightIcon),
+          m.trust(onboardingCWIcon),
         ]),
-        m('div.option-row', [
-          m('div.icon', [
-            m.trust(onboardingEmailIcon),
-          ]),
-          m('span.description', [
-            'Sign up via ',
-            m('strong', 'email'),
-            ' to start recieving notifications and/or set up an crypto address if you don’t have one.'
-          ]),
-          m(Button, {
-            label: 'Sign Up via Email'
-          })
-        ]),
-        m('div.option-row', [
-          m('div.icon', [
-            m.trust(onboardingGithubIcon),
-          ]),
-          m('span.description', [
-            'Continue with ',
-            m('strong', 'Github'),
-            ' to connect to Commonwealth.'
-          ]),
-          m(Button, {
-            label: 'Continue with Github'
-          })
-        ])
+        m('h2', 'Connect Your Wallet'),
+        m('span', 'Connect your wallet address to claim the following address on Commonwealth.')
       ]),
+      m('div.address', '5GZLd2vkbZS9yCkEGPq1WaLJ5hr79v9ecyXFCXkVjPjuDzrf'),
+      m(Button, {
+        label: 'Connect Wallet',
+        onclick: () => {
+          vnode.attrs.onUseWallet();
+        }
+      }),
+      m('div.or', 'OR'),
+      m('div.cli', 'Claim address with command line')
     ]);
   },
 };
 
-export default OnboardingModalConnectTab;
+export default OnboardingConnect;
