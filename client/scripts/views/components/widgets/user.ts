@@ -10,13 +10,6 @@ import app from 'state';
 import { Account, AddressInfo, ChainInfo, ChainBase, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 
-export const CHAINBASE_SHORT_FOR_AVATAR = {
-  [ChainBase.CosmosSDK]: 'ATOM',
-  [ChainBase.Ethereum]: 'ETH',
-  [ChainBase.NEAR]: 'NEAR',
-  [ChainBase.Substrate]: 'SUB',
-};
-
 const User: m.Component<{
   user: Account<any> | AddressInfo | Profile;
   avatarSize?: number;
@@ -218,8 +211,6 @@ export const UserBlock: m.Component<{
           avatarSize: 28,
           popover,
         }),
-        // TODO: this is weird...symbol display should not depend on user being an Account
-        user.chain instanceof ChainInfo && m('.user-block-symbol', CHAINBASE_SHORT_FOR_AVATAR[user.chain.base]),
       ]),
       m('.user-block-center', [
         m('.user-block-name', [
