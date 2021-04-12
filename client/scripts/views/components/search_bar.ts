@@ -131,12 +131,11 @@ export const getMemberPreview = (addr, searchTerm) => {
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Display longer or even full addresses
   return m(ListItem, {
-    contentLeft: m(MemberIcon),
     label: m('a.search-results-item', [
       m(UserBlock, {
         user: profile,
         searchTerm,
-        avatarSize: 36,
+        avatarSize: 17,
       }),
     ]),
     onclick: (e) => {
@@ -148,7 +147,6 @@ export const getMemberPreview = (addr, searchTerm) => {
 export const getCommunityPreview = (community) => {
   if (community.contentType === ContentType.Token) {
     return m(ListItem, {
-      contentLeft: m(CommunityIcon),
       label: m('a.search-results-item', [
         m('img', {
           src: community.logoURI,
@@ -165,7 +163,6 @@ export const getCommunityPreview = (community) => {
   } else if (community.contentType === ContentType.Chain
     || community.contentType === ContentType.Community) {
     return m(ListItem, {
-      contentLeft: m(CommunityIcon),
       label: m('a.search-results-item', [
         m(CommunityLabel, {
           community,
@@ -253,7 +250,6 @@ export const getDiscussionPreview = (thread, searchTerm) => {
         ]),
       ]
     ]),
-    contentLeft: m(DiscussionIcon)
   });
 };
 
@@ -293,12 +289,20 @@ const getResultsPreview = (results, searchTerm) => {
   })
     .slice(0, 10)
     .sort((a, b) => {
-      return getContentTypeOrdering(b) - getContentTypeOrdering(a);
+      return getContentTypeOrdering(a) - getContentTypeOrdering(b);
     });
   const organizedResults = [];
   sortedResults.forEach((item) => {
+    console.log(item.contentType);
     if (!placement[item.contentType]) {
-      const headerEle = m(ListItem, { label: capitalize(item.ContentType) });
+      const headerEle = m(ListItem, {
+        label: `${capitalize(item.contentType)}s`,
+        class: 'disabled',
+        onclick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
       organizedResults.push(headerEle);
       placement[item.contentType] = true;
     }
@@ -309,7 +313,7 @@ const getResultsPreview = (results, searchTerm) => {
         : item.searchType === SearchType.Community
           ? getCommunityPreview(item)
           : null;
-    organizedResults.push(m(ListItem, { label: resultRow }));
+    organizedResults.push(resultRow);
   });
   return organizedResults;
 };
