@@ -250,9 +250,16 @@ const send = async (models, content: WebhookContent) => {
             },
           }]
         };
-      } else if (url.indexOf('telegram') !== -1) {
-        const chatId = -562987835;
-        webhookData = {
+      } else if (url.indexOf('telegram.com') !== -1) {
+        const getUpdatesUrl = url.split('/sendPhoto').slice(0, -1).join('/');
+        const response = await request.get(`${getUpdatesUrl}${getUpdatesUrl[getUpdatesUrl.length - 1] === '/' ? '' : '/'}getChat`);
+        const chatId = response.body.result.id;
+        webhookData = isChainEvent ? {
+          chat_id: chatId,
+          photo: previewImageUrl,
+          caption: `<a href="${chainEventLink}"><b>${title}</b></a> \r\n${fulltext}`,
+          parse_mode: 'HTML',
+        } : {
           chat_id: chatId,
           photo: previewImageUrl,
           caption: `<b>Actor:</b> <a href="${actorAccountLink}">${actor}</a> \r\n <a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
@@ -267,11 +274,7 @@ const send = async (models, content: WebhookContent) => {
         return;
       }
       try {
-        if (process.env.NODE_ENV === 'production' || (SLACK_FEEDBACK_WEBHOOK && url === SLACK_FEEDBACK_WEBHOOK)) {
           await request.post(url).send(webhookData);
-        } else {
-          console.log('Suppressed webhook notification to', url);
-        }
       } catch (err) {
         console.error(err);
       }
