@@ -17,7 +17,7 @@ const OnboardingProgressBar: m.Component<IOnboardingProgressBarAttr> = {
         m('span', 'Join Communities'),
       ]),
       m('div.bar', [
-        m('div.passed')
+        m(`div.passed.step${step}`)
       ])
     ]);
   },

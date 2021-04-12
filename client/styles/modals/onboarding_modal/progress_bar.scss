@@ -30,8 +30,28 @@
       left: 0;
       top: 0;
       height: 100%;
-      width: 60px;
+      width: 0px;
       background: linear-gradient(to right, #b37dba, #6086d1);
+    }
+
+    .step0 {
+      width: 60px;
+    }
+
+    .step1 {
+      width: 160px;
+    }
+
+    .step2 {
+      width: 250px;
+    }
+
+    .step3 {
+      width: 350px;
+    }
+
+    .step4 {
+      width: 100%;
     }
   }
 }

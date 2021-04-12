@@ -42,7 +42,7 @@ export enum ChainNetwork {
 }
 
 // This function returns a default chain for a chainbase
-export function baseToNetwork(n: ChainBase): ChainNetwork {
+export function baseToNetwork(n: ChainBase | string): ChainNetwork {
   switch (n) {
     case ChainBase.CosmosSDK: return ChainNetwork.Cosmos;
     case ChainBase.Substrate: return ChainNetwork.Edgeware;

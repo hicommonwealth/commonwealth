@@ -1,7 +1,5 @@
-.OnboardingModalSetupProfileTab {
+.OnboardingSetupProfile {
   padding: 25px 0;
-  width: 360px;
-  margin: auto;
 
   .title {
     display: flex;
@@ -15,9 +13,11 @@
 
   .OnboardingProfileForm {
     position: relative;
-    button[type="submit"] {
-      position: absolute;
-      right: -200px;
-    }
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 360px;
+    height: 300px;
+    margin: auto;
+    margin-top: 15px;
   }
 }

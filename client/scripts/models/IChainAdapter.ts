@@ -8,7 +8,7 @@ import m from 'mithril';
 import { CommentRefreshOption } from 'controllers/server/comments';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
-import { ChainBase, ChainClass } from './types';
+import { ChainBase, ChainClass, networkToBase } from './types';
 import { Account, NodeInfo, ProposalModule } from '.';
 
 // Extended by a chain's main implementation. Responsible for module
@@ -70,7 +70,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     // If user is no longer on the initializing chain, abort initialization
     // and return false, so that the invoking selectNode fn can similarly
     // break, rather than complete.
-    if (this.meta.chain.id !== m.route.param('scope')) {
+    console.log(m.route.param('scope'), this.meta.chain.id);
+    if (this.meta.chain.id !== m.route.param('scope') && networkToBase(m.route.param('scope')) !== null) {
       return false;
     }
 

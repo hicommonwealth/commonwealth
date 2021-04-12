@@ -12,23 +12,23 @@ import OnboardingFooterActions from './footer_actions';
 interface IOnboardingChooseWalletAttr {
   onBack: () => void;
   onNext: () => void;
+  selected: ChainBase;
+  onSelect: (base: ChainBase) => void;
 }
 
 interface IOnboardingChooseWalletState {
   search: string;
-  selected: string;
 }
 
 const ChooseWallet: m.Component<IOnboardingChooseWalletAttr, IOnboardingChooseWalletState> = {
   oninit: (vnode) => {
-    vnode.state.selected = null;
     vnode.state.search = '';
   },
   view: (vnode) => {
     const getWalletItemForChainBase = (base: ChainBase) => m('div.item', {
-      class: vnode.state.selected === base ? 'selected' : '',
+      class: vnode.attrs.selected === base ? 'selected' : '',
       onclick: () => {
-        vnode.state.selected = base;
+        vnode.attrs.onSelect(base);
       }
     }, [
       m(ChainBaseIcon, { chainbase: base, size: 40 }),
@@ -66,9 +66,9 @@ const ChooseWallet: m.Component<IOnboardingChooseWalletAttr, IOnboardingChooseWa
       ]),
       m(OnboardingFooterActions, {
         backDisabled: false,
-        nextDisabled: !vnode.state.selected,
+        nextDisabled: !vnode.attrs.selected,
         onBack: vnode.attrs.onBack,
-        onNext: vnode.attrs.onNext,
+        onNext: () => vnode.attrs.onNext(),
       })
     ]);
   },

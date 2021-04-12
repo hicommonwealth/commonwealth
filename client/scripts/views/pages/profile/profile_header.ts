@@ -78,8 +78,8 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
-    console.log(account);
     const isClaimable = !account || !account.profile || account.profile.isEmpty;
+    console.log(account);
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
@@ -142,7 +142,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             rounded: true,
             class: '',
             onclick: () => {
-              app.modals.create({ modal: OnboardingModal });
+              app.modals.create({ modal: OnboardingModal, data: { joiningCommunity: app.activeCommunityId(), joiningChain: app.activeChainId() } });
             },
             label: 'Claim Address'
           }),

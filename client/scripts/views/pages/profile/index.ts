@@ -284,7 +284,7 @@ const ProfilePage: m.Component<{ address: string, setIdentity?: boolean }, IProf
 
     const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
-    console.log(account, loading, loaded);
+
     if (!loading && !loaded) {
       vnode.state.loading = true;
       loadProfile();

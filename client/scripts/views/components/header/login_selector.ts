@@ -158,7 +158,6 @@ const LoginSelector: m.Component<{
       return arr;
     }, []);
 
-    console.log(app.user.addresses);
     return m(ButtonGroup, { class: 'LoginSelector' }, [
       (app.chain || app.community) && !app.chainPreloading && vnode.state.profileLoadComplete && !app.user.activeAccount && m(Button, {
         class: 'login-selector-left',

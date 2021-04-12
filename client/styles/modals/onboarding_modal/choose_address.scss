@@ -1,0 +1,96 @@
+.OnboardingChooseAddress {
+  padding: 25px 0;
+  text-align: center;
+
+  .title {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: auto;
+
+    .icons {
+      display: flex;
+      align-items: center;
+
+      .ChainIcon {
+        margin-right: 30px;
+      }
+    }
+
+    h2 {
+      font-size: 32px;
+      line-height: 38.4px;
+      margin: 34px 0 8px 0;
+    }
+  }
+
+  .content {
+    width: 340px;
+    margin: auto;
+
+    .cui-spinner {
+      margin: 100px 0 140px 0;
+
+      .cui-spinner-icon {
+        height: 80px;
+        width: 80px;
+      }
+    }
+
+    .accounts-list {
+      height: 240px;
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      .account-item {
+        display: flex;
+        width: 100%;
+        border: 1px solid #dddddd;
+        border-radius: 4px;
+        height: 72px;
+        align-items: center;
+        cursor: pointer;
+
+        .account-item-avatar {
+          flex-shrink: 1;
+          .account-user {
+            width: 65px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .user-avatar-only {
+              width: 40px;
+              height: 40px;
+            }
+          }
+        }
+
+        .account-item-left {
+          width: calc(100% - 65px);
+          text-align: left;
+          line-height: 1;
+          margin-top: 8px;
+
+          .account-item-name {
+            font-size: 18px;
+            font-weight: 500;
+          }
+
+          .account-item-address {
+            font-size: 14px;
+            font-weight: 400;
+            margin-top: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        &:hover {
+          border: 1px solid #999;
+        }
+      }
+    }
+  }
+}

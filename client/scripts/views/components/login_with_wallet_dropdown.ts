@@ -37,8 +37,6 @@ const LoginWithWalletDropdown: m.Component<{
                 : '/?';
     // only redirect to home as an absolute last resort
 
-    console.log(loggingInWithAddress, 'loggingInWithAddress', joiningChain, joiningCommunity);
-
     // I introduce one more parameter in web3loginParams because of the following case
     // When user log into a community, we let the user to select one of the chainbase wallet to sign (new flow)
     // But with the old flow, it only creates a role between the default chain vs address.
