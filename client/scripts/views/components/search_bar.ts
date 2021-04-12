@@ -346,11 +346,19 @@ const SearchBar : m.Component<{}, {
     //   vnode.state.searchPrefix = SearchPrefix.COMMUNITY;
     // }
     const inCommunity = app.chain || app.community;
+    if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
 
     // When user types in from: or in:, dropdown only shows options for completing those terms
     // When user types in both, shows options for both together
 
     const { fromPrefix, inPrefix, results, searchTerm } = vnode.state;
+    const value = inPrefix
+      ? fromPrefix
+        ? `in:${inPrefix} from:${fromPrefix} ${searchTerm}`
+        : `in:${inPrefix} ${searchTerm}`
+      : fromPrefix
+        ? `from:${fromPrefix} ${searchTerm}`
+        : searchTerm;
 
     return m(ControlGroup, {
       class: vnode.state.focused ? 'SearchBar focused' : 'SearchBar'
@@ -360,7 +368,7 @@ const SearchBar : m.Component<{}, {
         autofocus: true,
         fluid: true,
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
-        value: vnode.state.searchTerm,
+        value,
         oncreate: (e) => {
           if ((e.dom?.children[0] as HTMLInputElement)?.value) {
             vnode.state.searchTerm = (e.dom.children[0] as HTMLInputElement).value.toLowerCase();
@@ -369,7 +377,7 @@ const SearchBar : m.Component<{}, {
         onclick: async (e) => {
           vnode.state.focused = true;
           if (inCommunity) {
-            vnode.state.inPrefix = inCommunity.id;
+            vnode.state.inPrefix = `${inCommunity.id}`;
           }
         },
         // contentLeft,
