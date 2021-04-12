@@ -22,9 +22,9 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import getTokenLists from './home/token_lists';
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import PageNotFound from './404';
+import { ContentType, search, SearchType } from '../components/search_bar';
 
 const SEARCH_DELAY = 750;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
@@ -32,83 +32,11 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 // TODO
 const searchCache = {}; // only used to restore search results when returning to the page
 
-export enum SearchType {
-  Discussion = 'discussion',
-  Community = 'community',
-  Member = 'member',
-  Top = 'top',
-}
-
-export enum ContentType {
-  Thread = 'thread',
-  Comment = 'comment',
-  Community = 'community',
-  Chain = 'chain',
-  Token = 'token',
-  Member = 'member'
-}
-
-export const search = async (searchTerm, communityScope, vnode) => {
-  vnode.state.searchLoading = true;
-
-  // if !communityScope search only...
-
-  (async () => {
-    try {
-      await searchDiscussions(searchTerm, SEARCH_PAGE_SIZE).then((discussions) => {
-        vnode.state.results = vnode.state.results.concat(discussions.map((discussion) => {
-          discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
-          discussion.searchType = SearchType.Discussion;
-          return discussion;
-        }));
-        m.redraw();
-      });
-
-      await searchMentionableAddresses(searchTerm, SEARCH_PAGE_SIZE, ['created_at', 'DESC']).then((addrs) => {
-        vnode.state.results = vnode.state.results.concat(addrs.map((addr) => {
-          addr.contentType = ContentType.Member;
-          addr.searchType = SearchType.Member;
-          return addr;
-        }));
-        m.redraw();
-      });
-
-      await getTokenLists().then((unfilteredTokens) => {
-        const tokens = unfilteredTokens.filter((token) => token.name?.toLowerCase().includes(searchTerm));
-        vnode.state.results = vnode.state.results.concat(tokens.map((token) => {
-          token.contentType = ContentType.Token;
-          token.searchType = SearchType.Community;
-          return token;
-        }));
-      });
-
-      await searchChainsAndCommunities(searchTerm, SEARCH_PAGE_SIZE).then((comms) => {
-        vnode.state.results = vnode.state.results.concat(comms.map((commOrChain) => {
-          commOrChain.contentType = commOrChain.created_at ? ContentType.Community : ContentType.Chain;
-          commOrChain.searchType = SearchType.Community;
-          return commOrChain;
-        }));
-      });
-
-      console.log('loading over');
-      vnode.state.searchLoading = false;
-      vnode.state.errorText = null;
-      m.redraw();
-    } catch (err) {
-      console.log('FETCHING ERROR');
-      // TODO: Ensure error-catching operational
-      vnode.state.searchLoading = false;
-      vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
-      m.redraw();
-    }
-  })();
-};
-
 // TODO: Linkification of users, tokens, comms results
-const getMemberResult = (addr, searchTerm) => {
+export const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
-  // TODO: Linkification of full ListItem
+  // TODO: Display longer or even full addresses
   return m(ListItem, {
     contentLeft: m(MemberIcon),
     label: m('a.search-results-item', [
@@ -124,7 +52,7 @@ const getMemberResult = (addr, searchTerm) => {
   });
 };
 
-const getCommunityResult = (community) => {
+export const getCommunityResult = (community) => {
   if (community.contentType === ContentType.Token) {
     return m(ListItem, {
       contentLeft: m(CommunityIcon),
@@ -158,7 +86,7 @@ const getCommunityResult = (community) => {
   }
 };
 
-const getDiscussionResult = (thread, searchTerm) => {
+export const getDiscussionResult = (thread, searchTerm) => {
   // TODO: Separate threads, proposals, and comments
   const activeId = app.activeId();
   const proposalId = thread.proposalid;
@@ -299,14 +227,14 @@ const SearchPage : m.Component<{
     if (searchTerm !== vnode.state.searchTerm) {
       vnode.state.searchTerm = searchTerm;
       vnode.state.results = [];
-      search(searchTerm, communityScope, vnode);
+      search(searchTerm, { communityScope }, vnode);
       return LoadingPage;
     }
 
     if (vnode.state.searchLoading) {
       return LoadingPage;
     } else if (!vnode.state.results && !vnode.state.errorText) {
-      search(searchTerm, communityScope, vnode);
+      search(searchTerm, { communityScope }, vnode);
       return;
     }
 
