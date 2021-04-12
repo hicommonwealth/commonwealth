@@ -38,6 +38,8 @@ const nodes = [
   // [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
   [ 'wss://mainnet.infura.io/ws', 'marlin', '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f'],
   [ 'ws://127.0.0.1:9545', 'marlin-local', '0xe0D6a92B91B83D5c8A95557f1c966cAFd97f7171'], // TODO: Can't seem to keep this consistent which each local deploy
+  [ 'wss://mainnet.infura.io/ws', 'compoundalpha', '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984'],
+  [ 'ws://127.0.0.1:9545', 'compoundalpha-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
   [ 'ws://api.clover.finance', 'clover'],
   [ 'wss://rpc-01.snakenet.hydradx.io', 'hydradx'],
   [ 'wss://ropsten.infura.io/ws', 'alex-ropsten', '0xFab46E002BbF0b4509813474841E0716E6730136']
@@ -373,6 +375,25 @@ const resetServer = (models): Promise<number> => {
           type: 'dao',
         }),
         models.Chain.create({
+          id: 'compoundalpha',
+          network: 'compoundalpha',
+          symbol: 'LIN',
+          name: 'compoundalpha',
+          icon_url: '/static/img/protocols/eth.png',
+          active: true,
+          type: 'dao',
+          collapsed_on_homepage: false,
+        }),
+        models.Chain.create({
+          id: 'compoundalpha-local',
+          network: 'compoundalpha',
+          symbol: 'LIN',
+          name: 'compoundalpha (local)',
+          icon_url: '/static/img/protocols/eth.png',
+          active: true,
+          type: 'dao',
+        }),
+        models.Chain.create({
           id: 'clover',
           network: 'clover',
           symbol: 'CLOV',
@@ -417,6 +438,7 @@ const resetServer = (models): Promise<number> => {
         nearLocal, nearTestnet,
         moloch, metacartel, molochLocal,
         marlin, marlinLocal,
+        compoundalpha, compoundalphaLocal,
         alexRopsten,
       ] = chains;
 

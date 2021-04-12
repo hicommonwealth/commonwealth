@@ -16,7 +16,7 @@ interface GovernorAlphaInterface extends Interface {
 
     DOMAIN_TYPEHASH: TypedFunctionDescription<{ encode([]: []): string }>;
 
-    MPond: TypedFunctionDescription<{ encode([]: []): string }>;
+    comp: TypedFunctionDescription<{ encode([]: []): string }>;
 
     guardian: TypedFunctionDescription<{ encode([]: []): string }>;
 
@@ -162,7 +162,7 @@ export class GovernorAlpha extends Contract {
 
     DOMAIN_TYPEHASH(): Promise<string>;
 
-    MPond(): Promise<string>;
+    comp(): Promise<string>;
 
     guardian(): Promise<string>;
 
@@ -311,7 +311,7 @@ export class GovernorAlpha extends Contract {
 
   DOMAIN_TYPEHASH(): Promise<string>;
 
-  MPond(): Promise<string>;
+  comp(): Promise<string>;
 
   guardian(): Promise<string>;
 
@@ -485,7 +485,7 @@ export class GovernorAlpha extends Contract {
 
     DOMAIN_TYPEHASH(): Promise<BigNumber>;
 
-    MPond(): Promise<BigNumber>;
+    comp(): Promise<BigNumber>;
 
     guardian(): Promise<BigNumber>;
 

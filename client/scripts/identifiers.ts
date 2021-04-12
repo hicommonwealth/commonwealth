@@ -14,6 +14,7 @@ export enum ProposalType {
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
   MarlinProposal = 'marlinproposal',
+  CompoundalphaProposal = 'compoundalphaproposal',
 }
 
 export const proposalSlugToClass = () => {
@@ -45,6 +46,9 @@ export const proposalSlugToClass = () => {
   if (app.chain.class === ChainClass.Marlin) {
     mmap.set('marlinproposal', (app.chain as any).governance);
   }
+  if (app.chain.class === ChainClass.Compoundalpha) {
+    mmap.set('compoundalphaproposal', (app.chain as any).governance);
+  }
   return mmap;
 };
 
@@ -66,6 +70,7 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['treasuryproposal', 'Treasury Proposal'],
   ['discussion', 'Discussion Thread'],
   ['marlinproposal', 'Proposal'],
+  ['compoundalphaproposal', 'Proposal'],
   ['cosmosproposal', 'Proposal'],
   ['molochproposal', 'Proposal']
 ]);

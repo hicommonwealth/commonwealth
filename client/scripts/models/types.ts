@@ -33,6 +33,8 @@ export enum ChainNetwork {
   Moloch = 'moloch',
   Marlin = 'marlin',
   MarlinTestnet = 'marlin-testnet',
+  Compoundalpha = 'compoundalpha',
+  CompoundalphaTestnet = 'compoundalpha-testnet',
   Metacartel = 'metacartel',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
@@ -85,6 +87,8 @@ export enum ChainClass {
   Moloch = 'moloch',
   Marlin = 'marlin',
   MarlinTestnet = 'marlin-testnet',
+  Compoundalpha = 'compoundalpha',
+  CompoundalphaTestnet = 'compoundalpha-testnet',
   ALEX = 'alex',
   Commonwealth = 'commonwealth',
 }

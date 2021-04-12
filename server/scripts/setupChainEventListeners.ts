@@ -3,7 +3,7 @@ import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents, chainSupportedBy,
-  MarlinTypes, MarlinEvents,
+  MarlinTypes, MarlinEvents, CompoundalphaTypes, CompoundalphaEvents,
 } from '@commonwealth/chain-events';
 
 import EventStorageHandler from '../eventHandlers/storage';
@@ -147,6 +147,23 @@ const setupChainEventListeners = async (
         }
       );
       subscriber = await MarlinEvents.subscribeEvents({
+        chain: node.chain,
+        handlers,
+        skipCatchup,
+        discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+        api,
+      });
+    } else if (chainSupportedBy(node.chain, CompoundalphaTypes.EventChains)) {
+      const governorAlphaContractAddress = '0x777992c2E4EDF704e49680468a9299C6679e37F6';
+      const timelockContractAddress = '0x42Bf58AD084595e9B6C5bb2aA04050B0C291264b';
+      const api = await CompoundalphaEvents.createApi(
+        node.url, {
+          uni: node.address,
+          governorAlpha: governorAlphaContractAddress,
+          timelock: timelockContractAddress,
+        }
+      );
+      subscriber = await CompoundalphaEvents.subscribeEvents({
         chain: node.chain,
         handlers,
         skipCatchup,

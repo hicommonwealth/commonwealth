@@ -330,6 +330,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/marlin/adapter'
     )).default;
     newChain = new Marlin(n, app);
+  } else if (n.chain.network === ChainNetwork.Compoundalpha || n.chain.network === ChainNetwork.CompoundalphaTestnet) {
+    const Compoundalpha = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "compoundalpha-main" */
+      './controllers/chain/ethereum/compoundalpha/adapter'
+    )).default;
+    newChain = new Compoundalpha(n, app);
   } else if ([ChainNetwork.ALEX].includes(n.chain.network)) {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
