@@ -113,13 +113,12 @@ const app: IApp = {
   user: new UserController(),
 
   recentActivity: new RecentActivityController(),
-  searchCache: {},
+  searchCache: [],
 
-  activeChainId: () => app.chain 
-    ? 
-      (app.chain as Token).isToken && (app.chain as Token).isUninitialized
-      ? (app.chain as Token).contractAddress 
-      : app.chain.id 
+  activeChainId: () => app.chain
+    ? (app.chain as Token).isToken && (app.chain as Token).isUninitialized
+      ? (app.chain as Token).contractAddress
+      : app.chain.id
     : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
