@@ -7,7 +7,7 @@ import { Button, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'constru
 import app from 'state';
 import { ChainBase } from 'models';
 import { ChainBaseIcon } from 'views/components/chain_icon';
-import { baseToNetwork } from 'models/types';
+import { baseToLabel, baseToNetwork } from 'models/types';
 
 const CHAINBASE_WITH_CLI = [
   ChainBase.CosmosSDK, ChainBase.Substrate
@@ -50,7 +50,7 @@ const LoginWithWalletDropdown: m.Component<{
       label: m('.chain-login-label', [
         m(ChainBaseIcon, { chainbase: base, size: 20 }),
         m('.chain-login-label-name', [
-          cli ? `${base} (command line)` : base
+          cli ? `${baseToLabel(base)} (command line)` : baseToLabel(base)
         ]),
       ]),
       onclick: (e) => {
