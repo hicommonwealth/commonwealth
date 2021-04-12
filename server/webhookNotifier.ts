@@ -250,15 +250,9 @@ const send = async (models, content: WebhookContent) => {
             },
           }]
         };
-      } else if (url.indexOf('telegram.com') !== -1) {
-        const response = "https://api.telegram.org/bot1662899908:AAGuGPpsYzfM2KzAGjveaois9TUN-OMggC4/getChat";
-        const chatId = response.body.result.id;
-        webhookData = isChainEvent ? {
-          chat_id: chatId,
-          photo: previewImageUrl,
-          caption: `<a href="${chainEventLink}"><b>${title}</b></a> \r\n${fulltext}`,
-          parse_mode: 'HTML',
-        } : {
+      } else if (url.indexOf('telegram') !== -1) {
+        const chatId = -562987835;
+        webhookData = {
           chat_id: chatId,
           photo: previewImageUrl,
           caption: `<b>Actor:</b> <a href="${actorAccountLink}">${actor}</a> \r\n <a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
