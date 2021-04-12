@@ -261,7 +261,7 @@ export class SubstrateDemocracyReferendum
     if (collectiveProposal) return collectiveProposal;
 
     // search for treasury proposal for approveProposal only (not rejectProposal)
-    if (preimage.section === 'treasury' && preimage.method === 'approveProposal') {
+    if (preimage?.section === 'treasury' && preimage?.method === 'approveProposal') {
       return chain.treasury?.store.getByIdentifier(preimage.args[0]);
     }
 
