@@ -5,12 +5,12 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn('Chains', 'collapsed_on_homepage', {
         type: Sequelize.BOOLEAN,
-        defaultValue: true,
+        defaultValue: false,
         allowNull: false,
       });
       await queryInterface.addColumn('OffchainCommunities', 'collapsed_on_homepage', {
         type: Sequelize.BOOLEAN,
-        defaultValue: true,
+        defaultValue: false,
         allowNull: false,
       });
     });

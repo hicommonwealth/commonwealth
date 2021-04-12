@@ -37,22 +37,26 @@ export default async function (models, chain?: string): Promise<void> {
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain);
 
     const nodeUrl = constructSubstrateUrl(node.url);
-    const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
+    try {
+      const api = await SubstrateEvents.createApi(nodeUrl, selectSpec(node.chain));
 
-    // fetch all events and run through handlers in sequence then exit
-    log.info('Fetching chain events...');
-    const fetcher = new SubstrateEvents.StorageFetcher(api);
-    const events = await fetcher.fetch();
+      // fetch all events and run through handlers in sequence then exit
+      log.info('Fetching chain events...');
+      const fetcher = new SubstrateEvents.StorageFetcher(api);
+      const events = await fetcher.fetch();
 
-    log.info(`Writing chain events to db... (count: ${events.length})`);
-    for (const event of events) {
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        const dbEvent = await migrationHandler.handle(event);
-        await entityArchivalHandler.handle(event, dbEvent);
-      } catch (e) {
-        log.error(`Event handle failure: ${e.message}`);
+      log.info(`Writing chain events to db... (count: ${events.length})`);
+      for (const event of events) {
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const dbEvent = await migrationHandler.handle(event);
+          await entityArchivalHandler.handle(event, dbEvent);
+        } catch (e) {
+          log.error(`Event handle failure: ${e.message}`);
+        }
       }
+    } catch (e) {
+      log.error(`Failed to fetch events for ${node.chain}: ${e.message}`);
     }
   }
 }
