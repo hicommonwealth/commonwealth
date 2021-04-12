@@ -113,7 +113,7 @@ const app: IApp = {
   user: new UserController(),
 
   recentActivity: new RecentActivityController(),
-  searchCache: [],
+  searchCache: {},
 
   activeChainId: () => app.chain
     ? (app.chain as Token).isToken && (app.chain as Token).isUninitialized

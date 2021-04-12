@@ -6,8 +6,6 @@ export const searchDiscussions = async (
   searchTerm: string,
   limit: number = 50
 ) => {
-  console.log(app.activeChainId());
-  console.log(app.activeCommunityId());
   const response = await $.get(`${app.serverUrl()}/search`, {
     chain: app.activeChainId(),
     community: app.activeCommunityId(),
@@ -18,6 +16,7 @@ export const searchDiscussions = async (
   if (response.status !== 'Success') {
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
+  console.log({ threadResults: response.result });
   return response.result;
 };
 
