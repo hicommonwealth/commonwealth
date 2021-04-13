@@ -49,9 +49,9 @@ const linkExistingAddressToChain = async (models, req: Request, res: Response, n
   // check if the original address's token is expired. refer edge case 1)
   let verificationToken = originalAddress.verification_token;
   let verificationTokenExpires = originalAddress.verification_token_expires;
-  const isOriginalExpired = verificationTokenExpires && +verificationTokenExpires <= +(new Date());
+  const isOriginalTokenValid = verificationTokenExpires && +verificationTokenExpires <= +(new Date());
 
-  if (!isOriginalExpired) {
+  if (!isOriginalTokenValid) {
     const chains = await models.Chain.findAll({
       where: { base: chain.base }
     });
