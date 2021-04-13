@@ -154,9 +154,9 @@ const User: m.Component<{
             profile
               ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
-              profile ? [
-                (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
-              ] : addrShort)
+            profile ? [
+              (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
+            ] : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
       friendlyChainName && m('.user-chain', friendlyChainName),
@@ -211,8 +211,6 @@ export const UserBlock: m.Component<{
           avatarSize: 28,
           popover,
         }),
-        // TODO: this is weird...symbol display should not depend on user being an Account
-        user.chain instanceof ChainInfo && m('.user-block-symbol', user.chain.symbol),
       ]),
       m('.user-block-center', [
         m('.user-block-name', [

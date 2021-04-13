@@ -9,17 +9,16 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
 import { SigningCosmosClient } from '@cosmjs/launchpad';
 
-import { Button, Callout, Input, TextArea, Icon, Icons, Spinner, Checkbox } from 'construct-ui';
+import { Button, Input, TextArea, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
-import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
+import { AddressInfo, Account, ChainBase } from 'models';
 import app, { ApiStatus } from 'state';
 
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
-import Cosmos from 'controllers/chain/cosmos/main';
 import Substrate from 'controllers/chain/substrate/main';
 import Ethereum from 'controllers/chain/ethereum/main';
 import Near from 'controllers/chain/near/main';
@@ -27,11 +26,9 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { ChainIcon } from 'views/components/chain_icon';
 import CodeBlock from 'views/components/widgets/code_block';
-import User, { UserBlock } from 'views/components/widgets/user';
+import User from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
-import { formatAddressShort } from '../../../../shared/utils';
 import AddressSwapper from '../components/addresses/address_swapper';
 
 enum LinkNewAddressSteps {
@@ -49,13 +46,14 @@ enum LinkNewAddressWallets {
 
 const EthereumLinkAccountItem: m.Component<{
   address,
+  targetCommunity,
   accountVerifiedCallback,
   errorCallback,
   linkNewAddressModalVnode
 }, { linking }> = {
   view: (vnode) => {
     // TODO: implement vnode.state.linking
-    const { address, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode } = vnode.attrs;
+    const { address, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode, targetCommunity } = vnode.attrs;
     return m('.EthereumLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
@@ -90,7 +88,7 @@ const EthereumLinkAccountItem: m.Component<{
         const webWallet = api.webWallet;
 
         // Sign with the method on eth_webwallet, because we don't have access to the private key
-        const signerAccount = await createUserWithAddress(address) as EthereumAccount;
+        const signerAccount = await createUserWithAddress(address, undefined, targetCommunity) as EthereumAccount;
         const webWalletSignature = await webWallet.signMessage(signerAccount.validationToken);
 
         signerAccount.validate(webWalletSignature)
@@ -131,12 +129,13 @@ const EthereumLinkAccountItem: m.Component<{
 
 const CosmosLinkAccountItem: m.Component<{
   account,
+  targetCommunity,
   accountVerifiedCallback,
   errorCallback,
   linkNewAddressModalVnode
 }, { linking }> = {
   view: (vnode) => {
-    const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode } = vnode.attrs;
+    const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode, targetCommunity } = vnode.attrs;
     return m('.CosmosLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
@@ -157,7 +156,7 @@ const CosmosLinkAccountItem: m.Component<{
         );
 
         // Get the verification token & placeholder TX to send
-        const signerAccount = await createUserWithAddress(account.address);
+        const signerAccount = await createUserWithAddress(account.address, undefined, targetCommunity);
         const signDoc = await validationTokenToSignDoc(account.address, signerAccount.validationToken);
 
         // Some typing and versioning issues here...signAmino should be available but it's not
@@ -207,12 +206,13 @@ const CosmosLinkAccountItem: m.Component<{
 
 const SubstrateLinkAccountItem: m.Component<{
   account,
+  targetCommunity,
   accountVerifiedCallback,
   errorCallback,
   linkNewAddressModalVnode
 }, { linking }> = {
   view: (vnode) => {
-    const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode } = vnode.attrs;
+    const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode, targetCommunity } = vnode.attrs;
     const address = AddressSwapper({
       address: account.address,
       currentPrefix: (app.chain as Substrate).chain.ss58Format,
@@ -246,7 +246,7 @@ const SubstrateLinkAccountItem: m.Component<{
         }
 
         try {
-          const signerAccount = await createUserWithAddress(address) as SubstrateAccount;
+          const signerAccount = await createUserWithAddress(address, undefined, targetCommunity) as SubstrateAccount;
           const signer = await (app.chain as Substrate).webWallet.getSigner(address);
           vnode.state.linking = true;
           m.redraw();
@@ -306,6 +306,7 @@ const LinkNewAddressModal: m.Component<{
   loggingInWithAddress?: boolean; // determines whether the header says "Connect a new address" or "Login with address"
   joiningCommunity: string,       // join community after verification
   joiningChain: string,           // join chain after verification
+  targetCommunity?: string,       // this is valid when loggingInWithAddress=true and user joins to community through default chain.
   useCommandLineWallet: boolean,  //
   alreadyInitializedAccount?: Account<any>; // skip verification, go straight to profile creation (only used for NEAR)
   successCallback;
@@ -344,6 +345,8 @@ const LinkNewAddressModal: m.Component<{
     const linkAddressHeader = m('.compact-modal-title', [
       vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
     ]);
+
+    const { targetCommunity } = vnode.attrs;
 
     // initialize the step
     if (vnode.state.step === undefined) {
@@ -561,6 +564,7 @@ const LinkNewAddressModal: m.Component<{
               app.chain.webWallet?.accounts.map(
                 (address) => m(EthereumLinkAccountItem, {
                   address,
+                  targetCommunity,
                   accountVerifiedCallback,
                   errorCallback: (error) => { notifyError(error); },
                   linkNewAddressModalVnode: vnode,
@@ -570,6 +574,7 @@ const LinkNewAddressModal: m.Component<{
               app.chain.webWallet?.accounts.map(
                 (account: InjectedAccountWithMeta) => m(SubstrateLinkAccountItem, {
                   account,
+                  targetCommunity,
                   accountVerifiedCallback,
                   errorCallback: (error) => { notifyError(error); },
                   linkNewAddressModalVnode: vnode,
@@ -579,6 +584,7 @@ const LinkNewAddressModal: m.Component<{
               app.chain.webWallet?.accounts.map(
                 (account: InjectedAccountWithMeta) => m(CosmosLinkAccountItem, {
                   account,
+                  targetCommunity,
                   accountVerifiedCallback,
                   errorCallback: (error) => { notifyError(error); },
                   linkNewAddressModalVnode: vnode,
@@ -602,7 +608,7 @@ const LinkNewAddressModal: m.Component<{
             fluid: true,
             autocomplete: 'off',
             placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here (e.g. 5Dvq...)'
-                : 'Paste the address here',
+              : 'Paste the address here',
             oninput: async (e) => {
               const address = (e.target as any).value;
               vnode.state.error = null;
@@ -632,7 +638,7 @@ const LinkNewAddressModal: m.Component<{
                   vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
                     address,
                     currentPrefix: (app.chain as Substrate).chain.ss58Format,
-                  }), vnode.state.isEd25519 ? 'ed25519' : undefined);
+                  }), vnode.state.isEd25519 ? 'ed25519' : undefined, targetCommunity);
                 } catch (err) {
                   vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
                 }
@@ -658,7 +664,7 @@ const LinkNewAddressModal: m.Component<{
           //         vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
           //           address: vnode.state.enteredAddress,
           //           currentPrefix: (app.chain as Substrate).chain.ss58Format,
-          //         }), vnode.state.isEd25519 ? 'ed25519' : undefined);
+          //         }), vnode.state.isEd25519 ? 'ed25519' : undefined, targetCommunity);
           //       } catch (err) {
           //         vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Failed to create user.';
           //       }
