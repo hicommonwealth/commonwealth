@@ -16,7 +16,7 @@ export const searchDiscussions = async (
   if (response.status !== 'Success') {
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
-  console.log({ threadResults: response.result });
+  console.log({ searchTerm, threadResults: response.result });
   return response.result;
 };
 

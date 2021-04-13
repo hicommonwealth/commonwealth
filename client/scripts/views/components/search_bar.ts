@@ -7,9 +7,6 @@ import {
   searchMentionableAddresses,
   searchDiscussions,
   searchChainsAndCommunities,
-  CommunityIcon,
-  DiscussionIcon,
-  MemberIcon,
 } from 'helpers/search';
 import getTokenLists from 'views/pages/home/token_lists';
 import app from 'state';
@@ -23,7 +20,7 @@ import User from './widgets/user';
 
 interface SearchParams {
   communityScope?: string;
-  isSearchPreview?: string;
+  isSearchPreview?: boolean;
 }
 
 export enum SearchType {
@@ -42,7 +39,7 @@ export enum ContentType {
   Member = 'member'
 }
 
-const SEARCH_PREVIEW_SIZE = 5;
+const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
 // TODO: Linkification of users, tokens, comms results
@@ -338,15 +335,18 @@ const SearchBar : m.Component<{}, {
         onclick: async (e) => {
           vnode.state.focused = true;
         },
-        // contentLeft,
-        oninput: async (e) => {
+        oninput: (e) => {
           if (!vnode.state.searchModified) {
             vnode.state.searchModified = true;
           }
           vnode.state.searchTerm = e.target.value?.toLowerCase();
-          if (e.target.value?.length >= 3) {
-            const params = inCommunity ? { communityScope: inCommunity.id } : {};
-            await search(vnode.state.searchTerm, params, vnode);
+          if (e.target.value?.length > 3) {
+            const params: SearchParams = {};
+            if (inCommunity) {
+              params['communityScope'] = inCommunity.id;
+              params['isSearchPreview'] = true;
+            }
+            _.debounce(() => search(vnode.state.searchTerm, params, vnode), 200)();
           }
         },
         onkeyup: (e) => {
@@ -355,8 +355,8 @@ const SearchBar : m.Component<{}, {
               notifyError('Enter a valid search term');
               return;
             }
-            if (searchTerm.length < 3) {
-              notifyError('Query must be at least 3 characters');
+            if (searchTerm.length < 4) {
+              notifyError('Query must be at least 4 characters');
             }
             // TODO: Consistent, in-advance sanitization of all params
             let params = `q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`;

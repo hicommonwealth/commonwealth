@@ -9,7 +9,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const Errors = {
   UnexpectedError: 'Unexpected error',
   QueryMissing: 'Must enter query to begin searching',
-  QueryTooShort: 'Query must be at least 3 characters',
+  QueryTooShort: 'Query must be at least 4 characters',
 };
 
 const search = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -41,7 +41,7 @@ const search = async (models, req: Request, res: Response, next: NextFunction) =
   if (!req.query.search) {
     return next(new Error(Errors.QueryMissing));
   }
-  if (req.query.search.length < 3) {
+  if (req.query.search.length < 4) {
     return next(new Error(Errors.QueryTooShort));
   }
 
