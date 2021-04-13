@@ -271,6 +271,13 @@
             border-bottom-left-radius: 6px;
         }
     }
+    .account-item.account-item-emphasized {
+        background: $background-color-light;
+
+        &:hover {
+            background: $background-color-light-hover;
+        }
+    }
 
     // for step 2 - polkadot-js
     .NewAddressFromWebWallet {
