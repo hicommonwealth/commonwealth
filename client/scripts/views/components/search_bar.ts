@@ -19,17 +19,11 @@ import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
-import User, { UserBlock } from './widgets/user';
-
-export enum SearchPrefix {
-  COMMUNITY = 'in:',
-  USER = 'from:'
-}
+import User from './widgets/user';
 
 interface SearchParams {
   communityScope?: string;
-  memberScope?: string;
-  isSearchPreview?: boolean;
+  isSearchPreview?: string;
 }
 
 export enum SearchType {
@@ -177,31 +171,6 @@ export const getDiscussionPreview = (thread, searchTerm) => {
   });
 };
 
-const getContentTypeOrdering = (content: any) => {
-  let type;
-  switch (content.contentType) {
-    case ContentType.Thread:
-      type = 1;
-      break;
-    case ContentType.Comment:
-      type = 2;
-      break;
-    case ContentType.Community:
-      type = 3;
-      break;
-    case ContentType.Token:
-      type = 4;
-      break;
-    case ContentType.Member:
-      type = 5;
-      break;
-    default:
-      type = 6;
-      break;
-  }
-  return type;
-};
-
 const sortResults = (a, b) => {
   // TODO: Token-sorting approach
   // Some users are not verified; we give them a default date of 1900
@@ -210,28 +179,45 @@ const sortResults = (a, b) => {
   return bCreatedAt.diff(aCreatedAt);
 };
 
-const getResultsPreview = (searchTerm, communityScoped?) => {
-  const results = {};
-  const a = app;
-  const memberResults = app.searchCache[SearchType.Member].sort(sortResults);
-  const discussionResults = app.searchCache[SearchType.Discussion].sort(sortResults);
+const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]) => {
   debugger
-  if (communityScoped) {
-    console.log({ members: memberResults });
-    results[SearchType.Member] = memberResults.slice(0, 3);
-    console.log({ discussions: discussionResults });
-    results[SearchType.Discussion] = discussionResults.slice(0, 6 - results[SearchType.Member].length);
-    // If discussions do not "fill" the 6-result quota, more than 3 users can be displayed
-    if (discussionResults.length < 3) {
-      results[SearchType.Member] = results[SearchType.Member]
-        .concat(memberResults.slice(2, 6 - discussionResults.length));
+  const results = {};
+  for (const key of types) {
+    results[key] = [];
+  }
+  let priorityPosition = 0;
+  let resultsLength = 0;
+  while (resultsLength < 6) {
+    for (let i = 0; i < types.length; i++) {
+      const type = types[i];
+      if (resultsLength < 6) {
+        const nextResult = unfilteredResults[type][priorityPosition];
+        if (nextResult) {
+          results[type].push(nextResult);
+          resultsLength += 1;
+        }
+      }
     }
+    priorityPosition += 1;
+  }
+  return results;
+};
+
+const getResultsPreview = (searchTerm: string, params: SearchParams, vnode, communityScoped?) => {
+  let results;
+  let types;
+  if (communityScoped) {
+    types = [SearchType.Discussion, SearchType.Member];
+    results = getBalancedContentListing(app.searchCache, types);
+  } else {
+    types = [SearchType.Discussion, SearchType.Member, SearchType.Community];
+    results = getBalancedContentListing(app.searchCache, types);
   }
   const organizedResults = [];
-  Object.entries(results).forEach((pair) => {
-    const [type, res] = pair;
-    if ((res as any).length === 0) return;
-    console.log({ type, res });
+  types.forEach((type) => {
+    debugger
+    const res = results[type];
+    if (res?.length === 0) return;
     const headerEle = m(ListItem, {
       label: `${capitalize(type)}s`,
       class: 'disabled',
@@ -255,10 +241,21 @@ const getResultsPreview = (searchTerm, communityScoped?) => {
   return organizedResults;
 };
 
+const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) => {
+  console.log('loading over');
+  app.searchCache.loaded = true;
+  vnode.state.searchLoading = false;
+  vnode.state.errorText = !err
+    ? null : (err.responseJSON?.error || err.responseText || err.toString());
+  vnode.state.results = getResultsPreview(searchTerm, params, vnode, true);
+  m.redraw();
+};
+
 export const search = async (searchTerm: string, params: SearchParams, vnode) => {
   vnode.state.searchLoading = true;
+  console.log({ searchTerm });
   // TODO: Hookup community and member scope
-  const { communityScope, memberScope, isSearchPreview } = params;
+  const { communityScope, isSearchPreview } = params;
   const querySize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
 
   // if !communityScope search only...
@@ -270,15 +267,7 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
       discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
       discussion.searchType = SearchType.Discussion;
       return discussion;
-    });
-
-    if (memberScope) {
-      console.log('loading over');
-      vnode.state.searchLoading = false;
-      vnode.state.errorText = null;
-      m.redraw();
-      return;
-    }
+    }).sort(sortResults);
 
     const addrs = await searchMentionableAddresses(searchTerm, querySize, ['created_at', 'DESC']);
     console.log({ addrs });
@@ -286,15 +275,11 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
       addr.contentType = ContentType.Member;
       addr.searchType = SearchType.Member;
       return addr;
-    });
+    }).sort(sortResults);
     m.redraw();
 
     if (communityScope) {
-      console.log('loading over');
-      app.searchCache.loaded = true;
-      vnode.state.searchLoading = false;
-      vnode.state.errorText = null;
-      m.redraw();
+      concludeSearch(searchTerm, params, vnode);
       return;
     }
 
@@ -314,19 +299,11 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
         commOrChain.contentType = commOrChain.created_at ? ContentType.Community : ContentType.Chain;
         commOrChain.searchType = SearchType.Community;
         return commOrChain;
-      }));
+      })).sort(sortResults);
 
-    console.log('loading over');
-    vnode.state.searchLoading = false;
-    vnode.state.errorText = null;
-    vnode.state.results = getResultsPreview(vnode.state.searchTerm, true);
-    m.redraw();
+    concludeSearch(searchTerm, params, vnode);
   } catch (err) {
-    console.log('FETCHING ERROR');
-    // TODO: Ensure error-catching operational
-    vnode.state.searchLoading = false;
-    vnode.state.errorText = err.responseJSON?.error || err.responseText || err.toString();
-    m.redraw();
+    concludeSearch(searchTerm, params, vnode, err);
   }
 };
 
@@ -335,30 +312,14 @@ const SearchBar : m.Component<{}, {
   searchLoading: boolean,
   searchTerm: string,
   searchModified: boolean,
-  fromPrefix: string,
-  inPrefix: string,
   errorText: string,
   focused: boolean,
 }> = {
   view: (vnode) => {
-    // if (m.route.param('q') && !vnode.state.searchModified) {
-    //   vnode.state.searchTerm = m.route.param('q').toLowerCase();
-    //   vnode.state.searchPrefix = SearchPrefix.COMMUNITY;
-    // }
     const inCommunity = app.chain || app.community;
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
 
-    // When user types in from: or in:, dropdown only shows options for completing those terms
-    // When user types in both, shows options for both together
-
-    const { fromPrefix, inPrefix, results, searchTerm } = vnode.state;
-    const value = inPrefix
-      ? fromPrefix
-        ? `in:${inPrefix} from:${fromPrefix} ${searchTerm}`
-        : `in:${inPrefix} ${searchTerm}`
-      : fromPrefix
-        ? `from:${fromPrefix} ${searchTerm}`
-        : searchTerm;
+    const { results, searchTerm } = vnode.state;
 
     return m(ControlGroup, {
       class: vnode.state.focused ? 'SearchBar focused' : 'SearchBar'
@@ -368,7 +329,7 @@ const SearchBar : m.Component<{}, {
         autofocus: true,
         fluid: true,
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
-        value,
+        value: vnode.state.searchTerm,
         oncreate: (e) => {
           if ((e.dom?.children[0] as HTMLInputElement)?.value) {
             vnode.state.searchTerm = (e.dom.children[0] as HTMLInputElement).value.toLowerCase();
@@ -376,9 +337,6 @@ const SearchBar : m.Component<{}, {
         },
         onclick: async (e) => {
           vnode.state.focused = true;
-          if (inCommunity) {
-            vnode.state.inPrefix = `${inCommunity.id}`;
-          }
         },
         // contentLeft,
         oninput: async (e) => {
@@ -386,14 +344,13 @@ const SearchBar : m.Component<{}, {
             vnode.state.searchModified = true;
           }
           vnode.state.searchTerm = e.target.value?.toLowerCase();
-          if (e.target.value?.length > 2) {
-            // TODO: Hook up community from & address in params
-            await search(vnode.state.searchTerm, {}, vnode);
+          if (e.target.value?.length >= 3) {
+            const params = inCommunity ? { communityScope: inCommunity.id } : {};
+            await search(vnode.state.searchTerm, params, vnode);
           }
         },
         onkeyup: (e) => {
           if (e.key === 'Enter') {
-            debugger
             if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
               notifyError('Enter a valid search term');
               return;
@@ -403,8 +360,7 @@ const SearchBar : m.Component<{}, {
             }
             // TODO: Consistent, in-advance sanitization of all params
             let params = `q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`;
-            if (inPrefix) params += `&in=${inPrefix}`;
-            if (fromPrefix) params += `&from=${fromPrefix}`;
+            if (inCommunity) params += `&in=${inCommunity.id}`;
             vnode.state.searchModified = false;
             m.route.set(`/${app.activeId()}/search?q=${params}}`);
           }
