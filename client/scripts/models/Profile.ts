@@ -14,6 +14,7 @@ class Profile {
   private _lastActive: Date;
   private _isCouncillor: boolean = false;
   private _isValidator: boolean = false;
+  private _isEmpty: boolean = false;
   private _isNameInvalid: boolean = false;
   get name() { return this._name; }
   get headline() { return this._headline; }
@@ -25,6 +26,7 @@ class Profile {
   get lastActive() { return this._lastActive; }
   get isCouncillor() { return this._isCouncillor; }
   get isValidator() { return this._isValidator; }
+  get isEmpty() { return this._isEmpty; }
   get isNameInvalid() { return this._isNameInvalid; }
 
   public readonly chain: string;
@@ -37,6 +39,7 @@ class Profile {
 
   public initializeEmpty() {
     this._initialized = true;
+    this._isEmpty = true;
   }
 
   // When the user updates their name locally, mark it invalid for the duration
@@ -49,6 +52,7 @@ class Profile {
 
   public initializeWithChain(name, headline, bio, avatarUrl, judgements, lastActive, isCouncillor = false, isValidator = false) {
     this._initialized = true;
+    this._isEmpty = false;
     this._isOnchain = true;
     this._name = name;
     this._headline = headline;
@@ -62,6 +66,7 @@ class Profile {
 
   public initialize(name, headline, bio, avatarUrl, lastActive, isCouncillor = false, isValidator = false) {
     this._initialized = true;
+    this._isEmpty = false;
     this._name = name;
     this._headline = headline;
     this._bio = bio;
