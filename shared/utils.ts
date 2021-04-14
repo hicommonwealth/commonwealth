@@ -42,6 +42,7 @@ export const smartTrim = (text, maxLength = 200) => {
   }
 };
 
+// Todo: We need to allow for subdomain validation for the telgram bot
 export const validURL = (str) => {
   const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
     + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name

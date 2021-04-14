@@ -1,4 +1,4 @@
-import request from 'superagent';
+import request from 'superagent'; //HTTP client
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
 import { SubstrateEvents } from '@commonwealth/chain-events';
@@ -7,6 +7,7 @@ import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
 import { getForumNotificationCopy } from '../shared/notificationFormatter';
 import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from './config';
+import { response } from 'express';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -87,7 +88,7 @@ const send = async (models, content: WebhookContent) => {
   try {
     address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
   } catch (err) {
-    // pass nothing if no matching address is found
+    console.log("There's no address")
   }
 
   // if a community is passed with the content, we know that it is from an offchain community
@@ -108,9 +109,13 @@ const send = async (models, content: WebhookContent) => {
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
     // We currently only support slack webhooks
-    if (validURL(wh.url)) {
-      chainOrCommwebhookUrls.push(wh.url);
-    }
+    chainOrCommwebhookUrls.push(wh.url);
+    
+    //Todo: Fix validation
+
+    // if (validURL(wh.url)) {
+    //   chainOrCommwebhookUrls.push(wh.url);
+    // }
   });
 
   const {
@@ -172,6 +177,7 @@ const send = async (models, content: WebhookContent) => {
   await Promise.all(chainOrCommwebhookUrls
     .filter((url) => !!url)
     .map(async (url) => {
+      console.log(url)
       let webhookData;
       if (url.indexOf('slack.com') !== -1) {
         // slack webhook format (stringified JSON)
@@ -250,20 +256,23 @@ const send = async (models, content: WebhookContent) => {
             },
           }]
         };
-      } else if (url.indexOf('telegram.com') !== -1) {
+      } else if (url.indexOf('telegram.org') !== -1) {
         const getUpdatesUrl = url.split('/sendPhoto').slice(0, -1).join('/');
-        const response = await request.get(`${getUpdatesUrl}${getUpdatesUrl[getUpdatesUrl.length - 1] === '/' ? '' : '/'}getChat`);
-        const chatId = response.body.result.id;
+        console.log(getUpdatesUrl)
+
+        // const response = await request.get(getChat)
+        // console.log(response)
+
         webhookData = isChainEvent ? {
-          chat_id: chatId,
+          chat_id: -562987835,
           photo: previewImageUrl,
-          caption: `<a href="${chainEventLink}"><b>${title}</b></a> \r\n${fulltext}`,
-          parse_mode: 'HTML',
+          caption: `<a href="${chainEventLink}"><b>${title}</b></a>\n${fulltext}`,
+          parse_mode: 'HTML'
         } : {
-          chat_id: chatId,
+          chat_id: -562987835,
           photo: previewImageUrl,
-          caption: `<b>Actor:</b> <a href="${actorAccountLink}">${actor}</a> \r\n <a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
-          parse_mode: 'HTML',
+          caption: `<b>Actor:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
+          parse_mode: 'HTML'
         };
       } else {
         // TODO: other formats unimplemented
