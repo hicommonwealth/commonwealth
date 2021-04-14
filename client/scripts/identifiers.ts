@@ -6,6 +6,7 @@ import ThreadsController from './controllers/server/threads';
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
+  SubstrateBountyProposal = 'bountyproposal',
   SubstrateCollectiveProposal = 'councilmotion',
   PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',
@@ -31,6 +32,7 @@ export const proposalSlugToClass = () => {
     mmap.set('councilmotion', (app.chain as any).council);
     mmap.set('phragmenelection', (app.chain as any).phragmenElections);
     mmap.set('treasuryproposal', (app.chain as any).treasury);
+    mmap.set('bountyproposal', (app.chain as any).bounties);
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     mmap.set('cosmosproposal', (app.chain as any).governance);
   }
@@ -57,6 +59,7 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['referendum', 'Democracy Referendum'],
   ['democracyproposal', 'Democracy Proposal'],
   ['democracypreimage', 'Democracy Preimage'],
+  ['bountyproposal', 'Bounty Proposal'],
   ['democracyimminent', 'Democracy Imminent Preimage'],
   ['councilmotion', 'Council Motion'],
   ['phragmenelection', 'Phragmen Council Candidacy'],
@@ -87,6 +90,13 @@ export const chainEntityTypeToProposalSlug = (t: string) => {
   else if (t === 'democracy-referendum') return ProposalType.SubstrateDemocracyReferendum;
   else if (t === 'democracy-proposal') return ProposalType.SubstrateDemocracyProposal;
   else if (t === 'collective-proposal') return ProposalType.SubstrateCollectiveProposal;
+};
+
+export const proposalSlugToChainEntityType = (t) => {
+  if (t === ProposalType.SubstrateTreasuryProposal) return 'treasury-proposal';
+  else if (t === ProposalType.SubstrateDemocracyReferendum) return 'democracy-referendum';
+  else if (t === ProposalType.SubstrateDemocracyProposal) return 'democracy-proposal';
+  else if (t === ProposalType.SubstrateCollectiveProposal) return 'collective-proposal';
 };
 
 export const chainEntityTypeToProposalName = (t: string) => {

@@ -38,8 +38,12 @@
     }
     .cui-button.discussions-topic {
         margin-right: 6px;
-        .cui-icon {
-            margin-left: 1px;
+        .cui-popover-content {
+            position: relative;
+            top: 1px;
+            .cui-menu-item {
+                font-weight: initial !important;
+            }
         }
         .cui-icon svg {
             $size: 13px;
@@ -47,10 +51,7 @@
             min-width: $size;
             height: $size;
             width: $size;
-            stroke: tint(#2480cc, 25%);
-        }
-        .cui-icon:hover svg {
-            stroke: tint(#2480cc, 10%);
+            margin-right: -2px;
         }
     }
     .cui-button.discussions-topic,
@@ -88,6 +89,16 @@
     }
 
     // content
+    .PinnedDivider {
+        hr {
+            height: 1px;
+            border: none;
+            border-bottom: 1px solid $border-color-off-white;
+            margin-left: 4px;
+            margin-right: 4px;
+            width: -webkit-fill-available;
+        }
+    }
     .LastSeenDivider {
         display: flex;
         padding: 0 0 3px;

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import ViewCountCache from '../util/viewCountCache';
+import { sequelize } from '../database';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -29,39 +30,25 @@ const viewCount = async (models, cache: ViewCountCache, req: Request, res: Respo
     return next(new Error(Errors.InvalidChainOrComm));
   }
 
-  // verify thread exists before querying
-  const obj = await models.OffchainThread.findOne({
+  // verify count exists before querying
+  let count = await models.OffchainViewCount.findOne({
     where: community ? {
       community: req.body.community,
-      id: req.body.object_id,
+      object_id: req.body.object_id,
     } : {
       chain: req.body.chain,
-      id: req.body.object_id,
+      object_id: req.body.object_id,
     }
   });
-  if (!obj) {
+  if (!count) {
     return next(new Error(Errors.InvalidThread));
   }
-
-  // query view counts, creating as needed
-  let [ count, created ] = await models.OffchainViewCount.findOrCreate({
-    where: community ? {
-      community: req.body.community,
-      object_id: req.body.object_id,
-    } : {
-      chain: req.body.chain,
-      object_id: req.body.object_id,
-    },
-    defaults: {
-      view_count: 1,
-    }
-  });
 
   // hit cache to decide whether to add to count
   const isNewView = await cache.view(req.ip, req.body.object_id);
 
   // add one to view count if not in cache and not newly created
-  if (isNewView && !created) {
+  if (isNewView) {
     count = await count.update({
       view_count: count.view_count + 1,
     });

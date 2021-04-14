@@ -1,10 +1,10 @@
-import 'components/proposals_loading_row.scss';
+import 'components/loading_row.scss';
 
 import m from 'mithril';
 
-const ProposalsLoadingRow: m.Component<{}> = {
+const LoadingRow: m.Component<{}> = {
   view: (vnode) => {
-    return m('.ProposalsLoadingRow', [
+    return m('.LoadingRow', [
       m('.proposal-row', [
         m('.proposal-left', [
           m('.title-block'),
@@ -21,4 +21,4 @@ const ProposalsLoadingRow: m.Component<{}> = {
   }
 };
 
-export default ProposalsLoadingRow;
+export default LoadingRow;

@@ -14,6 +14,8 @@ import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import PageLoading from 'views/pages/loading';
+import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { formatAddressShort } from '../../../../../shared/utils';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
@@ -77,6 +79,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
+    const isClaimable = !account || !account.profile || account.profile.isEmpty;
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
@@ -130,6 +133,14 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               }
             }, 'Copy address'),
             vnode.state.copied && m('span.copy-done', 'Copied'),
+            m('.space'),
+            isClaimable && m(LoginWithWalletDropdown, {
+              prepopulateAddress: account.address,
+              loggingInWithAddress: !app.isLoggedIn(),
+              joiningCommunity: app.activeCommunityId(),
+              joiningChain: app.activeChainId(),
+              label: 'Claim address',
+            }),
           ]),
         ]),
         m('.bio-actions-breakpoint'),

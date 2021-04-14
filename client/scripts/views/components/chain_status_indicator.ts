@@ -21,10 +21,11 @@ const ChainStatusIndicator: m.Component<{
       [ApiStatus.Connected, 'Online'],
     ]);
 
-    const blockNum = app.chain?.block?.height ? formatNumberLong(app.chain?.block?.height) : '0';
-    const title = !app.chain ? '' : app.chain.networkStatus === ApiStatus.Connected
-      ? `Block ${blockNum}`
-      : apiStatusToLabel.get(app.chain.networkStatus);
+    const title = !app.chain ? '' : app.chain.networkStatus !== ApiStatus.Connected
+      ? apiStatusToLabel.get(app.chain.networkStatus)
+      : app.chain?.block?.height
+        ? `Block ${formatNumberLong(app.chain?.block?.height)}`
+        : 'Loading blocks...';
 
     return m('.ChainStatusIndicator', [
       m('.status', {

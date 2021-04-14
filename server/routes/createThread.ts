@@ -418,6 +418,14 @@ const createThread = async (models, tokenBalanceCache: TokenBalanceCache, req: R
   author.last_active = new Date();
   author.save();
 
+  // initialize view count (no await)
+  models.OffchainViewCount.create({
+    community: finalThread.community,
+    chain: finalThread.chain,
+    object_id: finalThread.id,
+    view_count: 0,
+  });
+
   return res.json({ status: 'Success', result: finalThread.toJSON() });
 };
 
