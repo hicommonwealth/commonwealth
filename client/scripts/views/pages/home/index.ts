@@ -4,7 +4,6 @@ import m from 'mithril';
 
 import Sublayout from 'views/sublayout';
 import CommunityCards from './community_cards';
-import Search from './search';
 
 const Homepage: m.Component<{}, {}> = {
   view: (vnode: m.VnodeDOM) => {
@@ -29,7 +28,6 @@ const Homepage: m.Component<{}, {}> = {
         ]),
       ]),
     }, [
-      m(Search),
       m(CommunityCards),
     ]);
   }
