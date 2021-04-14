@@ -32,7 +32,6 @@ class CommunityInfo {
   public readonly visible: boolean;
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
-  public isInitialized: boolean;
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
@@ -41,7 +40,7 @@ class CommunityInfo {
 
   constructor(
     id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain,
-    visible, invitesEnabled, privacyEnabled, collapsedOnHomepage, isInitialized, featuredTopics, topics, adminsAndMods?
+    visible, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
     this.name = name;
@@ -57,7 +56,6 @@ class CommunityInfo {
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
     this.collapsedOnHomepage = collapsedOnHomepage;
-    this.isInitialized = isInitialized;
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];

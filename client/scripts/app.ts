@@ -188,24 +188,8 @@ export async function createTemporaryTokenChain(n: NodeInfo): Promise<boolean> {
   await deinitChainOrCommunity();
 
   // Begin initializing the community
-  //const newCommunity = new Community(c, app);
-  /*
-  const finalizeInitialization = await newCommunity.init();
-
-  // If the user is still in the initializing community, finalize the
-  // initialization; otherwise, abort and return false
-  if (!finalizeInitialization) {
-    return false;
-  } else {
-    app.community = newCommunity;
-  }*/
-
-  //app.community = newCommunity;
-
   const newToken = new Token(n, app)
   app.chain = newToken;
-
-  console.log(`${n.name.toUpperCase()} started.`);
 
   // Redraw with community fully loaded and return true to indicate
   // initialization has finalized.
@@ -465,9 +449,6 @@ export async function initTemporaryTokenChain(address: string): Promise<boolean>
 
   if(!token) { return false }
 
-  // Update active addresses w Ethereum address
- // updateActiveAddresses(n.chain)
-
   return createTemporaryTokenChain(
     new NodeInfo(
       0,
@@ -597,8 +578,6 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-
-
       // Special case to defer chain loading specifically for viewing an offchain thread. We need
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
