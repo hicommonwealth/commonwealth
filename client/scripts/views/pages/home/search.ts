@@ -1,15 +1,12 @@
 import m from 'mithril';
+import app from 'state';
 import { InputSelect } from 'construct-ui';
-import getTokenLists from './token_lists';
-/*
-localStorage
-*/
 
 var items = [];
 var searchValue =  ""
 const Search : m.Component<{ }> = {
   oninit: async () => {
-    items = await getTokenLists();
+    items = await app.tokens.getTokensFromLists();
   },
   view: (vnode) => {
     return m('.Search', [

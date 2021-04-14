@@ -12,6 +12,7 @@ import {
   OffchainThreadStage,
   CommunityInfo,
   NodeInfo,
+  NewChainInfo,
   OffchainTopic,
   Profile,
   ChainEntity,
@@ -140,7 +141,7 @@ class ThreadsController {
     attachments?: string[],
     readOnly?: boolean,
     isNewChain?: boolean,
-    newChainInfo?: any
+    newChainInfo?: NewChainInfo
   ) {
     try {
       // TODO: Change to POST /thread

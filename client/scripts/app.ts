@@ -24,8 +24,6 @@ import LoginModal from 'views/modals/login_modal';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
-import getTokenLists from 'views/pages/home/token_lists';
-
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/home');
 import(/* webpackPrefetch: true */ 'views/pages/discussions');
@@ -444,10 +442,12 @@ export function initCommunity(communityId: string): Promise<boolean> {
 
 export async function initTemporaryTokenChain(address: string): Promise<boolean> {
   // todo token list in localstorage
-  let tokenLists = await getTokenLists()
+  let tokenLists = await app.tokens.getTokensFromLists()
   let token = tokenLists.find(o=>{ return o.address === address })
 
   if(!token) { return false }
+
+  app.threads.initialize([],0,0,true)
 
   return createTemporaryTokenChain(
     new NodeInfo(
