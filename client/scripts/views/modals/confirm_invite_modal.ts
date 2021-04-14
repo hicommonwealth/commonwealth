@@ -162,6 +162,7 @@ const ConfirmInviteModal: m.Component<{}, {
                 }),
               ]),
               addresses.length === 0 && m('.no-accounts', 'You must connect an address to join this community.'),
+              // TODO: This should actually accept the invite for you after your address is connected!
               addresses.length === 0 && m('a.btn.add-account', {
                 href: '#',
                 onclick: (e) => {
