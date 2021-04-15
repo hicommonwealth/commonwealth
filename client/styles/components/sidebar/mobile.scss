@@ -126,6 +126,9 @@
 .MobileSidebarPopoverMenu {
     @include sidebar();
     margin: 0 10px;
+    .sidebar-spacer {
+        margin-top: 20px;
+    }
     .section-header {
         font-size: 18px;
         color: $text-color-light;

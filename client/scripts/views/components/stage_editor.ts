@@ -54,7 +54,9 @@ const ChainEntitiesSelector: m.Component<{
           if (ce.typeId.startsWith('0x')) {
             return false;
           } else {
-            return ce.typeId.toString().toLowerCase().includes(query.toLowerCase());
+            return ce.typeId.toString().toLowerCase().includes(query.toLowerCase())
+              || ce.title?.toString().toLowerCase().includes(query.toLowerCase())
+              || chainEntityTypeToProposalName(ce.type).toLowerCase().includes(query.toLowerCase());
           }
         },
         onSelect: (ce: ChainEntity) => {

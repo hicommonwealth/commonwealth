@@ -4,16 +4,20 @@
 .UserGallery {
     .overflow-users-wrap {
         @include circledAvatar();
+        position: relative;
         display: inline-block;
         margin-right: -16px;
         margin-top: -3px;
         white-space: nowrap;
         background-color: $background-color-medium-accent;
+        line-height: 44px !important;
         .overflow-users {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: -50%;
             text-align: center;
             color: white;
-            position: relative;
-            top: 2px;
         }
     }
 }

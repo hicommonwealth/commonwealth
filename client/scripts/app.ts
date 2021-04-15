@@ -40,7 +40,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
       data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
-      data.nodes.map((node) => {
+      data.nodes.sort((a, b) => a.id - b.id).map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
           url: node.url,
@@ -48,7 +48,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           address: node.address,
         }));
       });
-      data.communities.map((community) => {
+      data.communities.sort((a, b) => a.id - b.id).map((community) => {
         return app.config.communities.add(CommunityInfo.fromJSON({
           id: community.id,
           name: community.name,
@@ -77,7 +77,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       // add recentActivity
       const { recentThreads } = data;
       Object.entries(recentThreads).forEach(([comm, count]) => {
-        app.recentActivity.setCommunityThreadCounts(comm, count as number);
+        app.recentActivity.setCommunityThreadCounts(comm, count);
       });
 
       // update the login status
@@ -545,6 +545,7 @@ $(() => {
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
+    '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
 
     // Login page
     '/login':                    importRoute('views/pages/login', { scoped: false }),
@@ -575,15 +576,16 @@ $(() => {
     '/:scope/referenda':         importRoute('views/pages/referenda', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
+    '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-    '/:scope/council':           importRoute('views/pages/council/index', { scoped: true }),
+    '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
     '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
     '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
     '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
-    '/:scope/communityStats':    importRoute('views/pages/stats', { scoped: true, deferChain: true }),
+    '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
 
     '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
@@ -593,7 +595,7 @@ $(() => {
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
+    '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
 
     // NEAR login
     '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),

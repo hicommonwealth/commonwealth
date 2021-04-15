@@ -15,7 +15,7 @@ const User: m.Component<{
   avatarSize?: number;
   avatarOnly?: boolean; // overrides most other properties
   hideAvatar?: boolean;
-  hideIdentityIcon?: boolean; // only applies to substrate identities
+  hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
   showAddressWithDisplayName?: boolean; // show address inline with the display name
   linkify?: boolean;
   onclick?: any;
@@ -83,10 +83,10 @@ const User: m.Component<{
     }
     const getRoleTags = (long?) => [
       // 'long' makes role tags show as full length text
-      profile.isCouncillor && m('.role-icon.role-icon-councillor', {
+      profile.isCouncillor && !hideIdentityIcon && m('.role-icon.role-icon-councillor', {
         class: long ? 'long' : ''
       }, long ? `${friendlyChainName} Councillor` : 'C'),
-      profile.isValidator && m('.role-icon.role-icon-validator', {
+      profile.isValidator && !hideIdentityIcon && m('.role-icon.role-icon-validator', {
         class: long ? 'long' : ''
       }, long ? `${friendlyChainName} Validator` : 'V'),
       // offchain role in commonwealth forum
@@ -122,15 +122,18 @@ const User: m.Component<{
             // non-substrate name
             linkify
               ? link('a.user-display-name.username',
-                profile
+                (profile
                   ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
-                  : 'javascript:',
-                profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort)
+                  : 'javascript:'
+                ), [
+                  profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort,
+                  getRoleTags(false),
+                ])
               : m('a.user-display-name.username', [
-                profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort
+                profile ? (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName) : addrShort,
+                getRoleTags(false),
               ])
           ],
-        getRoleTags(false),
       ]);
 
     const userPopover = m('.UserPopover', {
@@ -146,14 +149,14 @@ const User: m.Component<{
       ]),
       m('.user-name', [
         (app.chain && app.chain.base === ChainBase.Substrate && app.cachedIdentityWidget)
-          ? m(app.cachedIdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort, showAddressWithDisplayName })
+          ? m(app.cachedIdentityWidget, { account, linkify: true, profile, hideIdentityIcon, addrShort, showAddressWithDisplayName: false })
           : link('a.user-display-name',
             profile
               ? `/${m.route.param('scope') || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
-              profile ? [
-                (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
-              ] : addrShort)
+            profile ? [
+              (showAddressWithDisplayName ? profile.displayNameWithAddress : profile.displayName)
+            ] : addrShort)
       ]),
       profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain)),
       friendlyChainName && m('.user-chain', friendlyChainName),
@@ -208,8 +211,6 @@ export const UserBlock: m.Component<{
           avatarSize: 28,
           popover,
         }),
-        // TODO: this is weird...symbol display should not depend on user being an Account
-        user.chain instanceof ChainInfo && m('.user-block-symbol', user.chain.symbol),
       ]),
       m('.user-block-center', [
         m('.user-block-name', [

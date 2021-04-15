@@ -8,6 +8,7 @@ import { QueryTypes } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+import { getLastEdited } from '../util/getLastEdited';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -55,14 +56,15 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
               model: models.OffchainTopic,
               as: 'topic'
             }
-          ]
+          ],
+          exclude: [ 'version_history' ],
         });
 
         const query = `
           SELECT addr.id AS addr_id, addr.address AS addr_address,
             addr.chain AS addr_chain, thread_id, thread_title,
             thread_community, thread_chain, thread_created, threads.kind, threads.stage,
-            threads.version_history, threads.read_only, threads.body,
+            threads.read_only, threads.body,
             threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
             topics.description AS topic_description, topics.chain_id AS topic_chain,
             topics.telegram AS topic_telegram,
@@ -71,7 +73,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           RIGHT JOIN (
             SELECT t.id AS thread_id, t.title AS thread_title, t.address_id,
               t.created_at AS thread_created, t.community AS thread_community,
-              t.chain AS thread_chain, t.version_history, t.read_only, t.body,
+              t.chain AS thread_chain, t.read_only, t.body,
               t.stage, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(
                 CONCAT(
                   '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
@@ -105,7 +107,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
             AND t.deleted_at IS NULL
             AND t.pinned = false
             GROUP BY (t.id, c.comm_created_at, t.created_at)
-            ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT ${20 - pinnedThreads.length}
+            ORDER BY COALESCE(c.comm_created_at, t.created_at) DESC LIMIT ${Math.max(0, 10 - pinnedThreads.length)}
           ) threads
           ON threads.address_id = addr.id
           LEFT JOIN "OffchainTopics" topics
@@ -131,13 +133,14 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           const chain_entities = JSON.parse(t.chain_entities[0]).id
             ? t.chain_entities.map((c) => JSON.parse(c))
             : [];
+          const last_edited = getLastEdited(t);
 
           const data = {
             id: t.thread_id,
             title: t.thread_title,
             url: t.url,
             body: t.body,
-            version_history: t.version_history,
+            last_edited,
             kind: t.kind,
             stage: t.stage,
             read_only: t.read_only,
@@ -178,6 +181,11 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
           },
           include: [models.Address, models.OffchainAttachment],
           order: [['created_at', 'DESC']],
+        }).map((c, idx) => {
+          const row = c.toJSON();
+          const last_edited = getLastEdited(row);
+          row['last_edited'] = last_edited;
+          return row;
         });
 
         // Reactions
@@ -222,7 +230,8 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
         const monthlyComments = await models.OffchainComment.findAll({ where, include: [ models.Address ] });
         const monthlyThreads = await models.OffchainThread.findAll({
           where,
-          include: [ { model: models.Address, as: 'Address' } ]
+          include: [ { model: models.Address, as: 'Address' } ],
+          exclude: [ 'version_history' ],
         });
 
         monthlyComments.concat(monthlyThreads).forEach((post) => {
@@ -263,7 +272,7 @@ const bulkOffchain = async (models, req: Request, res: Response, next: NextFunct
       numPrevotingThreads,
       numVotingThreads,
       threads, // already converted to JSON earlier
-      comments: comments.map((c) => c.toJSON()),
+      comments, // already converted to JSON earlier
       reactions: reactions.map((r) => r.toJSON()),
       //
       admins: admins.map((a) => a.toJSON()),
