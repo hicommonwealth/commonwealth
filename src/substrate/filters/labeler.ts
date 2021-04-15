@@ -94,6 +94,13 @@ export const Label: LabelerFilter = (
 ): IEventLabel => {
   const balanceFormatter = (bal) => edgBalanceFormatter(chainId, bal);
   switch (data.kind) {
+    case EventKind.BalanceTransfer: {
+      const { sender, dest, value } = data;
+      return {
+        heading: 'Balance Transferred',
+        label: `${fmtAddr(sender)} transferred ${balanceFormatter(value)} to ${fmtAddr(dest)}.`,
+      };
+    }
     /**
      * ImOnline Events
      */

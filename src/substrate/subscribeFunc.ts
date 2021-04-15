@@ -8,7 +8,12 @@ import { Processor } from './processor';
 import { Block, IEventData } from './types';
 
 import { factory, formatFilename } from '../logging';
+import { EnricherConfig } from './filters/enricher';
 const log = factory.getLogger(formatFilename(__filename));
+
+export interface ISubstrateSubscribeOptions extends ISubscribeOptions<ApiPromise> {
+  enricherConfig?: EnricherConfig;
+}
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
@@ -54,8 +59,8 @@ export async function createApi(
  * @param discoverReconnectRange A function to determine how long we were offline upon reconnection.
  * @returns An active block subscriber.
  */
-export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions<ApiPromise>> = async (options) => {
-  const { chain, api, handlers, skipCatchup, archival, startBlock, discoverReconnectRange, verbose } = options;
+export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubstrateSubscribeOptions> = async (options) => {
+  const { chain, api, handlers, skipCatchup, archival, startBlock, discoverReconnectRange, verbose, enricherConfig } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>) => {
     let prevResult = null;
@@ -74,7 +79,7 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
 
   // helper function that sends a block through the event processor and
   // into the event handlers
-  const processor = new Processor(api);
+  const processor = new Processor(api, enricherConfig || {});
   const processBlockFn = async (block: Block) => {
     // retrieve events from block
     const events: CWEvent<IEventData>[] = await processor.process(block);

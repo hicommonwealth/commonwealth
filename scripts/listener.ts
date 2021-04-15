@@ -120,6 +120,7 @@ if (chainSupportedBy(network, SubstrateEvents.Types.EventChains)) {
       archival,
       startBlock,
       verbose: true,
+      enricherConfig: { balanceTransferThresholdPermill: 1_000 }, // 0.1% of total issuance
     });
   });
 } else if (chainSupportedBy(network, MolochEvents.Types.EventChains)) {

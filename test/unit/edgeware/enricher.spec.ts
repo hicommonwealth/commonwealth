@@ -5,12 +5,11 @@ import {
   Proposal, TreasuryProposal, Votes, Event, Extrinsic, Registration,
   RegistrarInfo, Bounty, 
 } from '@polkadot/types/interfaces';
-import { DeriveDispatch, DeriveProposalImage, DeriveBounty, DeriveCollectiveProposal, DeriveBounties } from '@polkadot/api-derive/types';
+import { DeriveDispatch, DeriveProposalImage, DeriveBounties } from '@polkadot/api-derive/types';
 import { Vec, bool, Data, TypeRegistry, Option } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
-import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { ValidatorId, RewardPoint } from '@polkadot/types/interfaces';
 import { OffenceDetails, ReportIdOf } from '@polkadot/types/interfaces/offences';
 import { Enrich } from '../../../src/substrate/filters/enricher';
@@ -26,6 +25,7 @@ const offenceDetails = [
 ];
 const blockNumber = 10;
 const api = constructFakeApi({
+  totalIssuance: async () => new BN(1_000_000),
   electionRounds: async () => '10',
   electionMembers: async () => [ [ 'dave' ], [ 'charlie' ], [ 'eve' ] ],
   activeEra: async () => '5',
@@ -558,6 +558,74 @@ const constructBool = (b: boolean): bool => {
 
 /* eslint-disable: dot-notation */
 describe('Edgeware Event Enricher Filter Tests', () => {
+  it('should enrich balance-transfer event to everyone without config', async () => {
+    const kind = EventKind.BalanceTransfer;
+    const event = constructEvent([ 'alice', 'bob', new BN('1001') ], 'balances', [ 'AccountId', 'AccountId', 'Balance' ]);
+    
+    // publicly emit all transfers
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      includeAddresses: [],
+      data: {
+        kind,
+        sender: 'alice',
+        dest: 'bob',
+        value: '1001',
+      }
+    });
+  });
+  it('should enrich balance-transfer event with threshold 0 to everyone', async () => {
+    const kind = EventKind.BalanceTransfer;
+    const event = constructEvent([ 'alice', 'bob', new BN('10') ], 'balances', [ 'AccountId', 'AccountId', 'Balance' ]);
+    
+    // publicly emit all transfers
+    const result = await Enrich(api, blockNumber, kind, event, { balanceTransferThresholdPermill: 0 });
+    assert.deepEqual(result, {
+      blockNumber,
+      includeAddresses: [],
+      data: {
+        kind,
+        sender: 'alice',
+        dest: 'bob',
+        value: '10',
+      }
+    });
+  });
+  it('should enrich large balance-transfer event to everyone with config', async () => {
+    const kind = EventKind.BalanceTransfer;
+    const event = constructEvent([ 'alice', 'bob', new BN('1001') ], 'balances', [ 'AccountId', 'AccountId', 'Balance' ]);
+    
+    // only publicly emit transfers > 1_000
+    const result = await Enrich(api, blockNumber, kind, event, { balanceTransferThresholdPermill: 1_000 });
+    assert.deepEqual(result, {
+      blockNumber,
+      includeAddresses: [],
+      data: {
+        kind,
+        sender: 'alice',
+        dest: 'bob',
+        value: '1001',
+      }
+    });
+  });
+  it('should enrich small balance-transfer event to included addresses with config', async () => {
+    const kind = EventKind.BalanceTransfer;
+    const event = constructEvent([ 'alice', 'bob', new BN('999') ], 'balances', [ 'AccountId', 'AccountId', 'Balance' ]);
+    
+    // only publicly emit transfers > 1_000
+    const result = await Enrich(api, blockNumber, kind, event, { balanceTransferThresholdPermill: 1_000 });
+    assert.deepEqual(result, {
+      blockNumber,
+      includeAddresses: [ 'alice', 'bob' ],
+      data: {
+        kind,
+        sender: 'alice',
+        dest: 'bob',
+        value: '999',
+      }
+    });
+  });
   it('should enrich new-session event', async () => {
     const kind = EventKind.NewSession;
     let activeExposures: { [key: string]: any } = {

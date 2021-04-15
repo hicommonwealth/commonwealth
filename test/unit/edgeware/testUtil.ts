@@ -159,6 +159,9 @@ export function constructFakeApi(
         blockHash,
         events,
       },
+      balances: {
+        totalIssuance: callOverrides['totalIssuance'],
+      },
       session: {
         nextKeys: callOverrides['nextKeys'],
         currentIndex,

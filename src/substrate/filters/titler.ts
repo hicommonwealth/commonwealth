@@ -8,6 +8,12 @@ import { EventKind } from '../types';
  */
 export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
   switch (kind) {
+    case EventKind.BalanceTransfer: {
+      return {
+        title: 'Balance Transferred',
+        description: 'A balance transfer is performed.',
+      }
+    }
     /**
      * ImOnline Events
      */

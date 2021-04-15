@@ -13,6 +13,12 @@ export function ParseType (
   // TODO: we can unify this with the enricher file: parse out the kind, and then
   //   marshall the rest of the types in the same place. But for now, we can leave as-is.
   switch (section) {
+    case 'balances': {
+      switch (method) {
+        case 'Transfer': return EventKind.BalanceTransfer;
+        default: return null;
+      }
+    }
     case 'imOnline':
       switch (method) {
         case 'AllGood': return EventKind.AllGood;

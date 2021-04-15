@@ -117,6 +117,9 @@ export enum EventKind {
   Reward = 'reward',
   Bonded = 'bonded',
   Unbonded = 'unbonded',
+
+  BalanceTransfer = 'balance-transfer',
+
   StakingElection = 'staking-election',
 
   VoteDelegated = 'vote-delegated',
@@ -186,6 +189,13 @@ export enum EventKind {
 
 interface IEvent {
   kind: EventKind;
+}
+
+export interface IBalanceTransfer extends IEvent {
+  kind: EventKind.BalanceTransfer;
+  sender: AccountId;
+  dest: AccountId;
+  value: BalanceString;
 }
 
 /**
@@ -640,6 +650,7 @@ export type IEventData =
   | IReward
   | IBonded
   | IUnbonded
+  | IBalanceTransfer
   | IStakingElection
   | IVoteDelegated
   | IDemocracyProposed

@@ -7,12 +7,19 @@ import { Extrinsic, Event } from '@polkadot/types/interfaces';
 import { IEventProcessor, CWEvent } from '../interfaces';
 import { Block, isEvent, IEventData } from './types';
 import { ParseType } from './filters/type_parser';
-import { Enrich } from './filters/enricher';
+import { Enrich, EnricherConfig } from './filters/enricher';
 
 import { factory, formatFilename } from '../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export class Processor extends IEventProcessor<ApiPromise, Block> {
+  constructor(
+    protected _api: ApiPromise,
+    private _enricherConfig: EnricherConfig = {},
+  ) {
+    super(_api);
+  }
+
   private _lastBlockNumber: number;
   public get lastBlockNumber() { return this._lastBlockNumber; }
 
@@ -41,7 +48,7 @@ export class Processor extends IEventProcessor<ApiPromise, Block> {
         );
       if (kind !== null) {
         try {
-          const result = await Enrich(this._api, blockNumber, kind, data);
+          const result = await Enrich(this._api, blockNumber, kind, data, this._enricherConfig);
           return result;
         } catch (e) {
           log.error(`Event enriching failed for ${kind}`);
