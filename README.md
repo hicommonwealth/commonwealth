@@ -23,6 +23,16 @@ Be sure to call `yarn unlink` once development has been completed and the new ch
 
 Please submit any enhancements or bug fixes as a Pull Request on the [project's github page](https://github.com/hicommonwealth/chain-events).
 
+## Publishing
+
+First ensure you bump the package version in the [package.json](./package.json) file. Then build, and publish to the npm repository. A `--dry-run` is useful beforehand to ensure the version and file lists are correct.
+
+```bash
+~/chain-events$ yarn build
+~/chain-events$ npm publish [--tag <tag>] --dry-run
+~/chain-events$ npm publish [--tag <tag>]
+```
+
 ## Standalone Usage
 
 This package includes a "event listener" script located at [listener.ts](./scripts/listener.ts), which permits real-time listening for on-chain events, and can be used for testing a chain connection.
