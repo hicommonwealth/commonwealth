@@ -62,7 +62,7 @@ const ConfirmInviteModal: m.Component<{}, {
           vnode.state.selectedAddress = account.address;
         },
       }, [
-        m(UserBlock, { user: account })
+        m(UserBlock, { user: account, showChainName: true })
       ]);
     };
 
@@ -93,12 +93,10 @@ const ConfirmInviteModal: m.Component<{}, {
           m('p', [
             'You\'ve been invited to the ',
             m('strong', invites[vnode.state.location].community_name),
-            ' community.'
+            ' community. Select an address to accept the invite:'
           ]),
           vnode.state.accepted.includes(vnode.state.location) ? m('h4', 'You\'ve accepted this invite!')
             : vnode.state.rejected.includes(vnode.state.location) ? m('h4', 'You\'ve already deleted this invite!') : [
-              addresses.length > 0
-                && m('p', 'Select an address to join:'),
               m('.invite-addresses', [
                 addresses,
               ]),
@@ -129,7 +127,7 @@ const ConfirmInviteModal: m.Component<{}, {
                       });
                     }
                   },
-                  label: 'Join',
+                  label: 'Accept invite',
                 }),
                 m('.invite-actions-or', 'or'),
                 m(Button, {
