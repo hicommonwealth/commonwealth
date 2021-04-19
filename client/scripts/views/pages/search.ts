@@ -7,9 +7,6 @@ import { Tabs, Spinner, TabItem, Tag, ListItem } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
 import {
-  searchMentionableAddresses,
-  searchDiscussions,
-  searchChainsAndCommunities,
   DiscussionIcon,
   CommunityIcon,
   MemberIcon
@@ -210,6 +207,7 @@ const SearchPage : m.Component<{
     });
 
     const communityScope = m.route.param('scope');
+    debugger
     if (communityScope && (!app.chain && !app.community)) {
       return LoadingPage;
     }

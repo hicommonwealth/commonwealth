@@ -1,17 +1,19 @@
 import $ from 'jquery';
 import app from 'state';
 import m from 'mithril';
+import { SearchParams } from '../views/components/search_bar';
 
 export const searchDiscussions = async (
   searchTerm: string,
-  limit: number = 50
+  params: SearchParams
 ) => {
+  const { resultSize, chain, community } = params;
   const response = await $.get(`${app.serverUrl()}/search`, {
-    chain: app.activeChainId(),
-    community: app.activeCommunityId(),
+    chain,
+    community,
     cutoff_date: null, // cutoffDate.toISOString(),
     search: searchTerm,
-    results_size: limit,
+    results_size: resultSize,
   });
   if (response.status !== 'Success') {
     throw new Error(`Got unsuccessful status: ${response.status}`);
@@ -22,12 +24,13 @@ export const searchDiscussions = async (
 
 export const searchMentionableAddresses = async (
   searchTerm: string,
-  limit: number = 6,
+  params: SearchParams,
   order: string[] = ['name', 'ASC']
 ) => {
+  const { resultSize } = params;
   const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
     chain: app.activeChainId(),
-    limit,
+    limit: resultSize,
     searchTerm,
     order,
   });

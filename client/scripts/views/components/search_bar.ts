@@ -18,9 +18,12 @@ import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User from './widgets/user';
 
-interface SearchParams {
+export interface SearchParams {
   communityScope?: string;
   isSearchPreview?: boolean;
+  community?: string;
+  chain?: string;
+  resultSize?: number;
 }
 
 export enum SearchType {
@@ -260,16 +263,16 @@ const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) =
 export const search = async (searchTerm: string, params: SearchParams, vnode) => {
   console.log({ searchTerm });
   // TODO: Hookup community and member scope
-  const { communityScope, isSearchPreview } = params;
-  const querySize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
+  const { communityScope, isSearchPreview, community, chain } = params;
+  const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
 
   // if !communityScope search only...
 
   try {
     if (communityScope) {
       const [discussions, addrs] = await Promise.all([
-        searchDiscussions(searchTerm, querySize),
-        searchMentionableAddresses(searchTerm, querySize, ['created_at', 'DESC'])
+        searchDiscussions(searchTerm, { resultSize, community, chain }),
+        searchMentionableAddresses(searchTerm, { resultSize }, ['created_at', 'DESC'])
       ]);
       console.log({ discussions });
       app.searchCache[SearchType.Discussion] = discussions.map((discussion) => {
@@ -289,10 +292,10 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
       return;
     } else {
       const [discussions, addrs, unfilteredTokens, comms] = await Promise.all([
-        searchDiscussions(searchTerm, querySize),
-        searchMentionableAddresses(searchTerm, querySize, ['created_at', 'DESC']),
+        searchDiscussions(searchTerm, { resultSize }),
+        searchMentionableAddresses(searchTerm, { resultSize }, ['created_at', 'DESC']),
         getTokenLists(),
-        searchChainsAndCommunities(searchTerm, querySize),
+        searchChainsAndCommunities(searchTerm, resultSize),
       ]);
 
       app.searchCache[SearchType.Discussion] = discussions.map((discussion) => {
@@ -333,13 +336,24 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
 
 const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
   view: (vnode) => {
+    const { searchTerm } = vnode.attrs;
     return m(ListItem, {
       class: 'no-results',
       label: [
-        m('b', vnode.attrs.searchTerm),
+        m('b', searchTerm),
         m('span', { style: 'white-space: pre;' }, '  •  '),
         m('span', 'Search community...')
-      ]
+      ],
+      onclick: (e) => {
+        if (searchTerm.length < 4) {
+          notifyError('Query must be at least 4 characters');
+        }
+        // TODO: Consistent, in-advance sanitization of all params
+        let params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
+        if (app.activeCommunityId()) params += `&comm=${app.activeCommunityId()}`;
+        else if (app.activeChainId()) params += `&chain=${app.activeChainId()}`;
+        m.route.set(`/search?q=${params}`);
+      }
     });
   }
 };
@@ -347,7 +361,6 @@ const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
 const SearchBar : m.Component<{}, {
   results: any[],
   searchTerm: string,
-  searchModified: boolean,
   errorText: string,
   focused: boolean,
 }> = {
@@ -378,9 +391,6 @@ const SearchBar : m.Component<{}, {
           vnode.state.focused = true;
         },
         oninput: (e) => {
-          if (!vnode.state.searchModified) {
-            vnode.state.searchModified = true;
-          }
           vnode.state.searchTerm = e.target.value?.toLowerCase();
           if (e.target.value?.length > 3) {
             const params: SearchParams = {};
@@ -402,9 +412,9 @@ const SearchBar : m.Component<{}, {
             }
             // TODO: Consistent, in-advance sanitization of all params
             let params = `q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`;
-            if (inCommunity) params += `&in=${inCommunity.id}`;
-            vnode.state.searchModified = false;
-            m.route.set(`/${app.activeId()}/search?q=${params}}`);
+            if (app.activeCommunityId()) params += `&comm=${app.activeCommunityId()}`;
+            else if (app.activeChainId()) params += `&chain=${app.activeChainId()}`;
+            m.route.set(`/search?q=${params}`);
           }
         },
       }),

@@ -157,6 +157,8 @@
                 &:first-child {
                     margin-top: 0px;
                 }
+            }
+            &.disabled {
                 &:hover {
                     background: white;
                     cursor: default;

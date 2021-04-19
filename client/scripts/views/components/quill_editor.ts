@@ -276,7 +276,7 @@ const instantiateEditor = (
       }];
       renderList(formattedMatches, searchTerm);
     } else if (searchTerm.length > 0) {
-      members = await searchMentionableAddresses(searchTerm, 6);
+      members = await searchMentionableAddresses(searchTerm, { resultSize: 6 });
       formattedMatches = members.map((addr) => {
         const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
         const node = document.createElement('div');
