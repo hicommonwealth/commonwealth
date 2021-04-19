@@ -1,6 +1,10 @@
 .OnboardingChooseWallet {
-  padding: 25px 0;
+  padding: 0;
+  padding-bottom: 25px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 
   .title {
     display: flex;
@@ -23,8 +27,11 @@
   .content {
     width: 340px;
     margin: auto;
+    flex-grow: 1;
+
     .cui-input {
       width: 100%;
+      margin-bottom: 0 !important;
     }
     .wallets {
       display: grid;
@@ -32,7 +39,6 @@
       column-gap: 20px;
       row-gap: 20px;
       margin-top: 20px;
-      height: 260px;
 
       .item {
         display: flex;

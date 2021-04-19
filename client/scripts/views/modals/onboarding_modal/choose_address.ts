@@ -2,6 +2,13 @@ import 'modals/onboarding_modal/choose_address.scss';
 
 import m, { Vnode } from 'mithril';
 import $ from 'jquery';
+
+import { stringToHex } from '@polkadot/util';
+import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
+
+import { SigningCosmosClient } from '@cosmjs/launchpad';
+
 import mixpanel from 'mixpanel-browser';
 import app, { ApiStatus } from 'state';
 import { initChain, initAppState, selectNode } from 'app';
@@ -27,52 +34,24 @@ import AvatarUpload from 'views/components/avatar_upload';
 import { onboardingChooseAddressIcon } from '../../components/sidebar/icons';
 import { ChainBaseIcon } from '../../components/chain_icon';
 import OnboardingFooterActions from './footer_actions';
-
-interface IOnboardingChooseAddressAttr {
-  joiningChain?: string;
-  joiningCommunity?: string;
-  base: ChainBase;
-  onBack: () => void;
-  onNext: (account: Account<any>) => void;
-}
-
-interface IOnboardingChooseAddressState {
-  // // meta
-  // step;
-  // error;
-  // selectedWallet: LinkNewAddressWallets;
-  // // step 1 - validate address
-  // userProvidedSignature: string;
-  // secretPhraseSaved: boolean;
-  // newAddress: Account<any>; // true if account was already initialized, otherwise it's the Account
-  // linkingComplete: boolean;
-  // // step 2 - create a profile
-  // isNewLogin: boolean;
-  // // step 3 - complete
-  // hasName: boolean;
-  // hasHeadline: boolean;
-  // uploadsInProgress: boolean;
-  // isEd25519?: boolean;
-  // enteredAddress?: string;
-  initializingWallet: boolean;
-  // onpopstate;
-
-  loadingScope: string;
-}
+import AddressSwapper from '../../components/addresses/address_swapper';
 
 const EthereumLinkAccountItem: m.Component<{
   address,
   targetCommunity,
   accountVerifiedCallback,
   errorCallback,
-  linkNewAddressModalVnode
+  linkNewAddressModalVnode,
+  disabled
 }, { linking }> = {
   view: (vnode) => {
     // TODO: implement vnode.state.linking
-    const { address, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode, targetCommunity } = vnode.attrs;
-    return m('.EthereumLinkAccountItem.account-item', {
+    const { address, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode, targetCommunity, disabled } = vnode.attrs;
+    return m(`.EthereumLinkAccountItem.account-item${disabled ? '.disabled' : ''}`, {
       onclick: async (e) => {
         e.preventDefault();
+        if (disabled) return;
+
         vnode.state.linking = true;
 
         // check address status if currently logged in
@@ -137,20 +116,191 @@ const EthereumLinkAccountItem: m.Component<{
   }
 };
 
+const SubstrateLinkAccountItem: m.Component<{
+  account,
+  targetCommunity,
+  accountVerifiedCallback,
+  errorCallback,
+  linkNewAddressModalVnode,
+  disabled
+}, { linking }> = {
+  view: (vnode) => {
+    const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode, targetCommunity, disabled } = vnode.attrs;
+    const address = AddressSwapper({
+      address: account.address,
+      currentPrefix: (app.chain as Substrate).chain.ss58Format,
+    });
+
+    return m(`.SubstrateLinkAccountItem.account-item${disabled ? '.disabled' : ''}`, {
+      onclick: async (e) => {
+        e.preventDefault();
+        if (disabled) return;
+
+        // check address status if currently logged in
+        if (app.isLoggedIn()) {
+          const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+            address,
+            chain: app.activeChainId(),
+            jwt: app.user.jwt,
+          });
+          if (result.exists) {
+            if (result.belongsToUser) {
+              notifyInfo('This address is already linked to your current account.');
+              return;
+            } else {
+              const modalMsg = 'This address is currently linked to another account. '
+                + 'Remove it from that account and transfer to yours?';
+              const confirmed = await confirmationModalWithText(modalMsg)();
+              if (!confirmed) {
+                vnode.state.linking = false;
+                return;
+              }
+            }
+          }
+        }
+
+        try {
+          const signerAccount = await createUserWithAddress(address, undefined, targetCommunity) as SubstrateAccount;
+          const signer = await (app.chain as Substrate).webWallet.getSigner(address);
+          vnode.state.linking = true;
+          m.redraw();
+
+          const token = signerAccount.validationToken;
+          const payload: SignerPayloadRaw = {
+            address: signerAccount.address,
+            data: stringToHex(token),
+            type: 'bytes',
+          };
+          const signature = (await signer.signRaw(payload)).signature;
+          signerAccount.validate(signature).then(() => {
+            vnode.state.linking = false;
+            m.redraw();
+            // return if user signs for two addresses
+            if (linkNewAddressModalVnode.state.linkingComplete) return;
+            linkNewAddressModalVnode.state.linkingComplete = true;
+            accountVerifiedCallback(signerAccount);
+          }, (err) => {
+            vnode.state.linking = false;
+            errorCallback('Verification failed');
+          }).then(() => {
+            m.redraw();
+          }).catch((err) => {
+            vnode.state.linking = false;
+            errorCallback('Verification failed');
+            m.redraw();
+          });
+        } catch (err) {
+          // catch when the user rejects the sign message prompt
+          vnode.state.linking = false;
+          errorCallback('Verification failed');
+          m.redraw();
+        }
+      }
+    }, [
+      m('.account-item-avatar', [
+        m('.account-user', m(User, { user: app.chain.accounts.get(address), avatarOnly: true, avatarSize: 40 })),
+      ]),
+      m('.account-item-left', [
+        m('.account-item-name', [
+          m('.account-user', m(User, { user: app.chain.accounts.get(address), hideAvatar: true })),
+        ]),
+        m('.account-item-address', address),
+      ]),
+    ]);
+  }
+};
+
+const CosmosLinkAccountItem: m.Component<{
+  account,
+  targetCommunity,
+  accountVerifiedCallback,
+  errorCallback,
+  linkNewAddressModalVnode,
+  disabled
+}, { linking }> = {
+  view: (vnode) => {
+    const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode, targetCommunity, disabled } = vnode.attrs;
+    return m(`.CosmosLinkAccountItem.account-item${disabled ? '.disabled' : ''}`, {
+      onclick: async (e) => {
+        e.preventDefault();
+        if (disabled) return;
+
+        const offlineSigner = app.chain.webWallet?.offlineSigner;
+        if (!offlineSigner) return notifyError('Missing or misconfigured web wallet');
+        vnode.state.linking = true;
+        m.redraw();
+
+        const client = new SigningCosmosClient(
+          // TODO: Figure out our own nodes, these are ported from the Keplr example code.
+          app.chain.meta.chain.network === 'cosmos'
+            ? 'https://node-cosmoshub-3.keplr.app/rest'
+            : app.chain.meta.chain.network === 'straightedge'
+              ? 'https://node-straightedge-2.keplr.app/rest'
+              : '',
+          account.address,
+          offlineSigner,
+        );
+
+        // Get the verification token & placeholder TX to send
+        const signerAccount = await createUserWithAddress(account.address, undefined, targetCommunity);
+        const signDoc = await validationTokenToSignDoc(account.address, signerAccount.validationToken);
+
+        // Some typing and versioning issues here...signAmino should be available but it's not
+        ((client as any).signer.signAmino
+          ? (client as any).signer.signAmino(account.address, signDoc)
+          : (client as any).signer.sign(account.address, signDoc)
+        ).then(async (signature) => {
+          return signerAccount.validate(JSON.stringify(signature)).then(() => {
+            // return if user signs for two addresses
+            if (linkNewAddressModalVnode.state.linkingComplete) return;
+            linkNewAddressModalVnode.state.linkingComplete = true;
+            return accountVerifiedCallback(signerAccount).then(() => m.redraw());
+          }).catch((err) => {
+            vnode.state.linking = false;
+            errorCallback(
+              err ? `${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}` : 'Unknown error'
+            );
+            m.redraw();
+          });
+        }).catch((err) => {
+          vnode.state.linking = false;
+          errorCallback(
+            err ? `${err?.name || 'Error'}: ${typeof err === 'string' ? err : err.message}` : 'Unknown error'
+          );
+          m.redraw();
+        });
+      },
+    }, [
+      m('.account-item-avatar', [
+        m('.account-user', m(User, { user: app.chain.accounts.get(account.address), avatarOnly: true, avatarSize: 40 })),
+      ]),
+      m('.account-item-left', [
+        m('.account-item-name', [
+          m('.account-user', m(User, { user: app.chain.accounts.get(account.address), hideAvatar: true })),
+        ]),
+        m('.account-item-address', account.address),
+      ]),
+    ]);
+  }
+};
+
+interface IOnboardingChooseAddressAttr {
+  address: string;
+  joiningChain?: string;
+  joiningCommunity?: string;
+  base: ChainBase;
+  onBack: () => void;
+  onNext: (account: Account<any>) => void;
+}
+
+interface IOnboardingChooseAddressState {
+  initializingWallet: boolean;
+  loadingScope: string;
+}
+
 const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChooseAddressState> = {
   oninit: (vnode) => {
-    const scope = baseToNetwork(vnode.attrs.base);
-
-    if (!app.chain && scope !== app.activeId() && vnode.state.loadingScope !== scope) {
-      const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
-      vnode.state.loadingScope = scope;
-
-      selectNode(scopeMatchesChain, false).then((response) => {
-        if (response) {
-          initChain();
-        }
-      });
-    }
+    vnode.state.initializingWallet = false;
   },
   view: (vnode) => {
     const accountVerifiedCallback = async (account: Account<any>) => {
@@ -244,35 +394,17 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
           vnode.state.initializingWallet = false;
           m.redraw();
         };
-        if (app.chain.webWallet?.available && ((vnode.state.initializingWallet !== false && app.chain.networkStatus !== ApiStatus.Disconnected) || (app.chain.networkStatus === ApiStatus.Disconnected))) {
-          content = [m(Spinner, {
-            size: 'lg',
-            active: true,
-            oncreate
-          })];
-          title = 'Connecting to chain...';
-        } else {
-          content = [m(Button, {
-            class: 'account-adder',
-            intent: 'primary',
-            rounded: true,
-            disabled: !app.chain.webWallet?.available // disable if unavailable
-              || vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
-            oncreate,
-            onclick: async (vvnode) => {
-              // initialize API if needed before starting webwallet
-              if (vnode.state.initializingWallet) return;
-              vnode.state.initializingWallet = true;
-              await app.chain.initApi();
-              await app.chain.webWallet?.enable();
-              vnode.state.initializingWallet = false;
-              m.redraw();
-            },
-            label:
-              !app.chain.webWallet?.available ? 'No wallet detected' : 'Connect to wallet'
-          })];
-        }
+        content = [m(Button, {
+          class: 'account-adder',
+          oncreate,
+        }), m(Spinner, {
+          size: 'lg',
+          active: app.chain.webWallet?.available,
+        })];
+        title = !app.chain.webWallet?.available ? 'No wallet detected' : 'Connecting to chain...';
       } else {
+        const addressFound = app.chain.webWallet?.accounts?.includes(vnode.attrs.address);
+
         content = [
           !app.chain.webWallet?.available && m('.get-wallet-text', [
             'Install a compatible wallet to continue',
@@ -287,17 +419,10 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
           app.chain.webWallet?.enabled && m('.accounts-caption', [
             app.chain.webWallet?.accounts.length === 0 ? [
               m('p', 'Wallet connected, but no accounts were found.'),
-            ] : app.chain.base === ChainBase.Ethereum ? [
-              m('p.small-text', 'To connect with a different account, select it in your wallet, and refresh the page.'),
-            ] : [
-              m('p', 'Select an address:'),
-              m('p.small-text', 'Look for a popup, or check your wallet/browser extension.'),
-              app.chain.base === ChainBase.CosmosSDK
-                && m('p.small-text', [
-                  `Because ${app.chain.meta.chain.name} does not support signed verification messages, `,
-                  'you will be asked to sign a no-op transaction. It will not be submitted to the chain.'
-                ]),
-            ],
+            ] : !addressFound ? [
+              m('p.small-text', 'We can’t find the following address in your current wallet. Please try looking in another wallet to claim it.'),
+              m('div.targetAddress', vnode.attrs.address)
+            ] : '',
           ]),
           m('.accounts-list', [
             app.chain.base === ChainBase.NEAR ? [
@@ -326,6 +451,29 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
                   accountVerifiedCallback,
                   errorCallback: (error) => { notifyError(error); },
                   linkNewAddressModalVnode: vnode,
+                  disabled: address !== vnode.attrs.address
+                })
+              ),
+            ] : app.chain.base === ChainBase.Substrate ? [
+              app.chain.webWallet?.accounts.map(
+                (account: InjectedAccountWithMeta) => m(SubstrateLinkAccountItem, {
+                  account,
+                  targetCommunity,
+                  accountVerifiedCallback,
+                  errorCallback: (error) => { notifyError(error); },
+                  linkNewAddressModalVnode: vnode,
+                  disabled: account.address !== vnode.attrs.address
+                })
+              ),
+            ] : app.chain.base === ChainBase.CosmosSDK ? [
+              app.chain.webWallet?.accounts.map(
+                (account: InjectedAccountWithMeta) => m(CosmosLinkAccountItem, {
+                  account,
+                  targetCommunity,
+                  accountVerifiedCallback,
+                  errorCallback: (error) => { notifyError(error); },
+                  linkNewAddressModalVnode: vnode,
+                  disabled: account.address !== vnode.attrs.address
                 })
               ),
             ] : [],

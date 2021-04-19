@@ -75,11 +75,20 @@ export interface IProfileHeaderState {
 }
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
+  oninit: (vnode) => {
+    const { account } = vnode.attrs;
+    const step = m.route.param('step');
+    const joiningCommunity = m.route.param('joiningCommunity');
+    const joiningChain = m.route.param('joiningChain');
+    if (step) {
+      app.modals.removeAll();
+      app.modals.create({ modal: OnboardingModal, data: { joiningCommunity, joiningChain, address: account.address, step } });
+    }
+  },
   view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
     const isClaimable = !account || !account.profile || account.profile.isEmpty;
-    console.log(account);
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
@@ -142,7 +151,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             rounded: true,
             class: '',
             onclick: () => {
-              app.modals.create({ modal: OnboardingModal, data: { joiningCommunity: app.activeCommunityId(), joiningChain: app.activeChainId() } });
+              app.modals.create({ modal: OnboardingModal, data: { joiningCommunity: app.activeCommunityId(), joiningChain: app.activeChainId(), address: account.address } });
             },
             label: 'Claim Address'
           }),

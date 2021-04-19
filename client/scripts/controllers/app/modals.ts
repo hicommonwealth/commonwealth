@@ -33,6 +33,11 @@ export class ModalStore {
     m.redraw();
   }
 
+  public removeAll() {
+    this._modals = [];
+    m.redraw();
+  }
+
   public getList() {
     return this._modals;
   }

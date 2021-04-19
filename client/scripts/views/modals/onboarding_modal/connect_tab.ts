@@ -8,6 +8,7 @@ import { onboardingCWIcon, onboardingArrowRightIcon, onboardingWalletIcon } from
 interface IOnboardingConnectAttr {
   onUseWallet: () => void;
   onUseCLI: () => void;
+  address: string;
 }
 
 const OnboardingConnect: m.Component<IOnboardingConnectAttr, {}> = {
@@ -22,7 +23,7 @@ const OnboardingConnect: m.Component<IOnboardingConnectAttr, {}> = {
         m('h2', 'Connect Your Wallet'),
         m('span', 'Connect your wallet address to claim the following address on Commonwealth.')
       ]),
-      m('div.address', '5GZLd2vkbZS9yCkEGPq1WaLJ5hr79v9ecyXFCXkVjPjuDzrf'),
+      m('div.address', vnode.attrs.address),
       m(Button, {
         label: 'Connect Wallet',
         onclick: () => {

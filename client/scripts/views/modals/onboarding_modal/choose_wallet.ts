@@ -35,11 +35,16 @@ const ChooseWallet: m.Component<IOnboardingChooseWalletAttr, IOnboardingChooseWa
       base
     ]);
 
+    const matchBase = (base: ChainBase) => {
+      if (!base) return false;
+      return base.toLowerCase().includes(vnode.state.search.toLowerCase());
+    };
+
     const allChains = app.config.chains.getAll();
     const sortedChainBases = [ChainBase.CosmosSDK, ChainBase.Ethereum, ChainBase.NEAR, ChainBase.Substrate].filter((base) => allChains.find((chain) => chain.base === base));
 
     const chainbase = app.chain?.meta?.chain?.base;
-    const items = app.chain ? [ getWalletItemForChainBase(chainbase) ] : sortedChainBases.map((base) => getWalletItemForChainBase(base));
+    const items = app.chain ? (matchBase(chainbase) ? [ getWalletItemForChainBase(chainbase) ] : []) : sortedChainBases.filter((base) => matchBase(base)).map((base) => getWalletItemForChainBase(base));
 
     return m('.OnboardingChooseWallet', [
       m('div.title', [
@@ -54,11 +59,12 @@ const ChooseWallet: m.Component<IOnboardingChooseWalletAttr, IOnboardingChooseWa
             m(Input, {
               name: 'search',
               placeholder: 'Type to filter wallets',
+              autoComplete: 'off',
               oninput: (e) => {
                 const result = (e.target as any).value;
                 vnode.state.search = result;
                 m.redraw();
-              }
+              },
             }),
           ])
         ]),

@@ -1,12 +1,15 @@
 .OnboardingChooseAddress {
   padding: 25px 0;
   text-align: center;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 
   .title {
     display: flex;
     align-items: center;
     flex-direction: column;
-    margin: auto;
+    margin: 0 auto;
 
     .icons {
       display: flex;
@@ -25,11 +28,16 @@
   }
 
   .content {
-    width: 340px;
-    margin: auto;
+    width: 420px;
+    margin: 0 auto;
+    flex-grow: 1;
+
+    .account-adder {
+      display: none;
+    }
 
     .cui-spinner {
-      margin: 100px 0 140px 0;
+      margin-top: 90px;
 
       .cui-spinner-icon {
         height: 80px;
@@ -37,8 +45,21 @@
       }
     }
 
+    .targetAddress {
+      background: #ffffe8;
+      padding: 10px 20px;
+      margin: 10px auto 20px;
+      line-height: 1;
+      width: fit-content;
+    }
+
+    .accounts-caption {
+      p {
+        margin: 0;
+      }
+    }
+
     .accounts-list {
-      height: 240px;
       overflow-y: auto;
       overflow-x: hidden;
 
@@ -50,6 +71,10 @@
         height: 72px;
         align-items: center;
         cursor: pointer;
+        width: 360px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10px;
 
         .account-item-avatar {
           flex-shrink: 1;
@@ -89,6 +114,12 @@
 
         &:hover {
           border: 1px solid #999;
+        }
+
+        &.disabled {
+          border: 1px solid #dddddd !important;
+          cursor: initial;
+          color: gray;
         }
       }
     }

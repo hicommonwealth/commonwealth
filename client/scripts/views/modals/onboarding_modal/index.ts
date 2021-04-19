@@ -2,9 +2,11 @@ import 'modals/onboarding_modal/index.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { ChainBase } from 'client/scripts/models';
-import { Account } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import app from 'state';
+import { ChainBase, Account } from 'models';
+
+import { notifySuccess } from 'controllers/app/notifications';
+import { baseToNetwork } from 'models/types';
 
 import OnboardingProgressBar from './progress_bar';
 import OnboardingConnect from './connect_tab';
@@ -22,29 +24,30 @@ interface IOnboardingState {
 interface IOnboardingAttrs {
   joiningChain?: string;
   joiningCommunity?: string;
+  address: string;
+  step: string;
 }
 
 const OnboardingModal: m.Component<IOnboardingAttrs, IOnboardingState> = {
   oninit: (vnode) => {
-    vnode.state.step = 0;
+    vnode.state.step = parseInt(vnode.attrs.step, 10) || 0;
     vnode.state.selected = null;
     vnode.state.account = null;
   },
   view: (vnode) => {
     const { step } = vnode.state;
-    const { joiningChain, joiningCommunity } = vnode.attrs;
-    const onUseWallet = () => {
-      vnode.state.step = 1;
-    };
+    const { joiningChain, joiningCommunity, address } = vnode.attrs;
 
-    const onUseCLI = () => {
-      vnode.state.step = 2;
-    };
     return m('.OnboardingModal', [
       m(OnboardingProgressBar, { step: vnode.state.step }),
       step === 0 ? m(OnboardingConnect, {
-        onUseWallet,
-        onUseCLI
+        address,
+        onUseWallet: () => {
+          vnode.state.step = 1;
+        },
+        onUseCLI: () => {
+          vnode.state.step = 2;
+        }
       })
         : step === 1 ? m(OnboardingChooseWallet, {
           selected: vnode.state.selected,
@@ -57,13 +60,34 @@ const OnboardingModal: m.Component<IOnboardingAttrs, IOnboardingState> = {
           },
           onNext: () => {
             vnode.state.step = 2;
+            if (joiningCommunity) {
+              app.modals.removeAll();
+
+              const scope = baseToNetwork(vnode.state.selected);
+              m.route.set(`/${scope}/account/${vnode.attrs.address}`, {
+                base: m.route.param('base'),
+                joiningChain,
+                joiningCommunity,
+                step: 2,
+              });
+            }
           },
         }) : step === 2 ? m(OnboardingChooseAddress, {
+          address,
           joiningChain,
           joiningCommunity,
           base: vnode.state.selected,
           onBack: () => {
             vnode.state.step = 1;
+            if (joiningCommunity) {
+              app.modals.removeAll();
+              m.route.set(`/${joiningCommunity}/account/${vnode.attrs.address}`, {
+                base: m.route.param('base'),
+                joiningChain: vnode.attrs.joiningChain,
+                joiningCommunity: vnode.attrs.joiningCommunity,
+                step: 1,
+              });
+            }
           },
           onNext: (account: Account<any>) => {
             vnode.state.account = account;
