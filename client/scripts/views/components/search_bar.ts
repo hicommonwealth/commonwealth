@@ -334,14 +334,15 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
 const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
   view: (vnode) => {
     return m(ListItem, {
+      class: 'no-results',
       label: [
         m('b', vnode.attrs.searchTerm),
-        m('span', ' • '),
+        m('span', { style: 'white-space: pre;' }, '  •  '),
         m('span', 'Search community...')
       ]
     });
   }
-}
+};
 
 const SearchBar : m.Component<{}, {
   results: any[],
@@ -408,7 +409,7 @@ const SearchBar : m.Component<{}, {
         },
       }),
       // TODO: Addrs are showing twice
-      searchTerm.length !== 0
+      searchTerm.length > 4
       && searchResults
     ]);
   }
