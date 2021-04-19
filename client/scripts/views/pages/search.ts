@@ -206,9 +206,10 @@ const SearchPage : m.Component<{
       ],
     });
 
-    const communityScope = m.route.param('scope');
-    debugger
-    if (communityScope && (!app.chain && !app.community)) {
+    const communityScope = m.route.param('community');
+    const chainScope = m.route.param('chain');
+
+    if ((communityScope || chainScope) && (!app.chain && !app.community)) {
       return LoadingPage;
     }
 
@@ -225,14 +226,14 @@ const SearchPage : m.Component<{
     if (searchTerm !== vnode.state.searchTerm) {
       vnode.state.searchTerm = searchTerm;
       vnode.state.results = [];
-      search(searchTerm, { communityScope }, vnode);
+      search(searchTerm, { communityScope, chainScope }, vnode);
       return LoadingPage;
     }
 
     if (vnode.state.searchLoading) {
       return LoadingPage;
     } else if (!vnode.state.results && !vnode.state.errorText) {
-      search(searchTerm, { communityScope }, vnode);
+      search(searchTerm, { communityScope, chainScope }, vnode);
       return;
     }
 

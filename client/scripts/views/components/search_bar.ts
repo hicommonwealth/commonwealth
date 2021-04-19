@@ -20,9 +20,8 @@ import User from './widgets/user';
 
 export interface SearchParams {
   communityScope?: string;
+  chainScope?: string;
   isSearchPreview?: boolean;
-  community?: string;
-  chain?: string;
   resultSize?: number;
 }
 
@@ -255,7 +254,8 @@ const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) =
   app.searchCache.loaded = true;
   vnode.state.errorText = !err
     ? null : (err.responseJSON?.error || err.responseText || err.toString());
-  vnode.state.results = getResultsPreview(searchTerm, params, vnode, true);
+  const commOrChainScoped = params.communityScope || params.chainScope;
+  vnode.state.results = getResultsPreview(searchTerm, params, vnode, commOrChainScoped);
   console.log('redrawing');
   m.redraw();
 };
@@ -263,15 +263,15 @@ const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) =
 export const search = async (searchTerm: string, params: SearchParams, vnode) => {
   console.log({ searchTerm });
   // TODO: Hookup community and member scope
-  const { communityScope, isSearchPreview, community, chain } = params;
+  const { isSearchPreview, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
 
   // if !communityScope search only...
 
   try {
-    if (communityScope) {
+    if (communityScope || chainScope) {
       const [discussions, addrs] = await Promise.all([
-        searchDiscussions(searchTerm, { resultSize, community, chain }),
+        searchDiscussions(searchTerm, { resultSize, communityScope, chainScope }),
         searchMentionableAddresses(searchTerm, { resultSize }, ['created_at', 'DESC'])
       ]);
       console.log({ discussions });
@@ -365,14 +365,14 @@ const SearchBar : m.Component<{}, {
   focused: boolean,
 }> = {
   view: (vnode) => {
-    const inCommunity = app.chain || app.community;
+    const chainOrCommScope = app.activeChainId() || app.activeCommunityId();
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
 
     const { results, searchTerm } = vnode.state;
     const searchResults = (results?.length > 0)
       ? m(List, results)
       : m(List, [ m(emptySearchPreview, { searchTerm }) ]);
-    console.log(searchTerm.length);
+
     return m(ControlGroup, {
       class: vnode.state.focused ? 'SearchBar focused' : 'SearchBar'
     }, [
@@ -394,9 +394,9 @@ const SearchBar : m.Component<{}, {
           vnode.state.searchTerm = e.target.value?.toLowerCase();
           if (e.target.value?.length > 3) {
             const params: SearchParams = {};
-            if (inCommunity) {
-              params['communityScope'] = inCommunity.id;
-              params['isSearchPreview'] = true;
+            params['isSearchPreview'] = true;
+            if (chainOrCommScope) {
+              params['communityScope'] = chainOrCommScope;
             }
             _.debounce(() => search(vnode.state.searchTerm, params, vnode), 200)();
           }
