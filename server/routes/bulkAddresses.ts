@@ -15,7 +15,14 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const bulkAddresses = async (models, req, res, next) => {
   const options = {
-    order: req.query.order ? [req.query.order] : [['created_at', 'DESC']],
+    order: [req.query.order
+      ? req.query.community
+        ? [models.Address, models.Role].concat([req.query.order])
+        : req.query.order
+      : req.query.community
+        ? [models.Address, models.Role, 'created_at', 'DESC']
+        : ['created_at', 'DESC']
+    ]
   };
 
   if (req.query.limit) options['limit'] = req.query.limit;
@@ -24,7 +31,7 @@ const bulkAddresses = async (models, req, res, next) => {
   if (req.query.chain || req.query.community) {
     [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
     if (error) return next(new Error(error));
-    else options['where'] = { chain: req.query.chain };
+    if (chain) options['where'] = { chain: req.query.chain };
   }
 
   if (req.query.searchTerm?.length) {
@@ -43,12 +50,13 @@ const bulkAddresses = async (models, req, res, next) => {
       ? Object.assign(options['where'], subStr)
       : subStr;
     if (req.query.community) {
-      options['include'] = [
-        { model: models.Role },
-        { where: { offchain_community_id: community.id } }
-      ];
+      options['include'] = [{
+        model: models.Role,
+        where: { offchain_community_id: community.id },
+      }];
     }
     console.log(options);
+    console.log(options['include']);
   }
 
   const addresses = await models.Address.findAll(options);
