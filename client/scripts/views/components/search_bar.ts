@@ -44,7 +44,7 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 
 // TODO: Linkification of users, tokens, comms results
 export const getMemberPreview = (addr, searchTerm) => {
-  debugger
+  console.log('getMemberPreview');
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Display longer or even full addresses
@@ -65,7 +65,7 @@ export const getMemberPreview = (addr, searchTerm) => {
 };
 
 export const getCommunityPreview = (community) => {
-  debugger
+  console.log('getCommunityPreview');
   if (community.contentType === ContentType.Token) {
     return m(ListItem, {
       label: m('a.search-results-item', [
@@ -98,7 +98,7 @@ export const getCommunityPreview = (community) => {
 };
 
 export const getDiscussionPreview = (thread, searchTerm) => {
-  debugger
+  console.log('getDiscussionPreview');
   // TODO: Separate threads, proposals, and comments
   const activeId = app.activeId();
   const proposalId = thread.proposalid;
@@ -180,14 +180,19 @@ const sortResults = (a, b) => {
 };
 
 const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]) => {
-  debugger
+  console.log('getbalancedContentListing');
   const results = {};
+  let unfilteredResultsLength = 0;
   for (const key of types) {
     results[key] = [];
+    unfilteredResultsLength += unfilteredResults[key].length;
   }
   let priorityPosition = 0;
   let resultsLength = 0;
-  while (resultsLength < 6) {
+  debugger
+  console.log({resultsLength, unfilteredResultsLength});
+  while (resultsLength < 6 && resultsLength < unfilteredResultsLength) {
+    console.log({ typesLength: types.length, resultsLength, unfilteredLength: unfilteredResults.length });
     for (let i = 0; i < types.length; i++) {
       const type = types[i];
       if (resultsLength < 6) {
@@ -195,10 +200,12 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
         if (nextResult) {
           results[type].push(nextResult);
           resultsLength += 1;
+          console.log({resultsLength});
         }
       }
     }
     priorityPosition += 1;
+    console.log({priorityPosition});
   }
   return results;
 };
@@ -215,7 +222,6 @@ const getResultsPreview = (searchTerm: string, params: SearchParams, vnode, comm
   }
   const organizedResults = [];
   types.forEach((type) => {
-    debugger
     const res = results[type];
     if (res?.length === 0) return;
     const headerEle = m(ListItem, {
@@ -244,15 +250,14 @@ const getResultsPreview = (searchTerm: string, params: SearchParams, vnode, comm
 const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) => {
   console.log('loading over');
   app.searchCache.loaded = true;
-  vnode.state.searchLoading = false;
   vnode.state.errorText = !err
     ? null : (err.responseJSON?.error || err.responseText || err.toString());
   vnode.state.results = getResultsPreview(searchTerm, params, vnode, true);
+  console.log('redrawing');
   m.redraw();
 };
 
 export const search = async (searchTerm: string, params: SearchParams, vnode) => {
-  vnode.state.searchLoading = true;
   console.log({ searchTerm });
   // TODO: Hookup community and member scope
   const { communityScope, isSearchPreview } = params;
@@ -320,16 +325,26 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
         })).sort(sortResults);
     }
 
-
     concludeSearch(searchTerm, params, vnode);
   } catch (err) {
     concludeSearch(searchTerm, params, vnode, err);
   }
 };
 
+const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
+  view: (vnode) => {
+    return m(ListItem, {
+      label: [
+        m('b', vnode.attrs.searchTerm),
+        m('span', ' • '),
+        m('span', 'Search community...')
+      ]
+    });
+  }
+}
+
 const SearchBar : m.Component<{}, {
   results: any[],
-  searchLoading: boolean,
   searchTerm: string,
   searchModified: boolean,
   errorText: string,
@@ -340,7 +355,10 @@ const SearchBar : m.Component<{}, {
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
 
     const { results, searchTerm } = vnode.state;
-
+    const searchResults = (results?.length > 0)
+      ? m(List, results)
+      : m(List, [ m(emptySearchPreview, { searchTerm }) ]);
+    console.log(searchTerm.length);
     return m(ControlGroup, {
       class: vnode.state.focused ? 'SearchBar focused' : 'SearchBar'
     }, [
@@ -369,7 +387,7 @@ const SearchBar : m.Component<{}, {
               params['communityScope'] = inCommunity.id;
               params['isSearchPreview'] = true;
             }
-            _.debounce(() => search(vnode.state.searchTerm, params, vnode), 1000)();
+            _.debounce(() => search(vnode.state.searchTerm, params, vnode), 200)();
           }
         },
         onkeyup: (e) => {
@@ -390,8 +408,8 @@ const SearchBar : m.Component<{}, {
         },
       }),
       // TODO: Addrs are showing twice
-      (results?.length > 0)
-      && m(List, results)
+      searchTerm.length !== 0
+      && searchResults
     ]);
   }
 };

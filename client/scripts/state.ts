@@ -113,6 +113,7 @@ const app: IApp = {
   user: new UserController(),
 
   recentActivity: new RecentActivityController(),
+  // TODO: Add type
   searchCache: {},
 
   activeChainId: () => app.chain
