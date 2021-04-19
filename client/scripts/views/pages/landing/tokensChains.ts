@@ -50,7 +50,7 @@ const TokensChainsComponent: m.Component<{}, {}> = {
                     [
                       m('img', {
                         class: 'mx-auto mb-3 w-12 h-auto',
-                        src: 'assets/img/near-protocol.png',
+                        src: 'static/img/near-protocol.png',
                         alt: '',
                       }),
                       m(
@@ -78,7 +78,7 @@ const TokensChainsComponent: m.Component<{}, {}> = {
                     [
                       m('img', {
                         class: 'mx-auto mb-3 w-12 h-auto',
-                        src: 'assets/img/edgeware.svg',
+                        src: 'static/img/edgeware.svg',
                         alt: '',
                       }),
                       m(
@@ -106,7 +106,7 @@ const TokensChainsComponent: m.Component<{}, {}> = {
                     [
                       m('img', {
                         class: 'mx-auto mb-3 w-12 h-auto',
-                        src: 'assets/img/straightedge.svg',
+                        src: 'static/img/straightedge.svg',
                         alt: '',
                       }),
                       m(
@@ -134,7 +134,7 @@ const TokensChainsComponent: m.Component<{}, {}> = {
                     [
                       m('img', {
                         class: 'mx-auto mb-3 w-12 h-auto',
-                        src: 'assets/img/near-protocol.png',
+                        src: 'static/img/near-protocol.png',
                         alt: '',
                       }),
                       m(

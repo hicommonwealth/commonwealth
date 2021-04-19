@@ -32,7 +32,7 @@ const JoinCommonWealthSection: m.Component<{}, {}> = {
                 ' Join yours ',
                 m('img', {
                   class: 'inline ml-1.5',
-                  src: 'assets/img/arrow-right-black.svg',
+                  src: 'static/img/arrow-right-black.svg',
                   alt: "Let's Go",
                 }),
               ])

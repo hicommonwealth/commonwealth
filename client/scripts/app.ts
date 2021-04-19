@@ -2,6 +2,8 @@ import 'lib/normalize.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
+import 'tailwindcss/tailwind.css';
+import '../styles/style.css';
 
 import m from 'mithril';
 import $ from 'jquery';

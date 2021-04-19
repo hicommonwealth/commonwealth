@@ -65,7 +65,7 @@ const TokensCreatorComponent: m.Component<{}, {}> = {
                     'flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0',
                   id: 'tab-codepen',
                 },
-                m('img', { src: 'assets/img/tab1.svg', alt: '' })
+                m('img', { src: 'static/img/tab1.svg', alt: '' })
               ),
             ])
           ),
@@ -107,7 +107,7 @@ const TokensCreatorComponent: m.Component<{}, {}> = {
                 },
                 m('img', {
                   class: 'block max-w-none w-full h-auto',
-                  src: 'assets/img/tab2.svg',
+                  src: 'static/img/tab2.svg',
                   alt: '',
                 })
               ),
@@ -151,7 +151,7 @@ const TokensCreatorComponent: m.Component<{}, {}> = {
                 },
                 m('img', {
                   class: 'block max-w-none w-full h-auto',
-                  src: 'assets/img/tab3.svg',
+                  src: 'static/img/tab3.svg',
                   alt: '',
                 })
               ),
@@ -195,7 +195,7 @@ const TokensCreatorComponent: m.Component<{}, {}> = {
                 },
                 m('img', {
                   class: 'block max-w-none w-full h-auto',
-                  src: 'assets/img/tab4.svg',
+                  src: 'static/img/tab4.svg',
                   alt: '',
                 })
               ),

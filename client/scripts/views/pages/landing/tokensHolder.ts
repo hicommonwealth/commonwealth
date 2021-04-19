@@ -31,7 +31,7 @@ const TokenHoldersComponent: m.Component<{}, {}> = {
           m('div', { class: 'text-center lg:text-left' }, [
             m('img', {
               class: 'mb-9 w-12 h-auto mx-auto lg:mx-0',
-              src: 'assets/img/near-protocol.png',
+              src: 'static/img/near-protocol.png',
               alt: '',
             }),
             m(
@@ -48,7 +48,7 @@ const TokenHoldersComponent: m.Component<{}, {}> = {
           m('div', { class: 'text-center lg:text-left' }, [
             m('img', {
               class: 'mb-9 w-12 h-auto mx-auto lg:mx-0',
-              src: 'assets/img/near-protocol.png',
+              src: 'static/img/near-protocol.png',
               alt: '',
             }),
             m('h3', { class: 'text-2xl font-extrabold mb-1' }, 'Stay updated'),
@@ -61,7 +61,7 @@ const TokenHoldersComponent: m.Component<{}, {}> = {
           m('div', { class: 'text-center lg:text-left' }, [
             m('img', {
               class: 'mb-9 w-12 h-auto mx-auto lg:mx-0',
-              src: 'assets/img/near-protocol.png',
+              src: 'static/img/near-protocol.png',
               alt: '',
             }),
             m(
@@ -78,7 +78,7 @@ const TokenHoldersComponent: m.Component<{}, {}> = {
           m('div', { class: 'text-center lg:text-left' }, [
             m('img', {
               class: 'mb-9 w-12 h-auto mx-auto lg:mx-0',
-              src: 'assets/img/near-protocol.png',
+              src: 'static/img/near-protocol.png',
               alt: '',
             }),
             m(

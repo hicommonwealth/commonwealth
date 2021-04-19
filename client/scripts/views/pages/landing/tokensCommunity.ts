@@ -62,7 +62,7 @@ const TokensCommunityComponent: m.Component<{}, {}> = {
                             m('span', { class: 'flex flex-row font-bold' }, [
                               m('img', {
                                 class: 'mr-4',
-                                src: 'assets/img/add.svg',
+                                src: 'static/img/add.svg',
                                 alt: '',
                               }),
                               m('span', { class: 'mt-1' }, ' Add your token!'),
@@ -81,7 +81,7 @@ const TokensCommunityComponent: m.Component<{}, {}> = {
                               m('span', { class: 'flex flex-row font-bold' }, [
                                 m('img', {
                                   class: 'mr-4 w-5 h-auto',
-                                  src: 'assets/img/y3d.png',
+                                  src: 'static/img/y3d.png',
                                   alt: '',
                                 }),
                                 m(
@@ -110,7 +110,7 @@ const TokensCommunityComponent: m.Component<{}, {}> = {
                               m('span', { class: 'flex flex-row font-bold' }, [
                                 m('img', {
                                   class: 'mr-4 w-5 h-auto',
-                                  src: 'assets/img/y3d.png',
+                                  src: 'static/img/y3d.png',
                                   alt: '',
                                 }),
                                 m(
@@ -139,7 +139,7 @@ const TokensCommunityComponent: m.Component<{}, {}> = {
                         " Let's Go ",
                         m('img', {
                           class: 'inline ml-1.5',
-                          src: 'assets/img/arrow-right.svg',
+                          src: 'static/img/arrow-right.svg',
                           alt: "Let's Go",
                         }),
                       ]
@@ -173,19 +173,19 @@ const TokensCommunityComponent: m.Component<{}, {}> = {
                 m('img', {
                   class:
                     'absolute top-1/2 transform -translate-y-2/4 left-10 max-w-none max-h-none h-auto w-629 xl:left-36 mt-10',
-                  src: 'assets/img/discussions.svg',
+                  src: 'static/img/discussions.svg',
                   alt: '',
                 }),
                 m('img', {
                   class:
                     'absolute -bottom-10 left-24 lg:-bottom-2 lg:left-64 w-350',
-                  src: 'assets/img/notification.svg',
+                  src: 'static/img/notification.svg',
                   alt: '',
                 }),
                 m('img', {
                   class:
                     'absolute top-1/2 transform translate-y-5 -left-5 w-400',
-                  src: 'assets/img/discussion.svg',
+                  src: 'static/img/discussion.svg',
                   alt: '',
                 }),
               ]

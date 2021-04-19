@@ -11,7 +11,7 @@ const HeaderLandingPage: m.Component<{}, {}> = {
       [
         m('img', {
           class: 'w-32 md:w-48 lg:w-60',
-          src: 'assets/img/logo.svg',
+          src: 'static/img/logo.svg',
           alt: 'Commonwealth',
         }),
         m(
@@ -63,7 +63,7 @@ const HeaderLandingPage: m.Component<{}, {}> = {
               m('a', { class: 'btn-primary pb-3', href: '' }, [
                 m('img', {
                   class: 'inline mr-1.5',
-                  src: 'assets/img/user.svg',
+                  src: 'static/img/user.svg',
                   alt: 'Login',
                 }),
                 ' Login ',

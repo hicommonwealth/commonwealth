@@ -14,7 +14,7 @@ const FooterLandingPage: m.Component<{}, {}> = {
         [
           m('img', {
             class: 'w-60',
-            src: 'assets/img/logo.svg',
+            src: 'static/img/logo.svg',
             alt: 'Commonwealth',
           }),
           m(

@@ -5,7 +5,7 @@ const ChainsCrowdfundingComponent: m.Component<{}, {}> = {
     return m('section', { class: 'container mx-auto pt-20' }, [
       m('img', {
         class: 'mx-auto mb-3 w-36 h-auto',
-        src: 'assets/img/misc.png',
+        src: 'static/img/misc.png',
         alt: '',
       }),
       m(
@@ -67,7 +67,7 @@ const ChainsCrowdfundingComponent: m.Component<{}, {}> = {
                 },
                 m('img', {
                   class: 'block max-w-2xl w-full h-auto',
-                  src: 'assets/img/card1.png',
+                  src: 'static/img/card1.png',
                   alt: '',
                 })
               ),
@@ -111,7 +111,7 @@ const ChainsCrowdfundingComponent: m.Component<{}, {}> = {
                 },
                 m('img', {
                   class: 'block max-w-2xl w-full h-auto',
-                  src: 'assets/img/card2.png',
+                  src: 'static/img/card2.png',
                   alt: '',
                 })
               ),
@@ -155,7 +155,7 @@ const ChainsCrowdfundingComponent: m.Component<{}, {}> = {
                 },
                 m('img', {
                   class: 'block max-w-2xl w-full h-auto',
-                  src: 'assets/img/card3.png',
+                  src: 'static/img/card3.png',
                   alt: '',
                 })
               ),
