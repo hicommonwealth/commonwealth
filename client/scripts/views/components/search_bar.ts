@@ -2,7 +2,7 @@ import 'pages/search.scss';
 
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
-import { ControlGroup, Input, List, ListItem } from 'construct-ui';
+import { ControlGroup, Input, List, ListItem, Spinner } from 'construct-ui';
 import {
   searchMentionableAddresses,
   searchDiscussions,
@@ -199,7 +199,6 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
         if (nextResult) {
           results[type].push(nextResult);
           resultsLength += 1;
-          console.log({resultsLength});
         }
       }
     }
@@ -262,6 +261,7 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
   console.log({ searchTerm });
   const { isSearchPreview, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
+  app.searchCache.loaded = false;
 
   // TODO: Simplify param passing, so consistent across calls, fns
   try {
@@ -365,9 +365,11 @@ const SearchBar : m.Component<{}, {
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
 
     const { results, searchTerm } = vnode.state;
-    const searchResults = (results?.length > 0)
-      ? m(List, results)
-      : m(List, [ m(emptySearchPreview, { searchTerm }) ]);
+    const searchResults = (results?.length === 0)
+      ? (app.searchCache.loaded || searchTerm.length > 5)
+        ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
+        : m(List, m(ListItem, { label: m(Spinner, { active: true } )}))
+      : m(List, results);
 
     return m(ControlGroup, {
       class: vnode.state.focused ? 'SearchBar focused' : 'SearchBar'
@@ -415,7 +417,7 @@ const SearchBar : m.Component<{}, {
         },
       }),
       // TODO: Addrs are showing twice
-      searchTerm.length > 4
+      searchTerm.length > 3
       && searchResults
     ]);
   }
