@@ -20,16 +20,28 @@ import {
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
 import Token from 'controllers/chain/ethereum/token/adapter';
+import { networkToBase } from 'models/types';
 
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
-function createAccount(account: Account<any>) {
+function createAccount(account: Account<any>, community?: string) {
   // TODO: Change to POST /address
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
     keytype: account.chainBase === ChainBase.Substrate
       && (account as any).isEd25519 ? 'ed25519' : undefined,
     chain: account.chain.id,
+    community,
+    jwt: app.user.jwt,
+  });
+}
+
+export function linkExistingAddressToChainOrCommunity(address: string, chain: string, originChain: string, community: string) {
+  return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
+    address,
+    chain,
+    originChain,
+    community,
     jwt: app.user.jwt,
   });
 }
@@ -100,24 +112,20 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
 }
 
 export async function updateActiveAddresses(chain?: ChainInfo) {
-  /*
-  if((chain as Token).isToken && (chain as Token).isUninitialized) {
+  // update addresses for a chain (if provided) or for offchain communities (if null)
+  // for offchain communities, addresses on all chains are available by default
 
-  } else {*/
-    // update addresses for a chain (if provided) or for offchain communities (if null)
-    // for offchain communities, addresses on all chains are available by default
-    app.user.setActiveAccounts(
-      chain
-        ? app.user.addresses
-          .filter((a) => a.chain === chain.id)
-          .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
-          .filter((addr) => addr)
-        : app.user.addresses
-          .filter((addr) => app.config.chains.getById(addr.chain))
-          .map((addr) => app.community?.accounts.get(addr.address, addr.chain))
-          .filter((addr) => addr)
-    );
-//  }
+  app.user.setActiveAccounts(
+    chain
+      ? app.user.addresses
+        .filter((a) => a.chain === chain.id)
+        .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
+        .filter((addr) => addr)
+      : app.user.addresses
+        .filter((addr) => app.config.chains.getById(addr.chain))
+        .map((addr) => app.community?.accounts.get(addr.address, addr.chain))
+        .filter((addr) => addr)
+  );
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
@@ -212,9 +220,9 @@ export async function createUserWithMnemonic(mnemonic: string): Promise<Account<
   return account;
 }
 
-export async function createUserWithAddress(address: string, keytype?: string): Promise<Account<any>> {
+export async function createUserWithAddress(address: string, keytype?: string, community?: string): Promise<Account<any>> {
   const account = app.chain.accounts.get(address, keytype);
-  const response = await createAccount(account);
+  const response = await createAccount(account, community);
   const token = response.result.verification_token;
   account.setValidationToken(token);
   account.setAddressId(response.result.id);

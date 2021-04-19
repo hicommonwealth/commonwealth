@@ -22,6 +22,8 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
                 'a', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread', {},
                 `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
               ),
+              ' in',
+              link('a', `/${chain || community}`, ` ${chain || community}`),
             ],
         createdAt && [
           m.trust(' &middot; '),

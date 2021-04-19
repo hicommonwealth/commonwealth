@@ -13,6 +13,7 @@ import getHedgehogAuthentication from './routes/getHedgehogAuthentication';
 import createHedgehogUser from './routes/createHedgehogUser';
 
 import createAddress from './routes/createAddress';
+import linkExistingAddressToChain from './routes/linkExistingAddressToChain';
 import verifyAddress from './routes/verifyAddress';
 import deleteAddress from './routes/deleteAddress';
 import getAddressStatus from './routes/getAddressStatus';
@@ -125,6 +126,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   // TODO: Change to DELETE /address
   router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), deleteAddress.bind(this, models));
+  router.post('/linkExistingAddressToChain', linkExistingAddressToChain.bind(this, models));
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   // TODO: Change to PUT /node
   router.post('/selectNode', passport.authenticate('jwt', { session: false }), selectNode.bind(this, models));
