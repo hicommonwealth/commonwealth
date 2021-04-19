@@ -184,13 +184,14 @@ export const UserBlock: m.Component<{
   popover?: boolean,
   showRole?: boolean,
   showAddressWithDisplayName?: boolean,
+  showChainName?: boolean,
   hideOnchainRole?: boolean,
   selected?: boolean,
   compact?: boolean,
 }> = {
   view: (vnode) => {
     const {
-      user, hideIdentityIcon, popover, showRole, hideOnchainRole, showAddressWithDisplayName, selected, compact
+      user, hideIdentityIcon, popover, showRole, hideOnchainRole, showAddressWithDisplayName, showChainName, selected, compact
     } = vnode.attrs;
 
     let profile;
@@ -227,6 +228,8 @@ export const UserBlock: m.Component<{
           class: profile?.address ? '' : 'no-address',
         }, [
           profile?.address && formatAddressShort(profile.address, profile.chain),
+          profile?.address && showChainName && ' · ',
+          showChainName && (typeof user.chain === 'string' ? user.chain : user.chain.name),
         ]),
       ]),
       m('.user-block-right', [

@@ -379,6 +379,7 @@ const LinkNewAddressModal: m.Component<{
             key: 'placeholder',
             intent: 'primary',
             label: [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ],
+            rounded: true,
             disabled: true,
           }),
         ])
