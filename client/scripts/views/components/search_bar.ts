@@ -44,6 +44,7 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 
 // TODO: Linkification of users, tokens, comms results
 export const getMemberPreview = (addr, searchTerm) => {
+  debugger
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Display longer or even full addresses
@@ -64,6 +65,7 @@ export const getMemberPreview = (addr, searchTerm) => {
 };
 
 export const getCommunityPreview = (community) => {
+  debugger
   if (community.contentType === ContentType.Token) {
     return m(ListItem, {
       label: m('a.search-results-item', [
@@ -96,6 +98,7 @@ export const getCommunityPreview = (community) => {
 };
 
 export const getDiscussionPreview = (thread, searchTerm) => {
+  debugger
   // TODO: Separate threads, proposals, and comments
   const activeId = app.activeId();
   const proposalId = thread.proposalid;
@@ -258,45 +261,65 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
   // if !communityScope search only...
 
   try {
-    const discussions = await searchDiscussions(searchTerm, querySize);
-    console.log({ discussions });
-    app.searchCache[SearchType.Discussion] = discussions.map((discussion) => {
-      discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
-      discussion.searchType = SearchType.Discussion;
-      return discussion;
-    }).sort(sortResults);
-
-    const addrs = await searchMentionableAddresses(searchTerm, querySize, ['created_at', 'DESC']);
-    console.log({ addrs });
-    app.searchCache[SearchType.Member] = addrs.map((addr) => {
-      addr.contentType = ContentType.Member;
-      addr.searchType = SearchType.Member;
-      return addr;
-    }).sort(sortResults);
-    m.redraw();
-
     if (communityScope) {
+      const [discussions, addrs] = await Promise.all([
+        searchDiscussions(searchTerm, querySize),
+        searchMentionableAddresses(searchTerm, querySize, ['created_at', 'DESC'])
+      ]);
+      console.log({ discussions });
+      app.searchCache[SearchType.Discussion] = discussions.map((discussion) => {
+        discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
+        discussion.searchType = SearchType.Discussion;
+        return discussion;
+      }).sort(sortResults);
+
+      console.log({ addrs });
+      app.searchCache[SearchType.Member] = addrs.map((addr) => {
+        addr.contentType = ContentType.Member;
+        addr.searchType = SearchType.Member;
+        return addr;
+      }).sort(sortResults);
+
       concludeSearch(searchTerm, params, vnode);
       return;
+    } else {
+      const [discussions, addrs, unfilteredTokens, comms] = await Promise.all([
+        searchDiscussions(searchTerm, querySize),
+        searchMentionableAddresses(searchTerm, querySize, ['created_at', 'DESC']),
+        getTokenLists(),
+        searchChainsAndCommunities(searchTerm, querySize),
+      ]);
+
+      app.searchCache[SearchType.Discussion] = discussions.map((discussion) => {
+        discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
+        discussion.searchType = SearchType.Discussion;
+        return discussion;
+      }).sort(sortResults);
+
+      console.log({ addrs });
+      app.searchCache[SearchType.Member] = addrs.map((addr) => {
+        addr.contentType = ContentType.Member;
+        addr.searchType = SearchType.Member;
+        return addr;
+      }).sort(sortResults);
+
+      const tokens = unfilteredTokens.filter((token) => token.name?.toLowerCase().includes(searchTerm));
+      console.log({ tokens });
+      app.searchCache[SearchType.Community] = tokens.map((token) => {
+        token.contentType = ContentType.Token;
+        token.searchType = SearchType.Community;
+        return token;
+      });
+
+      console.log(comms);
+      app.searchCache[SearchType.Community] = app.searchCache[SearchType.Community]
+        .concat(comms.map((commOrChain) => {
+          commOrChain.contentType = commOrChain.created_at ? ContentType.Community : ContentType.Chain;
+          commOrChain.searchType = SearchType.Community;
+          return commOrChain;
+        })).sort(sortResults);
     }
 
-    const unfilteredTokens = await getTokenLists();
-    const tokens = unfilteredTokens.filter((token) => token.name?.toLowerCase().includes(searchTerm));
-    console.log({ tokens });
-    app.searchCache[SearchType.Community] = tokens.map((token) => {
-      token.contentType = ContentType.Token;
-      token.searchType = SearchType.Community;
-      return token;
-    });
-
-    const comms = await searchChainsAndCommunities(searchTerm, querySize);
-    console.log(comms);
-    app.searchCache[SearchType.Community] = app.searchCache[SearchType.Community]
-      .concat(comms.map((commOrChain) => {
-        commOrChain.contentType = commOrChain.created_at ? ContentType.Community : ContentType.Chain;
-        commOrChain.searchType = SearchType.Community;
-        return commOrChain;
-      })).sort(sortResults);
 
     concludeSearch(searchTerm, params, vnode);
   } catch (err) {
@@ -346,7 +369,7 @@ const SearchBar : m.Component<{}, {
               params['communityScope'] = inCommunity.id;
               params['isSearchPreview'] = true;
             }
-            _.debounce(() => search(vnode.state.searchTerm, params, vnode), 200)();
+            _.debounce(() => search(vnode.state.searchTerm, params, vnode), 1000)();
           }
         },
         onkeyup: (e) => {

@@ -194,7 +194,9 @@ export const UserBlock: m.Component<{
 }> = {
   view: (vnode) => {
     const {
-      user, hideIdentityIcon, popover, showRole, searchTerm, hideOnchainRole, showAddressWithDisplayName, showChainName, selected, compact
+      user, hideIdentityIcon, popover, showRole, searchTerm,
+      hideOnchainRole, showAddressWithDisplayName, showChainName,
+      selected, compact, linkify
     } = vnode.attrs;
 
     let profile;
