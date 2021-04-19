@@ -29,21 +29,13 @@ export const searchMentionableAddresses = async (
   order: string[] = ['name', 'ASC']
 ) => {
   const { resultSize, communityScope, chainScope } = params;
-  let response;
-  if (communityScope || chainScope) {
-    // implement bulkMember logic
-    const reqParams = communityScope
-      ? { community: communityScope }
-      : { chain: chainScope };
-    response = await $.get(`${app.serverUrl()}/bulkMembers}`, reqParams);
-  } else {
-    response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-      chain: chainScope,
-      limit: resultSize,
-      searchTerm,
-      order,
-    });
-  }
+  const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+    chain: chainScope,
+    community: communityScope,
+    limit: resultSize,
+    searchTerm,
+    order,
+  });
   if (response.status !== 'Success') {
     debugger
     throw new Error(`Got unsuccessful status: ${response.status}`);

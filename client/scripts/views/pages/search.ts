@@ -28,6 +28,7 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 
 // TODO: Linkification of users, tokens, comms results
 export const getMemberResult = (addr, searchTerm) => {
+  debugger
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Display longer or even full addresses

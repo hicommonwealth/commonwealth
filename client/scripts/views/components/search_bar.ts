@@ -362,7 +362,6 @@ const SearchBar : m.Component<{}, {
   focused: boolean,
 }> = {
   view: (vnode) => {
-    const chainOrCommScope = app.activeChainId() || app.activeCommunityId();
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
 
     const { results, searchTerm } = vnode.state;
@@ -393,9 +392,8 @@ const SearchBar : m.Component<{}, {
           if (e.target.value?.length > 3) {
             const params: SearchParams = {};
             params['isSearchPreview'] = true;
-            if (chainOrCommScope) {
-              params['communityScope'] = chainOrCommScope;
-            }
+            params['communityScope'] = app.activeCommunityId();
+            params['chainScope'] = app.activeChainId();
             _.debounce(() => search(vnode.state.searchTerm, params, vnode), 200)();
           }
         },
