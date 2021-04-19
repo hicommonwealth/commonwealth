@@ -7,10 +7,10 @@ export const searchDiscussions = async (
   searchTerm: string,
   params: SearchParams
 ) => {
-  const { resultSize, chain, community } = params;
+  const { resultSize, chainScope, communityScope } = params;
   const response = await $.get(`${app.serverUrl()}/search`, {
-    chain,
-    community,
+    chain: chainScope,
+    community: communityScope,
     cutoff_date: null, // cutoffDate.toISOString(),
     search: searchTerm,
     results_size: resultSize,
@@ -27,16 +27,27 @@ export const searchMentionableAddresses = async (
   params: SearchParams,
   order: string[] = ['name', 'ASC']
 ) => {
-  const { resultSize } = params;
-  const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-    chain: app.activeChainId(),
-    limit: resultSize,
-    searchTerm,
-    order,
-  });
+  const { resultSize, communityScope, chainScope } = params;
+  let response;
+  if (communityScope || chainScope) {
+    // implement bulkMember logic
+    const reqParams = chainScope
+      ? { community: communityScope }
+      : { chain: chainScope };
+    response = await $.get(`${app.serverUrl()}/bulkMembers}`, reqParams);
+  } else {
+    response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+      chain: chainScope,
+      limit: resultSize,
+      searchTerm,
+      order,
+    });
+  }
   if (response.status !== 'Success') {
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
+  console.log({ isRoles: !!(communityScope || chainScope) });
+  console.log(response.result);
   return response.result;
 };
 

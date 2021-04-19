@@ -262,17 +262,15 @@ const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) =
 
 export const search = async (searchTerm: string, params: SearchParams, vnode) => {
   console.log({ searchTerm });
-  // TODO: Hookup community and member scope
   const { isSearchPreview, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
 
-  // if !communityScope search only...
-
+  // TODO: Simplify param passing, so consistent across calls, fns
   try {
     if (communityScope || chainScope) {
       const [discussions, addrs] = await Promise.all([
         searchDiscussions(searchTerm, { resultSize, communityScope, chainScope }),
-        searchMentionableAddresses(searchTerm, { resultSize }, ['created_at', 'DESC'])
+        searchMentionableAddresses(searchTerm, { resultSize, communityScope, chainScope }, ['created_at', 'DESC'])
       ]);
       console.log({ discussions });
       app.searchCache[SearchType.Discussion] = discussions.map((discussion) => {
@@ -352,7 +350,7 @@ const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
         let params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
         if (app.activeCommunityId()) params += `&comm=${app.activeCommunityId()}`;
         else if (app.activeChainId()) params += `&chain=${app.activeChainId()}`;
-        m.route.set(`/search?q=${params}`);
+        m.route.set(`/search?${params}`);
       }
     });
   }
@@ -414,7 +412,7 @@ const SearchBar : m.Component<{}, {
             let params = `q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`;
             if (app.activeCommunityId()) params += `&comm=${app.activeCommunityId()}`;
             else if (app.activeChainId()) params += `&chain=${app.activeChainId()}`;
-            m.route.set(`/search?q=${params}`);
+            m.route.set(`/search?${params}`);
           }
         },
       }),

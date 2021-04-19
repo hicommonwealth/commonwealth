@@ -26,9 +26,6 @@ import { ContentType, search, SearchType } from '../components/search_bar';
 const SEARCH_DELAY = 750;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
-// TODO
-const searchCache = {}; // only used to restore search results when returning to the page
-
 // TODO: Linkification of users, tokens, comms results
 export const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
@@ -209,7 +206,8 @@ const SearchPage : m.Component<{
     const communityScope = m.route.param('community');
     const chainScope = m.route.param('chain');
 
-    if ((communityScope || chainScope) && (!app.chain && !app.community)) {
+    if ((communityScope || chainScope)
+      && (!app.activeChainId() && !app.activeCommunityId)) {
       return LoadingPage;
     }
 
@@ -226,6 +224,7 @@ const SearchPage : m.Component<{
     if (searchTerm !== vnode.state.searchTerm) {
       vnode.state.searchTerm = searchTerm;
       vnode.state.results = [];
+      debugger
       search(searchTerm, { communityScope, chainScope }, vnode);
       return LoadingPage;
     }
@@ -233,6 +232,7 @@ const SearchPage : m.Component<{
     if (vnode.state.searchLoading) {
       return LoadingPage;
     } else if (!vnode.state.results && !vnode.state.errorText) {
+      debugger
       search(searchTerm, { communityScope, chainScope }, vnode);
       return;
     }
