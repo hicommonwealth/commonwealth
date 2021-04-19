@@ -251,8 +251,15 @@ const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) =
     ? null : (err.responseJSON?.error || err.responseText || err.toString());
   if (vnode.state.errorText) console.trace();
   const commOrChainScoped = params.communityScope || params.chainScope;
-  vnode.state.results = err
-    ? [] : getResultsPreview(searchTerm, params, vnode, commOrChainScoped);
+  console.log({ err });
+  debugger
+  if (err) {
+    vnode.state.results = [];
+  } else {
+    vnode.state.results = params.isSearchPreview
+      ? getResultsPreview(searchTerm, params, vnode, commOrChainScoped)
+      : app.searchCache;
+  }
   console.log('redrawing');
   m.redraw();
 };

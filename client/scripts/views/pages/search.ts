@@ -159,9 +159,17 @@ export const getDiscussionResult = (thread, searchTerm) => {
   });
 };
 
-const getListing = (state: any, results: any, searchTerm: string, searchType?: SearchType) => {
+const getListing = (results: any, searchTerm: string, pageCount: number, searchType?: SearchType) => {
+  debugger
   const filter = searchType === SearchType.Top ? null : searchType;
-  const tabScopedResults = (filter ? results.filter((res) => res.searchType === searchType) : results)
+  const concatResults = () => {
+    let allResults = [];
+    [SearchType.Discussion, SearchType.Member, SearchType.Community].forEach((type) => {
+      allResults = allResults.concat(results[type]);
+    });
+    return allResults;
+  };
+  const tabScopedResults = (filter ? results[searchType] : concatResults())
     .sort((a, b) => {
       // TODO: Token-sorting approach
       // Some users are not verified; we give them a default date of 1900
@@ -170,6 +178,8 @@ const getListing = (state: any, results: any, searchTerm: string, searchType?: S
       return bCreatedAt.diff(aCreatedAt);
     })
     .map((res) => {
+      const a = app;
+      if (!res) debugger
       return res.searchType === SearchType.Discussion
         ? getDiscussionResult(res, searchTerm)
         : res.searchType === SearchType.Member
@@ -178,7 +188,7 @@ const getListing = (state: any, results: any, searchTerm: string, searchType?: S
             ? getCommunityResult(res)
             : null;
     })
-    .slice(0, state.pageCount * 50);
+    .slice(0, pageCount * 50);
   return tabScopedResults;
 };
 
@@ -204,7 +214,7 @@ const SearchPage : m.Component<{
       ],
     });
 
-    const communityScope = m.route.param('community');
+    const communityScope = m.route.param('comm');
     const chainScope = m.route.param('chain');
     const scope = communityScope || chainScope;
 
@@ -239,12 +249,9 @@ const SearchPage : m.Component<{
       vnode.state.pageCount = 1;
     }
 
-    const tabScopedListing = getListing(
-      vnode.state,
-      vnode.state.results,
-      vnode.state.searchTerm,
-      vnode.state.activeTab
-    );
+    const { results, pageCount, activeTab } = vnode.state;
+
+    const tabScopedListing = getListing(results, searchTerm, pageCount, activeTab);
 
     const resultCount = vnode.state.activeTab === SearchType.Top
       ? tabScopedListing.length === SEARCH_PAGE_SIZE
