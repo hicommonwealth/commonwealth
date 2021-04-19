@@ -10,6 +10,7 @@
 
     span {
       width: 130px;
+      text-align: center;
 
       &:nth-child(2) {
         text-align: center;
@@ -53,6 +54,39 @@
 
     .step4 {
       width: 100%;
+    }
+  }
+
+  @media only screen and (max-width: 768px) {
+    width: 325px;
+    padding: 24px 0 8px 0;
+
+    .titles {
+      span {
+        width: 100px;
+      }
+    }
+
+    .bar {
+      .step0 {
+        width: 60px;
+      }
+
+      .step1 {
+        width: 92px;
+      }
+
+      .step2 {
+        width: 127px;
+      }
+
+      .step3 {
+        width: 188px;
+      }
+
+      .step4 {
+        width: 100%;
+      }
     }
   }
 }

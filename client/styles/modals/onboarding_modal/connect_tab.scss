@@ -63,4 +63,20 @@
     width: fit-content;
     margin: auto;
   }
+
+  @media only screen and (max-width: 768px) {
+    padding: 15px 0;
+    .title {
+      width: 260px;
+    }
+
+    .address {
+      font-size: 14px;
+      margin: 10px auto;
+    }
+
+    .or {
+      margin: 15px 0;
+    }
+  }
 }

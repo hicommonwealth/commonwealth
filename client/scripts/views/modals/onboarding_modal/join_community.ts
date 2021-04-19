@@ -85,6 +85,11 @@ const JoinCommunity: m.Component<IOnboardingJoinCommunityAttr, IOnboardingJoinCo
           }) : null;
     };
 
+    const matchCommunity = (name: string) => {
+      if (!name) return false;
+      return name.toLowerCase().includes(vnode.state.search.toLowerCase());
+    };
+
     return m('.OnboardingJoinCommunity', [
       m('div.title', [
         m('div.icons', [
@@ -98,6 +103,7 @@ const JoinCommunity: m.Component<IOnboardingJoinCommunityAttr, IOnboardingJoinCo
             m(Input, {
               name: 'search',
               placeholder: 'Type to filter communities',
+              autoComplete: 'off',
               oninput: (e) => {
                 const result = (e.target as any).value;
                 vnode.state.search = result;
@@ -107,7 +113,7 @@ const JoinCommunity: m.Component<IOnboardingJoinCommunityAttr, IOnboardingJoinCo
           ])
         ]),
         m('div.communities', [
-          allCommunities.map(renderCommunity),
+          allCommunities.filter((_) => matchCommunity(_.name)).map(renderCommunity),
         ]),
       ]),
       m(OnboardingFooterActions, {

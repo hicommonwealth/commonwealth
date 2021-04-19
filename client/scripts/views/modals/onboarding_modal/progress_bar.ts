@@ -12,7 +12,7 @@ const OnboardingProgressBar: m.Component<IOnboardingProgressBarAttr> = {
 
     return m('.OnboardingProgressBar', [
       m('div.titles', [
-        m('span', 'Connect'),
+        m('span', 'Connect Wallet'),
         m('span', 'Set Up Profile'),
         m('span', 'Join Communities'),
       ]),

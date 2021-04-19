@@ -51,7 +51,7 @@ const ChooseWallet: m.Component<IOnboardingChooseWalletAttr, IOnboardingChooseWa
         m('div.icons', [
           m.trust(onboardingChooseWalletIcon),
         ]),
-        m('h2', 'Choose a Wallet'),
+        m('h2', 'Choose Your Wallet'),
       ]),
       m('div.content', [
         m(Form, { class: 'OnboardingChooseWalletForm' }, [

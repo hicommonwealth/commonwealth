@@ -17,7 +17,7 @@ import { Button, Input, TextArea, Spinner, Checkbox } from 'construct-ui';
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import { AddressInfo, Account, ChainBase } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { baseToNetwork } from 'models/types';
+import { baseToNetwork, networkToBase } from 'models/types';
 
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
@@ -204,7 +204,7 @@ const SubstrateLinkAccountItem: m.Component<{
         m('.account-item-name', [
           m('.account-user', m(User, { user: app.chain.accounts.get(address), hideAvatar: true })),
         ]),
-        m('.account-item-address', address),
+        m('.account-item-address', account.address),
       ]),
     ]);
   }
@@ -482,10 +482,12 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
       }
     }
 
+    const scope = m.route.param('scope');
+
     return m('.OnboardingChooseAddress', [
       m('div.title', [
         m('div.icons', [
-          m(ChainBaseIcon, { chainbase: ChainBase.Ethereum, size: 40 }), // TODO: use base instead of ethereum
+          m(ChainBaseIcon, { chainbase: networkToBase(scope), size: 40 }), // TODO: use base instead of ethereum
           m.trust(onboardingChooseAddressIcon),
         ]),
         m('h2', title),

@@ -1,7 +1,7 @@
 @import "client/styles/shared";
 
 .OnboardingModal {
-  width: calc(100vw - 300px);
+  width: calc(100vw - 100px);
   max-width: 960px;
   height: 700px;
   display: flex;
@@ -55,20 +55,11 @@
         line-height: 22px;
       }
 
-      &:first-child {
-        svg {
-          margin-right: 16px;
-        }
-      }
-
       &:last-child {
         span {
           background: -webkit-linear-gradient(#6086d1, #b37dba);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-        }
-        svg {
-          margin-left: 16px;
         }
       }
 
@@ -130,5 +121,27 @@
     background: linear-gradient(230.54deg, rgba(121, 224, 232, 0.1) 20.32%, rgba(191, 142, 96, 0.1) 38.38%, rgba(214, 159, 204, 0.1) 54.5%, rgba(179, 125, 186, 0.1) 73.68%);
     filter: blur(80px);
     border-radius: 230.704px;
+  }
+
+  @media only screen and (max-width: 768px) {
+    height: calc(100vh - 40px);
+    .OnboardingFooterActions {
+      margin: 0 15px;
+      button {
+        width: 140px;
+      }
+    }
+
+    form {
+      .cui-form-group {
+        .cui-input {
+          margin-bottom: 20px;
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 575.98px) {
+    width: inherit;
   }
 }

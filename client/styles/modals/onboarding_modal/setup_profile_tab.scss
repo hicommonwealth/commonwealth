@@ -16,8 +16,24 @@
     overflow-y: auto;
     overflow-x: hidden;
     width: 360px;
-    height: 300px;
+    height: 295px;
     margin: auto;
     margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  @media only screen and (max-width: 768px) {
+    padding: 15px 0;
+
+    .title {
+      h2 {
+        margin: 12px 0 8px 0;
+      }
+    }
+
+    .OnboardingProfileForm {
+      width: 332px;
+      height: calc(100vh - 380px);
+    }
   }
 }
