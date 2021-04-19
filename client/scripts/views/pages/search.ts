@@ -205,11 +205,7 @@ const SearchPage : m.Component<{
 
     const communityScope = m.route.param('community');
     const chainScope = m.route.param('chain');
-
-    if ((communityScope || chainScope)
-      && (!app.activeChainId() && !app.activeCommunityId)) {
-      return LoadingPage;
-    }
+    const scope = communityScope || chainScope;
 
     const searchTerm = m.route.param('q')?.toLowerCase();
     if (!searchTerm) {
@@ -224,7 +220,6 @@ const SearchPage : m.Component<{
     if (searchTerm !== vnode.state.searchTerm) {
       vnode.state.searchTerm = searchTerm;
       vnode.state.results = [];
-      debugger
       search(searchTerm, { communityScope, chainScope }, vnode);
       return LoadingPage;
     }
@@ -232,7 +227,6 @@ const SearchPage : m.Component<{
     if (vnode.state.searchLoading) {
       return LoadingPage;
     } else if (!vnode.state.results && !vnode.state.errorText) {
-      debugger
       search(searchTerm, { communityScope, chainScope }, vnode);
       return;
     }
@@ -316,8 +310,9 @@ const SearchPage : m.Component<{
           vnode.state.searchTerm,
           '\'',
           vnode.state.activeTab === SearchType.Top
-            && ` in ${capitalize(app.activeId())}`,
-          capitalize(app.activeId())
+            && scope
+            && ` in ${capitalize(scope)}`,
+          scope
             && [
               '. ',
               link(

@@ -16,6 +16,7 @@ export const searchDiscussions = async (
     results_size: resultSize,
   });
   if (response.status !== 'Success') {
+    debugger
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
   console.log({ searchTerm, threadResults: response.result });
@@ -31,7 +32,7 @@ export const searchMentionableAddresses = async (
   let response;
   if (communityScope || chainScope) {
     // implement bulkMember logic
-    const reqParams = chainScope
+    const reqParams = communityScope
       ? { community: communityScope }
       : { chain: chainScope };
     response = await $.get(`${app.serverUrl()}/bulkMembers}`, reqParams);
@@ -44,6 +45,7 @@ export const searchMentionableAddresses = async (
     });
   }
   if (response.status !== 'Success') {
+    debugger
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
   console.log({ isRoles: !!(communityScope || chainScope) });
@@ -60,6 +62,7 @@ export const searchChainsAndCommunities = async (
     limit,
   });
   if (response.status !== 'Success') {
+    debugger
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
   return response.result;

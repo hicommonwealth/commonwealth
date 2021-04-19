@@ -187,14 +187,11 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
   let unfilteredResultsLength = 0;
   for (const key of types) {
     results[key] = [];
-    unfilteredResultsLength += unfilteredResults[key].length;
+    unfilteredResultsLength += (unfilteredResults[key]?.length || 0);
   }
   let priorityPosition = 0;
   let resultsLength = 0;
-  debugger
-  console.log({resultsLength, unfilteredResultsLength});
   while (resultsLength < 6 && resultsLength < unfilteredResultsLength) {
-    console.log({ typesLength: types.length, resultsLength, unfilteredLength: unfilteredResults.length });
     for (let i = 0; i < types.length; i++) {
       const type = types[i];
       if (resultsLength < 6) {
@@ -207,7 +204,6 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
       }
     }
     priorityPosition += 1;
-    console.log({priorityPosition});
   }
   return results;
 };
@@ -254,8 +250,10 @@ const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) =
   app.searchCache.loaded = true;
   vnode.state.errorText = !err
     ? null : (err.responseJSON?.error || err.responseText || err.toString());
+  if (vnode.state.errorText) console.trace();
   const commOrChainScoped = params.communityScope || params.chainScope;
-  vnode.state.results = getResultsPreview(searchTerm, params, vnode, commOrChainScoped);
+  vnode.state.results = err
+    ? [] : getResultsPreview(searchTerm, params, vnode, commOrChainScoped);
   console.log('redrawing');
   m.redraw();
 };
@@ -328,6 +326,7 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
 
     concludeSearch(searchTerm, params, vnode);
   } catch (err) {
+    console.trace();
     concludeSearch(searchTerm, params, vnode, err);
   }
 };
@@ -378,6 +377,7 @@ const SearchBar : m.Component<{}, {
         placeholder: 'Type to search...',
         autofocus: true,
         fluid: true,
+        // TODO: param term not populating input
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
         value: vnode.state.searchTerm,
         oncreate: (e) => {
