@@ -160,14 +160,29 @@ const ConfirmInviteModal: m.Component<{}, {
                 }),
               ]),
               addresses.length === 0 && m('.no-accounts', 'You must connect an address to join this community.'),
-              // TODO: This should actually accept the invite for you after your address is connected!
               addresses.length === 0 && m('a.btn.add-account', {
                 href: '#',
                 onclick: (e) => {
                   e.preventDefault();
+
+                  // set defaults for the web3 login modal
+                  const defaultChainId = 'edgeware';
+                  const joiningCommunity = invites[vnode.state.location].community_id;
+                  const targetCommunity = joiningCommunity;
+                  const prev = m.route.get();
+                  const next = `/${joiningCommunity}`;
+                  // TODO: implement joiningChain once confirm_invite_modal supports chains
+                  const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
+
+                  // redirect to /web3login to connect to the chain
+                  m.route.set(`/${app.chain?.id || defaultChainId}/web3login`, web3loginParams);
+
+                  // show web3 login modal
                   app.modals.lazyCreate('link_new_address_modal', {
+                    joiningCommunity,
+                    targetCommunity,
                     successCallback: () => {
-                      // TODO XX: set membership
+                      m.route.set(next);
                       $(e.target).trigger('modalexit');
                     }
                   });

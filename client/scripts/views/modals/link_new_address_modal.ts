@@ -74,8 +74,7 @@ const EthereumLinkAccountItem: m.Component<{
               vnode.state.linking = false;
               return;
             } else {
-              const modalMsg = 'This address is currently linked to another account. '
-                + 'Remove it from that account and transfer to yours?';
+              const modalMsg = 'Another user owns this address. Remove it from that user and transfer it to yours?';
               const confirmed = await confirmationModalWithText(modalMsg)();
               if (!confirmed) {
                 vnode.state.linking = false;
