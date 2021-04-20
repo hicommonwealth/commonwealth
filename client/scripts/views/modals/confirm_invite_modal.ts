@@ -159,13 +159,13 @@ const ConfirmInviteModal: m.Component<{}, {
                   label: 'Reject invite'
                 }),
               ]),
-              addresses.length === 0 && m('.no-accounts', 'You must connect an address to join this community.'),
               addresses.length === 0 && m('a.btn.add-account', {
                 href: '#',
                 onclick: (e) => {
                   e.preventDefault();
 
                   // set defaults for the web3 login modal
+                  // TODO: let the user select between different crypto wallets for linking an address
                   const defaultChainId = 'edgeware';
                   const joiningCommunity = invites[vnode.state.location].community_id;
                   const targetCommunity = joiningCommunity;
