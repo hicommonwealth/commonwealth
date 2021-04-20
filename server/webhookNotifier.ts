@@ -1,4 +1,4 @@
-import request from 'superagent'; //HTTP client
+import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
 import { SubstrateEvents } from '@commonwealth/chain-events';
@@ -108,14 +108,7 @@ const send = async (models, content: WebhookContent) => {
   });
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
-    // We currently only support slack webhooks
-    chainOrCommwebhookUrls.push(wh.url);
-    
-    //Todo: Fix validation
-
-    // if (validURL(wh.url)) {
-    //   chainOrCommwebhookUrls.push(wh.url);
-    // }
+      chainOrCommwebhookUrls.push(wh.url);
   });
 
   const {
@@ -258,20 +251,26 @@ const send = async (models, content: WebhookContent) => {
         };
       } else if (url.indexOf('telegram.org') !== -1) {
         const getUpdatesUrl = url.split('/@').slice(0, -1).join('@');
-        console.log(getUpdatesUrl)
+        console.log('This is the URL link',getUpdatesUrl)
+        console.log('This is the chat username')
+
+        var getChatUsername = url.split("/@");
+        getChatUsername = '@'+getChatUsername[1];
+        console.log("This is the chat username", getChatUsername)
+
+        url = getUpdatesUrl+'/sendMessage'
+        console.log("This is the new URL link", url)
 
         // const response = await request.get(getChat)
         // console.log(response)
 
         webhookData = isChainEvent ? {
-          chat_id: -562987835,
-          photo: previewImageUrl,
-          caption: `<a href="${chainEventLink}"><b>${title}</b></a>\n${fulltext}`,
+          chat_id: getChatUsername,
+          text: `<a href="${chainEventLink}"><b>${title}</b></a>\n${fulltext}`,
           parse_mode: 'HTML'
         } : {
-          chat_id: -562987835,
-          photo: previewImageUrl,
-          caption: `<b>Actor:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
+          chat_id: getChatUsername,
+          text: `<b>Actor:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
           parse_mode: 'HTML'
         };
       } else {
@@ -283,7 +282,7 @@ const send = async (models, content: WebhookContent) => {
         return;
       }
       try {
-          await request.post(url).send(webhookData);
+         await request.post(url).send(webhookData);
       } catch (err) {
         console.error(err);
       }
