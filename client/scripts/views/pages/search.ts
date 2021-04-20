@@ -21,9 +21,9 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import PageNotFound from './404';
-import { ContentType, search, SearchType } from '../components/search_bar';
+import { ContentType, initializeSearch, search, SearchType } from '../components/search_bar';
 
-const SEARCH_DELAY = 750;
+export const ALL_RESULTS_KEY = 'COMMONWEALTH_ALL_RESULTS';
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
 // TODO: Linkification of users, tokens, comms results
@@ -201,6 +201,9 @@ const SearchPage : m.Component<{
   pageCount: number,
   errorText: string
 }> = {
+  oncreate: () => {
+    initializeSearch();
+  },
   view: (vnode) => {
     const LoadingPage = m(PageLoading, {
       narrow: true,
@@ -232,7 +235,7 @@ const SearchPage : m.Component<{
       return LoadingPage;
     }
 
-    if (!app.searchCache.loaded) {
+    if (!app.searchCache[searchTerm].loaded) {
       return LoadingPage;
     }
 
@@ -299,7 +302,7 @@ const SearchPage : m.Component<{
       }),
     ]),
     m('.search-results', [
-      !app.searchCache.loaded ? m('.search-loading', [
+      !app.searchCache[searchTerm].loaded ? m('.search-loading', [
         m(Spinner, {
           active: true,
           fill: true,

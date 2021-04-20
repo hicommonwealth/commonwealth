@@ -17,6 +17,7 @@ import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
+import { ALL_RESULTS_KEY } from '../pages/search';
 
 export interface SearchParams {
   communityScope?: string;
@@ -208,15 +209,15 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
   return results;
 };
 
-const getResultsPreview = (searchTerm: string, params: SearchParams, vnode, communityScoped?) => {
+const getResultsPreview = (searchTerm: string, communityScoped?) => {
   let results;
   let types;
   if (communityScoped) {
     types = [SearchType.Discussion, SearchType.Member];
-    results = getBalancedContentListing(app.searchCache, types);
+    results = getBalancedContentListing(app.searchCache[searchTerm], types);
   } else {
     types = [SearchType.Discussion, SearchType.Member, SearchType.Community];
-    results = getBalancedContentListing(app.searchCache, types);
+    results = getBalancedContentListing(app.searchCache[searchTerm], types);
   }
   const organizedResults = [];
   types.forEach((type) => {
@@ -245,17 +246,16 @@ const getResultsPreview = (searchTerm: string, params: SearchParams, vnode, comm
   return organizedResults;
 };
 
-
 const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) => {
-  app.searchCache.loaded = true;
+  app.searchCache[searchTerm].loaded = true;
   const commOrChainScoped = params.communityScope || params.chainScope;
   if (err) {
     vnode.state.results = {};
     vnode.state.errorText = (err.responseJSON?.error || err.responseText || err.toString());
   } else {
     vnode.state.results = params.isSearchPreview
-      ? getResultsPreview(searchTerm, params, vnode, commOrChainScoped)
-      : app.searchCache;
+      ? getResultsPreview(searchTerm, commOrChainScoped)
+      : app.searchCache[searchTerm];
   }
   console.log('redrawing');
   m.redraw();
@@ -264,72 +264,68 @@ const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) =
 export const search = async (searchTerm: string, params: SearchParams, vnode) => {
   const { isSearchPreview, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
-  app.searchCache.loaded = false;
+  app.searchCache[searchTerm] = { loaded: false };
 
   // TODO: Simplify param passing, so consistent across calls, fns
   try {
+    const [discussions, addrs] = await Promise.all([
+      searchDiscussions(searchTerm, { resultSize, communityScope, chainScope }),
+      searchMentionableAddresses(searchTerm, { resultSize, communityScope, chainScope }, ['created_at', 'DESC'])
+    ]);
+
+    app.searchCache[searchTerm][SearchType.Discussion] = discussions.map((discussion) => {
+      discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
+      discussion.searchType = SearchType.Discussion;
+      return discussion;
+    }).sort(sortResults);
+
+    app.searchCache[searchTerm][SearchType.Member] = addrs.map((addr) => {
+      addr.contentType = ContentType.Member;
+      addr.searchType = SearchType.Member;
+      return addr;
+    }).sort(sortResults);
+
     if (communityScope || chainScope) {
-      const [discussions, addrs] = await Promise.all([
-        searchDiscussions(searchTerm, { resultSize, communityScope, chainScope }),
-        searchMentionableAddresses(searchTerm, { resultSize, communityScope, chainScope }, ['created_at', 'DESC'])
-      ]);
-      console.log({ discussions });
-      app.searchCache[SearchType.Discussion] = discussions.map((discussion) => {
-        discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
-        discussion.searchType = SearchType.Discussion;
-        return discussion;
-      }).sort(sortResults);
-
-      console.log({ addrs });
-      app.searchCache[SearchType.Member] = addrs.map((addr) => {
-        addr.contentType = ContentType.Member;
-        addr.searchType = SearchType.Member;
-        return addr;
-      }).sort(sortResults);
-
       concludeSearch(searchTerm, params, vnode);
       return;
-    } else {
-      const [discussions, addrs, unfilteredTokens, comms] = await Promise.all([
-        searchDiscussions(searchTerm, { resultSize }),
-        searchMentionableAddresses(searchTerm, { resultSize }, ['created_at', 'DESC']),
-        getTokenLists(),
-        searchChainsAndCommunities(searchTerm, resultSize),
-      ]);
-
-      app.searchCache[SearchType.Discussion] = discussions.map((discussion) => {
-        discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
-        discussion.searchType = SearchType.Discussion;
-        return discussion;
-      }).sort(sortResults);
-
-      console.log({ addrs });
-      app.searchCache[SearchType.Member] = addrs.map((addr) => {
-        addr.contentType = ContentType.Member;
-        addr.searchType = SearchType.Member;
-        return addr;
-      }).sort(sortResults);
-
-      const tokens = unfilteredTokens.filter((token) => token.name?.toLowerCase().includes(searchTerm));
-      console.log({ tokens });
-      app.searchCache[SearchType.Community] = tokens.map((token) => {
-        token.contentType = ContentType.Token;
-        token.searchType = SearchType.Community;
-        return token;
-      });
-
-      console.log(comms);
-      app.searchCache[SearchType.Community] = app.searchCache[SearchType.Community]
-        .concat(comms.map((commOrChain) => {
-          commOrChain.contentType = commOrChain.created_at ? ContentType.Community : ContentType.Chain;
-          commOrChain.searchType = SearchType.Community;
-          return commOrChain;
-        })).sort(sortResults);
     }
+
+    const unfilteredTokens = app.searchCache[ALL_RESULTS_KEY]['tokens'];
+    const tokens = unfilteredTokens.filter((token) => token.name?.toLowerCase().includes(searchTerm));
+    console.log({ tokens });
+    app.searchCache[searchTerm][SearchType.Community] = tokens.map((token) => {
+      token.contentType = ContentType.Token;
+      token.searchType = SearchType.Community;
+      return token;
+    });
+
+    const allComms = app.searchCache[ALL_RESULTS_KEY]['communities'];
+    app.searchCache[searchTerm][SearchType.Community] = app.searchCache[searchTerm][SearchType.Community]
+      .concat(allComms.map((commOrChain) => {
+        commOrChain.contentType = commOrChain.created_at ? ContentType.Community : ContentType.Chain;
+        commOrChain.searchType = SearchType.Community;
+        return commOrChain;
+      })).sort(sortResults);
 
     concludeSearch(searchTerm, params, vnode);
   } catch (err) {
     concludeSearch(searchTerm, params, vnode, err);
+  }
+};
+
+export const initializeSearch = async () => {
+  // Pre-queries communities and tokens. Future searches merely filter from cached list,
+  // to prevent unnecessary backend requests
+  if (!app.searchCache[ALL_RESULTS_KEY]?.loaded) {
+    app.searchCache[ALL_RESULTS_KEY] = {};
+    try {
+      const [tokens, comms] = await Promise.all([getTokenLists(), searchChainsAndCommunities()]);
+      app.searchCache[ALL_RESULTS_KEY]['tokens'] = tokens;
+      app.searchCache[ALL_RESULTS_KEY]['communities'] = comms;
+    } catch (err) {
+      app.searchCache[ALL_RESULTS_KEY]['tokens'] = [];
+      app.searchCache[ALL_RESULTS_KEY]['communities'] = [];
+    }
   }
 };
 
@@ -368,7 +364,7 @@ const SearchBar : m.Component<{}, {
 
     const { results, searchTerm } = vnode.state;
     const searchResults = (results?.length === 0)
-      ? (app.searchCache.loaded || searchTerm.length > 5)
+      ? (app.searchCache[searchTerm].loaded || searchTerm.length > 5)
         ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
         : m(List, m(ListItem, { label: m(Spinner, { active: true }) }))
       : m(List, results);
@@ -387,11 +383,13 @@ const SearchBar : m.Component<{}, {
           if ((e.dom?.children[0] as HTMLInputElement)?.value) {
             vnode.state.searchTerm = (e.dom.children[0] as HTMLInputElement).value.toLowerCase();
           }
+          initializeSearch();
         },
         onclick: async (e) => {
           vnode.state.focused = true;
         },
         oninput: (e) => {
+          e.stopPropagation();
           vnode.state.searchTerm = e.target.value?.toLowerCase();
           if (e.target.value?.length > 3) {
             const params: SearchParams = {};
@@ -402,6 +400,7 @@ const SearchBar : m.Component<{}, {
           }
         },
         onkeyup: (e) => {
+          e.stopPropagation();
           if (e.key === 'Enter') {
             if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
               notifyError('Enter a valid search term');
