@@ -387,11 +387,10 @@ const SearchBar : m.Component<{}, {
     console.log(app.searchCache);
 
     return m(ControlGroup, {
-      class: vnode.state.focused ? 'SearchBar focused' : 'SearchBar'
+      class: 'SearchBar'
     }, [
       m(Input, {
         placeholder: 'Type to search...',
-        autofocus: true,
         fluid: true,
         contentLeft: m(SearchIcon),
         defaultValue: m.route.param('q') || vnode.state.searchTerm,

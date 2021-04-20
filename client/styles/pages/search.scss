@@ -149,20 +149,30 @@
         display: flex;
         align-items: center;
         height: 100%;
-        background: #EFEFEF;
-        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
-        border-radius: 17px;
+        border-radius: 25px;
         font-size: 14px;
         color: black;
         svg {
-            fill: linear-gradient(to right, #91ACE1, #DDBFE1);
+            z-index: 2;
+            position: relative;
+            left: 30px;
+            margin-left: -15px;
+            fill: url(#paint0_linear);
         }
-        &.focused {
-            background: linear-gradient(to right, #91ACE1, #DDBFE1);
+        &:focus-within {
+            background: linear-gradient(to bottom, #91ACE1, #DDBFE1);
             border-radius: 17px;
+            // box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
         }
         input {
             height: 34px;
+            position: relative;
+            top: 1px;
+            background: #EFEFEF;
+            &:focus {
+                border: none;
+            }
+            // border: 1px solid white !important;
         }
     }
     .cui-list {
