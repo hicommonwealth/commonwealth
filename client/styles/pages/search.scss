@@ -11,6 +11,19 @@
     .search-error {
         margin: 21px 0 8px;
     }
+    .cui-tabs {
+        .cui-tabs-item.cui-active {
+            border-width: 2px;
+            border-style: solid;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
+            border-image: linear-gradient(to right, #6086d1, #b37dba) 1;
+            border-image: linear-gradient(to right, #6086d1, #b37dba) 1; /* FF3.6-15 */
+            border-image: linear-gradient(to right, #6086d1, #b37dba) 1; /* Chrome10-25,Safari5.1-6 */
+            border-image: linear-gradient(to right, #6086d1, #b37dba) 1; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        }
+    }
     .search-results {
         .search-results-caption {
             margin: 20px 0;
