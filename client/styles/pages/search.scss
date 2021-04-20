@@ -165,14 +165,13 @@
                 }
             }
         }
-        .User {
-            display: flex;
-            align-items: center;
-            .user-avatar {
-                margin: 0 10px 0 0;
+        .UserBlock {
+            .user-block-left {
+                display: flex;
+                align-items: center;
             }
-            .user-display-name {
-                margin-top: 3px;
+            .user-block-right {
+                display: none;
             }
         }
     }

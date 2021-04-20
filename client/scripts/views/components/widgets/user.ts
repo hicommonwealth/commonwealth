@@ -184,6 +184,7 @@ export const UserBlock: m.Component<{
   popover?: boolean,
   showRole?: boolean,
   showAddressWithDisplayName?: boolean,
+  showFullAddress?: boolean,
   searchTerm?: string,
   showChainName?: boolean,
   hideOnchainRole?: boolean,
@@ -196,7 +197,7 @@ export const UserBlock: m.Component<{
     const {
       user, hideIdentityIcon, popover, showRole, searchTerm,
       hideOnchainRole, showAddressWithDisplayName, showChainName,
-      selected, compact, linkify
+      selected, compact, linkify, showFullAddress
     } = vnode.attrs;
 
     let profile;
@@ -216,15 +217,11 @@ export const UserBlock: m.Component<{
       const isNear = profile.address.chain === 'near';
       const queryStart = profile.address.toLowerCase().indexOf(searchTerm);
       const queryEnd = queryStart + searchTerm.length;
-      const addrStart = isNear ? 0 : Math.max(queryStart - 3, 0);
-      const addrEnd = isNear ? profile.address.length : Math.min(profile.address.length, queryEnd + 3);
       console.log({ addr: profile.address, searchTerm });
       return ([
-        !isNear && addrStart !== 0 &&  m('span', '…'),
-        m('span', profile.address.slice(addrStart, queryStart)),
+        m('span', profile.address.slice(0, queryStart)),
         m('mark', profile.address.slice(queryStart, queryEnd)),
-        m('span', profile.address.slice(queryEnd, addrEnd)),
-        !isNear && addrEnd !== profile.address.length &&  m('span', '…'),
+        m('span', profile.address.slice(queryEnd, profile.address.length)),
       ]);
     })() : null;
 
@@ -251,7 +248,9 @@ export const UserBlock: m.Component<{
         m('.user-block-address', {
           class: profile?.address ? '' : 'no-address',
         }, [
-          highlightSearchTerm ? highlightedAddress : formatAddressShort(profile.address, profile.chain),
+          highlightSearchTerm
+            ? highlightedAddress
+            : showFullAddress ? profile.address : formatAddressShort(profile.address, profile.chain),
           profile?.address && showChainName && ' · ',
           showChainName && (typeof user.chain === 'string' ? user.chain : user.chain.name),
         ]),

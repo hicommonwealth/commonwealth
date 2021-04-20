@@ -28,7 +28,6 @@ export const searchMentionableAddresses = async (
   params: SearchParams,
   order: string[] = ['name', 'ASC']
 ) => {
-  return [];
   const { resultSize, communityScope, chainScope } = params;
   const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
     chain: chainScope,

@@ -16,7 +16,7 @@ import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
-import User from './widgets/user';
+import User, { UserBlock } from './widgets/user';
 
 export interface SearchParams {
   communityScope?: string;
@@ -44,20 +44,21 @@ export enum ContentType {
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
-// TODO: Linkification of users, tokens, comms results
-export const getMemberPreview = (addr, searchTerm) => {
+// TODO: Linkification of tokens, comms results
+export const getMemberPreview = (addr, searchTerm, showChainName) => {
   console.log('getMemberPreview');
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Display longer or even full addresses
   return m(ListItem, {
     label: m('a.search-results-item', [
-      // TODO: Add searchTerm support that's present in UserBlock
-      m(User, {
+      m(UserBlock, {
         user: profile,
-        // searchTerm,
-        avatarSize: 17,
+        searchTerm,
+        avatarSize: 24,
         showAddressWithDisplayName: true,
+        showFullAddress: true,
+        showChainName,
       }),
     ]),
     onclick: (e) => {
@@ -234,7 +235,7 @@ const getResultsPreview = (searchTerm: string, params: SearchParams, vnode, comm
       const resultRow = item.searchType === SearchType.Discussion
         ? getDiscussionPreview(item, searchTerm)
         : item.searchType === SearchType.Member
-          ? getMemberPreview(item, searchTerm)
+          ? getMemberPreview(item, searchTerm, !communityScoped)
           : item.searchType === SearchType.Community
             ? getCommunityPreview(item)
             : null;
