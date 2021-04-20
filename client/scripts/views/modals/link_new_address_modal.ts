@@ -306,7 +306,7 @@ const SubstrateLinkAccountItem: m.Component<{
 };
 
 const LinkNewAddressModal: m.Component<{
-  loggingInWithAddress?: boolean; // determines whether the header says "Connect a new address" or "Login with address"
+  loggingInWithAddress?: boolean; // determines whether the header says "Connect address" or "Login with address"
   joiningCommunity: string,       // join community after verification
   joiningChain: string,           // join chain after verification
   targetCommunity?: string,       // this is valid when loggingInWithAddress=true and user joins to community through default chain.
@@ -349,7 +349,7 @@ const LinkNewAddressModal: m.Component<{
   },
   view: (vnode) => {
     const linkAddressHeader = m('.compact-modal-title', [
-      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect a new address'),
+      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Connect address'),
     ]);
 
     const { targetCommunity } = vnode.attrs;

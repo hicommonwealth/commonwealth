@@ -10,8 +10,10 @@
     }
 
     .select-address-placeholder {
-        padding: 10px 0 15px;
-        padding-right: 4px;
+        padding: 30px 30px 24px;
+        border: 1px solid $border-color-light;
+        border-radius: 15px;
+        margin-bottom: 12px;
         p:first-child {
             margin-top: 0;
         }
