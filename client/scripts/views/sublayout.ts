@@ -29,6 +29,7 @@ const Sublayout: m.Component<{
   showNewProposalButton?: boolean,
   showCouncilMenu?: boolean,
   hideSidebar?: boolean,
+  centerGrid?: boolean,
   alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
 }> = {
   view: (vnode) => {
@@ -118,7 +119,7 @@ const Sublayout: m.Component<{
                 m('.token-banner-content', `Link ${app.chain.meta.chain.symbol} address to participate in this community`),
               ]) : '',
           m('.sublayout-body', [
-            m('.sublayout-grid', [
+            m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
               !hideSidebar && m('.sublayout-sidebar-col', [
                 m(Sidebar),
               ]),

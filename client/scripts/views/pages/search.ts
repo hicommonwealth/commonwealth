@@ -273,6 +273,9 @@ const SearchPage : m.Component<{
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,
+      alwaysShowTitle: true,
+      hideSidebar: true,
+      centerGrid: true,
     }, m(Tabs, [
       m(TabItem, {
         label: 'Top',

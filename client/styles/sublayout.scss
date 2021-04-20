@@ -13,6 +13,10 @@
         @include xs-max {
             padding: 0 $layout-padding-xs;
         }
+        &.flex-center {
+            display: flex;
+            justify-content: center;
+        }
     }
     .sublayout-sidebar-col {
         flex: 1;
@@ -87,6 +91,7 @@
             margin-top: 0 !important;
             flex: 3;
             white-space: nowrap;
+            max-width: min-content;
             > .ChainIcon,
             > .CommunityIcon {
                 display: inline-block;

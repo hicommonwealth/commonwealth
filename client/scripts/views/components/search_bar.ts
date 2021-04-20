@@ -350,8 +350,7 @@ const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
       class: 'no-results',
       label: [
         m('b', searchTerm),
-        m('span', { style: 'white-space: pre;' }, '  •  '),
-        m('span', 'Search community...')
+        m('span', `Search ${app.activeId() || 'Commonwealth'}`)
       ],
       onclick: (e) => {
         if (searchTerm.length < 4) {
@@ -391,6 +390,7 @@ const SearchBar : m.Component<{}, {
     }, [
       m(Input, {
         placeholder: 'Type to search...',
+        autofocus: true,
         fluid: true,
         contentLeft: m(SearchIcon),
         defaultValue: m.route.param('q') || vnode.state.searchTerm,

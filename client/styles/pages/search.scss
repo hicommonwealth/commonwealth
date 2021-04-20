@@ -210,11 +210,28 @@
                 &:first-child {
                     margin-top: 0px;
                 }
+                &:hover {
+                    background: white;
+                }
             }
             &.disabled {
                 &:hover {
-                    background: white;
                     cursor: default;
+                }
+            }
+            &.no-results {
+                display: flex;
+                justify-content: space-between;
+                b {
+                    width: 50%;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+                span {
+                    width: 50%;
+                    color: $primary-bg-color;
+                    text-align: right;
                 }
             }
         }
