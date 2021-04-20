@@ -177,7 +177,6 @@ const getListing = (results: any, searchTerm: string, pageCount: number, searchT
       return bCreatedAt.diff(aCreatedAt);
     })
     .map((res) => {
-      const a = app;
       return res.searchType === SearchType.Discussion
         ? getDiscussionResult(res, searchTerm)
         : res.searchType === SearchType.Member
@@ -227,11 +226,15 @@ const SearchPage : m.Component<{
       });
     }
 
+    if (!app.searchCache[ALL_RESULTS_KEY]?.loaded) {
+      return LoadingPage;
+    }
+
     // re-fetch results for new search
     if (searchTerm !== vnode.state.searchTerm) {
       vnode.state.searchTerm = searchTerm;
       vnode.state.results = {};
-      search(searchTerm, { communityScope, chainScope }, vnode);
+      search(searchTerm, { communityScope, chainScope }, vnode.state);
       return LoadingPage;
     }
 
@@ -256,9 +259,6 @@ const SearchPage : m.Component<{
       : tabScopedListing.length === SEARCH_PAGE_SIZE
         ? `${tabScopedListing.length}+ ${capitalize(activeTab)} results`
         : pluralize(tabScopedListing.length, `${capitalize(activeTab)} result`);
-
-    const a = app;
-    debugger
 
     return m(Sublayout, {
       class: 'SearchPage',

@@ -246,14 +246,16 @@ const getResultsPreview = (searchTerm: string, communityScoped?) => {
   return organizedResults;
 };
 
-const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) => {
-  app.searchCache[searchTerm].loaded = true;
+const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) => {
+  if (!app.searchCache[searchTerm].loaded) {
+    app.searchCache[searchTerm].loaded = true;
+  }
   const commOrChainScoped = params.communityScope || params.chainScope;
   if (err) {
-    vnode.state.results = {};
-    vnode.state.errorText = (err.responseJSON?.error || err.responseText || err.toString());
+    state.results = {};
+    state.errorText = (err.responseJSON?.error || err.responseText || err.toString());
   } else {
-    vnode.state.results = params.isSearchPreview
+    state.results = params.isSearchPreview
       ? getResultsPreview(searchTerm, commOrChainScoped)
       : app.searchCache[searchTerm];
   }
@@ -261,12 +263,14 @@ const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) =
   m.redraw();
 };
 
-export const search = async (searchTerm: string, params: SearchParams, vnode) => {
+export const search = async (searchTerm: string, params: SearchParams, state) => {
   const { isSearchPreview, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
-  app.searchCache[searchTerm] = { loaded: false };
 
-  // TODO: Simplify param passing, so consistent across calls, fns
+  if (app.searchCache[searchTerm]?.loaded) {
+    // If results exist in cache, conclude search
+    concludeSearch(searchTerm, params, state);
+  }
   try {
     const [discussions, addrs] = await Promise.all([
       searchDiscussions(searchTerm, { resultSize, communityScope, chainScope }),
@@ -286,7 +290,7 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
     }).sort(sortResults);
 
     if (communityScope || chainScope) {
-      concludeSearch(searchTerm, params, vnode);
+      concludeSearch(searchTerm, params, state);
       return;
     }
 
@@ -300,16 +304,20 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
     });
 
     const allComms = app.searchCache[ALL_RESULTS_KEY]['communities'];
+    const filteredComms = allComms.filter((comm) => {
+      return comm.name?.toLowerCase().includes(searchTerm)
+        || comm.symbol?.toLowerCase().includes(searchTerm)
+    });
     app.searchCache[searchTerm][SearchType.Community] = app.searchCache[searchTerm][SearchType.Community]
-      .concat(allComms.map((commOrChain) => {
+      .concat(filteredComms.map((commOrChain) => {
         commOrChain.contentType = commOrChain.created_at ? ContentType.Community : ContentType.Chain;
         commOrChain.searchType = SearchType.Community;
         return commOrChain;
       })).sort(sortResults);
 
-    concludeSearch(searchTerm, params, vnode);
+    concludeSearch(searchTerm, params, state);
   } catch (err) {
-    concludeSearch(searchTerm, params, vnode, err);
+    concludeSearch(searchTerm, params, state, err);
   }
 };
 
@@ -326,6 +334,8 @@ export const initializeSearch = async () => {
       app.searchCache[ALL_RESULTS_KEY]['tokens'] = [];
       app.searchCache[ALL_RESULTS_KEY]['communities'] = [];
     }
+    app.searchCache[ALL_RESULTS_KEY].loaded = true;
+    m.redraw();
   }
 };
 
@@ -363,11 +373,20 @@ const SearchBar : m.Component<{}, {
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
 
     const { results, searchTerm } = vnode.state;
-    const searchResults = (results?.length === 0)
-      ? (app.searchCache[searchTerm].loaded || searchTerm.length > 5)
-        ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
-        : m(List, m(ListItem, { label: m(Spinner, { active: true }) }))
-      : m(List, results);
+    const showDropdownPreview = !m.route.get().includes('/search?q=');
+    let searchResults;
+    const a = app;
+    try {
+      searchResults = (results?.length === 0)
+        ? (app.searchCache[searchTerm].loaded || searchTerm.length > 5)
+          ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
+          : m(List, m(ListItem, { label: m(Spinner, { active: true }) }))
+        : m(List, results);
+    } catch {
+      debugger
+    }
+
+    console.log(app.searchCache);
 
     return m(ControlGroup, {
       class: vnode.state.focused ? 'SearchBar focused' : 'SearchBar'
@@ -380,9 +399,6 @@ const SearchBar : m.Component<{}, {
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
         value: vnode.state.searchTerm,
         oncreate: (e) => {
-          if ((e.dom?.children[0] as HTMLInputElement)?.value) {
-            vnode.state.searchTerm = (e.dom.children[0] as HTMLInputElement).value.toLowerCase();
-          }
           initializeSearch();
         },
         onclick: async (e) => {
@@ -391,12 +407,15 @@ const SearchBar : m.Component<{}, {
         oninput: (e) => {
           e.stopPropagation();
           vnode.state.searchTerm = e.target.value?.toLowerCase();
+          if (!app.searchCache[vnode.state.searchTerm]) {
+            app.searchCache[vnode.state.searchTerm] = { loaded: false };
+          }
           if (e.target.value?.length > 3) {
             const params: SearchParams = {};
             params['isSearchPreview'] = true;
             params['communityScope'] = app.activeCommunityId();
             params['chainScope'] = app.activeChainId();
-            _.debounce(() => search(vnode.state.searchTerm, params, vnode), 200)();
+            _.debounce(() => search(vnode.state.searchTerm, params, vnode.state), 200)();
           }
         },
         onkeyup: (e) => {
@@ -416,8 +435,8 @@ const SearchBar : m.Component<{}, {
           }
         },
       }),
-      // TODO: Addrs are showing twice
       searchTerm.length > 3
+      && showDropdownPreview
       && searchResults
     ]);
   }
