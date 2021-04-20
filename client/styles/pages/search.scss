@@ -152,6 +152,7 @@
         border-radius: 25px;
         font-size: 14px;
         color: black;
+        border: 1px solid transparent;
         svg {
             z-index: 2;
             position: relative;
@@ -161,18 +162,16 @@
         }
         &:focus-within {
             background: linear-gradient(to bottom, #91ACE1, #DDBFE1);
-            border-radius: 17px;
             // box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
         }
         input {
             height: 34px;
             position: relative;
-            top: 1px;
             background: #EFEFEF;
+            border: 1px solid white;
             &:focus {
-                border: none;
+                border: none !important;
             }
-            // border: 1px solid white !important;
         }
     }
     .cui-list {

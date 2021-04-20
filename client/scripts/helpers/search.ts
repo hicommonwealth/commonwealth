@@ -62,7 +62,7 @@ export const SearchIcon = {
       width: '15px',
       height: '16px',
       viewBox: '0 0 15 16',
-      fill: 'none', 
+      fill: 'none',
     }, [
       m('path', {
         'fill-rule': 'evenodd',
