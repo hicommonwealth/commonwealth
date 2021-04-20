@@ -3,16 +3,27 @@
 .SearchPage {
     padding-bottom: 40px;
 
+    .sublayout-main-col {
+        padding: 0 5%;
+    }
+    .sublayout-sidebar-col {
+        display: none;
+    }
+
     .search-page-input {
         margin-top: 30px;
-    }
-    .search-loading {
     }
     .search-error {
         margin: 21px 0 8px;
     }
     .cui-tabs {
+        .cui-tabs-item {
+            padding: 13px 15px 7px;
+            margin: 0 !important;
+            color: $text-color-light;
+        }
         .cui-tabs-item.cui-active {
+            color: $text-color-black;
             border-width: 2px;
             border-style: solid;
             border-top: 0;
@@ -24,7 +35,7 @@
             border-image: linear-gradient(to right, #6086d1, #b37dba) 1; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
         }
     }
-    .search-results {
+    .search-results-wrapper {
         .search-results-caption {
             margin: 20px 0;
             color: $text-color-light;
@@ -32,7 +43,15 @@
                 margin-left: 10px;
             }
         }
+        .search-all-communities {
+            &:hover {
+                text-decoration: none;
+            }
+        }
         .search-results-list {
+            .cui-list {
+                max-height: none !important;
+            }
             .cui-list-item {
                 border-top: none;
                 border-bottom: none;
@@ -102,6 +121,14 @@
                             padding: 5px 2px 0;
                             margin: 0 3px;
                             border-radius: 5px;
+                        }
+                    }
+                    &.token-result {
+                        display: flex;
+                        align-items: center;
+                        width: 100%;
+                        img {
+                            margin-right: 13px;
                         }
                     }
                 }

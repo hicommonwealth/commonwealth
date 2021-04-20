@@ -29,6 +29,7 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 // TODO: Linkification of users, tokens, comms results
 export const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
+  if (addr.name) profile.initialize(addr.name, null, null, null, null);
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Display longer or even full addresses
   return m(ListItem, {
@@ -164,7 +165,9 @@ const getListing = (results: any, searchTerm: string, pageCount: number, searchT
   const concatResults = () => {
     let allResults = [];
     [SearchType.Discussion, SearchType.Member, SearchType.Community].forEach((type) => {
-      allResults = allResults.concat(results[type]);
+      if (results[type]?.length) {
+        allResults = allResults.concat(results[type]);
+      }
     });
     return allResults;
   };
@@ -234,6 +237,9 @@ const SearchPage : m.Component<{
     if (searchTerm !== vnode.state.searchTerm) {
       vnode.state.searchTerm = searchTerm;
       vnode.state.results = {};
+      if (!app.searchCache[vnode.state.searchTerm]) {
+        app.searchCache[vnode.state.searchTerm] = { loaded: false };
+      }
       search(searchTerm, { communityScope, chainScope }, vnode.state);
       return LoadingPage;
     }
@@ -301,7 +307,7 @@ const SearchPage : m.Component<{
         },
       }),
     ]),
-    m('.search-results', [
+    m('.search-results-wrapper', [
       !app.searchCache[searchTerm].loaded ? m('.search-loading', [
         m(Spinner, {
           active: true,

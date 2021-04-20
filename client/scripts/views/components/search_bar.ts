@@ -46,9 +46,11 @@ const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
 // TODO: Linkification of tokens, comms results
-export const getMemberPreview = (addr, searchTerm, showChainName) => {
+export const getMemberPreview = (addr, searchTerm, showChainName?) => {
   console.log('getMemberPreview');
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
+  if (addr.name) profile.initialize(addr.name, null, null, null, null);
+  console.log({ profile });
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Display longer or even full addresses
   return m(ListItem, {
@@ -75,8 +77,8 @@ export const getCommunityPreview = (community) => {
       label: m('a.search-results-item', [
         m('img', {
           src: community.logoURI,
-          height: '36px',
-          width: '36px'
+          height: '24px',
+          width: '24px'
         }),
         m('span', community.name)
       ]),
@@ -88,7 +90,7 @@ export const getCommunityPreview = (community) => {
   } else if (community.contentType === ContentType.Chain
     || community.contentType === ContentType.Community) {
     return m(ListItem, {
-      label: m('a.search-results-item', [
+      label: m('a.search-results-item.token-result', [
         m(CommunityLabel, {
           community,
           size: 36,
@@ -220,11 +222,11 @@ const getResultsPreview = (searchTerm: string, communityScoped?) => {
     results = getBalancedContentListing(app.searchCache[searchTerm], types);
   }
   const organizedResults = [];
-  types.forEach((type) => {
+  types.forEach((type: SearchType) => {
     const res = results[type];
     if (res?.length === 0) return;
     const headerEle = m(ListItem, {
-      label: `${capitalize(type)}s`,
+      label: type === SearchType.Community ? 'Communities' : `${capitalize(type)}s`,
       class: 'disabled',
       onclick: (e) => {
         e.preventDefault();
@@ -232,11 +234,12 @@ const getResultsPreview = (searchTerm: string, communityScoped?) => {
       }
     });
     organizedResults.push(headerEle);
+    console.log({ communityScoped });
     (res as any[]).forEach((item) => {
       const resultRow = item.searchType === SearchType.Discussion
         ? getDiscussionPreview(item, searchTerm)
         : item.searchType === SearchType.Member
-          ? getMemberPreview(item, searchTerm, !communityScoped)
+          ? getMemberPreview(item, searchTerm, !!communityScoped)
           : item.searchType === SearchType.Community
             ? getCommunityPreview(item)
             : null;
@@ -374,17 +377,11 @@ const SearchBar : m.Component<{}, {
 
     const { results, searchTerm } = vnode.state;
     const showDropdownPreview = !m.route.get().includes('/search?q=');
-    let searchResults;
-    const a = app;
-    try {
-      searchResults = (results?.length === 0)
-        ? (app.searchCache[searchTerm].loaded || searchTerm.length > 5)
-          ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
-          : m(List, m(ListItem, { label: m(Spinner, { active: true }) }))
-        : m(List, results);
-    } catch {
-      debugger
-    }
+    const searchResults = (results?.length === 0)
+      ? (app.searchCache[searchTerm].loaded || searchTerm.length > 5)
+        ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
+        : m(List, m(ListItem, { label: m(Spinner, { active: true }) }))
+      : m(List, results);
 
     console.log(app.searchCache);
 
