@@ -257,7 +257,7 @@ const send = async (models, content: WebhookContent) => {
           }]
         };
       } else if (url.indexOf('telegram.org') !== -1) {
-        const getUpdatesUrl = url.split('/sendPhoto').slice(0, -1).join('/');
+        const getUpdatesUrl = url.split('/@').slice(0, -1).join('@');
         console.log(getUpdatesUrl)
 
         // const response = await request.get(getChat)
