@@ -28,7 +28,6 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 
 // TODO: Linkification of users, tokens, comms results
 export const getMemberResult = (addr, searchTerm) => {
-  debugger
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   const userLink = `/${m.route.param('scope') || addr.chain}/account/${addr.address}?base=${addr.chain}`;
   // TODO: Display longer or even full addresses
@@ -160,7 +159,7 @@ export const getDiscussionResult = (thread, searchTerm) => {
 };
 
 const getListing = (results: any, searchTerm: string, pageCount: number, searchType?: SearchType) => {
-  debugger
+  if (Object.keys(results).length === 0) return [];
   const filter = searchType === SearchType.Top ? null : searchType;
   const concatResults = () => {
     let allResults = [];
@@ -179,7 +178,6 @@ const getListing = (results: any, searchTerm: string, pageCount: number, searchT
     })
     .map((res) => {
       const a = app;
-      if (!res) debugger
       return res.searchType === SearchType.Discussion
         ? getDiscussionResult(res, searchTerm)
         : res.searchType === SearchType.Member
@@ -196,8 +194,7 @@ const SearchPage : m.Component<{
   results: any[]
 }, {
   activeTab: SearchType,
-  results: any[],
-  searchLoading: boolean,
+  results: any,
   searchTerm: string,
   searchPrefix: string,
   overridePrefix: boolean,
@@ -223,23 +220,20 @@ const SearchPage : m.Component<{
       vnode.state.errorText = 'Must enter query to begin searching';
       return m(PageNotFound, {
         title: 'Search',
-        message: 'Please enter query to begin searching'
+        message: 'Please enter a query to begin searching'
       });
     }
 
     // re-fetch results for new search
     if (searchTerm !== vnode.state.searchTerm) {
       vnode.state.searchTerm = searchTerm;
-      vnode.state.results = [];
+      vnode.state.results = {};
       search(searchTerm, { communityScope, chainScope }, vnode);
       return LoadingPage;
     }
 
-    if (vnode.state.searchLoading) {
+    if (!app.searchCache.loaded) {
       return LoadingPage;
-    } else if (!vnode.state.results && !vnode.state.errorText) {
-      search(searchTerm, { communityScope, chainScope }, vnode);
-      return;
     }
 
     if (!vnode.state.activeTab) {
@@ -252,14 +246,16 @@ const SearchPage : m.Component<{
     const { results, pageCount, activeTab } = vnode.state;
 
     const tabScopedListing = getListing(results, searchTerm, pageCount, activeTab);
-
-    const resultCount = vnode.state.activeTab === SearchType.Top
+    const resultCount = activeTab === SearchType.Top
       ? tabScopedListing.length === SEARCH_PAGE_SIZE
         ? `${tabScopedListing.length}+ results`
         : pluralize(tabScopedListing.length, 'result')
       : tabScopedListing.length === SEARCH_PAGE_SIZE
-        ? `${tabScopedListing.length}+ ${capitalize(vnode.state.activeTab)} results`
-        : pluralize(tabScopedListing.length, `${capitalize(vnode.state.activeTab)} result`);
+        ? `${tabScopedListing.length}+ ${capitalize(activeTab)} results`
+        : pluralize(tabScopedListing.length, `${capitalize(activeTab)} result`);
+
+    const a = app;
+    debugger
 
     return m(Sublayout, {
       class: 'SearchPage',
@@ -271,7 +267,7 @@ const SearchPage : m.Component<{
     }, m(Tabs, [
       m(TabItem, {
         label: 'Top',
-        active: vnode.state.activeTab === SearchType.Top,
+        active: activeTab === SearchType.Top,
         onclick: () => {
           vnode.state.pageCount = 1;
           vnode.state.activeTab = SearchType.Top;
@@ -279,7 +275,7 @@ const SearchPage : m.Component<{
       }),
       m(TabItem, {
         label: 'Communities',
-        active: vnode.state.activeTab === SearchType.Community,
+        active: activeTab === SearchType.Community,
         onclick: () => {
           vnode.state.pageCount = 1;
           vnode.state.activeTab = SearchType.Community;
@@ -287,7 +283,7 @@ const SearchPage : m.Component<{
       }),
       m(TabItem, {
         label: 'Discussion',
-        active: vnode.state.activeTab === SearchType.Discussion,
+        active: activeTab === SearchType.Discussion,
         onclick: () => {
           vnode.state.pageCount = 1;
           vnode.state.activeTab = SearchType.Discussion;
@@ -295,7 +291,7 @@ const SearchPage : m.Component<{
       }),
       m(TabItem, {
         label: 'Members',
-        active: vnode.state.activeTab === SearchType.Member,
+        active: activeTab === SearchType.Member,
         onclick: () => {
           vnode.state.pageCount = 1;
           vnode.state.activeTab = SearchType.Member;
@@ -303,7 +299,7 @@ const SearchPage : m.Component<{
       }),
     ]),
     m('.search-results', [
-      vnode.state.searchLoading ? m('.search-loading', [
+      !app.searchCache.loaded ? m('.search-loading', [
         m(Spinner, {
           active: true,
           fill: true,

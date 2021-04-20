@@ -245,17 +245,13 @@ const getResultsPreview = (searchTerm: string, params: SearchParams, vnode, comm
   return organizedResults;
 };
 
+
 const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) => {
-  console.log('loading over');
   app.searchCache.loaded = true;
-  vnode.state.errorText = !err
-    ? null : (err.responseJSON?.error || err.responseText || err.toString());
-  if (vnode.state.errorText) console.trace();
   const commOrChainScoped = params.communityScope || params.chainScope;
-  console.log({ err });
-  debugger
   if (err) {
-    vnode.state.results = [];
+    vnode.state.results = {};
+    vnode.state.errorText = (err.responseJSON?.error || err.responseText || err.toString());
   } else {
     vnode.state.results = params.isSearchPreview
       ? getResultsPreview(searchTerm, params, vnode, commOrChainScoped)
@@ -266,7 +262,6 @@ const concludeSearch = (searchTerm: string, params: SearchParams, vnode, err?) =
 };
 
 export const search = async (searchTerm: string, params: SearchParams, vnode) => {
-  console.log({ searchTerm });
   const { isSearchPreview, communityScope, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
   app.searchCache.loaded = false;
@@ -334,7 +329,6 @@ export const search = async (searchTerm: string, params: SearchParams, vnode) =>
 
     concludeSearch(searchTerm, params, vnode);
   } catch (err) {
-    console.trace();
     concludeSearch(searchTerm, params, vnode, err);
   }
 };
@@ -376,7 +370,7 @@ const SearchBar : m.Component<{}, {
     const searchResults = (results?.length === 0)
       ? (app.searchCache.loaded || searchTerm.length > 5)
         ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
-        : m(List, m(ListItem, { label: m(Spinner, { active: true } )}))
+        : m(List, m(ListItem, { label: m(Spinner, { active: true }) }))
       : m(List, results);
 
     return m(ControlGroup, {
@@ -416,7 +410,6 @@ const SearchBar : m.Component<{}, {
             if (searchTerm.length < 4) {
               notifyError('Query must be at least 4 characters');
             }
-            // TODO: Consistent, in-advance sanitization of all params
             let params = `q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`;
             if (app.activeCommunityId()) params += `&comm=${app.activeCommunityId()}`;
             else if (app.activeChainId()) params += `&chain=${app.activeChainId()}`;

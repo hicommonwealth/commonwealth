@@ -16,10 +16,8 @@ export const searchDiscussions = async (
     results_size: resultSize,
   });
   if (response.status !== 'Success') {
-    debugger
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
-  console.log({ searchTerm, threadResults: response.result });
   return response.result;
 };
 
@@ -37,7 +35,6 @@ export const searchMentionableAddresses = async (
     order,
   });
   if (response.status !== 'Success') {
-    debugger
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
   console.log({ isRoles: !!(communityScope || chainScope) });
@@ -54,7 +51,6 @@ export const searchChainsAndCommunities = async (
     limit,
   });
   if (response.status !== 'Success') {
-    debugger
     throw new Error(`Got unsuccessful status: ${response.status}`);
   }
   return response.result;
