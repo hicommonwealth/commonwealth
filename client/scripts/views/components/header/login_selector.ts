@@ -9,7 +9,7 @@ import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider,
 
 import app from 'state';
 import { Account, AddressInfo, ChainBase, ChainInfo, CommunityInfo, RoleInfo, RolePermission } from 'models';
-import { isSameAccount, pluralize, articlize } from 'helpers';
+import { isSameAccount, pluralize } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
@@ -217,7 +217,7 @@ const LoginSelector: m.Component<{
         label: [
           m('span.hidden-sm', [
             samebaseAddressesFiltered.length === 0
-              ? `Connect ${articlize(app.chain?.meta?.chain.name) || 'an'} address`
+              ? 'Connect address'
               : 'Join'
           ]),
         ],
