@@ -2,11 +2,12 @@ import 'pages/search.scss';
 
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
-import { ControlGroup, Input, List, ListItem, Spinner } from 'construct-ui';
+import { ControlGroup, Icon, Icons, Input, List, ListItem, Spinner } from 'construct-ui';
 import {
   searchMentionableAddresses,
   searchDiscussions,
   searchChainsAndCommunities,
+  SearchIcon,
 } from 'helpers/search';
 import getTokenLists from 'views/pages/home/token_lists';
 import app from 'state';
@@ -392,7 +393,7 @@ const SearchBar : m.Component<{}, {
         placeholder: 'Type to search...',
         autofocus: true,
         fluid: true,
-        // TODO: param term not populating input
+        contentLeft: m(SearchIcon),
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
         value: vnode.state.searchTerm,
         oncreate: (e) => {

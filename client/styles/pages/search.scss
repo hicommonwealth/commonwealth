@@ -154,6 +154,9 @@
         border-radius: 17px;
         font-size: 14px;
         color: black;
+        svg {
+            fill: linear-gradient(to right, #91ACE1, #DDBFE1);
+        }
         &.focused {
             background: linear-gradient(to right, #91ACE1, #DDBFE1);
             border-radius: 17px;

@@ -82,6 +82,9 @@
         }
 
         .sublayout-header-left {
+            display: flex;
+            align-items: center;
+            margin-top: 0 !important;
             flex: 3;
             white-space: nowrap;
             > .ChainIcon,
@@ -132,6 +135,7 @@
         }
         .sublayout-header-right {
             display: flex;
+            align-items: center;
             flex: 1;
             text-align: right;
             flex-direction: row-reverse;
