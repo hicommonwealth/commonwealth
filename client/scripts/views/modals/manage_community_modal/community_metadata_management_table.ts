@@ -17,6 +17,7 @@ interface ICommunityMetadataManagementState {
   element: string;
   telegram: string;
   github: string;
+  customDomain: string;
 }
 
 export interface IChainOrCommMetadataManagementAttrs {
@@ -38,6 +39,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.element = vnode.attrs.community.element;
     vnode.state.telegram = vnode.attrs.community.telegram;
     vnode.state.github = vnode.attrs.community.github;
+    vnode.state.customDomain = vnode.attrs.community.customDomain;
   },
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [m(Table, {
@@ -87,6 +89,12 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         placeholder: 'https://github.com',
         onChangeHandler: (v) => { vnode.state.github = v; },
       }),
+      m(InputPropertyRow, {
+        title: 'Domain',
+        defaultValue: vnode.state.customDomain,
+        placeholder: 'gov.edgewa.re',
+        onChangeHandler: (v) => { vnode.state.customDomain = v; },
+      }),
       m(TogglePropertyRow, {
         title: 'Privacy',
         defaultValue: vnode.attrs.community.privacyEnabled,
@@ -129,6 +137,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           element,
           telegram,
           github,
+          customDomain,
           invitesEnabled,
           privacyEnabled,
         } = vnode.state;
@@ -142,6 +151,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             element,
             telegram,
             github,
+            customDomain,
             privacyEnabled,
             invitesEnabled,
           });

@@ -21,6 +21,7 @@ export interface OffchainCommunityAttributes {
   featured_topics?: string[];
   privacyEnabled?: boolean;
   invitesEnabled?: boolean;
+  customDomain?: string;
   collapsed_on_homepage: boolean;
   created_at?: Date;
   updated_at?: Date;
@@ -68,6 +69,7 @@ export default (
       // XXX: mixing camelCase and underscore_case is bad practice
       privacyEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       invitesEnabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      customDomain: { type: dataTypes.STRING, allowNull: true, },
       collapsed_on_homepage: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     }, {
       underscored: true,
