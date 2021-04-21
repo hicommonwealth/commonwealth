@@ -51,6 +51,10 @@
       margin: 10px auto 20px;
       line-height: 1;
       width: fit-content;
+
+      &.mobile {
+        display: none;
+      }
     }
 
     .accounts-caption {
@@ -161,6 +165,15 @@
         .account-item-left {
           width: calc(100% - 50px);
         }
+      }
+    }
+
+    .targetAddress {
+      display: none;
+
+      &.mobile {
+        margin: 10px auto;
+        display: inherit !important;
       }
     }
   }

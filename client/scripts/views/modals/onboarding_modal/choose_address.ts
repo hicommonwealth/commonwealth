@@ -423,7 +423,8 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
               m('p', 'Wallet connected, but no accounts were found.'),
             ] : !addressFound ? [
               m('p.small-text', 'We can’t find the following address in your current wallet. Please try looking in another wallet to claim it.'),
-              m('div.targetAddress', vnode.attrs.address)
+              m('div.targetAddress', vnode.attrs.address),
+              m('div.targetAddress.mobile', [vnode.attrs.address?.slice(0, 10), '...', vnode.attrs.address?.slice(-10)])
             ] : '',
           ]),
           m('.accounts-list', [

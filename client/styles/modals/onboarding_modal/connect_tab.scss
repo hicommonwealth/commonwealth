@@ -36,6 +36,10 @@
     margin: 25px auto;
     line-height: 1;
     width: fit-content;
+
+    &.mobile {
+      display: none;
+    }
   }
 
   button {
@@ -71,8 +75,12 @@
     }
 
     .address {
-      font-size: 14px;
-      margin: 10px auto;
+      display: none;
+
+      &.mobile {
+        margin: 10px auto;
+        display: inherit;
+      }
     }
 
     .or {

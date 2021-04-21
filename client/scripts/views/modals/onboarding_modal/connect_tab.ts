@@ -24,6 +24,7 @@ const OnboardingConnect: m.Component<IOnboardingConnectAttr, {}> = {
         m('span', 'Connect your wallet address to claim the following address on Commonwealth.')
       ]),
       m('div.address', vnode.attrs.address),
+      m('div.address.mobile', [vnode.attrs.address?.slice(0, 10), '...', vnode.attrs.address?.slice(-10)]),
       m(Button, {
         label: 'Connect Wallet',
         onclick: () => {
