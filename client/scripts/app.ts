@@ -90,6 +90,14 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       if (updateSelectedNode && data.user && data.user.selectedNode) {
         app.user.setSelectedNode(NodeInfo.fromJSON(data.user.selectedNode));
       }
+
+      // update whether we're on a custom domain
+      const host = document.location.host;
+      app.setIsCustomDomain(
+        app.config.chains.getAll().find((c) => c.customDomain === host) !== undefined
+          || app.config.communities.getAll().find((c) => c.customDomain === host) !== undefined
+      );
+
       resolve();
     }).catch((err: any) => {
       app.loadingError = err.responseJSON?.error || 'Error loading application state';
@@ -518,7 +526,7 @@ $(() => {
       // handle custom domains, for routes that need special handling
       const host = document.location.host;
       if (redirectCustomDomain) {
-        const hasLoadedAll = app.config.chains.getAll().length === 0 || app.config.communities.getAll().length === 0;
+        const hasLoadedAll = app.config.chains.getAll().length !== 0 || app.config.communities.getAll().length !== 0;
         const matchingChain = app.config.chains.getAll().find((c) => c.customDomain === host);
         const matchingCommunity = app.config.communities.getAll().find((c) => c.customDomain === host);
 
