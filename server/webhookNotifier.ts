@@ -266,12 +266,28 @@ const send = async (models, content: WebhookContent) => {
 
         webhookData = isChainEvent ? {
           chat_id: getChatUsername,
-          text: `<a href="${chainEventLink}"><b>${title}</b></a>\n${fulltext}`,
-          parse_mode: 'HTML'
+          text: `<a href="${chainEventLink}"><b>${title}</b></a>\n\n${fulltext}`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            "resize_keyboard": true,
+            "inline_keyboard": [
+              [
+                {"text": "Read more on commonwealth", "url": "http://www.google.com/"}
+              ]
+            ]
+          }
         } : {
           chat_id: getChatUsername,
-          text: `<b>Actor:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
-          parse_mode: 'HTML'
+          text: `<b>Actor:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            "resize_keyboard": true,
+            "inline_keyboard": [
+              [
+                {"text": "Commonwealth", "url": "http://www.google.com/"}
+              ]
+            ]
+          }
         };
       } else {
         // TODO: other formats unimplemented
