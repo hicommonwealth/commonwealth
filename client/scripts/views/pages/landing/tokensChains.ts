@@ -1,59 +1,23 @@
 import m from 'mithril';
-import Glide from '@glidejs/glide';
 
-const TokensChainsComponent: m.Component<{}, {}> = {
+interface IState {
+  chains: {
+    img: string;
+    content: string;
+    title: string;
+  }[];
+  oncreateSlider: Function;
+}
+
+const TokensChainsComponent: m.Component<IState, IState> = {
+  oninit: (vnode) => {
+    vnode.state.chains = vnode.attrs.chains;
+    vnode.state.oncreateSlider = vnode.attrs.oncreateSlider;
+  },
   oncreate: (vnode) => {
-    const glide = new (Glide as any)('.glide', {
-      type: 'carousel',
-      focusAt: 'center',
-      perView: 3,
-      gap: 40,
-      autoplay: 0,
-      hoverpause: true,
-      peek: {
-        before: 100,
-        after: 100,
-      },
-      breakpoints: {
-        1024: {
-          perView: 2,
-          gap: 40,
-        },
-        768: {
-          perView: 2,
-          gap: 20,
-        },
-        640: {
-          perView: 1,
-          gap: 16,
-          peek: {
-            before: 50,
-            after: 50,
-          },
-        },
-      },
-    });
-    glide.mount();
+    vnode.state.oncreateSlider();
   },
   view: (vnode) => {
-    const chainsAllowed = [
-      {
-        img: 'static/img/near-protocol.png',
-        title: 'NEAR Protocol',
-        content: ' High-performance platform for dapps with foccus on UX ',
-      },
-      {
-        img: 'static/img/edgeware.svg',
-        title: 'Edgeware',
-        content: ' Next generation smart contracts ',
-      },
-      {
-        img: 'static/img/straightedge.svg',
-        title: 'Straightedge',
-        content: ' A Cosmic smart contracting platform ',
-      },
-    ];
-
     return m(
       'section',
       {
@@ -90,20 +54,20 @@ const TokensChainsComponent: m.Component<{}, {}> = {
               'div',
               { class: 'glide__track', 'data-glide-el': 'track' },
               m('ul', { class: 'glide__slides' }, [
-                chainsAllowed.map(
+                vnode.state.chains.map(
                   (chain: { img: string; title: string; content: string }) => {
                     return m(
                       'li',
-                      { class: 'glide__slide  h-48' },
+                      { class: 'glide__slide  h-56' },
                       m(
                         'div',
                         {
                           class:
-                            'bg-white rounded shadow-xl p-5 xl:p-10 text-center',
+                            'bg-white rounded shadow-xl p-5 xl:p-10 text-center h-56',
                         },
                         [
                           m('img', {
-                            class: 'mx-auto mb-3 w-12 h-auto',
+                            class: 'mx-auto mb-3 w-12 h-auto h-56',
                             src: chain.img,
                             alt: '',
                           }),

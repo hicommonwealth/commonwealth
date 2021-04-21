@@ -1,6 +1,14 @@
 import m from 'mithril';
+import './landing_page_header.scss';
 
-const HeaderLandingPage: m.Component<{}, {}> = {
+interface IState {
+  navs: { text: string; ref: string }[];
+}
+
+const HeaderLandingPage: m.Component<IState, IState> = {
+  oninit: (vnode: m.VnodeDOM<IState, IState>) => {
+    vnode.state.navs = vnode.attrs.navs;
+  },
   view: (vnode) => {
     return m(
       'div',
@@ -21,47 +29,19 @@ const HeaderLandingPage: m.Component<{}, {}> = {
             'nav',
             { class: 'hidden lg:block' },
             m('ul', { class: 'lg:flex lg:flex-row lg:items-center' }, [
+              vnode.state.navs.map((nav: any) => {
+                return m(
+                  'li.LandingPageHeaderLinks',
+                  { class: 'ml-10' },
+                  m(
+                    'a',
+                    { class: 'text-gray-500 leading-none', href: nav.href },
+                    nav.text
+                  )
+                );
+              }),
               m(
-                'li',
-                { class: 'ml-10' },
-                m(
-                  'a',
-                  { class: 'text-gray-500 leading-none', href: '' },
-                  'Why Commonwealth?'
-                )
-              ),
-              m(
-                'li',
-                { class: 'ml-10' },
-                m(
-                  'a',
-                  {
-                    class: 'text-gray-500 leading-none',
-                    href: 'useCases.html',
-                  },
-                  'Use Cases'
-                )
-              ),
-              m(
-                'li',
-                { class: 'ml-10' },
-                m(
-                  'a',
-                  { class: 'text-gray-500 leading-none', href: '' },
-                  'Crowdfounding'
-                )
-              ),
-              m(
-                'li',
-                { class: 'ml-10' },
-                m(
-                  'a',
-                  { class: 'text-gray-500 leading-none', href: '' },
-                  'Developers'
-                )
-              ),
-              m(
-                'li',
+                'li.LandingPageHeaderLinks',
                 { class: 'ml-10' },
                 m('a', { class: 'btn-primary pb-3', href: '' }, [
                   m('img', {

@@ -1,6 +1,20 @@
 import m from 'mithril';
 
-const ChainsCrowdfundingComponent: m.Component<{}, {}> = {
+interface IState {
+  chains: {
+    button: {
+      id: string;
+      title: string;
+      card: { id: string; text: string };
+    };
+    card: { id: string; src: string; alt: string };
+  }[];
+}
+
+const ChainsCrowdfundingComponent: m.Component<IState, IState> = {
+  oninit: (vnode) => {
+    vnode.state.chains = vnode.attrs.chains;
+  },
   view: (vnode) => {
     return m('section', { class: 'container mx-auto pt-20' }, [
       m('img', {
@@ -10,12 +24,12 @@ const ChainsCrowdfundingComponent: m.Component<{}, {}> = {
       }),
       m(
         'h2',
-        { class: 'text-3xl font-extrabold mb-5 text-center mb-10' },
+        { class: 'text-3xl font-bold mb-5 text-center mb-10' },
         ' Leverage on-chain crowdfunding '
       ),
       m(
         'div',
-        { class: 'text-center' },
+        { class: 'flex justify-center text-center' },
         m(
           'a',
           { class: 'btn-outline text-xl px-6 rounded-lg pb-3', href: '' },
@@ -29,138 +43,48 @@ const ChainsCrowdfundingComponent: m.Component<{}, {}> = {
             'bg-white rounded-3xl p-3 lg:p-6 relative min-h-tabs lg:flex lg:flex-col lg:h-full mt-20',
         },
         [
-          m(
-            'li',
-            { class: 'lg:flex-grow' },
-            m('div', { class: 'lg:flex lg:flex-row' }, [
-              m(
-                'div',
-                { class: 'lg:w-1/3 lg:mr-5 xl:mr-20' },
+          vnode.state.chains.map((chain: any) => {
+            return m(
+              'li',
+              { class: 'lg:flex-grow' },
+              m('div', { class: 'lg:flex lg:flex-row' }, [
                 m(
-                  'button',
+                  'div',
+                  { class: 'lg:w-1/3 lg:mr-5 xl:mr-20' },
+                  m(
+                    'button',
+                    {
+                      class:
+                        'rounded-2xl p-5 bg-gray-300 text-left w-full focus:outline-none',
+                      onclick: "changeTokenCreatorsTab(1, 'secondSection')",
+                      id: chain.button.id,
+                    },
+                    [
+                      m(
+                        'h4',
+                        { class: 'font-bold text-xl' },
+                        chain.button.title
+                      ),
+                      m('p', { id: chain.button.card.id }, chain.button.card.text),
+                    ]
+                  )
+                ),
+                m(
+                  'div',
                   {
                     class:
-                      'rounded-2xl p-5 bg-gray-100 text-left w-full focus:outline-none',
-                    onclick: 'changeCrowdfundingTab(1)',
-                    id: 'tab-card-button',
+                      'flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0',
+                    id: chain.card.id,
                   },
-                  [
-                    m(
-                      'h4',
-                      { class: 'font-extrabold text-xl' },
-                      'Fund new projects'
-                    ),
-                    m(
-                      'p',
-                      { id: 'tab-card-text' },
-                      ' Anyone from within your community can easily turn a conversation thread into a Kickstarter-like campaign '
-                    ),
-                  ]
-                )
-              ),
-              m(
-                'div',
-                {
-                  class:
-                    'flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0',
-                  id: 'tab-card',
-                },
-                m('img', {
-                  class: 'block max-w-2xl w-full h-auto',
-                  src: 'static/img/card1.png',
-                  alt: '',
-                })
-              ),
-            ])
-          ),
-          m(
-            'li',
-            { class: 'lg:flex-grow' },
-            m('div', { class: 'lg:flex lg:flex-row' }, [
-              m(
-                'div',
-                { class: 'lg:w-1/3 lg:mr-5 xl:mr-20' },
-                m(
-                  'button',
-                  {
-                    class:
-                      'rounded-2xl p-5 text-left w-full focus:outline-none',
-                    onclick: 'changeCrowdfundingTab(2)',
-                    id: 'tab2-card-button',
-                  },
-                  [
-                    m(
-                      'h4',
-                      { class: 'font-extrabold text-xl' },
-                      ' Create Community Endowments '
-                    ),
-                    m(
-                      'p',
-                      { id: 'tab2-card-text' },
-                      ' Lets you pool funds with other like minded folks and fund interesting projects within your community or across the web[need better word] '
-                    ),
-                  ]
-                )
-              ),
-              m(
-                'div',
-                {
-                  class:
-                    ' flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0',
-                  id: 'tab2-card',
-                },
-                m('img', {
-                  class: 'block max-w-2xl w-full h-auto',
-                  src: 'static/img/card2.png',
-                  alt: '',
-                })
-              ),
-            ])
-          ),
-          m(
-            'li',
-            { class: 'lg:flex-grow' },
-            m('div', { class: 'lg:flex lg:flex-row' }, [
-              m(
-                'div',
-                { class: 'lg:w-1/3 lg:mr-5 xl:mr-20' },
-                m(
-                  'button',
-                  {
-                    class:
-                      'rounded-2xl p-5 text-left w-full focus:outline-none',
-                    onclick: 'changeCrowdfundingTab(3)',
-                    id: 'tab3-card-button',
-                  },
-                  [
-                    m(
-                      'h4',
-                      { class: 'font-extrabold text-xl' },
-                      'Launch New Tokens'
-                    ),
-                    m(
-                      'p',
-                      { id: 'tab3-card-text' },
-                      ' Use a project to raise funds for a new tokenize DeFi or NFT token and optionally plug in an allowlist for KYC compliance '
-                    ),
-                  ]
-                )
-              ),
-              m(
-                'div',
-                {
-                  class:
-                    'flex justify-center lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0',
-                  id: 'tab3-card',
-                },
-                m('img', {
-                  class: 'block max-w-2xl w-full h-auto',
-                  src: 'static/img/card3.png',
-                  alt: '',
-                })
-              ),
-            ])
-          ),
+                  m('img', {
+                    class: 'block max-w-2xl w-full h-auto',
+                    src: chain.card.src,
+                    alt: chain.card.alt,
+                  })
+                ),
+              ])
+            );
+          }),
         ]
       ),
     ]);

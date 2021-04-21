@@ -1,0 +1,11 @@
+@import "client/styles/shared";
+
+.LandingPageHeaderLinks {
+  a.text-gray-500.leading-none {
+    color: $text-color-black;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

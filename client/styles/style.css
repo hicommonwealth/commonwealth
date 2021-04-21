@@ -104,12 +104,12 @@
       rgba(96, 134, 209, 1) 100%
     );
   }
-  /* .btn-primary {
-    @apply bg-black text-white rounded p-3 pb-2 leading-none transition duration-300 ease-in-out hover:bg-gray-800;
+   .btn-primary {
+    @apply bg-black text-white rounded p-3 pb-2 leading-none transition duration-300 ease-in-out ;
   }
 
   .btn-outline {
-    @apply bg-transparent border border-black text-black rounded p-3 pb-2 leading-none transition duration-300 ease-in-out hover:border-gray-800;
+    @apply bg-transparent border border-black text-black rounded p-3 pb-2 leading-none transition duration-300 ease-in-out ;
   }
 
   .btn-white {
@@ -138,5 +138,9 @@
 
   .btn-gradient > span {
     @apply z-10 relative;
-  } */
+  } 
+
+  section.LandingPageTokenHolders {
+    @apply mx-auto pt-20
+  }
 }
