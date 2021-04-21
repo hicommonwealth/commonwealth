@@ -272,19 +272,19 @@ const send = async (models, content: WebhookContent) => {
             "resize_keyboard": true,
             "inline_keyboard": [
               [
-                {"text": "Read more on commonwealth", "url": "http://www.google.com/"}
+                {"text": "Read more on commonwealth", "url": chainEventLink}
               ]
             ]
           }
         } : {
           chat_id: getChatUsername,
-          text: `<b>Actor:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
+          text: `<b>Author:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
           parse_mode: 'HTML',
           reply_markup: {
             "resize_keyboard": true,
             "inline_keyboard": [
               [
-                {"text": "Commonwealth", "url": "http://www.google.com/"}
+                {"text": "Commonwealth", "url": chainEventLink}
               ]
             ]
           }
