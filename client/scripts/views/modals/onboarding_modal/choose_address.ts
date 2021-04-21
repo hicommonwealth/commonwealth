@@ -403,7 +403,9 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
         })];
         title = !app.chain.webWallet?.available ? 'No wallet detected' : 'Connecting to chain...';
       } else {
-        const addressFound = app.chain.webWallet?.accounts?.includes(vnode.attrs.address);
+        const addressIndex = app.chain.webWallet?.accounts?.findIndex((_) => app.chain.base === ChainBase.Ethereum ? _ === vnode.attrs.address : _.address === vnode.attrs.address);
+        const addressFound = addressIndex >= 0;
+        const sortedAccounts = addressFound ? [app.chain.webWallet?.accounts[addressIndex], ...app.chain.webWallet?.accounts.filter((_) => app.chain.base === ChainBase.Ethereum ? _ !== vnode.attrs.address : _.address !== vnode.attrs.address)] : app.chain.webWallet?.accounts;
 
         content = [
           !app.chain.webWallet?.available && m('.get-wallet-text', [
@@ -444,7 +446,7 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
               }),
             ] : app.chain.networkStatus !== ApiStatus.Connected ? [
             ] : app.chain.base === ChainBase.Ethereum ? [
-              app.chain.webWallet?.accounts.map(
+              sortedAccounts.map(
                 (address) => m(EthereumLinkAccountItem, {
                   address,
                   targetCommunity,
@@ -455,7 +457,7 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
                 })
               ),
             ] : app.chain.base === ChainBase.Substrate ? [
-              app.chain.webWallet?.accounts.map(
+              sortedAccounts.map(
                 (account: InjectedAccountWithMeta) => m(SubstrateLinkAccountItem, {
                   account,
                   targetCommunity,
@@ -466,7 +468,7 @@ const ChooseAddress: m.Component<IOnboardingChooseAddressAttr, IOnboardingChoose
                 })
               ),
             ] : app.chain.base === ChainBase.CosmosSDK ? [
-              app.chain.webWallet?.accounts.map(
+              sortedAccounts.map(
                 (account: InjectedAccountWithMeta) => m(CosmosLinkAccountItem, {
                   account,
                   targetCommunity,
