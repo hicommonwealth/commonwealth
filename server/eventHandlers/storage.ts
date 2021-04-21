@@ -2,15 +2,21 @@
  * Generic handler that stores the event in the database.
  */
 import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/chain-events';
-
+import Sequelize from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
+
+const { Op } = Sequelize;
+
+export interface StorageFilterConfig {
+  excludedEvents?: IChainEventKind[];
+}
 
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _chain: string,
-    private readonly _excludedEvents: IChainEventKind[] = [],
+    private readonly _filterConfig: StorageFilterConfig = {},
   ) {
     super();
   }
@@ -29,13 +35,41 @@ export default class extends IEventHandler {
     return event;
   }
 
+  private async _shouldSkip(event: CWEvent): Promise<boolean> {
+    if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return true;
+    const addressesExist = async (addresses: string[]) => {
+      const addressModels = await this._models.Address.findAll({
+        where: {
+          address: {
+            // TODO: we need to ensure the chain prefixes are correct here
+            [Op.in]: addresses,
+          },
+          chain: this._chain,
+        },
+      });
+      return !!addressModels?.length;
+    };
+
+    // if using includeAddresses, check against db to see if addresses exist
+    // TODO: we can unify this with notifications.ts to save us some fetches and filter better
+    // NOTE: this is currently only used by staking and transfer events.
+    //   DO NOT USE INCLUDE ADDRESSES FOR CHAIN ENTITY-RELATED EVENTS.
+    if (event.includeAddresses) {
+      const shouldSend = await addressesExist(event.includeAddresses);
+      if (!shouldSend) return true;
+    }
+    return false;
+  }
+
   /**
    * Handles an event by creating a ChainEvent in the database.
+   * NOTE: this may modify the event.
    */
   public async handle(event: CWEvent) {
     event = this.truncateEvent(event);
     log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
-    if (this._excludedEvents.includes(event.data.kind)) {
+    const shouldSkip = await this._shouldSkip(event);
+    if (shouldSkip) {
       log.trace('Skipping event!');
       return;
     }

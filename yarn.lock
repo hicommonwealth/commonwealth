@@ -956,10 +956,10 @@
   resolved "https://registry.yarnpkg.com/@clover-network/node-tpye/-/node-tpye-1.0.1.tgz#cb61a6ef57c3207ce3baec6f0bdcd23287dc5209"
   integrity sha512-edR5xE6I3DdcNboBTnK9U6cVHPKsvJRD19o+LUelvJnqrH+DHipMZVr8VBLpf9CvLBxHNZffGX6Jf/iJmkR9+g==
 
-"@commonwealth/chain-events@0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.5.2.tgz#4ce0f86f8b811917ce50297da9ae76272a928f44"
-  integrity sha512-7+F975aksgDOjEoAOssP4cIlOZt9Eg56KiD0wrmc4qmkqK3rtgl6CX0xopamMufJ9LuwrHCSKDACorcRmHrrdQ==
+"@commonwealth/chain-events@0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.5.3.tgz#18e504289f1e8e84ee94f6681203e82a7d9d8426"
+  integrity sha512-ZrlHi5QmPdNrEJmPfsL/JKZ0LTSWNW6sGsBSXurYvtkPL6vr9Bh7yC+BMg2fNw8et14U47HJbAsgZwPBNIO/lA==
   dependencies:
     "@clover-network/node-tpye" "^1.0.1"
     "@edgeware/node-types" "^3.3.3"
@@ -1023,10 +1023,15 @@
   resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.24.0-alpha.13.tgz#5e4c53b0e045929d344eb47bb1dc957fc308cf4c"
   integrity sha512-WOK55hj7p13J/8DI8BJ7MQVnTSTuZhg0LL2gGeRkEcQfORRAwXrOrhOuFrSJgJpACh0f5OvwuPbRF+lEC4IG8A==
 
-"@edgeware/node-types@3.3.3", "@edgeware/node-types@^3.3.3":
+"@edgeware/node-types@3.3.3":
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.3.3.tgz#0a1f11698203c8056722e4c1b218f04f6eec55ed"
   integrity sha512-RDdTjLRZD36MOQGA9g1MXvJpogg08J/0PwJXCEe8tZGlwoHXHw0PT8ieIQMTe2DCKegafHtDYufX36iePngzng==
+
+"@edgeware/node-types@^3.3.3":
+  version "3.3.4"
+  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.3.4.tgz#6666cc636a11dc197813b6f56bc54f9db0a200d4"
+  integrity sha512-wCud1L4hmVeu2dkBsP3f89lWIwtg87Hh6t1AT6KvFlpR0vGWR1HLAe2ITmB9RhJdWy8NR5rLoCAEzaq4TDcctA==
 
 "@ethersproject/abi@5.0.0-beta.153":
   version "5.0.0-beta.153"

@@ -14,6 +14,7 @@ interface CommunityData {
   telegram: string;
   github: string;
   visible: boolean;
+  customDomain: string;
   invitesEnabled: boolean,
   privacyEnabled: boolean,
 }
@@ -32,15 +33,17 @@ class CommunityInfo {
   public readonly visible: boolean;
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
+  public customDomain: string;
   public readonly collapsedOnHomepage: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
 
+  // TODO: convert this to accept opject with params instead
   constructor(
-    id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain,
-    visible, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
+    id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain, visible,
+    customDomain, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
     this.name = name;
@@ -53,6 +56,7 @@ class CommunityInfo {
     this.github = github;
     this.defaultChain = defaultChain;
     this.visible = visible;
+    this.customDomain = customDomain;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
     this.collapsedOnHomepage = collapsedOnHomepage;
@@ -74,6 +78,7 @@ class CommunityInfo {
       json.github,
       json.default_chain,
       json.visible,
+      json.customDomain,
       json.invitesEnabled,
       json.privacyEnabled,
       json.collapsed_on_homepage,
@@ -136,6 +141,7 @@ class CommunityInfo {
     name,
     iconUrl,
     privacyEnabled,
+    customDomain,
     website,
     discord,
     element,
@@ -153,6 +159,7 @@ class CommunityInfo {
       'element': element,
       'telegram': telegram,
       'github': github,
+      'customDomain': customDomain,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
       'jwt': app.user.jwt,
@@ -166,6 +173,7 @@ class CommunityInfo {
     this.element = updatedCommunity.element;
     this.telegram = updatedCommunity.telegram;
     this.github = updatedCommunity.github;
+    this.customDomain = updatedCommunity.customDomain;
     this.privacyEnabled = updatedCommunity.privacyEnabled;
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }
