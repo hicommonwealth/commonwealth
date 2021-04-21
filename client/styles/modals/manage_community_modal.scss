@@ -2,6 +2,9 @@
 
 .ManageCommunityModal {
     width: 800px;
+    @include sm-max {
+        width: initial;
+    }
     .compact-modal-body-max {
         display: flex;
         flex-direction: column;
@@ -121,7 +124,7 @@
             }
             .cui-list-item {
                 overflow-wrap: anywhere;
-                padding: 0;
+                padding: 0 !important;
                 margin-bottom: 6px;
                 border-bottom: none;
             }

@@ -16,6 +16,10 @@ import { Coin } from 'adapters/currency';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracy from './democracy';
+import SubstrateDemocracyProposal from './democracy_proposal';
+import { SubstrateTreasuryProposal } from './treasury_proposal';
+import { SubstrateCollectiveProposal } from './collective_proposal';
+import Substrate from './main';
 
 export enum DemocracyConviction {
   None = 0,
@@ -139,6 +143,9 @@ export class SubstrateDemocracyReferendum
   private _endBlock: number;
   public readonly hash: string;
 
+  private _threshold;
+  public get threshold() { return this._threshold; }
+
   private _passed: boolean;
   public get passed() { return this._passed; }
 
@@ -198,16 +205,23 @@ export class SubstrateDemocracyReferendum
     this._Accounts = Accounts;
     this._Democracy = Democracy;
     this._endBlock = this.data.endBlock;
+    this._threshold = this.data.threshold;
     this.hash = eventData.proposalHash;
     this.createdAt = entity.createdAt;
+    this.threadId = entity.threadId;
 
-    // see if preimage exists and populate data if it does
+    // see if associated entity title exists, otherwise try to populate title with preimage
     const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
-    if (preimage) {
-      this._preimage = preimage;
-      this.title = formatCall(preimage);
+    const associatedProposalOrMotion = this.getProposalOrMotion(preimage);
+    if (associatedProposalOrMotion) {
+      this.title = associatedProposalOrMotion.title;
     } else {
-      this.title = `Referendum #${this.data.index}`;
+      if (preimage) {
+        this._preimage = preimage;
+        this.title = formatCall(preimage);
+      } else {
+        this.title = `Referendum #${this.data.index}`;
+      }
     }
 
     // handle events params for passing, if exists at init time
@@ -220,6 +234,42 @@ export class SubstrateDemocracyReferendum
 
   protected complete() {
     super.complete(this._Democracy.store);
+  }
+
+  // Attempts to find the Democracy Proposal or Collective Motion that produced this Referendum by
+  //   searching for the same proposal hash.
+  // NOTE: for full functionality, both "democracyProposals" and "council" modules must be loaded
+  //   before this funciton is called!
+  // TODO: This may cause issues if we have the same Call proposed twice, as this will only fetch the
+  //   first one in storage. To fix this, we will need to use some timing heuristics to check that
+  //   this referendum was created approximately when the found proposal concluded.
+  public getProposalOrMotion(preimage): SubstrateDemocracyProposal | SubstrateCollectiveProposal
+    | SubstrateTreasuryProposal | undefined {
+    // ensure all modules have loaded
+    if (!this._Chain.app.isModuleReady) return;
+
+    // search for same preimage/proposal hash
+    const chain = (this._Chain.app.chain as Substrate);
+    const democracyProposal = chain.democracyProposals?.store.getAll().find((p) => {
+      return p.hash === this.hash;
+    });
+    if (democracyProposal) return democracyProposal;
+
+    const collectiveProposal = chain.council?.store.getAll().find((p) => {
+      return p.data.hash === this.hash;
+    });
+    if (collectiveProposal) return collectiveProposal;
+
+    // search for treasury proposal for approveProposal only (not rejectProposal)
+    if (preimage?.section === 'treasury' && preimage?.method === 'approveProposal') {
+      return chain.treasury?.store.getByIdentifier(preimage.args[0]);
+    }
+
+    console.log('could not find:',
+      this.hash,
+      chain.council?.store.getAll().map((c) => c.data.hash),
+      chain.democracyProposals?.store.getAll().map((c) => c.hash));
+    return undefined;
   }
 
   public update(e: ChainEvent) {
@@ -270,7 +320,9 @@ export class SubstrateDemocracyReferendum
         const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._preimage = preimage;
-          this.title = formatCall(preimage);
+          if (!this.title) {
+            this.title = formatCall(preimage);
+          }
         }
         break;
       }
@@ -382,12 +434,9 @@ export class SubstrateDemocracyReferendum
   }
 
   // TRANSACTIONS
-  // TODO: allow the user to enter how much balance they want to vote with
   public async submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
     const conviction = convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index;
-
-    // fake the arg to compute balance
-    const balance = await (vote.account as SubstrateAccount).freeBalance;
+    const balance = this._Chain.coins(vote.amount, true);
 
     // "AccountVote" type, for kusama
     // we don't support "Split" votes right now
@@ -401,15 +450,7 @@ export class SubstrateDemocracyReferendum
       }
     };
 
-    // even though voting balance is specifiable, we pre-populate the voting balance as "all funds"
-    //   to align with old voting behavior -- we should change this soon.
-    // TODO: move this computation out into the view as needed, to prepopulate field
-    const fees = await this._Chain.computeFees(
-      vote.account.address,
-      (api: ApiPromise) => api.tx.democracy.vote(this.data.index, srmlVote)
-    );
-
-    srmlVote.Standard.balance = balance.sub(fees).toString();
+    srmlVote.Standard.balance = balance.toString();
 
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,

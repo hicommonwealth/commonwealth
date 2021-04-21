@@ -14,31 +14,51 @@ const log = factory.getLogger(formatFilename(__filename));
 // Otherwise, it defaults to returning them in order of ['created_at', 'DESC'] (following to /bulkMembers).
 
 const bulkAddresses = async (models, req, res, next) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
-  if (error) return next(new Error(error));
-
   const options = {
-    order: req.query.order ? [req.query.order] : [['created_at', 'DESC']],
+    order: [req.query.order
+      ? req.query.community
+        ? [models.Address, models.Role].concat([req.query.order])
+        : req.query.order
+      : req.query.community
+        ? [models.Address, models.Role, 'created_at', 'DESC']
+        : ['created_at', 'DESC']
+    ]
   };
 
   if (req.query.limit) options['limit'] = req.query.limit;
-  if (chain) options['where'] = { chain: req.query.chain };
-  const subStr = {
-    [Op.or]: [
-      { name: { [Op.iLike]: `%${req.query.searchTerm}%` } },
-      {
-        [Op.and]: [
-          { name: { [Op.ne]: null } },
-          { address: { [Op.iLike]: `%${req.query.searchTerm}%` } }
-        ]
-      }
-    ]
-  };
+
+  let chain; let community; let error;
+  if (req.query.chain || req.query.community) {
+    [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+    if (error) return next(new Error(error));
+    if (chain) options['where'] = { chain: req.query.chain };
+  }
+
   if (req.query.searchTerm?.length) {
+    const subStr = {
+      [Op.or]: [
+        { name: { [Op.iLike]: `%${req.query.searchTerm}%` } },
+        {
+          [Op.and]: [
+            { name: { [Op.ne]: null } },
+            { address: { [Op.iLike]: `%${req.query.searchTerm}%` } }
+          ]
+        }
+      ]
+    };
     options['where'] = options['where']
       ? Object.assign(options['where'], subStr)
       : subStr;
+    if (req.query.community) {
+      options['include'] = [{
+        model: models.Role,
+        where: { offchain_community_id: community.id },
+      }];
+    }
+    console.log(options);
+    console.log(options['include']);
   }
+
   const addresses = await models.Address.findAll(options);
   return res.json({ status: 'Success', result: addresses.map((p) => p.toJSON()) });
 };

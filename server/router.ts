@@ -13,6 +13,7 @@ import getHedgehogAuthentication from './routes/getHedgehogAuthentication';
 import createHedgehogUser from './routes/createHedgehogUser';
 
 import createAddress from './routes/createAddress';
+import linkExistingAddressToChain from './routes/linkExistingAddressToChain';
 import verifyAddress from './routes/verifyAddress';
 import deleteAddress from './routes/deleteAddress';
 import getAddressStatus from './routes/getAddressStatus';
@@ -33,6 +34,7 @@ import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
+import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 
@@ -124,6 +126,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   // TODO: Change to DELETE /address
   router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), deleteAddress.bind(this, models));
+  router.post('/linkExistingAddressToChain', linkExistingAddressToChain.bind(this, models));
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   // TODO: Change to PUT /node
   router.post('/selectNode', passport.authenticate('jwt', { session: false }), selectNode.bind(this, models));
@@ -140,6 +143,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // offchain communities
   router.post('/starCommunity', passport.authenticate('jwt', { session: false }), starCommunity.bind(this, models));
+  router.get('/getCommunitiesAndChains', getCommunitiesAndChains.bind(this, models));
 
   // offchain community admin routes
   // TODO: Change to POST /community

@@ -155,6 +155,11 @@ const send = async (models, content: WebhookContent) => {
     } else if (content.community) {
       // TODO:
       // if the community has a logo, show it as preview image
+      const offchainCommunity = await models.OffchainCommunity.findOne({ where: { id: content.community, privacyEnabled: false } });
+      if (offchainCommunity) {
+        previewImageUrl = `https://commonwealth.im${offchainCommunity.iconUrl}`;
+        previewAltText = offchainCommunity.name;
+      }
     }
   }
 

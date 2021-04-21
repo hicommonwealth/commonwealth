@@ -3,15 +3,39 @@
 .SearchPage {
     padding-bottom: 40px;
 
+    .sublayout-main-col {
+        padding: 0 5%;
+    }
+    .sublayout-sidebar-col {
+        display: none;
+    }
+
     .search-page-input {
         margin-top: 30px;
-    }
-    .search-loading {
     }
     .search-error {
         margin: 21px 0 8px;
     }
-    .search-results {
+    .cui-tabs {
+        .cui-tabs-item {
+            padding: 13px 15px 7px;
+            margin: 0 !important;
+            color: $text-color-light;
+        }
+        .cui-tabs-item.cui-active {
+            color: $text-color-black;
+            border-width: 2px;
+            border-style: solid;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
+            border-image: linear-gradient(to right, #6086d1, #b37dba) 1;
+            border-image: linear-gradient(to right, #6086d1, #b37dba) 1; /* FF3.6-15 */
+            border-image: linear-gradient(to right, #6086d1, #b37dba) 1; /* Chrome10-25,Safari5.1-6 */
+            border-image: linear-gradient(to right, #6086d1, #b37dba) 1; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        }
+    }
+    .search-results-wrapper {
         .search-results-caption {
             margin: 20px 0;
             color: $text-color-light;
@@ -19,48 +43,205 @@
                 margin-left: 10px;
             }
         }
-        .search-results-list {
-            a.search-results-item {
-                display: block;
-                padding: 13px 0;
-                color: $text-color-black;
+        .search-all-communities {
+            &:hover {
                 text-decoration: none;
+            }
+        }
+        .search-results-list {
+            .cui-list {
+                max-height: none !important;
+            }
+            .cui-list-item {
+                border-top: none;
+                border-bottom: none;
+                min-height: 100px;
                 &:hover {
                     background-color: $background-color-white-hover;
                 }
-            }
-            .search-results-thread-title {
-                font-weight: 500;
-            }
-            .search-results-thread-subtitle {
-                margin: 2px 0 3px;
-                .created-at {
-                    font-weight: 400;
-                    color: $text-color-light;
+                .cui-list-item-content-left {
+                    height: 100px;
+                    width: 50px;
+                    min-width: 50px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin-right: 4px;
                 }
-                .User {
-                    margin-left: 14px;
-                    font-weight: 400;
-                    color: $text-color-light;
+                .search-results-item {
+                    display: block;
+                    padding: 20px;
+                    color: $text-color-black;
+                    text-decoration: none;
+                    width: 100%;
+                    overflow: hidden;
+                    /* Member results */
+                    .user-block-name {
+                        opacity: 1;
+                        font-weight: 500;
+                        margin-bottom: 2px;
+                    }
+                    .user-block-address {
+                        font-size: 18px;
+                        margin-top: 2px;
+                        opacity: 1;
+                        color: $text-color-light;
+                        mark {
+                            background: $background-color-light;
+                            border-radius: 5px;
+                            color: black !important;
+                        }
+                    }
+                    /* Thread results */
+                    .search-results-thread-title {
+                        font-weight: 500;
+                    }
+                    .search-results-thread-subtitle {
+                        margin: 2px 0 3px;
+                        .created-at {
+                            font-weight: 400;
+                            color: $text-color-light;
+                        }
+                        .User {
+                            margin-left: 14px;
+                            font-weight: 400;
+                            color: $text-color-light;
+                        }
+                    }
+                    .search-results-thread-body {
+                        color: $text-color-light;
+                    }
+                    .search-results-comment {
+                        color: $text-color-light;
+                    }
+                    .search-results-thread-body,
+                    .search-results-comment {
+                        mark {
+                            background: $background-color-light;
+                            padding: 5px 2px 0;
+                            margin: 0 3px;
+                            border-radius: 5px;
+                        }
+                    }
+                    &.token-result {
+                        display: flex;
+                        align-items: center;
+                        width: 100%;
+                        img {
+                            margin-right: 13px;
+                        }
+                    }
+                }
+                .search-results-item:hover {
+                    cursor: pointer;
                 }
             }
-            .search-results-item:hover {
-                cursor: pointer;
+        }
+    }
+}
+
+.SearchBar {
+    margin: 0 50px 0 50px;
+    padding: 0 1px;
+    flex: 6;
+    position: relative;
+    .cui-input {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        border-radius: 25px;
+        font-size: 14px;
+        color: black;
+        border: 1px solid transparent;
+        svg {
+            z-index: 2;
+            position: relative;
+            left: 30px;
+            margin-left: -15px;
+            fill: url(#paint0_linear);
+        }
+        &:focus-within {
+            background: linear-gradient(to bottom, #91ACE1, #DDBFE1);
+            // box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        input {
+            height: 34px;
+            position: relative;
+            background: #EFEFEF;
+            border: 1px solid white;
+            &:focus {
+                border: none !important;
             }
-            .search-results-thread-body {
-                color: $text-color-light;
-            }
-            .search-results-comment {
-                color: $text-color-light;
-            }
-            .search-results-thread-body,
-            .search-results-comment {
+        }
+    }
+    .cui-list {
+        position: absolute;
+        z-index: 10;
+        top: 40px;
+        left: 3%;
+        border-radius: 0 0 4px 4px;
+        box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.15);
+        width: 94%;
+        padding: 20px;
+        overflow-y: visible;
+        .cui-list-item {
+            border-bottom: none;
+            padding: 2px !important;
+            .search-results-item {
+                color: $text-color-black;
+                text-decoration: none;
+                font-size: 14px;
+                overflow: hidden;
+                .search-results-thread-title {
+                    font-weight: 500;
+                }
                 mark {
-                    background: $background-color-light;
-                    padding: 5px 2px 0;
-                    margin: 0 3px;
-                    border-radius: 5px;
+                    background-color: #CFCBFF;
+                    padding: 2px 2px 0 2px;
                 }
+            }
+            &.disabled, &.no-results {
+                font-weight: 500;
+                font-size: 12px;
+                line-height: 14px;
+                text-transform: uppercase;
+                color: #AAAAAA;
+                margin-top: 18px;
+                &:first-child {
+                    margin-top: 0px;
+                }
+                &:hover {
+                    background: white;
+                }
+            }
+            &.disabled {
+                &:hover {
+                    cursor: default;
+                }
+            }
+            &.no-results {
+                display: flex;
+                justify-content: space-between;
+                b {
+                    width: 50%;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+                span {
+                    width: 50%;
+                    color: $primary-bg-color;
+                    text-align: right;
+                }
+            }
+        }
+        .UserBlock {
+            .user-block-left {
+                display: flex;
+                align-items: center;
+            }
+            .user-block-right {
+                display: none;
             }
         }
     }

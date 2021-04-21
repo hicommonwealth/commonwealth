@@ -2,7 +2,7 @@ import 'layout.scss';
 
 import m from 'mithril';
 
-import { initChain, initCommunity, deinitChainOrCommunity, selectNode } from 'app';
+import { initChain, initCommunity, initTemporaryTokenChain, deinitChainOrCommunity, selectNode } from 'app';
 import app from 'state';
 
 import Sublayout from 'views/sublayout';
@@ -37,6 +37,11 @@ export const Layout: m.Component<{
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
     const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
+    //Is Ethereum Address
+    function isEthereumAddress(name : string) {
+      return name.startsWith("0x") && name.length==42
+    }
+
     if (app.loadingError) {
       return m('.Layout.mithril-app', [
         m(Sublayout, { errorLayout: [
@@ -49,7 +54,11 @@ export const Layout: m.Component<{
     } else if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
       return m(LoadingLayout, { hideSidebar });
-    } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity) {
+    } else if (scope && isEthereumAddress(scope) && scope !== vnode.state.loadingScope) {
+      vnode.state.loadingScope = scope;
+      initTemporaryTokenChain(scope);
+      return m(LoadingLayout, { hideSidebar });
+    } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity && !isEthereumAddress(scope)) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return m('.Layout.mithril-app', [

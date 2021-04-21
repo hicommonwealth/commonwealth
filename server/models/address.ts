@@ -74,6 +74,14 @@ export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAt
     keytype?: string
   ) => Promise<AddressInstance>;
 
+  updateWithTokenProvided?: (
+    address: AddressInstance,
+    user_id: number,
+    keytype?: string,
+    verification_token?: string,
+    verification_token_expires?: Date
+  ) => Promise<AddressInstance>;
+
   verifySignature?: (
     models: Sequelize.Models,
     chain: ChainInstance,
@@ -162,6 +170,23 @@ export default (
     return address.save();
   };
 
+  // Update an existing address' verification token with provided one
+  Address.updateWithTokenProvided = (
+    address: AddressInstance,
+    user_id: number,
+    keytype?: string,
+    verification_token?: string,
+    verification_token_expires?: Date
+  ): Promise<AddressInstance> => {
+    address.user_id = user_id;
+    address.keytype = keytype;
+    address.verification_token = verification_token;
+    address.verification_token_expires = verification_token_expires;
+    address.last_active = new Date();
+
+    return address.save();
+  };
+
   // Verify an address' verification token. Requires some data to be
   // passed from the frontend to show exactly what was signed.
   // Supports Substrate, Ethereum, Cosmos, and NEAR.
@@ -233,7 +258,13 @@ export default (
       } else {
         isValid = false;
       }
-    } else if (chain.base === 'ethereum') {
+    } else if (chain.network === 'ethereum'
+      || chain.network === 'moloch'
+      || chain.network === 'alex'
+      || chain.network === 'metacartel'
+      || chain.network === 'commonwealth'
+      || chain.type === "token"
+    ) {
       //
       // ethereum address handling
       //

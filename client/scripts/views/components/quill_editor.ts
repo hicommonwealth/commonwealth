@@ -1,6 +1,6 @@
 import 'components/quill_editor.scss';
 
-import m, { VnodeDOM } from 'mithril';
+import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment-twitter';
@@ -13,11 +13,11 @@ import QuillMention from 'quill-mention';
 
 import app from 'state';
 import { loadScript } from 'helpers';
+import { searchMentionableAddresses } from 'helpers/search';
 import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
-import { Profile, RolePermission } from 'models';
-import User from 'views/components/widgets/user';
+import { Profile } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PreviewModal from 'views/modals/preview_modal';
 
@@ -255,20 +255,6 @@ const instantiateEditor = (
   Quill.register('formats/twitter', TwitterBlot, true);
   Quill.register('formats/video', VideoBlot, true);
 
-  const searchMentionableAddresses = async (searchTerm: string) => {
-    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-      limit: 6,
-      searchTerm,
-      order: ['name', 'ASC']
-    });
-    if (response.status !== 'Success') {
-      throw new Error(`got unsuccessful status: ${response.status}`);
-    }
-    return response.result;
-  };
-
   const queryMentions = async (searchTerm, renderList, mentionChar) => {
     if (mentionChar !== '@') return;
     // Optional code for tagging roles:
@@ -290,7 +276,7 @@ const instantiateEditor = (
       }];
       renderList(formattedMatches, searchTerm);
     } else if (searchTerm.length > 0) {
-      members = await searchMentionableAddresses(searchTerm);
+      members = await searchMentionableAddresses(searchTerm, { resultSize: 6 });
       formattedMatches = members.map((addr) => {
         const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
         const node = document.createElement('div');
@@ -515,13 +501,14 @@ const instantiateEditor = (
 
   const createSpinner = () => {
     const ele = document.createElement('div');
+    ele.classList.add('cui-spinner');
+    ele.classList.add('cui-spinner-active');
+    ele.classList.add('cui-spinner-fill');
     ele.classList.add('spinner-wrap');
-    ele.classList.add('img-spinner');
     const firstChild = document.createElement('div');
-    const secondChild = document.createElement('span');
-    firstChild.innerText = 'Uploading';
-    secondChild.classList.add('icon-spinner2');
-    secondChild.classList.add('animate-spin');
+    const secondChild = document.createElement('div');
+    firstChild.classList.add('cui-spinner-content');
+    secondChild.classList.add('cui-spinner-icon');
     firstChild.appendChild(secondChild);
     ele.appendChild(firstChild);
     return ele;
@@ -573,27 +560,40 @@ const instantiateEditor = (
           reject(new Error(`Upload failed: ${err}`));
         });
       }).catch((err : any) => {
+        document.getElementsByClassName('spinner-wrap')[0].remove();
         err = err.responseJSON ? err.responseJSON.error : err.responseText;
         reject(new Error(`Failed to get an S3 signed upload URL: ${err}`));
       });
     });
   };
 
+  // handle drag-and-drop and paste events
   const imageHandler = async (imageDataUrl, type) => {
     if (!type) type = 'image/png';
 
-    // HACK: remove base64 format image, since an uploaded one will be inserted
-    quill.deleteText(quill.getSelection().index - 1, 1);
+    // filter out base64 format images from Quill
+    const contents = quill.getContents();
+    const indexesToFilter = [];
+    contents.ops.forEach((op, index) => {
+      if (op.insert?.image?.startsWith('data:image/jpeg;base64')
+          || op.insert?.image?.startsWith('data:image/gif;base64')
+          || op.insert?.image?.startsWith('data:image/png;base64')) indexesToFilter.push(index);
+    });
+    contents.ops = contents.ops.filter((op, index) => indexesToFilter.indexOf(index) === -1);
+    quill.setContents(contents.ops); // must set contents to contents.ops for some reason
 
     const file = dataURLtoFile(imageDataUrl, type);
+    quill.enable(false);
     uploadImg(file).then((response) => {
+      quill.enable(true);
       if (typeof response === 'string' && detectURL(response)) {
         const index = (quill.getSelection() || {}).index || quill.getLength();
         if (index) quill.insertEmbed(index, 'image', response, 'user');
       }
     }).catch((err) => {
-      notifyError('Failed to upload image');
+      notifyError('Failed to upload image. Was it a valid JPG, PNG, or GIF?');
       console.log(err);
+      quill.enable(true);
     });
   };
 
@@ -833,6 +833,7 @@ const instantiateEditor = (
       if (quill.isEnabled()) {
         // Save the entire updated text to localStorage
         const data = JSON.stringify(quill.getContents());
+        console.log(quill.getContents());
         localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, data);
         state.unsavedChanges = new Delta();
       }

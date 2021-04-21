@@ -11,7 +11,6 @@ import NewThreadModal from 'views/modals/new_thread_modal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import Token from 'controllers/chain/ethereum/token/adapter';
-import { CandidacyButton, CollectiveVotingButton, getCouncilCandidates } from '../pages/council';
 
 const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
   const activeAccount = app.user.activeAccount;
@@ -48,22 +47,17 @@ const getNewProposalMenu = (candidates: Array<[SubstrateAccount, number]>) => {
         }),
         label: 'New council motion'
       }),
-      candidates
-        && [
-          m(MenuDivider),
-          m(CollectiveVotingButton, { candidates, menuStyle: true }),
-          m(CandidacyButton, { candidates, menuStyle: true }),
-        ]
+      m(MenuItem, {
+        onclick: (e) => m.route.set(`/${app.chain.id}/new/proposal/:type`, {
+          type: ProposalType.SubstrateBountyProposal,
+        }),
+        label: 'New bounty proposal'
+      }),
     ],
   ];
 };
 
 export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
-  oninit: (vnode) => {
-    if (app.chain && m.route.get().includes('council')) {
-      vnode.state.councilCandidates = getCouncilCandidates();
-    }
-  },
   view: (vnode) => {
     return m('.NewProposalButton.MobileNewProposalButton', [
       m(PopoverMenu, {
@@ -107,7 +101,7 @@ const NewProposalButton: m.Component<{
         label: 'New thread',
         fluid,
         disabled: !app.user.activeAccount
-          || !app.activeCommunityId() && ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+       ,//   || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }
@@ -122,7 +116,8 @@ const NewProposalButton: m.Component<{
         hasArrow: false,
         trigger: m(Button, {
           disabled: !app.user.activeAccount
-            || ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
+            // TODO, figure this out and change it back
+            ,//|| ((app.chain as Token).isToken && !(app.chain as Token).hasToken),
           label: 'New thread',
         }),
         position: 'bottom-end',

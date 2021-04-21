@@ -19,7 +19,7 @@ const ConvictionsChooser: m.Component<{ callback: (number) => void }, {}> = {
       defaultValue: convictions()[0].toString(),
       options: convictions().map((c) => ({
         value: c.toString(),
-        label: `${convictionToWeight(c)}x weight (${convictionToLocktime(c)}x lock)`,
+        label: `${convictionToWeight(c)}x weight (locked for ${convictionToLocktime(c)}x enactment period)`,
       })),
       onSelect: (option) => {
         vnode.attrs.callback(parseInt((option as any).value, 10));

@@ -24,10 +24,11 @@ class ChainInfo {
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
+  public type: string;
 
   constructor(
     id, network, symbol, name, iconUrl, description, website, discord, element, telegram, github,
-    blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?, base?
+    blockExplorerIds, collapsedOnHomepage, featuredTopics, topics, adminsAndMods?, base?, type?
   ) {
     this.id = id;
     this.network = network;
@@ -46,6 +47,7 @@ class ChainInfo {
     this.featuredTopics = featuredTopics || [];
     this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
+    this.type = type;
   }
 
   public static fromJSON(json) {
@@ -73,6 +75,7 @@ class ChainInfo {
       json.topics,
       json.adminsAndMods,
       json.base,
+      json.type,
     );
   }
 

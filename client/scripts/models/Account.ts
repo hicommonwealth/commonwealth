@@ -103,6 +103,7 @@ abstract class Account<C extends Coin> {
       const params : any = {
         address: this.address,
         chain: this.chain.id,
+        isToken: this.chain.type === "token",
         jwt: this.app.user.jwt,
         signature,
       };

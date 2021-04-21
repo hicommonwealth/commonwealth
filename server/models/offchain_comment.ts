@@ -61,6 +61,11 @@ export default (
       { fields: ['id'] },
       { fields: ['chain', 'root_id'] },
       { fields: ['address_id'] },
+      { fields: ['chain', 'created_at'] },
+      { fields: ['community', 'created_at'] },
+      { fields: ['chain', 'updated_at'] },
+      { fields: ['community', 'updated_at'] },
+      { fields: ['root_id'] },
     ],
   });
 

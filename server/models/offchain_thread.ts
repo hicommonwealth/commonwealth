@@ -71,6 +71,12 @@ export default (
       { fields: ['address_id'] },
       { fields: ['chain'] },
       { fields: ['community'] },
+      { fields: ['chain', 'created_at'] },
+      { fields: ['community', 'created_at'] },
+      { fields: ['chain', 'updated_at'] },
+      { fields: ['community', 'updated_at'] },
+      { fields: ['chain', 'pinned'] },
+      { fields: ['community', 'pinned'] },
     ],
   });
 

@@ -19,7 +19,7 @@ const PageNotFound: m.Component<{ title?: string, message?: string }> = {
       m('.page-not-found-container', [
         m(EmptyState, {
           class: 'PageNotFound',
-          icon: Icons.MINUS_CIRCLE,
+          icon: Icons.HELP_CIRCLE,
           header: 'Page not found',
           content: message
             || 'This page may not be visible to the public. If it belongs to a private thread, try logging in.'

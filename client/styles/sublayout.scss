@@ -13,13 +13,17 @@
         @include xs-max {
             padding: 0 $layout-padding-xs;
         }
+        &.flex-center {
+            display: flex;
+            justify-content: center;
+        }
     }
     .sublayout-sidebar-col {
         flex: 1;
         padding-right: 30px;
         max-width: $sidebar-width;
         .Sidebar {
-            max-width: 180px; // sidebar button width
+            max-width: 190px; // sidebar button width
         }
     }
     @include sm-max {
@@ -82,8 +86,12 @@
         }
 
         .sublayout-header-left {
+            display: flex;
+            align-items: center;
+            margin-top: 0 !important;
             flex: 3;
             white-space: nowrap;
+            max-width: min-content;
             > .ChainIcon,
             > .CommunityIcon {
                 display: inline-block;
@@ -120,10 +128,19 @@
                     line-height: 1.1;
                     margin: -1px 0;
                 }
+                .cui-icon {
+                    position: relative;
+                    top: -1px;
+                    &::before {
+                        content: ' ';
+                        width: 5px;
+                    }
+                }
             }
         }
         .sublayout-header-right {
             display: flex;
+            align-items: center;
             flex: 1;
             text-align: right;
             flex-direction: row-reverse;
@@ -137,5 +154,13 @@
         position: relative;
         min-height: calc(100vh - 140px);
         padding: 1px 0; // prevent margins from flowing outside the container
+    }
+    .token-banner {
+        padding: 8px 0 2px;
+        background: $background-color-white-hover;
+        color: $text-color-darker;
+        text-align: center;
+    }
+    .token-banner-content {
     }
 }

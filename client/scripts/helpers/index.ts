@@ -12,7 +12,7 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   if (stage === OffchainThreadStage.Discussion) {
     return 'Discussion';
   } else if (stage === OffchainThreadStage.ProposalInReview) {
-    return 'Gathering Comments';
+    return 'Preparing for Voting';
   } else if (stage === OffchainThreadStage.Voting) {
     return 'Voting';
   } else if (stage === OffchainThreadStage.Passed) {
@@ -64,14 +64,20 @@ export function externalLink(selector, target, children) {
   }, children);
 }
 
-export function link(selector: string, target: string, children, extraAttrs?: object) {
+export function link(selector: string, target: string, children, extraAttrs?: object, saveScrollPositionAs?: string) {
   const attrs = {
     href: target,
     onclick: (e) => {
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
       if (e.target.target === '_blank') return;
+
       e.preventDefault();
       e.stopPropagation();
+
+      if (saveScrollPositionAs) {
+        localStorage[saveScrollPositionAs] = window.scrollY;
+      }
+
       if (window.location.href.split('?')[0] === target.split('?')[0]) {
         m.route.set(target, {}, { replace: true });
       } else {
@@ -99,22 +105,6 @@ export function removeUrlPrefix(url) {
 /*
  * icons
  */
-export function featherIcon(icon, size, stroke, color) {
-  return m('svg.feather-icon', {
-    'width': size,
-    'height': size,
-    'fill': 'none',
-    'stroke': color,
-    'stroke-width': stroke,
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
-  }, [
-    m('use', {
-      'xlink:href': `/static/img/feather-sprite.svg#${icon}`
-    }),
-  ]);
-}
-
 export const SwitchIcon = {
   view: (vnode) => {
     return m('svg.SwitchIcon', {
@@ -138,19 +128,6 @@ export const SwitchIcon = {
       ]),
     ]);
   }
-};
-
-export const symbols = {
-  times: '\u00d7',
-  middot: '\u00b7',
-  checkmark: '\u2714',
-  rsaquo: '\u203a',
-  lsaquo: '\u2039',
-  raquo: '\u00bb',
-  laquo: '\u00ab',
-  copy: '\u00a9',
-  exclamation: '\u26a0\ufe0f',
-  triangle: '\u25be',
 };
 
 /*
@@ -216,17 +193,12 @@ export function formatAsTitleCase(str: string) {
 
 export function formatLastUpdated(timestamp) {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
-  if (timestamp.isBefore(moment().subtract(30, 'days'))) return timestamp.format('MMM D');
   const formatted = timestamp.fromNow(true);
-  if (formatted.indexOf(' month') !== -1) {
-    return timestamp.format('MMM D');
-  } else {
-    return `${formatted
+  return `${formatted
       .replace(' days', 'd')
       .replace(' day', 'd')
       .replace(' hours', 'h')
       .replace(' hour', 'h')} ago`;
-  }
 }
 
 // duplicated in adapters/currency.ts

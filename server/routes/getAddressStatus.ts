@@ -16,20 +16,22 @@ const getAddress = async (models, req: Request, res: Response, next: NextFunctio
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
   }
+
+  const chainName = req.body.chain.startsWith("0x") ? "ethereum" : req.body.chain;
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
+    where: { id: chainName }
   });
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
 
   const existingAddress = await models.Address.findOne({
-    where: { chain: req.body.chain, address: req.body.address, verified: { [Op.ne]: null } }
+    where: { chain: chainName, address: req.body.address, verified: { [Op.ne]: null } }
   });
 
   let result;
   if (existingAddress) {
-    const belongsToUser = req.user && (existingAddress.user_id === req.user.id);
+    const belongsToUser = req.user && (existingAddress.user_id === req.user.id) ;
     result = {
       exists: true,
       belongsToUser
