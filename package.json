@@ -170,7 +170,6 @@
     "source-map": "^0.7.3",
     "style-loader": "^0.23.1",
     "superagent": "^5.2.2",
-    "telegraf": "^4.3.0",
     "tendermint": "^5.0.2",
     "throttled-queue": "^1.0.7",
     "ts-loader": "^6.2.0",
