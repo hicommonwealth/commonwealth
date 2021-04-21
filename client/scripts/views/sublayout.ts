@@ -13,7 +13,6 @@ import Sidebar from 'views/components/sidebar';
 import MobileSidebarHeader from 'views/components/sidebar/mobile';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import Token from 'controllers/chain/ethereum/token/adapter';
-
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 

@@ -14,11 +14,15 @@ module.exports = {
           400: '#A6A6B1',
           800: '#333236',
           900: '#29282D',
+          500: '#000000',
+          300: '#F6F6F6',
+          700: '#F9FAFE',
         },
       },
       container: {
         padding: '1rem',
         screens: {
+          xs: '375px',
           xl: '1140px',
         },
       },
@@ -57,8 +61,8 @@ module.exports = {
         '5xl': '2.50rem',
       },
       backgroundImage: (theme) => ({
-        'geometric-pattern': "url('/static/assets/img/bg.png')",
-        footer: "url('/static/assets/img/footer.png')",
+        'geometric-pattern': "url('/static/img/bg.png')",
+        footer: "url('/static/img/footer.png')",
       }),
     },
   },
