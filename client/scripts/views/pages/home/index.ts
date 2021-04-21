@@ -5,7 +5,6 @@ import m from 'mithril';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import CommunityCards from './community_cards';
-import Search from './search';
 
 const Homepage: m.Component<{}, {}> = {
   oncreate: (vnode) => {
@@ -37,7 +36,6 @@ const Homepage: m.Component<{}, {}> = {
         ]),
       ]),
     }, [
-      m(Search),
       m(CommunityCards),
     ]);
   }
