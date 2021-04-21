@@ -7,7 +7,6 @@ import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
 import { getForumNotificationCopy } from '../shared/notificationFormatter';
 import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from './config';
-import { response } from 'express';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -170,7 +169,6 @@ const send = async (models, content: WebhookContent) => {
   await Promise.all(chainOrCommwebhookUrls
     .filter((url) => !!url)
     .map(async (url) => {
-      console.log(url)
       let webhookData;
       if (url.indexOf('slack.com') !== -1) {
         // slack webhook format (stringified JSON)
@@ -251,18 +249,11 @@ const send = async (models, content: WebhookContent) => {
         };
       } else if (url.indexOf('telegram.org') !== -1) {
         const getUpdatesUrl = url.split('/@').slice(0, -1).join('@');
-        console.log('This is the URL link',getUpdatesUrl)
-        console.log('This is the chat username')
 
         var getChatUsername = url.split("/@");
         getChatUsername = '@'+getChatUsername[1];
-        console.log("This is the chat username", getChatUsername)
 
         url = getUpdatesUrl+'/sendMessage'
-        console.log("This is the new URL link", url)
-
-        // const response = await request.get(getChat)
-        // console.log(response)
 
         webhookData = isChainEvent ? {
           chat_id: getChatUsername,
