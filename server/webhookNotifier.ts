@@ -87,7 +87,7 @@ const send = async (models, content: WebhookContent) => {
   try {
     address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
   } catch (err) {
-    console.log("There's no address")
+    // pass nothing if no matching address is found
   }
 
   // if a community is passed with the content, we know that it is from an offchain community
@@ -250,8 +250,8 @@ const send = async (models, content: WebhookContent) => {
       } else if (url.indexOf('telegram.org') !== -1) {
         const getUpdatesUrl = url.split('/@').slice(0, -1).join('@');
 
-        var getChatUsername = url.split("/@");
-        getChatUsername = '@'+getChatUsername[1];
+        let getChatUsername = url.split('/@');
+        getChatUsername = '@' + getChatUsername[1];
 
         url = getUpdatesUrl+'/sendMessage'
 
@@ -289,7 +289,11 @@ const send = async (models, content: WebhookContent) => {
         return;
       }
       try {
-         await request.post(url).send(webhookData);
+        if (process.env.NODE_ENV === 'production' || (SLACK_FEEDBACK_WEBHOOK && url === SLACK_FEEDBACK_WEBHOOK)) {
+          await request.post(url).send(webhookData);
+        } else {
+          console.log('Suppressed webhook notification to', url);
+        }
       } catch (err) {
         console.error(err);
       }
