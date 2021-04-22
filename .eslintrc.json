@@ -20,6 +20,8 @@
     }
   },
   "rules": {
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/camelcase": "off",
     "import/extensions": "off",
     "import/no-unresolved": "off",
     "import/no-cycle": "off",

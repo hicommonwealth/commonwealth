@@ -13,26 +13,38 @@ const Tabs = {
     }
     if (vnode.state.selectedIndex === undefined) {
       // tslint:disable-next-line:no-string-literal
-      const defaultSelectedIndex = _.findIndex(vnode.children, (c) => c['selected']);
-      vnode.state.selectedIndex = defaultSelectedIndex === -1 ? 0 : defaultSelectedIndex;
+      const defaultSelectedIndex = _.findIndex(
+        vnode.children,
+        (c) => c['selected']
+      );
+      vnode.state.selectedIndex =
+        defaultSelectedIndex === -1 ? 0 : defaultSelectedIndex;
     }
     const names = vnode.children.map((t) => t.name);
     return m('.Tabs', [
       m('.tab-bar', [
         names.map((name, index) => {
-          return m('a.tab-entry', {
-            class: (vnode.state.selectedIndex === index ? 'active' : '')
-              + (vnode.children[index].disabled ? ' disabled' : ''),
-            href: '#',
-            onclick: ((i, e) => { e.preventDefault(); vnode.state.selectedIndex = i; }).bind(this, index)
-          }, name);
+          return m(
+            'a.tab-entry',
+            {
+              class:
+                (vnode.state.selectedIndex === index ? 'active' : '') +
+                (vnode.children[index].disabled ? ' disabled' : ''),
+              href: '#',
+              onclick: ((i, e) => {
+                e.preventDefault();
+                vnode.state.selectedIndex = i;
+              }).bind(this, index),
+            },
+            name
+          );
         }),
         m('.clear'),
       ]),
       m('.tab-content', vnode.children[vnode.state.selectedIndex].content),
       m('.clear'),
     ]);
-  }
+  },
 };
 
 export default Tabs;
