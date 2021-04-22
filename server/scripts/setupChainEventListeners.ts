@@ -127,6 +127,7 @@ const setupChainEventListeners = async (
         SubstrateTypes.EventKind.Reward,
         SubstrateTypes.EventKind.TreasuryRewardMinting,
         SubstrateTypes.EventKind.TreasuryRewardMintingV2,
+        SubstrateTypes.EventKind.HeartbeatReceived,
       ];
 
       const handlers = generateHandlers(node, { excludedEvents });
