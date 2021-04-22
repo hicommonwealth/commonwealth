@@ -371,6 +371,7 @@ const SearchBar : m.Component<{}, {
   searchTerm: string,
   errorText: string,
   focused: boolean,
+  inputTimeout: any,
 }> = {
   view: (vnode) => {
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
@@ -378,12 +379,10 @@ const SearchBar : m.Component<{}, {
     const { results, searchTerm } = vnode.state;
     const showDropdownPreview = !m.route.get().includes('/search?q=');
     const searchResults = (results?.length === 0)
-      ? (app.searchCache[searchTerm].loaded || searchTerm.length > 5)
+      ? (app.searchCache[searchTerm].loaded)
         ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
         : m(List, m(ListItem, { label: m(Spinner, { active: true }) }))
       : m(List, results);
-
-    console.log(app.searchCache);
 
     return m(ControlGroup, {
       class: 'SearchBar'
@@ -408,11 +407,15 @@ const SearchBar : m.Component<{}, {
             app.searchCache[vnode.state.searchTerm] = { loaded: false };
           }
           if (e.target.value?.length > 3) {
-            const params: SearchParams = {};
-            params['isSearchPreview'] = true;
-            params['communityScope'] = app.activeCommunityId();
-            params['chainScope'] = app.activeChainId();
-            _.debounce(() => search(vnode.state.searchTerm, params, vnode.state), 200)();
+            const params: SearchParams = {
+              isSearchPreview: true,
+              communityScope: app.activeCommunityId(),
+              chainScope: app.activeChainId()
+            };
+            clearTimeout(vnode.state.inputTimeout);
+            vnode.state.inputTimeout = setTimeout(() => {
+              return search(vnode.state.searchTerm, params, vnode.state);
+            }, 650);
           }
         },
         onkeyup: (e) => {
