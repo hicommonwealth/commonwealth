@@ -1,22 +1,33 @@
 import chai from 'chai';
+
 import { EventKind, RawEvent, Api } from '../../../src/moloch/types';
 import { Enrich } from '../../../src/moloch/filters/enricher';
 
 const { assert } = chai;
 
-const constructEvent = (data: object, section = '', typeDef: string[] = []): RawEvent => {
+const constructEvent = (data): RawEvent => {
   return {
     args: data,
   } as RawEvent;
 };
 
 const blockNumber = 10000;
-const api: Api = {
-  proposalQueue: async (n) => ({ startingPeriod: '1', details: 'hello', yesVotes: '5', noVotes: '4' }),
+const api: Api = ({
+  proposalQueue: async () => ({
+    startingPeriod: '1',
+    details: 'hello',
+    yesVotes: '5',
+    noVotes: '4',
+  }),
   periodDuration: async () => '2',
   summoningTime: async () => '0',
-  members: async (addr) => ({ delegateKey: addr, shares: '10', exists: true, highestIndexYesVote: 1 }),
-} as unknown as Api;
+  members: async (addr: string) => ({
+    delegateKey: addr,
+    shares: '10',
+    exists: true,
+    highestIndexYesVote: 1,
+  }),
+} as unknown) as Api;
 
 const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
 
@@ -34,7 +45,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
     const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ 'member' ],
+      excludeAddresses: ['member'],
       data: {
         kind,
         proposalIndex: 1,
@@ -45,7 +56,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
         sharesRequested: '6',
         details: 'hello',
         startTime: 2,
-      }
+      },
     });
   });
 
@@ -60,7 +71,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
     const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ 'member' ],
+      excludeAddresses: ['member'],
       data: {
         kind,
         proposalIndex: 1,
@@ -69,7 +80,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
         vote: 1,
         shares: '10',
         highestIndexYesVote: 1,
-      }
+      },
     });
   });
 
@@ -98,7 +109,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
         didPass: true,
         yesVotes: '5',
         noVotes: '4',
-      }
+      },
     });
   });
 
@@ -111,12 +122,12 @@ describe('Moloch Event Enricher Filter Tests', () => {
     const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ 'member' ],
+      excludeAddresses: ['member'],
       data: {
         kind,
         member: 'member',
         sharesToBurn: '10',
-      }
+      },
     });
   });
 
@@ -129,12 +140,12 @@ describe('Moloch Event Enricher Filter Tests', () => {
     const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ 'applicant' ],
+      excludeAddresses: ['applicant'],
       data: {
         kind,
         proposalIndex: 1,
         applicant: 'applicant',
-      }
+      },
     });
   });
 
@@ -147,12 +158,12 @@ describe('Moloch Event Enricher Filter Tests', () => {
     const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      includeAddresses: [ 'new-delegate' ],
+      includeAddresses: ['new-delegate'],
       data: {
         kind,
         member: 'member',
         newDelegateKey: 'new-delegate',
-      }
+      },
     });
   });
 
@@ -169,7 +180,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
         kind,
         summoner: 'summoner',
         shares: '5',
-      }
+      },
     });
   });
 });

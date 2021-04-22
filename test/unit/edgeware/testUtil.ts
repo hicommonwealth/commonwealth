@@ -1,31 +1,36 @@
+/* eslint-disable func-names */
 /* eslint-disable dot-notation */
 import { ApiPromise } from '@polkadot/api';
 import { Option } from '@polkadot/types';
 import { IdentityJudgement, AccountVote } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
+
 import { IdentityJudgement as JudgementEnum } from '../../../src/substrate/types';
 
 export function constructOption<T extends Codec>(value?: T): Option<T> {
   if (value) {
-    return {
+    return ({
       isSome: true,
       isNone: false,
       isEmpty: false,
       value,
       unwrap: () => value,
-    } as unknown as Option<T>;
-  } else {
-    return {
-      isSome: false,
-      isNone: true,
-      isEmpty: true,
-      value: undefined,
-      unwrap: () => { throw new Error('option is null'); }
-    } as unknown as Option<T>;
+    } as unknown) as Option<T>;
   }
+  return ({
+    isSome: false,
+    isNone: true,
+    isEmpty: true,
+    value: undefined,
+    unwrap: () => {
+      throw new Error('option is null');
+    },
+  } as unknown) as Option<T>;
 }
 
-export function constructIdentityJudgement(j: JudgementEnum): IdentityJudgement {
+export function constructIdentityJudgement(
+  j: JudgementEnum
+): IdentityJudgement {
   const obj = {
     isUnknown: false,
     isFeePaid: false,
@@ -57,90 +62,120 @@ export function constructIdentityJudgement(j: JudgementEnum): IdentityJudgement 
     case JudgementEnum.Erroneous:
       obj.isErroneous = true;
       break;
+    default:
+      break;
   }
-  return obj as unknown as IdentityJudgement;
+  return (obj as unknown) as IdentityJudgement;
 }
 
 export function constructAccountVote(
   isAye: boolean,
   conviction: number,
   balance: string,
-  isSplit = false,
+  isSplit = false
 ): AccountVote {
   if (isSplit) {
     return { isSplit: true, asSplit: {}, isStandard: false } as AccountVote;
-  } else {
-    return {
-      isSplit: false,
-      isStandard: true,
-      asStandard: {
-        balance,
-        vote: {
-          isAye,
-          isNay: !isAye,
-          conviction: {
-            index: conviction,
-          }
-        }
-      }
-    } as unknown as AccountVote;
   }
+  return ({
+    isSplit: false,
+    isStandard: true,
+    asStandard: {
+      balance,
+      vote: {
+        isAye,
+        isNay: !isAye,
+        conviction: {
+          index: conviction,
+        },
+      },
+    },
+  } as unknown) as AccountVote;
 }
 
-export function constructFakeApi(
-  callOverrides: { [name: string]: (...args: any[]) => Promise<any> }
-): ApiPromise {
+export function constructFakeApi(callOverrides: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [name: string]: (...args: any[]) => Promise<any>;
+}): ApiPromise {
   // TODO: auto-multi everything here
-  const identityOf = function (...args) { return callOverrides['identityOf'](...args); };
+  const identityOf = function (...args) {
+    return callOverrides['identityOf'](...args);
+  };
   identityOf.multi = callOverrides['identityOfMulti'];
 
-  const blockHash = function (...args) { return callOverrides['blockHash'](...args); };
+  const blockHash = function (...args) {
+    return callOverrides['blockHash'](...args);
+  };
   blockHash.multi = callOverrides['blockHash.multi'];
 
-  const events = function (...args) { return callOverrides['events'](...args); };
+  const events = function (...args) {
+    return callOverrides['events'](...args);
+  };
   events.at = callOverrides['events.at'];
-  
-  const currentIndex = function (...args) { return callOverrides['currentIndex'](...args); };
+
+  const currentIndex = function (...args) {
+    return callOverrides['currentIndex'](...args);
+  };
   currentIndex.at = callOverrides['currentIndex.at'];
 
-  const validators = function (...args) { return callOverrides['validators'](...args); };
+  const validators = function (...args) {
+    return callOverrides['validators'](...args);
+  };
   validators.at = callOverrides['validators.at'];
   validators.keysAt = callOverrides['validators.keysAt'];
 
-  const bonded = function (...args) { return callOverrides['bonded'](...args); };
+  const bonded = function (...args) {
+    return callOverrides['bonded'](...args);
+  };
   bonded.at = callOverrides['bonded.at'];
 
-  const stakers = function (...args) { return callOverrides['stakers'](...args); };
+  const stakers = function (...args) {
+    return callOverrides['stakers'](...args);
+  };
   stakers.at = callOverrides['stakers.at'];
   stakers.keysAt = callOverrides['stakers.keysAt'];
 
-  const currentEra = function (...args) { return callOverrides['currentEra'](...args); };
+  const currentEra = function (...args) {
+    return callOverrides['currentEra'](...args);
+  };
   currentEra.at = callOverrides['currentEra.at'];
 
-
-  const erasRewardPoints = function (...args) { return callOverrides['erasRewardPoints'](...args); };
+  const erasRewardPoints = function (...args) {
+    return callOverrides['erasRewardPoints'](...args);
+  };
   erasRewardPoints.at = callOverrides['erasRewardPoints.at'];
 
-  const currentEraPointsEarned = function (...args) { return callOverrides['currentEraPointsEarned'](...args); };
+  const currentEraPointsEarned = function (...args) {
+    return callOverrides['currentEraPointsEarned'](...args);
+  };
   currentEraPointsEarned.at = callOverrides['currentEraPointsEarned.at'];
 
-  const payee = function (...args) { return callOverrides['payee'](...args); };
+  const payee = function (...args) {
+    return callOverrides['payee'](...args);
+  };
   payee.at = callOverrides['payee.at'];
-  
-  const proposals = function (...args) { return callOverrides['treasuryProposals'](...args); };
+
+  const proposals = function (...args) {
+    return callOverrides['treasuryProposals'](...args);
+  };
   proposals.multi = callOverrides['treasuryProposalsMulti'];
 
-  const bounties = function (...args) { return callOverrides['treasuryBounties'](...args); };
+  const bounties = function (...args) {
+    return callOverrides['treasuryBounties'](...args);
+  };
   bounties.multi = callOverrides['bountiesMulti'];
 
-  return {
+  return ({
     createType: (name, value) => value,
     queryMulti: (queries) => {
-      return Promise.all(queries.map((q: any[]) => {
-        const qFunc = q[0];
-        const qArgs = q.slice(1);
-        return qFunc(...qArgs);
-      }));
+      return Promise.all(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        queries.map((q: any[]) => {
+          const qFunc = q[0];
+          const qArgs = q.slice(1);
+          return qFunc(...qArgs);
+        })
+      );
     },
     rpc: {
       chain: {
@@ -152,7 +187,7 @@ export function constructFakeApi(
       state: {
         getRuntimeVersion: callOverrides['getRuntimeVersion'],
         subscribeRuntimeVersion: callOverrides['subscribeRuntimeVersion'],
-      }
+      },
     },
     query: {
       system: {
@@ -168,7 +203,7 @@ export function constructFakeApi(
         validators,
       },
       staking: {
-        bonded,        
+        bonded,
         currentPoints: callOverrides['currentPoints'],
         activeEra: callOverrides['activeEra'],
         stakers,
@@ -215,12 +250,12 @@ export function constructFakeApi(
         concurrentReportsIndex: callOverrides['concurrentReportsIndex'],
         reports: {
           multi: callOverrides['reports.multi'],
-        }
+        },
       },
       identity: {
         identityOf,
         registrars: callOverrides['registrars'],
-      }
+      },
     },
     derive: {
       chain: {
@@ -244,7 +279,7 @@ export function constructFakeApi(
       },
       council: {
         proposals: callOverrides['councilProposalsDerive'],
-      }
-    }
-  } as unknown as ApiPromise;
+      },
+    },
+  } as unknown) as ApiPromise;
 }

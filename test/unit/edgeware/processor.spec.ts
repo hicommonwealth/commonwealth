@@ -1,36 +1,40 @@
 import chai from 'chai';
 import { Header, EventRecord, Extrinsic } from '@polkadot/types/interfaces';
+import BN from 'bn.js';
 
 import { Processor } from '../../../src/substrate/processor';
 import { EventKind, ISlash } from '../../../src/substrate/types';
+
 import { constructFakeApi } from './testUtil';
-import BN from 'bn.js';
 
 const { assert } = chai;
 
 interface IFakeEvent {
   section: string;
   method: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   phase?: {
-    isApplyExtrinsic: boolean,
-    asApplyExtrinsic: number,
-  }
+    isApplyExtrinsic: boolean;
+    asApplyExtrinsic: number;
+  };
 }
 
-const constructFakeBlock = (blockNumber: number, events: IFakeEvent[], extrinsics = []) => {
+const constructFakeBlock = (
+  blockNumber: number,
+  events: IFakeEvent[],
+  extrinsics = []
+) => {
   return {
-    header: {
+    header: ({
       hash: blockNumber,
       number: blockNumber,
-    } as unknown as Header,
-    events: events.map(
-      (event) => {
-        const phase = Object.assign({}, event.phase);
-        delete event.phase;
-        return ({ event, phase } as unknown as EventRecord);
-      }
-    ),
+    } as unknown) as Header,
+    events: events.map((event) => {
+      const phase = { ...event.phase };
+      delete event.phase;
+      return ({ event, phase } as unknown) as EventRecord;
+    }),
     versionNumber: 10,
     versionName: 'edgeware',
     extrinsics: extrinsics as Extrinsic[],
@@ -44,21 +48,21 @@ describe('Edgeware Event Processor Tests', () => {
       {
         section: 'staking',
         method: 'Slash',
-        data: [ 'Alice', '10000' ],
+        data: ['Alice', '10000'],
       },
       {
         section: 'democracy',
         method: 'Proposed',
-        data: [ '4', '100000' ],
+        data: ['4', '100000'],
       },
       {
         section: 'democracy',
         method: 'Started',
-        data: [ '5', 'Supermajorityapproval' ],
+        data: ['5', 'Supermajorityapproval'],
         phase: {
           isApplyExtrinsic: true,
           asApplyExtrinsic: 0,
-        }
+        },
       },
       {
         section: 'system',
@@ -67,13 +71,13 @@ describe('Edgeware Event Processor Tests', () => {
         phase: {
           isApplyExtrinsic: true,
           asApplyExtrinsic: 0,
-        }
+        },
       },
       {
         section: 'bounty',
         method: 'BountyProposed',
-        data: [ '1', ]
-      }
+        data: ['1'],
+      },
     ];
 
     const fakeExtrinsics = [
@@ -85,7 +89,7 @@ describe('Edgeware Event Processor Tests', () => {
         },
         signer: 'Alice',
         data: new Uint8Array(),
-      }
+      },
     ];
 
     const fakeBlocks = [
@@ -95,7 +99,7 @@ describe('Edgeware Event Processor Tests', () => {
 
     const api = constructFakeApi({
       publicProps: async () => {
-        return [ [ ], [ 4, 'hash', 'Alice' ] ];
+        return [[], [4, 'hash', 'Alice']];
       },
       electionRounds: async () => '5',
       referendumInfoOf: async (idx) => {
@@ -112,68 +116,67 @@ describe('Edgeware Event Processor Tests', () => {
               };
             },
           };
-        } else {
-          throw new Error('bad referendum idx');
         }
+        throw new Error('bad referendum idx');
       },
-      getBlockHash: async (blockNumber) => {
-        return  2
+      getBlockHash: async () => {
+        return 2;
       },
-      'currentIndex.at' : async () => new BN(12),
+      'currentIndex.at': async () => new BN(12),
     });
 
     // run test
     const processor = new Processor(api);
-    Promise.all(
-      fakeBlocks.map((block) => processor.process(block))
-    ).then((results) => {
-      assert.equal(processor.lastBlockNumber, 2);
-      assert.deepEqual(results[0], [
-        {
-          /* eslint-disable dot-notation */
-          data: {
-            kind: EventKind.Slash,
-            validator: 'Alice',
-            amount: '10000',
-          } as ISlash,
-          blockNumber: 1,
-          includeAddresses: ['Alice'],
-        },
-        {
-          data: {
-            kind: EventKind.DemocracyProposed,
-            proposalIndex: 4,
-            proposalHash: 'hash',
-            deposit: '100000',
-            proposer: 'Alice',
+    Promise.all(fakeBlocks.map((block) => processor.process(block)))
+      .then((results) => {
+        assert.equal(processor.lastBlockNumber, 2);
+        assert.deepEqual(results[0], [
+          {
+            /* eslint-disable dot-notation */
+            data: {
+              kind: EventKind.Slash,
+              validator: 'Alice',
+              amount: '10000',
+            } as ISlash,
+            blockNumber: 1,
+            includeAddresses: ['Alice'],
           },
-          excludeAddresses: ['Alice'],
-          blockNumber: 1,
-        },
-      ]);
-      assert.deepEqual(results[1], [
-        {
-          data: {
-            kind: EventKind.DemocracyStarted,
-            referendumIndex: 5,
-            proposalHash: 'hash',
-            voteThreshold: 'Supermajorityapproval',
-            endBlock: 123,
+          {
+            data: {
+              kind: EventKind.DemocracyProposed,
+              proposalIndex: 4,
+              proposalHash: 'hash',
+              deposit: '100000',
+              proposer: 'Alice',
+            },
+            excludeAddresses: ['Alice'],
+            blockNumber: 1,
           },
-          blockNumber: 2,
-        },
-        {
-          data: {
-            kind: EventKind.ElectionCandidacySubmitted,
-            candidate: 'Alice',
-            round: 5,
+        ]);
+        assert.deepEqual(results[1], [
+          {
+            data: {
+              kind: EventKind.DemocracyStarted,
+              referendumIndex: 5,
+              proposalHash: 'hash',
+              voteThreshold: 'Supermajorityapproval',
+              endBlock: 123,
+            },
+            blockNumber: 2,
           },
-          blockNumber: 2,
-          excludeAddresses: ['Alice'],
-        }
-      ]);
-      done();
-    }).catch((err) => done(err));
+          {
+            data: {
+              kind: EventKind.ElectionCandidacySubmitted,
+              candidate: 'Alice',
+              round: 5,
+            },
+            blockNumber: 2,
+            excludeAddresses: ['Alice'],
+          },
+        ]);
+        done();
+      })
+      .catch((err) => done(err));
   });
 
   it('should process old and new versions differently', (done) => {
@@ -186,7 +189,7 @@ describe('Edgeware Event Processor Tests', () => {
       {
         section: 'staking',
         method: 'Fake',
-        data: [ 'Alice', '10000' ],
+        data: ['Alice', '10000'],
       },
     ];
 
@@ -217,7 +220,7 @@ describe('Edgeware Event Processor Tests', () => {
           isApplyExtrinsic: true,
           asApplyExtrinsic: 0,
         },
-      }
+      },
     ];
     const fakeExtrinsics = [
       {
@@ -228,7 +231,7 @@ describe('Edgeware Event Processor Tests', () => {
         },
         signer: 'Alice',
         data: new Uint8Array(),
-      }
+      },
     ];
 
     const block = constructFakeBlock(1, fakeEvents, fakeExtrinsics);
@@ -253,7 +256,7 @@ describe('Edgeware Event Processor Tests', () => {
       {
         section: 'staking',
         method: 'Bonded',
-        data: [ 'Alice', '10000' ],
+        data: ['Alice', '10000'],
       },
     ];
 
@@ -266,7 +269,9 @@ describe('Edgeware Event Processor Tests', () => {
           isEmpty: true,
           isSome: false,
           value: null,
-          unwrap: () => { throw new Error('no value'); },
+          unwrap: () => {
+            throw new Error('no value');
+          },
         };
       },
     });
@@ -289,12 +294,12 @@ describe('Edgeware Event Processor Tests', () => {
       {
         section: 'staking',
         method: 'Bonded',
-        data: [ 'Alice', '10000' ],
+        data: ['Alice', '10000'],
       },
     ];
 
     const block = constructFakeBlock(1, fakeEvents);
-    const api = constructFakeApi({ });
+    const api = constructFakeApi({});
 
     const processor = new Processor(api);
     processor.process(block).then((results) => {
@@ -318,8 +323,8 @@ describe('Edgeware Event Processor Tests', () => {
         phase: {
           isApplyExtrinsic: true,
           asApplyExtrinsic: 0,
-        }
-      }
+        },
+      },
     ];
 
     const fakeExtrinsics = [
@@ -331,11 +336,11 @@ describe('Edgeware Event Processor Tests', () => {
         },
         signer: 'Alice',
         data: new Uint8Array(),
-      }
+      },
     ];
 
     const block = constructFakeBlock(1, fakeEvents, fakeExtrinsics);
-    const api = constructFakeApi({ });
+    const api = constructFakeApi({});
 
     const processor = new Processor(api);
     processor.process(block).then((results) => {
@@ -351,7 +356,7 @@ describe('Edgeware Event Processor Tests', () => {
 
   it('should ignore extrinsics with no success or failed events', (done) => {
     // setup fake data
-    const fakeEvents: IFakeEvent[] = [ ];
+    const fakeEvents: IFakeEvent[] = [];
 
     const fakeExtrinsics = [
       {
@@ -362,11 +367,11 @@ describe('Edgeware Event Processor Tests', () => {
         },
         signer: 'Alice',
         data: new Uint8Array(),
-      }
+      },
     ];
 
     const block = constructFakeBlock(1, fakeEvents, fakeExtrinsics);
-    const api = constructFakeApi({ });
+    const api = constructFakeApi({});
 
     const processor = new Processor(api);
     processor.process(block).then((results) => {

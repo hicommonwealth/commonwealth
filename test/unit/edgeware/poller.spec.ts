@@ -1,8 +1,14 @@
 import chai from 'chai';
-import { Hash, EventRecord, Header, RuntimeVersion } from '@polkadot/types/interfaces';
+import {
+  Hash,
+  EventRecord,
+  Header,
+  RuntimeVersion,
+} from '@polkadot/types/interfaces';
+
+import { Poller } from '../../../src/substrate/poller';
 
 import { constructFakeApi } from './testUtil';
-import { Poller } from '../../../src/substrate/poller';
 
 const { assert } = chai;
 
@@ -14,59 +20,60 @@ class IMockHash extends Number {
   }
 }
 
-const hashNums: number[] = [...Array(10).keys()].map((i) => i < 5 ? 0 : i);
-const hashes = hashNums.map((n) => new IMockHash(n)) as unknown as Hash[];
+const hashNums: number[] = [...Array(10).keys()].map((i) => (i < 5 ? 0 : i));
+const hashes = (hashNums.map((n) => new IMockHash(n)) as unknown) as Hash[];
 const headers: Header[] = hashNums.map((hash) => {
   if (hash === 0) {
     return undefined;
-  } else {
-    return {
-      parentHash: (hash - 1),
-      number: 100 + hash,
-      hash,
-    } as unknown as Header;
   }
+  return ({
+    parentHash: hash - 1,
+    number: 100 + hash,
+    hash,
+  } as unknown) as Header;
 });
 
 const events = {
-  6: [{ event: { data: [1] } }] as unknown as EventRecord[],
-  8: [{ event: { data: [2] } }, { event: { data: [3, 4] } }] as unknown as EventRecord[],
+  6: ([{ event: { data: [1] } }] as unknown) as EventRecord[],
+  8: ([
+    { event: { data: [2] } },
+    { event: { data: [3, 4] } },
+  ] as unknown) as EventRecord[],
 };
 
 const getMockApi = () => {
   return constructFakeApi({
-    getHeader: (hash?: Hash) => {
+    getHeader: async (hash?: Hash) => {
       if (hash === undefined) {
         hash = hashes[hashes.length - 1];
       }
-      return headers[hash as unknown as number];
+      return headers[(hash as unknown) as number];
     },
     'events.at': (hash: Hash) => {
-      return events[hash as unknown as number] || [];
+      return events[(hash as unknown) as number] || [];
     },
-    getBlockHash: (blockNumber: number) => {
+    getBlockHash: async (blockNumber: number) => {
       if (blockNumber === 2600 || blockNumber === 2400) {
         return hashes[5];
       }
       if (blockNumber >= 100 && blockNumber <= 110) {
         return hashes[blockNumber - 100];
-      } else {
-        return new IMockHash(0);
       }
+      return new IMockHash(0);
     },
-    getBlock: (hash) => {
+    getBlock: async () => {
       return {
         block: {
           extrinsics: [],
-        }
+        },
       };
     },
-    getRuntimeVersion: () => {
-      return {
+    getRuntimeVersion: async () => {
+      return ({
         specVersion: 10,
         specName: 'edgeware',
-      } as unknown as RuntimeVersion;
-    }
+      } as unknown) as RuntimeVersion;
+    },
   });
 };
 
@@ -111,7 +118,6 @@ describe('Edgeware Event Poller Tests', () => {
     assert.equal(blocks[0].versionName, 'edgeware');
   });
 
-
   it('should derive endblock from header', async () => {
     // setup mock data
     const api = getMockApi();
@@ -139,13 +145,17 @@ describe('Edgeware Event Poller Tests', () => {
     // setup test class
     const poller = new Poller(api);
 
-    assert.isUndefined(await poller.poll({
-      startBlock: 111,
-    }));
-    assert.isUndefined(await poller.poll({
-      startBlock: 100,
-      endBlock: 99,
-    }));
+    assert.isEmpty(
+      await poller.poll({
+        startBlock: 111,
+      })
+    );
+    assert.isEmpty(
+      await poller.poll({
+        startBlock: 100,
+        endBlock: 99,
+      })
+    );
   });
 
   it('should reduce size of range if too large', async () => {

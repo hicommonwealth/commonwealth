@@ -1,19 +1,18 @@
 import chai from 'chai';
+
 import { EventKind, RawEvent, Api } from '../../../src/marlin/types';
 import { Enrich } from '../../../src/marlin/filters/enricher';
 
 const { assert } = chai;
 
-const constructEvent = (data: object, section = '', typeDef: string[] = []): RawEvent => {
+const constructEvent = (data): RawEvent => {
   return {
     args: data,
   } as RawEvent;
 };
 
 const blockNumber = 10000;
-const api: Api = {} as unknown as Api;
-
-const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
+const api: Api = ({} as unknown) as Api;
 
 describe('Marlin Event Enricher Filter Tests', () => {
   // Comp Events
@@ -31,13 +30,13 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ owner, ],
+      excludeAddresses: [owner],
       data: {
         kind,
         owner,
         spender,
         amount,
-      }
+      },
     });
   });
 
@@ -55,13 +54,13 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ delegator, ],
+      excludeAddresses: [delegator],
       data: {
         kind,
         delegator,
         toDelegate,
         fromDelegate,
-      }
+      },
     });
   });
   // DelegateVotesChanged
@@ -79,18 +78,18 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ delegate, ],
+      excludeAddresses: [delegate],
       data: {
         kind,
         delegate,
         previousBalance,
         newBalance,
-      }
+      },
     });
   });
 
   // Transfer
- it('should enrich Transfer event', async () => {
+  it('should enrich Transfer event', async () => {
     const kind = EventKind.Transfer;
     const from = 'me';
     const to = 'them';
@@ -104,13 +103,13 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ from, ],
+      excludeAddresses: [from],
       data: {
         kind,
         from,
         to,
         amount,
-      }
+      },
     });
   });
 
@@ -132,7 +131,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ 'sender' ],
+      excludeAddresses: ['sender'],
       data: {
         kind,
         id: 1,
@@ -144,7 +143,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
         startBlock: blockNumber,
         endBlock: blockNumber + 172, // votingPeriod()
         description: 'test description',
-      }
+      },
     });
   });
 
@@ -161,7 +160,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
       data: {
         kind,
         id: 1,
-      }
+      },
     });
   });
 
@@ -178,7 +177,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
       data: {
         kind,
         id: 1,
-      }
+      },
     });
   });
 
@@ -198,7 +197,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
         kind,
         id: 1,
         eta,
-      }
+      },
     });
   });
 
@@ -208,7 +207,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const voter = 'i voted!';
     const id = 123;
     const support = false;
-    const votes = '525600'
+    const votes = '525600';
     const event = constructEvent({
       proposalId: id,
       voter,
@@ -218,14 +217,14 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ voter ],
+      excludeAddresses: [voter],
       data: {
         kind,
         id,
         voter,
         support,
         votes,
-      }
+      },
     });
   });
 
@@ -250,7 +249,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ ],
+      excludeAddresses: [],
       data: {
         kind,
         txHash,
@@ -259,7 +258,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
         signature,
         data,
         eta,
-      }
+      },
     });
   });
 
@@ -283,7 +282,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ ],
+      excludeAddresses: [],
       data: {
         kind,
         txHash,
@@ -292,7 +291,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
         signature,
         data,
         eta,
-      }
+      },
     });
   });
 
@@ -301,16 +300,16 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const kind = EventKind.NewAdmin;
     const newAdmin = '0xAddress';
     const event = constructEvent({
-      newAdmin
+      newAdmin,
     });
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ newAdmin ],
+      excludeAddresses: [newAdmin],
       data: {
         kind,
-        newAdmin
-      }
+        newAdmin,
+      },
     });
   });
 
@@ -319,16 +318,16 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const kind = EventKind.NewDelay;
     const newDelay = 123;
     const event = constructEvent({
-      newDelay
+      newDelay,
     });
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ ],
+      excludeAddresses: [],
       data: {
         kind,
-        newDelay
-      }
+        newDelay,
+      },
     });
   });
 
@@ -337,16 +336,16 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const kind = EventKind.NewPendingAdmin;
     const newPendingAdmin = '0xAddress';
     const event = constructEvent({
-      newPendingAdmin
+      newPendingAdmin,
     });
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ ],
+      excludeAddresses: [],
       data: {
         kind,
-        newPendingAdmin
-      }
+        newPendingAdmin,
+      },
     });
   });
 
@@ -370,7 +369,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
     const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
-      excludeAddresses: [ ],
+      excludeAddresses: [],
       data: {
         kind,
         txHash,
@@ -379,7 +378,7 @@ describe('Marlin Event Enricher Filter Tests', () => {
         signature,
         data,
         eta,
-      }
+      },
     });
   });
 });

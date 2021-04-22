@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { hexToNumberString, hexToNumber as web3HexToNumber } from 'web3-utils';
+
 import { Moloch1 } from '../contractTypes/Moloch1';
 import { CWEvent } from '../../interfaces';
 import { EventKind, RawEvent, IEventData, Api } from '../types';
@@ -26,7 +28,7 @@ export async function Enrich(
   api: Api,
   blockNumber: number,
   kind: EventKind,
-  rawData: RawEvent,
+  rawData: RawEvent
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
     case EventKind.SubmitProposal: {
@@ -41,12 +43,12 @@ export async function Enrich(
       // TODO: pull these out into class, perhaps
       const proposal = await (api as Moloch1).proposalQueue(proposalIndex);
       const startingPeriod = +proposal.startingPeriod;
-      const details = proposal.details;
+      const { details } = proposal;
       const periodDuration = +(await api.periodDuration());
       const summoningTime = +(await api.summoningTime());
       return {
         blockNumber,
-        excludeAddresses: [ memberAddress ],
+        excludeAddresses: [memberAddress],
         data: {
           kind,
           proposalIndex: hexToNumber(proposalIndex),
@@ -56,16 +58,21 @@ export async function Enrich(
           tokenTribute: hexToString(tokenTribute),
           sharesRequested: hexToString(sharesRequested),
           details,
-          startTime: summoningTime + (startingPeriod * periodDuration),
-        }
+          startTime: summoningTime + startingPeriod * periodDuration,
+        },
       };
     }
     case EventKind.SubmitVote: {
-      const { proposalIndex, delegateKey, memberAddress, uintVote } = rawData.args as any;
+      const {
+        proposalIndex,
+        delegateKey,
+        memberAddress,
+        uintVote,
+      } = rawData.args as any;
       const member = await (api as Moloch1).members(memberAddress);
       return {
         blockNumber,
-        excludeAddresses: [ memberAddress ],
+        excludeAddresses: [memberAddress],
         data: {
           kind,
           proposalIndex: hexToNumber(proposalIndex),
@@ -74,11 +81,18 @@ export async function Enrich(
           vote: uintVote,
           shares: member.shares.toString(),
           highestIndexYesVote: +member.highestIndexYesVote,
-        }
+        },
       };
     }
     case EventKind.ProcessProposal: {
-      const { proposalIndex, applicant, memberAddress, tokenTribute, sharesRequested, didPass } = rawData.args as any;
+      const {
+        proposalIndex,
+        applicant,
+        memberAddress,
+        tokenTribute,
+        sharesRequested,
+        didPass,
+      } = rawData.args as any;
       const proposal = await (api as Moloch1).proposalQueue(proposalIndex);
       return {
         blockNumber,
@@ -92,31 +106,31 @@ export async function Enrich(
           didPass,
           yesVotes: proposal.yesVotes.toString(),
           noVotes: proposal.noVotes.toString(),
-        }
+        },
       };
     }
     case EventKind.Ragequit: {
       const { memberAddress, sharesToBurn } = rawData.args as any;
       return {
         blockNumber,
-        excludeAddresses: [ memberAddress ],
+        excludeAddresses: [memberAddress],
         data: {
           kind,
           member: memberAddress,
           sharesToBurn: hexToString(sharesToBurn),
-        }
+        },
       };
     }
     case EventKind.Abort: {
       const { proposalIndex, applicantAddress } = rawData.args as any;
       return {
         blockNumber,
-        excludeAddresses: [ applicantAddress ],
+        excludeAddresses: [applicantAddress],
         data: {
           kind,
           proposalIndex: hexToNumber(proposalIndex),
           applicant: applicantAddress,
-        }
+        },
       };
     }
     case EventKind.UpdateDelegateKey: {
@@ -125,12 +139,12 @@ export async function Enrich(
         blockNumber,
         // TODO: we only alert the new delegate that the key was changed
         //   ...is this correct?
-        includeAddresses: [ newDelegateKey ],
+        includeAddresses: [newDelegateKey],
         data: {
           kind,
           member: memberAddress,
           newDelegateKey,
-        }
+        },
       };
     }
     case EventKind.SummonComplete: {
@@ -141,7 +155,7 @@ export async function Enrich(
           kind,
           summoner,
           shares: hexToString(shares),
-        }
+        },
       };
     }
     default: {

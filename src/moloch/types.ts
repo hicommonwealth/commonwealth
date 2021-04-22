@@ -1,15 +1,21 @@
 import { Event } from 'ethers';
+
 import { ISubscribeOptions } from '../interfaces';
+
 import { Moloch1 } from './contractTypes/Moloch1';
 import { Moloch2 } from './contractTypes/Moloch2';
 
 type UnPromisify<T> = T extends Promise<infer U> ? U : T;
-export type ProposalV1 = UnPromisify<ReturnType<Moloch1['functions']['proposalQueue']>>;
-export type ProposalV2 = UnPromisify<ReturnType<Moloch2['functions']['proposals']>>;
+export type ProposalV1 = UnPromisify<
+  ReturnType<Moloch1['functions']['proposalQueue']>
+>;
+export type ProposalV2 = UnPromisify<
+  ReturnType<Moloch2['functions']['proposals']>
+>;
 
 export type Api = Moloch1 | Moloch2;
 
-export const EventChains = [ 'moloch', 'moloch-local' ] as const;
+export const EventChains = ['moloch', 'moloch-local'] as const;
 
 export type RawEvent = Event;
 
@@ -17,10 +23,12 @@ export interface SubscribeOptions extends ISubscribeOptions<Api> {
   contractVersion: 1 | 2;
 }
 
+// eslint-disable-next-line no-shadow
 export enum EntityKind {
   Proposal = 'proposal',
 }
 
+// eslint-disable-next-line no-shadow
 export enum EventKind {
   SubmitProposal = 'submit-proposal',
   SubmitVote = 'submit-vote',
@@ -99,14 +107,13 @@ export interface ISummonComplete extends IEvent {
 }
 
 export type IEventData =
-  ISubmitProposal
+  | ISubmitProposal
   | ISubmitVote
   | IProcessProposal
   | IRagequit
   | IAbort
   | IUpdateDelegateKey
-  | ISummonComplete
+  | ISummonComplete;
 // eslint-disable-next-line semi-style
-;
 
 export const EventKinds: EventKind[] = Object.values(EventKind);

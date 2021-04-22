@@ -7,21 +7,44 @@ import * as MolochTypes from './moloch/types';
 import * as MarlinTypes from './marlin/types';
 
 // add other events here as union types
-export type IChainEntityKind = SubstrateTypes.EntityKind | MolochTypes.EntityKind | MarlinTypes.EntityKind;
-export type IChainEventData = SubstrateTypes.IEventData | MolochTypes.IEventData | MarlinTypes.IEventData;
-export type IChainEventKind = SubstrateTypes.EventKind | MolochTypes.EventKind | MarlinTypes.EventKind;
-export const ChainEventKinds = [...SubstrateTypes.EventKinds, ...MolochTypes.EventKinds, ...MarlinTypes.EventKinds];
-export const EventSupportingChains = [...SubstrateTypes.EventChains, ...MolochTypes.EventChains, ...MarlinTypes.EventChains] as const;
+export type IChainEntityKind =
+  | SubstrateTypes.EntityKind
+  | MolochTypes.EntityKind
+  | MarlinTypes.EntityKind;
+export type IChainEventData =
+  | SubstrateTypes.IEventData
+  | MolochTypes.IEventData
+  | MarlinTypes.IEventData;
+export type IChainEventKind =
+  | SubstrateTypes.EventKind
+  | MolochTypes.EventKind
+  | MarlinTypes.EventKind;
+export const ChainEventKinds = [
+  ...SubstrateTypes.EventKinds,
+  ...MolochTypes.EventKinds,
+  ...MarlinTypes.EventKinds,
+];
+export const EventSupportingChains = [
+  ...SubstrateTypes.EventChains,
+  ...MolochTypes.EventChains,
+  ...MarlinTypes.EventChains,
+] as const;
 export type EventSupportingChainT = typeof EventSupportingChains[number];
 
-export function chainSupportedBy<T extends readonly string[]>(c: string, eventChains: T): c is T[number] {
+export function chainSupportedBy<T extends readonly string[]>(
+  c: string,
+  eventChains: T
+): c is T[number] {
   return eventChains.some((s) => s === c);
 }
 
-export function isSupportedChain(chain: string): chain is EventSupportingChainT {
+export function isSupportedChain(
+  chain: string
+): chain is EventSupportingChainT {
   return chainSupportedBy(chain, EventSupportingChains);
 }
 
+// eslint-disable-next-line no-shadow
 export enum EntityEventKind {
   Create = 0,
   Update,
@@ -37,17 +60,18 @@ export interface CWEvent<IEventData = IChainEventData> {
 }
 
 // handles individual events by sending them off to storage/notifying
-export abstract class IEventHandler<DBEventType = any> {
+export abstract class IEventHandler<DBEventType = IChainEventData> {
   // throws on error, returns a db event, or void
-  public abstract handle(event: CWEvent, dbEvent?: DBEventType): Promise<DBEventType>;
+  public abstract handle(
+    event: CWEvent,
+    dbEvent?: DBEventType
+  ): Promise<DBEventType>;
 }
 
 // parses events out of blocks into a standard format and
 // passes them through to the handler
 export abstract class IEventProcessor<Api, RawEvent> {
-  constructor(
-    protected _api: Api,
-  ) { }
+  constructor(protected _api: Api) {}
 
   // throws on error
   public abstract process(block: RawEvent): Promise<CWEvent[]>;
@@ -55,17 +79,21 @@ export abstract class IEventProcessor<Api, RawEvent> {
 
 // fetches blocks from chain in real-time via subscription for processing
 export abstract class IEventSubscriber<Api, RawEvent> {
-  constructor(
-    protected _api: Api,
-    protected _verbose = false,
-  ) { }
+  constructor(protected _api: Api, protected _verbose = false) {}
 
-  public get api(): Api { return this._api; }
+  public get api(): Api {
+    return this._api;
+  }
 
   // throws on error
-  public abstract subscribe(cb: (event: RawEvent) => any): Promise<void>;
+  public abstract subscribe(cb: (event: RawEvent) => void): Promise<void>;
 
   public abstract unsubscribe(): void;
+}
+
+export interface IDisconnectedRange {
+  startBlock: number;
+  endBlock?: number;
 }
 
 export interface ISubscribeOptions<Api> {
@@ -79,34 +107,28 @@ export interface ISubscribeOptions<Api> {
   verbose?: boolean;
 }
 
-
 export type SubscribeFunc<
-  Api, RawEvent, Options extends ISubscribeOptions<Api>
-  > = (options: Options) => Promise<IEventSubscriber<Api, RawEvent>>;
-
-export interface IDisconnectedRange {
-  startBlock: number;
-  endBlock?: number;
-}
+  Api,
+  RawEvent,
+  Options extends ISubscribeOptions<Api>
+> = (options: Options) => Promise<IEventSubscriber<Api, RawEvent>>;
 
 // synthesizes events from chain storage
 export abstract class IStorageFetcher<Api> {
-  constructor(
-    protected _api: Api,
-  ) { }
+  constructor(protected _api: Api) {}
 
   public abstract fetch(range?: IDisconnectedRange): Promise<CWEvent[]>;
 }
 
-
 // fetches historical blocks from chain for processing
 export abstract class IEventPoller<Api, RawEvent> {
-  constructor(
-    protected _api: Api,
-  ) { }
+  constructor(protected _api: Api) {}
 
   // throws on error
-  public abstract poll(range: IDisconnectedRange, maxRange?: number): Promise<RawEvent[]>;
+  public abstract poll(
+    range: IDisconnectedRange,
+    maxRange?: number
+  ): Promise<RawEvent[]>;
 }
 
 // a set of labels used to display notifications
@@ -129,9 +151,7 @@ export interface IEventTitle {
   description: string;
 }
 
-export type TitlerFilter = (
-  kind: IChainEventKind,
-) => IEventTitle;
+export type TitlerFilter = (kind: IChainEventKind) => IEventTitle;
 
 export function entityToFieldName(entity: IChainEntityKind): string | null {
   switch (entity) {
@@ -164,163 +184,220 @@ export function entityToFieldName(entity: IChainEntityKind): string | null {
     }
     default: {
       // should be exhaustive
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const dummy: never = entity;
       return null;
     }
   }
 }
 
-export function eventToEntity(event: IChainEventKind): [ IChainEntityKind, EntityEventKind ] {
+export function eventToEntity(
+  event: IChainEventKind
+): [IChainEntityKind, EntityEventKind] {
   switch (event) {
     // Democracy Events
     case SubstrateTypes.EventKind.DemocracyProposed: {
-      return [ SubstrateTypes.EntityKind.DemocracyProposal, EntityEventKind.Create ];
+      return [
+        SubstrateTypes.EntityKind.DemocracyProposal,
+        EntityEventKind.Create,
+      ];
     }
     case SubstrateTypes.EventKind.DemocracyTabled: {
-      return [ SubstrateTypes.EntityKind.DemocracyProposal, EntityEventKind.Complete ];
+      return [
+        SubstrateTypes.EntityKind.DemocracyProposal,
+        EntityEventKind.Complete,
+      ];
     }
 
     case SubstrateTypes.EventKind.DemocracyStarted: {
-      return [ SubstrateTypes.EntityKind.DemocracyReferendum, EntityEventKind.Create ];
+      return [
+        SubstrateTypes.EntityKind.DemocracyReferendum,
+        EntityEventKind.Create,
+      ];
     }
     case SubstrateTypes.EventKind.DemocracyVoted:
     case SubstrateTypes.EventKind.DemocracyPassed: {
-      return [ SubstrateTypes.EntityKind.DemocracyReferendum, EntityEventKind.Update ];
+      return [
+        SubstrateTypes.EntityKind.DemocracyReferendum,
+        EntityEventKind.Update,
+      ];
     }
     case SubstrateTypes.EventKind.DemocracyNotPassed:
     case SubstrateTypes.EventKind.DemocracyCancelled:
     case SubstrateTypes.EventKind.DemocracyExecuted: {
-      return [ SubstrateTypes.EntityKind.DemocracyReferendum, EntityEventKind.Complete ];
+      return [
+        SubstrateTypes.EntityKind.DemocracyReferendum,
+        EntityEventKind.Complete,
+      ];
     }
 
     // Preimage Events
     case SubstrateTypes.EventKind.PreimageNoted: {
-      return [ SubstrateTypes.EntityKind.DemocracyPreimage, EntityEventKind.Create ];
+      return [
+        SubstrateTypes.EntityKind.DemocracyPreimage,
+        EntityEventKind.Create,
+      ];
     }
     case SubstrateTypes.EventKind.PreimageUsed:
     case SubstrateTypes.EventKind.PreimageInvalid:
     case SubstrateTypes.EventKind.PreimageReaped: {
-      return [ SubstrateTypes.EntityKind.DemocracyPreimage, EntityEventKind.Complete ];
+      return [
+        SubstrateTypes.EntityKind.DemocracyPreimage,
+        EntityEventKind.Complete,
+      ];
     }
 
     // Treasury Events
     case SubstrateTypes.EventKind.TreasuryProposed: {
-      return [ SubstrateTypes.EntityKind.TreasuryProposal, EntityEventKind.Create ];
+      return [
+        SubstrateTypes.EntityKind.TreasuryProposal,
+        EntityEventKind.Create,
+      ];
     }
     case SubstrateTypes.EventKind.TreasuryRejected:
     case SubstrateTypes.EventKind.TreasuryAwarded: {
-      return [ SubstrateTypes.EntityKind.TreasuryProposal, EntityEventKind.Complete ];
+      return [
+        SubstrateTypes.EntityKind.TreasuryProposal,
+        EntityEventKind.Complete,
+      ];
     }
 
     // Bounty Events
     case SubstrateTypes.EventKind.TreasuryBountyProposed: {
-      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Create ];
+      return [SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Create];
     }
     case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
-      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update ];
+      return [SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update];
     }
     case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
-      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update ];
+      return [SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update];
     }
     case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
-      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Complete ];
+      return [
+        SubstrateTypes.EntityKind.TreasuryBounty,
+        EntityEventKind.Complete,
+      ];
     }
     case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Complete ]; 
+      return [
+        SubstrateTypes.EntityKind.TreasuryBounty,
+        EntityEventKind.Complete,
+      ];
     }
     case SubstrateTypes.EventKind.TreasuryBountyExtended: {
-      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update ];
+      return [SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Update];
     }
     case SubstrateTypes.EventKind.TreasuryBountyRejected: {
-      return [ SubstrateTypes.EntityKind.TreasuryBounty, EntityEventKind.Complete ];
+      return [
+        SubstrateTypes.EntityKind.TreasuryBounty,
+        EntityEventKind.Complete,
+      ];
     }
 
     // Collective Events
     case SubstrateTypes.EventKind.CollectiveProposed: {
-      return [ SubstrateTypes.EntityKind.CollectiveProposal, EntityEventKind.Create ];
+      return [
+        SubstrateTypes.EntityKind.CollectiveProposal,
+        EntityEventKind.Create,
+      ];
     }
     case SubstrateTypes.EventKind.CollectiveVoted:
     case SubstrateTypes.EventKind.CollectiveApproved: {
-      return [ SubstrateTypes.EntityKind.CollectiveProposal, EntityEventKind.Update ];
+      return [
+        SubstrateTypes.EntityKind.CollectiveProposal,
+        EntityEventKind.Update,
+      ];
     }
     case SubstrateTypes.EventKind.CollectiveDisapproved:
     case SubstrateTypes.EventKind.CollectiveExecuted: {
-      return [ SubstrateTypes.EntityKind.CollectiveProposal, EntityEventKind.Complete ];
+      return [
+        SubstrateTypes.EntityKind.CollectiveProposal,
+        EntityEventKind.Complete,
+      ];
     }
 
     // Signaling Events
     case SubstrateTypes.EventKind.SignalingNewProposal: {
-      return [ SubstrateTypes.EntityKind.SignalingProposal, EntityEventKind.Create ];
+      return [
+        SubstrateTypes.EntityKind.SignalingProposal,
+        EntityEventKind.Create,
+      ];
     }
     case SubstrateTypes.EventKind.SignalingCommitStarted:
     case SubstrateTypes.EventKind.SignalingVotingStarted: {
-      return [ SubstrateTypes.EntityKind.SignalingProposal, EntityEventKind.Update ];
+      return [
+        SubstrateTypes.EntityKind.SignalingProposal,
+        EntityEventKind.Update,
+      ];
     }
     case SubstrateTypes.EventKind.SignalingVotingCompleted: {
-      return [ SubstrateTypes.EntityKind.SignalingProposal, EntityEventKind.Complete ];
+      return [
+        SubstrateTypes.EntityKind.SignalingProposal,
+        EntityEventKind.Complete,
+      ];
     }
 
     // Moloch Events
     case MolochTypes.EventKind.SubmitProposal: {
-      return [ MolochTypes.EntityKind.Proposal, EntityEventKind.Create ];
+      return [MolochTypes.EntityKind.Proposal, EntityEventKind.Create];
     }
     case MolochTypes.EventKind.SubmitVote: {
-      return [ MolochTypes.EntityKind.Proposal, EntityEventKind.Update ];
+      return [MolochTypes.EntityKind.Proposal, EntityEventKind.Update];
     }
     case MolochTypes.EventKind.ProcessProposal: {
-      return [ MolochTypes.EntityKind.Proposal, EntityEventKind.Complete ];
+      return [MolochTypes.EntityKind.Proposal, EntityEventKind.Complete];
     }
     case MolochTypes.EventKind.Abort: {
-      return [ MolochTypes.EntityKind.Proposal, EntityEventKind.Complete ];
+      return [MolochTypes.EntityKind.Proposal, EntityEventKind.Complete];
     }
 
     // Marlin Events
     case MarlinTypes.EventKind.Approval: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete];
     }
     case MarlinTypes.EventKind.CancelTransaction: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete];
     }
     case MarlinTypes.EventKind.DelegateChanged: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Update ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Update];
     }
     case MarlinTypes.EventKind.DelegateVotesChanged: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Update ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Update];
     }
     case MarlinTypes.EventKind.ExecuteTransaction: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete];
     }
     case MarlinTypes.EventKind.NewAdmin: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Create ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Create];
     }
     case MarlinTypes.EventKind.NewDelay: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Create ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Create];
     }
     case MarlinTypes.EventKind.NewPendingAdmin: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Create ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Create];
     }
     case MarlinTypes.EventKind.ProposalCanceled: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete];
     }
     case MarlinTypes.EventKind.ProposalCreated: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Create ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Create];
     }
     case MarlinTypes.EventKind.ProposalExecuted: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete];
     }
     case MarlinTypes.EventKind.ProposalQueued: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Update ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Update];
     }
     case MarlinTypes.EventKind.QueueTransaction: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Update ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Update];
     }
     case MarlinTypes.EventKind.Transfer: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete];
     }
     case MarlinTypes.EventKind.VoteCast: {
-      return [ MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete ];
+      return [MarlinTypes.EntityKind.Proposal, EntityEventKind.Complete];
     }
-    
+
     default: {
       return null;
     }

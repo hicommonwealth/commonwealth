@@ -1,26 +1,37 @@
 import EthDater from 'ethereum-block-by-date';
 
 import { CWEvent, IStorageFetcher, IDisconnectedRange } from '../interfaces';
+import { factory, formatFilename } from '../logging';
+
 import { IEventData, EventKind, Api, ProposalV1, ProposalV2 } from './types';
-import { Moloch1 } from './contractTypes/Moloch1';
 import { Moloch2 } from './contractTypes/Moloch2';
 
-import { factory, formatFilename } from '../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export class StorageFetcher extends IStorageFetcher<Api> {
-  constructor(protected readonly _api: Api, private readonly _version: 1 | 2, private readonly _dater: EthDater) {
+  constructor(
+    protected readonly _api: Api,
+    private readonly _version: 1 | 2,
+    private readonly _dater: EthDater
+  ) {
     super(_api);
   }
 
-  private _periodDuration: number;     // 1 period in seconds
-  private _summoningTime: number;      // starting time of contract
+  private _periodDuration: number; // 1 period in seconds
+
+  private _summoningTime: number; // starting time of contract
+
   private _abortPeriod: number;
+
   private _votingPeriod: number;
+
   private _gracePeriod: number;
+
   private _currentBlock: number;
+
   private _currentTimestamp: number;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private _isProposalV1(m: ProposalV1 | ProposalV2): m is ProposalV1 {
     return this._version === 1;
   }
@@ -29,9 +40,9 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     index: number,
     proposal: ProposalV1 | ProposalV2,
     startTime: number,
-    startBlock: number,
+    startBlock: number
   ): Promise<CWEvent<IEventData>[]> {
-    const events: CWEvent<IEventData>[] = [ ];
+    const events: CWEvent<IEventData>[] = [];
     if (this._isProposalV1(proposal)) {
       const proposedEvent: CWEvent<IEventData> = {
         blockNumber: startBlock,
@@ -44,27 +55,31 @@ export class StorageFetcher extends IStorageFetcher<Api> {
           sharesRequested: proposal.sharesRequested.toString(),
           details: proposal.details,
           startTime,
-        }
+        },
       };
       events.push(proposedEvent);
       if (proposal.aborted) {
         // derive block # from abort time
         const maximalAbortTime = Math.min(
           this._currentTimestamp,
-          (startTime + (this._abortPeriod * this._periodDuration)) * 1000
+          (startTime + this._abortPeriod * this._periodDuration) * 1000
         );
         let blockNumber;
         if (maximalAbortTime === this._currentTimestamp) {
           log.info('Still in abort window, using current timestamp.');
           blockNumber = this._currentBlock;
         } else {
-          log.info(`Passed abort window, fetching timestamp ${maximalAbortTime}`);
+          log.info(
+            `Passed abort window, fetching timestamp ${maximalAbortTime}`
+          );
           try {
             const abortBlock = await this._dater.getDate(maximalAbortTime);
             blockNumber = abortBlock.block;
           } catch (e) {
             // fake it if we can't fetch it
-            log.error(`Unable to fetch abort block from timestamp ${maximalAbortTime}: ${e.message}.`);
+            log.error(
+              `Unable to fetch abort block from timestamp ${maximalAbortTime}: ${e.message}.`
+            );
             blockNumber = startBlock + 1;
           }
         }
@@ -75,20 +90,28 @@ export class StorageFetcher extends IStorageFetcher<Api> {
             kind: EventKind.Abort,
             proposalIndex: index,
             applicant: proposal.applicant,
-          }
+          },
         };
         events.push(abortedEvent);
       } else if (proposal.processed) {
         // derive block # from process time
-        const minimalProcessTime = startTime + ((this._votingPeriod + this._gracePeriod) * this._periodDuration);
-        log.info(`Fetching minimum processed block at time ${minimalProcessTime}.`);
+        const minimalProcessTime =
+          startTime +
+          (this._votingPeriod + this._gracePeriod) * this._periodDuration;
+        log.info(
+          `Fetching minimum processed block at time ${minimalProcessTime}.`
+        );
         let blockNumber;
         try {
-          const processedBlock = await this._dater.getDate(minimalProcessTime * 1000);
+          const processedBlock = await this._dater.getDate(
+            minimalProcessTime * 1000
+          );
           blockNumber = processedBlock.block;
         } catch (e) {
           // fake it if we can't fetch it
-          log.error(`Unable to fetch processed block from timestamp ${minimalProcessTime}: ${e.message}.`);
+          log.error(
+            `Unable to fetch processed block from timestamp ${minimalProcessTime}: ${e.message}.`
+          );
           blockNumber = startBlock + 2;
         }
 
@@ -104,7 +127,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
             didPass: proposal.didPass,
             yesVotes: proposal.yesVotes.toString(),
             noVotes: proposal.noVotes.toString(),
-          }
+          },
         };
         events.push(processedEvent);
       }
@@ -123,7 +146,10 @@ export class StorageFetcher extends IStorageFetcher<Api> {
    *
    * @param range Determines the range of blocks to query events within.
    */
-  public async fetch(range?: IDisconnectedRange, fetchAllCompleted = false): Promise<CWEvent<IEventData>[]> {
+  public async fetch(
+    range?: IDisconnectedRange,
+    fetchAllCompleted = false
+  ): Promise<CWEvent<IEventData>[]> {
     // we need to fetch a few constants to convert voting periods into blocks
     this._periodDuration = +(await this._api.periodDuration());
     this._summoningTime = +(await this._api.summoningTime());
@@ -132,7 +158,9 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     this._abortPeriod = +(await this._api.abortWindow());
     this._currentBlock = +(await this._api.provider.getBlockNumber());
     log.info(`Current block: ${this._currentBlock}.`);
-    this._currentTimestamp = (await this._api.provider.getBlock(this._currentBlock)).timestamp;
+    this._currentTimestamp = (
+      await this._api.provider.getBlock(this._currentBlock)
+    ).timestamp;
     log.info(`Current timestamp: ${this._currentTimestamp}.`);
     if (!this._currentBlock) {
       log.error('Failed to fetch current block! Aborting fetch.');
@@ -145,51 +173,65 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     } else if (!range.startBlock) {
       range.startBlock = 0;
     } else if (range.startBlock >= this._currentBlock) {
-      log.error(`Start block ${range.startBlock} greater than current block ${this._currentBlock}!`);
+      log.error(
+        `Start block ${range.startBlock} greater than current block ${this._currentBlock}!`
+      );
       return [];
     }
     if (range.endBlock && range.startBlock >= range.endBlock) {
       log.error(`Invalid fetch range: ${range.startBlock}-${range.endBlock}.`);
       return [];
-    } else if (!range.endBlock) {
+    }
+    if (!range.endBlock) {
       range.endBlock = this._currentBlock;
     }
-    log.info(`Fetching Moloch entities for range: ${range.startBlock}-${range.endBlock}.`);
+    log.info(
+      `Fetching Moloch entities for range: ${range.startBlock}-${range.endBlock}.`
+    );
 
     const queueLength = +(await this._api.getProposalQueueLength());
     const results: CWEvent<IEventData>[] = [];
 
-    /* eslint-disable no-await-in-loop */
     for (let i = 0; i < queueLength; i++) {
       // work backwards through the queue, starting with the most recent
       const queuePosition = queueLength - i - 1;
-      const proposalIndex = this._version === 1
-        ? queuePosition
-        : +(await (this._api as Moloch2).proposalQueue(queuePosition));
+      const proposalIndex =
+        this._version === 1
+          ? queuePosition
+          : +(await (this._api as Moloch2).proposalQueue(queuePosition));
 
       // fetch actual proposal
-      const proposal: ProposalV1 | ProposalV2 = this._version === 1
-        ? await this._api.proposalQueue(proposalIndex)
-        : await this._api.proposals(proposalIndex);
+      const proposal: ProposalV1 | ProposalV2 =
+        this._version === 1
+          ? await this._api.proposalQueue(proposalIndex)
+          : await this._api.proposals(proposalIndex);
       log.debug(`Fetched Moloch proposal ${proposalIndex} from storage.`);
 
       // compute starting time and derive closest block number
       const startingPeriod = +proposal.startingPeriod;
-      const proposalStartingTime = (startingPeriod * this._periodDuration) + this._summoningTime;
+      const proposalStartingTime =
+        startingPeriod * this._periodDuration + this._summoningTime;
       log.debug(`Fetching block for timestamp ${proposalStartingTime}.`);
       let proposalStartBlock: number;
       try {
         const block = await this._dater.getDate(proposalStartingTime * 1000);
         proposalStartBlock = block.block;
-        log.debug(`For timestamp ${block.date}, fetched ETH block #${block.block}.`);
+        log.debug(
+          `For timestamp ${block.date}, fetched ETH block #${block.block}.`
+        );
       } catch (e) {
-        log.error(`Unable to fetch closest block to timestamp ${proposalStartingTime}: ${e.message}`);
+        log.error(
+          `Unable to fetch closest block to timestamp ${proposalStartingTime}: ${e.message}`
+        );
         log.error('Skipping proposal event fetch.');
         // eslint-disable-next-line no-continue
         continue;
       }
 
-      if (proposalStartBlock >= range.startBlock && proposalStartBlock <= range.endBlock) {
+      if (
+        proposalStartBlock >= range.startBlock &&
+        proposalStartBlock <= range.endBlock
+      ) {
         const events = await this._eventsFromProposal(
           proposalIndex,
           proposal,
@@ -201,16 +243,25 @@ export class StorageFetcher extends IStorageFetcher<Api> {
         // halt fetch once we find a completed proposal in order to save data
         // we may want to run once without this, in order to fetch backlog, or else develop a pagination
         // strategy, but for now our API usage is limited.
-        if (!fetchAllCompleted && events.find((p) => p.data.kind === EventKind.ProcessProposal)) {
-          log.debug(`Proposal ${proposalIndex} is marked processed, halting fetch.`);
+        if (
+          !fetchAllCompleted &&
+          events.find((p) => p.data.kind === EventKind.ProcessProposal)
+        ) {
+          log.debug(
+            `Proposal ${proposalIndex} is marked processed, halting fetch.`
+          );
           break;
         }
       } else if (proposalStartBlock < range.startBlock) {
-        log.debug(`Moloch proposal start block (${proposalStartBlock}) is before ${range.startBlock}, ending fetch.`);
+        log.debug(
+          `Moloch proposal start block (${proposalStartBlock}) is before ${range.startBlock}, ending fetch.`
+        );
         break;
       } else if (proposalStartBlock > range.endBlock) {
         // keep walking backwards until within range
-        log.debug(`Moloch proposal start block (${proposalStartBlock}) is after ${range.endBlock}, ending fetch.`);
+        log.debug(
+          `Moloch proposal start block (${proposalStartBlock}) is after ${range.endBlock}, ending fetch.`
+        );
       }
     }
     return results;

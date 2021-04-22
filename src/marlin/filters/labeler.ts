@@ -1,12 +1,6 @@
 import { LabelerFilter, IEventLabel } from '../../interfaces';
 import { IEventData, EventKind } from '../types';
 
-function fmtAddr(addr : string) {
-  if (!addr) return;
-  if (addr.length < 16) return addr;
-  return `${addr.slice(0, 7)}…${addr.slice(addr.length - 3)}`;
-}
-
 /**
  * This a labeler function, which takes event data and describes it in "plain english",
  * such that we can display a notification regarding its contents.
@@ -14,7 +8,7 @@ function fmtAddr(addr : string) {
 export const Label: LabelerFilter = (
   blockNumber: number,
   chainId: string,
-  data: IEventData,
+  data: IEventData
 ): IEventLabel => {
   switch (data.kind) {
     // MPond events
@@ -47,35 +41,47 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Canceled',
         label: `Proposal ${data.id} was cancelled.`,
-        linkUrl: chainId ? `/${chainId}/proposal/marlinproposal/${data.id}` : null,
+        linkUrl: chainId
+          ? `/${chainId}/proposal/marlinproposal/${data.id}`
+          : null,
       };
     }
     case EventKind.ProposalCreated: {
       return {
         heading: 'Proposal Created',
         label: `Proposal ${data.id} was created.`,
-        linkUrl: chainId ? `/${chainId}/proposal/marlinproposal/${data.id}` : null,
+        linkUrl: chainId
+          ? `/${chainId}/proposal/marlinproposal/${data.id}`
+          : null,
       };
     }
     case EventKind.ProposalExecuted: {
       return {
         heading: 'Proposal Executed',
         label: `Proposal ${data.id} was executed.`,
-        linkUrl: chainId ? `/${chainId}/proposal/marlinproposal/${data.id}` : null,
+        linkUrl: chainId
+          ? `/${chainId}/proposal/marlinproposal/${data.id}`
+          : null,
       };
     }
     case EventKind.ProposalQueued: {
       return {
         heading: 'Proposal Queued',
         label: `Proposal ${data.id} queued up. ETA: Block ${data.eta}.`,
-        linkUrl: chainId ? `/${chainId}/proposal/marlinproposal/${data.id}` : null,
+        linkUrl: chainId
+          ? `/${chainId}/proposal/marlinproposal/${data.id}`
+          : null,
       };
     }
     case EventKind.VoteCast: {
       return {
         heading: 'Vote Cast',
-        label: `Voter (${data.voter}) cast ${data.votes} votes ${data.support ? 'not' : null} in support of proposal ${data.id}.`,
-        linkUrl: chainId ? `/${chainId}/proposal/marlinproposal/${data.id}` : null,
+        label: `Voter (${data.voter}) cast ${data.votes} votes ${
+          data.support ? 'not' : null
+        } in support of proposal ${data.id}.`,
+        linkUrl: chainId
+          ? `/${chainId}/proposal/marlinproposal/${data.id}`
+          : null,
       };
     }
     // Timelock events
@@ -117,6 +123,7 @@ export const Label: LabelerFilter = (
     }
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = data;
       throw new Error('unknown event type');
     }

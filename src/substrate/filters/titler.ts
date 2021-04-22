@@ -12,7 +12,7 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
       return {
         title: 'Balance Transferred',
         description: 'A balance transfer is performed.',
-      }
+      };
     }
     /**
      * ImOnline Events
@@ -26,13 +26,14 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
     case EventKind.SomeOffline: {
       return {
         title: 'Some validators were offline ',
-        description: 'At the end of the session, at least one validator was found to be offline.',
+        description:
+          'At the end of the session, at least one validator was found to be offline.',
       };
     }
     case EventKind.AllGood: {
       return {
         title: 'All validators were online ',
-        description: 'At the end of the session, no offence was committed.'
+        description: 'At the end of the session, no offence was committed.',
       };
     }
 
@@ -42,10 +43,10 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
     case EventKind.NewSession: {
       return {
         title: 'New Session',
-        description: 'A new session begins.'
-      }
+        description: 'A new session begins.',
+      };
     }
-    
+
     /**
      * Offences Events
      */
@@ -87,7 +88,7 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
       return {
         title: 'Staking Election',
         description: 'A new validator set is elected.',
-      }
+      };
     }
 
     /**
@@ -109,7 +110,7 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
       return {
         title: 'Democracy Proposal Seconded',
         description: 'A democracy proposal is seconded.',
-      }
+      };
     }
     case EventKind.DemocracyTabled: {
       return {
@@ -166,25 +167,28 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
     case EventKind.PreimageUsed: {
       return {
         title: 'Preimage Used',
-        description: 'A democracy referendum\'s execution uses a preimage.',
+        description: "A democracy referendum's execution uses a preimage.",
       };
     }
     case EventKind.PreimageInvalid: {
       return {
         title: 'Preimage Invalid',
-        description: 'A democracy referendum\'s execution was attempted but the preimage is invalid.',
+        description:
+          "A democracy referendum's execution was attempted but the preimage is invalid.",
       };
     }
     case EventKind.PreimageMissing: {
       return {
         title: 'Preimage Missing',
-        description: 'A democracy referendum\'s execution was attempted but the preimage is missing.',
+        description:
+          "A democracy referendum's execution was attempted but the preimage is missing.",
       };
     }
     case EventKind.PreimageReaped: {
       return {
         title: 'Preimage Reaped',
-        description: 'A registered preimage is removed and the deposit is collected.',
+        description:
+          'A registered preimage is removed and the deposit is collected.',
       };
     }
 
@@ -248,7 +252,7 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
     case EventKind.TreasuryBountyExtended: {
       return {
         title: 'Treasury Bounty Expiry Extended',
-        description: 'A treasury bounty\'s expiry is extended.',
+        description: "A treasury bounty's expiry is extended.",
       };
     }
 
@@ -338,13 +342,13 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
     case EventKind.SignalingCommitStarted: {
       return {
         title: 'Signaling Proposal Commit Started',
-        description: 'A signaling proposal\'s commit phase begins.',
+        description: "A signaling proposal's commit phase begins.",
       };
     }
     case EventKind.SignalingVotingStarted: {
       return {
         title: 'Signaling Proposal Voting Started',
-        description: 'A signaling proposal\'s voting phase begins.',
+        description: "A signaling proposal's voting phase begins.",
       };
     }
     case EventKind.SignalingVotingCompleted: {
@@ -372,29 +376,30 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
       return {
         title: 'Identity Set',
         description: 'A user sets an identity.',
-      }
+      };
     }
     case EventKind.JudgementGiven: {
       return {
         title: 'Identity Judgement Given',
         description: 'A registrar passes judgement on an identity.',
-      }
+      };
     }
     case EventKind.IdentityCleared: {
       return {
         title: 'Identity Cleared',
         description: 'A user clears an identity.',
-      }
+      };
     }
     case EventKind.IdentityKilled: {
       return {
         title: 'Identity Killed',
-        description: 'A user\'s identity is rejected.',
-      }
+        description: "A user's identity is rejected.",
+      };
     }
 
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = kind;
       throw new Error('unknown event type');
     }

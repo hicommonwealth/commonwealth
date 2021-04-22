@@ -1,5 +1,9 @@
 import {
-  Header, EventRecord, Extrinsic, Event, IdentityJudgement as SubstrateJudgement,
+  Header,
+  EventRecord,
+  Extrinsic,
+  Event,
+  IdentityJudgement as SubstrateJudgement,
 } from '@polkadot/types/interfaces';
 
 export const EventChains = [
@@ -27,6 +31,7 @@ export type BigIntString = string;
 export type BlockNumber = number;
 export type AccountId = string;
 export type RuntimeVersion = number;
+// eslint-disable-next-line no-shadow
 export enum IdentityJudgement {
   Unknown = 'unknown',
   FeePaid = 'fee-paid',
@@ -36,31 +41,32 @@ export enum IdentityJudgement {
   LowQuality = 'low-quality',
   Erroneous = 'erroneous',
 }
-export interface BountyStatus {
-  isProposed: boolean,
-  isApproved: boolean,
-  isFunded: boolean,
-  isCuratorProposed: boolean,
-  asCuratorProposed: BountyStatusCuratorProposed,
-  isActive: boolean,
-  asActive: BountyStatusActive,
-  isPendingPayout: boolean,
-  asPendingPayout: BountyStatusPendingPayout,
-}
 
 export interface BountyStatusCuratorProposed {
-  curator: AccountId,
+  curator: AccountId;
 }
 
 export interface BountyStatusActive {
-  curator: AccountId,
-  updateDue: BlockNumber,
+  curator: AccountId;
+  updateDue: BlockNumber;
 }
 
 export interface BountyStatusPendingPayout {
-  curator: AccountId,
-  beneficiary: AccountId,
-  unlockAt: BlockNumber,
+  curator: AccountId;
+  beneficiary: AccountId;
+  unlockAt: BlockNumber;
+}
+
+export interface BountyStatus {
+  isProposed: boolean;
+  isApproved: boolean;
+  isFunded: boolean;
+  isCuratorProposed: boolean;
+  asCuratorProposed: BountyStatusCuratorProposed;
+  isActive: boolean;
+  asActive: BountyStatusActive;
+  isPendingPayout: boolean;
+  asPendingPayout: BountyStatusPendingPayout;
 }
 
 export function parseJudgement(j: SubstrateJudgement): IdentityJudgement {
@@ -94,6 +100,7 @@ export interface Validator {
 }
 
 // Used for grouping EventKinds together for archival purposes
+// eslint-disable-next-line no-shadow
 export enum EntityKind {
   DemocracyProposal = 'democracy-proposal',
   DemocracyReferendum = 'democracy-referendum',
@@ -112,6 +119,7 @@ export function isEvent(e: Event | Extrinsic): e is Event {
   return !(e.data instanceof Uint8Array);
 }
 
+// eslint-disable-next-line no-shadow
 export enum EventKind {
   Slash = 'slash',
   Reward = 'reward',
@@ -184,7 +192,7 @@ export enum EventKind {
   SomeOffline = 'some-offline',
 
   // offences events
-  Offence = 'offences-offence'
+  Offence = 'offences-offence',
 }
 
 interface IEvent {
@@ -225,22 +233,22 @@ export interface IOffence extends IEvent {
   offenceKind: string;
   opaqueTimeSlot: string;
   applied: boolean;
-  offenders: Array<string>
+  offenders: Array<string>;
 }
 
 // Individual Exposure
 export interface IndividualExposure {
-  who: AccountId,
-  value: string
+  who: AccountId;
+  value: string;
 }
 
 // Active Exposure
 export interface ActiveExposure {
   [key: string]: {
-    own: number,
-    total: number,
-    others: IndividualExposure[],
-  }
+    own: number;
+    total: number;
+    others: IndividualExposure[];
+  };
 }
 
 /**
@@ -253,7 +261,7 @@ export interface INewSession extends IEvent {
   waiting: Array<AccountId>;
   sessionIndex: number;
   currentEra?: number;
-  validatorInfo: { [key: string]: Validator },
+  validatorInfo: { [key: string]: Validator };
 }
 
 /**
@@ -430,53 +438,53 @@ export interface ITreasuryRejected extends IEvent {
 
 export interface ITreasuryBountyProposed extends IEvent {
   // New bounty proposal. [index]
-  kind: EventKind.TreasuryBountyProposed,
-  bountyIndex: number,
-  proposer: AccountId,
-  value: BalanceString,
-  fee: BalanceString,
-  curatorDeposit: BalanceString,
-  bond: BalanceString,
+  kind: EventKind.TreasuryBountyProposed;
+  bountyIndex: number;
+  proposer: AccountId;
+  value: BalanceString;
+  fee: BalanceString;
+  curatorDeposit: BalanceString;
+  bond: BalanceString;
 }
 
 export interface ITreasuryBountyAwarded extends IEvent {
   // A bounty is awarded to a beneficiary. [index, beneficiary]
-  kind: EventKind.TreasuryBountyAwarded,
-  bountyIndex: number,
-  beneficiary: AccountId,
+  kind: EventKind.TreasuryBountyAwarded;
+  bountyIndex: number;
+  beneficiary: AccountId;
 }
 
 export interface ITreasuryBountyRejected extends IEvent {
   // A bounty proposal was rejected; funds were slashed. [index, bond]
-  kind: EventKind.TreasuryBountyRejected,
-  bountyIndex: number,
-  bond: BalanceString,
+  kind: EventKind.TreasuryBountyRejected;
+  bountyIndex: number;
+  bond: BalanceString;
 }
 
 export interface ITreasuryBountyBecameActive extends IEvent {
   // A bounty proposal is funded and became active. [index]
-  kind: EventKind.TreasuryBountyBecameActive,
-  bountyIndex: number,
+  kind: EventKind.TreasuryBountyBecameActive;
+  bountyIndex: number;
 }
 
 export interface ITreasuryBountyClaimed extends IEvent {
   // A bounty is claimed by beneficiary. [index, payout, beneficiary]
-  kind: EventKind.TreasuryBountyClaimed,
-  bountyIndex: number,
-  payout: BalanceString,
-  beneficiary: AccountId,
+  kind: EventKind.TreasuryBountyClaimed;
+  bountyIndex: number;
+  payout: BalanceString;
+  beneficiary: AccountId;
 }
 
 export interface ITreasuryBountyCanceled extends IEvent {
   // A bounty is cancelled. [index]
-  kind: EventKind.TreasuryBountyCanceled,
-  bountyIndex: number,
+  kind: EventKind.TreasuryBountyCanceled;
+  bountyIndex: number;
 }
 
 export interface ITreasuryBountyExtended extends IEvent {
   // A bounty expiry is extended. [index]
-  kind: EventKind.TreasuryBountyExtended,
-  bountyIndex: number,
+  kind: EventKind.TreasuryBountyExtended;
+  bountyIndex: number;
 }
 
 /**
@@ -646,7 +654,7 @@ export interface AccountPoints {
 }
 
 export type IEventData =
-  ISlash
+  | ISlash
   | IReward
   | IBonded
   | IUnbonded
@@ -702,9 +710,8 @@ export type IEventData =
   | IHeartbeatReceived
   | ISomeOffline
   | IAllGood
-  | IOffence
-  // eslint-disable-next-line semi-style
-  ;
+  | IOffence;
+// eslint-disable-next-line semi-style
 
 export const EventKinds: EventKind[] = Object.values(EventKind);
 
@@ -713,21 +720,42 @@ export const EventKinds: EventKind[] = Object.values(EventKind);
  * not be relied upon for general implementations.
  */
 export type IDemocracyProposalEvents =
-  IDemocracyProposed | IDemocracySeconded | IDemocracyTabled;
+  | IDemocracyProposed
+  | IDemocracySeconded
+  | IDemocracyTabled;
 export type IDemocracyReferendumEvents =
-  IDemocracyStarted | IDemocracyVoted | IDemocracyPassed
-  | IDemocracyNotPassed | IDemocracyCancelled | IDemocracyExecuted;
+  | IDemocracyStarted
+  | IDemocracyVoted
+  | IDemocracyPassed
+  | IDemocracyNotPassed
+  | IDemocracyCancelled
+  | IDemocracyExecuted;
 export type IDemocracyPreimageEvents =
-  IPreimageNoted | IPreimageUsed | IPreimageInvalid
-  | IPreimageMissing | IPreimageReaped;
+  | IPreimageNoted
+  | IPreimageUsed
+  | IPreimageInvalid
+  | IPreimageMissing
+  | IPreimageReaped;
 export type ITreasuryProposalEvents =
-  ITreasuryProposed | ITreasuryRejected | ITreasuryAwarded;
+  | ITreasuryProposed
+  | ITreasuryRejected
+  | ITreasuryAwarded;
 export type ICollectiveProposalEvents =
-  ICollectiveProposed | ICollectiveVoted | ICollectiveApproved
-  | ICollectiveDisapproved | ICollectiveExecuted;
+  | ICollectiveProposed
+  | ICollectiveVoted
+  | ICollectiveApproved
+  | ICollectiveDisapproved
+  | ICollectiveExecuted;
 export type ISignalingProposalEvents =
-  ISignalingNewProposal | ISignalingCommitStarted
-  | ISignalingVotingStarted | ISignalingVotingCompleted;
+  | ISignalingNewProposal
+  | ISignalingCommitStarted
+  | ISignalingVotingStarted
+  | ISignalingVotingCompleted;
 export type ITreasuryBountyEvents =
-  ITreasuryBountyBecameActive | ITreasuryBountyCanceled | ITreasuryBountyClaimed | ITreasuryBountyAwarded 
-    | ITreasuryBountyExtended | ITreasuryBountyProposed | ITreasuryBountyRejected; 
+  | ITreasuryBountyBecameActive
+  | ITreasuryBountyCanceled
+  | ITreasuryBountyClaimed
+  | ITreasuryBountyAwarded
+  | ITreasuryBountyExtended
+  | ITreasuryBountyProposed
+  | ITreasuryBountyRejected;

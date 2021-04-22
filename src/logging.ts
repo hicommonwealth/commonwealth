@@ -1,5 +1,4 @@
 import {
-  LoggerFactory,
   LoggerFactoryOptions,
   LFService,
   LogGroupRule,
@@ -13,12 +12,15 @@ const options = new LoggerFactoryOptions()
   .addLogGroupRule(new LogGroupRule(new RegExp('route.+'), LogLevel.Debug))
   .addLogGroupRule(new LogGroupRule(new RegExp('.+'), LogLevel.Info));
 
-export const formatFilename = (name) => {
+export const formatFilename = (name: string): string => {
   const t = name.split('/');
   return t[t.length - 1];
 };
 
-export const factory = LFService.createNamedLoggerFactory('ChainEvents', options);
+export const factory = LFService.createNamedLoggerFactory(
+  'ChainEvents',
+  options
+);
 
 const control = getLogControl();
 

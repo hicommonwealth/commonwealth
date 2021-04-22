@@ -1,26 +1,21 @@
-import { hexToNumberString, hexToNumber as web3HexToNumber } from 'web3-utils';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CWEvent } from '../../interfaces';
 import { EventKind, RawEvent, IEventData, Api } from '../types';
-
 
 export async function Enrich(
   api: Api,
   blockNumber: number,
   kind: EventKind,
-  rawData: RawEvent,
+  rawData: RawEvent
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
     // MPond events
     case EventKind.Approval: {
-      const {
-        owner,
-        spender,
-        amount
-      } = rawData.args as any;
+      const { owner, spender, amount } = rawData.args as any;
 
       return {
         blockNumber,
-        excludeAddresses: [ owner, ],
+        excludeAddresses: [owner],
         data: {
           kind,
           owner,
@@ -30,15 +25,11 @@ export async function Enrich(
       };
     }
     case EventKind.DelegateChanged: {
-      const {
-        delegator,
-        fromDelegate,
-        toDelegate,
-      } = rawData.args as any;
+      const { delegator, fromDelegate, toDelegate } = rawData.args as any;
 
       return {
         blockNumber,
-        excludeAddresses: [ delegator ],
+        excludeAddresses: [delegator],
         data: {
           kind,
           delegator,
@@ -48,15 +39,11 @@ export async function Enrich(
       };
     }
     case EventKind.DelegateVotesChanged: {
-      const {
-        delegate,
-        previousBalance,
-        newBalance,
-      } = rawData.args as any;
+      const { delegate, previousBalance, newBalance } = rawData.args as any;
 
       return {
         blockNumber,
-        excludeAddresses: [ delegate ],
+        excludeAddresses: [delegate],
         data: {
           kind,
           delegate,
@@ -66,15 +53,11 @@ export async function Enrich(
       };
     }
     case EventKind.Transfer: {
-      const {
-        from,
-        to,
-        amount
-      } = rawData.args as any;
+      const { from, to, amount } = rawData.args as any;
 
       return {
         blockNumber,
-        excludeAddresses: [ from ],
+        excludeAddresses: [from],
         data: {
           kind,
           from,
@@ -85,7 +68,7 @@ export async function Enrich(
     }
     // GovernorAlpha Events
     case EventKind.ProposalCanceled: {
-      const { id, } = rawData.args as any;
+      const { id } = rawData.args as any;
       return {
         blockNumber,
         excludeAddresses: [],
@@ -110,7 +93,7 @@ export async function Enrich(
 
       return {
         blockNumber,
-        excludeAddresses: [ proposer ],
+        excludeAddresses: [proposer],
         data: {
           kind,
           id,
@@ -126,15 +109,15 @@ export async function Enrich(
       };
     }
     case EventKind.ProposalExecuted: {
-      const { id, } = rawData.args as any;
+      const { id } = rawData.args as any;
       return {
         blockNumber,
         excludeAddresses: [],
         data: {
           kind,
           id,
-        }
-      }
+        },
+      };
     }
     case EventKind.ProposalQueued: {
       const { id, eta } = rawData.args as any;
@@ -145,19 +128,14 @@ export async function Enrich(
           kind,
           id,
           eta,
-        }
-      }
+        },
+      };
     }
     case EventKind.VoteCast: {
-      const {
-        voter,
-        proposalId,
-        support,
-        votes,
-      } = rawData.args as any;
+      const { voter, proposalId, support, votes } = rawData.args as any;
       return {
         blockNumber,
-        excludeAddresses: [ voter, ],
+        excludeAddresses: [voter],
         data: {
           kind,
           voter,
@@ -169,7 +147,14 @@ export async function Enrich(
     }
     // Timelock events
     case EventKind.CancelTransaction: {
-      const { txHash, target, value, signature, data, eta } = rawData.args as any;
+      const {
+        txHash,
+        target,
+        value,
+        signature,
+        data,
+        eta,
+      } = rawData.args as any;
       return {
         blockNumber,
         excludeAddresses: [],
@@ -185,7 +170,14 @@ export async function Enrich(
       };
     }
     case EventKind.ExecuteTransaction: {
-      const { txHash, target, value, signature, data, eta } = rawData.args as any;
+      const {
+        txHash,
+        target,
+        value,
+        signature,
+        data,
+        eta,
+      } = rawData.args as any;
       return {
         blockNumber,
         excludeAddresses: [],
@@ -201,10 +193,10 @@ export async function Enrich(
       };
     }
     case EventKind.NewAdmin: {
-      const { newAdmin, } = rawData.args as any;
+      const { newAdmin } = rawData.args as any;
       return {
         blockNumber,
-        excludeAddresses: [ newAdmin, ],
+        excludeAddresses: [newAdmin],
         data: {
           kind,
           newAdmin,
@@ -212,7 +204,7 @@ export async function Enrich(
       };
     }
     case EventKind.NewDelay: {
-      const { newDelay, } = rawData.args as any;
+      const { newDelay } = rawData.args as any;
       return {
         blockNumber,
         excludeAddresses: [],
@@ -223,7 +215,7 @@ export async function Enrich(
       };
     }
     case EventKind.NewPendingAdmin: {
-      const { newPendingAdmin, } = rawData.args as any;
+      const { newPendingAdmin } = rawData.args as any;
       return {
         blockNumber,
         excludeAddresses: [],
@@ -234,7 +226,14 @@ export async function Enrich(
       };
     }
     case EventKind.QueueTransaction: {
-      const { txHash, target, value, signature, data, eta, } = rawData.args as any; 
+      const {
+        txHash,
+        target,
+        value,
+        signature,
+        data,
+        eta,
+      } = rawData.args as any;
       return {
         blockNumber,
         excludeAddresses: [],
@@ -255,5 +254,5 @@ export async function Enrich(
     }
   }
 
-  return { blockNumber: null, data: null, }
+  return { blockNumber: null, data: null };
 }

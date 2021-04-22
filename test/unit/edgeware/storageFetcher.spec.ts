@@ -1,15 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import chai from 'chai';
 import {
-  AccountId, BalanceOf, Registration, RegistrarInfo, TreasuryProposal, Proposal, Votes, Bounty, 
+  AccountId,
+  BalanceOf,
+  Registration,
+  RegistrarInfo,
+  TreasuryProposal,
+  Proposal,
+  Votes,
+  Bounty,
 } from '@polkadot/types/interfaces';
-import { Vec, Data, TypeRegistry, } from '@polkadot/types';
+import { Vec, Data, TypeRegistry } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
-import { DeriveReferendum, } from '@polkadot/api-derive/democracy/types';
-import { DeriveBounty, } from '@polkadot/api-derive/types';
+import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
+import { DeriveBounty } from '@polkadot/api-derive/types';
 
-
-import { constructFakeApi, constructOption, constructIdentityJudgement } from './testUtil';
 import {
   EventKind,
   IDemocracyProposed,
@@ -28,6 +34,12 @@ import {
 } from '../../../src/substrate/types';
 import { StorageFetcher } from '../../../src/substrate/storageFetcher';
 
+import {
+  constructFakeApi,
+  constructOption,
+  constructIdentityJudgement,
+} from './testUtil';
+
 const { assert } = chai;
 
 const blockNumber = 10;
@@ -38,177 +50,197 @@ const api = constructFakeApi({
   }),
 
   // identities
-  identityOfMulti: async (addrs) => addrs.map((addr, i) => {
-    if (i === 1) return constructOption();
-    if (addr === 'dave') return constructOption({
-      info: {
-        // NO DISPLAY NAME SET
-        web: new Data(new TypeRegistry(), { Raw: stringToHex(`${addr}-display-name`) }),
-      },
-      judgements: [],
-    } as unknown as Registration);
-    return constructOption({
-      info: {
-        display: new Data(new TypeRegistry(), { Raw: stringToHex(`${addr}-display-name`) }),
-      },
-      judgements: addr !== 'charlie' ? [
-        [ 0, constructIdentityJudgement(IdentityJudgement.KnownGood) ],
-        [ 1, constructIdentityJudgement(IdentityJudgement.Erroneous) ],
-      ] : [
-
-      ],
-    } as unknown as Registration)
-  }),
+  identityOfMulti: async (addrs) =>
+    addrs.map((addr, i) => {
+      if (i === 1) return constructOption();
+      if (addr === 'dave')
+        return constructOption(({
+          info: {
+            // NO DISPLAY NAME SET
+            web: new Data(new TypeRegistry(), {
+              Raw: stringToHex(`${addr}-display-name`),
+            }),
+          },
+          judgements: [],
+        } as unknown) as Registration);
+      return constructOption(({
+        info: {
+          display: new Data(new TypeRegistry(), {
+            Raw: stringToHex(`${addr}-display-name`),
+          }),
+        },
+        judgements:
+          addr !== 'charlie'
+            ? [
+                [0, constructIdentityJudgement(IdentityJudgement.KnownGood)],
+                [1, constructIdentityJudgement(IdentityJudgement.Erroneous)],
+              ]
+            : [],
+      } as unknown) as Registration);
+    }),
   registrars: async () => [
-    constructOption({ account: 'charlie' } as unknown as RegistrarInfo),
-    constructOption({ account: 'dave' } as unknown as RegistrarInfo),
+    constructOption(({ account: 'charlie' } as unknown) as RegistrarInfo),
+    constructOption(({ account: 'dave' } as unknown) as RegistrarInfo),
   ],
 
   // democracy proposals
-  publicProps: async () => [
-    [ 1, 'hash1', 'Charlie' ],
-  ],
-  depositOf: async (idx) => idx !== 1
-    ? constructOption()
-    : constructOption([ '100', [ 'Alice' ] ] as unknown as [ BalanceOf, Vec<AccountId> ] & Codec),
+  publicProps: async () => [[1, 'hash1', 'Charlie']],
+  depositOf: async (idx) =>
+    idx !== 1
+      ? constructOption()
+      : constructOption((['100', ['Alice']] as unknown) as [
+          BalanceOf,
+          Vec<AccountId>
+        ] &
+          Codec),
 
   // democracy referenda
-  referendumsActive: async () => [{
-    index: '3',
-    imageHash: 'image-hash-2',
-    status: {
-      threshold: 'Supermajorityapproval',
-      end: '100',
-    }
-  } as unknown as DeriveReferendum],
-  dispatchQueue: async () => [{
-    index: '2',
-    at: '50',
-    imageHash: 'image-hash-1',
-  }],
+  referendumsActive: async () => [
+    ({
+      index: '3',
+      imageHash: 'image-hash-2',
+      status: {
+        threshold: 'Supermajorityapproval',
+        end: '100',
+      },
+    } as unknown) as DeriveReferendum,
+  ],
+  dispatchQueue: async () => [
+    {
+      index: '2',
+      at: '50',
+      imageHash: 'image-hash-1',
+    },
+  ],
 
   // democracy preimages
-  preimages: async (hashes) => hashes.map((hash) => hash === 'image-hash-1'
-    ? ({
-      at: '10',
-      proposer: 'Alice',
-      proposal: {
-        method: 'method-1',
-        section: 'section-1',
-        args: [ 'arg-1-1', 'arg-1-2' ],
-      }
-    })
-    : hash === 'hash1'
-      ? ({
-        at: '20',
-        proposer: 'Bob',
-        proposal: {
-          method: 'method-2',
-          section: 'section-2',
-          args: [ 'arg-2-1', 'arg-2-2' ],
-        }
-      })
-      : null),
+  preimages: async (hashes) =>
+    hashes.map((hash) =>
+      hash === 'image-hash-1'
+        ? {
+            at: '10',
+            proposer: 'Alice',
+            proposal: {
+              method: 'method-1',
+              section: 'section-1',
+              args: ['arg-1-1', 'arg-1-2'],
+            },
+          }
+        : hash === 'hash1'
+        ? {
+            at: '20',
+            proposer: 'Bob',
+            proposal: {
+              method: 'method-2',
+              section: 'section-2',
+              args: ['arg-2-1', 'arg-2-2'],
+            },
+          }
+        : null
+    ),
 
   // treasury proposals
-  treasuryApprovals: async () => [ '0', '1', '2' ],
+  treasuryApprovals: async () => ['0', '1', '2'],
   treasuryProposalCount: async () => '4',
-  treasuryProposalsMulti: async (ids) => ids.length === 1 && +ids[0] === 3 ? [
-    constructOption({
-      proposer: 'Alice',
-      value: 50,
-      beneficiary: 'Bob',
-      bond: 5,
-    } as unknown as TreasuryProposal)
-  ] : [], // should not see anything else
+  treasuryProposalsMulti: async (ids) =>
+    ids.length === 1 && +ids[0] === 3
+      ? [
+          constructOption(({
+            proposer: 'Alice',
+            value: 50,
+            beneficiary: 'Bob',
+            bond: 5,
+          } as unknown) as TreasuryProposal),
+        ]
+      : [], // should not see anything else
 
   // bounty proposals
-  bountyApprovals: async () => [ '0', '1', '2' ],
+  bountyApprovals: async () => ['0', '1', '2'],
   bountyCount: async () => '3',
-  bountiesMulti: async (ids) => ids.length === 1 && +ids[0] === 3 ? [
-    constructOption({
-      proposer: 'alice',
-      value: 50,
-      fee: 10,
-      curatorDeposit: 10,
-      bond: 10,
-      status: {}
-    } as unknown as Bounty)
-  ] : [], // should not see anything else
-  bounties: async () => [{
-    bounty: {
-      proposer: 'alice',
-      value: 50,
-      fee: 10,
-      curatorDeposit: 10,
-      bond: 10,
-      status: "Proposed"
-    },
-    description: 'test bounty description',
-    index: 0,
-    proposals: [{}]
-  } as unknown as DeriveBounty],
-  
+  bountiesMulti: async (ids) =>
+    ids.length === 1 && +ids[0] === 3
+      ? [
+          constructOption(({
+            proposer: 'alice',
+            value: 50,
+            fee: 10,
+            curatorDeposit: 10,
+            bond: 10,
+            status: {},
+          } as unknown) as Bounty),
+        ]
+      : [], // should not see anything else
+  bounties: async () => [
+    ({
+      bounty: {
+        proposer: 'alice',
+        value: 50,
+        fee: 10,
+        curatorDeposit: 10,
+        bond: 10,
+        status: 'Proposed',
+      },
+      description: 'test bounty description',
+      index: 0,
+      proposals: [{}],
+    } as unknown) as DeriveBounty,
+  ],
+
   // collective proposals
-  collectiveProposals: async () => [ 'council-hash2', 'council-hash' ],
+  collectiveProposals: async () => ['council-hash2', 'council-hash'],
   votingMulti: async () => [
     constructOption(),
-    constructOption({
+    constructOption(({
       index: '15',
       threshold: '4',
       ayes: ['Alice'],
       nays: ['Bob'],
-    } as unknown as Votes)
+    } as unknown) as Votes),
   ],
   collectiveProposalOf: async (h) => {
     if (h !== 'council-hash') {
       throw new Error('invalid council proposal');
     } else {
-      return constructOption({
+      return constructOption(({
         method: 'proposal-method',
         section: 'proposal-section',
-        args: [ 'proposal-arg-1', 'proposal-arg-2' ],
-      } as unknown as Proposal);
+        args: ['proposal-arg-1', 'proposal-arg-2'],
+      } as unknown) as Proposal);
     }
   },
 
   // signaling proposals
-  inactiveProposals: async () => [
-    [ 'inactive-hash', '100']
-  ],
-  activeProposals: async () => [
-    [ 'active-hash', '200']
-  ],
-  completedProposals: async () => [
-    [ 'completed-hash', '10']
-  ],
-  signalingProposalOf: async (hash) => hash === 'inactive-hash'
-    ? constructOption({
-      author: 'Inactive Author',
-      title: 'inactive',
-      contents: 'inactive contents',
-      vote_id: '1',
-      stage: {
-        isCommit: false,
-        isVoting: false,
-        isCompleted: false,
-      }
-    } as any)
-    : hash === 'active-hash'
+  inactiveProposals: async () => [['inactive-hash', '100']],
+  activeProposals: async () => [['active-hash', '200']],
+  completedProposals: async () => [['completed-hash', '10']],
+  signalingProposalOf: async (hash) =>
+    hash === 'inactive-hash'
       ? constructOption({
-        author: 'Active Author',
-        title: 'active',
-        contents: 'active contents',
-        vote_id: '2',
-        transition_time: '250',
-        stage: {
-          isCommit: false,
-          isVoting: true,
-          isCompleted: false,
-        }
-      } as any)
+          author: 'Inactive Author',
+          title: 'inactive',
+          contents: 'inactive contents',
+          vote_id: '1',
+          stage: {
+            isCommit: false,
+            isVoting: false,
+            isCompleted: false,
+          },
+        } as any)
+      : hash === 'active-hash'
+      ? constructOption({
+          author: 'Active Author',
+          title: 'active',
+          contents: 'active contents',
+          vote_id: '2',
+          transition_time: '250',
+          stage: {
+            isCommit: false,
+            isVoting: true,
+            isCompleted: false,
+          },
+        } as any)
       : hash === 'completed-hash'
-        ? constructOption({
+      ? constructOption({
           author: 'Completed Author',
           title: 'completed',
           contents: 'completed contents',
@@ -218,35 +250,38 @@ const api = constructFakeApi({
             isCommit: false,
             isVoting: false,
             isCompleted: true,
-          }
-        } as any) : constructOption(),
-  voteRecords: async (id) => id === '1'
-    ? constructOption({
-      id: 1,
-      outcomes: [ 'inactive1', 'inactive2' ],
-      data: {
-        tally_type: 'inactive tally',
-        vote_type: 'inactive vote',
-      }
-    } as any)
-    : id === '2'
+          },
+        } as any)
+      : constructOption(),
+  voteRecords: async (id) =>
+    id === '1'
       ? constructOption({
-        id: 2,
-        outcomes: [ 'active1', 'active2' ],
-        data: {
-          tally_type: 'active tally',
-          vote_type: 'active vote',
-        }
-      } as any)
+          id: 1,
+          outcomes: ['inactive1', 'inactive2'],
+          data: {
+            tally_type: 'inactive tally',
+            vote_type: 'inactive vote',
+          },
+        } as any)
+      : id === '2'
+      ? constructOption({
+          id: 2,
+          outcomes: ['active1', 'active2'],
+          data: {
+            tally_type: 'active tally',
+            vote_type: 'active vote',
+          },
+        } as any)
       : id === '3'
-        ? constructOption({
+      ? constructOption({
           id: 3,
-          outcomes: [ 'completed1', 'completed2' ],
+          outcomes: ['completed1', 'completed2'],
           data: {
             tally_type: 'completed tally',
             vote_type: 'completed vote',
-          }
-        } as any) : constructOption(),
+          },
+        } as any)
+      : constructOption(),
 });
 
 /* eslint-disable: dot-notation */
@@ -255,41 +290,46 @@ describe('Edgeware Event Migration Tests', () => {
     const fetcher = new StorageFetcher(api);
     const events = await fetcher.fetch();
     assert.sameDeepMembers(events, [
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.DemocracyProposed,
           proposalIndex: 1,
           proposalHash: 'hash1',
           proposer: 'Charlie',
           deposit: '100',
-        } as IDemocracyProposed
+        } as IDemocracyProposed,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.DemocracyStarted,
           referendumIndex: 3,
           proposalHash: 'image-hash-2',
           voteThreshold: 'Supermajorityapproval',
           endBlock: 100,
-        } as IDemocracyStarted
+        } as IDemocracyStarted,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.DemocracyStarted,
           referendumIndex: 2,
           proposalHash: 'image-hash-1',
           voteThreshold: '',
           endBlock: 0,
-        } as IDemocracyStarted
+        } as IDemocracyStarted,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.DemocracyPassed,
           referendumIndex: 2,
           dispatchBlock: 50,
-        } as IDemocracyPassed
+        } as IDemocracyPassed,
       },
-      { blockNumber: 10,
+      {
+        blockNumber: 10,
         data: {
           kind: EventKind.PreimageNoted,
           proposalHash: 'image-hash-1',
@@ -297,11 +337,12 @@ describe('Edgeware Event Migration Tests', () => {
           preimage: {
             method: 'method-1',
             section: 'section-1',
-            args: [ 'arg-1-1', 'arg-1-2' ],
-          }
-        } as IPreimageNoted
+            args: ['arg-1-1', 'arg-1-2'],
+          },
+        } as IPreimageNoted,
       },
-      { blockNumber: 20,
+      {
+        blockNumber: 20,
         data: {
           kind: EventKind.PreimageNoted,
           proposalHash: 'hash1',
@@ -309,11 +350,12 @@ describe('Edgeware Event Migration Tests', () => {
           preimage: {
             method: 'method-2',
             section: 'section-2',
-            args: [ 'arg-2-1', 'arg-2-2' ],
-          }
-        } as IPreimageNoted
+            args: ['arg-2-1', 'arg-2-2'],
+          },
+        } as IPreimageNoted,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.TreasuryProposed,
           proposalIndex: 3,
@@ -321,9 +363,10 @@ describe('Edgeware Event Migration Tests', () => {
           value: '50',
           beneficiary: 'Bob',
           bond: '5',
-        } as ITreasuryProposed
+        } as ITreasuryProposed,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.CollectiveProposed,
           collectiveName: 'council',
@@ -334,29 +377,32 @@ describe('Edgeware Event Migration Tests', () => {
           call: {
             method: 'proposal-method',
             section: 'proposal-section',
-            args: [ 'proposal-arg-1', 'proposal-arg-2' ],
-          }
-        } as ICollectiveProposed
+            args: ['proposal-arg-1', 'proposal-arg-2'],
+          },
+        } as ICollectiveProposed,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.CollectiveVoted,
           collectiveName: 'council',
           proposalHash: 'council-hash',
           voter: 'Alice',
           vote: true,
-        } as ICollectiveVoted
+        } as ICollectiveVoted,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.CollectiveVoted,
           collectiveName: 'council',
           proposalHash: 'council-hash',
           voter: 'Bob',
           vote: false,
-        } as ICollectiveVoted
+        } as ICollectiveVoted,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.SignalingNewProposal,
           proposer: 'Inactive Author',
@@ -366,10 +412,11 @@ describe('Edgeware Event Migration Tests', () => {
           description: 'inactive contents',
           tallyType: 'inactive tally',
           voteType: 'inactive vote',
-          choices: [ 'inactive1', 'inactive2' ],
-        } as ISignalingNewProposal
+          choices: ['inactive1', 'inactive2'],
+        } as ISignalingNewProposal,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.SignalingNewProposal,
           proposer: 'Active Author',
@@ -379,10 +426,11 @@ describe('Edgeware Event Migration Tests', () => {
           description: 'active contents',
           tallyType: 'active tally',
           voteType: 'active vote',
-          choices: [ 'active1', 'active2' ],
-        } as ISignalingNewProposal
+          choices: ['active1', 'active2'],
+        } as ISignalingNewProposal,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.SignalingNewProposal,
           proposer: 'Completed Author',
@@ -392,31 +440,34 @@ describe('Edgeware Event Migration Tests', () => {
           description: 'completed contents',
           tallyType: 'completed tally',
           voteType: 'completed vote',
-          choices: [ 'completed1', 'completed2' ],
-        } as ISignalingNewProposal
+          choices: ['completed1', 'completed2'],
+        } as ISignalingNewProposal,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.SignalingVotingStarted,
           proposalHash: 'active-hash',
           voteId: '2',
           endBlock: 250,
-        } as ISignalingVotingStarted
+        } as ISignalingVotingStarted,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.SignalingVotingStarted,
           proposalHash: 'completed-hash',
           voteId: '3',
           endBlock: 100,
-        } as ISignalingVotingStarted
+        } as ISignalingVotingStarted,
       },
-      { blockNumber,
+      {
+        blockNumber,
         data: {
           kind: EventKind.SignalingVotingCompleted,
           proposalHash: 'completed-hash',
           voteId: '3',
-        } as ISignalingVotingCompleted
+        } as ISignalingVotingCompleted,
       },
       {
         blockNumber,
@@ -427,22 +478,27 @@ describe('Edgeware Event Migration Tests', () => {
           value: '50',
           fee: '10',
           curatorDeposit: '10',
-          bond: '10'
-        } as ITreasuryBountyProposed
+          bond: '10',
+        } as ITreasuryBountyProposed,
       },
       {
         blockNumber,
         data: {
           kind: 'treasury-bounty-became-active',
-          bountyIndex: 0
-        } as ITreasuryBountyBecameActive
+          bountyIndex: 0,
+        } as ITreasuryBountyBecameActive,
       },
     ]);
   });
 
   it('should generate identity-set events', async () => {
     const fetcher = new StorageFetcher(api);
-    const events = await fetcher.fetchIdentities(['alice', 'bob', 'charlie', 'dave']);
+    const events = await fetcher.fetchIdentities([
+      'alice',
+      'bob',
+      'charlie',
+      'dave',
+    ]);
     assert.sameDeepMembers(events, [
       {
         blockNumber,
@@ -450,8 +506,11 @@ describe('Edgeware Event Migration Tests', () => {
           kind: EventKind.IdentitySet,
           who: 'alice',
           displayName: 'alice-display-name',
-          judgements: [ [ 'charlie', IdentityJudgement.KnownGood ], [ 'dave', IdentityJudgement.Erroneous ] ],
-        }
+          judgements: [
+            ['charlie', IdentityJudgement.KnownGood],
+            ['dave', IdentityJudgement.Erroneous],
+          ],
+        },
       },
       {
         blockNumber,
@@ -459,9 +518,9 @@ describe('Edgeware Event Migration Tests', () => {
           kind: EventKind.IdentitySet,
           who: 'charlie',
           displayName: 'charlie-display-name',
-          judgements: [ ],
-        }
+          judgements: [],
+        },
       },
-    ])
+    ]);
   });
 });

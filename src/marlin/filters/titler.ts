@@ -63,7 +63,6 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
         title: 'Vote cast',
         description: 'A new vote has been cast.',
       };
-
     }
     // Timelock events
     case EventKind.CancelTransaction: {
@@ -104,6 +103,7 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
     }
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveMatch: never = kind;
       throw new Error('unknown event type');
     }

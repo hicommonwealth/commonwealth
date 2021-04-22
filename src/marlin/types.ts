@@ -1,15 +1,17 @@
 import { Event } from 'ethers';
-import { BigNumber, BigNumberish } from 'ethers/utils';
-import { compact } from 'underscore';
-import { ISubscribeOptions } from '../interfaces';
+
 import { MPond } from './contractTypes/MPond';
 import { GovernorAlpha } from './contractTypes/GovernorAlpha';
 import { Timelock } from './contractTypes/Timelock';
 
 // Used to unwrap promises returned by contract functions
 type UnPromisify<T> = T extends Promise<infer U> ? U : T;
-export type Proposal = UnPromisify<ReturnType<GovernorAlpha['functions']['proposals']>>
-export type Receipt = UnPromisify<ReturnType<GovernorAlpha['functions']['getReceipt']>>
+export type Proposal = UnPromisify<
+  ReturnType<GovernorAlpha['functions']['proposals']>
+>;
+export type Receipt = UnPromisify<
+  ReturnType<GovernorAlpha['functions']['getReceipt']>
+>;
 
 // API is imported contracts classes
 interface IMarlinContracts {
@@ -17,7 +19,7 @@ interface IMarlinContracts {
   comp: MPond;
   governorAlpha: GovernorAlpha;
   timelock: Timelock;
-};
+}
 
 export type Api = IMarlinContracts;
 
@@ -25,10 +27,13 @@ export const EventChains = ['marlin', 'marlin-local'] as const;
 
 export type RawEvent = Event;
 
+// eslint-disable-next-line no-shadow
 export enum EntityKind {
+  // eslint-disable-next-line no-shadow
   Proposal = 'proposal',
 }
 
+// eslint-disable-next-line no-shadow
 export enum EventKind {
   // MPond Events
   Approval = 'approval',
@@ -124,7 +129,6 @@ export interface IVoteCast extends IEvent {
   votes: Balance;
 }
 
-
 // Timelock Event Interfaces
 export interface ICancelTransaction extends IEvent {
   kind: EventKind.CancelTransaction;
@@ -173,7 +177,7 @@ export interface IQueueTransaction extends IEvent {
 
 export type IEventData =
   // MPond
-  IApproval
+  | IApproval
   | IDelegateChanged
   | IDelegateVotesChanged
   | ITransfer
@@ -189,8 +193,7 @@ export type IEventData =
   | INewAdmin
   | INewDelay
   | INewPendingAdmin
-  | IQueueTransaction
-  // eslint-disable-next-line semi-style
-;
+  | IQueueTransaction;
+// eslint-disable-next-line semi-style
 
 export const EventKinds: EventKind[] = Object.values(EventKind);
