@@ -1,5 +1,13 @@
 {
-  "extends": ["airbnb-base"],
+  "extends": [
+    "airbnb-base",
+    "plugin:prettier/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "plugins": ["@typescript-eslint"],
   "parser": "@typescript-eslint/parser",
   "settings": {
@@ -56,7 +64,6 @@
     "dot-notation": 0,
     "no-lonely-if": 0,
     "no-multi-spaces": 0,
-    "strict": 0,
     "no-await-in-loop": 0,
     "no-async-promise-executor": 0
   }
